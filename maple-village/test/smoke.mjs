@@ -1,5 +1,7 @@
 // Headless smoke test: builds the dev page, plays through the core loop with the stub, fails on any page error.
 //   node test/smoke.mjs            (screenshots land in test/shots/)
+//   ONLY="guest room|surf" node test/smoke.mjs   runs only the sections whose title contains one of the |-separated
+//   substrings (case-insensitive); "core loop" is the phone/desktop walk-through at the top.
 import { execSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { mkdirSync, readFileSync } from "node:fs";
@@ -21,13 +23,18 @@ execSync("node build.mjs --dev --once", { cwd: root, stdio: "inherit" });
 const shots = join(root, "test/shots"); mkdirSync(shots, { recursive: true });
 const url = pathToFileURL(join(root, "dist/dev.html")).href;
 const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || undefined });
-// Most checks expect a reload to start at home base: pages opt out of "pick up where Mel left off" (core.js F.where)
+// Most checks expect a reload to start at home base: pages opt out of "pick up where you left off" (core.js F.where)
 // unless they ask for it with newPage({resume: true}).
-{ const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); if (!resume) await pg.addInitScript(() => { window.__mapleNoResume = true; }); return pg; }; }
+// Pages are tracked so a section that throws before its page.close() doesn't leave its page open for the rest of the
+// run (dozens of leaked pages once crashed the browser near the end): each new section closes any left over.
+const openPages = new Set();
+{ const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); openPages.add(pg); pg.on("close", () => openPages.delete(pg)); if (!resume) await pg.addInitScript(() => { window.__mapleNoResume = true; }); return pg; }; }
 const errors = [];
+const ONLY = (process.env.ONLY || "").toLowerCase().split("|").map(x => x.trim()).filter(Boolean);
+const want = title => { const on = !ONLY.length || ONLY.some(o => title.toLowerCase().includes(o)); if (on) for (const pg of openPages) pg.close().catch(() => {}); return on; };
 const check = (cond, msg) => { if (!cond) { errors.push("FAIL: " + msg); console.log("  ✗ " + msg); } else console.log("  ✓ " + msg); };
 
-for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop", width: 1280, height: 900 }]) {
+if (want("core loop")) for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop", width: 1280, height: 900 }]) {
   console.log(`\n${vp.name}`);
   const page = await browser.newPage({ viewport: vp });
   page.on("pageerror", e => errors.push(`${vp.name} pageerror: ${e.message}`));
@@ -123,7 +130,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 // The quest board's rules (quests.js), checked straight from the module
-try {
+if (want("\nquest board rules")) try {
   console.log("\nquest board rules");
   const QB = await import(pathToFileURL(join(root, "src/game/quests.js")).href);
   const { ITEMS } = await import(pathToFileURL(join(root, "src/data/items.js")).href);
@@ -159,7 +166,7 @@ try {
   check(QB.boostedStory(H, "hazel", dayKey()) && !QB.boostedStory(H, "hana", dayKey()), "finishing a request makes that villager's next story chapter ready today");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 // A village request in the game: the board walks you to the villager, you hand it over, a heart shows in Neighbours
-try {
+if (want("\nvillage requests")) try {
   console.log("\nvillage requests");
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   page.on("pageerror", e => errors.push(`requests pageerror: ${e.message}`));
@@ -181,15 +188,14 @@ try {
   await page.screenshot({ path: join(shots, "requests-neighbours.png") });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-// Darren: Monday lunchtime he's fixing the house at home base; mid-morning he's typing at his desk indoors
-try {
-  console.log("\ndarren");
+// Home base: the weekend paper in the letterbox, the garden shed, the evening glow, and the home office indoors
+if (want("\nhome base: the paper, the shed and the office")) try {
+  console.log("\nhome base: the paper, the shed and the office");
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  page.on("pageerror", e => errors.push(`darren pageerror: ${e.message}`));
+  page.on("pageerror", e => errors.push(`home base pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&nosample=1&time=12:45&date=2026-10-05");
   await page.waitForTimeout(1200);
-  check(await page.locator('#actors [data-npc="darren"].act-repair').count() === 1, "Darren is repairing the house at lunchtime");
-  await page.screenshot({ path: join(shots, "darren-base.png") });
+  await page.screenshot({ path: join(shots, "home-base.png") });
   await page.click('[data-open="settings"]');
   await page.fill("#paperNameIn", "The Maple Gazette");
   await page.click("#paperSave");
@@ -210,7 +216,7 @@ try {
   check(await page.locator("#list li.task").count() === before, "and put back with Undo");
   await page.click("#pclose");
   await page.locator('#world [data-place="shed"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Darren's shed/.test(document.querySelector("#ctx").textContent), null, { timeout: 15000 });
+  await page.waitForFunction(() => /The garden shed/.test(document.querySelector("#ctx").textContent), null, { timeout: 15000 });
   check(await page.locator("#ctx [data-tool]").count() === 6 && await page.locator('#ctx [data-tool="harvester"]').count() === 1, "the shed sells six garden tools (the auto seeder, fertiliser and auto harvester too)");
   await page.click('#ctx [data-close]');
   await page.goto(url + "?seed=1&nosample=1&time=20:15&date=2026-10-05");
@@ -224,15 +230,15 @@ try {
   await page.waitForTimeout(600);
   await page.locator('#world [data-spot="officedoor"]').dispatchEvent("click");
   await page.waitForFunction(() => /office/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(600);
-  check(await page.locator('#actors [data-npc="darren"].act-type').count() === 1, "Darren is typing at his desk in the home office on a weekday morning");
-  await page.screenshot({ path: join(shots, "darren-desk.png") });
+  check(/office/i.test(await page.locator("#sceneName").textContent()) && await page.locator('#actors [data-npc]').count() === 0, "the home office opens off the living room, and it's yours alone");
+  await page.screenshot({ path: join(shots, "home-office.png") });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-// Family gifts: buy keepsakes and treats at the market, give them in person at home
-try {
-  console.log("\nfamily gifts");
+// Gifts for friends: buy keepsakes and treats at the market, give them in person or send them round
+if (want("\ngifts for friends")) try {
+  console.log("\ngifts for friends");
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  page.on("pageerror", e => errors.push(`family pageerror: ${e.message}`));
+  page.on("pageerror", e => errors.push(`gifts pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&nosample=1&time=10:00&date=2026-10-05");
   await page.waitForTimeout(600);
   await page.waitForTimeout(900);
@@ -245,37 +251,37 @@ try {
   await page.waitForTimeout(300);
   await page.locator('#world [data-place="market"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-shop="family"]', { timeout: 20000 });
+  check(await page.locator('#ctx [data-shop="family"]').textContent() === "Gifts", "the market has a Gifts tab");
   await page.click('#ctx [data-shop="family"]');
   for (const id of ["sandpit", "truck", "headphones", "hammock", "icecream", "kopi"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(150); }
   check(await page.locator('#ctx .item[data-id="hammock"]').textContent().then(t => /at home/.test(t)), "keepsakes are bought once and go home");
-  await page.waitForTimeout(800);
-  await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
-  await page.waitForTimeout(800);
-  check(await page.locator("#evanHold rect").count() > 0, "Evan carries his toy truck");
-  check(await page.locator("#sceneArt").innerHTML().then(h => /Sandpit/.test(h)), "the sandpit is at home base");
+  check(await page.evaluate(() => { const o = window.__mapleGame.F().fam.owned; return o.truck && o.sandpit && o.headphones && o.hammock; }), "the tin truck, the sandpit, Bo's headphones and the hammock are all kept");
+  await page.click('#ctx [data-close]').catch(() => {}); await page.waitForTimeout(300);
+  // Hana keeps the market: the ice cream (it suits any friend) goes to her in person
   await page.click('[data-open="bag"]');
-  await page.click('#bag .item[data-id="icecream"]'); await page.click('#bag [data-giveto="evan"]');
-  await page.waitForTimeout(300);
-  check(await page.locator("#evanHold path").count() > 0 && await page.locator("#evanSay").textContent().then(t => /ICE CREAM/.test(t)), "Evan gets his ice cream");
-  check(await page.locator("#panel").isHidden() && await page.locator("#evanSay .who").textContent() === "Evan", "the backpack closes so you can see Evan say thank you, with his name on the bubble");
+  await page.click('#bag .item[data-id="icecream"]');
+  check(await page.locator('#bag [data-giveto="hana"]').textContent().then(t => /here/.test(t)) && await page.locator('#bag [data-giveto="bo"]').textContent().then(t => /send it/.test(t)), "tapping a gift opens a chooser: who it suits, and whether they're here or it gets sent");
+  check(await page.locator('#bag [data-giveto]').evaluateAll(n => n.map(x => x.dataset.giveto).filter(Boolean).sort().join()) === "bo,farid,hana,mei,posy,theo,tomi", "ice cream suits any of the seven friends");
+  await page.click('#bag [data-giveto="hana"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => { const f = window.__mapleGame.F(); return !f.inv.icecream && f.fam.gifts.hana === 1 && !(f.thanks || []).length; }), "Hana gets her ice cream in person, right at the market");
+  await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05"); await page.waitForTimeout(900);   // back home: Bo's at his workshop
   await page.click('[data-open="bag"]');
   await page.click('#bag .item[data-id="kopi"]');
-  check(await page.locator('#bag [data-giveto="darren"]').textContent().then(t => /send it/.test(t)), "tapping a gift opens a chooser: who it suits, and whether they're here or it gets sent");
-  await page.click('#bag [data-giveto="darren"]'); await page.waitForTimeout(300);
-  check(await page.locator("#speech").textContent().then(t => /sent to Darren/.test(t)) && await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).thanks.length === 1), "a gift for someone who isn't here is sent round, with a thank-you note to follow");
+  await page.click('#bag [data-giveto="bo"]'); await page.waitForTimeout(300);
+  check(await page.locator("#speech").textContent().then(t => /sent to Bo/.test(t)) && await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).thanks.length === 1), "a gift for someone who isn't here is sent round, with a thank-you note to follow");
   await page.addInitScript(() => { if (!/thankspatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f || !f.thanks) return;
     f.thanks.forEach(t => { t.at = Date.now() - 60e3; }); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?seed=1&nosample=1&time=20:00&date=2026-10-05&thankspatch=1");
   await page.waitForTimeout(1000);
-  check(await page.locator('#actors [data-npc="darren"].act-rest').count() === 1, "Darren rests in his hammock in the evening");
+  check(await page.locator("#sceneArt").innerHTML().then(h => /Sandpit/.test(h)), "the sandpit is at home base");
   await page.click('[data-open="mail"]'); await page.waitForTimeout(300);
-  check(/Thank you from Darren/.test(await page.locator("#mailView").textContent()), "Darren's thank-you note arrives in the mailbox");
+  check(/Thank you from Bo/.test(await page.locator("#mailView").textContent()), "Bo's thank-you note arrives in the mailbox");
   await page.click('[data-open="mail"]').catch(() => {});
-  await page.screenshot({ path: join(shots, "family-evening.png") });
+  await page.screenshot({ path: join(shots, "gifts-evening.png") });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 // Animals: buy chicks and bunnies at the market, feed them in the run at home, upgrade the run; Pancake at the news board
-try {
+if (want("\nanimals")) try {
   console.log("\nanimals");
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   page.on("pageerror", e => errors.push(`animals pageerror: ${e.message}`));
@@ -298,7 +304,7 @@ try {
   check(await page.locator('#ctx .item[data-id="chick"]').textContent().then(t => /run is full/.test(t)), "a chick and a bunny fill the little run");
   await page.screenshot({ path: join(shots, "animals-market.png") });
   await page.click('#ctx [data-shop="me"]');
-  check(await page.locator('#ctx [data-decor="r_lights"]').count() === 1 && await page.locator('#ctx [data-decor="me_bow"]').count() === 1, "the market sells things for Mel and her room");
+  check(await page.locator('#ctx [data-decor="r_lights"]').count() === 1 && await page.locator('#ctx [data-decor="me_bow"]').count() === 1, "the market sells things for you and your room");
   await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
   await page.waitForTimeout(900);
@@ -325,7 +331,7 @@ try {
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 // Saving: a browser with no copy of its own (like the Claude app after a refresh) must load the cloud save, never overwrite it
-try {
+if (want("\nsaving")) try {
   console.log("\nsaving");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`saving pageerror: ${e.message}`));
@@ -349,74 +355,113 @@ try {
   check(st2.coins === 55 && st2.inv.strawberry === 2, `a stale page catches up with another device's save instead of overwriting it (coins ${st2.coins})`);
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // Evan's room: Evan leads, Mel waits by the door, the toddler plays, and nothing in Mel's game changes
-  console.log("\nevan's room");
+if (want("\nthe guest room")) try {
+  // The guest room (game/guests.js): invite someone from the address book; they come for three days on a written plan
+  console.log("\nthe guest room");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await page.goto(url + "?reset=1&seed=1&time=10:30");
-  await page.waitForTimeout(800);
+  page.on("pageerror", e => errors.push(`guest room pageerror: ${e.message}`));
+  const go = async q => { await page.goto(url + q); await page.waitForTimeout(1200); };
+  const here = sc => page.evaluate(async sc => { window.__mapleScene(sc); await new Promise(r => setTimeout(r, 900)); return [...document.querySelectorAll("#actors .npc[data-npc]")].map(n => n.dataset.npc); }, sc);
+  const openBook = async () => { await page.evaluate(() => { const g = document.querySelector('#world [data-spot="gbook"]'); g.dispatchEvent(new MouseEvent("click", {bubbles: true})); g.dispatchEvent(new PointerEvent("pointerdown", {bubbles: true})); g.dispatchEvent(new PointerEvent("pointerup", {bubbles: true})); });
+    await page.waitForFunction(() => /The guest book/.test(document.querySelector("#ctx").textContent), null, { timeout: 15000 }); };
+  await go("?reset=1&seed=1&nosample=1&date=2026-10-14&time=16:00");
   await page.locator('#world [data-place="home"]').dispatchEvent("click");
   await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  check(await page.locator('#world [data-spot="kiddoor"]').count() === 1, "the house has a door to Evan's room on the right");
-  const before = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")), t = JSON.parse(localStorage.getItem("fox.today")); return JSON.stringify({c: f.coins, x: f.xp, done: t.doneIds, e: t.earned}); });
+  check(await page.locator('#world [data-spot="kiddoor"]').count() === 1, "the house has a door to the guest room on the right");
   await page.locator('#world [data-spot="kiddoor"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(1500);
-  check(await page.evaluate(() => document.body.classList.contains("kidmode")) && await page.locator("#chatBtn").isHidden() && await page.locator(".hudbtns").isHidden(), "inside, the grown-up buttons are tucked away");
-  check(await page.evaluate(() => getComputedStyle(document.getElementById("mmaple")).display === "none"), "Maple stays outside");
-  const melAt = await page.evaluate(() => document.getElementById("mel").getAttribute("transform"));
-  await page.locator('#world [data-spot="snacks"]').dispatchEvent("click");
-  await page.waitForSelector("#ctx [data-snack]", { timeout: 10000 });
-  check(await page.evaluate(() => document.getElementById("mel").getAttribute("transform")) === melAt, "Evan walks to the snack cupboard while Mel waits by the door");
-  check(await page.locator("#ctx [data-snack]").count() === 5, "the snack cupboard has milk, juice, apple chips, watermelon and goldfish crackers");
-  await page.click('#ctx [data-snack="fish"]'); await page.waitForTimeout(300);
-  check(await page.locator("#panel").isHidden() && /fish|crunch/i.test(await page.locator("#evanSay").textContent()), "picking one, Evan munches it");
-  await page.locator('#world [data-spot="dino"]').dispatchEvent("click");
-  await page.waitForSelector("#kgame .kegg", { timeout: 10000 });
-  for (let i = 0; i < 4; i++) { await page.click(`[data-egg="${i}"]`); await page.click(`[data-egg="${i}"]`); }
-  check(await page.locator("#kgame .kpop").count() === 4, "the dino egg game: tap tap, a baby dinosaur hatches");
-  await page.click('[data-kid="done"]');
-  await page.locator('#world [data-spot="train"]').dispatchEvent("click");
-  await page.waitForSelector("#kgame .ktrain", { timeout: 10000 });
-  await page.click("#kgame"); await page.waitForTimeout(3300);
-  check(await page.locator("#kgame .ktrain svg").count() === 3, "the train game: off it goes, back with another carriage");
-  await page.click('[data-kid="done"]');
-  await page.locator('#world [data-spot="kbed"]').dispatchEvent("click");
-  await page.waitForFunction(() => document.getElementById("evan").style.visibility === "hidden", null, { timeout: 10000 });
-  check(await page.locator("#world .zz").count() >= 1, "Evan can sleep in his car bed");
-  await page.locator("#world").click({ position: { x: 200, y: 500 } }); await page.waitForTimeout(400);
-  check(await page.evaluate(() => document.getElementById("evan").style.visibility !== "hidden"), "and a tap wakes him");
-  check(await page.evaluate(() => { const l = [...document.querySelectorAll("#world text.lab")].find(t => /To the house/.test(t.textContent)); const m = l && /translate\(([\d.]+) ([\d.]+)\)/.exec(l.parentNode.getAttribute("transform")); return !!m && +m[1] < 90 && +m[2] > 470; }), "the door's sign sits below the door, clear of Mel");
-  await page.locator('#world [data-exit]').dispatchEvent("click");
-  await page.waitForFunction(() => !/Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 5000 }).catch(() => {});
-  check(!/Evan's room/.test(await page.locator("#sceneName").textContent()) && !(await page.evaluate(() => document.body.classList.contains("kidmode"))), "tapping the door goes back to the house");
-  const after = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")), t = JSON.parse(localStorage.getItem("fox.today")); return JSON.stringify({c: f.coins, x: f.xp, done: t.doneIds, e: t.earned}); });
-  check(before === after, "nothing in Evan's room changes Mel's game (coins, XP, quests)");
-  // hugs: Evan runs over with his arms up; a tap on him and Mel hugs back
-  await page.goto(url + "?seed=1&time=10:30&hugsoon=1");
-  await page.waitForFunction(() => document.getElementById("evan").classList.contains("hug"), null, { timeout: 25000 }).catch(() => {});
-  check(await page.evaluate(() => document.getElementById("evan").classList.contains("hug")), "now and then Evan comes over for a hug");
-  await page.locator("#evan").dispatchEvent("click"); await page.waitForTimeout(300);
-  check(await page.evaluate(() => document.getElementById("mel").classList.contains("hugging")) && !(await page.locator("#melSay").isHidden()), "tap him and Mel hugs him back");
-  // bedtime: 8pm to 7am Evan is asleep in his room
-  await page.goto(url + "?seed=1&time=21:00");
-  await page.waitForTimeout(800);
-  check(await page.evaluate(() => getComputedStyle(document.getElementById("evan")).display === "none"), "after 8pm Evan isn't out playing");
-  await page.locator('#world [data-place="home"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.locator('#world [data-spot="kiddoor"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(800);
-  await page.locator("#world").click({ position: { x: 200, y: 500 } }); await page.waitForTimeout(300);
-  check(await page.locator("#world .zz").count() >= 1 && /shh/.test(await page.locator("#evanSay").textContent()), "at night he's asleep in his car bed, and stays asleep");
-  await page.screenshot({ path: join(shots, "evan-room-night.png") });
-  await page.locator('#world [data-exit]').dispatchEvent("click");
-  await page.waitForFunction(() => !/Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 5000 }).catch(() => {});
-  check(!/Evan's room/.test(await page.locator("#sceneName").textContent()), "the door still works while he's asleep");
+  await page.waitForFunction(() => /guest room/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(800);
+  check(await page.locator("#world [data-spot]").evaluateAll(n => ["gbed", "gbook", "gwardrobe", "gshelf"].every(k => n.some(x => x.dataset.spot === k))), "the guest room: a bed, the guest book on the desk, a wardrobe and a bookshelf");
+  await openBook();
+  check(/Nobody to invite yet/.test(await page.locator("#ctx").textContent()), "with an empty address book there's nobody to invite yet");
+  await page.evaluate(() => { const F = window.__mapleGame.F(); F.met = {...(F.met || {}), jason: true}; F.book = {ids: {jason: "2026-10-01"}, sent: []}; window.__mapleGame.render(); });
+  await page.waitForTimeout(400); await openBook().catch(() => {});
+  check(await page.locator('#ctx [data-guest="ask:jason"]').textContent().then(t => /Ornella/.test(t) && /Cinque Terre/.test(t)), "the guest book offers everyone in the address book (Ornella, from Cinque Terre)");
+  await page.click('#ctx [data-guest="ask:jason"]'); await page.waitForTimeout(500);
+  check(await page.evaluate(() => JSON.stringify(window.__mapleGame.F().guest)) === JSON.stringify({id: "jason", day: "2026-10-15", asked: "2026-10-14"}) && /coming tomorrow on the 10:30 train, for 3 days/.test(await page.locator("#ctx").textContent()), "invited: she's coming tomorrow on the 10:30 train, for three days");
+  check(await page.locator('#ctx [data-guest="cancel"]').count() === 1, "until then it can be put off");
+  check(!(await here("kidroom")).includes("jason"), "nobody in the guest room the evening before");
+  await go("?seed=1&nosample=1&date=2026-10-15&time=10:45");
+  check((await here("hlane")).includes("jason"), "the next morning she's off the 10:30 train at Honeybrook station");
+  await page.click('[data-open="friend"]'); await page.waitForTimeout(400);
+  check(await page.locator("#friendView").textContent().then(t => /Staying with you\s*Ornella/.test(t)), "Who's where lists her first, under Staying with you");
+  await page.click("#pclose");
+  await go("?seed=1&nosample=1&date=2026-10-15&time=23:00");
+  check((await here("kidroom")).includes("jason"), "at night she's asleep in the guest room");
+  await go("?seed=1&nosample=1&date=2026-10-16&time=14:30");
+  await page.evaluate(() => window.__mapleScene("kidroom")); await page.waitForTimeout(900);
+  await openBook();
+  check(await page.locator("#ctx").textContent().then(t => /Ornella is staying/.test(t) && /Day 2 of 3/.test(t) && /Today's plan/.test(t)), "the guest book shows today's plan while she's here (day 2 of 3)");
+  check(await page.evaluate(() => window.__mapleGame.F().guestLog.jason.includes("2026-10-15")), "and she's signed the book");
+  await go("?seed=1&nosample=1&date=2026-10-17&time=12:00");
+  check(!(await here("hlane")).includes("jason") && !(await here("kidroom")).includes("jason"), "after the 11 o'clock train on the third day she's gone");
+  check(!(await page.evaluate(() => window.__mapleGame.mail().unread)).some(m => /^guest-/.test(m)), "no thank-you letter yet on the day she goes");
+  await go("?seed=1&nosample=1&date=2026-10-18&time=10:00");
+  check((await page.evaluate(() => window.__mapleGame.mail().unread)).includes("guest-jason-2026-10-15"), "the morning after, her thank-you letter arrives");
+  await page.click('[data-open="friend"]'); await page.waitForTimeout(400);
+  check(!/Staying with you/.test(await page.locator("#friendView").textContent()), "and she's off Who's where");
+  await page.click("#pclose");
+  await page.click('[data-open="mail"]'); await page.waitForTimeout(300);
+  check(/Thank you from Ornella/.test(await page.locator("#mailView").textContent()), "headed Thank you from Ornella");
+  await page.click('[data-open="mail"]').catch(() => {});
+  const GU = await import(pathToFileURL(join(root, "src/game/guests.js")).href);
+  const G = {guest: {id: "jason", day: "2026-10-15", asked: "2026-10-14"}};
+  check(!GU.canInvite(G, "2026-10-16") && GU.canInvite(G, "2026-10-18") && !GU.cancel(G, "2026-10-15") && GU.cancel({guest: {id: "jason", day: "2026-10-15"}}, "2026-10-14"), "one guest at a time; a booking can be put off only before the day");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // My routines: the noticeboard in Mel's room
+if (want("\nthe setup card")) try {
+  // A new game: the opening story (game/intro.js), then character creation (game/setup.js): a name, how you look, and a
+  // pet. Dev builds skip both unless the URL asks (?setup=1).
+  console.log("\nthe setup card");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`setup pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&time=10:00"); await page.waitForTimeout(1200);
+  check(await page.locator("#setup").isHidden().catch(() => true) && await page.evaluate(() => { const F = window.__mapleGame.F(); return F.pet === "fox" && F.name === "Ember" && F.me && F.me.name === ""; }), "dev builds skip the setup card: a fox called Ember, and no name yet");
+  await page.goto(url + "?reset=1&setup=1&time=10:00"); await page.waitForTimeout(1600);
+  check(await page.locator("#intro").isVisible() && await page.locator('#intro [data-in="skip"]').count() === 1, "a new game opens on the story, which can be skipped");
+  await page.click('#intro [data-in="skip"]'); await page.waitForTimeout(800);
+  check(await page.locator("#setup").isVisible() && await page.evaluate(() => window.__mapleGame.F().introSeen === true), "then the setup card (and the story's marked as seen)");
+  await page.fill("#suName", "Robin"); await page.click('[data-su="go:look"]'); await page.waitForTimeout(300);
+  await page.click('[data-su="body:man"]'); await page.click('[data-su="go:pet"]'); await page.waitForTimeout(300);
+  await page.click('[data-su="pet:capybara"]'); await page.waitForTimeout(300); await page.click('[data-su="done"]'); await page.waitForTimeout(1500);
+  const me = await page.evaluate(() => { const F = window.__mapleGame.F(); return {name: F.me && F.me.name, pet: F.pet, pname: F.name}; });
+  check(me.name === "Robin" && me.pet === "capybara" && me.pname === "Mochi", `a name, a look and a pet: ${me.name}, with a capybara called ${me.pname}`);
+  check(await page.locator("#setup").isHidden().catch(() => true) && await page.locator("#mmaple").evaluate(e => e.innerHTML.length > 50), "the card closes and the capybara follows you about");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nAda's haberdashery and Idris the tailor")) try {
+  // Sewing (game/tailor.js, data/sewing.js, F.sew): fabric and buttons from Ada (scene "chico"), a design made up by Idris
+  // (scene "luna") for his fee, ready the next morning from nine, then worn from the wardrobe
+  console.log("\nAda's haberdashery and Idris the tailor");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`sewing pageerror: ${e.message}`));
+  const tap = sel => page.evaluate(s => document.querySelector(s).dispatchEvent(new MouseEvent("click", {bubbles: true})), sel);
+  const coins = () => page.evaluate(() => window.__mapleGame.F().coins);
+  await page.goto(url + "?reset=1&seed=1&nosample=1&date=2026-10-19&time=10:00"); await page.waitForTimeout(1000);
+  await page.evaluate(() => { window.__mapleGame.F().coins = 300; window.__mapleScene("chico"); }); await page.waitForTimeout(900);
+  await tap('#world [data-spot="habcounter"]'); await page.waitForSelector('#ctx [data-sew="buy:4"]', { timeout: 15000 });
+  await page.click('[data-sew="pat:gingham"]'); await page.click('[data-sew="col:#E8566C"]'); await page.click('[data-sew="buy:4"]'); await page.waitForTimeout(300);
+  await page.click('[data-sew="tab:buttons"]'); await page.click('[data-sew="btn:shell"]'); await page.waitForTimeout(300);
+  await page.click('[data-sew="tab:basket"]'); await page.waitForTimeout(300);
+  check(await page.locator("#ctx").innerText().then(t => /gingham cotton × 4/i.test(t) && /Shell buttons × 1/.test(t)) && await coins() < 300, "at Ada's: four pieces of gingham and a card of shell buttons in the sewing basket");
+  await page.evaluate(() => window.__mapleScene("luna")); await page.waitForTimeout(900);
+  await tap('#world [data-spot="tailtable"]'); await page.waitForSelector('#ctx [data-sew="kind:dress"]', { timeout: 15000 });
+  await page.click('[data-sew="kind:dress"]'); await page.click('[data-sew="sleeves:puff"]'); await page.click('[data-sew="neck:collar"]'); await page.click('[data-sew="buttons:shell"]'); await page.click('[data-sew="pockets:1"]'); await page.waitForTimeout(400);
+  check(await page.locator("#ctx .tlprev").count() === 1, "at Idris's table: a dress designed, with a preview");
+  const c0 = await coins(); await page.click('[data-sew="order"]'); await page.waitForTimeout(600);
+  check(await coins() === c0 - 40 && /Tomorrow from nine/.test(await page.locator("#ctx").innerText()), "ordered: only his fee comes off (40), and it's ready tomorrow from nine");
+  await page.goto(url + "?seed=1&nosample=1&date=2026-10-20&time=10:00"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("luna")); await page.waitForTimeout(900);
+  await tap('#world [data-spot="rail"]'); await page.waitForSelector('#ctx [data-sew="collect"]', { timeout: 15000 });
+  await page.click('[data-sew="collect"]'); await page.waitForTimeout(600);
+  check(await page.evaluate(() => window.__mapleGame.F().sew.clothes.map(c => c.name).join()) === "Poppy gingham cotton dress", "the next morning the dress is on the rail to collect");
+  await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(900);
+  await tap('#world [data-spot="wardrobe"]'); await page.waitForSelector("#ctx [data-wear]", { timeout: 15000 });
+  await page.locator("#ctx [data-wear]").first().click(); await page.waitForTimeout(800);
+  check(await page.evaluate(() => !!window.__mapleGame.F().sew.wear.dress) && await page.locator("#mel .clTorso").evaluate(e => e.innerHTML.length > 50), "worn from the wardrobe: you're in your new dress");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nmy routines")) try {
+  // My routines: the noticeboard in your room
   console.log("\nmy routines");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.goto(url + "?reset=1&seed=1&time=08:30&date=2026-10-07");
@@ -437,7 +482,7 @@ try {
   const coins1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
   check(coins1 - coins0 === (steps - 1) + 8, `each routine step earns a coin and finishing the routine earns an 8-coin bonus, once a day (+${coins1 - coins0})`);
   await page.click('#ctx [data-rt="sel"]:has-text("Beauty")'); await page.click('#ctx [data-rt="edit"]');
-  check(await page.locator('#ctx [data-day="sun"]').inputValue() === "Air shot micro-needling + face mask", "Mel's beauty week is already on the board");
+  check(await page.locator('#ctx [data-day="sun"]').inputValue() === "Air shot micro-needling + face mask", "your beauty week is already on the board");
   await page.click("#ctx .rpaste summary");
   await page.fill("#rtPaste", "Mon: double cleanse\nTue - hair mask\nWednesday: exfoliate\nThu: sheet mask\nFri. nails\nSun: rest");
   await page.click('#ctx [data-rt="paste"]'); await page.waitForTimeout(150);
@@ -454,7 +499,7 @@ try {
   await page.screenshot({ path: join(shots, "routines.png") });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\ntrophy room")) try {
   // Trophy room: off the town hall; trophies on pedestals, the trophy book, affirmations, kind words
   console.log("\ntrophy room");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -486,12 +531,12 @@ try {
   check((await page.locator("#ctx .tpage h3").first().textContent()) === name && await page.locator("#ctx .tpage svg").count() >= 1, "a trophy can go into the trophy book: a page with a polaroid and the story");
   await page.click("#pclose"); await page.waitForTimeout(200);
   await page.locator('#world [data-spot="bench"]').dispatchEvent("click"); await page.waitForTimeout(2500);
-  check(await page.evaluate(() => document.getElementById("mel").classList.contains("sit")), "Mel can sit on the bench");
+  check(await page.evaluate(() => document.getElementById("mel").classList.contains("sit")), "you can sit on the bench");
   check(await page.locator("#world [data-pigeon]").count() >= 2 && await page.locator('#world [data-spot="fountain"]').count() === 1, "with a fountain and pigeons pecking about");
   await page.screenshot({ path: join(shots, "courtyard.png") });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\njournal, bedtime, backup")) try {
   // The journal (writing desk), bedtime, backup
   console.log("\njournal, bedtime, backup");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -508,12 +553,12 @@ try {
   check(await page.locator("#ctx .jlist details").count() === 1, "a journal page is kept at the writing desk");
   await page.click("#pclose");
   await page.click('[data-open="settings"]'); await page.click("#setBackup"); await page.waitForTimeout(300);
-  check(await page.evaluate(() => window.__download && /maples-village-backup-.*\.json/.test(window.__download.filename) && window.__download.size > 200), "Settings can download a backup of the whole game");
+  check(await page.evaluate(() => window.__download && /honeybrook-backup-.*\.json/.test(window.__download.filename) && window.__download.size > 200), "Settings can download a backup of the whole game");
   check(await page.locator("#setBed").isChecked(), "Stay in bed is on by default");
   await page.click("#pclose");
   await page.addInitScript(() => { window.__said = []; new MutationObserver(() => { const t = document.getElementById("speech"); if (t) window.__said.push(t.textContent); }).observe(document, {subtree: true, childList: true, characterData: true}); });
   await page.goto(url + "?seed=1&time=23:02"); await page.waitForTimeout(14000);
-  check(await page.evaluate(() => (window.__said || []).some(t => /Time to start winding down/.test(t))), "from 11pm Maple offers a calm wind-down line");
+  check(await page.evaluate(() => (window.__said || []).some(t => /Time to start winding down/.test(t))), "from 11pm your pet offers a calm wind-down line");
   check(await page.evaluate(() => new Set((window.__said || []).filter(t => /winding down|Teeth, then skincare|Phone on charge/.test(t))).size <= 1), "and only one every half a minute or so, with no nagging");
   await page.goto(url + "?seed=1&time=23:50"); await page.waitForTimeout(2500);
   check(!(await page.locator("#bedLock").isHidden()) && await page.evaluate(() => document.body.classList.contains("bedlocked")), "from 11:45pm the village rests: everything waits until 6am");
@@ -525,10 +570,10 @@ try {
   await page.click("#bedNo"); await page.waitForTimeout(300);
   check(!(await page.locator("#bedLock").isHidden()) && await page.locator("#bedUp").isVisible(), "\"Back to sleep\" keeps the village resting");
   await page.click("#bedUp"); await page.click("#bedYes"); await page.waitForTimeout(1500);
-  check(await page.locator("#bedLock").isHidden(), "unless Mel really needs to get up (just for tonight)");
+  check(await page.locator("#bedLock").isHidden(), "unless you really need to get up (just for tonight)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\ntasting room")) try {
   // The tasting room's small plates and the kitchen
   console.log("\ntasting room");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -537,7 +582,7 @@ try {
     if (q.includes("rvpatch")) f.history = Object.assign(f.history || {}, {"2026-10-05": {q: 4, steps: 6200, water: 1500, harvest: 2, coins: 30}, "2026-10-07": {q: 6, steps: 7400, water: 2000, harvest: 1, coins: 44}});
     if (q.includes("menupatch")) { f.coins = 40; f.inv = Object.assign(f.inv || {}, {potato: 2}); }
     if (q.includes("menupatch")) { f.inv = Object.assign(f.inv || {}, {flour: 1, egg: 2, olives: 1}); }
-    if (q.includes("menupatch")) { f.vine = f.vine || {}; f.vine.help = Object.assign(f.vine.help || {}, {cook: false}); }   // Mel cooks herself here (Pilar has her own test)
+    if (q.includes("menupatch")) { f.vine = f.vine || {}; f.vine.help = Object.assign(f.vine.help || {}, {cook: false}); }   // you cook yourself here (Pilar has her own test)
     if (q.includes("dinnerpatch")) { (f.vine.tapasList || []).forEach(t => { t.day = "2026-01-01"; }); }
     if (q.includes("goatpatch")) { f.coins = 200; f.pets = f.pets || {run: 0, animals: [], next: 1}; f.pets.animals = [{id: "g1", kind: "goat", name: "Biscuit", born: Date.now(), feeds: 3, fedDay: null, col: 0}]; f.inv = Object.assign(f.inv || {}, {goatfeed: 1}); }
     if (q.includes("platepatch")) { f.vine = f.vine || {}; f.vine.shelf = [{id: "w9", name: "Test Red", type: "red", n: 40, price: 24, open: 0}]; f.vine.menu = {cheese: 40}; f.vine.lastTick = Date.now() - 600*60e3; }
@@ -602,7 +647,7 @@ try {
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.plates > 0), "villagers order small plates with their wine");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nthe vineyard")) try {
   // The vineyard: grow grapes, ferment and bottle wine, sell it in the wine shop; workers water, an assistant serves
   console.log("\nthe vineyard");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -645,8 +690,8 @@ try {
   const ph = await page.locator('#vyName0').getAttribute("placeholder"); await page.click('#ctx [data-vy="suggest"]'); await page.waitForTimeout(300);
   const sug = await page.locator('#vyName0').inputValue();
   check(ph && sug && ph !== "Name it" && sug !== ph && sug.length > 3, `a ready barrel suggests names (${ph}; ${sug})`);
-  await page.fill('#vyName0', "Evan's Blush"); await page.click('#ctx [data-vy="bottle"]');
-  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.cellar.some(c => c.name === "Evan's Blush" && c.n === 6)), "a ready barrel is named and bottled: six bottles in the cellar");
+  await page.fill('#vyName0', "Rosy Blush"); await page.click('#ctx [data-vy="bottle"]');
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.cellar.some(c => c.name === "Rosy Blush" && c.n === 6)), "a ready barrel is named and bottled: six bottles in the cellar");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-place="wineshop"]').dispatchEvent("click");
   await page.waitForFunction(() => /wine shop/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
@@ -654,19 +699,19 @@ try {
   check(await page.locator('#actors [data-npc="celeste"]').count() === 1, "Celeste is behind the wine shop counter");
   await page.locator('#world [data-spot="wshelf"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-vystock]', { timeout: 15000 }); await page.click('#ctx [data-vystock]');
-  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.shelf.some(s => s.name === "Evan's Blush" && s.n === 6)), "the bottles are stocked on the shop shelves");
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.shelf.some(s => s.name === "Rosy Blush" && s.n === 6)), "the bottles are stocked on the shop shelves");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-spot="menu"]').dispatchEvent("click");
   await page.waitForSelector("#ctx .chalk", { timeout: 15000 });
-  check(/Today's menu/.test(await page.locator("#ctx h2").textContent()) && /Evan's Blush/.test(await page.locator("#ctx").textContent()), "the chalkboard opens today's menu: what's available, with prices");
+  check(/Today's menu/.test(await page.locator("#ctx h2").textContent()) && /Rosy Blush/.test(await page.locator("#ctx").textContent()), "the chalkboard opens today's menu: what's available, with prices");
   await page.click('#ctx [data-close]');
-  // customers while Mel's away: back-date the last tick, sales land in the honesty box
+  // customers while you're away: back-date the last tick, sales land in the honesty box
   await page.goto(url + "?seed=1&time=21:00&sold=1"); await page.waitForTimeout(4200);
-  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.box > 0), "villagers buy wine while Mel's away and pay into the honesty box");
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.box > 0), "villagers buy wine while you're away and pay into the honesty box");
   await page.screenshot({ path: join(shots, "vineyard.png") });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nstaff, names and the tasting room tables")) try {
   // Staff: Marco and Ines pick and fill barrels, Celeste stocks the shelves, Pilar runs the kitchen; renaming; diners' tables
   console.log("\nstaff, names and the tasting room tables");
   { const tr = await import(new URL("../src/game/tours.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), cel = np.NPCS.find(n => n.id === "celeste");
@@ -678,7 +723,7 @@ try {
   await page.addInitScript(() => { const q = location.search; if (!/staffpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     const H = 3600e3, t = Date.now(); f.vine = f.vine || {}; f.vine.rows = [0, 1, 2].map(i => ({trellis: i === 0, vines: [null, null, null]}));
     f.vine.rows[0].vines[0] = {v: "red", planted: t - 20*H, wateredAt: t - 9*H}; f.vine.grapes = {red: 0, white: 0}; f.vine.barrels = [null];
-    f.vine.cellar = [{id: "wc1", name: "Cellar White", type: "white", n: 6}]; f.vine.shelf = [{id: "ws1", name: "Evan's Blush", type: "rose", n: 6, price: 15, open: 2}];
+    f.vine.cellar = [{id: "wc1", name: "Cellar White", type: "white", n: 6}]; f.vine.shelf = [{id: "ws1", name: "Rosy Blush", type: "rose", n: 6, price: 15, open: 2}];
     f.vine.lastTick = t - 3*60e3; f.vine.menu = {}; f.vine.tapasList = [];
     f.kitchen = {larder: {flour: 2, milk: 2, potato: 4, egg: 4, olives: 2, loaf: 1}, oven: null, press: null};
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
@@ -703,18 +748,15 @@ try {
   check(await page.locator('#ctx [data-vyhelp]').count() === 5 && await page.locator('#ctx [data-vyhelp="fetch"]').isChecked() === false, "the staff card at the counter has a tick for each helper (fetching from the backpack is off to start)");
   await page.locator('#ctx [data-vyhelp="cook"]').uncheck();
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.help.cook === false), "unticking Pilar sends her home");
-  await page.fill("#vyNameV", "Bay Hill Vines"); await page.fill("#vyNameS", "Mel & Maple's Cellar"); await page.click('#ctx [data-vy="names"]'); await page.waitForTimeout(300);
-  check(/Mel &amp; Maple|Mel & Maple/.test(await page.locator("#sceneName").textContent()), "the wine shop can be renamed");
+  await page.fill("#vyNameV", "Bay Hill Vines"); await page.fill("#vyNameS", "Hill & Maple's Cellar"); await page.click('#ctx [data-vy="names"]'); await page.waitForTimeout(300);
+  check(/Hill &amp; Maple|Hill & Maple/.test(await page.locator("#sceneName").textContent()), "the wine shop can be renamed");
   await page.screenshot({ path: join(shots, "staff-card.png") });
   await page.click('#ctx [data-close]');
   await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(700);
-  check(/Bay Hill Vines/.test(await page.locator("#sceneName").textContent()) && /Mel &amp; Maple|Mel & Maple/.test(await page.locator("#sceneArt").innerHTML()), "and the vineyard too, with the new names on the map");
-  await page.goto(url + "?seed=1&time=19:05&date=2026-10-07"); await page.waitForTimeout(900);
+  check(/Bay Hill Vines/.test(await page.locator("#sceneName").textContent()) && /Hill &amp; Maple|Hill & Maple/.test(await page.locator("#sceneArt").innerHTML()), "and the vineyard too, with the new names on the map");
+  await page.goto(url + "?seed=1&time=19:05&date=2026-10-08"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
-  check(await page.locator('#actors [data-npc="farid"].act-sit').count() === 1 && await page.locator('#actors [data-npc="mei"].act-sit').count() === 1 && await page.locator("#actors .act-sit").count() >= 5, "after work the orchard's farmhands come in for a tasting too (five at the tables at 7pm)");
-  await page.goto(url + "?seed=1&time=19:05&date=2026-10-07"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
-  check(await page.locator('#actors [data-npc="farid"].act-sit').count() === 1 && await page.locator('#actors [data-npc="mei"].act-sit').count() === 1 && await page.locator("#actors .act-sit").count() >= 5, "after work the orchard's farmhands come in for a tasting too (five at the tables at 7pm)");
+  check(await page.locator('#actors [data-npc="farid"].act-sit').count() === 1 && await page.locator('#actors [data-npc="mei"].act-sit').count() === 1 && await page.locator("#actors .act-sit").count() >= 4, "after work Farid and Mei come in for a tasting too");
   await page.goto(url + "?seed=1&time=13:20&date=2026-10-07"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
   check(await page.locator("#actors .act-sit").evaluateAll(n => n.filter(x => ["aiko", "ben", "clara", "dev", "rosa", "bastien", "grace", "hiro"].includes(x.dataset.npc)).length) === 2, "out-of-towners drop in for a lunchtime tasting");
@@ -726,7 +768,7 @@ try {
   await page.screenshot({ path: join(shots, "tasting-tables.png") });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nlane to vineyard path")) try {
   // A path joins Makers' Lane and the vineyard directly (lane at the bottom, vineyard at the top)
   console.log("\nlane to vineyard path");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -741,7 +783,7 @@ try {
   check(true, "and back up again");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nhens: three meals, three eggs")) try {
   // A grown hen eats breakfast, lunch and dinner, with an egg after each meal
   console.log("\nhens: three meals, three eggs");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -761,9 +803,9 @@ try {
   check(/fed and happy/.test(await page.locator("#ctx .pets").textContent()), "then she's full until the next meal");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // Ma Ma's orchard and flower farm: plant, Ma Ma picks, the farm shop, bouquets and pots, the fruit crate, tea and cake
-  console.log("\nMa Ma's orchard");
+if (want("\nthe orchard")) try {
+  // The orchard and flower farm: plant, Farid picks, the farm shop, bouquets and pots, the fruit crate, tea and cake
+  console.log("\nthe orchard");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`orchard pageerror: ${e.message}`));
   await page.addInitScript(() => { const q = location.search; if (!/orchpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
@@ -772,13 +814,12 @@ try {
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-07"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-07&orchpatch=1"); await page.waitForTimeout(1000);
-  check(await page.locator('#world [data-place="toOrchard"]').count() === 1, "home has a gate at the top left to Ma Ma's orchard");
+  check(await page.locator('#world [data-place="toOrchard"]').count() === 1, "home has a gate at the top left to the orchard");
   await page.locator('#world [data-place="toOrchard"]').dispatchEvent("click");
   await page.waitForFunction(() => /orchard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(800);
-  check((await fox()).coins === 309, "Ma Ma hands over the farm shop's takings when you arrive");
-  check(await page.locator('#actors [data-npc="mama"]').count() === 1 && await page.locator('#world [data-place="cottage"]').count() === 1 && await page.locator('#world [data-tree]').count() === 12, "Ma Ma is out among the twelve tree spots, by her cottage");
-  check(await page.locator('#actors [data-npc="gonggong"]').count() === 1, "Gong Gong is helping in the orchard this morning");
+  check((await fox()).coins === 309, "Farid hands over the farm shop's takings when you arrive");
+  check(await page.locator('#actors [data-npc="farid"].act-farm').count() === 1 && await page.locator('#world [data-place="cottage"]').count() === 1 && await page.locator('#world [data-tree]').count() === 12, "Farid is out among the twelve tree spots, by the cottage");
   await page.locator('#world [data-tree="0"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-or="plant"][data-k="apple"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-or="plant"][data-k="peach"]').count() === 0, "only this season's saplings are on offer");
@@ -788,7 +829,7 @@ try {
   await page.locator('#world [data-place="farmshop"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-or="take"][data-k="apple"]', { timeout: 15000 });
   await page.click('#ctx [data-or="take"][data-k="apple"]'); await page.waitForTimeout(200);
-  check(await fox().then(f => f.inv.apple >= 1 && f.orch.stock.apple === 2), "fruit Ma Ma picked can be taken from the farm shop");
+  check(await fox().then(f => f.inv.apple >= 1 && f.orch.stock.apple === 2), "fruit Farid picked can be taken from the farm shop");
   check(await page.locator('#ctx [data-or="buy"]').count() === 0, "fruit isn't for sale: it only comes from your own trees, free");
   await page.click('#ctx [data-or="tab"][data-k="plant"]'); await page.waitForTimeout(200);
   await page.click('#ctx [data-or="plantany"][data-where="bush"][data-k="heather"]'); await page.waitForTimeout(200);
@@ -805,26 +846,27 @@ try {
   await page.locator('#world [data-place="toFlowers"]').dispatchEvent("click");
   await page.waitForFunction(() => /flower farm/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(await page.locator('#world [data-bed]').count() === 12 && await page.locator('#world [data-bush]').count() === 4, "the flower farm has twelve beds and four bushes");
+  check(await page.locator('#actors [data-npc="mei"]').count() === 1, "and Mei is there watering this morning");
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="wshelf"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-vyfruit="apple"]', { timeout: 15000 }); await page.click('#ctx [data-vyfruit="apple"]'); await page.waitForTimeout(200);
   check(await fox().then(f => f.vine.fruit.apple >= 1 && !f.inv.apple), "fruit goes into the wine shop's fruit crate to sell");
   await page.goto(url + "?seed=1&time=15:30&date=2026-10-07"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("cottage")); await page.waitForTimeout(900);
-  check(await page.locator('#actors [data-npc="mama"]').count() === 1, "Ma Ma's home in her cottage at teatime");
+  check(await page.locator('#actors [data-npc="farid"]').count() === 1 && /Farid and Mei's cottage/.test(await page.locator("#sceneName").textContent()), "Farid's home in the cottage he shares with Mei at teatime");
   const c0 = (await fox()).coins;
   await page.locator('#world [data-spot="tea"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-or="tea"]', { timeout: 15000 }); await page.click('#ctx [data-or="tea"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.coins === c0 + 3 && f.orch.tea === "2026-10-07"), "tea and cake with Ma Ma, once a day");
+  check(await fox().then(f => f.coins === c0 + 3 && f.orch.tea === "2026-10-07"), "tea and cake with Farid, once a day");
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="bq_mum"]'); await page.waitForTimeout(400);
-  check(await page.locator('#bag [data-giveto="dad"]').count() === 1 && await page.locator('#bag [data-giveto="mama"].primary').count() === 1, "a bouquet opens the chooser: the whole family, whoever's here first");
-  await page.click('#bag [data-giveto="mama"]'); await page.waitForTimeout(400);
-  check(await fox().then(f => f.bouquets && f.bouquets.mama === 1 && !f.inv.bq_mum), "a bouquet can be given to Ma Ma in person (or sent to anyone in the family)");
+  check(await page.locator('#bag [data-giveto="theo"]').count() === 1 && await page.locator('#bag [data-giveto="farid"].primary').count() === 1, "a bouquet opens the chooser: any of your friends, whoever's here first");
+  await page.click('#bag [data-giveto="farid"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.bouquets && f.bouquets.farid === 1 && !f.inv.bq_mum), "a bouquet can be given to Farid in person (or sent to any friend)");
   await page.screenshot({ path: join(shots, "cottage.png") });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // Orchard workers, visitors and weekend tours (paid into Ma Ma's tin); Darren's weekday tours
+if (want("\norchard tours")) try {
+  // Orchard workers, visitors and weekend tours (paid into the orchard's tin); Bo's weekday evening tours
   console.log("\norchard tours");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`tours pageerror: ${e.message}`));
@@ -836,26 +878,26 @@ try {
   await page.goto(url + "?seed=1&time=10:20&date=2026-10-10&tourpatch=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(1200);
   const ids = await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
-  check(ids.filter(x => ["hana", "okada", "juniper", "bo", "lin", "pip", "opal", "theo"].includes(x)).length >= 1 && ids.filter(x => ["aiko", "ben", "clara", "dev", "elena", "felix", "grace", "hiro"].includes(x)).length >= 1 && ids.some(x => ["mama", "gonggong", "farid", "mei"].includes(x)), "a Saturday morning tour: a guide with a mix of villagers and out-of-towners in the orchard");
+  check(ids.filter(x => ["hana", "okada", "juniper", "bo", "lin", "pip", "opal", "theo"].includes(x)).length >= 1 && ids.filter(x => ["aiko", "ben", "clara", "dev", "elena", "felix", "grace", "hiro"].includes(x)).length >= 1 && ids.some(x => ["farid", "mei"].includes(x)), "a Saturday morning tour: a guide with a mix of villagers and out-of-towners in the orchard");
   check(await page.locator('#actors [data-npc="farid"]').count() + await page.locator('#actors .act-guide').count() >= 1, "Farid works the orchard (or is leading the tour)");
   await page.locator('#world [data-place="farmshop"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ortour", { timeout: 15000 });
   check(/10am with .*11:30.*2pm.*4pm/.test(await page.locator("#ctx .ortour").textContent()), "the farm shop lists today's four tours and their guides");
   await page.click('#ctx [data-close]'); await page.locator('#world [data-place="toursign"]').dispatchEvent("click"); await page.waitForSelector("#ctx .wlist", { timeout: 15000 });
   check(await page.locator("#ctx .wlist li").count() === 4 && /on now/.test(await page.locator("#ctx").textContent()) && /Signed up: .*\(visiting\)/.test(await page.locator("#ctx").textContent()), "the tour sign shows today's tours, which one's on now, and who's signed up");
   await page.goto(url + "?seed=1&time=11:05&date=2026-10-10"); await page.waitForTimeout(2500);
-  check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.tin >= 12 && o.tin % 4 === 0 && o.toursPaid.done.includes(0); }), "when a tour finishes, its visitors pay 4 coins each into Ma Ma's tin");
+  check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.tin >= 12 && o.tin % 4 === 0 && o.toursPaid.done.includes(0); }), "when a tour finishes, its visitors pay 4 coins each into the orchard's tin");
   await page.goto(url + "?seed=1&time=18:00&date=2026-10-08"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(1200);
-  check(await page.locator('#actors [data-npc="darren"].act-guide').count() === 1, "on Thursday evenings Darren leads a farm tour");
+  check(await page.locator('#actors [data-npc="bo"].act-guide').count() === 1, "on Thursday evenings Bo leads a farm tour");
   await page.evaluate(() => window.__mapleScene("flowers")); await page.waitForTimeout(400);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-08"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("flowers")); await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="mei"]').count() === 1, "Mei looks after the flower farm");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // The field (lake, swans, picnic, football) between the orchard and town; gifts for Ma Ma and Gong Gong
-  console.log("\nthe field and grandparents' gifts");
+if (want("\nthe field, and gifts for Farid and Mei")) try {
+  // The field (lake, swans, picnic, football) between the orchard and town; gifts for Farid and Mei
+  console.log("\nthe field, and gifts for Farid and Mei");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`field pageerror: ${e.message}`));
   await page.addInitScript(() => { if (!/giftpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
@@ -866,19 +908,19 @@ try {
   check(await page.locator('#world [data-place="toField"]').count() === 1, "the town square has a path west to the field");
   await page.locator('#world [data-place="toField"]').dispatchEvent("click");
   await page.waitForFunction(() => /field/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(900);
-  check(await page.locator('#actors [data-npc="pip"]').count() === 1 && await page.locator('#actors [data-npc="mama"]').count() === 1 && await page.locator('#actors [data-npc="gonggong"]').count() === 1, "on a Friday afternoon Pip's playing football and Ma Ma and Gong Gong are walking by the lake (4pm)");
+  check(await page.locator('#actors [data-npc="pip"]').count() === 1 && await page.locator('#actors [data-npc="farid"]').count() === 1 && await page.locator('#actors [data-npc="mei"]').count() === 1, "on a Friday afternoon Pip's playing football and Farid and Mei are walking by the lake (4pm)");
   await page.locator('#world [data-place="lake"]').dispatchEvent("click"); await page.waitForTimeout(4500);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.today") || "{}").swans === "2026-10-09" || /swan/i.test(document.querySelector("#speech").textContent)), "the swans can be fed");
   await page.click('[data-open="bag"]').catch(() => {}); await page.keyboard.press("Escape");
   await page.evaluate(() => window.__mapleScene("market")); await page.waitForTimeout(800);
   await page.waitForSelector('#ctx [data-shop="family"]', { timeout: 20000 }); await page.click('#ctx [data-shop="family"]');
   check(await page.locator('#ctx .item[data-id="mooncake"]').count() === 1 && await page.locator('#ctx .item[data-id="birdsnest"]').count() === 1, "Hana sells nyonya kueh, bird's nest, chicken essence, and mooncakes in autumn");
-  check(/Mum or Dad/.test(await page.locator('#ctx .item[data-id="kuehlapis"]').textContent()) && await page.locator('#ctx .item[data-id="protbar"]').count() === 1 && await page.locator('#ctx .item[data-id="bubbletea"]').count() === 1,
-    "the kuehs suit Mum and Dad too, and there are gifts for Marcus (dairy-free protein) and Angellina");
+  check(/Hana or Theo/.test(await page.locator('#ctx .item[data-id="kuehlapis"]').textContent()) && await page.locator('#ctx .item[data-id="protbar"]').count() === 1 && await page.locator('#ctx .item[data-id="bubbletea"]').count() === 1,
+    "the kuehs suit Hana and Theo too, and there are gifts for Tomi (a protein bar) and Posy (bubble tea)");
   await page.click('#ctx .item[data-id="ondeh"]'); await page.waitForTimeout(200);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1000);
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="ondeh"]'); await page.click('#bag [data-giveto].primary'); await page.waitForTimeout(400);
-  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return !f.inv.ondeh && ((f.fam.gifts.mama || 0) + (f.fam.gifts.gonggong || 0)) === 1; }), "the ondeh-ondeh goes to Ma Ma or Gong Gong (whoever's here)");
+  check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return !f.inv.ondeh && ((f.fam.gifts.farid || 0) + (f.fam.gifts.mei || 0)) === 1; }), "the ondeh-ondeh goes to Farid or Mei (whoever's here)");
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-07"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="toFieldO"]').dispatchEvent("click");
@@ -886,7 +928,7 @@ try {
   check(true, "and the field is up the path from the top of the orchard");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nplayground families, farmers market, field fair")) try {
   // A busy weekend: tourist families at the vineyard playground (and a roundabout), the Sunday farmers market at the field
   // with the wine shop's stall selling off the shop's own shelves, and the field fair on the last Saturday of the month
   console.log("\nplayground families, farmers market, field fair");
@@ -903,8 +945,8 @@ try {
   await page.goto(url + "?seed=1&time=12:55&date=2026-10-11&mktpatch=1"); await page.waitForTimeout(2500);
   check(await page.evaluate(() => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.shelf[0].n < 40; }), "on a Sunday morning the market stall sells bottles off the wine shop's own shelves");
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
-  check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.stock.apple + o.stock["stem:rose"] < 80 && o.tin > 0; }), "Ma Ma's market stall sells fruit and flowers off the farm shop's own shelves, into her tin");
-  check(await page.locator('#world [data-place^="mstall"]').count() === 9 && await page.locator('#actors [data-npc="ines"]').count() === 1 && await page.locator('#actors [data-npc="mama"]').count() === 1, "the Sunday farmers market: eight stalls along the top (and Noor's adoption corner), our wine stall with Ines and Ma Ma's fruit and flowers");
+  check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.stock.apple + o.stock["stem:rose"] < 80 && o.tin > 0; }), "Farid's market stall sells fruit and flowers off the farm shop's own shelves, into the orchard's tin");
+  check(await page.locator('#world [data-place^="mstall"]').count() === 9 && await page.locator('#actors [data-npc="ines"]').count() === 1 && await page.locator('#actors [data-npc="farid"]').count() === 1, "the Sunday farmers market: eight stalls along the top (and Noor's adoption corner), our wine stall with Ines and Farid's fruit and flowers");
   check(await page.locator('#world [data-place="mstall0"]').evaluate(g => g.getBBox().y < 170), "the market stalls stand along the top of the field");
   check(await page.locator("#actors .sfront").count() === 9, "each stall's table (and the pet pen) is drawn among the people, so a keeper can stand behind it");
   { const { keeperPose, MARKET } = await import(pathToFileURL(join(root, "src/game/tours.js")).href);
@@ -920,16 +962,16 @@ try {
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-place="mstall4"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-or="take"]', { timeout: 15000 });
-  check(/market stall/.test(await page.locator("#ctx h2").textContent()) && await page.locator('#ctx [data-or="tab"][data-k="plant"]').count() === 0, "Ma Ma's stall shares the farm shop's shelves, fruit and flowers only (no planting)");
+  check(/market stall/.test(await page.locator("#ctx h2").textContent()) && await page.locator('#ctx [data-or="tab"][data-k="plant"]').count() === 0, "Farid's stall shares the farm shop's shelves, fruit and flowers only (no planting)");
   await page.click('#ctx [data-or="take"]'); await page.waitForTimeout(300);
-  check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.fox")).inv.apple || 0) >= 1), "Mel can take fruit from Ma Ma's stall for free");
+  check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.fox")).inv.apple || 0) >= 1), "you can take fruit from Farid's stall for free");
   await page.click('#ctx [data-close]');
   const mfox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.locator('#world [data-place="mstall2"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id]', { timeout: 15000 });
   check(await page.locator('#ctx .item[data-id]').evaluateAll(b => b.map(x => x.dataset.id)).then(ids => ids.length >= 2 && ids.every(id => ["carrot", "corn", "strawberry", "blueberry", "tomato", "potato", "pepper", "pea", "pumpkin", "leek"].includes(id))), "Clara's produce stall sells what's in season, for when the garden's between harvests");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-place="mstall1"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="honey"]', { timeout: 15000 });
-  check(await page.locator('#ctx .item[data-id="beecandle"]').count() === 1 && /for the family/.test(await page.locator('#ctx .item[data-id="honey"]').textContent()), "Felix's honey stall: honey, honeycomb and beeswax candles, gifts for the family");
+  check(await page.locator('#ctx .item[data-id="beecandle"]').count() === 1 && /for a friend/.test(await page.locator('#ctx .item[data-id="honey"]').textContent()), "Felix's honey stall: honey, honeycomb and beeswax candles, gifts for a friend");
   const m0 = (await mfox()).coins; await page.click('#ctx .item[data-id="honey"]'); await page.waitForTimeout(300);
   check(await mfox().then(f => f.inv.honey === 1 && f.coins === m0 - 8) && await page.locator("#undoBar").isVisible(), "buying honey offers an undo");
   await page.click("#undoBtn"); await page.waitForTimeout(300);
@@ -937,7 +979,7 @@ try {
   await page.click('#ctx .item[data-id="honey"]'); await page.waitForTimeout(300); await page.click('#ctx [data-close]');
   const g0 = await mfox().then(f => Object.values(f.fam.gifts).reduce((a, b) => a + b, 0));
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="honey"]'); await page.click('#bag [data-giveto].primary'); await page.waitForTimeout(400);
-  check(await mfox().then(f => !f.inv.honey && Object.values(f.fam.gifts).reduce((a, b) => a + b, 0) === g0 + 1), "market honey can be given to anyone in the family who's here");
+  check(await mfox().then(f => !f.inv.honey && Object.values(f.fam.gifts).reduce((a, b) => a + b, 0) === g0 + 1), "market honey can be given to any friend who's here");
   await page.click('[data-open="bag"]').catch(() => {});
   for (const [st, id] of [["mstall5", "soap_lav"], ["mstall6", "paleale"]]) { await page.locator(`#world [data-place="${st}"]`).dispatchEvent("click"); await page.waitForSelector(`#ctx .item[data-id="${id}"]`, { timeout: 15000 }); await page.click('#ctx [data-close]'); }
   check(true, "Grace's handmade soap stall and Ben's craft beer stall");
@@ -946,10 +988,10 @@ try {
   check(/Field fair/.test(await page.locator("#sceneArt").textContent()) && await page.locator('#world [data-place^="mstall"]').count() === 5, "on the last Saturday of the month the field fair is on: kites, face painting, lemonade, snacks");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // The foreshore (west of the field): the sea with dolphins and paddleboarders, two family houses, Mum, Dad, Marcus and
-  // Angellina with their routines, Mum's exercise class at the field, a family paddle, and gifts for the family
-  console.log("\nthe foreshore and Mel's family");
+if (want("\nthe foreshore: Hana and Theo, Tomi and Posy")) try {
+  // The foreshore (west of the field): the sea with dolphins and paddleboarders, two houses (Hana and Theo's, Tomi and
+  // Posy's) and their routines, Hana's exercise class at the field, a paddle together, and gifts
+  console.log("\nthe foreshore: Hana and Theo, Tomi and Posy");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`shore pageerror: ${e.message}`));
   const ffox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -961,77 +1003,72 @@ try {
   check(await page.locator('#world [data-place="toShoreF"]').count() === 1 && await page.locator('#world [data-place="exlawn"]').count() === 1, "the field has a gate west to the foreshore, and the exercise lawn");
   await page.goto(url + "?seed=1&time=07:30&date=2026-10-06&shorepatch=1"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
-  check(await page.locator('#world [data-place="mumdad"]').count() === 1 && await page.locator('#world [data-place="marcus"]').count() === 1 && await page.locator('#world [data-place="suprack"]').count() === 1
-    && await page.locator('#world [data-place="toFieldS"]').count() === 1 && await page.locator('#world [data-place="toFlowersS"]').count() === 1, "the foreshore: Mum and Dad's house, Marcus and Angellina's, the paddleboards, gates to the field and the flower farm");
-  check(await ids().then(a => a.includes("mum") && a.includes("dad")), "early on a Tuesday Mum's out for her walk and Dad's sketching on the sand");
-  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="paleale"]'); await page.click('#bag [data-giveto="dad"]'); await page.waitForTimeout(400);
-  check(await ffox().then(f => !f.inv.paleale && f.fam.gifts.dad === 1), "a craft pale ale from the market can go to Dad");
+  check(await page.locator('#world [data-place="hanatheo"]').count() === 1 && await page.locator('#world [data-place="tomiposy"]').count() === 1 && await page.locator('#world [data-place="suprack"]').count() === 1
+    && await page.locator('#world [data-place="toFieldS"]').count() === 1 && await page.locator('#world [data-place="toFlowersS"]').count() === 1, "the foreshore: Hana and Theo's house, Tomi and Posy's, the paddleboards, gates to the field and the flower farm");
+  check(await ids().then(a => a.includes("hana") && a.includes("theo")), "early on a Tuesday Hana's out for her walk and Theo's sketching on the sand");
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="paleale"]'); await page.click('#bag [data-giveto="theo"]'); await page.waitForTimeout(400);
+  check(await ffox().then(f => !f.inv.paleale && f.fam.gifts.theo === 1), "a craft pale ale from the market can go to Theo");
   await page.click('[data-open="bag"]').catch(() => {});
   await page.locator('#world [data-place="suprack"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="play"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-sup="base"]').count() === 1, "the paddleboards offer a paddle about, or a paddle home");
   await page.click('#ctx [data-sup="play"]'); await page.waitForTimeout(4000);
-  check(await page.locator("#mel.sup").count() === 1 && await page.locator('#actors [data-npc="mum"].act-sup, #actors [data-npc="dad"].act-sup').count() === 2, "a family paddle: Mel takes a board out and Mum and Dad paddle out too");
+  check(await page.locator("#mel.sup").count() === 1 && await page.locator('#actors [data-npc="hana"].act-sup, #actors [data-npc="theo"].act-sup').count() === 2, "a paddle together: you take a board out and Hana and Theo paddle out too");
   await page.goto(url + "?seed=1&time=16:30&date=2026-10-10"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
-  check(await page.locator('#actors [data-npc="marcus"].act-sup').count() === 1 && await page.locator('#actors [data-npc="angelina"].act-sup').count() === 1, "on weekend afternoons Marcus and Angellina go paddleboarding");
-  await page.goto(url + "?seed=1&time=15:30&date=2026-10-11"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
-  check(await page.locator('#actors [data-npc="darren"].act-sup').count() === 1, "Darren goes paddleboarding on Sunday afternoons");
-  await page.goto(url + "?seed=1&time=09:30&date=2026-10-06"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("mumdad")); await page.waitForTimeout(1200);
-  check(await ids().then(a => a.includes("dad")) && ["piano", "bass", "easel", "mat"].length === await page.locator("#world [data-spot]").evaluateAll(n => n.filter(x => ["piano", "bass", "easel", "mat"].includes(x.dataset.spot)).length), "inside Mum and Dad's: Dad at the piano, his double bass and easel, Mum's mat");
+  check(await page.locator('#actors [data-npc="tomi"].act-sup').count() === 1, "on weekend afternoons Tomi goes paddleboarding");
+  await page.goto(url + "?seed=1&time=20:00&date=2026-10-06"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("hanatheo")); await page.waitForTimeout(1200);
+  check(await ids().then(a => a.includes("theo")) && ["piano", "bass", "easel", "mat"].length === await page.locator("#world [data-spot]").evaluateAll(n => n.filter(x => ["piano", "bass", "easel", "mat"].includes(x.dataset.spot)).length), "inside Hana and Theo's: Theo at the piano, his double bass and easel, Hana's mat");
   await page.goto(url + "?seed=1&time=20:00&date=2026-10-05"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("marcus")); await page.waitForTimeout(1200);
-  check(await page.locator('#actors [data-npc="marcus"].act-game').count() === 1 && await ids().then(a => a.includes("angelina")), "evenings at Marcus and Angellina's: Marcus gaming on the sofa, Angellina beside him");
-  await page.goto(url + "?seed=1&time=10:00&date=2026-10-05"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("bank")); await page.waitForTimeout(1200);
-  check(await ids().then(a => a.includes("marcus") && a.includes("opal")), "on Mondays Marcus works at the bank alongside Opal");
+  await page.evaluate(() => window.__mapleScene("tomiposy")); await page.waitForTimeout(1200);
+  check(await page.locator('#actors [data-npc="tomi"].act-game').count() === 1 && await ids().then(a => a.includes("posy")), "evenings at Tomi and Posy's: Tomi gaming on the sofa, Posy beside him");
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-05"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1200);
+  check(await page.locator('#actors [data-npc="tomi"].act-farm').count() === 1, "on weekdays Tomi lends a hand in the vineyard (until the old mill's press is going)");
   await page.goto(url + "?seed=1&time=08:20&date=2026-10-06"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
-  check(await page.locator('#actors [data-npc="mum"].act-lead').count() === 1 && await page.locator("#actors .act-exercise").count() === 3, "Mum leads her class on the exercise lawn at 8, three villagers joining in");
+  check(await page.locator('#actors [data-npc="hana"].act-lead').count() === 1 && await page.locator("#actors .act-exercise").count() === 3, "Hana leads her class on the exercise lawn at 8, three villagers joining in");
   const c0 = (await ffox()).coins; await page.locator('#world [data-place="exlawn"]').dispatchEvent("click"); await page.waitForTimeout(8500);
-  check(await page.locator("#mel.exercise").count() === 1 && (await ffox()).coins === c0 + 2, "Mel can join Mum's class (a couple of coins, once a day)");
+  check(await page.locator("#mel.exercise").count() === 1 && (await ffox()).coins === c0 + 2, "you can join Hana's class (a couple of coins, once a day)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // Family dinners (Wednesdays and Sundays, rotating round the four houses), who's where today, and the family and
-  // villagers out and about: the vineyard, the Sunday market, Makers' Lane
-  console.log("\nfamily dinners and who's where");
+if (want("\ndining tables and who's where")) try {
+  // A dining table in each of the four houses (data/dining.js) to sit at, who's where today, your friends at home in the
+  // evening, and villagers out and about: the wine shop, the Sunday market, Makers' Lane
+  console.log("\ndining tables and who's where");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`dinner pageerror: ${e.message}`));
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
-  const fam = ["darren", "mama", "gonggong", "mum", "dad", "marcus", "angelina"];
-  await page.goto(url + "?reset=1&seed=1&time=19:00&date=2026-10-07"); await page.waitForTimeout(800);
+  const fam = ["bo", "farid", "mei", "hana", "theo", "tomi", "posy"];
+  await page.goto(url + "?reset=1&seed=1&time=21:00&date=2026-10-07"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("cottage")); await page.waitForTimeout(2500);
-  check(await ids().then(a => fam.every(f => a.includes(f))) && await page.locator("#actors .sfront").count() === 1, "Wednesday family dinner at Ma Ma and Gong Gong's: all seven round the big table (drawn in front of those along the back)");
+  check(await ids().then(a => a.includes("farid") && a.includes("mei") && !a.includes("hana") && !a.includes("tomi")), "a Wednesday evening at Farid and Mei's: just the two of them at home, back from the wine shop (no supper crowd)");
   await page.locator('#world [data-spot="dine"]').dispatchEvent("click"); await page.waitForTimeout(2500);
-  check(await page.locator("#mel.sit").count() === 1 && await page.locator("#evan.sit").count() === 1, "Mel takes her seat at the table, and Evan's in his");
-  for (const h of ["home", "mumdad", "marcus"]) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(500);
-    check(await page.locator('#world [data-spot="dine"]').count() === 1, `there's a family dining table at ${h}`); }
-  await page.goto(url + "?seed=1&time=19:00&date=2026-10-11"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("mumdad")); await page.waitForTimeout(2500);
-  check(await ids().then(a => fam.every(f => a.includes(f))), "Sunday's dinner is at Mum and Dad's (the host goes round the four houses)");
+  check(await page.locator("#mel.sit").count() === 1, "tap the dining table and you sit down");
+  for (const h of ["home", "hanatheo", "tomiposy"]) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(500);
+    check(await page.locator('#world [data-spot="dine"]').count() === 1, `there's a dining table at ${h}`); }
+  await page.goto(url + "?seed=1&time=20:30&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("linjun")); await page.waitForTimeout(2000);
+  check(await ids().then(a => a.includes("lin") && a.includes("juniper")), "Lin and Juniper's cottage on the foreshore: both home in the evening");
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-07"); await page.waitForTimeout(800);
   await page.click('[data-open="friend"]'); await page.waitForTimeout(400);
-  check(await page.locator("details.whowhere").count() >= 18 && /Family dinner tonight at Ma Ma and Gong Gong's/.test(await page.locator("#friendBody").textContent()), "who's where today: everyone's day, family first, and tonight's dinner");
+  check(await page.locator("details.whowhere").count() >= 18 && /Close friends/.test(await page.locator("#friendBody").textContent()) && !/supper/i.test(await page.locator("#friendBody").textContent()), "who's where today: everyone's day, close friends first");
   await page.click('[data-open="friend"]').catch(() => {});
   await page.goto(url + "?seed=1&time=14:30&date=2026-10-05"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(1200);
   check(await ids().then(a => a.includes("okada")), "villagers wander Makers' Lane too (Mr Okada, Monday afternoon)");
-  await page.goto(url + "?seed=1&time=18:00&date=2026-10-09"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1200);
-  check(await ids().then(a => a.includes("marcus") && a.includes("angelina")), "Marcus and Angellina come to the vineyard on Friday evenings");
+  await page.goto(url + "?seed=1&time=18:45&date=2026-10-09"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
+  check(await ids().then(a => a.includes("tomi") && a.includes("posy")), "Tomi and Posy come to the wine shop on Friday evenings");
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
-  check(await ids().then(a => ["mum", "dad", "marcus", "angelina"].every(f => a.includes(f))), "the whole family's at the Sunday farmers market");
+  check(await ids().then(a => a.includes("farid")) && await page.locator('#actors [data-npc="tomi"].act-footy').count() === 1, "at the Sunday farmers market: Farid at his stall, Tomi playing football");
   await page.goto(url + "?seed=1&time=20:00&date=2026-10-06"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
-  check(await page.locator('#actors [data-npc="marcus"].act-sit').count() === 1 && await page.locator('#actors [data-npc="angelina"].act-sit').count() === 1, "Tuesday is date night: Marcus and Angellina at a tasting table in the wine shop");
-  await page.goto(url + "?seed=1&time=14:00&date=2026-10-10"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("marcus")); await page.waitForTimeout(3000);
-  check(await page.locator("#evan").isVisible() && /Mario|Spiderman|game/i.test(await page.locator("#evanSay").textContent()), "Evan visits Uncle Marcus's and asks for Mario and Spiderman");
-  { const { NPCS } = await import(pathToFileURL(join(root, "src/data/npcs.js")).href), d = NPCS.find(n => n.id === "dad"), m = NPCS.find(n => n.id === "marcus");
-    check(d.hellos.includes("Hi darling! Love you, have a good day.") && d.lines.some(l => /Ah Gong loves who the most/.test(l)) && /Zeh/.test(m.intro), "Dad's \"Hi darling, love you, have a good day\", Ah Gong, and Marcus calling Mel Zeh"); }
+  check(await page.locator('#actors [data-npc="tomi"].act-sit').count() === 1 && await page.locator('#actors [data-npc="posy"].act-sit').count() === 1, "Tuesday is date night: Tomi and Posy at a tasting table in the wine shop");
+  { const { NPCS } = await import(pathToFileURL(join(root, "src/data/npcs.js")).href), said = n => [n.intro, n.away, ...(n.hellos || []), ...(n.lines || []), ...Object.values(n.actLines || {}).flat()].filter(x => typeof x === "string");
+    const seven = ["hana", "theo", "farid", "mei", "tomi", "posy", "bo"].map(id => NPCS.find(n => n.id === id));
+    check(seven.every(Boolean) && !seven.flatMap(said).some(l => /darling|\bZeh\b|Ah Gong|Ah Ma\b|sayang|\bEvan\b|\bMel\b/.test(l)), "the seven friends talk like friends: no pet names or family titles in their lines"); }
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto(url + "?seed=1&time=21:00&date=2026-10-06"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1000);
@@ -1039,7 +1076,7 @@ try {
   await page.emulateMedia({ colorScheme: "light" });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nbig goals")) try {
   // Big goals to save up for: the garage (through a door at the back of the house), a scooter and a car (faster between
   // screens), a dolphin cruise boat at the jetty, and a cellar door extension off the wine shop
   console.log("\nbig goals");
@@ -1053,7 +1090,7 @@ try {
   await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(800);
   check(await page.locator('#world [data-spot="officedoor"]').count() === 1 && await page.locator('#world [data-spot="gdoor"]').count() === 1 && await page.locator('#world [data-spot="desk"]').count() === 0, "the living room has doors to the home office (left) and the garage (right); the desks have moved out");
   await page.locator('#world [data-spot="officedoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
-  check(await page.locator('#world [data-spot="desk"], #world [data-spot="office"], #world [data-spot="treadmill"]').count() === 3, "the home office: Mel's desk, Darren's desk and the treadmill");
+  check(await page.locator('#world [data-spot="desk"], #world [data-spot="office"], #world [data-spot="treadmill"]').count() === 3, "the home office: your desk, the spare desk and the treadmill");
   await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="gdoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
   check(await page.locator('#world [data-spot="laundry"]').count() === 1 && await page.locator('#world [data-spot="cupboard"]').count() === 1, "the garage holds the laundry corner and the cleaning cupboard");
@@ -1065,7 +1102,7 @@ try {
   check(await gf().then(f => f.goals.car && f.ride === "car" && f.coins === 13000 - 800 - 3500), "and a cream convertible");
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click"); await page.waitForTimeout(250);
-  check(await page.locator("#mel.drive").count() === 1 && await page.locator("#mel.withEvan").count() === 1, "outdoors Mel drives the convertible between places, with Evan and Maple aboard");
+  check(await page.locator("#mel.drive").count() === 1, "outdoors you drive the convertible between places");
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 30000 });   // let the drive arrive before jumping elsewhere
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="cdoor"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="cellar"]', { timeout: 15000 });
@@ -1086,12 +1123,12 @@ try {
   await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1500);
   check(await page.locator("#actors .npc").count() >= 6, "the wine club gathers in the cellar door");
   await page.locator('#world [data-spot="flight"]').dispatchEvent("click"); await page.waitForTimeout(2500);
-  check(/hosting the wine club/.test(await page.locator("#speech").textContent()), "Mel hosts the club at the tasting bar");
+  check(/hosting the wine club/.test(await page.locator("#speech").textContent()), "you host the club at the tasting bar");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\npaddling between home and the foreshore")) try {
   // Paddling home: the stream from the sea feeds the lake, the river runs on home; a little jetty at home and the
-  // foreshore's rack take Mel (with Evan and Maple) straight from one to the other
+  // foreshore's rack take you (and your pet) straight from one to the other
   console.log("\npaddling between home and the foreshore");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`paddle pageerror: ${e.message}`));
@@ -1101,8 +1138,8 @@ try {
   await page.locator('#world [data-place="homejetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 15000 });
   await page.click('#ctx [data-sup="shore"]');
   await page.waitForFunction(() => document.querySelector('#world [data-place="suprack"]'), null, { timeout: 15000 }); await page.waitForTimeout(1200);
-  check(await page.evaluate(() => { const r = document.getElementById("mel").getBoundingClientRect(), j = document.querySelector('#world [data-place="suprack"]').getBoundingClientRect(); return Math.abs(r.x - j.x) < 120 && Math.abs(r.y - j.y) < 160; }) && await page.locator("#evan").isVisible(),
-    "paddle to the foreshore: Mel steps off by the paddleboards there, Evan with her");
+  check(await page.evaluate(() => { const r = document.getElementById("mel").getBoundingClientRect(), j = document.querySelector('#world [data-place="suprack"]').getBoundingClientRect(); return Math.abs(r.x - j.x) < 120 && Math.abs(r.y - j.y) < 160; }),
+    "paddle to the foreshore: you step off by the paddleboards there");
   await page.locator('#world [data-place="suprack"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="base"]', { timeout: 15000 });
   await page.click('#ctx [data-sup="base"]');
   await page.waitForFunction(() => document.querySelector('#world [data-place="homejetty"]'), null, { timeout: 15000 }); await page.waitForTimeout(1200);
@@ -1117,12 +1154,12 @@ try {
   check(dark && await page.locator('#world [data-place="homejetty"]').count() === 1, "too dark to paddle the river late at night");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nthe Scoop Shack")) try {
   // The Scoop Shack on the bay: stock the fridge, discover a flavour at the bench, have one free, take one to give
-  // (gelato isn't offered to Marcus), and while time passes Tomo makes batches and customers buy
+  // (gelato isn't offered to Tomi), and while time passes Tomo makes batches and customers buy
   console.log("\nthe Scoop Shack");
   { const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {inv: {}, scoop: {fridge: {milk: 3, fl_rose: 2}}, cocoa: {}}, orch = {stock: {}};
-    check(sc.unstockFridge(F, "milk", 2, orch).to === "bag" && F.inv.milk === 2 && F.scoop.fridge.milk === 1 && sc.unstockFridge(F, "fl_rose", 99, orch).to === "farm" && orch.stock["stem:rose"] === 2, "things can come back out of the gelato fridge (flower stems go back to Ma Ma's shelf)");
+    check(sc.unstockFridge(F, "milk", 2, orch).to === "bag" && F.inv.milk === 2 && F.scoop.fridge.milk === 1 && sc.unstockFridge(F, "fl_rose", 99, orch).to === "farm" && orch.stock["stem:rose"] === 2, "things can come back out of the gelato fridge (flower stems go back to the farm shop's shelf)");
     cc.cocoaState(F).pantry = {honey: 2}; check(cc.unstockPantry(F, "honey", 99, orch).n === 2 && F.inv.honey === 2, "and off the Cocoa Room's fillings shelf"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => { errors.push(`scoop pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
@@ -1163,12 +1200,12 @@ try {
   const before = await fox().then(f => f.scoop.tubs[r1.id]);
   await page.locator('#world [data-spot="gboard"]').dispatchEvent("click"); await page.waitForSelector(`#ctx [data-gmake="${r1.id}"]`, { timeout: 15000 });
   await page.click(`#ctx [data-gmake="${r1.id}"]`); await page.waitForTimeout(300);
-  check(await fox().then(f => f.scoop.churn.length === 1 && f.scoop.fridge.mango === 2), "Mel makes another tub herself from the recipe book (one of each ingredient, into the churner)");
+  check(await fox().then(f => f.scoop.churn.length === 1 && f.scoop.fridge.mango === 2), "you make another tub yourself from the recipe book (one of each ingredient, into the churner)");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.locator('#world [data-spot="gbench"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gsel="mango"]', { timeout: 15000 });
   await page.click('#ctx [data-gsel="mango"]'); await page.click('#ctx [data-gsel="milk"]'); await page.waitForTimeout(200);
   await page.click(`#ctx [data-gmake="${r1.id}"]`); await page.waitForTimeout(300);
-  check(await fox().then(f => f.scoop.churn.length === 2), "or at the mixing bench, picking a flavour she already knows");
+  check(await fox().then(f => f.scoop.churn.length === 2), "or at the mixing bench, picking a flavour you already know");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=13:10&date=2026-10-10"); await page.waitForTimeout(1500);
   await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(800);
@@ -1177,14 +1214,14 @@ try {
   await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gpick]", { timeout: 15000 });
   await page.locator("#ctx [data-gpick]").first().click(); await page.waitForTimeout(200);
   await page.click("#ctx [data-geat]"); await page.waitForTimeout(500);
-  check(await page.locator("#melCone").isVisible() && await fox().then(f => f.scoop.tubs[r1.id] > 0), "a free one at the counter: Mel's holding a cone");
+  check(await page.locator("#melCone").isVisible() && await fox().then(f => f.scoop.tubs[r1.id] > 0), "a free one at the counter: you're holding a cone");
   await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gpick]", { timeout: 15000 });
   await page.locator("#ctx [data-gpick]").first().click(); await page.waitForTimeout(200);
   await page.click('#ctx [data-gtake="cone"]'); await page.waitForTimeout(400);
   const gid = await fox().then(f => Object.keys(f.inv).find(k => k.startsWith("gel_cone")));
   check(!!gid, "one to take away goes in the backpack");
   await page.click('[data-open="bag"]'); await page.click(`#bag .item[data-id="${gid}"]`); await page.waitForTimeout(300);
-  check(await page.locator('#bag [data-giveto="evan"]').count() === 1 && await page.locator('#bag [data-giveto="marcus"]').count() === 0, "it can be given like a gift (a gelato isn't offered to Marcus: lactose)");
+  check(await page.locator('#bag [data-giveto="hana"]').count() === 1 && await page.locator('#bag [data-giveto="tomi"]').count() === 0, "it can be given like a gift (a gelato isn't offered to Tomi: lactose)");
   await page.click('[data-open="bag"]').catch(() => {});
   // the display: take a flavour off (customers can't buy it then), put it back, and swap one in when all 8 slots are full
   await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(700);
@@ -1207,11 +1244,11 @@ try {
   check(await fox().then(f => f.scoop.display.length === 8 && f.scoop.display[2] === "f8" && !f.scoop.display.includes("f2")), "with all 8 slots full, a flavour swaps in for one you choose");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=15:00&date=2026-10-12&scooppatch=rewind"); await page.waitForTimeout(2500);
-  check(await fox().then(f => Object.values(f.scoop.sold).reduce((a, d) => a + d.n, 0) > 0), "customers buy while it's open (the takings come to Mel)");
-  check(await fox().then(f => Object.values(f.scoop.made || {}).reduce((a, b) => a + b, 0) === 2), "nobody makes tubs behind Mel's back: only the two she made (Tomo serves now)");
+  check(await fox().then(f => Object.values(f.scoop.sold).reduce((a, d) => a + d.n, 0) > 0), "customers buy while it's open (the takings come to you)");
+  check(await fox().then(f => Object.values(f.scoop.made || {}).reduce((a, b) => a + b, 0) === 2), "nobody makes tubs behind your back: only the two you made (Tomo serves now)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nthe Cocoa Room")) try {
   // The Cocoa Room: bought from the bay's old shopfront, then bean to bar in its kitchen (roast 10 min, grind 2 hours,
   // temper, mould) and bars sold off the wall
   console.log("\nthe Cocoa Room");
@@ -1220,12 +1257,12 @@ try {
   page.on("dialog", d => { errors.push("the Cocoa Room used a browser pop-up"); d.dismiss(); });
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { const m = /ccpatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    if (m[1] === "coins") { f.coins = 2000; f.inv = {...(f.inv || {}), honey: 2, pandan: 1}; f.cocoa = {plan: {on: false}}; }   // Mateo paused while Mel works it by hand
+    if (m[1] === "coins") { f.coins = 2000; f.inv = {...(f.inv || {}), honey: 2, pandan: 1}; f.cocoa = {plan: {on: false}}; }   // Mateo paused while you work it by hand
     if (m[1] === "rewind") f.cocoa.at = 1;
     const trays = () => f.cocoa.bonbons.forEach(b => { f.cocoa.trays[b.id] = 12; });
     if (m[1] === "links" || m[1] === "fest" || m[1] === "club") { Object.assign(f.cocoa, {choc: {milk: 40, dark: 40, white: 40}, plan: {...f.cocoa.plan, on: false}}); trays(); }
     if (m[1] === "links") { f.scoop = {...(f.scoop || {}), up: {...((f.scoop || {}).up || {}), dip: 1}}; f.vine = {...(f.vine || {}), shelf: [{id: "wtest", name: "Maple's Red", type: "red", n: 3, price: 18, open: 0}]}; }
-    if (m[1] === "club") { f.goals.cellar = 1; f.cocoa.at = Date.parse("2026-11-06T10:00:00Z"); }
+    if (m[1] === "club") { f.goals.cellar = 1; f.cocoa.at = Date.parse("2026-11-06T10:00:00Z"); f.cocoa.bars = {milk: 40, dark: 40, white: 40}; }   // well stocked, so the day's shoppers can't sell out before the club arrives
     if (m[1] === "ups") { f.coins = 10000; Object.assign(f.cocoa, {choc: {milk: 40, dark: 40, white: 40}, bars: {milk: 10, dark: 10, white: 10}, roasted: 2, grind: null, ground: null, grind2: null, ground2: null, up: {}, plan: {...f.cocoa.plan, on: false}}); trays(); }
     if (m[1] === "upsrun") { const t0 = +(/t0=(\d+)/.exec(location.search) || [])[1]; Object.assign(f.cocoa, {at: t0, treeAt: t0 - 3*864e5, beans: 0, choc: {milk: 40, dark: 40, white: 40}, bars: {milk: 20, dark: 20, white: 20}}); trays(); }
     if (m[1] === "mateo") Object.assign(f.cocoa, {at: 1, plan: {on: true, buy: true, floor: 200, hold: 0}, beans: 0, roasted: 0, roast: null, grind: null, ground: null, res: {milk: 0, dark: 0, white: 0}, keep: {milk: 30, dark: 30, white: 0}, choc: {milk: 0, dark: 0, white: 0}, bars: {milk: 0, dark: 0, white: 0}, made: 0});
@@ -1269,20 +1306,20 @@ try {
   await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(800);
   check(await page.locator('#world [data-spot="barwall"]').count() === 1 && await page.locator('#world [data-spot="ckdoor"]').count() === 1, "the shop front: the bar wall, the counter, the kitchen door");
   await tap("ccounter", '#ctx [data-cc="give"][data-k="dark"]'); await page.click('#ctx [data-cc="give"][data-k="dark"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.inv.bar_dark === 1), "a dark chocolate bar to give (dairy-free, so even for Marcus)");
+  check(await fox().then(f => f.inv.bar_dark === 1), "a dark chocolate bar to give (dairy-free, so even for Tomi)");
   await page.click('#ctx [data-cc="pkopen"][data-k="box"][data-n="4"]'); await page.waitForSelector('#ctx [data-cc="pkadd"]', {timeout: 15000});
   const pickId = await page.locator('#ctx [data-cc="pkadd"]').first().getAttribute("data-k"), before = await fox().then(f => f.cocoa.trays[pickId]);
   for (let i = 0; i < 2; i++) { await page.locator('#ctx [data-cc="pkadd"]').first().click(); await page.waitForTimeout(150); }
   check(await page.locator('#ctx [data-cc="pkgo"]').isDisabled() && /2 of 4 chosen/.test(await page.locator("#ctx").textContent()), "choose the bonbons for a box: two of the first flavour, and it won't pack till there are four");
   await page.click('#ctx [data-cc="pkfill"]'); await page.waitForTimeout(150); await page.click('#ctx [data-cc="pkgo"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.inv.box4d === 1 && before - f.cocoa.trays[pickId] >= 2), "a gift box of four bonbons from the display case, the ones Mel chose (all dark, so dairy-free)");
+  check(await fox().then(f => f.inv.box4d === 1 && before - f.cocoa.trays[pickId] >= 2), "a gift box of four bonbons from the display case, the ones you chose (all dark, so dairy-free)");
   await page.click("#ctx [data-close]").catch(() => {});
   await tap("case", '#ctx [data-cc="case"]');
   check(await page.locator('#ctx [data-cc="case"]').count() === 2, "the display case shows the bonbons");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.click("#ctx [data-close]").catch(() => {});
   await at("16:00", "&ccpatch=rewind"); await page.waitForTimeout(1500);
-  check(await fox().then(f => Object.values(f.cocoa.sold || {}).reduce((a, d) => a + d.n, 0) > 0 && Object.values(f.cocoa.sold || {}).reduce((a, d) => a + (d.bonbons || 0), 0) > 0), "customers buy bars off the wall and bonbons from the case while it's open (the takings come to Mel)");
+  check(await fox().then(f => Object.values(f.cocoa.sold || {}).reduce((a, d) => a + d.n, 0) > 0 && Object.values(f.cocoa.sold || {}).reduce((a, d) => a + (d.bonbons || 0), 0) > 0), "customers buy bars off the wall and bonbons from the case while it's open (the takings come to you)");
   await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1500);
   check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("amara"), "Amara's behind the counter");
   await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(1500);
@@ -1290,9 +1327,9 @@ try {
   // Mateo runs the bar line on his own: two days of shifts, from no beans at all
   await at("18:30", "&ccpatch=mateo"); await page.waitForTimeout(1500);
   const mt = await fox().then(f => ({c: f.cocoa, coins: f.coins}));
-  check(mt.c.res.milk === 30 && mt.c.res.dark === 30 && mt.c.res.white === 0, `he fills the bonbon shelf first, to Mel's targets (milk ${mt.c.res.milk}, dark ${mt.c.res.dark})`);
+  check(mt.c.res.milk === 30 && mt.c.res.dark === 30 && mt.c.res.white === 0, `he fills the bonbon shelf first, to your targets (milk ${mt.c.res.milk}, dark ${mt.c.res.dark})`);
   check(mt.c.made >= 30 && Object.values(mt.c.bars).reduce((a, n) => a + n, 0) + Object.values(mt.c.sold).reduce((a, d) => a + d.n, 0) > 0, `then moulds the rest into bars (${mt.c.made} made), never touching the shelf`);
-  check(mt.c.bought >= 4 && mt.coins >= 200, `and buys his own beans with auto-buy (${mt.c.bought} sacks), keeping Mel above her coin floor`);
+  check(mt.c.bought >= 4 && mt.coins >= 200, `and buys his own beans with auto-buy (${mt.c.bought} sacks), keeping you above your coin floor`);
   await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
   await tap("ccounter", '#ctx [data-cc="keep"][data-k="white"][data-n="1"]'); await page.click('#ctx [data-cc="keep"][data-k="white"][data-n="1"]'); await page.waitForTimeout(300);
   await page.click('#ctx [data-cc="plan"][data-k="buy"]'); await page.waitForTimeout(300);
@@ -1336,7 +1373,7 @@ try {
   for (let i = 0; i < 11; i++) { const b = page.locator('#ctx [data-cc="buyup"]').first(); if (!(await b.count())) break; await b.click(); await page.waitForTimeout(250); }
   check(await fox().then(f => Object.keys(f.cocoa.up).length === 11 && f.coins === 10000 - 4850), "all eleven bought, the vending machine too (4850 coins)");
   await page.click('#ctx [data-cc="counter"]'); await page.waitForSelector('#ctx [data-cc="hot"]', { timeout: 15000 }); await page.click('#ctx [data-cc="hot"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.cocoa.choc.milk === 39), "the hot chocolate bar: Mel has a cup (one piece of chocolate)");
+  check(await fox().then(f => f.cocoa.choc.milk === 39), "the hot chocolate bar: you have a cup (one piece of chocolate)");
   await page.click('#ctx [data-cc="pkopen"][data-k="grand"]'); await page.waitForTimeout(300); await page.click('#ctx [data-cc="pkfill"]'); await page.waitForTimeout(150); await page.click('#ctx [data-cc="pkgo"]'); await page.waitForTimeout(300);
   check(await fox().then(f => (f.inv.box16 || 0) + (f.inv.box16d || 0) === 1), "the gift wrapping station packs a grand box of 16");
   check(await page.locator("#fore").innerHTML().then(h => /q18 6 36 0/.test(h)), "a chocolate fountain on the counter");
@@ -1351,13 +1388,13 @@ try {
   await at("16:30", `&ccpatch=upsrun&t0=${t0}`); await page.waitForTimeout(1500);
   const up = await fox();
   check((up.cocoa.sold["2026-10-10"] || {}).workshop === 48, "Saturday's bonbon workshop: six makers, 48 coins");
-  check(up.cocoa.beans >= 1, "the cacao tree at Ma Ma's sends a sack of beans");
+  check(up.cocoa.beans >= 1, "the cacao tree at the orchard sends a sack of beans");
   check((up.scoop.fridge.housechoc || 0) >= 5, "the supply deal sends dark chocolate to the Scoop Shack's fridge");
   await at("15:00"); await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1800);
   const ws = await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   check(ws.filter(id => !["amara", "lila", "mateo"].includes(id)).length >= 4 && /Bonbon workshop/.test(await page.locator("#fore").textContent()), `Saturday's workshop class at the tables (${ws.join(", ")})`);
   await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(900);
-  check(/Cacao tree/.test(await page.locator("#sceneArt").textContent()), "the cacao tree grows in Ma Ma's orchard");
+  check(/Cacao tree/.test(await page.locator("#sceneArt").textContent()), "the cacao tree grows in the orchard");
   await page.locator('#world [data-place="cacao"]').dispatchEvent("click"); await page.waitForTimeout(1500);
   check(/next in about/.test(await page.locator("#say").textContent().catch(() => "") + await page.locator("body").textContent()), "walk up to the cacao tree: when the next sack is due");
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-12"); await page.waitForTimeout(900);
@@ -1370,10 +1407,10 @@ try {
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="mstall9"]').count() === 1 && (await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("mateo"), "the Cocoa Room cart at the Sunday farmers market, with Mateo");
   await page.locator('#world [data-place="mstall9"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
-  check(/farmers market cart/.test(await page.locator("#ctx").innerText()), "and Mel can serve from it");
+  check(/farmers market cart/.test(await page.locator("#ctx").innerText()), "and you can serve from it");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nWildflower Farm")) try {
   // Wildflower Farm, east of the bay: Felix's bees, Elena's cows and goats, the farm stand
   console.log("\nWildflower Farm");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1403,7 +1440,7 @@ try {
   check(await fox().then(f => f.inv.goatmilk === 1), "a goat gives a bottle of goat's milk");
   await page.click("#ctx [data-close]").catch(() => {});
   await tap("hives", '#ctx [data-hf="honey"]'); await page.click('#ctx [data-hf="honey"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.hfarm.frames >= 2), "a full hive gives Mel two frames of comb");
+  check(await fox().then(f => f.hfarm.frames >= 2), "a full hive gives you two frames of comb");
   await page.click("#ctx [data-close]").catch(() => {});
   const c0 = await fox().then(f => f.coins);
   await tap("fstand", '#ctx [data-hf="buy"][data-k="egg"]'); await page.click('#ctx [data-hf="buy"][data-k="egg"]'); await page.waitForTimeout(300);
@@ -1437,7 +1474,7 @@ try {
   check(await page.locator('#ctx [data-hf="milkall"]').isDisabled(), "milking is mornings only");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nfarm life")) try {
   // Farm life: moods and yields, the goat gate, trust and what it unlocks, Felix and Elena's asks, swarms, turning cheese
   console.log("\nfarm life");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1468,19 +1505,19 @@ try {
   let outDay = null; for (const d of ["2026-10-08", "2026-10-09", "2026-10-11", "2026-10-12", "2026-10-13", "2026-10-14"]) { await go("08:00", d); if (await page.locator('#world [data-place="stray"]').count()) { outDay = d; break; } }
   check(!!outDay, `with the gate left unlatched, a goat gets out (${outDay})`);
   if (outDay) { await page.locator('#world [data-place="stray"]').dispatchEvent("click"); await page.waitForTimeout(3000);
-    check(await page.locator('#world [data-place="stray"]').count() === 0 && await fox().then(f => f.hfarm.caught === outDay), "and Mel rounds it up"); }
+    check(await page.locator('#world [data-place="stray"]').count() === 0 && await fox().then(f => f.hfarm.caught === outDay), "and you round it up"); }
   await tap("goats", '#ctx [data-hf="latch"]'); await page.click('#ctx [data-hf="latch"]'); await page.waitForTimeout(200);
   await page.click("#ctx [data-close]").catch(() => {});
   await go("08:00", "2026-10-10");
   check(await page.locator('#world [data-place="stray"]').count() === 0, "latched the night before: everyone's in");
   await tap("farmhouse", "#ctx h2");
-  check(/helper/i.test(await page.locator("#ctx").innerText()) && /asks/i.test(await page.locator("#ctx").innerText()), "the farmhouse: Mel's trust level and today's ask");
+  check(/helper/i.test(await page.locator("#ctx").innerText()) && /asks/i.test(await page.locator("#ctx").innerText()), "the farmhouse: your trust level and today's ask");
   await page.click("#ctx [data-close]").catch(() => {});
   await go("08:00", "2026-10-10", "&flpatch=trust");
   await tap("cows", '#ctx [data-hf="feed"]'); await page.click('#ctx [data-hf="feed"]'); await page.waitForTimeout(1500);
-  check(await fox().then(f => f.hfarm.trust >= 40 && f.hfarm.myHive), "enough help and they trust her more: a trusted hand, with a hive of her own");
+  check(await fox().then(f => f.hfarm.trust >= 40 && f.hfarm.myHive), "enough help and they trust you more: a trusted hand, with a hive of your own");
   await page.click("#ctx [data-close]").catch(() => {});
-  check(await page.locator('#world [data-place="hives"]').innerHTML().then(h => h.includes("#E8566C")), "her hive sits in the lavender with a little flag");
+  check(await page.locator('#world [data-place="hives"]').innerHTML().then(h => h.includes("#E8566C")), "your hive sits in the lavender with a little flag");
   await go("08:00", "2026-10-10", "&flpatch=swarm"); await page.waitForTimeout(21000);
   check(await fox().then(f => f.hfarm.swarms >= 1), "a full hive left too long swarms");
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-10&flpatch=wheel"); await page.waitForTimeout(900);
@@ -1496,10 +1533,10 @@ try {
   await page.click("#ctx [data-close]").catch(() => {});
   await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(900);
   await tap("fstand", '#ctx [data-hf="shelf"]'); await page.click('#ctx [data-hf="shelf"][data-k="chz_cheddar"][data-n="99"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.hfarm.shelf.chz_cheddar === 3 && !f.inv.chz_cheddar), "a partner has her own shelf at the farm stand");
+  check(await fox().then(f => f.hfarm.shelf.chz_cheddar === 3 && !f.inv.chz_cheddar), "a partner has their own shelf at the farm stand");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nHoneybrook station")) try {
   // The cottage lane and Honeybrook station: four cottages, the windmill, the timetable, and trains along the top row
   console.log("\nHoneybrook station");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1538,7 +1575,7 @@ try {
   check(await page.locator('#world [data-place="toStationV"]').count() === 1 && /Honeybrook/.test(await page.locator("#sceneArt").textContent()), "the town square: the station road up to Honeybrook, and the welcome sign");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nthe campervan")) try {
   // The campervan: bought at its spot on the cottage lane, then done up inside from the mood board
   console.log("\nthe campervan");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1568,8 +1605,8 @@ try {
   check(await fox().then(f => f.coins === 90 && f.van.use.bedding === "van_bedding_coastal"), "a piece bought once can be swapped back in for free");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // Keepsakes on the shelves of Mel's buildings, and pets adopted at the market that live with someone in the family
+if (want("\nkeepsakes and pets")) try {
+  // Keepsakes on the shelves of your buildings, and pets adopted at the market that live with one of your friends
   console.log("\nkeepsakes and pets");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`pets pageerror: ${e.message}`));
@@ -1592,7 +1629,7 @@ try {
   await page.click("#ctx [data-keepdown]"); await page.waitForTimeout(400);
   check(await fox().then(f => !f.keeps.scoop1 && f.inv.k_conelamp === 1), "and comes back down into the backpack");
   await page.click('#bag .item[data-id="cuenco"]').catch(async () => { await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="cuenco"]'); });
-  await page.waitForSelector('#bag [data-keepit]', { timeout: 15000 }); check(await page.locator('#bag [data-giveto="mum"]').count() === 1, "a Ronda souvenir can still be given away");
+  await page.waitForSelector('#bag [data-keepit]', { timeout: 15000 }); check(await page.locator('#bag [data-giveto="hana"]').count() === 1, "a Ronda souvenir can still be given away");
   await page.click('#bag [data-keepit]'); await page.waitForSelector('#ctx [data-keepat="mill1"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-keepat="cocoa2"]').count() === 1 && await page.locator('#ctx [data-keepat="green1"]').count() === 1 && await page.locator('#ctx [data-keepat="fridge"]').count() === 0, "or kept: new shelves in the Cocoa Room, the greenhouse and the mill (and the fridge is for magnets)");
   await page.click('#ctx [data-keepat="mill1"]'); await page.waitForTimeout(500);
@@ -1604,21 +1641,24 @@ try {
   await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(900);
   check(await fox().then(f => f.keeps.fridge === "iman") && await page.locator('#world [data-keep="fridge"]').count() === 1, "and there it is on the fridge at home");
   await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(900);
-  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="pet_puppy"]'); await page.waitForSelector('#ctx [data-adoptfor="evan"]', { timeout: 15000 });
-  await page.click('#ctx [data-adoptfor="evan"]'); await page.waitForSelector('#ctx [data-adoptat="home"]', { timeout: 15000 });
+  await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="pet_puppy"]'); await page.waitForSelector('#ctx [data-adoptfor="farid"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-adoptfor]').evaluateAll(n => n.map(x => x.dataset.adoptfor).sort().join()) === "bo,farid,hana,mei,posy,theo,tomi", "a pet can go to any of the seven friends");
+  await page.click('#ctx [data-adoptfor="farid"]'); await page.waitForSelector('#ctx [data-adoptat="orchard"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-adoptat="room"]').count() === 1 && await page.locator('#ctx [data-adoptat="field"]').count() === 1, "adopting a puppy: it can live at home, in a building or outdoors");
-  await page.click('#ctx [data-adoptat="home"]'); await page.waitForTimeout(800);
+  await page.click('#ctx [data-adoptat="orchard"]'); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=12:30&date=2026-10-10"); await page.waitForTimeout(900);   // Farid's lunch under the trees
+  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(1200);
   const pet = await fox().then(f => (f.companions || [])[0]);
-  check(pet && pet.owner === "evan" && pet.scene === "home" && pet.kind === "puppy" && await page.locator('#world [data-pet]').count() === 1, `the puppy is Evan's now and lives at home (${pet && pet.name})`);
+  check(pet && pet.owner === "farid" && pet.scene === "orchard" && pet.kind === "puppy" && await page.locator('#world [data-pet]').count() === 1, `the puppy is Farid's now and lives in the orchard (${pet && pet.name})`);
   await page.locator('#world [data-pet]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-petdo="pat"]', { timeout: 15000 });
   await page.click('#ctx [data-petdo="pat"]'); await page.waitForTimeout(300);
   const canPlay = await page.locator('#ctx [data-petdo="play"]').count();
   if (canPlay) { await page.click('#ctx [data-petdo="play"]'); await page.waitForTimeout(500); }
-  check(canPlay === 1 && await fox().then(f => f.companions[0].playDay && f.companions[0].patDay), "pat the puppy, and with Evan home, they play together");
+  check(canPlay === 1 && await fox().then(f => f.companions[0].playDay && f.companions[0].patDay), "pat the puppy, and with Farid there, they play together");
   await page.click("#pclose").catch(() => {});
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nScoop Shack upgrades")) try {
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
@@ -1648,7 +1688,7 @@ try {
   const f1 = await fox();
   check(["honesty", "awning", "neon", "bike", "dip"].every(k => f1.scoop.up[k]) && f1.coins === 3000 - 2300, `all five bought (coins ${f1.coins})`);
   await page.click("#ctx [data-close]").catch(() => {});
-  await page.locator('#world [data-spot="gddoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
+  await page.locator('#world [data-spot="gddoor"]').dispatchEvent("click"); await page.waitForSelector('#world [data-spot="gdipbar"]', { timeout: 15000 }).catch(() => {});
   check(await page.locator('#world [data-spot="gdipbar"]').count() === 1 && await page.locator('#world [data-spot="gtops"]').count() === 1, "the dip station's door opens into its own room");
   await page.evaluate(() => window.__mapleScene("scoopdip")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="gtops"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gtopbuy="coconut"]', { timeout: 15000 }); await page.click('#ctx [data-gtopbuy="coconut"]'); await page.waitForTimeout(300);
@@ -1666,12 +1706,12 @@ try {
   check(/dark-chocolate dipped with coconut shavings/.test(await page.locator(`#bag .item[data-id="${dipped}"]`).innerText()), "it's in the backpack by name");
   await page.click('#bag [data-deliver]'); await page.waitForSelector("#ctx [data-gvpick]", { timeout: 15000 });
   await page.locator("#ctx [data-gvpick]").first().click(); await page.waitForTimeout(200);
-  check(await page.locator('#ctx [data-gvto="marcus"]').count() === 0 && await page.locator('#ctx [data-gvto="mum"]').count() === 1, "the delivery bike sends from anywhere (a gelato isn't offered to Marcus)");
-  await page.click('#ctx [data-gvto="mum"]'); await page.waitForTimeout(400);
-  check(await fox().then(f => (f.thanks || []).some(t => t.who === "mum" && /^gel_/.test(t.item))), "Tomo pedals it to Mum, and a thank-you note is on its way");
+  check(await page.locator('#ctx [data-gvto="tomi"]').count() === 0 && await page.locator('#ctx [data-gvto="hana"]').count() === 1, "the delivery bike sends from anywhere (a gelato isn't offered to Tomi)");
+  await page.click('#ctx [data-gvto="hana"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => (f.thanks || []).some(t => t.who === "hana" && /^gel_/.test(t.item))), "Tomo pedals it to Hana, and a thank-you note is on its way");
   await page.goto(url + "?seed=1&time=21:00&date=2026-10-13&uppatch=rewind"); await page.waitForTimeout(2500);
   const box = await fox().then(f => f.scoop.box);
-  check(await fox().then(f => (f.scoop.sold["2026-10-13"] || {}).cart > 0), "the cart sells at Tuesday's night market (the takings come to Mel)");
+  check(await fox().then(f => (f.scoop.sold["2026-10-13"] || {}).cart > 0), "the cart sells at Tuesday's night market (the takings come to you)");
   check(box > 0, `the honesty freezer sold while the shop was shut (${box} coins in its box)`);
   await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
   check(await page.locator('#world [data-place="hfreezer"]').count() === 1 && await page.locator('#world [data-place="dbike"]').count() === 1 && await page.locator("#sceneArt .nightcopy circle").count() > 5, "the freezer and bike are on the bay, and the fairy lights glow at night");
@@ -1683,7 +1723,7 @@ try {
   check(await page.locator("#panel").isHidden() || !(await page.locator("#ctx").innerText()).includes("honesty freezer"), "the ✕ closes the Scoop Shack's panels too");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\ningredients")) try {
   // Ingredients: pantry staples at Hana's deli, grapes out of the vineyard's crates, things back out of the larder
   console.log("\ningredients");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1711,7 +1751,7 @@ try {
   check(await fox().then(f => f.inv.fish >= 1 && !(f.kitchen.larder.fish)), "anything in the wine shop's larder can be taken back to the backpack");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\naccessories in the wardrobe")) try {
   // Accessories in the wardrobe: bought once at Hana's, worn or put away from the wardrobe
   console.log("\naccessories in the wardrobe");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1722,16 +1762,16 @@ try {
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-06"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-06&accpatch=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(800);
-  check(await page.locator("#melBow").isVisible() && await page.locator("#melPj").isVisible(), "Mel's wearing her velvet bow, and her silk pyjamas in her room");
+  check(await page.locator("#melBow").isVisible() && await page.locator("#melPj").isVisible(), "you're wearing your velvet bow, and your silk pyjamas in your room");
   await page.locator('#world [data-spot="wardrobe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-acc="me_bow"]', { timeout: 15000 });
-  check(await page.locator("#ctx [data-acc]").count() === 2, "the wardrobe lists the accessories she owns");
+  check(await page.locator("#ctx [data-acc]").count() === 2, "the wardrobe lists the accessories you own");
   await page.click('#ctx [data-acc="me_bow"]'); await page.waitForTimeout(300); await page.click('#ctx [data-acc="me_pj"]'); await page.waitForTimeout(400);
-  check(!(await page.locator("#melBow").isVisible()) && !(await page.locator("#melPj").isVisible()), "and she can take them off there");
+  check(!(await page.locator("#melBow").isVisible()) && !(await page.locator("#melPj").isVisible()), "and you can take them off there");
   await page.click('#ctx [data-acc="me_bow"]'); await page.waitForTimeout(400);
   check(await page.locator("#melBow").isVisible(), "and put them back on");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nsunset and dusk")) try {
   // The evening light: a sunset from 6pm deepening into dusk by 7:30, the same on every outdoor screen
   console.log("\nsunset and dusk");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1747,7 +1787,7 @@ try {
     return n > 5 && n*2 === all && document.querySelectorAll("#sceneArt .nightcopy rect").length >= 4; }), "at night the street lamps light up and every place name sits on white tape above the dark");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nthe night market")) try {
   // The night market: Tuesday and Thursday evenings, 6 to 10pm on the field. Out-of-town traders, fairy lights, a jazz
   // duo on a little stage (tip the band), tourists and a few villagers shopping; the wine shop's evening regulars still come
   console.log("\nthe night market");
@@ -1765,7 +1805,7 @@ try {
   check(await page.locator('#world [data-place="jazzhat"]').count() === 1 && await page.locator('#world [data-place="exlawn"]').count() === 0, "a jazz stage on the lawn (the exercise mats packed away), with a hat for tips");
   const c0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
   await page.locator('#world [data-place="jazzhat"]').dispatchEvent("click");
-  await page.waitForFunction(c => JSON.parse(localStorage.getItem("fox.fox")).coins !== c, c0, { timeout: 15000 }).catch(() => {});   // Mel walks over to the hat first
+  await page.waitForFunction(c => JSON.parse(localStorage.getItem("fox.fox")).coins !== c, c0, { timeout: 15000 }).catch(() => {});   // you walk over to the hat first
   { const c1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins); check(c1 === c0 - 2, `two coins in the band's hat (${c0} -> ${c1})`); }
   await page.locator('#world [data-place="mstall0"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="friedchicken"]', { timeout: 15000 });
   const yunToday = await page.locator("#ctx .item[data-id]").evaluateAll(n => n.map(x => x.dataset.id));
@@ -1774,7 +1814,7 @@ try {
   check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.fox")).inv || {}).friedchicken === 1), "bought one, as a gift");
   await page.click('#ctx [data-close]').catch(() => {});
   await page.locator('#world [data-place="mstall5"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-decor="n_lanterns"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-decor="r_moon"]').count() === 1, "the lantern stall has lanterns for the house and a moon lamp for Mel's room");
+  check(await page.locator('#ctx [data-decor="r_moon"]').count() === 1, "the lantern stall has lanterns for the house and a moon lamp for your room");
   await page.click('#ctx [data-close]').catch(() => {});
   check(here.includes("tomo") && await page.locator('#world [data-place="mstall8"]').count() === 1, "and the Scoop Shack's cart, with Tomo scooping");
   await page.locator('#world [data-place="mstall8"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
@@ -1802,32 +1842,25 @@ try {
   check((await ids()).includes("juniper"), "the wine shop's evening regulars still drop in (Juniper at 6:45 on a night market Tuesday)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // Bedroom doors: Ma Ma and Gong Gong, Mum and Dad, Marcus and Angellina head to bed at 10:50pm and are gone after 11
+if (want("\nbedroom doors")) try {
+  // Bedroom doors: Farid and Mei, Hana and Theo, Tomi and Posy head to bed at 10:50pm and are gone after 11
   console.log("\nbedroom doors");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`bedroom pageerror: ${e.message}`));
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
-  const pairs = {cottage: ["mama", "gonggong"], mumdad: ["mum", "dad"], marcus: ["marcus", "angelina"]};
+  const pairs = {cottage: ["farid", "mei"], hanatheo: ["hana", "theo"], tomiposy: ["tomi", "posy"]};
   await page.goto(url + "?reset=1&seed=1&time=22:55&date=2026-10-13"); await page.waitForTimeout(800);
   for (const [h, two] of Object.entries(pairs)) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(1500);
     check(await page.locator('#world [data-spot="bedroom"]').count() === 1 && await ids().then(a => two.every(f => a.includes(f))), `${h} has a bedroom door, and ${two.join(" and ")} are at it just before 11pm`); }
-  check(await page.evaluate(() => { window.__mapleScene("cottage"); return true; }) && await page.locator('#world [data-spot="mbed"]').count() === 0, "Ma Ma's bed is out of the cottage's main room");
-  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(1500);
-  check(await ids().then(a => a.includes("darren")), "Darren winds down on the sofa before bed");
+  check(await page.evaluate(() => { window.__mapleScene("cottage"); return true; }) && await page.locator('#world [data-spot="mbed"]').count() === 0, "no bed in the cottage's main room");
   await page.goto(url + "?seed=1&time=23:30&date=2026-10-13"); await page.waitForTimeout(800);
   for (const [h, two] of Object.entries(pairs)) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(1200);
     check(await ids().then(a => !two.some(f => a.includes(f))), `after 11pm ${two.join(" and ")} are behind the bedroom door`); }
   await page.locator('#world [data-spot="bedroom"]').dispatchEvent("click"); await page.waitForFunction(() => /asleep/.test(document.querySelector("#speech").textContent), null, { timeout: 15000 }).catch(() => {});
   check(/fast asleep/.test(await page.locator("#speech").textContent()), "knocking at night: they're fast asleep");
-  await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(1000);
-  check(await page.locator("#world .darrenBed").count() === 1, "and Darren's asleep in Mel's bed by 11pm");
-  await page.goto(url + "?seed=1&time=15:00&date=2026-10-13"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(1000);
-  check(await page.locator("#world .darrenBed").count() === 0, "but not in the afternoon");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nrainy days")) try {
   // Rain on any day of the year (light showers outside the wet season), and everyone in their own rain gear
   console.log("\nrainy days");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1835,7 +1868,7 @@ try {
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-12"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => { const r = document.getElementById("rain"); return !r.hidden && r.classList.contains("light"); }), "a light shower in October (not just the wet season)");
-  check(await page.locator("#melRain .brolly").count() === 1 && await page.evaluate(() => document.getElementById("evan").classList.contains("raincoat")), "Mel under her brolly, Evan in his raincoat and wellies");
+  check(await page.locator("#melRain .brolly").count() === 1, "you're under your brolly");
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(2500);
   const gear = await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].map(n => n.querySelector(".brolly") ? "b:" + n.querySelector(".brolly > path:nth-of-type(3)").getAttribute("style") : n.querySelector(".rcoat") ? "c:" + n.querySelector(".rcoat").getAttribute("style") : ""));
   check(gear.length > 0 && gear.every(Boolean) && new Set(gear).size > 1, "everyone in town has a brolly or a raincoat, not all the same");
@@ -1844,7 +1877,7 @@ try {
   check(await page.evaluate(() => document.getElementById("rain").hidden) && await page.locator("#melRain .brolly, #actors .brolly").count() === 0, "and on a dry day the brollies are put away");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nfishing")) try {
   // Fishing: a rod, worms from real-life quests, cast, wait for the bite, reel in the green; a journal of catches
   console.log("\nfishing");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1862,7 +1895,7 @@ try {
   await page.click('#ctx [data-fish="cast"]'); await page.waitForTimeout(200); await page.click('#ctx [data-fish="reel"]'); await page.waitForTimeout(200);
   check(/Too soon/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 2), "reel in before the bite and it's gone (with the worm)");
   await page.click('#ctx [data-fish="cast"]'); await page.waitForSelector("#ctx .fbar", { timeout: 9000 });
-  check(await page.locator("#world #melRod").isVisible(), "Mel holds her rod while she's fishing");
+  check(await page.locator("#world #melRod").isVisible(), "you hold your rod while you're fishing");
   await page.waitForFunction(() => { const e = document.querySelector("#ctx .fbar"); if (!e) return true; const q = ((Date.now() - +e.dataset.t0)/+e.dataset.dur) % 2, m = q < 1 ? q : 2 - q; if (Math.abs(m - +e.dataset.at) >= +e.dataset.w/2 - .03) return false; document.querySelector('#ctx [data-fish="reel"]').click(); return true; }, null, { polling: 10, timeout: 5000 });   // reel the instant it's in the green (a separate click can miss it on a busy machine)
   await page.waitForTimeout(300);
   const f1 = await fox(), got = Object.keys(f1.fish.caught);
@@ -1876,7 +1909,7 @@ try {
   check(await page.locator('#ctx [data-fish="cast"]').isDisabled() && /Finish a quest/.test(await page.locator("#ctx").textContent()), "no worms left: finish a quest to dig up another");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nmore uses, more tapas")) try {
   // Round 101: goat's milk in the press, farm cheeses and honey in the kitchen, the chef's request, more tapas
   console.log("\nmore uses, more tapas");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1901,9 +1934,9 @@ try {
   check(await fox().then(f => f.vine.menu.shortbread === 4 && !f.kitchen.larder.tulip), "garden tulips go into flower shortbread");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // Phase 4, the rest: sunflower seeds for the hens, petal syrup, bouquet orders, Ma Ma's tomato and egg at dinner
-  console.log("\nflowers, eggs and Ma Ma's tomato and egg");
+if (want("\nflowers, eggs and bouquet orders")) try {
+  // Phase 4, the rest: sunflower seeds for the hens, petal syrup, bouquet orders
+  console.log("\nflowers, eggs and bouquet orders");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`phase4 pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -1933,15 +1966,11 @@ try {
   await page.waitForSelector('#ctx [data-or="order"]', { timeout: 20000 }).catch(() => {});
   const c0 = await fox().then(f => f.coins);
   if (await page.locator('#ctx [data-or="order"]').count()) { await page.click('#ctx [data-or="order"]'); await page.waitForTimeout(300);
-    check(await fox().then(f => f.coins === c0 + 25 && !f.inv.bq_tulip), "a bouquet order at Ma Ma's: hand one over for 25 coins"); }
-  else check(false, "a bouquet order at Ma Ma's: hand one over for 25 coins");
-  await page.goto(url + "?seed=1&time=19:00&date=2026-10-07"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("cottage")); await page.waitForTimeout(2000);
-  await page.locator('#world [data-spot="dine"]').dispatchEvent("click"); await page.waitForTimeout(1500);
-  check(await fox().then(f => !f.inv.tomato && (f.inv.egg || 0) === eggs0), "at family dinner, two tomatoes and two eggs become Ma Ma's tomato and egg");
+    check(await fox().then(f => f.coins === c0 + 25 && !f.inv.bq_tulip), "a bouquet order at the farm shop: hand one over for 25 coins"); }
+  else check(false, "a bouquet order at the farm shop: hand one over for 25 coins");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nHoneybrook Woods, bikes and the river taxi")) try {
   // Round 103: Honeybrook Woods (the waterfall, the ranger, foraging, the pool), hire bikes, the river taxi, and
   // villagers out and about on the new screens (on bikes, fishing, at the farm and in the cottages)
   console.log("\nHoneybrook Woods, bikes and the river taxi");
@@ -1968,14 +1997,14 @@ try {
     check(await fox().then(f => f.coins === 95 && f.bike && f.bike.until > gameNow), "a hire bike: 5 coins for an hour"); }
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-place="lookout"]').dispatchEvent("click"); await page.waitForTimeout(400);
-  check(await page.locator("#mel.biking").count() === 1, "Mel rides it (faster than walking, slower than the scooter)");
+  check(await page.locator("#mel.biking").count() === 1, "you ride it (faster than walking, slower than the scooter)");
   await page.waitForTimeout(3500);
   await page.locator('#world [data-place="taxiwoods"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-taxi]', { timeout: 15000 });
   check(await page.locator('#ctx [data-taxi]').count() === 4, "the river taxi stops: Makers' Lane, home, the lake and the foreshore");
   await page.click('#ctx [data-taxi="taxishore"]'); await page.waitForTimeout(800);
   check(await page.locator(".taxiride").count() === 1, "a little ride down the river on the launch");
   await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 15000 });
-  check(await fox().then(f => f.coins === 91), "and off at the foreshore, one gate from Ma Ma's flower farm (4 coins)");
+  check(await fox().then(f => f.coins === 91), "and off at the foreshore, one gate from the flower farm (4 coins)");
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="homejetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-taxiopen]', { timeout: 15000 });
   await page.click('#ctx [data-taxiopen]'); await page.waitForTimeout(300);
@@ -1983,55 +2012,55 @@ try {
   await page.locator('#ctx [data-close]').first().click();
   await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(900);
   check(await page.locator('#world [data-place="toWoodsM"]').count() === 1 && await page.locator('#world [data-place="taxilane"]').count() === 1, "Makers' Lane: the river comes down from the woods, with a taxi stop and a path up the hill");
-  await page.goto(url + "?seed=1&time=7:00&date=2026-10-10"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(2000);
-  check(await page.locator('#actors .npc[data-npc="dad"] .bikeArt, #actors .npc[data-npc="dad"]').count() >= 1 && await page.evaluate(() => { const n = document.querySelector('#actors .npc[data-npc="dad"]'); return !!n && n.innerHTML.includes("#8A5A3A") && n.innerHTML.includes("#E8566C"); }), "Dad's fishing off the pier on a Saturday morning");
+  await page.goto(url + "?seed=1&time=7:00&date=2026-10-07"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2000);
+  check(await page.locator('#actors .npc[data-npc="mei"].act-fish').count() === 1, "Mei's fishing at the lake early on a Wednesday");
   await page.goto(url + "?seed=1&time=21:30&date=2026-10-07"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("honeysuckle")); await page.waitForTimeout(2000);
   check(await ids().then(a => a.includes("mateo") && a.includes("lila")), "Mateo and Lila are home in Honeysuckle in the evening");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nstories, and friends out at the fairs")) try {
   // Round 104: backstories told a chapter at a time in the bubbles (on days with a quest done), with rewards; and
-  // Mel's family at the night market and the fair
-  console.log("\nstories and the family out at the fairs");
+  // your friends at the night market and the fair
+  console.log("\nstories, and friends out at the fairs");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`stories pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   await page.addInitScript(() => { if (!/storypatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     f.met = {...(f.met || {}), celeste: true}; f.goals = {...(f.goals || {}), cocoa: 1}; f.story = {heard: {celeste: 4}, day: {}, log: [], flags: {}};
-    if (/quest=1/.test(location.search)) f.storyDay = "2026-10-07";
+    if (/quest=1/.test(location.search)) { f.board = f.board || {}; f.board.hearts = {...(f.board.hearts || {}), celeste: 3}; f.board.story = {...(f.board.story || {}), celeste: "2026-10-07"}; }
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&storypatch=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(2800);
-  check(await page.locator('#actors .npc[data-npc="celeste"].story').count() === 0, "no quest done today: no story chapter yet");
+  check(await page.locator('#actors .npc[data-npc="celeste"].story').count() === 0, "not enough hearts yet: no story chapter");
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&storypatch=1&quest=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(2800);
-  check(await page.locator('#actors .npc[data-npc="celeste"].story').count() === 1, "a quest done today: Celeste has a chapter ready (the little … over her head)");
+  check(await page.locator('#actors .npc[data-npc="celeste"].story').count() === 1, "three hearts and her request done today: Celeste has a chapter ready (the little … over her head)");
   await page.locator('#actors .npc[data-npc="celeste"]').dispatchEvent("click"); await page.waitForTimeout(600);
   check(/smelled chocolate again/.test(await page.locator("#npcSay").textContent()), "she tells it in her bubbles: the old chocolatier was her family's");
   const f1 = await fox();
-  check(f1.story.heard.celeste === 5 && f1.inv.s_recipebook === 1 && f1.inv.s_praline === 2, "and gives Mel Henri's recipe book and his pralines");
+  check(f1.story.heard.celeste === 5 && f1.inv.s_recipebook === 1 && f1.inv.s_praline === 2, "and gives you Henri's recipe book and his pralines");
   await page.waitForTimeout(12000);
   await page.locator('#actors .npc[data-npc="celeste"]').dispatchEvent("click"); await page.waitForTimeout(400);
   check(await fox().then(f => f.story.heard.celeste === 5), "one chapter a day: the next waits for another day");
-  { const st = await import(new URL("../src/game/stories.js", import.meta.url)), day = "2026-10-07", ids = ["celeste", "okada", "hana", "bo", "theo", "juniper"];
-    const F = {storyDay: day, met: Object.fromEntries(ids.map(i => [i, true])), story: {heard: {}, day: {}, log: [], flags: {}}}, ready = () => ids.filter(i => st.storyReady(F, i, day));
+  { const st = await import(new URL("../src/game/stories.js", import.meta.url)), day = "2026-10-11", ids = ["carmen", "rafael", "lucia", "manolo"];
+    const F = {met: Object.fromEntries(ids.map(i => [i, true])), inv: {}, story: {heard: {}, day: {}, log: [], flags: {}}}, ready = () => ids.filter(i => st.storyReady(F, i, day));
     const r0 = ready().length; st.tellStory(F, ready()[0], () => {}, day); st.tellStory(F, ready()[0], () => {}, day);
-    check(r0 === 2 && ready().length === 0, "at most two villagers tell a chapter a day (six could; two do)"); }
-  // the family at the night market (Tuesday) and the fair (the last Saturday)
+    check(r0 === 2 && ready().length === 0, "on a trip, at most two locals tell a chapter a day (four could; two do)"); }
+  // friends at the night market (Tuesday) and the fair (the last Saturday)
   await page.goto(url + "?seed=1&time=18:45&date=2026-10-06"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);
-  check(await ids().then(a => ["mama", "gonggong", "marcus", "angelina"].every(x => a.includes(x))), "Tuesday's night market: Ma Ma, Gong Gong, Marcus and Angellina are there");
+  check(await ids().then(a => ["farid", "mei", "tomi", "posy"].every(x => a.includes(x))), "Tuesday's night market: Farid, Mei, Tomi and Posy are there");
   await page.goto(url + "?seed=1&time=11:30&date=2026-10-31"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);
-  check(await ids().then(a => ["mum", "dad", "mama", "gonggong"].every(x => a.includes(x))), "the field fair: Mum, Dad, Ma Ma and Gong Gong are there in the morning");
+  check(await ids().then(a => ["hana", "theo", "farid", "mei"].every(x => a.includes(x))), "the field fair: Hana, Theo, Farid and Mei are there in the morning");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  // Round 105: reopening the game the same day picks up where Mel left off; tulip bulbs on sale in autumn
+if (want("\npicking up where you left off")) try {
+  // Round 105: reopening the game the same day picks up where you left off; tulip bulbs on sale in autumn
   console.log("\npicking up where you left off");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, resume: true });
   page.on("pageerror", e => errors.push(`resume pageerror: ${e.message}`));
@@ -2040,28 +2069,28 @@ try {
   await page.evaluate(() => window.__mapleScene("hwoods")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="lookout"]').dispatchEvent("click"); await page.waitForTimeout(3500);
   await page.goto(url + "?seed=1&time=12:30&date=2026-10-07"); await page.waitForTimeout(1500);
-  check(/Woods/.test(await page.locator("#sceneName").textContent()), "reopening the same day: back in Honeybrook Woods, where Mel left off");
+  check(/Woods/.test(await page.locator("#sceneName").textContent()), "reopening the same day: back in Honeybrook Woods, where you left off");
   await page.goto(url + "?seed=1&time=9:00&date=2026-10-08"); await page.waitForTimeout(1500);
-  check(/Home/.test(await page.locator("#sceneName").textContent()), "a new day: she wakes up at home");
+  check(/Home/.test(await page.locator("#sceneName").textContent()), "a new day: you wake up at home");
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(800);
   await page.locator('#world [data-place="market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-shop="seeds"]', { timeout: 20000 });
   await page.click('#ctx [data-shop="seeds"]'); await page.waitForTimeout(300);
   check(await page.locator('#ctx .item[data-id="tulip_seed"]').count() === 1 && await page.locator('#ctx .item[data-id="sunflower_seed"]').count() === 1, "in autumn the seed shelf has tulip bulbs and sunflower seeds");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\na day trip to Kyoto")) try {
   console.log("\na day trip to Kyoto");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), K = tw.TOWNS.kyoto;
   { const own = [...readFileSync(join(root, "src/data/world.js"), "utf8").matchAll(/^  ([a-zA-Z_]+):\s*\{scene:/gm)].map(m => m[1]);
     check(!Object.keys(tw.TOWN_PLACES).some(k => own.includes(k)), "no town's places share a name with a Honeybrook place (Kyoto's temple hall once replaced the Town hall)"); }
   check(K.fare === 60 && K.screens.length === 4 && K.screens.every(sc => tw.townOf(sc) === "kyoto") && Object.keys(tw.TOWN_BRIDGES).filter(k => k.startsWith("kt_")).length === 4, "Kyoto: four screens, 60 coins a ticket");
   const ronda = tw.TOWNS.ronda.acts, used = new Set(Object.values(ronda).flatMap(a => Object.values(a).map(x => x.act)));
-  check(Object.values(K.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "nobody in the family does the same thing in Kyoto as in Ronda");
+  check(Object.values(K.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "nobody does the same thing in Kyoto as in Ronda");
   { const ky = await import(new URL("../src/game/kyoto.js", import.meta.url)), F = {coins: 100, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
     const w = ky.whiskStart(0); for (let i = 0; i < 8; i++) ky.whisk(w, w.t0 + i*ky.TEA.BEAT + 30); const w2 = ky.whiskStart(0); for (let i = 0; i < 8; i++) ky.whisk(w2, w2.t0 + i*ky.TEA.BEAT + 280);
     check(ky.froth(w) && !ky.froth(w2), "the tea ceremony: whisks on the beat froth the tea, off the beat don't");
     const b = ky.sitStart(0); [["in", 100], ["out", 4100], ["in", 8100], ["out", 12100], ["in", 16100], ["out", 20100]].forEach(([k, t]) => ky.breathe(b, k, b.t0 + t)); check(b.done && ky.calm(b), "meditation: three breaths with the circle");
-    check(ky.makeNerikiri(F, "sakura", add) === "nk_sakura" && ky.throwCup(F, true, add) && F.inv.k_mycup === 1 && F.inv.k_dadcup === 1 && F.coins === 82, "a nerikiri (8) and a teacup on the wheel (10), Dad's lopsided one too");
+    check(ky.makeNerikiri(F, "sakura", add) === "nk_sakura" && ky.throwCup(F, true, add) && F.inv.k_mycup === 1 && F.inv.k_dadcup === 1 && F.coins === 82, "a nerikiri (8) and a teacup on the wheel (10), Theo's lopsided one too");
     Object.keys(ky.STAMP_AT).forEach(p => ky.stamp(F, p)); check(F.kyoto.lantern && ky.stampCount(F) === 8, "eight stamps fill the book, and the stone lantern goes by the pond at home"); }
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), ids = np.NPCS.map(n => n.id), kt = np.NPCS.filter(n => n.local === "kyoto");
     check(new Set(ids).size === ids.length && kt.length >= 15 && kt.filter(n => n.tourist).length >= 6, "Kyoto has plenty of people to meet (and no two villagers share an id)"); }
@@ -2077,22 +2106,22 @@ try {
   await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
   await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-ttown="kyoto"]', { timeout: 15000 });
   await page.click('#ctx [data-ttown="kyoto"]'); await page.waitForTimeout(300);
-  await page.click('#ctx [data-tpick="gonggong"]'); await page.click('#ctx [data-tpick="evan"]');
-  check(/120/.test(await page.locator("#ctx [data-trip]").textContent()) && /Kyoto/.test(await page.locator("#ctx h2").textContent()), "the ticket window offers Kyoto: Mel and Gong Gong, 120 coins (Evan free)");
+  check(await page.locator('#ctx [data-tpick]').evaluateAll(n => n.map(x => x.dataset.tpick).sort().join()) === "bo,farid,hana,mei,posy,theo,tomi", "any of the seven friends can come along");
+  await page.click('#ctx [data-tpick="mei"]');
+  check(/120/.test(await page.locator("#ctx [data-trip]").textContent()) && /Kyoto/.test(await page.locator("#ctx h2").textContent()), "the ticket window offers Kyoto: you and Mei, 120 coins");
   await page.click("#ctx [data-trip]");
   await page.waitForFunction(() => /Kyoto/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
-  check(await fox().then(f => f.coins === 180 && f.trip.town === "kyoto") && await ids().then(a => a.includes("gonggong")), "off the train at Kyoto station, with Gong Gong and Evan");
+  check(await fox().then(f => f.coins === 180 && f.trip.town === "kyoto") && await ids().then(a => a.includes("mei")), "off the train at Kyoto station, with Mei");
   check(await page.evaluate(() => ["kttrain", "ktbamboo", "ktyukata", "ktToLane", "ktToRiver"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "the station screen: the station, the bamboo grove, the yukata shop, and the ways east and south");
   for (const [gate, want, places] of [["ktToLane", "Higashiyama", ["ktpagoda", "ktchaya", "ktwagashi", "ktpottery"]], ["ktStepsDown", "temple", ["kthall", "kttorii", "ktzen", "ktkoi"]], ["ktToRiverW", "river", ["ktnishiki", "ktstones"]], ["ktToStationN", "station", ["kttrain"]]]) {
     await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
     await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
-    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("gonggong")), `through the gate to Kyoto's ${want} (Gong Gong follows)`);
+    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("mei")), `through the gate to Kyoto's ${want} (Mei follows)`);
   }
   // round 122-124: the yukata shop, the five rooms and their activities, the stamp book
   await page.locator('#world [data-place="ktyukata"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-kt="yukata:indigo"]', { timeout: 15000 });
   await page.click('#ctx [data-kt="yukata:indigo"]'); await page.waitForTimeout(500);
-  check(await fox().then(f => f.kyoto.yukata && f.kyoto.yukata.col === "indigo" && f.coins === 165) && await page.locator("#oDress").evaluate(e => e.style.display !== "none"), "a yukata for the day (15 coins): Mel's in indigo");
-  check(await page.locator("#evan").evaluate(e => e.style.getPropertyValue("--tee") === "#3E5E7A"), "and Evan's in a little jinbei");
+  check(await fox().then(f => f.kyoto.yukata && f.kyoto.yukata.col === "indigo" && f.coins === 165) && await page.locator("#mel .clTorso").evaluate(e => e.innerHTML.length > 50), "a yukata for the day (15 coins): you're in indigo");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   await page.locator('#world [data-place="ktToLane"]').dispatchEvent("click");
   await page.waitForFunction(() => /Higashiyama/.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 }); await page.waitForTimeout(1000);
@@ -2129,18 +2158,20 @@ try {
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 
-try {
+if (want("\na day trip to Ronda")) try {
   console.log("\na day trip to Ronda");
-  // who's away: tours, Ma Ma's stall, Mum's class and the family dinner all work round them
-  { const t = await import(new URL("../src/game/tours.js", import.meta.url)), sun = "2026-10-11", tue = "2026-10-13", wed = "2026-10-14";
-    const host0 = t.dinnerOn(sun).host;
-    t.setAway(() => ["mama", "gonggong", "mum", "dad", "darren"]);
-    check(t.toursOn(sun).every(x => !["mama", "gonggong"].includes(x.guide)) && t.eventOn(sun).stalls.find(x => x.at === 4).id === "mei", "Ma Ma and Gong Gong away: Farid or Mei lead the tours, and Mei minds Ma Ma's stall");
-    check(t.toursOn(tue)[0].guide === "farid" && !t.classOn(tue), "Darren away: Farid leads his Tuesday tour; Mum away: no class that morning");
-    const hostAway = d => ({mumdad: ["mum", "dad"], cottage: ["mama", "gonggong"], marcus: [], home: []})[t.dinnerOn(d).host].length > 0;
-    check(!hostAway(sun) && !hostAway(wed) && (["mumdad", "cottage"].includes(host0) ? t.dinnerOn(sun).host !== host0 : true), "a family dinner whose hosts are away moves to another house");
+  // who's away: tours, Farid's stall and Hana's class all work round them
+  { const t = await import(new URL("../src/game/tours.js", import.meta.url)), sat = "2026-10-10", sun = "2026-10-11", tue = "2026-10-13", wed = "2026-10-14";
+    t.setAway(() => ["farid"]);
+    check(t.toursOn(sat).length === 4 && t.toursOn(sat).every(x => x.guide === "mei") && t.eventOn(sun).stalls.find(x => x.at === 4).id === "mei", "Farid away: Mei leads Saturday's tours and minds his stall on Sunday");
+    t.setAway(() => ["farid", "mei"]);
+    check(t.toursOn(sat).length === 0 && t.toursOn(sun).length === 0, "Farid and Mei both away: no orchard tours that weekend (nobody to guide them)");
+    t.setAway(() => ["bo", "hana"]);
+    check(t.toursOn(tue)[0].guide === "farid" && !t.classOn(tue), "Bo away: Farid leads his Tuesday tour; Hana away: no class that morning");
+    t.setAway(() => ["bo", "farid", "mei"]);
+    check(t.toursOn(tue).length === 0, "and with Bo, Farid and Mei all away there's no Tuesday tour");
     t.setAway(() => []);
-    check(t.dinnerOn(sun).host === host0 && t.eventOn(sun).stalls.find(x => x.at === 4).id === "mama", "and with nobody away, everything's as usual"); }
+    check(!t.dinnerOn && t.eventOn(sun).stalls.find(x => x.at === 4).id === "farid" && t.toursOn(sat).length === 4, "and with nobody away, everything's as usual"); }
   // Ronda's tapas are learned by tasting them; the tiles, some only in season, make a bench; vines once Rafael trusts you
   { const k = await import(new URL("../src/game/kitchen.js", import.meta.url)), r = await import(new URL("../src/game/ronda.js", import.meta.url)), F = {coins: 999, inv: {}};
     check(!k.knows(F, "salmorejo") && k.knows(F, "patatas") && !!r.taste(F, "salmorejo") && k.knows(F, "salmorejo") && F.coins === 994, "tasting salmorejo at the tapas bar (5 coins) puts it on the stove at home");
@@ -2151,13 +2182,13 @@ try {
     r.rondaVisit(F, "2026-10-10"); r.rondaVisit(F, "2026-10-10"); const first = r.buyVines(F); r.rondaVisit(F, "2026-10-12");
     check(!first && r.buyVines(F) && F.vine.cuttings.tempranillo === 3 && F.vine.tempra, "Rafael sells Tempranillo cuttings on your second visit (three for 120)"); }
   // Ronda's locals tell their stories on a trip day (no quest needed); Doña Carmen knew Pilar's mother
-  { const st = await import(new URL("../src/game/stories.js", import.meta.url)), day = "2026-10-11", F = {met: {carmen: true, pilar: true}, inv: {}};
+  { const st = await import(new URL("../src/game/stories.js", import.meta.url)), day = "2026-10-11", F = {met: {carmen: true, pilar: true}, inv: {}, story: {heard: {pilar: 1}, day: {}, log: [], flags: {}}};
     const add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
-    check(!!st.storyReady(F, "carmen", day) && !st.storyReady(F, "pilar", day), "in Ronda, Doña Carmen tells her story without a quest that day (Honeybrook's villagers still wait for one)");
+    check(!!st.storyReady(F, "carmen", day) && !st.storyReady(F, "pilar", day), "in Ronda, Doña Carmen tells her story on a trip day (Pilar's next chapter waits for hearts)");
     F.story = {heard: {pilar: 2, carmen: 2}, day: {}, log: [], flags: {}};
     const t = st.tellStory(F, "carmen", add, day);
     check(t && /Rosario/.test(t.lines.join(" ")) && F.inv.yemas === 2, "Carmen's third chapter: Pilar is Rosario's girl, and two boxes of yemas to take home");
-    F.storyDay = "2026-10-12"; F.story.heard.pilar = 3;
+    F.story.heard.pilar = 3; F.board = {hearts: {pilar: 5}};
     check(/Carmen/.test((st.storyReady(F, "pilar", "2026-10-12") || {ch: {lines: []}}).ch.lines.join(" ")), "and back home, Pilar has a new chapter about Doña Carmen"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, resume: true });
   page.on("pageerror", e => errors.push(`ronda pageerror: ${e.message}`));
@@ -2170,41 +2201,41 @@ try {
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-11&tripcoins=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
-  await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-tpick="mama"]', { timeout: 15000 });
-  check(await page.locator("#ctx [data-tpick]").count() === 8 && /40/.test(await page.locator("#ctx").innerText()), "the ticket window: Ronda, 40 coins a person, pick from all eight of the family");
-  for (const id of ["mama", "gonggong", "evan"]) await page.click(`#ctx [data-tpick="${id}"]`);
-  check(/120/.test(await page.locator("#ctx [data-trip]").textContent()), "Mel, Ma Ma and Gong Gong: three tickets; Evan rides free (120 coins)");
+  await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-tpick="farid"]', { timeout: 15000 });
+  check(await page.locator("#ctx [data-tpick]").count() === 7 && /40/.test(await page.locator("#ctx").innerText()), "the ticket window: Ronda, 40 coins a person, pick from your seven friends");
+  for (const id of ["farid", "mei"]) await page.click(`#ctx [data-tpick="${id}"]`);
+  check(/120/.test(await page.locator("#ctx [data-trip]").textContent()), "you, Farid and Mei: three tickets (120 coins)");
   await page.click("#ctx [data-trip]");
   await page.waitForFunction(() => /Ronda/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2500);
-  check(await fox().then(f => f.coins === 180 && f.trip && f.trip.party.join() === "mama,gonggong,evan"), "tickets paid, and the trip's on");
+  check(await fox().then(f => f.coins === 180 && f.trip && f.trip.party.join() === "farid,mei"), "tickets paid, and the trip's on");
   { const tw = await import(new URL("../src/data/towns.js", import.meta.url)), R = tw.TOWNS.ronda.rooms, mus = Object.values(R).map(r => r.music);
-    check(Object.keys(R).length >= 5 && new Set([...mus, tw.TOWNS.ronda.music]).size === mus.length + 1 && Object.keys(R).every(r => tw.townOf(r) === "ronda" && tw.TOWN_PLACES[R[r].door]), "Ronda has its interiors behind its doors (six: Mel asked for the leather workshop too), each with its own music");
+    check(Object.keys(R).length >= 5 && new Set([...mus, tw.TOWNS.ronda.music]).size === mus.length + 1 && Object.keys(R).every(r => tw.townOf(r) === "ronda" && tw.TOWN_PLACES[R[r].door]), "Ronda has its interiors behind its doors (six, the leather workshop too), each with its own music");
     const rd = await import(new URL("../src/game/ronda.js", import.meta.url));
     const good = rd.palmasStart(0); [0, 1].forEach(k => rd.ACCENTS.forEach(a => rd.clap(good, good.t0 + (k*12 + a)*rd.BEAT_MS + 100)));
     const bad = rd.palmasStart(0); for (let bt = 0; bt < 24; bt++) rd.clap(bad, bad.t0 + bt*rd.BEAT_MS + 100);
     check(rd.showOn(13*60 + 30) && rd.showOn(20*60 + 30) && !rd.showOn(16*60) && rd.ole(good) && good.hits === 10 && !rd.ole(bad), "flamenco at 1 and 8: clap on 3, 6, 8, 10 and 12 for an olé (clapping on every beat doesn't count)");
     const tea = {t0: 0, glasses: []}; rd.pour(tea, .82*900); rd.pour(tea, 0); check(tea.glasses.join() === "true,false", "Amina's mint tea: pour from high up and it froths");
     const Fp = {coins: 10, inv: {}}, addp = (id, n) => { Fp.inv[id] = (Fp.inv[id] || 0) + n; };
-    check(rd.paintTile(Fp, "azul", "star", true, addp) === "ptile_azul_star" && Fp.coins === 2 && Fp.inv.etile === 1 && rd.paintTile(Fp, "verde", "wave", false, addp) === null, "painting a tile at Lucía's (8 coins): a keepsake, and Evan's finger-painted one too");
+    check(rd.paintTile(Fp, "azul", "star", false, addp) === "ptile_azul_star" && Fp.coins === 2 && !Fp.inv.etile && rd.paintTile(Fp, "verde", "wave", false, addp) === null, "painting a tile at Lucía's (8 coins): a keepsake");
     check(["especias", "ceramica", "postales"].every(s => Object.values(tw.TOWN_GOODS).filter(g => g.shop === s).length === 3), "shopping corners: spices and ceramics at the market, postcards at Doña Carmen's"); }
-  check(await ids().then(a => a.includes("mama") && a.includes("gonggong")) && await page.locator("#evan").evaluate(n => n.style.display !== "none"), "off the train at Ronda station: Ma Ma, Gong Gong and Evan came too");
+  check(await ids().then(a => a.includes("farid") && a.includes("mei")), "off the train at Ronda station: Farid and Mei came too");
   check(await page.evaluate(() => ["rdtrain", "alameda", "bandstand", "rdToPlaza", "rdStepsDown"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "Ronda's station screen: the station, the Alameda balcony, the bandstand, the way to the plaza and the gorge steps");
   await page.locator('#world [data-place="rdToPlaza"]').dispatchEvent("click");
   await page.waitForFunction(() => /plaza/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
-  check(await ids().then(a => a.includes("mama") && a.includes("gonggong")), "they follow Mel to the plaza");
-  check(await page.locator('#actors .npc[data-npc="mama"].act-haggle').count() === 1, "the plaza on a Sunday morning: Ma Ma haggling");
+  check(await ids().then(a => a.includes("farid") && a.includes("mei")), "they follow you to the plaza");
+  check(await page.locator('#actors .npc[data-npc="farid"].act-haggle').count() === 1, "the plaza on a Sunday morning: Farid haggling");
   check(await page.evaluate(() => ["mercado", "tapas", "dulces", "fuente", "rdBridgeN", "rdToStation"].every(id => document.querySelector(`#world [data-place="${id}"]`))), "the plaza: the market, the tapas bar, the sweet shop, the fountain, Puente Nuevo");
-  await page.locator('#actors .npc[data-npc="mama"]').dispatchEvent("click"); await page.waitForTimeout(400);
-  await page.locator('#actors .npc[data-npc="mama"]').dispatchEvent("click"); await page.waitForTimeout(400);
-  { let town = false; for (let k = 0; k < 6 && !town; k++) { await page.locator('#actors .npc[data-npc="mama"]').dispatchEvent("click"); await page.waitForTimeout(300); town = /sweeter|Aiyo|big drop/.test(await page.locator("#npcSay").textContent()); }
-    check(town, "Ma Ma has things to say about Ronda (her own oranges are sweeter)"); }
+  await page.locator('#actors .npc[data-npc="farid"]').dispatchEvent("click"); await page.waitForTimeout(400);
+  await page.locator('#actors .npc[data-npc="farid"]').dispatchEvent("click"); await page.waitForTimeout(400);
+  { let town = false; for (let k = 0; k < 6 && !town; k++) { await page.locator('#actors .npc[data-npc="farid"]').dispatchEvent("click"); await page.waitForTimeout(300); town = /sweeter|almond cake|What a drop/.test(await page.locator("#npcSay").textContent()); }
+    check(town, "Farid has things to say about Ronda (his own oranges are sweeter)"); }
   // round 116: the doors lead inside
   await page.locator('#world [data-place="tapas"]').dispatchEvent("click");
   await page.waitForFunction(() => /tapas bar/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
-  check(await ids().then(a => a.includes("paco") && a.includes("mama")) && await page.locator('#world [data-rdspot="tapas"]').count() === 1, "through the door: inside the tapas bar, Paco waiting tables, and the family came in too");
+  check(await ids().then(a => a.includes("paco") && a.includes("farid")) && await page.locator('#world [data-rdspot="tapas"]').count() === 1, "through the door: inside the tapas bar, Paco waiting tables, and your friends came in too");
   await page.locator('#world [data-rdspot="tapas"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rtaste="naranjas"]', { timeout: 15000 });
   await page.click('#ctx [data-rtaste="naranjas"]'); await page.waitForTimeout(400);
-  check(await fox().then(f => f.learned && f.learned.naranjas && f.coins === 176), "the tapas bar: a taste of orange salad (4 coins), and now Mel knows how to make it");
+  check(await fox().then(f => f.learned && f.learned.naranjas && f.coins === 176), "the tapas bar: a taste of orange salad (4 coins), and now you know how to make it");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   await page.locator('#world [data-exit]').dispatchEvent("click");
   await page.waitForFunction(() => /plaza/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1200);
@@ -2230,7 +2261,7 @@ try {
   await page.waitForFunction(() => /plaza/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(600);
   await page.waitForTimeout(1500);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(1800);
-  check(/plaza/.test(await scn()) && await ids().then(a => a.includes("mama")), "reopening mid-trip: back in Ronda's plaza, with the family");
+  check(/plaza/.test(await scn()) && await ids().then(a => a.includes("farid")), "reopening mid-trip: back in Ronda's plaza, with your friends");
   await page.evaluate(() => window.__mapleScene("rd_banos")); await page.waitForTimeout(1500);
   check(await ids().then(a => a.includes("amina")) && await page.locator('#world [data-rdspot="banos"]').count() === 1, "the Arab baths: Amina showing people round, under the star skylights");
   await page.evaluate(() => window.__mapleScene("rd_cuero")); await page.waitForTimeout(1500);
@@ -2239,9 +2270,9 @@ try {
   check(await page.locator("#ctx [data-rbuy]").count() === 5, "Ubrique leather to buy: a wallet, a handbag, a belt, a notebook and a keyring");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   await page.evaluate(() => window.__mapleScene("rd_jardin")); await page.waitForTimeout(1500);
-  check(await ids().then(a => a.includes("joaquin") && a.includes("gonggong")) && await page.locator('#world [data-rdspot="jardin"]').count() === 1, "the Moorish garden: Joaquín watering, and Gong Gong found a bench");
+  check(await ids().then(a => a.includes("joaquin") && a.includes("mei")) && await page.locator('#world [data-rdspot="jardin"]').count() === 1, "the Moorish garden: Joaquín watering, and Mei found a bench");
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
-  check(await ids().then(a => a.includes("mei") && !a.includes("mama") && !a.includes("gonggong")), "back in Honeybrook, Ma Ma's not at the market: Mei's minding her stall");
+  check(await ids().then(a => !a.includes("farid") && !a.includes("mei")), "back in Honeybrook, Farid and Mei aren't at the market: they're in Ronda with you");
   await page.evaluate(() => window.__mapleScene("rd_station")); await page.waitForTimeout(1000);
   await page.locator('#world [data-place="rdtrain"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-triphome]", { timeout: 15000 });
   await page.click("#ctx [data-triphome]");
@@ -2253,7 +2284,7 @@ try {
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1000);
   check(await page.locator("#world .tilebench").count() === 1, "with all eight tiles, the tiled bench stands by the pond at home");
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
-  check(await ids().then(a => a.includes("mama")), "and Ma Ma's back at her market stall");
+  check(await ids().then(a => a.includes("farid")), "and Farid's back at his market stall");
   // the last train, and the window closing for the day
   await page.goto(url + "?seed=1&time=17:00&date=2026-10-12&tripcoins=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
@@ -2270,7 +2301,7 @@ try {
   check(await page.locator("#ctx [data-trip]").count() === 0 && /last train to Ronda gone/.test(await page.locator("#ctx").innerText()), "after 6pm there are no more trains out to Ronda");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nJeju, by ferry and by train")) try {
   console.log("\nJeju, by ferry and by train");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), J = tw.TOWNS.jeju;
   check(J.screens.length === 4 && J.screens.every(sc => tw.townOf(sc) === "jeju" && sc.startsWith("jj_")) && J.arrive[0] === "jj_village" && J.arrive[0] !== J.screens[0] && J.ferry.arrive[0] === "jj_harbour",
@@ -2286,18 +2317,18 @@ try {
   await page.goto(url + "?seed=1&time=10:00&date=2026-11-12&jjcoins=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-trip="jeju"][data-by="ferry"]', { timeout: 15000 });
-  await page.click('#ctx [data-tpick="mama"]'); await page.click('#ctx [data-tpick="evan"]');
-  check(/100/.test(await page.locator("#ctx [data-trip]").textContent()) && /ferry to Jeju/i.test(await page.locator("#ctx h2").textContent()), "the ferry stop at the end of the jetty: Mel and Ma Ma to Jeju, 100 coins (Evan sails free)");
+  await page.click('#ctx [data-tpick="farid"]');
+  check(/100/.test(await page.locator("#ctx [data-trip]").textContent()) && /ferry to Jeju/i.test(await page.locator("#ctx h2").textContent()), "the ferry stop at the end of the jetty: you and Farid to Jeju, 100 coins");
   await page.click("#ctx [data-trip]");
   await page.waitForFunction(() => /Jeju/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
-  check(await fox().then(f => f.coins === 200 && f.trip.town === "jeju" && f.trip.by === "ferry") && /harbour/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("mama")), "off the ferry at Jeju's harbour, with Ma Ma and Evan");
+  check(await fox().then(f => f.coins === 200 && f.trip.town === "jeju" && f.trip.by === "ferry") && /harbour/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("farid")), "off the ferry at Jeju's harbour, with Farid");
   await page.locator('#world [data-place="jjpier"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="ferry"]', { timeout: 15000 });
   check(/ferry home/i.test(await page.locator("#ctx").innerText()), "the pier: a ferry home whenever you're ready");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   for (const [gate, want, places] of [["jjToShoreN", "Seongsan", ["jjcone", "jjhaenyeo", "jjpools"]], ["jjToFarms", "tangerine farms", ["jjorchard", "jjshed", "jjponies", "jjcairns"]], ["jjToVillage", "stone village", ["jjtrain", "jjcafe", "jjdye", "jjstatues"]], ["jjToHarbourW", "harbour", ["jjpier", "jjmarket", "jjlights"]]]) {
     await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
     await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
-    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("mama")), `through the gate to Jeju's ${want} (Ma Ma follows)`);
+    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("farid")), `through the gate to Jeju's ${want} (Farid follows)`);
   }
   await page.evaluate(() => window.__mapleScene("jj_village")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="jjtrain"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="train"]', { timeout: 15000 });
@@ -2311,14 +2342,14 @@ try {
   check(w1 === 4 && await fox().then(f => f.wish.n === 4), "the wish-tower by the river in the woods: one stone a day, and it grows");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nJeju's rooms, people and things to do")) try {
   console.log("\nJeju's rooms, people and things to do");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), J = tw.TOWNS.jeju;
   const jj = await import(new URL("../src/game/jeju.js", import.meta.url)), orch = await import(new URL("../src/data/orchard.js", import.meta.url));
   const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url)), cp = await import(new URL("../src/game/companions.js", import.meta.url));
   check(Object.keys(J.rooms).length === 5 && Object.values(J.rooms).every(r => r.music && tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[Object.keys(J.rooms).find(k => J.rooms[k] === r)]), "five rooms behind Jeju's doors, each with its own music");
   { const used = new Set([...Object.values(tw.TOWNS.ronda.acts), ...Object.values(tw.TOWNS.kyoto.acts)].flatMap(a => Object.values(a).map(x => x.act)));
-    check(Object.keys(J.acts).length === 7 && Object.values(J.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "the family all have something to do in Jeju, and none of it is what they did in Ronda or Kyoto"); }
+    check(Object.keys(J.acts).length === 7 && Object.values(J.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "your friends all have something to do in Jeju, and none of it is what they did in Ronda or Kyoto"); }
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), jl = np.NPCS.filter(n => n.local === "jeju"), rooms = Object.keys(J.rooms);
     check(jl.length >= 15 && jl.filter(n => n.tourist).length >= 6 && rooms.every(r => jl.filter(n => n.routine.some(sl => sl.scene === r)).length >= 2), "Jeju has locals and tourists, and at least two people for every room"); }
   { const F = {coins: 100, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
@@ -2329,7 +2360,7 @@ try {
     check(st.done && st.good === 8 && jj.sortReward(F, st, add, "2026-11-12") === 4 && F.inv.tangerine === 4, "sorting tangerines with Mr Ko: eight right, and a bag of four to take home");
     check(jj.dyeScarf(F, "2026-11-12") && jj.takeDye(F, add, "2026-11-13").left === 2 && jj.takeDye(F, add, "2026-11-15").ready && F.inv.j_scarf === 1 && F.coins === 88, "the persimmon scarf: 12 coins, then three days on the washing line and it's a keepsake");
     const at = jj.slowPost(F, "me", "2026-11-12"); check(at === "2026-11-26" && jj.slowMail(F, "2026-11-25").length === 0 && jj.slowMail(F, "2026-11-26").length === 1, "the slow-post box: a postcard to yourself turns up two weeks later");
-    check(!orch.treeOpen(F, orch.TREES.tangerine) && orch.treeOpen({jeju: {sapling: true}}, orch.TREES.tangerine) && orch.treeOpen(F, orch.TREES.apple), "tangerine trees grow in the orchard once Ma Ma's brought a sapling home from Jeju"); }
+    check(!orch.treeOpen(F, orch.TREES.tangerine) && orch.treeOpen({jeju: {sapling: true}}, orch.TREES.tangerine) && orch.treeOpen(F, orch.TREES.apple), "tangerine trees grow in the orchard once Farid's brought a sapling home from Jeju"); }
   check(["heukdwaeji", "jeonbok", "hallaomija"].every(k => kit.TAPAS[k]) && ["hallabong", "omija", "tangerine"].every(k => sc.INGR[k]), "Jeju's ingredients: three new dishes at the kitchen, and tangerine, hallabong and omija gelato");
   check(cp.KEEP_SPOTS.fridge2 && cp.KEEP_SPOTS.fridge2.only === "magnet" && tw.TOWN_GOODS.j_magnet.magnet && ["j_hareubang", "j_tewak", "j_shell", "j_scarf"].every(k => tw.TOWN_GOODS[k].kind === "keepsake"), "keepsakes from Jeju, and a second magnet spot on the fridge");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2337,14 +2368,14 @@ try {
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   await page.addInitScript(() => { if (!/jjtrip/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    f.coins = 300; f.trip = {town: "jeju", day: "2026-11-12", party: ["mama", "evan"], from: 600, by: "ferry"};
+    f.coins = 300; f.trip = {town: "jeju", day: "2026-11-12", party: ["farid"], from: 600, by: "ferry"};
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=13:00&date=2026-11-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=13:00&date=2026-11-12&jjtrip=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("jj_shore")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="jjhaenyeo"]').dispatchEvent("click");
   await page.waitForFunction(() => /divers/.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 }); await page.waitForTimeout(4800);
-  check(await ids().then(a => a.includes("halmang") && a.includes("seoyeon")) && await fox().then(f => f.inv.j_shell === 1), "inside the divers' house: Halmang Kim and Seo-yeon, and Halmang gives Evan a sea snail shell");
+  check(await ids().then(a => a.includes("halmang") && a.includes("seoyeon")), "inside the divers' house: Halmang Kim and Seo-yeon");
   await page.locator('#world [data-rdspot="jj_haenyeo"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="dive"]', { timeout: 15000 });
   await page.click('#ctx [data-jj="dive"]'); await page.waitForTimeout(300);
   for (let i = 0; i < 3; i++) {
@@ -2366,7 +2397,7 @@ try {
   await page.evaluate(() => window.__mapleScene("jj_cafe")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="jj_cafe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="cafe:ade"]', { timeout: 15000 });
   await page.click('#ctx [data-jj="cafe:ade"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.coins === 295 && f.jeju.treats === 1), "a hallabong ade at the café (5), and Evan gets a juice");
+  check(await fox().then(f => f.coins === 295 && f.jeju.treats === 1), "a hallabong ade at the café (5)");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   await page.evaluate(() => window.__mapleScene("jj_market")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="jj_market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="j_magnet"]', { timeout: 15000 });
@@ -2385,14 +2416,14 @@ try {
   await page.locator('#world [data-place="jjpier"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="ferry"]', { timeout: 15000 });
   await page.click('#ctx [data-triphome="ferry"]');
   await page.waitForFunction(() => !/Jeju/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
-  check(await fox().then(f => f.trip.done && f.jeju.sapling) && /foreshore|shore/i.test(await page.locator("#sceneName").textContent()), "home on the ferry to the foreshore jetty, and Ma Ma's brought a tangerine sapling for the orchard");
+  check(await fox().then(f => f.trip.done && f.jeju.sapling) && /foreshore|shore/i.test(await page.locator("#sceneName").textContent()), "home on the ferry to the foreshore jetty, and Farid's brought a tangerine sapling for the orchard");
   await page.goto(url + "?seed=1&time=10:00&date=2026-11-15"); await page.waitForTimeout(1200);
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="dyecloth"]').dispatchEvent("click"); await page.waitForTimeout(3500);
   check(await fox().then(f => f.inv.j_scarf === 1 && !f.jeju.dye), "three days later, the scarf's a deep rust on the washing line at home, and it's a keepsake now");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nCinque Terre: the five villages (well, four)")) try {
   console.log("\nCinque Terre: the five villages (well, four)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), C = tw.TOWNS.cinque;
   check(C.screens.length === 4 && C.screens.every(sc => tw.townOf(sc) === "cinque" && sc.startsWith("ct_")) && C.arrive[0] === "ct_corniglia" && C.arrive[0] !== C.screens[0] && tw.TOWN_PLACES[C.station].scene === "ct_corniglia",
@@ -2400,7 +2431,7 @@ try {
   check(C.fare === 80 && Object.keys(tw.TOWN_PLACES).filter(k => (tw.TOWN_PLACES[k].scene || "").startsWith("ct_")).every(k => k.startsWith("ct")) && Object.keys(tw.TOWN_BRIDGES).filter(k => k.startsWith("ct_")).length === 4, "80 coins a ticket; every place starts with ct; four gates between the villages");
   check(Object.keys(C.rooms).length === 5 && Object.values(C.rooms).every(r => r.music && tw.TOWN_PLACES[r.door]) && Object.keys(C.rooms).every(k => tw.TOWN_BOUNDS[k]), "five rooms (focacceria, pesto kitchen, cantina, gelateria, lemon shop), each with its own music");
   { const used = new Set(["ronda", "kyoto", "jeju"].flatMap(t => Object.values(tw.TOWNS[t].acts)).flatMap(a => Object.values(a).map(x => x.act)));
-    check(Object.keys(C.acts).length === 7 && Object.values(C.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "the whole family has something to do, and none of it is what they did in Ronda, Kyoto or Jeju"); }
+    check(Object.keys(C.acts).length === 7 && Object.values(C.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "everyone has something to do, and none of it is what they did in Ronda, Kyoto or Jeju"); }
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), ids = np.NPCS.map(n => n.id), cl = np.NPCS.filter(n => n.local === "cinque"), rooms = Object.keys(C.rooms);
     check(new Set(ids).size === ids.length && cl.length >= 20 && cl.filter(n => n.tourist).length >= 6 && rooms.every(r => cl.filter(n => n.routine.some(sl => sl.scene === r)).length >= 2), "Cinque Terre has locals and tourists, and at least two people for every room"); }
   { const ITEMS = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS; await import(new URL("../src/game/loft.js", import.meta.url));
@@ -2416,7 +2447,7 @@ try {
     check(wrong === "oops" && ct.pestoDone(p) && ct.finishPesto(F, add) && F.inv.pesto === 2 && F.coins === 94 && F.cinque.pestoLesson, "pesto with Nonna Pina: garlic, pine nuts, basil, cheese, oil, in order, pounding each one in (6 coins, two jars, and her secret)");
     const h = ct.harvestStart(() => 0.1); const early = ct.pick(h, 0); h.riding = false; h.ripe.forEach((r, i) => ct.pick(h, i));
     check(early === null && ct.harvestDone(h) && ct.finishHarvest(F, add) === 3 && F.inv.grape_white === 3 && F.cinque.raisin && ct.finishHarvest(F, add) === 0, "the monorail harvest: ride up, pick the ripe bunches, and Signor Bruno gives you three (once a day) and shows you raisin wine");
-    check(!ct.paintBoat(F, "pink", "white", "Evan", add) && ct.paintBoat(F, "red", "white", "Evan", add) && F.inv.c_boat === 1 && ct.boatCols(F)[0] === "#C9483A", "painting a boat with Aldo: a red hull, a white stripe, \"Evan\" on the bow, and a little model to keep");
+    check(!ct.paintBoat(F, "pink", "white", "Stella", add) && !ct.paintBoat(F, "red", "white", "Evan", add) && ct.paintBoat(F, "red", "white", "Stella", add) && F.inv.c_boat === 1 && ct.boatCols(F)[0] === "#C9483A", "painting a boat with Aldo: a red hull, a white stripe, \"Stella\" on the bow, and a little model to keep");
     const t = ct.treat(F, ct.GELATO, "basilico"); check(t && F.coins === 91 && F.cinque.treats === 1, "a basil gelato at Gianni's (3)"); }
   { const H = 3600e3, D = 24*H, now = Date.UTC(2026, 9, 12), F = {coins: 0, inv: {grape_white: 4, grape_red: 2, lemon: 3, anchovy: 6, basil: 2, garlic: 1, pinenuts: 1, oliveoil: 1, chz_cheddar: 1}};
     check(!lf.loftOpen(F) && !lf.startBatch(F, "lemon", now), "the drying loft opens after your first trip to Cinque Terre");
@@ -2433,16 +2464,16 @@ try {
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "jason"), L = np.NPCS.find(n => n.id === "luca");
-    check(J && J.local === "cinque" && !J.tourist && J.look.specs && J.look.tall && J.look.palms && J.routine.some(sl => sl.scene === "ct_vernazza" && sl.act === "poem") && J.routine.some(sl => sl.act === "sit" && sl.from >= 18*60) && L && L.routine.some(sl => sl.act === "sit" && sl.from >= 18*60) && tw.TOWN_PLACES.ctjason.scene === "ct_vernazza",
-      "Jason lives in Vernazza now (the yellow house by the harbour): a poem at the café in the morning, the sunset on the harbour with Luca");
+    check(J && J.name === "Ornella" && L && L.name === "Dario" && J.local === "cinque" && !J.tourist && J.routine.some(sl => sl.scene === "ct_vernazza" && sl.act === "poem") && J.routine.some(sl => sl.act === "sit" && sl.from >= 18*60) && L && L.routine.some(sl => sl.act === "sit" && sl.from >= 18*60) && tw.TOWN_PLACES.ctjason.scene === "ct_vernazza",
+      "Ornella lives in Vernazza (the yellow house by the harbour): a verse at the café in the morning, the sunset on the harbour with Dario");
     const F = {met: {jason: true}, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
     F.story = {heard: {}, day: {carmen: "2026-10-12", rafael: "2026-10-12"}, log: [], flags: {}};
     const first = st.tellStory(F, "jason", add, "2026-10-12"), again = st.storyReady(F, "jason", "2026-10-12");
     ["2026-10-13", "2026-10-14", "2026-10-15"].forEach(d => st.tellStory(F, "jason", add, d));
-    check(first && /2015/.test(first.lines.join(" ")) && !again && F.inv.s_poem === 1 && F.story.heard.jason === 4, "Jason tells his stories a chapter a day whenever Mel visits (even after two others that day), and the fourth is a poem for her to keep"); }
+    check(first && /ferry/.test(first.lines.join(" ")) && !again && F.inv.s_poem === 1 && F.story.heard.jason === 4, "Ornella tells her stories a chapter a day whenever you visit (even after two others that day), and the fourth is a poem for you to keep"); }
   check(cp.KEEP_SPOTS.fridge3 && cp.KEEP_SPOTS.fridge3.only === "magnet" && tw.TOWN_GOODS.c_magnet.magnet && ["c_boat", "c_plate", "c_mortar"].every(k => tw.TOWN_GOODS[k].kind === "keepsake"), "keepsakes (the boat model, the lemon plate, the mortar) and a third magnet spot on the fridge");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nCinque Terre, by train")) try {
   console.log("\nCinque Terre, by train");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`cinque pageerror: ${e.message}`));
@@ -2456,15 +2487,15 @@ try {
   await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
   await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-ttown="cinque"]', { timeout: 15000 });
   await page.click('#ctx [data-ttown="cinque"]'); await page.waitForTimeout(300);
-  await page.click('#ctx [data-tpick="dad"]'); await page.click('#ctx [data-tpick="evan"]');
-  check(/160/.test(await page.locator("#ctx [data-trip]").textContent()) && /Cinque Terre/.test(await page.locator("#ctx h2").textContent()), "the ticket window offers Cinque Terre: Mel and Dad, 160 coins (Evan free)");
+  await page.click('#ctx [data-tpick="theo"]');
+  check(/160/.test(await page.locator("#ctx [data-trip]").textContent()) && /Cinque Terre/.test(await page.locator("#ctx h2").textContent()), "the ticket window offers Cinque Terre: you and Theo, 160 coins");
   await page.click("#ctx [data-trip]");
   await page.waitForFunction(() => /Cinque Terre/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
-  check(await fox().then(f => f.coins === 140 && f.trip.town === "cinque" && f.towns && f.towns.cinque) && /Corniglia/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("dad")), "off the train at Corniglia, with Dad and Evan");
+  check(await fox().then(f => f.coins === 140 && f.trip.town === "cinque" && f.towns && f.towns.cinque) && /Corniglia/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("theo")), "off the train at Corniglia, with Theo");
   for (const [gate, want, places] of [["ctToVernazza", "Vernazza", ["ctfocacceria", "cttower", "ctpiazza", "ctharbour", "ctjason"]], ["ctToMonterosso", "Monterosso", ["ctlimoni", "ctgigante", "ctbeach"]], ["ctToManarolaE", "Manarola", ["ctpesto", "ctgelato", "ctboats", "ctrocks", "ctpadlock"]], ["ctToCornigliaN", "Corniglia", ["cttrain", "ctcantina", "ctmonorail", "ctlemons"]]]) {
     await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
     await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
-    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("dad")), `through the gate to ${want} (Dad follows)`);
+    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("theo")), `through the gate to ${want} (Theo follows)`);
   }
   // the monorail harvest, in the browser
   await page.locator('#world [data-place="ctmonorail"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ct="ride"]', { timeout: 15000 });
@@ -2487,8 +2518,8 @@ try {
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   await page.evaluate(() => window.__mapleScene("ct_manarola")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="ctboats"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ct="hull:green"]', { timeout: 15000 });
-  await page.click('#ctx [data-ct="hull:green"]'); await page.click('#ctx [data-ct="stripe:yellow"]'); await page.click('#ctx [data-ct="bname:Maple"]'); await page.click('#ctx [data-ct="paint"]'); await page.waitForTimeout(400);
-  check(await fox().then(f => f.cinque.boat && f.cinque.boat.hull === "green" && f.cinque.boat.name === "Maple" && f.inv.c_boat === 1), "painting a boat in the street: fisherman's green, a yellow stripe, \"Maple\" on the bow, and a model to keep");
+  await page.click('#ctx [data-ct="hull:green"]'); await page.click('#ctx [data-ct="stripe:yellow"]'); await page.click('#ctx [data-ct="bname:Stella"]'); await page.click('#ctx [data-ct="paint"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.cinque.boat && f.cinque.boat.hull === "green" && f.cinque.boat.name === "Stella" && f.inv.c_boat === 1), "painting a boat in the street: fisherman's green, a yellow stripe, \"Stella\" on the bow, and a model to keep");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   for (const [room, who] of [["ct_focacceria", "ilaria"], ["ct_cantina", "carla"], ["ct_gelato", "gianni"], ["ct_limoni", "franca"]]) {
     await page.evaluate(r => window.__mapleScene(r), room); await page.waitForTimeout(1300);
@@ -2511,7 +2542,7 @@ try {
   check(/drying loft/i.test(await page.locator("#ctx h2").textContent()) && await page.locator('#ctx [data-lf="start:rack"]').isDisabled(), "up the ladder in the barrel shed: the drying loft (three bunches isn't enough for the racks yet)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nthe kite and the farm brush (round 130 fixes)")) try {
   console.log("\nthe kite and the farm brush (round 130 fixes)");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`kite pageerror: ${e.message}`));
@@ -2541,14 +2572,14 @@ try {
   check(await fox().then(f => f.coins === c0 + 17 + 21 + 10 && !f.inv.chz_cheddar), "your own cheese and honey sell at the market, tiered by how long they ripen: cheddar (4 days) 17, an excellent brie (3 days) 21, lavender honey 10");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nthe ice cream trolley, and the delivery bike's orders")) try {
   console.log("\nthe ice cream trolley, and the delivery bike's orders");
   { const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), g = await import(new URL("../src/game/goals.js", import.meta.url)), F = {coins: 0}, s = sc.scoopState(F);
     s.recipes = ["a", "b", "c", "d"].map(id => ({id, ings: [], name: id.toUpperCase() + " Gelato", col: "#FFF"})); s.tubs = {a: 20, b: 5, c: 20, d: 20};
     const tr = sc.loadTrolley(F, ["a", "b", "c", "d"]);
-    check(tr && Object.keys(tr.tubs).length === 3 && tr.tubs.a === 10 && tr.tubs.b === 5 && s.tubs.a === 10 && !s.tubs.b && g.ride(F) === "walk" && sc.trolleyPace(F) < .8, "the trolley takes three flavours, ten scoops each, from the shop's tubs; Mel walks slower pushing it, and can't ride");
+    check(tr && Object.keys(tr.tubs).length === 3 && tr.tubs.a === 10 && tr.tubs.b === 5 && s.tubs.a === 10 && !s.tubs.b && g.ride(F) === "walk" && sc.trolleyPace(F) < .8, "the trolley takes three flavours, ten scoops each, from the shop's tubs; you walk slower pushing it, and can't ride");
     const rnd = Math.random; Math.random = () => .1; const r = sc.trolleySell(F, "hana", "2026-10-12", {season: "summer", hm: 14*60}), again = sc.trolleySell(F, "hana", "2026-10-12", {}); Math.random = rnd;
-    check(r && r.items.length && r.items.every(([f]) => f === "cup" || f === "cone") && F.coins === r.coins && again === null, "tap someone and they buy a cup or a cone (never floats or waffles), once a day each, and the coins come to Mel");
+    check(r && r.items.length && r.items.every(([f]) => f === "cup" || f === "cone") && F.coins === r.coins && again === null, "tap someone and they buy a cup or a cone (never floats or waffles), once a day each, and the coins come to you");
     const back = sc.returnTrolley(F); check(back.back === 25 - r.items.length && back.n === r.items.length, "wheel it back in time and what's left goes back in the freezer");
     sc.loadTrolley(F, ["c"]); s.trolley.at -= 3*3600e3; check(sc.trolleyMelted(s) && sc.trolleySell(F, "theo", "2026-10-12", {}) === null && sc.returnTrolley(F).melted === 10, "after two hours the ice packs give up: no more sales, and the leftovers melt");
     s.up.bike = 1; s.display = ["d"]; s.at = wall("2026-10-12T04:00:00Z") - 60e3; const off = globalThis.__mapleOffset; globalThis.__mapleOffset = wall("2026-10-12T04:00:00Z") - Date.now();
@@ -2570,19 +2601,19 @@ try {
   await page.click('#ctx [data-gtsel="mango+milk"]'); await page.click('#ctx [data-gtsel="pandan"]'); await page.click('#ctx [data-gtrolley="go"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.scoop.trolley && f.scoop.trolley.tubs["mango+milk"] === 10 && f.scoop.trolley.tubs.pandan === 10 && f.scoop.tubs.pandan === 30), "at the counter: load the trolley with two flavours, ten scoops each");
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1500);
-  check(await page.locator("#mel").evaluate(e => e.classList.contains("trolley")), "out in the square, Mel's pushing the little pink trolley");
+  check(await page.locator("#mel").evaluate(e => e.classList.contains("trolley")), "out in the square, you're pushing the little pink trolley");
   const who = await page.locator("#actors .npc:not([data-npc^=\"agent\"])").first().getAttribute("data-npc");
   await page.locator(`#actors .npc[data-npc="${who}"]`).dispatchEvent("click"); await page.waitForTimeout(600);
-  check(await fox().then(f => f.scoop.asked && f.scoop.asked.ids.includes(who)), `tap someone (${who}) and Mel offers them an ice cream`);
+  check(await fox().then(f => f.scoop.asked && f.scoop.asked.ids.includes(who)), `tap someone (${who}) and you offer them an ice cream`);
   await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(2000);
   check(await fox().then(f => !f.scoop.trolley && f.scoop.tubs.pandan + f.scoop.tubs["mango+milk"] >= 60), "wheel it back into the shop and it's put away, the unsold scoops back in the freezer");
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1200);
   await page.evaluate(() => window.__mapleOrder()); await page.waitForTimeout(800);
   const rode = await page.locator("#actors .rideby .bikeArt").count(); await page.waitForTimeout(7000);
-  check(rode === 1 && await page.locator("#actors .rideby").count() === 0, "an order goes out while Mel's in the square: Tomo pedals past on the mint bike with the cool box, and is gone");
+  check(rode === 1 && await page.locator("#actors .rideby").count() === 0, "an order goes out while you're in the square: Tomo pedals past on the mint bike with the cool box, and is gone");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nthe bike takes bonbons and tapas too, and every shop says its takings at closing")) try {
   console.log("\nthe bike takes bonbons and tapas too, and every shop says its takings at closing");
   { const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), d = "2026-10-12";
     const c = cc.cocoaState({}); c.sold[d] = {n: 3, coins: 40, bonbons: 6, deliv: 2}; const early = cc.cocoaNews(c, d, 19*60), eve = cc.cocoaNews(c, d, 20*60 + 5), again = cc.cocoaNews(c, d, 21*60);
@@ -2599,22 +2630,22 @@ try {
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-12&bspatch=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="dbike"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gvother="bar:milk"]', { timeout: 15000 });
-  await page.click('#ctx [data-gvother="bar:milk"]'); await page.waitForSelector('#ctx [data-gvto="mum"]', { timeout: 15000 }); await page.click('#ctx [data-gvto="mum"]'); await page.waitForTimeout(400);
-  check(await fox().then(f => f.cocoa.bars.milk === 2 && f.thanks.some(t => t.who === "mum" && t.item === "bar_milk")), "from the delivery bike: a milk chocolate bar off the Cocoa Room's wall, pedalled round to Mum (a thank-you note to come)");
+  await page.click('#ctx [data-gvother="bar:milk"]'); await page.waitForSelector('#ctx [data-gvto="hana"]', { timeout: 15000 }); await page.click('#ctx [data-gvto="hana"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.cocoa.bars.milk === 2 && f.thanks.some(t => t.who === "hana" && t.item === "bar_milk")), "from the delivery bike: a milk chocolate bar off the Cocoa Room's wall, pedalled round to Hana (a thank-you note to come)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nSaturday disco night at the cellar door")) try {
   console.log("\nSaturday disco night at the cellar door");
   { const t = await import(new URL("../src/game/tours.js", import.meta.url)), sat = "2026-10-10", fri = "2026-10-09", crowd = t.discoCrowd(sat);
     check(t.discoNow(sat, 21*60) && !t.discoNow(sat, 19*60) && !t.discoNow(fri, 21*60) && !t.discoNow(sat, 23*60 + 40), "disco night is Saturdays, 8 to 11:30pm");
-    check(crowd.length === 16 && !crowd.some(id => ["mama", "gonggong", "okada", "lin", "celeste", "pilar"].includes(id)) && crowd.filter(id => t.NIGHT_TOURISTS.includes(id)).length === 5 && crowd.every(id => t.DISCO_MOVES.includes(t.discoSlot(id, sat, 21*60).act)),
-      "a packed floor: most of the village (not Ma Ma, Gong Gong, Mr Okada or Lin, nor anyone working) and five tourists, all dancing"); }
+    check(crowd.length === 16 && !crowd.some(id => ["farid", "mei", "okada", "lin", "celeste", "pilar"].includes(id)) && crowd.filter(id => t.NIGHT_TOURISTS.includes(id)).length === 5 && crowd.every(id => t.DISCO_MOVES.includes(t.discoSlot(id, sat, 21*60).act)),
+      "a packed floor: most of the village (not Farid, Mei, Mr Okada or Lin, nor anyone working) and five tourists, all dancing"); }
   { const t = await import(new URL("../src/game/tours.js", import.meta.url)), days = ["2026-10-10", "2026-10-17", "2026-10-24", "2026-10-31"];
     const moves = new Set(days.flatMap(d => Object.values(t.discoFloor(d)).map(f => f.move))), spots = Object.values(t.discoFloor(days[0])).map(f => f.at), drifters = Object.values(t.discoFloor(days[0])).filter(f => f.drift).length;
-    const xs = new Set(spots.map(([x]) => x)), couple = days.map(d => t.discoFloor(d)).find(f => f.mum && f.dad);
-    check(moves.size >= 5 && xs.size >= 12 && drifters >= 3 && (!couple || (Math.hypot(couple.mum.at[0] - couple.dad.at[0], couple.mum.at[1] - couple.dad.at[1]) < 70 && couple.mum.dir !== couple.dad.dir)),
-      `not a grid: knots of two or three, ${moves.size} different moves, some drifting between knots, and Mum and Dad dance together facing each other`);
-    check(t.dateSlot("marcus", "2026-10-10", 20*60) && !t.discoSlot("marcus", "2026-10-10", 20*60)?.date, "Marcus and Angellina keep their date night (7:30 to 9) and come on to the disco after"); }
+    const xs = new Set(spots.map(([x]) => x)), couple = days.map(d => t.discoFloor(d)).find(f => f.hana && f.theo);
+    check(moves.size >= 5 && xs.size >= 12 && drifters >= 3 && (!couple || (Math.hypot(couple.hana.at[0] - couple.theo.at[0], couple.hana.at[1] - couple.theo.at[1]) < 70 && couple.hana.dir !== couple.theo.dir)),
+      `not a grid: knots of two or three, ${moves.size} different moves, some drifting between knots, and Hana and Theo dance together facing each other`);
+    check(t.dateSlot("tomi", "2026-10-10", 20*60) && !t.discoSlot("tomi", "2026-10-10", 20*60)?.date, "Tomi and Posy keep their date night (7:30 to 9) and come on to the disco after"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`disco pageerror: ${e.message}`));
   await page.addInitScript(() => { if (!/dcpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), cellar: true};
@@ -2629,7 +2660,7 @@ try {
   check(await page.locator("#sceneArt .disco").count() === 0, "before 8 the cellar's its usual calm self");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nPilar's list, keeping things back, and more tapas")) try {
   console.log("\nPilar's list, keeping things back, and more tapas");
   const k = await import(new URL("../src/game/kitchen.js", import.meta.url)), day = "2026-10-14", F = {coins: 0, inv: {}};
   const kk = k.kitchenState(F); Object.assign(kk.larder, {tulip: 2, flour: 3, potato: 4, egg: 4, tomato: 4, loaf: 2});
@@ -2638,7 +2669,7 @@ try {
   check(kk.larder.tulip === 2 && !(F.vine.menu || {}).shortbread, "flowers kept back for petal syrup: Pilar doesn't make flower shortbread with them");
   kk.pilarNo.bread = true; kk.pilarNo.tapas = true; F.vine.tapasList = []; kk.larder.flour = 1; kk.oven = null;
   k.cookTick(F, day);
-  check(!kk.oven && !k.tapasAll(F, day).length, "untick bread and tapas on Pilar's list: she leaves the oven and the chalkboard to Mel");
+  check(!kk.oven && !k.tapasAll(F, day).length, "untick bread and tapas on Pilar's list: she leaves the oven and the chalkboard to you");
   ["tortilla", "huevos", "patatas", "puerros"].forEach(id => k.chooseTapas(F, id, day));
   check(k.tapasAll(F, day).map(t => t.id).join() === "tortilla,huevos,patatas", "up to three tapas of the day on the chalkboard");
   check(!!k.dropTapas(F, "patatas", day) && k.tapasAll(F, day).length === 2, "and one can come off again before it's cooked");
@@ -2649,7 +2680,7 @@ try {
     gk.fresh.honey.until = Date.now() - 1; k.cookTick(G, day);
     check(held && G.vine.menu.honeycake === 4, "honey just brought in waits 15 minutes before Pilar can bake it into honey cake (time to set keep)"); }
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nthe greenhouse, herbs and gambas")) try {
   console.log("\nthe greenhouse, herbs and gambas");
   { const g = await import(new URL("../src/game/greenhouse.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), k = await import(new URL("../src/game/kitchen.js", import.meta.url)), fi = await import(new URL("../src/game/fishing.js", import.meta.url));
     const F = {inv: {garlic_seed: 1, basil_seed: 1, gh_strawberry_seed: 1}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; if (F.inv[id] <= 0) delete F.inv[id]; };
@@ -2697,7 +2728,7 @@ try {
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.coins <= 100 && f.goals && f.goals.greenhouse; }), "the greenhouse cost 400 coins");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nthe old mill and the olive grove")) try {
   console.log("\nthe old mill and the olive grove");
   { const tw = await import(new URL("../src/data/towns.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ml = await import(new URL("../src/game/mill.js", import.meta.url));
     check(tw.TOWN_GOODS.oliveoil.sell > ml.JARS_PER_BOTTLE*it.ITEMS.olives.sell && tw.TOWN_GOODS.oliveoil.price > tw.TOWN_GOODS.oliveoil.sell, "a bottle of oil sells for more than the three jars of olives it takes (and Rafael's costs more than it sells for)");
@@ -2737,7 +2768,7 @@ try {
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.mill && f.mill.press && f.mill.press.n === 2 && f.inv.olives === 1 && f.goals.mill; }), "seven jars of olives: two bottles' worth goes under the millstone");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nFriday evenings: aperitivo, the bonfire, Sal's van, kites")) try {
   console.log("\nFriday evenings: aperitivo, the bonfire, Sal's van, kites");
   const t = await import(new URL("../src/game/tours.js", import.meta.url)), fr = await import(new URL("../src/game/friday.js", import.meta.url));
   const fri = "2026-10-16", thu = "2026-10-15";
@@ -2749,11 +2780,11 @@ try {
     check(w.nextHop("field", "hfarm") === "hfarm" && w.nextHop("hfarm", "field") === "field", "a path joins the lake field and Wildflower Farm"); }
   check(t.aperitivoNow(fri, 17*60) && !t.aperitivoNow(fri, 19*60 + 5) && !t.aperitivoNow(thu, 17*60), "aperitivo hour: Fridays, 4:30 to 7");
   check(t.tastingSlot("theo", fri, 17*60 + 30) && t.tastingSlot("opal", fri, 17*60), "the tasting room fills up on a Friday afternoon");
-  check(t.bonfireSlot("dad", fri, 19*60 + 30).act === "guitar" && t.bonfireSlot("mum", fri, 20*60).scene === "base" && !t.bonfireSlot("dad", thu, 19*60 + 30) && !t.bonfireSlot("marcus", fri, 19*60 + 10), "the bonfire, 7 to 10 on a Friday: Dad on guitar, Mum on a log, Marcus and Angellina from half seven");
+  check(t.bonfireSlot("theo", fri, 19*60 + 30).act === "guitar" && t.bonfireSlot("hana", fri, 20*60).scene === "base" && !t.bonfireSlot("theo", thu, 19*60 + 30) && !t.bonfireSlot("tomi", fri, 19*60 + 10), "the bonfire, 7 to 10 on a Friday: Theo on guitar, Hana on a log, Tomi and Posy from half seven");
   { const F = {coins: 20, inv: {}, history: {"2026-10-12": {q: 2}, "2026-10-14": {q: 3}, "2026-10-08": {q: 9}}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
     check(fr.weekQuests(F, fri) === 5 && fr.releaseLanterns(F, fri) === 5 && fr.releaseLanterns(F, fri) === null, "five quests this week: five lanterns, released once a Friday");
     check(!!fr.vanBuy(F, "clams", add) && !!fr.vanBuy(F, "worms", add) && F.inv.clams === 1 && F.coins === 10 && F.fish.bait >= 5, "Sal's van sells clams and worms"); }
-  check(t.lastFriday("2026-10-30") && !t.lastFriday(fri) && t.movieNow("2026-10-30", 20*60) && t.movieSlot("dad", "2026-10-30", 20*60).scene === "field" && !t.movieSlot("dad", fri, 20*60) && ["mum", "dad", "mama", "gonggong", "marcus", "angelina", "darren"].filter(id => (t.movieSlot(id, "2026-10-30", 20*60) || {}).at && Math.hypot(t.movieSlot(id, "2026-10-30", 20*60).at[0] - t.SCREEN[0], t.movieSlot(id, "2026-10-30", 20*60).at[1] - t.SCREEN[1]) < 120).length <= 2, "movie night: the last Friday of the month, the family on blankets on the field");
+  check(t.lastFriday("2026-10-30") && !t.lastFriday(fri) && t.movieNow("2026-10-30", 20*60) && t.movieSlot("theo", "2026-10-30", 20*60).scene === "field" && !t.movieSlot("theo", fri, 20*60) && ["hana", "theo", "farid", "mei", "tomi", "posy", "bo"].filter(id => (t.movieSlot(id, "2026-10-30", 20*60) || {}).at && Math.hypot(t.movieSlot(id, "2026-10-30", 20*60).at[0] - t.SCREEN[0], t.movieSlot(id, "2026-10-30", 20*60).at[1] - t.SCREEN[1]) < 120).length <= 2, "movie night: the last Friday of the month, your friends on blankets on the field");
   check(t.bayMarketNow(fri, 17*60) && t.bayKeepers(fri).length === 3 && t.bayMarketSlot(t.bayKeepers(fri)[0], fri, 17*60).scene === "field" && t.bayMarketSlot("hiro", fri, 17*60).scene === "field", "the Friday market on the field: three stalls, and Hiro selling kites");
   check(!t.bayMarketNow(fri, 19*60 + 20) && t.MOVIE[0] - t.BAYMKT[1] >= 15, "the market packs up a quarter of an hour before the film starts");
   check(fr.bayStallGoods(fri, 0).length === 4 && fr.bayStallGoods(fri, 0).join() !== fr.bayStallGoods(fri, 1).join() && fr.bayStallGoods(fri, 0).join() !== fr.bayStallGoods("2026-10-23", 0).join(), "each stall has four things, a different mix every week");
@@ -2770,7 +2801,7 @@ try {
   await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="fishvan"]').count() === 1 && await page.locator('#world [data-place="bonfire"]').count() === 0, "Friday night at the bay: Sal's van (and no bonfire on the beach)");
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1500);
-  check(await page.locator('#actors .npc[data-npc="dad"].act-guitar').count() === 1, "and at home, Dad playing guitar by the bonfire");
+  check(await page.locator('#actors .npc[data-npc="theo"].act-guitar').count() === 1, "and at home, Theo playing guitar by the bonfire");
   await page.locator('#world [data-place="bonfire"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-fire="lanterns"]', { timeout: 20000 });
   await page.click('#ctx [data-fire="lanterns"]'); await page.waitForTimeout(600);
   check(await page.locator("#fxLayer g").count() >= 1, "the week's lanterns lift off over the sea");
@@ -2781,10 +2812,10 @@ try {
   check(await page.locator('#world [data-place^="bm"]').count() === 0, "and the bay stays quiet");
   await page.goto(url + "?seed=1&time=20:00&date=2026-10-30"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
-  check(await page.locator('#world [data-place="screen"]').count() === 1 && await page.locator('#actors .npc[data-npc="mum"]').count() === 1, "the last Friday: movie night on the field, Mum on a blanket");
+  check(await page.locator('#world [data-place="screen"]').count() === 1 && await page.locator('#actors .npc[data-npc="hana"]').count() === 1, "the last Friday: movie night on the field, Hana on a blanket");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nBellbird Valley: the Vines (rounds 141-144)")) try {
   console.log("\nBellbird Valley: the Vines (rounds 141-144)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
   const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), ba = await import(new URL("../src/game/bbacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
@@ -2794,28 +2825,28 @@ try {
   check(stops.every(id => Object.values(T[id].rooms).every(r => tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[Object.keys(T[id].rooms).find(k => T[id].rooms[k] === r)])), "every room has a door outside and walls inside");
   const allRooms = stops.flatMap(id => Object.keys(T[id].rooms)), mus = new Set([...stops.map(id => T[id].music), ...allRooms.map(r => T[stops.find(id => T[id].rooms[r])].rooms[r].music)]);
   check(mus.size === 24 && new Set(bb.STOPS.flatMap(id => [tw.TOWNS[id].music, ...Object.entries(tw.TOWNS[id].rooms).filter(([k]) => k !== "bv_hpaper").map(([, r]) => r.music)])).size === 96, "24 tunes: one for every stop and every room (96 across the whole valley)");
-  const F0 = {coins: 100, inv: {}}; check(bb.known(F0).join() === "bv_gate" && bb.fuelFor("home", "bv_gate", ["evan", "mum"]) === 7 && bb.setOff(F0, "bv_gate", ["mum", "evan"], 8*60) && F0.coins === 93 && bb.stamped(F0, "bv_gate"), "the van: only Valley Gate on the map at first; 6 a leg plus 1 a grown-up, and a stamp");
+  const F0 = {coins: 100, inv: {}}; check(bb.known(F0).join() === "bv_gate" && bb.fuelFor("home", "bv_gate", ["hana"]) === 7 && bb.setOff(F0, "bv_gate", ["hana"], 8*60) && F0.coins === 93 && bb.stamped(F0, "bv_gate"), "the van: only Valley Gate on the map at first; 6 a leg plus 1 a grown-up, and a stamp");
   check(bb.known(F0).includes("bv_lookout") && bb.known(F0).includes("bv_creek") && !bb.known(F0).includes("bv_camp"), "the map reveals the stops a road away");
   // rooms, goods, specials
   const goods = Object.values(tw.TOWN_GOODS).filter(g => /^bv_/.test(g.shop || ""));
   check(goods.length >= 30 && goods.every(g => !g.sell || g.sell <= g.price), "the valley's shops, and nothing sells back for more than it costs");
-  check(tw.TOWN_GOODS.b_sparkling.price > vy.STYLES.sparkling.price + vy.RIDDLE.day*vy.RIDDLE.max, "Bellbird's sparkling costs more than Mel's best-riddled bottle sells for");
+  check(tw.TOWN_GOODS.b_sparkling.price > vy.STYLES.sparkling.price + vy.RIDDLE.day*vy.RIDDLE.max, "Bellbird's sparkling costs more than your best-riddled bottle sells for");
   const op1 = br.opshopToday("2026-10-12"), op2 = br.opshopToday("2026-10-13"); check(op1.length === 4 && op1.join() === br.opshopToday("2026-10-12").join() && op1.join() !== op2.join(), "the op shop: four treasures a day, different tomorrow");
-  check(["pavlova", "damper", "wattlescone"].every(id => kt.TAPAS[id].special === "bellbird" && kt.TAPAS[id].price >= 14) && !kt.knows({towns: {}}, "pavlova") && kt.knows({towns: {bellbird: "2026-10-12"}}, "pavlova"), "three Bellbird specials at the stove, once Mel's been");
-  check(it.ITEMS.raspberry_cane && it.ITEMS.raspberry_cane.visited === "bellbird" && it.CROPS.raspberry, "raspberry canes for the garden, once she's been");
+  check(["pavlova", "damper", "wattlescone"].every(id => kt.TAPAS[id].special === "bellbird" && kt.TAPAS[id].price >= 14) && !kt.knows({towns: {}}, "pavlova") && kt.knows({towns: {bellbird: "2026-10-12"}}, "pavlova"), "three Bellbird specials at the stove, once you've been");
+  check(it.ITEMS.raspberry_cane && it.ITEMS.raspberry_cane.visited === "bellbird" && it.CROPS.raspberry, "raspberry canes for the garden, once you've been");
   const F1 = {coins: 50, inv: {}, bellbird: {}}; check(br.chocTaste(F1) && !br.chocTaste(F1) && br.treat(F1, "bv_coffee", "flatwhite") && F1.coins === 46, "a free chocolate tasting once a day; a flat white for 4");
   // the people
   const bl = np.NPCS.filter(n => n.local === "bellbird");
   check(bl.length >= 40 && bl.filter(n => n.neighbour).length >= 10, "the valley's people, and the travelling neighbours at the camp");
   const inRoom = r => bl.filter(n => n.routine.some(sl => sl.scene === r)).length;
   check(allRooms.filter(r => !["bv_shed", "bv_cave"].includes(r)).every(r => inRoom(r) >= 1) && allRooms.filter(r => inRoom(r) >= 2).length >= 12, "people in the rooms (two or more in most)");
-  // the family: new acts at every stop, never repeated, and none from the earlier towns
+  // your friends: new acts at every stop, never repeated, and none from the earlier towns
   const old = new Set(["ronda", "kyoto", "jeju", "cinque"].flatMap(t => Object.values(T[t].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
   const mine = stops.flatMap(id => Object.values(T[id].acts).flatMap(a => Object.values(a).map(x => x.act)));
-  check(mine.length >= 18 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 3), "the family: three or four new things at every stop, all different, none from the other towns");
+  check(mine.length >= 18 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 3), "your friends: three or four new things at every stop, all different, none from the other towns");
   // the activities
   const F2 = {coins: 200, inv: {}, bellbird: {}}, add = (id, n) => { F2.inv[id] = (F2.inv[id] || 0) + n; };
-  check(!ba.balloonOpen(12*60) && ba.balloonOpen(7*60) && ba.balloonOpen(17*60 + 30) && ba.flightCost(["evan", "mum"]) === 55, "the balloon flies at dawn and golden hour: 30, Evan 10, others 15");
+  check(!ba.balloonOpen(12*60) && ba.balloonOpen(7*60) && ba.balloonOpen(17*60 + 30) && ba.flightCost(["hana"]) === 45, "the balloon flies at dawn and golden hour: 30 for you, 15 a friend");
   const fl = ba.flightStart(() => .3); fl.sights.forEach(([, want]) => { fl.alt = want; ba.flightMove(fl, "hold"); }); fl.alt = 1;
   check(fl.seen.length === 5 && ba.flightLand(fl) === true && ba.finishFlight(F2, fl, add) && F2.inv.b_flight === 1, "a flight: every sight at the right height, a soft landing, a certificate");
   const rd = ba.riddleStart(() => .6); while (!ba.riddleDone(rd)) ba.riddleTap(rd, rd.turns.findIndex(t => t)); check(ba.finishRiddle(F2) && vy.canRiddle(F2), "riddling with Jono, and the rack at home");
@@ -2828,9 +2859,9 @@ try {
   // Kel's cuttings (round 145): Pinot Noir and Chardonnay at home
   const F3 = {coins: 300, inv: {}, bellbird: {}}; check(!br.buyCuttings(F3, "pinot") && br.treat(F3, "bv_tasting", "flight") && br.buyCuttings(F3, "pinot") === "Pinot Noir" && br.buyCuttings(F3, "chardonnay") && F3.coins === 300 - 6 - 180, "after a tasting, Kel's Pinot Noir and Chardonnay cuttings (90 for three)");
   { const v3 = vy.vineState(F3); check(v3.cuttings.pinot === 3 && v3.cuttings.chardonnay === 3 && vy.grapeKinds(v3).includes("pinot") && vy.grapeKinds(v3).includes("chardonnay") && vy.STYLES.pinot.grape === "pinot" && vy.STYLES.chardonnay.price > vy.STYLES.white.price, "they grow on the trellis and make their own wines");
-    check(tw.TOWN_GOODS.b_pinot.price > vy.STYLES.pinot.price && tw.TOWN_GOODS.b_chard.price > vy.STYLES.chardonnay.price, "Kel's bottles cost more than Mel's own sell for"); }
+    check(tw.TOWN_GOODS.b_pinot.price > vy.STYLES.pinot.price && tw.TOWN_GOODS.b_chard.price > vy.STYLES.chardonnay.price, "Kel's bottles cost more than your own sell for"); }
   F2.inv.mallows = 1; const bag = ba.openBag(F2); ba.toast(bag); ba.toast(bag); ba.toast(bag); check(ba.pullOut(F2, bag) === "golden" && !ba.fireLit(16*60) && ba.fireLit(17*60), "a golden marshmallow, from five");
-  // in the browser: a van trip to the camp at six, a room, the fire and the family
+  // in the browser: a van trip to Valley Gate, a room, and a friend along
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`bellbird pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -2840,7 +2871,7 @@ try {
   await page.goto(url + "?seed=1&time=09:00&date=2026-10-12&bbv=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("van")); await page.waitForTimeout(900);
   await page.locator('#world [data-spot="vmap"]').dispatchEvent("click"); await page.waitForSelector("#ctx .bbmap", { timeout: 20000 });
-  await page.click('#ctx [data-bvpick="evan"]'); await page.click('#ctx [data-bvpick="mama"]'); await page.click('#ctx [data-bvgo="bv_gate"]'); await page.waitForTimeout(4500);
+  await page.click('#ctx [data-bvpick="farid"]'); await page.click('#ctx [data-bvgo="bv_gate"]'); await page.waitForTimeout(4500);
   check(await fox().then(f => f.trip && f.trip.town === "bv_gate" && f.coins === 293), "off in the van to Valley Gate");
   await page.evaluate(() => window.__mapleScene("bv_store")); await page.waitForTimeout(1200);
   check(await page.locator('#actors .npc[data-npc="mrsdunn"]').count() === 1, "Mrs Dunn behind the counter at the store");
@@ -2848,10 +2879,10 @@ try {
   await page.click('#ctx [data-rbuy="wattleseed"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.inv.wattleseed === 1), "a jar of wattleseed from Mrs Dunn's shelves");
   await page.evaluate(() => window.__mapleScene("bv_opshop")); await page.waitForTimeout(6000);
-  check(await page.locator('#actors .npc[data-npc="mama"].act-rummage').count() === 1, "Ma Ma rummaging in the op shop");
+  check(await page.locator('#actors .npc[data-npc="farid"].act-rummage').count() === 1, "Farid rummaging in the op shop");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe Coast Road (rounds 148-150)")) try {
   console.log("\nThe Coast Road (rounds 148-150)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
   const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), ca = await import(new URL("../src/game/cracts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
@@ -2868,14 +2899,14 @@ try {
   const cr = np.NPCS.filter(n => /^cr/.test(n.id)), rooms = stops.flatMap(id => Object.keys(T[id].rooms));
   check(cr.length >= 30 && cr.every(n => n.local === "bellbird") && cr.filter(n => n.neighbour).length >= 6 && new Set(np.NPCS.map(n => n.id)).size === np.NPCS.length, "the Coast Road's people, the travelling neighbours, and no one twice");
   check(rooms.filter(r => cr.some(n => n.routine.some(sl => sl.scene === r))).length >= 15, "people in the coast rooms");
-  // the family: new acts at every stop, never repeated, none from any earlier town (the Vines included)
+  // your friends: new acts at every stop, never repeated, none from any earlier town (the Vines included)
   const old = new Set([...["ronda", "kyoto", "jeju", "cinque"], ...bb.STOPS.filter(id => bb.regionOf(id) === "vines")].flatMap(t => Object.values(T[t].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
   const mine = stops.flatMap(id => Object.values(T[id].acts).flatMap(a => Object.values(a).map(x => x.act)));
-  check(mine.length >= 12 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 2), "the family: new things at every coast stop, all different, none from any earlier town");
+  check(mine.length >= 12 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 2), "your friends: new things at every coast stop, all different, none from any earlier town");
   // the activities
   const F = {coins: 200, inv: {}, bellbird: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
   const sf = ca.surfStart(); while (!ca.surfDone(sf)) { ca.surfDo(sf, "paddle"); ca.surfDo(sf, "paddle"); ca.surfDo(sf, "paddle"); ca.surfDo(sf, "pop"); }
-  check(sf.rides === 5 && ca.surfCost(true) === 20 && ca.finishSurf(F, sf, add) && F.inv.b_surfphoto === 1 && !ca.finishSurf(F, sf, add), "a surf lesson: pop up as the wave peaks; a photo of your first wave");
+  check(sf.rides === 5 && ca.surfCost(false) === 15 && ca.finishSurf(F, sf, add) && F.inv.b_surfphoto === 1 && !ca.finishSurf(F, sf, add), "a surf lesson: pop up as the wave peaks; a photo of your first wave");
   const early = ca.surfStart(); ca.surfDo(early, "pop"); const late = ca.surfStart(); [1, 2, 3, 4].forEach(() => ca.surfDo(late, "paddle")); check(early.last === "early" && late.last === "dumped", "too soon and it rolls past; too late and it dumps you");
   check(ca.whaleSeason("2026-10-12") && !ca.whaleSeason("2026-01-12") && ca.whaleStart("2026-01-12").whales === false, "humpbacks May to November, dolphins the rest of the year");
   let wr = 0; const wh = ca.whaleStart("2026-10-12", () => (wr = (wr + .37) % 1)); wh.at.forEach(i => ca.whaleLook(wh, i)); check(ca.whaleDone(wh) && wh.seen.length === 3 && ca.finishWhales(F, wh, add) && F.inv.b_whalecard === 1, "whales from the lighthouse balcony, and Win's sighting card");
@@ -2883,33 +2914,30 @@ try {
   [0, 1, 2].forEach(() => ca.glowWait(gl)); gl.lit.forEach((_, i) => ca.glowCount(gl, i)); check(ca.glowDone(gl) && ca.finishGlow(F, gl).n === ca.glowTotal(gl) && F.bellbird.glow > 0, "counting the glow-worms");
   const pt = ca.potsStart(() => .5); while (!ca.potsDone(pt)) { const p = ca.potHaul(pt); if (p && p.what !== "empty") ca.potChoose(pt, ca.potKeepable(p)); }
   check(pt.right === pt.pots.filter(p => p.what !== "empty").length && ca.finishPots(F, pt, add) === 2 && F.inv.crayfish === 2 && ca.finishPots(F, pt, add) === 0, "cray pots with Mags: keep the big ones, back with the small and the berried; two crays, once a day");
-  check(!ca.potKeepable({what: "berried", mm: 130}) && !ca.potKeepable({what: "cray", mm: 90}) && ca.potKeepable({what: "cray", mm: 110}), "the gauge, and the mums with eggs go back");
-  const pg = ca.pengStart(true, () => .1); while (!ca.pengDone(pg)) ca.pengDo(pg, pg.squeal[pg.round] ? "shush" : "still", () => .5); check(!ca.pengOpen(17*60) && ca.pengOpen(18*60 + 30) && pg.fright === 0 && ca.finishPeng(F, pg) === pg.here && pg.here > 0, "the penguin parade at dusk: stay still, and shush Evan in time");
+  check(!ca.potKeepable({what: "berried", mm: 130}) && !ca.potKeepable({what: "cray", mm: 90}) && ca.potKeepable({what: "cray", mm: 110}), "the gauge, and the mothers with eggs go back");
+  const pg = ca.pengStart(true, () => .1); while (!ca.pengDone(pg)) ca.pengDo(pg, pg.squeal[pg.round] ? "shush" : "still", () => .5); check(!ca.pengOpen(17*60) && ca.pengOpen(18*60 + 30) && pg.fright === 0 && ca.finishPeng(F, pg) === pg.here && pg.here > 0, "the penguin parade at dusk: stay still, and they come right past");
   const nip = ca.nipStart(() => .1); while (!ca.nipDone(nip)) ca.nipDo(nip, nip.wave[nip.leg] ? "duck" : "cheer"); const nr = ca.finishNip(F, nip, add);
-  check(nr.place === 1 && nr.medal && F.inv.b_nipmedal === 1 && !ca.finishNip(F, nip, add).medal, "Nippers: Evan wins, and his first medal");
-  // in the browser: the family at Breakwater, Jet's surf lesson
+  check(nr.place === 1 && nr.medal && F.inv.b_nipmedal === 1 && !ca.finishNip(F, nip, add).medal, "Nippers at the surf club: you win, and your first medal");
+  // in the browser: Hana and Tomi at Breakwater, Jet's surf lesson
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`coast pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { if (!/crv=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), van: true}; f.coins = 300;
-    f.bellbird = {stamps: {bv_gate: "2026-10-01"}}; f.trip = {town: "bv_breakwater", day: "2026-10-12", party: ["mum", "marcus", "evan"], from: 7*60, by: "van"};
+    f.bellbird = {stamps: {bv_gate: "2026-10-01"}}; f.trip = {town: "bv_breakwater", day: "2026-10-12", party: ["hana", "tomi"], from: 7*60, by: "van"};
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&crv=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("cw_beach")); await page.waitForTimeout(7000);
-  check(await page.locator('#actors .npc[data-npc="marcus"].act-bodyboard').count() === 1 && await page.locator('#actors .npc[data-npc="mum"].act-yoga').count() === 1 && await page.locator('#actors .npc[data-npc="crjet"]').count() === 1, "Breakwater: Marcus with his bodyboard, Mum's beach yoga, and Jet teaching");
+  check(await page.locator('#actors .npc[data-npc="tomi"].act-bodyboard').count() === 1 && await page.locator('#actors .npc[data-npc="hana"].act-yoga').count() === 1 && await page.locator('#actors .npc[data-npc="crjet"]').count() === 1, "Breakwater: Tomi with his bodyboard, Hana's beach yoga, and Jet teaching");
   await page.evaluate(() => window.__mapleScene("bv_surfshop")); await page.waitForTimeout(900);
   await page.locator('#world [data-rdspot="bv_surfshop"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bba="open:surf"]', { timeout: 20000 });
   await page.click('#ctx [data-bba="open:surf"]'); await page.click('#ctx [data-bba="surf"]'); await page.waitForTimeout(300);
   for (let w = 0; w < 5; w++) { for (let i = 0; i < 3; i++) await page.click('#ctx [data-bba="spaddle"]'); await page.click('#ctx [data-bba="popup"]'); }
   await page.click('#ctx [data-bba="surfed"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.coins === 280 && f.inv.b_surfphoto === 1 && f.bellbird.surfs === 1), "a surf lesson with Jet (20 with Evan), five waves ridden, and the photo");
-  await page.goto(url + "?seed=1&time=20:30&date=2026-10-12"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("cw_beach")); await page.waitForTimeout(2500);
-  check(await page.locator("#sceneArt .zzz").count() === 1 && !(await page.locator("#evan").isVisible()) && /tuck him into the back of the van/.test(await page.locator("#speech").textContent()), "after eight, Evan's tucked up asleep in the van");
+  check(await fox().then(f => f.coins === 285 && f.inv.b_surfphoto === 1 && f.bellbird.surfs === 1), "a surf lesson with Jet (15), five waves ridden, and the photo");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe Tablelands (rounds 157-160)")) try {
   console.log("\nThe Tablelands (rounds 157-160)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
   const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), ta = await import(new URL("../src/game/tlacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
@@ -2929,17 +2957,17 @@ try {
   const tl = np.NPCS.filter(n => /^tl/.test(n.id)), rooms = stops.flatMap(id => Object.keys(T[id].rooms));
   check(tl.length >= 30 && tl.every(n => n.local === "bellbird") && new Set(np.NPCS.map(n => n.id)).size === np.NPCS.length, "the Tablelands' people, and no one twice");
   check(rooms.filter(r => tl.some(n => n.routine.some(sl => sl.scene === r))).length >= 16, "people in the Tablelands rooms");
-  // the family: new acts at every stop, none from any earlier town (the Vines and the Coast Road included)
+  // your friends: new acts at every stop, none from any earlier town (the Vines and the Coast Road included)
   const old = new Set([...["ronda", "kyoto", "jeju", "cinque"], ...bb.STOPS.filter(id => bb.regionOf(id) !== "tablelands")].flatMap(t => Object.values(T[t].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
   const mine = stops.flatMap(id => Object.values(T[id].acts).flatMap(a => Object.values(a).map(x => x.act)));
-  check(mine.length >= 12 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 2), "the family: new things at every Tablelands stop, all different, none from anywhere before");
+  check(mine.length >= 12 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 2), "your friends: new things at every Tablelands stop, all different, none from anywhere before");
   // the activities
-  const F = {coins: 300, inv: {b_goldpan: 1}, bellbird: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, o = (hm, rng) => ({hm, addInv: add, evan: true, rng});
+  const F = {coins: 300, inv: {b_goldpan: 1}, bellbird: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, o = (hm, rng) => ({hm, addInv: add, rng});
   let st = {}; ta.tlAct(F, "swim", st, "swimin", null, o(10*60)); ["falls", "float", "veil"].forEach(k => ta.tlAct(F, "swim", st, "swim", k)); const inStill = !st.t.out && st.t.cold === 3; ta.tlAct(F, "swim", st, "swim", "out");
   check(inStill && st.t.out && ta.tlAct(F, "swim", st, "swimdone").close && F.bellbird.tl.swims === 1, "a swim in the falls: the falls, a float, behind the veil, and out");
   st = {}; check(!ta.tlAct(F, "swim", st, "swimin", null, o(19*60)), "no swimming after five");
   st = {}; ta.tlAct(F, "kayak", st, "kayakgo", null, o(10*60, () => .1)); while (!ta.kayakDone(st.t)) ta.tlAct(F, "kayak", st, "steer", String(st.t.at[st.t.leg]));
-  check(st.t.seen.length === 6 && F.coins === 300 - ta.kayakCost(true) && ta.tlAct(F, "kayak", st, "kayakdone").close && F.bellbird.tl.kayaks === 1, "once round Crater Lake in a kayak (16 with Evan), steering for whatever shows itself");
+  check(st.t.seen.length === 6 && F.coins === 300 - ta.kayakCost(true) && ta.tlAct(F, "kayak", st, "kayakdone").close && F.bellbird.tl.kayaks === 1, "once round Crater Lake in a kayak, steering for whatever shows itself");
   st = {}; ta.tlAct(F, "platypus", st, "platygo", null, o(7*60, () => .1)); ta.tlAct(F, "platypus", st, "platy", st.t.rings[0] ? "look" : "wait"); const before = st.t.seen; const nothing = {round: 0, rings: [false], seen: 0, gone: false};
   check(ta.platyDo(nothing, "look") === "gone" && nothing.gone && ta.platyOdds(7*60) > ta.platyOdds(12*60), "the platypus: look at the wrong moment and she's gone; better at dawn and dusk");
   st = {}; ta.tlAct(F, "calves", st, "calvesgo", null, o(10*60, () => .3)); const hungriest = st.t.calves.map((c, i) => [c.hunger, i]).sort((a, b) => b[0] - a[0])[0][1];
@@ -2956,19 +2984,19 @@ try {
   const p2 = ta.panStart(); ta.panDo(p2, "scoop"); ta.panDo(p2, "swirl"); check(F.inv.b_goldfleck === 1 && ta.panDo(p2, "look") === "gravel" && !ta.tlAct({inv: {}, bellbird: {}}, "pan", {}, "pango"), "gold panning: four swirls and a fleck for the tiny bottle (and you need a pan)");
   st = {}; ta.tlAct(F, "steam", st, "steamgo", null, o(10*60, () => .3)); while (!ta.steamDone(st.t)) ta.tlAct(F, "steam", st, "steam", st.t.cross.includes(st.t.leg) ? "whistle" : "look");
   check(st.t.whistled === 2 && ta.tlAct(F, "steam", st, "steamdone", null, o(10*60)).close && F.inv.b_steamticket === 1 && !ta.tlAct(F, "steam", {}, "steamgo", null, o(17*60)), "the steam train: whistle at the crossings, a punched ticket to keep; she runs 9 to 4");
-  // in the browser: the family at Misty Falls, and a swim from the falls
+  // in the browser: Mei and Tomi at Misty Falls, and a swim from the falls
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`tablelands pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { if (!/tlv=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), van: true}; f.coins = 300;
-    f.bellbird = {stamps: {bv_gate: "2026-10-01", bv_lookout: "2026-10-01"}}; f.trip = {town: "bv_falls", day: "2026-10-12", party: ["gonggong", "marcus", "evan"], from: 7*60, by: "van"};
+    f.bellbird = {stamps: {bv_gate: "2026-10-01", bv_lookout: "2026-10-01"}}; f.trip = {town: "bv_falls", day: "2026-10-12", party: ["mei", "tomi"], from: 7*60, by: "van"};
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&tlv=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("tf_top")); await page.waitForTimeout(7000);
-  check(await page.locator('#actors .npc[data-npc="gonggong"].act-flask').count() === 1 && await page.locator('#world [data-place="bvtview"]').count() === 1, "Misty Falls: Gong Gong with his thermos at the lookout");
+  check(await page.locator('#actors .npc[data-npc="mei"].act-flask').count() === 1 && await page.locator('#world [data-place="bvtview"]').count() === 1, "Misty Falls: Mei with her thermos at the lookout");
   await page.evaluate(() => window.__mapleScene("tf_pool")); await page.waitForTimeout(6000);
-  check(await page.locator('#actors .npc[data-npc="marcus"].act-wade').count() === 1 && await page.locator('#actors .npc[data-npc="tlkirra"]').count() === 1, "the swimming hole: Marcus wading by the falls, and Kirra the ranger");
+  check(await page.locator('#actors .npc[data-npc="tomi"].act-wade').count() === 1 && await page.locator('#actors .npc[data-npc="tlkirra"]').count() === 1, "the swimming hole: Tomi wading by the falls, and Kirra the ranger");
   await page.locator('#world [data-place="bvtfalls"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bba="tl:swimin"]', { timeout: 20000 });
   await page.click('#ctx [data-bba="tl:swimin"]'); for (const k of ["falls", "float", "veil", "out"]) await page.click(`#ctx [data-bba="tl:swim.${k}"]`);
   await page.click('#ctx [data-bba="tl:swimdone"]'); await page.waitForTimeout(300);
@@ -2979,7 +3007,7 @@ try {
   check(await fox().then(f => f.inv.b_rosella === 1 && f.coins === 294), "the Range Café: a jar of rosella jam to take home");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe Lavender Hills (rounds 161-164)")) try {
   console.log("\nThe Lavender Hills (rounds 161-164)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
   const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), la = await import(new URL("../src/game/lvacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
@@ -2994,15 +3022,15 @@ try {
   const goods = Object.entries(tw.TOWN_GOODS).filter(([, g]) => stops.some(id => Object.keys(T[id].rooms).includes(g.shop)));
   check(goods.length >= 15 && goods.every(([, g]) => !g.sell || g.sell <= g.price) && tw.TOWN_GOODS.honey_sun && sc.INGR.honey_sun, "the Lavender Hills' shops (sunflower honey for the gelato), and nothing sells back for more than it costs");
   check(["madeleines", "chevretart", "ratatouille"].every(id => kt.TAPAS[id] && kt.TAPAS[id].special === "lavender") && kt.beenTo({bellbird: {stamps: {bv_honey: "x"}}}, "lavender") && !kt.beenTo({bellbird: {stamps: {bv_gate: "x"}}}, "lavender"), "three Lavender Hills specials at the stove once you've been");
-  check(stops.every(id => Object.keys(T[id].rooms).filter(r => r !== "bv_hpaper").every(r => br.bbRoomPanel({coins: 50, inv: {}}, r).length > 50)), "every Lavender Hills room has its panel (Mel's paperie in Montrose has its own stations)");
+  check(stops.every(id => Object.keys(T[id].rooms).filter(r => r !== "bv_hpaper").every(r => br.bbRoomPanel({coins: 50, inv: {}}, r).length > 50)), "every Lavender Hills room has its panel (your paperie in Montrose has its own stations)");
   const lv = np.NPCS.filter(n => /^lv/.test(n.id)), rooms = stops.flatMap(id => Object.keys(T[id].rooms));
   check(lv.length >= 28 && lv.every(n => n.local === "bellbird") && new Set(np.NPCS.map(n => n.id)).size === np.NPCS.length, "the Lavender Hills' people, and no one twice");
   check(rooms.filter(r => lv.some(n => n.routine.some(sl => sl.scene === r))).length >= 16, "people in the Lavender Hills rooms");
   const old = new Set([...["ronda", "kyoto", "jeju", "cinque"], ...bb.STOPS.filter(id => bb.regionOf(id) !== "lavender")].flatMap(t => Object.values(T[t].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
   const mine = stops.flatMap(id => Object.values(T[id].acts).flatMap(a => Object.values(a).map(x => x.act)));
-  check(mine.length >= 12 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 2), "the family: new things at every Lavender Hills stop, all different, none from anywhere before");
+  check(mine.length >= 12 && new Set(mine).size === mine.length && mine.every(a => !old.has(a)) && stops.every(id => Object.keys(T[id].acts).length >= 2), "your friends: new things at every Lavender Hills stop, all different, none from anywhere before");
   // the activities
-  const F = {coins: 300, inv: {}, bellbird: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, o = (hm, rng) => ({hm: hm || 10*60, addInv: add, evan: true, rng: rng || (() => .3)});
+  const F = {coins: 300, inv: {}, bellbird: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, o = (hm, rng) => ({hm: hm || 10*60, addInv: add, rng: rng || (() => .3)});
   let st = {}; la.lvAct(F, "harvest", st, "cutgo", null, o()); const pale = st.t.ready.indexOf(false); check(la.harvestCut(st.t, pale) === "green" && st.t.wrong === 1, "the harvest: cutting a pale bush doesn't count");
   st.t.ready.forEach((r, i) => r && la.lvAct(F, "harvest", st, "cut", String(i))); la.lvAct(F, "harvest", st, "cutdone", null, o());
   check(F.inv.bq_lavender === 2 && !la.lvAct(F, "harvest", {}, "cutgo", null, o()), "two bunches of lavender, once a day");
@@ -3016,24 +3044,24 @@ try {
   while (!la.beesDone(st.t)) { la.lvAct(F, "bees", st, "bee", "smoke"); la.lvAct(F, "bees", st, "bee", "lift"); } la.lvAct(F, "bees", st, "beesdone", null, o());
   check(F.inv.honey_sun === 1 && !la.lvAct(F, "bees", {}, "beesgo", null, o()), "the hives with Mathis: a jar of sunflower honey, once a day");
   st = {}; la.lvAct(F, "maze", st, "mazego", null, o()); while (!la.mazeDone(st.t)) la.lvAct(F, "maze", st, "turn", ["left", "straight", "right"][st.t.path[st.t.at]]); la.lvAct(F, "maze", st, "mazedone", null, o());
-  check(F.inv.b_mazecert === 1, "the sunflower maze: Evan finds the middle, and his certificate");
-  st = {}; la.lvAct(F, "sticks", st, "sticksgo", null, o()); for (let i = 0; i < 3; i++) la.lvAct(F, "sticks", st, "stick", "fat", o(600, () => .1)); check(st.t.mine === 3 && la.lvAct(F, "sticks", st, "sticksdone").close, "Pooh-sticks off the Old Bridge, best of three against Dad");
+  check(F.inv.b_mazecert === 1, "the sunflower maze: you find the middle, and your certificate");
+  st = {}; la.lvAct(F, "sticks", st, "sticksgo", null, o()); for (let i = 0; i < 3; i++) la.lvAct(F, "sticks", st, "stick", "fat", o(600, () => .1)); check(st.t.mine === 3 && la.lvAct(F, "sticks", st, "sticksdone").close, "Pooh-sticks off the Old Bridge, best of three against Theo");
   st = {}; check(!la.lvAct(F, "bell", st, "bellgo", null, o(12*60)) && la.lvAct(F, "bell", st, "candle").hearts === 1, "a candle any time; the bell only at sunset");
   la.lvAct(F, "bell", st, "bellgo", null, o(18*60)); while (!la.bellDone(st.t)) la.lvAct(F, "bell", st, "bell", st.t.down[st.t.i] ? "pull" : "wait"); la.lvAct(F, "bell", st, "belldone", null, o(18*60));
   check(F.inv.b_bellmedal === 1, "ringing the chapel bell at sunset: five strokes, and Père Gaston's little bell");
   st = {}; la.lvAct(F, "banon", st, "banongo"); ["soak", "wrap", "tie", "rest"].forEach(k => la.lvAct(F, "banon", st, "bstep", k)); la.lvAct(F, "banon", st, "banondone");
   check(la.knowsBanon(F) && hf.cheesesFor(hf.hfState(F)).some(([k]) => k === "banon") && !hf.cheesesFor(hf.hfState({})).some(([k]) => k === "banon"), "Céline's banon lesson: then it's yours to make at home in Elena's cheese press");
-  // in the browser: the family at Lavender Ridge, and the harvest from the rows
+  // in the browser: Hana and Bo at Lavender Ridge, and the harvest from the rows
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`lavender pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { if (!/lvv=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), van: true}; f.coins = 300;
-    f.bellbird = {stamps: {bv_gate: "2026-10-01", bv_camp: "2026-10-01"}}; f.trip = {town: "bv_lavender", day: "2026-10-12", party: ["mum", "darren", "evan"], from: 7*60, by: "van"};
+    f.bellbird = {stamps: {bv_gate: "2026-10-01", bv_camp: "2026-10-01"}}; f.trip = {town: "bv_lavender", day: "2026-10-12", party: ["hana", "bo"], from: 7*60, by: "van"};
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&lvv=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("hv_rows")); await page.waitForTimeout(7000);
-  check(await page.locator('#actors .npc[data-npc="mum"].act-armful').count() === 1 && await page.locator('#actors .npc[data-npc="darren"].act-bee').count() === 1 && await page.locator('#actors .npc[data-npc="lvemile"]').count() === 1, "Lavender Ridge: Mum with an armful of lavender, a bee after Darren, and Émile in the rows");
+  check(await page.locator('#actors .npc[data-npc="hana"].act-armful').count() === 1 && await page.locator('#actors .npc[data-npc="bo"].act-bee').count() === 1 && await page.locator('#actors .npc[data-npc="lvemile"]').count() === 1, "Lavender Ridge: Hana with an armful of lavender, a bee after Bo, and Émile in the rows");
   await page.locator('#world [data-place="bvhrows"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bba="lv:cutgo"]', { timeout: 20000 });
   await page.click('#ctx [data-bba="lv:cutgo"]'); await page.waitForTimeout(200);
   for (let i = 0; i < 6; i++) { const b = page.locator(`#ctx [data-bba="lv:cut.${i}"]`); if (await b.count() && /deep purple/.test(await page.locator("#ctx li").nth(i).innerText())) await b.click(); }
@@ -3041,17 +3069,17 @@ try {
   check(await fox().then(f => f.inv.bq_lavender === 2 && f.bellbird.lv.cut === "2026-10-12"), "the lavender harvest with Émile, two bunches to take home");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe terrace and the Sunday long lunch (round 146)")) try {
   console.log("\nThe terrace and the Sunday long lunch (round 146)");
   const lu = await import(new URL("../src/game/lunch.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
   const sun = "2026-10-11", ids = new Set(np.NPCS.map(n => n.id)), bk = lu.bookingsFor(sun), seats = lu.seatsTaken(bk);
   check(lu.lunchOn(sun) && !lu.lunchOn("2026-10-12") && lu.nextSunday("2026-10-14") === "2026-10-18" && lu.nextSunday(sun) === sun, "every Sunday; the book shows the coming one");
-  check(seats >= 9 && seats <= lu.LUNCH.seats && bk.filter(b => b.family).length === 1 && bk.every(b => b.ids.every(id => ids.has(id))) && new Set(bk.flatMap(b => b.ids)).size === seats, "nine to twelve booked, one lot of the family, no one twice");
-  const fams = ["2026-10-11", "2026-10-18", "2026-10-25"].map(d => lu.bookingsFor(d).find(b => b.family).ids.join()); check(new Set(fams).size === 3, "a different pair of the family each week");
+  check(seats >= 9 && seats <= lu.LUNCH.seats && bk.filter(b => b.family).length === 1 && bk.every(b => b.ids.every(id => ids.has(id))) && new Set(bk.flatMap(b => b.ids)).size === seats, "nine to twelve booked, one pair of your friends, no one twice");
+  const fams = ["2026-10-11", "2026-10-18", "2026-10-25"].map(d => lu.bookingsFor(d).find(b => b.family).ids.join()); check(new Set(fams).size === 3, "a different pair of your friends each week");
   check(lu.bookOpen("2026-10-12").list.length < lu.bookOpen("2026-10-17").list.length && lu.bookOpen("2026-10-17").list.length === lu.bookingsFor("2026-10-18").length, "the book fills up through the week");
   const g = bk.find(b => !b.family), sl = lu.lunchSlot(g.ids[0], sun, 12*60 + 45, true);
   check(sl && sl.scene === "terrace" && sl.act === "sit" && !lu.lunchSlot(g.ids[0], sun, 12*60 + 45, false) && !lu.lunchSlot(g.ids[0], sun, 15*60 + 5, true), "booked guests sit at the long table 12 to 3 (once there's a terrace)");
-  const mm = lu.bookingsFor("2026-10-25").find(b => b.ids.includes("mama")); check(!mm || mm.at >= 13*60, "Ma Ma comes after her market stall shuts");
+  const mm = lu.bookingsFor("2026-10-25").find(b => b.ids.includes("farid")); check(!mm || mm.at >= 13*60, "Farid comes after his market stall shuts");
   // sales: a pair gets through about a bottle an hour, the dearer ones more
   const F = {coins: 0, inv: {}, vine: {terrace: true}}; const v = vy.vineState(F); v.shelf = [{id: "a", name: "House red", type: "red", n: 40, price: 18, open: 0}, {id: "b", name: "Reserva", type: "tempranillo", n: 40, price: 28, open: 0}];
   const realNow = Date.now, t0 = wall("2026-10-11T07:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 180*60000; const out = vy.sellTick(F, {}); Date.now = realNow;
@@ -3082,7 +3110,7 @@ try {
   check(/terrace/i.test(await page.locator("#sceneName").textContent()), "and back up by tapping the little terrace");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nMulled wine, and the mill workshop and shop (round 153)")) try {
   console.log("\nMulled wine, and the mill workshop and shop (round 153)");
   const ml = await import(new URL("../src/game/mulled.js", import.meta.url)), mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   const go = await import(new URL("../src/game/goals.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), tw = await import(new URL("../src/data/towns.js", import.meta.url));
@@ -3114,10 +3142,10 @@ try {
     check([oil, soap, lot, mull].every(x => x.got > x.cost) && [oil, soap, lot].every(x => x.sell >= x.cost), `every recipe pays: oil ${oil.cost}→${oil.got}, soap ${soap.cost}→${soap.got}, lotion ${lot.cost}→${lot.got}, mulled wine ${mull.cost}→${mull.got}`); }
   check(["honey", "honey_lav", "honey_blossom", "honey_cream", "honeycomb", "honey_sun", "honey_heath", "euchoney"].every(h => mc.HERB[h] && mc.HERB[h].soap && !mc.HERB[h].oil) && mc.HERB.honey_lav.lotion, "every honey (the hives', the trips') goes into soaps, and all but comb into lotions");
   check(go.GOALS.millshop && go.GOALS.millshop.needs === "mill" && np.NPCS.some(n => n.id === "hazel" && n.routine.some(sl => sl.scene === "millup" && sl.needs === "millshop")) && np.NPCS.find(n => n.id === "tomi").routine.some(sl => sl.scene === "mill" && sl.needs === "mill") && !np.NPCS.find(n => n.id === "ines").routine.some(sl => sl.scene === "mill"), "the Mill Shop goal, Hazel at the counter, Tomi at the press (Ines stays on the vines)");
-  // the Sunday market: a mill crate on Mel's wine stall, and Grace (Hazel's granddaughter) stocks Mel's soaps
+  // the Sunday market: a mill crate on your wine stall, and Grace (Hazel's granddaughter) stocks your soaps
   { const F = {craft: {store: {mc_s: 4, mc_o: 4}}}; it.ITEMS.mc_s = {n: "A bar of x soap", price: 8, mill: "soap"}; it.ITEMS.mc_o = {n: "A bottle of x oil", price: 28, mill: "oil"}; const real = Math.random; Math.random = () => .001;
     const g = [0, 1, 2, 3, 4].map(() => mc.craftSellMinute(F, "2026-10-18", 9*60, "grace")), m = mc.craftSellMinute(F, "2026-10-18", 9*60, "market"), sat = mc.craftSellMinute(F, "2026-10-17", 11*60, "shop"); Math.random = real;
-    check(g.slice(0, 4).every(x => x === 8) && g[4] === 0 && F.craft.store.mc_o === 2 && m === 28 && sat === 28 && F.craft.sold["2026-10-18"].grace === 4, "Grace sells Mel's soaps (only the soaps) at the Sunday market; the wine stall's mill crate sells too"); }
+    check(g.slice(0, 4).every(x => x === 8) && g[4] === 0 && F.craft.store.mc_o === 2 && m === 28 && sat === 28 && F.craft.sold["2026-10-18"].grace === 4, "Grace sells your soaps (only the soaps) at the Sunday market; the wine stall's mill crate sells too"); }
   check(np.NPCS.find(n => n.id === "grace").job.includes("Hazel"), "Grace is Hazel's granddaughter");
   { const tours = await import(new URL("../src/game/tours.js", import.meta.url)), sat = "2026-10-17", ids = tours.TOURISTS, hits = ids.filter(id => [12*60 + 10, 13*60 + 40, 16*60 + 10].some(t => mc.millVisitSlot(id, sat, t, true, ids, [])));
     check(hits.length >= 2 && !ids.some(id => mc.millVisitSlot(id, "2026-10-14", 13*60 + 10, true, ids, [])) && ids.some(id => mc.millVisitSlot(id, "2026-10-14", 12*60 + 10, true, ids, [])) && !ids.some(id => mc.millVisitSlot(id, "2026-10-12", 12*60 + 10, true, ids, [])) && !ids.some(id => mc.millVisitSlot(id, sat, 12*60 + 10, false, ids, [])), "day-trippers walk up the lane to the Mill Shop (once it's open): three at weekends, two on weekdays, none on Mondays"); }
@@ -3128,7 +3156,7 @@ try {
     check(mc.millSlot("hazel", sat, 14*60 + 30, true, T, []).workshop && T.filter(id => (mc.millSlot(id, sat, 14*60 + 30, true, T, []) || {}).workshop).length === 5 && !mc.workshopNow("2026-10-13", 14*60 + 30), "soap workshops: Hazel and five, Wednesdays and Saturdays");
     check(!mc.millSlot("hazel", sat, 11*60 + 10, false, T, []) && !mc.millSlot("hazel", sat, 14*60 + 30, false, T, []) && /Once the Mill Shop opens/.test(mc.tastePanel({}, null, {shop: false})) && /Once the Mill Shop opens/.test(mc.workshopPanel({}, {shop: false})), "before the Mill Shop's bought: no tastings or workshops, and the table and corner say they start once it opens");
     const F = {craft: {recipes: [{id: "oil_rosemary", kind: "oil", adds: ["rosemary"], name: "Rosemary olive oil"}]}, inv: {}}, st = mc.tasteStart(F); st.oils.forEach(o => { o.notes.forEach(n => mc.tastePick(st, n)); mc.tasteNext(st); });
-    const add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }; check(mc.tasteDone(st) && st.score === st.oils.reduce((a, o) => a + o.notes.length, 0) && mc.finishTaste(F, st, add) && F.inv.t_glass === 1, "Mel at a tasting: name the notes in each glass, and keep the cobalt glass");
+    const add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }; check(mc.tasteDone(st) && st.score === st.oils.reduce((a, o) => a + o.notes.length, 0) && mc.finishTaste(F, st, add) && F.inv.t_glass === 1, "an oil tasting: name the notes in each glass, and keep the cobalt glass");
     const G = {craft: {store: {mc_o: 3, mc_s: 3}}}; it.ITEMS.mc_o = {n: "o", price: 28, mill: "oil"}; it.ITEMS.mc_s = {n: "s", price: 8, mill: "soap"}; const real = Math.random; Math.random = () => .07;
     const after = mc.craftSellMinute(G, "2026-10-13", 11*60 + 50, "shop"), quiet = mc.craftSellMinute(G, "2026-10-13", 14*60, "shop"); Math.random = real;
     check(after === 28 && quiet === 0, "after a tasting, the oils fly off the shelves"); }
@@ -3160,13 +3188,13 @@ try {
     check(hit, "a tap anywhere on the workbench lands on it, not the floor between its legs"); }
   await page.locator('#world [data-millspot="bench"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-mc="add:rosemary"]', { timeout: 20000 });
   await page.click('#ctx [data-mc="add:rosemary"]'); await page.click('#ctx [data-mc="make"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.craft && f.craft.steep.length === 1 && f.craft.recipes[0].name === "Rosemary olive oil" && !f.inv.oliveoil), "Mel steeps her first infused oil: Rosemary olive oil");
+  check(await fox().then(f => f.craft && f.craft.steep.length === 1 && f.craft.recipes[0].name === "Rosemary olive oil" && !f.inv.oliveoil), "your first infused oil steeping: Rosemary olive oil");
   await page.click("#ctx [data-close]"); await page.locator('#world [data-millspot="shop"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="millshop"]', { timeout: 20000 });
   await page.click('#ctx [data-goal="millshop"]'); await page.waitForTimeout(600);
   check(await fox().then(f => f.goals.millshop && f.coins === 800), "the Mill Shop opens upstairs (1200)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe terrace's week: weddings, trivia, sip and paint, and the special days (round 152)")) try {
   console.log("\nThe terrace's week: weddings, trivia, sip and paint, and the special days (round 152)");
   const oc = await import(new URL("../src/game/occasions.js", import.meta.url)), lu = await import(new URL("../src/game/lunch.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
   const np = await import(new URL("../src/data/npcs.js", import.meta.url)), tp = await import(new URL("../src/data/terrace-people.js", import.meta.url)), ids = new Set(np.NPCS.map(n => n.id));
@@ -3177,12 +3205,12 @@ try {
   check(!!oc.occasionNow("2026-12-31", 15) && !oc.occasionNow("2026-12-31", 45) && !!oc.occasionNow("2026-12-31", 21*60), "New Year's Eve runs on past midnight");
   const sl = oc.occasionSlot("wd_tom", "2026-10-24", 14*60 + 10, true), dn = oc.occasionSlot("wd_tom", "2026-10-24", 18*60, true);
   check(sl && sl.scene === "terrace" && sl.at[1] === 280 && dn && ["dance", "boogie", "armsup", "twirl", "shuffle"].includes(dn.act) && !oc.occasionSlot("wd_tom", "2026-10-24", 14*60, false), "the couple under the arch at two, everyone dancing after five (and only once there's a terrace)");
-  check(oc.occasionSlot("amara", "2026-10-14", 19*60 + 30, true).act === "point" && oc.occasionSlot("dad", "2026-10-15", 14*60 + 30, true).act === "point" && oc.occasionSlot("juniper", "2026-10-15", 14*60 + 30, true).act === "paint", "Amara runs the quiz; Dad teaches the painting");
-  const md = lu.bookingsFor("2027-05-09"); check(md[0].mothers && md[0].ids.includes("mum") && md[0].ids.includes("mama") && lu.seatsTaken(md) <= 12, "Mother's Day: the whole family at the long lunch, Mum and Ma Ma guests of honour");
+  check(oc.occasionSlot("amara", "2026-10-14", 19*60 + 30, true).act === "point" && oc.occasionSlot("theo", "2026-10-15", 14*60 + 30, true).act === "point" && oc.occasionSlot("juniper", "2026-10-15", 14*60 + 30, true).act === "paint", "Amara runs the quiz; Theo teaches the painting");
+  const md = lu.bookingsFor("2027-05-09"); check(md[0].mothers && md[0].ids.includes("hana") && md[0].ids.includes("farid") && lu.seatsTaken(md) <= 12, "Mother's Day: all your friends at the long lunch");
   const cu = oc.comingUp("2026-10-12"); check(cu.some(e => /wedding of/.test(e.n)) && cu.some(e => e.n === "Trivia night") && cu.every(e => e.day >= "2026-10-12"), "the bookings book: what's coming up");
   // trivia: twenty questions, all with three answers; a perfect score wins the pot
   const qz = oc.quizFor("2026-10-14"); check(qz.length === 5 && qz.every(r => r.qs.length === 4 && r.qs.every(q => q[1].length === 3 && q[2] >= 0 && q[2] < 3)), "trivia: five rounds of four, three answers each");
-  const st = oc.triviaStart("2026-10-14", "Mel's Marvels"); while (!st.done) { oc.triviaAnswer(st, st.rounds[st.r].qs[st.q][2]); oc.triviaNext(st); }
+  const st = oc.triviaStart("2026-10-14", "The Marvels"); while (!st.done) { oc.triviaAnswer(st, st.rounds[st.r].qs[st.q][2]); oc.triviaNext(st); }
   const F = {coins: 0, inv: {}}; const r = oc.finishTrivia(F, st); check(st.score === 20 && r.win && F.coins === r.pot && r.pot === oc.QUIZ.entry*4 + oc.QUIZ.house, "twenty out of twenty: the winners take the pot");
   // sip and paint: three layers, and the painting to keep
   const ps = oc.paintStart("view"); [0, 1, 2].forEach(i => oc.paintStep(ps, i)); const G = {inv: {}}, add = (id, n) => { G.inv[id] = (G.inv[id] || 0) + n; };
@@ -3200,19 +3228,19 @@ try {
   await page.goto(url + "?reset=1&seed=1&time=19:20&date=2026-10-14"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=19:20&date=2026-10-14&tw=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("terrace")); await page.waitForTimeout(5000);
-  check(await page.locator('#actors .npc[data-npc="amara"].act-point').count() === 1 && await page.locator('#actors .npc[data-npc="darren"].act-sit').count() === 1 && await page.locator('#world [data-tspot="screen"]').count() === 1, "Wednesday night: Amara on the microphone, teams at the table, the screen up");
+  check(await page.locator('#actors .npc[data-npc="amara"].act-point').count() === 1 && await page.locator('#actors .npc[data-npc="bo"].act-sit').count() === 1 && await page.locator('#world [data-tspot="screen"]').count() === 1, "Wednesday night: Amara on the microphone, teams at the table, the screen up");
   check(await page.locator("#sceneArt rect.dusk").count() === 1 && await page.locator("#sceneArt .nglow").count() >= 8, "the terrace gets the evening light like everywhere outdoors, and its fairy lights, rattan lamps and candles glow");
   await page.locator('#world [data-tspot="screen"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-trv^="join"]', { timeout: 20000 });
   await page.click('#ctx [data-trv="join:0"]'); await page.waitForTimeout(300);
   for (let i = 0; i < 20; i++) { await page.click('#ctx [data-trv^="ans"] >> nth=0'); await page.click('#ctx [data-trv="next"]'); }
   await page.waitForSelector('#ctx [data-trv="end"], #ctx [data-trv^="tie"]', { timeout: 10000 }); await page.click('#ctx [data-trv="end"], #ctx [data-trv^="tie"] >> nth=0'); await page.waitForTimeout(400);
-  check(await fox().then(f => f.terraceEv && f.terraceEv.trivia === "2026-10-14" && f.terraceEv.quizzes === 1 && f.coins <= 100 - 10 + 50), "Mel plays trivia: ten coins in the jar, twenty questions, the scores read out");
+  check(await fox().then(f => f.terraceEv && f.terraceEv.trivia === "2026-10-14" && f.terraceEv.quizzes === 1 && f.coins <= 100 - 10 + 50), "you play trivia: ten coins in the jar, twenty questions, the scores read out");
   await page.locator('#world [data-tspot="book"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-lbtab="coming"]', { timeout: 20000 });
   await page.click('#ctx [data-lbtab="coming"]'); await page.waitForTimeout(300);
   check(/wedding of/i.test(await page.locator("#ctx").textContent()), "the bookings book's Coming up page shows the weddings booked in");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nStorage at home: the fridge and the garage shelf (round 166)")) try {
   console.log("\nStorage at home: the fridge and the garage shelf (round 166)");
   const sg = await import(new URL("../src/game/storage.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   check(sg.placeFor("raspberry") === "fridge" && sg.placeFor("flour") === "fridge" && sg.placeFor("balloon") === "shelf" && sg.placeFor("tulip_seed") === "shelf" && !Object.keys(it.ITEMS).some(id => ["tool", "pet"].includes(it.ITEMS[id].kind) && sg.placeFor(id)), "food and flowers go in the fridge; everything else on the garage shelf; tools and pets stay out");
@@ -3220,7 +3248,7 @@ try {
     check(sg.putAway(F, "fridge", "raspberry", 99) === 5 && !F.inv.raspberry && sg.putAway(F, "fridge", "balloon") === 0 && F.storage.fridge.raspberry === 5, "put away: raspberries into the fridge (a balloon doesn't fit)");
     check(sg.takeOut(F, "fridge", "raspberry", 2) === 2 && F.inv.raspberry === 2 && F.storage.fridge.raspberry === 3, "take some back out");
     check(sg.sendOff(F, "fridge", "raspberry", "scoop") === 3 && F.scoop.fridge.raspberry === 3 && !F.storage.fridge.raspberry && F.inv.raspberry === 2, "send the rest to the Scoop Shack fridge: the backpack's untouched");
-    check(sg.shopsFor("raspberry", () => false).map(s => s.k).join() === "scoop,kitchen" && sg.shopsFor("raspberry", () => true).some(s => s.k === "cocoa"), "only shops Mel owns, and that use it, are offered"); }
+    check(sg.shopsFor("raspberry", () => false).map(s => s.k).join() === "scoop,kitchen" && sg.shopsFor("raspberry", () => true).some(s => s.k === "cocoa"), "only shops you own, and that use it, are offered"); }
   { const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), F = {inv: {honey_lav: 1, goatmilk: 2}, goals: {mill: 1}};
     sg.putAway(F, "fridge", "honey_lav"); sg.putAway(F, "fridge", "goatmilk");
     check(sg.shopsFor("honey_lav", () => true).some(s => s.k === "basket") && sg.shopsFor("goatmilk", () => true).some(s => s.k === "basket"), "honey and goat's milk can go to the mill's basket");
@@ -3230,14 +3258,14 @@ try {
     mc.toBasket(F, "honey_lav"); F.inv.basil = 3; mc.toBasket(F, "basil"); const bp = mc.benchPanel(F, {tab: "basket"});
     check(/data-mc="unbasket:basil:1"/.test(bp) && mc.fromBasket(F, "basil", 2) === 2 && F.inv.basil === 2 && F.craft.basket.basil === 1, "the basket lists what's in it, and things can be taken back out"); }
   { const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {inv: {oliveoil: 3}};
-    check(mc.toBasket(F, "oliveoil") === 3 && F.craft.basket.oliveoil === 3 && !F.craft.oil && /Your olive oil/.test(mc.benchPanel(F, {tab: "basket"})) && mc.fromBasket(F, "oliveoil", 1) === 1 && F.inv.oliveoil === 1 && F.craft.basket.oliveoil === 2, "olive oil goes in the mill's basket, kept as Mel's own (round 199), and comes back out");
+    check(mc.toBasket(F, "oliveoil") === 3 && F.craft.basket.oliveoil === 3 && !F.craft.oil && /Your olive oil/.test(mc.benchPanel(F, {tab: "basket"})) && mc.fromBasket(F, "oliveoil", 1) === 1 && F.inv.oliveoil === 1 && F.craft.basket.oliveoil === 2, "olive oil goes in the mill's basket, kept as your own (round 199), and comes back out");
     // round 199: "I put four bottles of olive oil in the basket and it disappeared": Tomi infused with them. Now he only uses the mill's own pressing
     { const G = {inv: {oliveoil: 2, basil: 1}}, c = mc.craftState(G); c.recipes = [{kind: "oil", adds: ["basil"], name: "Basil oil"}]; mc.toBasket(G, "oliveoil", 2); mc.toBasket(G, "basil");
-      const d = mc.inesStep(G, {}, {}); check(!d.infused && c.basket.oliveoil === 2 && c.basket.basil === 1 && !c.steep.length, "Tomi leaves Mel's oil in the basket alone");
+      const d = mc.inesStep(G, {}, {}); check(!d.infused && c.basket.oliveoil === 2 && c.basket.basil === 1 && !c.steep.length, "Tomi leaves your oil in the basket alone");
       G.inv.beeswax = 2; check(/data-mc="basket:beeswax"/.test(mc.benchPanel(G, {tab: "basket"})) && mc.toBasket(G, "beeswax") === 2 && c.basket.beeswax === 2 && /Beeswax/.test(mc.benchPanel(G, {tab: "basket"})), "beeswax goes in the basket too (round 201)"); delete c.basket.beeswax;
-      G.inv.oliveoil = 3; const d2 = mc.inesStep(G, {}, {}); check(!d2.infused && c.basket.oliveoil === 2 && G.inv.oliveoil === 3 && !c.steep.length, "and never infuses anything, not from her backpack either (round 200)");
+      G.inv.oliveoil = 3; const d2 = mc.inesStep(G, {}, {}); check(!d2.infused && c.basket.oliveoil === 2 && G.inv.oliveoil === 3 && !c.steep.length, "and never infuses anything, not from your backpack either (round 200)");
       G.inv.oliveoil = 0; G.inv.basil = 1; const r = mc.craft(G, "oil", null, ["basil"]);
-      check(r.recipe && !c.basket.oliveoil && c.steep.length === 1, "and when Mel makes an oil herself, the bench uses her basket oil"); }
+      check(r.recipe && !c.basket.oliveoil && c.steep.length === 1, "and when you make an oil yourself, the bench uses your basket oil"); }
     check(["honey", "honey_lav", "honey_blossom", "honey_cream", "honeycomb", "honey_sun", "honey_heath", "euchoney"].every(cc.isFilling), "every honey is a bonbon filling"); }
   { const ml = await import(new URL("../src/game/mulled.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url));
     const F = {inv: {sp_cinnamon: 2, sp_clove: 1, orange: 1}}, v = {shelf: [{id: "r", name: "Red", type: "red", n: 1}]};
@@ -3276,24 +3304,24 @@ try {
   check(await fox().then(f => !f.inv.balloon && f.storage.shelf.balloon === 1), "the garage shelf takes the rest");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe Christmas market and hampers (rounds 172-174)")) try {
   console.log("\nThe Christmas market and hampers (rounds 172-174)");
   const tr = await import(new URL("../src/game/tours.js", import.meta.url)), xm = await import(new URL("../src/game/xmas.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url));
   check(tr.xmasOn("2026-11-20") && tr.xmasOn("2026-12-24") && !tr.xmasOn("2026-11-19") && !tr.xmasOn("2026-12-25"), "the Christmas market's season: 20 November to Christmas Eve");
   check(tr.eventsOn("2026-11-22").map(e => e.kind).join() === "market,xmas" && tr.eventsOn("2026-11-24").map(e => e.kind).join() === "xmas" && tr.eventsOn("2026-11-28").map(e => e.kind).join() === "xmas" && tr.eventsOn("2026-12-29").every(e => e.kind !== "xmas"),
     "it replaces the night market and the fair; the Sunday farmers market carries on in the morning");
   check(tr.eventOn("2026-11-22", 9*60).kind === "market" && tr.eventOn("2026-11-22", 18*60).kind === "xmas" && !tr.eventOn("2026-11-22", 15*60), "two events on a Sunday, each at its own time");
-  check(tr.XMAS.length === 8 && new Set(tr.XMAS.map(x => x.at)).size === 8 && tr.XMAS.find(x => x.kind === "cocoa").needs === "cocoa" && tr.XMAS.some(x => x.kind === "mine") && tr.XMAS.some(x => x.kind === "mulled"), "eight stalls: Mel's own, mulled wine, the Cocoa Room, wreaths, gingerbread, toys, chestnuts, hot chocolate");
+  check(tr.XMAS.length === 8 && new Set(tr.XMAS.map(x => x.at)).size === 8 && tr.XMAS.find(x => x.kind === "cocoa").needs === "cocoa" && tr.XMAS.some(x => x.kind === "mine") && tr.XMAS.some(x => x.kind === "mulled"), "eight stalls: your own, mulled wine, the Cocoa Room, wreaths, gingerbread, toys, chestnuts, hot chocolate");
   check(!tr.movieNow("2026-11-27", 20*60) && !tr.bayMarketNow("2026-11-27", 17*60) && tr.bayMarketNow("2026-11-13", 17*60), "the Friday field market and the film night give the field over in the season");
   check(tr.XMAS.flatMap(x => x.items).every(id => it.ITEMS[id] && it.ITEMS[id].price > 0) && tr.XMAS.flatMap(x => x.items).every(id => !/fill:none/.test(ic.icon(id)) || true), "every Christmas stall good is real and priced");
   { const F = {}; check(!xm.treeLit("2026-11-20", 17*60 + 31, F) && xm.countdownDue(F, "2026-11-20", 17*60 + 29) && xm.treeLit("2026-11-20", 17*60 + 36, F) && xm.treeLit("2026-11-21", 17*60 + 31, F) && !xm.treeLit("2026-11-21", 17*60 + 29, F), "the tree's lit at half past five; the first night it waits for the countdown");
     F.xmas = {lit: {2026: true}}; check(xm.treeLit("2026-11-20", 17*60 + 31, F) && !xm.countdownDue(F, "2026-11-20", 17*60 + 30), "after the countdown, it's lit"); }
   { const F = {inv: {chz_cheddar: 2, honey_lav: 3, bar_dark: 1, honey: 1, mc_x: 1}, coins: 0}, v = {shelf: [{id: "w", name: "Red", type: "red", n: 3, price: 18}]};
-    check(xm.putOut(F, "chz_cheddar") === 2 && xm.putOut(F, "honey_lav") === 3 && xm.putWine(F, v, "w") === 1 && v.shelf[0].n === 2 && xm.putOut(F, "mc_x") === 0, "Mel's stall: her cheeses, honey and a bottle off the shelves (and only things she's made)");
+    check(xm.putOut(F, "chz_cheddar") === 2 && xm.putOut(F, "honey_lav") === 3 && xm.putWine(F, v, "w") === 1 && v.shelf[0].n === 2 && xm.putOut(F, "mc_x") === 0, "your stall: your cheeses, honey and a bottle off the shelves (and only things you've made)");
     check([..."abc"].every(() => true) && xm.worth("chz_cheddar") <= it.ITEMS.chz_cheddar.price && xm.worth("honey_lav") <= it.ITEMS.honey_lav.price, "everything sells at no more than it costs to buy");
     xm.putOut(F, "bar_dark"); xm.putOut(F, "honey"); F.inv.box4 = 1; F.inv.honeycomb = 1; check(xm.putOut(F, "box4") === 1 && xm.putOut(F, "honeycomb") === 0, "six kinds at most on the stall");
     const real = Math.random; Math.random = () => .01; const got = xm.stallSellMinute(F, "2026-11-25", "mel"); Math.random = () => .07; const tin = xm.stallSellMinute(F, "2026-11-25", "tin"); Math.random = real;
-    check(got > 0 && tin === 0 && F.xmas.sold["2026-11-25"].n === 1, "it sells faster with Mel behind it than on the honesty tin");
+    check(got > 0 && tin === 0 && F.xmas.sold["2026-11-25"].n === 1, "it sells faster with you behind it than on the honesty tin");
     check(xm.takeWine(F, v, "w") === 1 && v.shelf[0].n === 3 && xm.takeBack(F, "honey_lav") === 3 && F.inv.honey_lav === 3, "unsold things go back"); }
   { const F = {inv: {honey_lav: 2, chz_cheddar: 1, bar_dark: 1}, coins: 20}, v = {shelf: [{id: "w", name: "Red", type: "red", n: 2, price: 18}]};
     check(xm.packStart(F, "small") && F.coins === 16 && xm.packAdd(F, "chz_cheddar") && xm.packWine(F, v, "w") && !xm.packStart(F, "big"), "a small basket from Penny: three things, a bottle off the shelves counts");
@@ -3301,7 +3329,7 @@ try {
     check(hp && hp.id === "hamper_1" && F.inv.hamper_1 === 1 && it.ITEMS.hamper_1 && it.ITEMS.hamper_1.hamper && it.ITEMS.hamper_1.sell <= it.ITEMS.hamper_1.price && /hamper$/.test(it.ITEMS.hamper_1.n), `tie the bow: "${hp && hp.name}" hamper, worth what's in it plus the basket, never more than it costs`);
     check(xm.hamperName(["chz_cheddar", "chz_blue", "chz_brie"], "small") === "The Cheese Lover's" && xm.hamperName(["honey", "bar_dark", "box4"], "small") === "Sweet Tooth" && xm.hamperName([{wine: "Red"}, "chz_cheddar", "chz_blue"], "small") === "Wine and Cheese", "hampers are named after what's in them");
     const now = wall("2026-12-03T08:00:00Z"); F.bellbird = {stamps: {bv_perfume: 1}};
-    check(xm.recipsFor(F).some(r => r.id === "lvarnaud") && !xm.recipsFor(F).some(r => r.id === "bvkel"), "Penny posts to the family, villagers, and trip friends Mel's met");
+    check(xm.recipsFor(F).some(r => r.id === "lvarnaud") && !xm.recipsFor(F).some(r => r.id === "bvkel"), "Penny posts to friends, villagers, and people you've met on trips");
     const sent = xm.sendHamper(F, "hamper_1", "lvarnaud", now); check(sent && !F.inv.hamper_1 && xm.hamperMail(F, now).length === 0 && xm.hamperMail(F, now + 864e5).length === 1, "a hamper to Madame Arnaud: her postcard comes the next day");
     const back = xm.collectReplies(F, now + 864e5); check(back.length === 1 && F.inv.b_lavbunch === 1 && /lavender/.test(xm.hamperMail(F, now + 864e5)[0].body), "with a little something from Rosehill");
     check(xm.ordersOn(F, "2026-11-30").length === 0 && xm.ordersOn(F, "2026-12-03").length === 2, "hamper orders pinned up from the 1st of December");
@@ -3335,7 +3363,7 @@ try {
   check(await page.locator('#ctx [data-xh="start:big"]').count() === 1, "Penny's hamper table at the post office, in the season");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nBonbon moulds (round 176)")) try {
   console.log("\nBonbon moulds (round 176)");
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 200, goals: {cocoa: 1}}, c = cc.cocoaState(F); c.choc.dark = 50; c.pantry.honey = 4; c.pantry.raspberry = 2;
   check(cc.mouldsOwned(c).join() === "dome" && cc.buyCcUp(F, "m_heart") && F.coins === 140 && cc.mouldsOwned(c).includes("heart"), "the dome to start; heart moulds from the shop upgrades");
@@ -3345,7 +3373,7 @@ try {
   check(cc.makeBonbons(F, "dark", ["honey"], "dome").r.name === b.r.base, "back in the dome, back to its old name");
   check(/data-cc="bshape"/.test(cc.bonbonPanel(F, {})), "the moulds are on the bonbon table");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe gift shop (round 178)")) try {
   console.log("\nThe gift shop (round 178)");
   const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), go = await import(new URL("../src/game/goals.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url));
   check(go.GOALS.giftshop && go.GOALS.giftshop.price === 800 && np.NPCS.some(n => n.id === "posy" && n.routine.some(r => r.scene === "giftshop" && r.needs === "giftshop")), "the gift shop (800 coins), with Posy at the till");
@@ -3358,7 +3386,7 @@ try {
   check(gs.giftSellMinute(F, "2026-10-14", 11*60, null, o) === 0, "shut, it sells nothing");
   check(/shared stock/.test(gs.giftPanel(F, "gtill", {...o, day: "2026-10-14", hm: 11*60, keeper: true})) && /Dark Honey Heart|Nothing in the Cocoa Room/.test(gs.giftPanel(F, "gcase", {...o, day: "2026-10-14"})), "the till and the bonbon case panels");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nPairing boxes in the gift shop (round 179)")) try {
   console.log("\nPairing boxes in the gift shop (round 179)");
   const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url));
   const F = {goals: {cocoa: 1, vineyard: 1}, inv: {}, vine: {shelf: [{id: "w", name: "Red", type: "red", n: 3, price: 18}]}}, c = cc.cocoaState(F);
@@ -3372,7 +3400,7 @@ try {
   const real = Math.random; Math.random = () => .01; const got = gs.giftSellMinute(F, "2026-10-14", 11*60, "keeper", o); Math.random = real;
   check(got === 18 + 4*c.prices.bonbon && !F.giftshop.pairs.length && F.giftshop.sold["2026-10-14"].pair === 1 && /pairing boxes/.test(gs.giftPanel(F, "gtill", {...o, hm: 11*60})), "it sells as a box, for no more than its parts");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nShoppers you can see (round 181)")) try {
   console.log("\nShoppers you can see (round 181)");
   const br = await import(new URL("../src/game/browse.js", import.meta.url)), pool = ["a", "b", "c", "d", "e", "f"], day = "2026-10-13";
   const vs = br.browseVisits("cocoa", day, 11*60, 20*60, pool);
@@ -3382,7 +3410,7 @@ try {
   check(!br.browseSlot(id, day, v.from + 13, {...o, stock: false}).act && br.browseSlot(id, day, v.from + 11, {...o, stock: false}).at === br.BROWSE.cocoa.door, "bare shelves: they look and leave empty-handed");
   check(!br.browseSlot(id, day, v.from + 3, {...o, open: false}) && !at(20), "nobody when it's shut, or between visits");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe Cocoa Room's vending machine (round 182)")) try {
   console.log("\nThe Cocoa Room's vending machine (round 182)");
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 500, goals: {cocoa: 1}}, c = cc.cocoaState(F);
   c.bars.dark = 10; c.plan.on = false; check(cc.buyCcUp(F, "vending") && F.coins === 100, "the vending machine, 400 coins from the catalogue");
@@ -3393,7 +3421,7 @@ try {
   const late = wall("2026-10-12T15:30:00Z"); c.at = late - 20*60e3; globalThis.__mapleOffset = late - Date.now(); Math.random = () => .005; const b0 = c.bars.dark; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
   check(c.bars.dark === b0, "nothing after 11 at night");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe paperie in Montrose (round 183)")) try {
   console.log("\nThe paperie in Montrose (round 183)");
   const pp = await import(new URL("../src/game/paperie.js", import.meta.url)), go = await import(new URL("../src/game/goals.js", import.meta.url)), ic = await import(new URL("../src/art/paper-icons.js", import.meta.url));
   const it = await import(new URL("../src/data/items.js", import.meta.url));
@@ -3411,7 +3439,7 @@ try {
   check(pp.takeDown(F, t0 + 27*60e3) === 0 && pp.takeDown(F, t0 + 26*60e3 + 864e5) === 6 && p.stock.pp_blush_lavender === 6, "dry by the same time tomorrow: six sheets onto the shelves");
   check(pp.toBag(F, "pp_blush_lavender") === 1 && F.inv.pp_blush_lavender === 1 && pp.toShelf(F, "pp_blush_lavender") === 1 && p.stock.pp_blush_lavender === 6, "a sheet into the backpack (a gift), and back");
   const rnd = Math.random; Math.random = () => .01; pp.paperTick(F, true, t0); const sold = pp.paperTick(F, true, t0 + 10*60e3); const none = pp.paperTick(F, false, t0 + 60*60e3); Math.random = rnd;
-  check(sold.coins > 0 && sold.coins === sold.n*it.ITEMS.pp_blush_lavender.price && none.coins === 0, `it sells while Mel's in Montrose, at the sheet's price (${sold.n} for ${sold.coins}), and not when she's away`);
+  check(sold.coins > 0 && sold.coins === sold.n*it.ITEMS.pp_blush_lavender.price && none.coins === 0, `it sells while you're in Montrose, at the sheet's price (${sold.n} for ${sold.coins}), and not when you're away`);
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => { errors.push(`paperie pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
   await page.addInitScript(() => { const m = /pppatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 2000;
@@ -3434,7 +3462,7 @@ try {
   check(f2.paperie.soak && f2.paperie.scraps === 2 && /2\. Soak/.test(await page.locator("#ctx .ppstep.now").textContent()), "tear two bundles into the tub: the steps along the top move on to Soak");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nHampers for Valentine's and Mother's Day (round 184)")) try {
   console.log("\nHampers for Valentine's and Mother's Day (round 184)");
   const xm = await import(new URL("../src/game/xmas.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url));
   check(xm.hamperSeason("2027-02-10") === "valentine" && xm.hamperSeason("2027-05-09") === "mothers" && xm.mothersDay(2027) === 9 && !xm.hamperSeason("2027-05-10") && xm.hamperSeason("2026-12-01") === "xmas" && !xm.hamperSeason("2026-10-12"),
@@ -3444,14 +3472,14 @@ try {
   const hp = {id: "h", size: "small", season: "valentine", items: []};
   check(xm.hamperIco(hp) === "hamper_small_v" && xm.hamperIco({...hp, season: "mothers", size: "big"}) === "hamper_big_m" && xm.hamperIco({size: "big"}) === "hamper_big", "a pink bow for Valentine's, lilac for Mother's Day, red for Christmas");
   const its = await import(new URL("../src/data/items.js", import.meta.url)); its.ITEMS.mc_testsoap = {n: "Test soap", mill: "soap", kind: "gift"};   // (mill soaps register when they're made)
-  check(xm.seasonName(["mc_testsoap", "mc_testsoap", "mc_testsoap"], "small", "mothers") === "Mum's Pamper" && /Valentine|Sweetheart|Roses/.test(xm.seasonName(["soap_lav"], "small", "valentine")), "and their own names: Mum's Pamper, Be My Valentine...");
+  check(xm.seasonName(["mc_testsoap", "mc_testsoap", "mc_testsoap"], "small", "mothers") === "The Mother's Day Pamper" && /Valentine|Sweetheart|Roses/.test(xm.seasonName(["soap_lav"], "small", "valentine")), "and their own names: The Mother's Day Pamper, Be My Valentine...");
   const G = {coins: 0, inv: {}, goals: {cocoa: 1}}, c = cc.cocoaState(G);
   c.bonbons.push({id: "a", shell: "dark", fills: [], name: "A"}, {id: "b", shell: "milk", fills: [], name: "B"}); c.trays = {a: 6, b: 6}; c.display = ["a", "b"];
   const pk = {kind: "box", size: 4, sel: {}};
   check(cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && !cc.pickAdd(G, pk, "b", 1) && cc.packBox(G, 4, pk.sel) === "box4d" && c.trays.a === 2 && c.trays.b === 6, "choose four dark ones: exactly those come out of the case");
   check(cc.packBox(G, 4, {a: 1}) === null && c.trays.a === 2, "a choice that doesn't add up packs nothing");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nWrapping with handmade paper (paperie round 2, round 185)")) try {
   console.log("\nWrapping with handmade paper (paperie round 2, round 185)");
   const wr = await import(new URL("../src/game/wrap.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ic = await import(new URL("../src/art/paper-icons.js", import.meta.url));
   const F = {coins: 100, inv: {pairbox: 1, pp_blush_lavender: 1, pp_sage_seeds: 1}, goals: {paperie: 1, giftshop: 1}};
@@ -3471,24 +3499,24 @@ try {
   const rnd = Math.random; Math.random = () => .01; const got = gs.giftSellMinute(F, "2026-10-14", 11*60, "keeper", {cocoa: null, onDisplay: () => [], store: {}, v: {shelf: []}}); Math.random = rnd;
   check(got === W.price && !F.giftshop.wrapped.length && F.giftshop.sold["2026-10-14"].wrap === 1, "and it sells as wrapped, at its own price");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe paperie, round 3: Lise, the card class, the seasons, seeds that grow (round 186)")) try {
   console.log("\nThe paperie, round 3: Lise, the card class, the seasons, seeds that grow (round 186)");
   const pp = await import(new URL("../src/game/paperie.js", import.meta.url)), go = await import(new URL("../src/game/goals.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), wr = await import(new URL("../src/game/wrap.js", import.meta.url)), np = await import(new URL("../src/data/lv-people.js", import.meta.url));
   check(go.GOALS.paperkeeper && go.GOALS.paperkeeper.needs === "paperie" && np.LV_PEOPLE.some(n => n.id === "lvlise" && n.routine[0].scene === "bv_hpaper" && n.routine[0].needs === "paperkeeper"), "Lise keeps the paperie (600 coins, once it's yours)");
   check(pp.keeperIn("2026-10-14", 11*60) && !pp.keeperIn("2026-10-12", 11*60) && !pp.keeperIn("2026-10-14", 18*60) && pp.paperSeason("2026-12-10") && !pp.paperSeason("2026-10-14"), "10 till 5, closed Mondays; December's a gift season");
   const F = {coins: 1000, goals: {paperie: 1}, inv: {}}, p = pp.paperState(F), wed = wall("2026-10-14T03:00:00Z");   // Wednesday 11am
   p.stock = {pp_blush_rose: 10}; p.at = wed - 60*60e3; let rnd = Math.random; Math.random = () => .99; let out = pp.paperTick(F, false, wed); Math.random = rnd;
-  check(out.coins === 0 && out.wage === 0 && p.stock.pp_blush_rose === 10, "no keeper, and Mel's away: the paperie's shut");
+  check(out.coins === 0 && out.wage === 0 && p.stock.pp_blush_rose === 10, "no keeper, and you're away: the paperie's shut");
   F.goals.paperkeeper = 1; p.line = [{col: "sage", add: "seeds", n: 6, done: wed - 1}]; p.at = wed - 60*60e3; Math.random = () => .01; out = pp.paperTick(F, false, wed); Math.random = rnd;
-  check(out.wage === pp.WAGE && out.coins > 0 && out.down === 6 && p.stock.pp_sage_seeds >= 0 && F.coins === 1000 - pp.WAGE + out.coins, `with Lise: she opens (her wage, ${pp.WAGE}), sells while Mel's home (${out.coins} coins), and takes the dry sheets down`);
+  check(out.wage === pp.WAGE && out.coins > 0 && out.down === 6 && p.stock.pp_sage_seeds >= 0 && F.coins === 1000 - pp.WAGE + out.coins, `with Lise: she opens (her wage, ${pp.WAGE}), sells while you're home (${out.coins} coins), and takes the dry sheets down`);
   const sat = wall("2026-10-17T08:00:00Z"); p.stock = {pp_blush_rose: 6}; p.at = sat - 5*60e3; Math.random = () => .99; out = pp.paperTick(F, false, sat); Math.random = rnd;
   check(out.cls === pp.CLASS.size*pp.CLASS.fee && p.stock.pp_blush_rose === 2 && p.classDay === "2026-10-17", "Saturday's card class: four people, four sheets, 32 coins");
   check(it.CROPS.wildflower && it.ITEMS.pp_sage_seeds.plantable && it.ITEMS.pp_sage_seeds.crop === "wildflower" && it.ITEMS.tag_seeded.plantable && it.ITEMS.wildflower.kind === "flower", "seeded paper and seeded tags plant in the garden and come up as wildflowers");
   const G = {coins: 100, inv: {box4: 1, pp_blush_none: 1, tag_seeded: 1}, goals: {paperie: 1}}, id = wr.wrapIt(G, {item: "box4", paper: "pp_blush_none", tag: "seeded"}), t0 = Date.now();
-  check(pp.bloomFor(G, id, "mum", t0) && !pp.bloomMail(G, t0 + 864e5).length && pp.bloomMail(G, t0 + 2*864e5 + 1).length === 1 && /front step/.test(pp.bloomMail(G, t0 + 3*864e5)[0].body), "a gift with a seeded tag: two days later Mum writes about the flowers by her front step");
+  check(pp.bloomFor(G, id, "hana", t0) && !pp.bloomMail(G, t0 + 864e5).length && pp.bloomMail(G, t0 + 2*864e5 + 1).length === 1 && /front step/.test(pp.bloomMail(G, t0 + 3*864e5)[0].body), "a gift with a seeded tag: two days later Hana writes about the flowers by her front step");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
-  console.log("\nLip balms and lip oils, dyed with Mel's flowers (round 187)");
+if (want("\nLip balms and lip oils, dyed with your flowers (round 187)")) try {
+  console.log("\nLip balms and lip oils, dyed with your flowers (round 187)");
   const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), tw = await import(new URL("../src/data/towns.js", import.meta.url)), li = await import(new URL("../src/art/lip-icons.js", import.meta.url));
   const F = {coins: 50, goals: {mill: 1}, inv: {honeycomb: 1, oliveoil: 3, honey: 2, mint: 1, tulip: 1}, orch: {stock: {"stem:dahlia": 2}}};
   check(mc.renderWax(F) === 2 && F.inv.beeswax === 2 && !F.inv.honeycomb && tw.TOWN_GOODS.beeswax && tw.TOWN_GOODS.beeswax.shop === "bv_hhoney", "beeswax: melt a honeycomb down into two blocks at the bench (or buy a block at Sunflower Hill's honey house)");
@@ -3503,7 +3531,7 @@ try {
   const done = mc.craftDone(F, Date.now() + 2*864e5);
   check(F.craft.store[mc.itemId(b.recipe)] === 4 && F.craft.store[mc.itemId(o.recipe)] === 3 && !F.craft.balm && !F.craft.lipoil.length && done.length === 2, "four tins and three bottles onto the mill's shelves");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nTake from the gift shop, and shop-bought wrapping paper (round 188)")) try {
   console.log("\nTake from the gift shop, and shop-bought wrapping paper (round 188)");
   const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), wr = await import(new URL("../src/game/wrap.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ic = await import(new URL("../src/art/paper-icons.js", import.meta.url));
   const F = {coins: 20, inv: {}, goals: {giftshop: 1}}, v = {shelf: [{id: "w1", name: "Merlot-ish", type: "red", n: 2, price: 18}]};
@@ -3515,7 +3543,7 @@ try {
   const id = wr.wrapIt(F, {item: "wb_w1", paper: "gw_gold", tag: "plain"});
   check(id && !F.inv.gw_gold && it.ITEMS[id].price === 18 + 1 + 1 && /gold paper/.test(it.ITEMS[id].n) && it.ITEMS[id].ico === "wrp_gold_none_none_none_plain", "a bottle wrapped in gold paper with a tag: a coin or two more (handmade paper's worth more)");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nPairing boxes packed in the gift shop's wine corner, Tempranillo too (round 189)")) try {
   console.log("\nPairing boxes packed in the gift shop's wine corner, Tempranillo too (round 189)");
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url));
   const F = {coins: 0, inv: {}, goals: {giftshop: 1, cocoa: 1}, cocoa: {bars: {}, trays: {a: 6}, bonbons: [{id: "a", shell: "dark", fills: ["honey"], name: "Dark Honey Heart"}], display: ["a"]},
@@ -3526,13 +3554,13 @@ try {
   const w = cc.packPairing(F, pk.k, pk.sel), k = gs.putOutPairs(F, c, 1);
   check(w === "Ronda Red" && k === 1 && !F.inv.pairbox && gs.giftState(F).pairs[0] === 28 + 4*c.prices.bonbon && F.vine.shelf[0].n === 1 && c.trays.a === 2, "packed and straight out on the display, at the bottle plus four bonbons");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe address book: post gifts and letters to people met on trips (round 190)")) try {
   console.log("\nThe address book: post gifts and letters to people met on trips (round 190)");
   await import(new URL("../src/game/ronda.js", import.meta.url)); const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   const T = Date.UTC(2026, 9, 14, 3), D = 864e5;
   const F = {coins: 10, inv: {box4: 2}, met: {lvemile: true, lvpainter: true, hana: true}};
-  check(bk.canAdd(F, "lvemile") && !bk.canAdd(F, "lvpainter") && !bk.canAdd(F, "hana") && !bk.canAdd(F, "lvmargaux") && bk.canAdd({met: {jason: true}}, "jason"), "only people met on a trip, not day-trippers, not village folk (Jason and Luca too, round 192)");
-  check(bk.addable(F).join() === "lvemile" && bk.addContact(F, "lvemile", "2026-10-14") && bk.contacts(F).join() === "lvemile" && !bk.addable(F).length, "added to the book when Mel wants");
+  check(bk.canAdd(F, "lvemile") && !bk.canAdd(F, "lvpainter") && !bk.canAdd(F, "hana") && !bk.canAdd(F, "lvmargaux") && bk.canAdd({met: {jason: true}}, "jason"), "only people met on a trip, not day-trippers, not village folk (Ornella and Dario too, round 192)");
+  check(bk.addable(F).join() === "lvemile" && bk.addContact(F, "lvemile", "2026-10-14") && bk.contacts(F).join() === "lvemile" && !bk.addable(F).length, "added to the book when you want");
   check(!!bk.postTo(F, "lvemile", {}, T).err && !bk.postTo(F, "lvemile", {open: "Thinking of you"}, T).err && F.coins === 10, "a letter needs a few words, and it's free");
   const e = bk.postTo(F, "lvemile", {item: "box4"}, T);
   check(!e.err && F.coins === 6 && F.inv.box4 === 1 && e.at === T + 2*D, "a parcel to the Lavender Hills: 4 coins postage, the reply in two days");
@@ -3544,15 +3572,15 @@ try {
   check(!!bk.postTo(G, "carmen", {item: "box4"}, T).err && bk.postage("carmen") === 8, "abroad costs 8, and there's no posting without the coins");
   const r = bk.postTo(G, "carmen", {text: "Hola!"}, T), keep = bk.PEN.carmen; delete bk.PEN.carmen; const plain = bk.replyBody(r); bk.PEN.carmen = keep;
   check(!r.err && /P\.S\./.test(plain) && bk.replyBody(r).includes(keep.sign), "Carmen writes back in her own voice (and anyone without one would send a P.S. from their own lines)");
-  bk.removeContact(F, "lvemile"); check(!bk.contacts(F).length, "and Mel can take someone out again");
+  bk.removeContact(F, "lvemile"); check(!bk.contacts(F).length, "and you can take someone out again");
   const vans = (await import(new URL("../src/data/npcs.js", import.meta.url))).NPCS.filter(p => p.local === "bellbird" && !p.tourist);
   check(vans.every(p => bk.PEN[p.id]), "round 191: every campervan local and neighbour has a voice of their own (" + vans.length + ")");
   const abroad = (await import(new URL("../src/data/npcs.js", import.meta.url))).NPCS.filter(p => ["ronda", "kyoto", "jeju", "cinque"].includes(p.local) && !p.tourist);
   check(abroad.every(p => bk.PEN[p.id]), "round 192: and everyone in Ronda, Kyoto, Jeju and Cinque Terre too (" + abroad.length + ")");
   const J = {coins: 20, inv: {box4: 1}, met: {jason: true}}; bk.addContact(J, "jason", "d"); const je = bk.postTo(J, "jason", {item: "box4"}, T), jb = bk.replyBody(je);
-  check(!je.err && je.at === T + 3*D && /^My dear Mel,/.test(jb) && jb.includes("yellow house by the harbour") && /\nP\.S\. /.test(jb) && jb.split("\n\n").length >= 6 && /;/.test(jb), "Jason writes back at length, semicolons and all, with a P.S.");
+  check(!je.err && je.at === T + 3*D && /^My dear friend,/.test(jb) && jb.includes("yellow house by the harbour") && !/\bMel\b|Jason|Luca/.test(jb) && /\nP\.S\. /.test(jb) && jb.split("\n\n").length >= 6 && /;/.test(jb), "Ornella writes back at length, semicolons and all, with a P.S. (and calls you friend)");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nEvery two-filling bonbon has a name (round 194: mint and pear crashed the bonbon table)")) try {
   console.log("\nEvery two-filling bonbon has a name (round 194: mint and pear crashed the bonbon table)");
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url));
   const ids = Object.keys(sc.INGR).filter(cc.isFilling); let bad = [];
@@ -3560,28 +3588,28 @@ try {
   check(!bad.length, "named every pairing of " + ids.length + " fillings in all three shells" + (bad.length ? ": " + bad.slice(0, 3).join(", ") : ""));
   check(/\S/.test(cc.bonbonName("white", ["mint", "pear"])), "white chocolate, mint and pear: " + cc.bonbonName("white", ["mint", "pear"]));
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe gift shop's gallery wall and makers' shelf (round 196)")) try {
   console.log("\nThe gift shop's gallery wall and makers' shelf (round 196)");
-  await import(new URL("../src/game/ronda.js", import.meta.url));   // (Mel's sip-and-paint paintings join ITEMS here)
+  await import(new URL("../src/game/ronda.js", import.meta.url));   // (your sip-and-paint paintings join ITEMS here)
   const gal = await import(new URL("../src/game/gallery.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   const F = {coins: 50, inv: {p_view: 1}, goals: {giftshop: 1}}, mon = "2026-10-19", T = Date.UTC(2026, 9, 19, 3), D = 864e5;
   const n = gal.stockUp(F, mon), fr = gal.galleryState(F).frames;
-  check(fr.filter(f => f && f.by).length === 3 && fr.filter(f => !f).length === 1 && new Set(fr.filter(Boolean).map(f => f.by)).size === 3, "three painters hang a painting each, and leave a frame for Mel's own");
+  check(fr.filter(f => f && f.by).length === 3 && fr.filter(f => !f).length === 1 && new Set(fr.filter(Boolean).map(f => f.by)).size === 3, "three painters hang a painting each, and leave a frame for your own");
   check(Object.values(gal.makersState(F).stock).every(x => x === 3) && Object.keys(gal.makersState(F).stock).length === 6, "six makers fill their spots on the shelf");
-  check(gal.hangOwn(F, "p_view") && !F.inv.p_view && gal.forSale(F).length === 3 && gal.takeDown(F, fr.findIndex(f => f && f.own)) && F.inv.p_view === 1, "Mel hangs her own painting (never for sale) and takes it down again");
+  check(gal.hangOwn(F, "p_view") && !F.inv.p_view && gal.forSale(F).length === 3 && gal.takeDown(F, fr.findIndex(f => f && f.own)) && F.inv.p_view === 1, "you hang your own painting (never for sale) and take it down again");
   const i = fr.findIndex(f => f && f.by), f0 = fr[i], c = gal.sellPainting(F, i, T);
-  check(c === gal.TOKEN && !fr[i] && f0.price > gal.TOKEN, "a painting sells: Mel keeps a token " + gal.TOKEN + " and the painter the rest (" + f0.price + ")");
+  check(c === gal.TOKEN && !fr[i] && f0.price > gal.TOKEN, "a painting sells: you keep a token " + gal.TOKEN + " and the painter the rest (" + f0.price + ")");
   check(!gal.galleryMail(F, T + 6*D).length && gal.galleryMail(F, T + 7*D).length === 1 && gal.galleryMail(F, T + 7*D)[0].body.includes(f0.t) && gal.galleryMail(F, T + 7*D)[0].body.includes(gal.PAINTERS[f0.by].sign), "a week later the painter writes to say it sold");
-  check(gal.sellMade(F, "mk_spoon") === 2 && gal.makersState(F).stock.mk_spoon === 2 && gal.makersState(F).week.bo === 9, "a spoon sells: Mel keeps about a fifth (2 of 9), Bo the rest");
-  check(gal.buyMade(F, "mk_cards") && F.coins === 44 && F.inv.mk_cards === 1 && it.ITEMS.mk_cards.kind === "gift", "Mel buys Auntie Lin's cards at the full price, to give");
+  check(gal.sellMade(F, "mk_spoon") === 2 && gal.makersState(F).stock.mk_spoon === 2 && gal.makersState(F).week.bo === 9, "a spoon sells: you keep about a fifth (2 of 9), Bo the rest");
+  check(gal.buyMade(F, "mk_cards") && F.coins === 44 && F.inv.mk_cards === 1 && it.ITEMS.mk_cards.kind === "gift", "you buy Auntie Lin's cards at the full price, to give");
   check(gal.stockUp(F, "2026-10-20") === 0 && gal.stockUp(F, "2026-10-26") > 0 && gal.forSale(F).length === 3, "the painters and makers come back the next Monday");
   let sold = 0; for (let k = 0; k < 4000; k++) { const g2 = {coins: 0, inv: {}, goals: {giftshop: 1}}; gal.stockUp(g2, mon); if (gs.giftSellMinute(g2, mon, 600, "mel", {store: {}, v: {shelf: []}, cocoa: null, onDisplay: () => []}) === gal.TOKEN) sold++; }
   check(sold > 0 && sold < 400, "shoppers buy a painting now and then, not often (" + sold + " in 4000 busy minutes)");
   const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), ms = new Set(Object.values(gal.PAINTERS).flatMap(p => p.works.map(w => w[4])));
   check(ms.size === Object.values(gal.PAINTERS).reduce((a, p) => a + p.works.length, 0) && [...ms].every(m => gal.paintSVG(0, 0, 38, 48, {m, c1: "#000", c2: "#fff"}).length > 80), "round 197: every painting has its own picture (" + ms.size + ")");
-  check(it.ITEMS.p_view.to === "family" && it.ITEMS.p_view.kind === "keepsake" && bk.postable(it.ITEMS.p_view), "and Mel's own paintings can be given, or posted to a friend");
+  check(it.ITEMS.p_view.to === "family" && it.ITEMS.p_view.kind === "keepsake" && bk.postable(it.ITEMS.p_view), "and your own paintings can be given, or posted to a friend");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nFrom our travels: friends send boxes for the gift shop (round 198)")) try {
   console.log("\nFrom our travels: friends send boxes for the gift shop (round 198)");
   await import(new URL("../src/game/ronda.js", import.meta.url));
   const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), gal = await import(new URL("../src/game/gallery.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
@@ -3592,20 +3620,20 @@ try {
   check(!bk.offersOpen(F, T + 9*D).length, "no offer after only two letters");
   const e = bk.postTo(F, who, {open: "Thank you for the day"}, T + 2*D);
   check(e.offer === item && !bk.offersOpen(F, T + 3*D).length && bk.offersOpen(F, T + 4*D).length === 1 && /gift shop now/.test(bk.replyBody(e)), "the third letter's reply offers a box a week, in a P.S.");
-  check(bk.acceptOffer(F, who, T + 4*D) && bk.lines(F).length === 1 && !bk.offersOpen(F, T + 4*D).length, "Mel says yes please");
+  check(bk.acceptOffer(F, who, T + 4*D) && bk.lines(F).length === 1 && !bk.offersOpen(F, T + 4*D).length, "you say yes please");
   const cost = bk.BOX*bk.tradeOf(item), c0 = F.coins, r = bk.travelTick(F, T + 5*D);
   check(r.got.length === 1 && F.coins === c0 - cost && F.giftshop.travel[item] === bk.BOX && cost < bk.BOX*it.ITEMS[item].price, "the first box comes, paid for on arrival (" + cost + " coins for " + bk.BOX + ")");
   check(!bk.travelTick(F, T + 6*D).got.length && bk.travelTick(F, T + 12*D + 1).got.length === 1, "then one box a week, and only one even after a long time away");
   F.coins = 1; check(bk.travelTick(F, T + 30*D).skip.length === 1 && F.giftshop.travel[item] === 2*bk.BOX, "no coins, no box that week (nothing owed)");
-  check(gal.takeTravel(F, item) && F.inv[item] === 1 && F.giftshop.travel[item] === 2*bk.BOX - 1, "Mel can take one off the shelf to give");
+  check(gal.takeTravel(F, item) && F.inv[item] === 1 && F.giftshop.travel[item] === 2*bk.BOX - 1, "you can take one off the shelf to give");
   let made = 0; const G = {coins: 0, inv: {}, goals: {giftshop: 1}, giftshop: {travel: {[item]: 500}}};
   for (let k = 0; k < 2000; k++) { const c = gs.giftSellMinute(G, "2026-10-21", 600, "mel", {store: {}, v: {shelf: []}, cocoa: null, onDisplay: () => []}); if (c === it.ITEMS[item].price) made++; }
   check(made > 0 && G.giftshop.travel[item] === 500 - made, "shoppers buy them at Madame Roux's own price (" + made + " sold)");
-  check(bk.stopLine(F, who) && !bk.lines(F).length && !bk.offersOpen(F, T + 40*D).length, "and Mel can stop the boxes whenever she likes");
+  check(bk.stopLine(F, who) && !bk.lines(F).length && !bk.offersOpen(F, T + 40*D).length, "and you can stop the boxes whenever you like");
   const G2 = {coins: 0, met: {}, goals: {}}; G2.met[who] = true; bk.addContact(G2, who, "d"); [0, 1, 2].forEach(k => bk.postTo(G2, who, {open: "Hi"}, T + k));
   check(!bk.offersOpen(G2, T + 9*D).length, "no offers before there's a gift shop to send to");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-try {
+if (want("\nThe gift basket beside the wrapping table (round 202)")) try {
   console.log("\nThe gift basket beside the wrapping table (round 202)");
   const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), wr = await import(new URL("../src/game/wrap.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   const F = {coins: 20, inv: {box4: 2, gw_red: 1}, goals: {giftshop: 1}}, id = wr.wrapIt(F, {item: "box4", paper: "gw_red"});
