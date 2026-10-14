@@ -31,7 +31,7 @@ export function buyTrip(F, town, party, hm = sgHM(), by = "train"){
 }
 export function endTrip(F){ if (F.trip && !F.trip.done) F.trip.done = true; }
 
-// tours.js asks who's away (orchard tour guides, Ma Ma's stall, Mum's class, the family dinner)
+// tours.js asks who's away (the farm tour guides, Farid's stall, Hana's class)
 // (a getter: the save can be swapped for a fresher copy from the cloud)
 export function initTrips(getF){ setAway(day => { const F = getF(); return F ? awayOn(F, day) : []; }); }
 
