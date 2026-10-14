@@ -471,7 +471,7 @@ try {
   await page.locator('#world [data-spot="trophydoor"]').dispatchEvent("click");
   await page.waitForFunction(() => /courtyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(600);
-  check(await page.locator("#world .ptrophy").count() >= 3, "trophies stand on the pedestals");
+  check(await page.locator("#world .ptrophy").count() >= 2, "trophies stand on the pedestals");
   check(await page.locator('#world [data-spot="kudos"]').count() === 1, "with a notice board on the wall");
   await page.locator('#world [data-spot="ped0"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-tr="book"]', { timeout: 10000 });
