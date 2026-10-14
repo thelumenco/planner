@@ -107,7 +107,10 @@ function quayScreen(){
   const boat = place("swboat", 330, 572, 34, 10, "Your boat at the pontoon", yourBoat(420, 620), "Your boat", 410, 534, "#CFE0EE");
   const bridge = swingBridge(350, 520, 426);
   const birds = gull(220, 180, 1, 0) + gull(410, 70, .8, 1) + gull(160, 420, .9, 2);
-  return ground + sea + pier + bank + market + kettle + potsHere + edge + pontoon + boats + boat + bridge + birds + fret()
+  // the harbourmaster's tide board by the pier, and the crab line and bucket at the quay's edge (round 208)
+  const tide = place("swtide", 240, 200, 24, 8, "The tide board", sk(`<rect x="236" y="150" width="6" height="44" style="fill:${C.iron}"/><rect x="216" y="132" width="46" height="34" rx="2" style="fill:#2F3A34"/><text x="239" y="144" text-anchor="middle" font-family="Klee One,serif" font-size="6.4" fill="#FFFDF6">HIGH WATER</text><path d="M224 152 h30 M224 159 h22" style="stroke:#FFFDF6" stroke-width="1"/>`, `<rect x="216" y="132" width="46" height="34" rx="2"/>`), "Tide board", 200, 120);
+  const crab = place("swcrab", 326, 470, 22, 8, "Crabbing off the quay", sk(`<path d="M318 470 h12 l-2 12 h-8z" style="fill:#E8823A"/><path d="M318 470 q6 -8 12 0" fill="none" style="stroke:${C.iron}" stroke-width=".8"/><path d="M340 460 q8 10 14 30" fill="none" style="stroke:#3A3430" stroke-width=".8"/>`, "") + `<g pointer-events="none"><ellipse cx="324" cy="480" rx="3" ry="2" style="fill:#5E7A4A"/></g>`, "Crab line", 290, 498, "#CFE0EE");
+  return ground + sea + pier + bank + market + kettle + potsHere + edge + pontoon + boats + boat + bridge + tide + crab + birds + fret()
     + gate("swToEast", 500, 450, "Old town", 450, 400, "East over the swing bridge to the old town", "#CFE0EE")
     + gate("swToWest", 70, 40, "West Cliff", 130, 36, "North up the slope to the West Cliff");
 }

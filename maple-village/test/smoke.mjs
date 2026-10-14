@@ -4321,6 +4321,63 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 
+// Rounds 207 to 209: Saltwick's rooms and shops, its people and three things to join in with, the charm bracelet, the family
+{
+  console.log("\nSaltwick's rooms, people, activities and charms (rounds 207 to 209)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`saltwick rooms pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/swpatch2/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 500; f.goals = {...(f.goals || {}), boat: 1};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const go = async sc => { await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(1500); };
+  const spot = async id => { await page.locator(`#world [data-rdspot="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(2500); };
+  const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(6500); };
+  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-16&swpatch2=1"); await page.waitForTimeout(1500);
+  // the swing bridge opens at half past: cross it then for the bridge charm
+  await go("sw_quay"); await place("swToEast");
+  check(!!((await gf()).saltwick || {}).charms?.bridge, "the swing bridge swings open for a coble at half past: there for it, the bridge charm");
+  // the fish market: Nan's slab; a lobster (and its charm)
+  await go("sw_market"); await spot("sw_market");
+  check(/Lobster/.test(await page.locator("#ctx").innerText()) && /Dulse/.test(await page.locator("#ctx").innerText()), "the fish market sells lobster, brown crab, sea salt, dulse and onions");
+  await page.click('#ctx [data-rbuy="lobster"]'); await page.waitForTimeout(800);
+  let f = await gf();
+  check(f.inv.lobster === 1 && f.saltwick.charms.lobster, "buying a lobster: one in the backpack, and the lobster charm");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(400);
+  // the Copper Kettle: a pot of tea
+  await go("sw_kettle"); await spot("sw_kettle"); const c0 = (await gf()).coins;
+  await page.click('#ctx [data-sw="kettle:tea"]'); await page.waitForTimeout(800);
+  check((await gf()).coins === c0 - 2, "a pot of tea at the Copper Kettle");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(400);
+  // polishing jet with Priya: the anchor charm
+  await go("sw_jet"); await spot("swpolish"); await page.click('#ctx [data-sw="polish"]'); await page.waitForTimeout(400);
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-sw="rub"]'); await page.waitForTimeout(150); }
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-sw="buff"]'); await page.waitForTimeout(150); }
+  await page.click('#ctx [data-sw="polished"]'); await page.waitForTimeout(800);
+  f = await gf();
+  check(f.saltwick.charms.anchor && f.saltwick.polished === 1, "polishing jet with Priya: rub, buff, and the anchor charm");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(400);
+  // the pier, the abbey and the lawn: three more charms, and Priya threads the bracelet
+  await go("sw_quay"); await place("swpiers"); await go("sw_abbey"); await place("swabbey"); await go("sw_west"); await place("swlawn");
+  f = await gf();
+  check(Object.keys(f.saltwick.charms).length === 6 && f.inv.sw_bracelet === 1, "all six charms (pier, abbey, lawn too): Priya threads the jet charm bracelet");
+  // crabbing off the quay
+  await go("sw_quay"); await place("swcrab"); await page.waitForSelector('#ctx [data-sw="crab"]', { timeout: 15000 });
+  await page.click('#ctx [data-sw="crab"]'); await page.waitForTimeout(300);
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-sw="cwait"]'); await page.waitForTimeout(150); }
+  await page.click('#ctx [data-sw="cpull"]'); await page.waitForTimeout(300); await page.click('#ctx [data-sw="crabdone"]'); await page.waitForTimeout(600);
+  check(((await gf()).saltwick.crabs ?? -1) >= 0, "crabbing off the quay: drop a line, wait, pull up, count them, tip them back");
+  // the shanty at the Fisherman's Arms (2 till 5, Billy singing)
+  await page.goto(url + "?seed=1&time=14:30&date=2026-10-16"); await page.waitForTimeout(1500);
+  await go("sw_pub"); await page.waitForTimeout(1500); await spot("swshanty"); await page.click('#ctx [data-sw="shanty"]'); await page.waitForTimeout(300);
+  for (let k = 0; k < 8; k++) { const line = await page.locator("#ctx p b").last().innerText(); await page.click(`#ctx [data-sw="${/HEAVE/.test(line) ? "heave" : "sing"}"]`); await page.waitForTimeout(150); }
+  await page.click('#ctx [data-sw="shantydone"]'); await page.waitForTimeout(800);
+  f = await gf();
+  check(f.saltwick.shanty === 1 && f.inv.sw_song === 1, "the shanty by the fire with Billy and Alf: sing and HEAVE, and the words to keep");
+  check(await page.locator('#world [data-npc="shantybilly"]').count() === 1 && await page.locator('#world [data-npc="ged"]').count() === 1, "Billy's singing and Ged's behind the bar");
+  await page.close();
+}
+
 {
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));

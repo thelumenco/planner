@@ -94,7 +94,7 @@ export const TRACKS = {
   // round 206: Saltwick Harbour, a slow, warm march like the brass band on the bandstand, with a sea-shanty lilt
   saltwick: {name: "Sunday on the bandstand", live: true, bpm: 84, steps: 6, tone: "rhodes", strum: [0, 3], arp: [1, 3, 5, 3, 4, 3], arpVel: .045, mel: .62,
     bars: [[43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [50, 57, 62, 66, 69], [43, 55, 59, 62, 67], [40, 52, 55, 59, 64], [48, 55, 60, 64, 67], [50, 54, 57, 62, 66], [43, 55, 59, 62, 71]],
-    lines: [[[0, 71], [2, 74], [4, 71]], [[0, 72], [3, 76]], [[0, 74], [2, 72], [4, 69]], [[0, 71], [3, 67]], [[0, 67], [2, 71], [4, 72]], [[0, 76], [3, 74]], [[0, 72], [2, 69], [4, 66]], [[0, 67]]]},
+    lines: [[[0, 71], [1, 74], [2, 71]], [[0, 72], [1.5, 76]], [[0, 74], [1, 72], [2, 69]], [[0, 71], [1.5, 67]], [[0, 67], [1, 71], [2, 72]], [[0, 76], [1.5, 74]], [[0, 72], [1, 69], [2, 66]], [[0, 67]]]},
   // Round 149: the Coast Road, every stop and every room its own
   bb_breakwater: {name: "Out past the break", live: true, bpm: 104, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .05, mel: .75,
     bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [52, 56, 59, 64, 68], [45, 57, 61, 64, 73], [42, 54, 57, 61, 66], [50, 57, 62, 66, 69], [52, 56, 59, 64, 71], [45, 57, 61, 64, 69]],
@@ -324,6 +324,29 @@ export const TRACKS = {
   // the lemon shop: a sunny mandolin strum in A major
   ct_limoni: {name: "Lemons on the terrace", live: true, bpm: 104, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 2, 3, 5, 3, 2, 4, 3], arpVel: .05, mel: .8,
     bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [52, 56, 59, 64, 68], [45, 57, 61, 64, 73]]},
+  // Saltwick Harbour's rooms, each its own
+  // the fish market hall: a brisk, bouncy piano in D, crates banging and Nan Storr calling the prices
+  sw_market: {name: "Haddock's lovelier", live: true, bpm: 120, steps: 8, tone: "piano", arp: [1, 3, 2, 3, 4, 3, 2, 3], arpVel: .05, mel: .8, bounce: true,
+    bars: [[38, 50, 57, 62, 66], [43, 55, 59, 62, 67], [45, 57, 61, 64, 69], [38, 50, 57, 62, 66], [47, 54, 59, 62, 66], [43, 55, 59, 62, 67], [45, 55, 57, 61, 64], [38, 50, 57, 62, 69]],
+    lines: [[[0, 74], [.5, 76], [1, 78], [2, 74], [3, 69]], [[0, 71], [1, 74], [1.5, 71], [2, 67], [3, 71]], [[0, 73], [.5, 74], [1, 76], [2, 73], [3, 69]], [[0, 74], [1, 78], [2, 81]],
+      [[0, 78], [.5, 76], [1, 74], [2, 71], [3, 74]], [[0, 79], [1, 78], [2, 76], [3, 74]], [[0, 73], [1, 76], [2, 79], [2.5, 76], [3, 73]], [[0, 74], [2, 74]]]},
+  // the chandlery: a slow, creaking 6/8 on a low guitar in A dorian, rope and tar and a ticking ship's clock
+  sw_chandlery: {name: "Rope and tar", live: true, bpm: 60, steps: 6, tone: "guitar", arp: [1, 0, 3, 2, 4, 0], arpVel: .038, mel: .5,
+    bars: [[45, 57, 60, 64, 69], [43, 55, 59, 62, 67], [45, 57, 60, 64, 69], [40, 52, 55, 59, 64], [41, 53, 57, 60, 65], [43, 55, 59, 62, 67], [38, 50, 57, 62, 66], [45, 57, 60, 64, 72]],
+    lines: [[[0, 76], [1.5, 74]], [[0, 71], [1, 72], [1.5, 74]], [[0, 76], [1.5, 72]], [[0, 71], [2, 67]], [[0, 69], [1, 72], [1.5, 77]], [[0, 74], [1.5, 71]], [[0, 74], [1, 72], [1.5, 69], [2.5, 66]], [[0, 69]]]},
+  // the Copper Kettle: a gentle teatime waltz on the piano in F, cups on saucers
+  sw_kettle: {name: "Jam first, then cream", live: true, bpm: 90, steps: 6, tone: "piano", arp: [1, 3, 5, 4, 3, 2], arpVel: .042, mel: .65,
+    bars: [[41, 53, 57, 60, 65, 69], [46, 53, 58, 62, 65, 70], [36, 52, 55, 58, 64, 67], [41, 53, 57, 60, 65, 69], [38, 50, 57, 62, 65, 69], [43, 50, 55, 58, 62, 67], [36, 48, 55, 60, 64, 67], [41, 53, 57, 60, 65, 72]],
+    lines: [[[0, 72], [1, 77], [2, 76]], [[0, 74], [2, 70]], [[0, 72], [1, 70], [2, 67]], [[0, 69], [1, 72]], [[0, 74], [1, 72], [2, 74]], [[0, 79], [1, 77], [2, 74]], [[0, 72], [1, 76], [2, 79]], [[0, 77]]]},
+  // the jet workshop: quiet and focused, slow rhodes in E minor with a few dark, unresolved chords, the polishing wheel humming
+  sw_jet: {name: "Black as the night sky", live: true, bpm: 54, steps: 8, tone: "rhodes", arp: [1, 0, 3, 0, 2, 0, 4, 0], arpVel: .032, mel: .4,
+    bars: [[40, 52, 55, 59, 62, 66], [36, 48, 55, 59, 64, 67], [45, 57, 60, 64, 67, 71], [47, 54, 57, 64, 66], [40, 52, 55, 59, 62, 66], [42, 54, 57, 60, 64], [36, 48, 55, 59, 64, 66], [47, 51, 54, 57, 63]],
+    lines: [[[0, 71], [2, 74]], [[0, 71], [1, 67], [3, 66]], [[0, 69], [2, 72]], [[0, 71], [3, 69]], [[0, 74], [1, 76], [2, 74], [3, 71]], [[0, 72], [2, 69]], [[0, 71], [1.5, 66], [3, 64]], [[0, 63], [2, 66]]]},
+  // the Fisherman's Arms: the shanty lads by the fire, a stamping 6/8 in D minor, the squeezebox strummed hard on 1 and 4
+  sw_pub: {name: "Haul her home", live: true, bpm: 112, steps: 6, tone: "guitar", strum: [0, 3], arp: [1, 3, 5, 1, 4, 2], arpVel: .05, mel: .95,
+    bars: [[38, 50, 57, 62, 65, 69], [36, 48, 55, 60, 64, 67], [38, 50, 57, 62, 65, 69], [45, 52, 57, 61, 64, 69], [41, 53, 57, 60, 65, 69], [36, 48, 55, 60, 64, 67], [45, 52, 57, 61, 64, 67], [38, 50, 57, 62, 65, 69]],
+    lines: [[[0, 69], [1, 69], [1.5, 74], [2.5, 72]], [[0, 67], [1, 69], [1.5, 72], [2.5, 67]], [[0, 69], [1, 65], [1.5, 62], [2.5, 65]], [[0, 64], [1.5, 61], [2.5, 64]],
+      [[0, 65], [1, 65], [1.5, 69], [2.5, 72]], [[0, 76], [1, 74], [1.5, 72], [2.5, 67]], [[0, 69], [1, 67], [1.5, 64], [2.5, 61]], [[0, 62], [1.5, 62]]]},
   // Round 128: Jeju's interiors, each its own
   // the divers' house: slow waves, low bells, a song you could hold your breath to
   jj_haenyeo: {name: "Breath of the sea", live: true, bpm: 46, steps: 8, tone: "bell", arp: [1, 0, 2, 0, 3, 0, 2, 0], arpVel: .03, mel: .35,

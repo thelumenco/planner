@@ -271,3 +271,48 @@
 .ch.npc.act-candle:not(.walk) .armR{transform:rotate(-55deg)}
 .ch.npc.act-goat:not(.walk) .armR{animation:feedA 2s ease-in-out infinite alternate}.ch.npc.act-goat .perch{animation:gullH 3s ease-in-out infinite}
 .ch.npc.act-heart:not(.walk) .armR{transform:rotate(-125deg)}.ch.npc.act-heart:not(.walk) .armL{transform:rotate(125deg)}
+
+/* a day out in a Yorkshire fishing town (never done anywhere before): Mum tries on jet earrings in a hand mirror, Dad
+   holds his crab sandwich up away from a gull (and loses), Ma Ma holds up the liveliest lobster, Gong Gong reads the
+   tide table aloud and points, Darren holds his cap on at the pier end, Marcus waves a pennant as the swing bridge
+   opens, Angellina clutches her ghost-walk guidebook and shivers, Evan dangles a crab line over the quay.
+   (.inhand: a prop that turns with the right arm, round the same shoulder) */
+.ch.npc .inhand{transform-origin:9.9px -34px}
+.ch.npc.act-tryon:not(.walk) .armR{transform:rotate(-150deg)}
+.ch.npc.act-tryon:not(.walk) .tool{animation:mirrorT 2.2s ease-in-out infinite alternate;transform-origin:20% 100%}
+.ch.npc.act-tryon:not(.walk) .flip > g{animation:tiltH 2.2s ease-in-out infinite alternate}
+@keyframes mirrorT{from{transform:rotate(-7deg)}to{transform:rotate(6deg)}}@keyframes tiltH{from{transform:rotate(-2deg)}to{transform:rotate(1.5deg)}}
+.ch.npc.act-gulls:not(.walk) .armR{animation:gullA 2.4s ease-in-out infinite}
+.ch.npc.act-gulls:not(.walk) .inhand{animation:gullS 2.4s ease-in-out infinite}
+.ch.npc .swoop{animation:swoopG 2.4s ease-in-out infinite}
+@keyframes gullA{0%,15%,85%,100%{transform:rotate(-146deg)}40%,62%{transform:rotate(-170deg)}}
+@keyframes gullS{0%,15%,85%,100%{transform:rotate(0)}40%,62%{transform:rotate(-24deg)}}
+@keyframes swoopG{0%,100%{transform:translate(0,0)}30%{transform:translate(-8px,10px)}48%{transform:translate(-12px,14px)}70%{transform:translate(6px,-2px)}}
+.ch.npc.act-lobster:not(.walk) .armR{transform:rotate(-120deg)}
+.ch.npc .claw{transform-box:fill-box;transform-origin:100% 100%;animation:clawW .32s ease-in-out infinite alternate}
+.ch.npc .claw2{transform-origin:0% 100%;animation-direction:alternate-reverse}
+@keyframes clawW{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+.ch.npc.act-tide:not(.walk) .armL{transform:rotate(55deg)}
+.ch.npc.act-tide:not(.walk) .armR{animation:tideA .9s ease-in-out infinite alternate}
+@keyframes tideA{from{transform:rotate(-92deg)}to{transform:rotate(-114deg)}}
+.ch.npc.act-pierwalk:not(.walk) .armR{transform:rotate(-168deg)}
+.ch.npc.act-pierwalk:not(.walk) .flip > g{animation:leanW 3s ease-in-out infinite alternate}
+.ch.npc .flap{transform-box:fill-box;transform-origin:100% 30%;animation:flapJ .3s ease-in-out infinite alternate}
+.ch.npc .gust{animation:drip 1.4s linear infinite reverse}
+@keyframes leanW{from{transform:rotate(4deg)}to{transform:rotate(7deg)}}@keyframes flapJ{from{transform:scaleX(.7) skewY(6deg)}to{transform:scaleX(1.1) skewY(-6deg)}}
+.ch.npc.act-bridgecheer:not(.walk) .armR{animation:cheerR .4s ease-in-out infinite alternate}
+.ch.npc.act-bridgecheer:not(.walk) .inhand{animation:cheerP .4s ease-in-out infinite alternate}
+.ch.npc.act-bridgecheer:not(.walk) .armL{animation:dupL .4s ease-in-out infinite alternate}
+.ch.npc.act-bridgecheer:not(.walk) .flip > g{animation:dboog .4s ease-in-out infinite alternate}
+.ch.npc.act-bridgecheer .tool{transform-origin:0% 50%;animation:flapJ .25s ease-in-out infinite alternate}
+@keyframes cheerR{from{transform:rotate(-150deg)}to{transform:rotate(-168deg)}}@keyframes cheerP{from{transform:rotate(10deg)}to{transform:rotate(-8deg)}}
+.ch.npc.act-spooked:not(.walk) .armR{transform:rotate(50deg)}.ch.npc.act-spooked:not(.walk) .armL{transform:rotate(-40deg)}
+.ch.npc.act-spooked:not(.walk) .flip > g{animation:shiverB 3.2s linear infinite}
+.ch.npc .shivers{opacity:0;animation:shiverL 3.2s linear infinite}
+@keyframes shiverB{0%,68%,84%,100%{transform:translateX(0)}70%,74%,78%{transform:translateX(-1px)}72%,76%,80%{transform:translateX(1px)}}
+@keyframes shiverL{0%,66%,88%,100%{opacity:0}70%,84%{opacity:1}}
+.ch.npc.act-crabline:not(.walk) .armR{transform:rotate(-60deg)}
+.ch.npc .cline{transform-box:fill-box;transform-origin:50% 0;animation:clineB 1.1s ease-in-out infinite alternate}
+.ch.npc .crabbob{animation:crabB 1.1s ease-in-out infinite alternate}
+@keyframes clineB{to{transform:scaleY(.84)}}@keyframes crabB{to{transform:translateY(var(--bob))}}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-tryon .tool,.ch.npc.act-tryon .flip > g,.ch.npc.act-gulls .armR,.ch.npc.act-gulls .inhand,.ch.npc .swoop,.ch.npc .claw,.ch.npc.act-tide .armR,.ch.npc.act-pierwalk .flip > g,.ch.npc .flap,.ch.npc .gust,.ch.npc.act-bridgecheer .armR,.ch.npc.act-bridgecheer .armL,.ch.npc.act-bridgecheer .inhand,.ch.npc.act-bridgecheer .flip > g,.ch.npc.act-bridgecheer .tool,.ch.npc.act-spooked .flip > g,.ch.npc .shivers,.ch.npc .cline,.ch.npc .crabbob{animation:none}}

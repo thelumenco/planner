@@ -64,6 +64,8 @@ import { bellbirdArt, vanRideArt } from "../art/bellbird-vines.js";
 import { BB_NAMES, BB_EVAN } from "../data/bellbird.js";
 import { SW_NAMES, SW_EVAN } from "../data/saltwick.js";
 import { saltwickArt, SALTWICK_SIGHT } from "../art/town-saltwick.js";
+import { saltwickRoomArt } from "../art/saltwick-rooms.js";
+import { saltwickPanel, swState, earnCharm, bridgeOpen, polishStart, polishStep, polishDone, finishPolish, shantyStart, shantyPress, shantyDone, finishShanty, shantyOn, crabStart, crabWait, crabPull, finishCrab, treat as swTreat, KETTLE, BAR, CRAB } from "./saltwick.js";
 import { mapPanel as bbMapPanel, passportPanel as bbPassport, setOff as bbSetOff, driveOn as bbDriveOn, homeFuel as bbHomeFuel, bbState } from "./bellbird.js";
 import { bbRoomPanel, treat as bbTreat, chocTaste, watchWater, NOTES as BB_NOTES, buyCuttings as bbCuttings } from "./bbrooms.js";
 import * as BBA from "./bbacts.js";
@@ -338,7 +340,7 @@ let ghBed = null, millOpen = false, lastMill = "";   // round 110: the olive pre
 let rondaView = null;   // round 107: a Ronda shop (ronda.js): "mercado", "tapas", "dulces", "convento", "azulejos"
 let woodsView = null;   // round 103: "ranger", "bike" or a river taxi stop id (transport.js, woods.js)
 let fishSpot = null, fishSt = {}, fishT = null;   // fishing: which spot Mel is at, and the cast in progress (fishing.js)
-let railOpen = false, lastTrain = "", tripPick = [], tripTown = "ronda", boatTown = null;   // the timetable board on Honeybrook's platform
+let railOpen = false, lastTrain = "", tripPick = [], tripTown = "ronda", boatTown = null, swView = null, swSt = {};   // round 207: Saltwick Harbour's panels   // the timetable board on Honeybrook's platform
 let lastFarm = 0;
 // the farm's clock: Mel's shelf at the farm stand sells, and a hive left full too long swarms
 function farmNow(){
@@ -1624,7 +1626,7 @@ function showPanel(hasCtx, skin){
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
   if (kid.open) { kid.open = null; stopKidGame(); ctx(); return; }
-  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; shelfOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; scratchOpen = false; calmOpen = false; recOpen = false; clientsOpen = false; planOpen = false; revOpen = false; jarsOpen = false; deskOpen = false; kudosOpen = false; routOpen = false; trophyView = null; lettersOpen = false; vaultView = null; vyView = null; reviewOpen = false; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; postOpen = false; healthOpen = false; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; swView = null; swSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 // Today's calendar panel (Google Calendar via the mcp capability).
 async function renderCal(fresh){
@@ -1715,6 +1717,7 @@ function ctx(){
   else if (railOpen && townOf(scene)) h = homePanel(F, townOf(scene), sgHM(), railOpen === "ferry" || railOpen === "boat" ? railOpen : "train");
   else if (kyotoView && townOf(scene) === "kyoto") h = kyotoPanel(F, kyotoView, {...ktSt, evan: inParty(F, "evan") && !evanNight()});
   else if (jejuView && townOf(scene) === "jeju") h = jejuPanel(F, jejuView, {...jjSt, evan: inParty(F, "evan") && !evanNight()});
+  else if (swView && townOf(scene) === "saltwick") h = saltwickPanel(F, swView, {...swSt, evan: inParty(F, "evan") && !evanNight(), hm: sgHM(), here: isHere("shantybilly")});   // round 207
   else if (cinqueView && townOf(scene) === "cinque") h = cinquePanel(F, cinqueView, {...ctSt, evan: inParty(F, "evan") && !evanNight()});
   else if (rondaView && townOf(scene)) h = rondaPanel(F, rondaView, {flam: flamSt, hm: sgHM(), tea: teaSt, amina: isHere("amina"), paint: paintSt});
   else if (fishSpot && FISH_SPOTS[fishSpot].scene === scene) h = fishPanel(F, fishSpot, fishSt);
@@ -1938,7 +1941,7 @@ function ctx(){
   c.querySelectorAll("[data-triphome]").forEach(b => b.onclick = () => tripHome(false, ["ferry", "boat"].includes(b.dataset.triphome) ? b.dataset.triphome : "train"));
   c.querySelectorAll("[data-rbuy]").forEach(b => b.onclick = () => { const id = b.dataset.rbuy;
     if (id === "vines") { if (!buyVines(F)) return; sfx("chaching"); flash("Three Tempranillo cuttings"); speak("Rafael wraps three cuttings in damp newspaper. \"Plant them in the sun. Talk to them. They're from my grandfather's vines.\" Plant them on a trellis at home.", 7000); }
-    else { const g = buyGood(F, id, addInv); if (!g) return; sfx("chaching"); flash(g.n);
+    else { const g = buyGood(F, id, addInv); if (!g) return; sfx("chaching"); flash(g.n); if (id === "lobster") swCharm("lobster");
       if (g.shop === "cuero" && id !== "llavero") speak("Antonio takes a little brass stamp and presses an M into the corner. \"For free. So everyone knows it's yours.\"", 5000);
       else if (g.shop === "postales" && id === "postal") speak("Doña Carmen stamps it for you, and points: \"The postbox is by the fountain.\"", 4000); }
     save(); ctx(); });
@@ -2103,6 +2106,27 @@ function ctx(){
       speak(`Fresh paint, gleaming: "${st.name}" along the bow${evanOn ? ", in Evan's wobbly letters" : ""}. Aldo gives you a little carved model of her to keep, and says he'll see one just like her at your jetty. Fishermen talk.`, 7000); ev(["I painted the E!", "my boat! MY boat!", "it says EVAN, Mama"], 1800); drawScene(); save(); }
     else if (a === "gelato" || a === "focaccia") { const t = ctTreat(F, a === "gelato" ? GELATO : FOCACCIA, v); if (!t) return; sfx("slurp"); gainXp(1); hearts(2); speak(`${t[0]}. ${t[2]}`, 5500); ev(a === "gelato" ? ["green ice cream!", "lick lick", "can I have the lemon one too?"] : ["crunchy bread!", "more please!", "yummy"]); save(); }
     else if (a === "taste") { if (F.coins < TASTE.price) return; F.coins -= TASTE.price; sfx("chime"); gainXp(1); speak("The white tastes of salt and sunshine. Then the Sciacchetrà: amber, honey, apricots, a long sweet finish. Signor Bruno watches your face and nods.", 6500); save(); }
+    ctx(); });
+  // Saltwick Harbour (rounds 207 to 208): polishing jet, the shanty, crabbing, the tearoom and the bar
+  c.querySelectorAll("[data-sw]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.sw.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); };
+    if (a === "polish") { swView = "swpolish"; swSt = {polish: polishStart()}; sfx("paper", true); ev(["my one's shiny too!", "rub rub rub", "it was a TREE?"], 1400); }
+    else if (a === "rub" || a === "buff") { if (swSt.polish && polishStep(swSt.polish, a)) sfx("tap"); }
+    else if (a === "polished") { if (!swSt.polish || !polishDone(swSt.polish)) return; const r = finishPolish(F, addInv); if (!r) return; swSt = {}; sfx("chime"); gainXp(2); hearts(2);
+      if (r.charm) { flash(`Jet charm: ${r.charm.name}`); speak("Priya drills a tiny hole, and your piece becomes a little jet anchor. "Your first charm," she says. "Earn the rest round town and I'll thread you a bracelet."", 7000); if (r.charm.all) braceletDone(); }
+      else { flash("A jet pendant"); speak("Priya sets your shining piece on a fine chain: a pendant, to keep or to give. "You're getting good at this," she says. "Don't tell Mr Ellerby."", 6500); }
+      ev(["mine shines, Mama!", "look, LOOK", "it's like a beetle!"], 2200); save(); }
+    else if (a === "charms") { swView = "swcharms"; sfx("paper", true); }
+    else if (a === "shantyopen") { swView = "swshanty"; swSt = {}; sfx("paper", true); }
+    else if (a === "shanty") { swSt = {shanty: shantyStart()}; sfx("paper", true); ev(["BANG BANG BANG", "I'm singing, Mama!", "heave! HEAVE!"], 1200); }
+    else if (a === "sing" || a === "heave") { if (!swSt.shanty) return; const ok = shantyPress(swSt.shanty, a); sfx(ok ? "tap" : "paper", true); if (a === "heave" && ok) act("cheer"); }
+    else if (a === "shantydone") { if (!swSt.shanty || !shantyDone(swSt.shanty)) return; const r = finishShanty(F, addInv); swSt = {}; sfx("chime"); gainXp(2); hearts(3); act("cheer");
+      speak(r.first ? "Billy tears a page from his notebook and writes out all the words in big careful capitals, HEAVE underlined three times. \"So you can sing it at home.\" It's in your backpack." : "The pub cheers itself. Alf plays a little flourish just for you.", 7000);
+      const t = tripOn(F), who = t ? t.party.filter(x => x !== "evan" && isHere(x)) : []; if (who.length) setTimeout(() => npcSay(who[0], pick(["That was GLORIOUS.", "I'm hoarse! I don't care!", "Again! One more!"])), 2600); ev(["again! AGAIN!", "I banged the tray!", "heave HO!"], 1800); save(); }
+    else if (a === "crab") { if (F.coins < CRAB.price) return; F.coins -= CRAB.price; swSt = {crab: crabStart()}; sfx("paper", true); ev(["I've got the bucket!", "crabs, come out!", "is it a big one?"], 1200); save(); }
+    else if (a === "cwait") { if (swSt.crab && crabWait(swSt.crab)) sfx("tap"); }
+    else if (a === "cpull") { if (!swSt.crab) return; const n = crabPull(swSt.crab); if (n == null) return; sfx(n ? "chime" : "paper", true); if (n) { act("cheer"); ev(n > 2 ? ["LOTS of crabs!", "one two three... FOUR?", "they're waving at me!"] : ["a crab! a crab!", "he's got pinchers!", "hello crabby"], 1200); } }
+    else if (a === "crabdone") { if (!swSt.crab || swSt.crab.caught == null) return; const n = swSt.crab.caught; finishCrab(F, n); swSt = {}; gainXp(1); hearts(n ? 2 : 1); speak(n ? "You tip the bucket over the edge, and the crabs scuttle off into the weed, sideways and offended. Evan waves them goodbye." : "You coil up the line. Next time, more bacon.", 5000); swView = null; save(); }
+    else if (a === "kettle" || a === "bar") { const t = swTreat(F, a === "kettle" ? KETTLE : BAR, v); if (!t) return; sfx("slurp"); gainXp(1); hearts(2); mel.sitting = true; nodes.mel.classList.add("sit"); speak(`${t[0]}. ${t[2]}`, 6000); ev(a === "kettle" ? ["cake! CAKE!", "a gingerbread man!", "it's warm, Mama"] : ["fizzy!", "it's spicy!", "a umbrella in my drink!"]); save(); }
     ctx(); });
   // the drying loft (round 132): up the ladder from the barrels; start a batch, collect a finished one
   c.querySelectorAll("[data-loft]").forEach(b => b.onclick = () => { vyView = null; loftView = true; sfx("paper", true); render(); });
@@ -2351,7 +2375,7 @@ function drawScene(){
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; const light = rainLevel(day) === 1; setTimeout(() => speak(light ? "A light shower today. Brollies up!" : "Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
-  $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene): TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene): TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene);
+  $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene): TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene): TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene);
   $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + vanSleeper() + vanCrateArt() + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));   // shelves with keepsakes, and pets at home here
   if ((outside() || scene === "terrace") && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // (round 153: the terrace too, Mel)   // the same evening light everywhere outdoors
   if ((outside() || scene === "terrace") && isDusk()) nightLights();
@@ -2605,6 +2629,10 @@ function roomSpot(id){
   if (id === "pp_buy") { goalView = "paperie"; sfx("paper", true); render(); return; }   // round 183: the paperie
   if (id.startsWith("pp_")) { ppView = id; if (id === "pp_rack") wrSt = {}; paperNow(); sfx("paper", true); render(); return; }
   if (id.startsWith("bv_")) { bbRoom = id; sfx("paper", true); render(); return; }
+  // Saltwick Harbour (rounds 207 to 208): each room's panel, the polishing bench, the charm board, the shanty corner; small touches
+  if (["sw_market", "sw_chandlery", "sw_kettle", "sw_jet", "sw_pub", "swpolish", "swcharms", "swshanty"].includes(id)) { swView = id; swSt = {}; sfx("paper", true); render(); return; }
+  if (SW_TOUCH[id]) { sfx("chime"); speak(pick(SW_TOUCH[id]), 5500); if (id === "swwindow" || id === "swfire") { mel.sitting = true; nodes.mel.classList.add("sit"); }
+    if (inParty(F, "evan") && !evanNight() && SW_EVAN_TOUCH[id]) setTimeout(() => evanSays(pick(SW_EVAN_TOUCH[id])), 1800); render(); return; }
   // Cinque Terre (round 132): each room's panel
   if (id === "ct_focacceria" || id === "ct_pesto" || id === "ct_cantina" || id === "ct_gelato" || id === "ct_limoni") { cinqueView = id; ctSt = {}; sfx("paper", true); render(); return; }
   // Jeju (round 128): each room's thing to do, and the slow-post box
@@ -2623,9 +2651,25 @@ function roomSpot(id){
   if (id === "jardin") { mel.sitting = true; nodes.mel.classList.add("sit"); sfx("chime"); speak(pick(["The fountain splashes, the water runs off down the channel, and the noise of the town just... stops.", "Orange blossom, myrtle, cool stone. You could sit here all afternoon.", "A sparrow drinks from the edge of the fountain. Nobody's in a hurry."]), 5500);
     const t = tripOn(F), who = t ? t.party.filter(x => x !== "evan" && isHere(x)) : []; if (who.length) setTimeout(() => npcSay(who[0], pick(TOWNS[townOf(scene)].lines[who[0]] || ["Lovely."])), 2600); render(); return; }
 }
+// Saltwick's charm bracelet (round 209): a charm for each thing done round town; all six and Priya threads them
+function swCharm(k){ const r = earnCharm(F, k, addInv); if (!r) return; setTimeout(() => { flash(`Jet charm: ${r.name}`); sfx("chime"); }, 1200); if (r.all) braceletDone(); save(); }
+function braceletDone(){ setTimeout(() => { flash("Your jet charm bracelet"); speak("Word travels fast in Saltwick: Priya's heard you've earned all six charms. She threads them onto a fine silver chain for you: anchor, gull, lobster, abbey, lighthouse, bridge. A whole day, round your wrist. It's in your backpack, a keepsake for a shelf.", 8000); }, 3200); }
+const SW_TOUCH = {
+  swscales: ["Nan Storr's brass scales, polished to gold. \"Fifty years, never weighed short. Not once. Ask anyone.\"", "You put a crab on the brass scales. It weighs exactly what Nan said it would, before she looked."],
+  swlantern: ["The lantern corner: red ones, green ones, brass ones, all glowing softly. Tom lights one every evening, just to see them shine.", "A ship's lantern, red glass. \"Port side,\" says Tom. \"Red for port. Port wine's red. That's how you remember.\""],
+  swyard: ["Through the back door: the yard, and Tom's coble up on blocks, half her planks new pale wood and half old and dark. \"She'll float,\" says Tom. \"One day.\"", "The coble in the yard smells of tar and new wood. A robin sits on her bow like it owns her."],
+  swwindow: ["The window seat: the harbour below, boats nodding at their moorings, gulls arguing over a chip. You could stay here all afternoon.", "Rain starts to speckle the glass. You don't mind a bit: you've got tea, and the whole harbour to watch."],
+  swfire: ["You warm your hands at the fire. Driftwood, says Ged, so it burns blue and green. It does: little flickers of sea colour.", "The fire crackles. Somebody's old dog is asleep in front of it, twitching, dreaming of gulls."]};
+const SW_EVAN_TOUCH = {swscales: ["weigh ME!", "it's going up and down!"], swlantern: ["pretty lights!", "red one! green one!"], swyard: ["a BOAT in a garden!", "can we go on it?"], swwindow: ["boats!", "that birdie's got a chip!"], swfire: ["warm warm warm", "doggy's sleeping"]};
 function townSpot(id){
   const town = townOf(scene), T = TOWNS[town];
   if (T.boat && id === T.boat.pier && tripOn(F) && tripOn(F).by === "boat") { railOpen = "boat"; sfx("paper", true); render(); return; }   // round 205: your own boat, tied up
+  // Saltwick Harbour (round 208): the crab line, the tide board; charms for the pier, the abbey and a sit on the lawn
+  if (id === "swcrab") { swView = "swcrab"; swSt = {}; sfx("paper", true); render(); return; }
+  if (id === "swpiers") { speak(T.say.swpiers + " You walk right out to the little green lighthouse and back, the wind in your ears.", 6000); swCharm("lighthouse"); render(); return; }
+  if (id === "swabbey") { speak(T.say.swabbey, 5500); swCharm("abbey"); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["a broken castle!", "where's the roof, Mama?", "echo! ECHO!"])), 1800); render(); return; }
+  if (id === "swlawn") { mel.sitting = true; nodes.mel.classList.add("sit"); speak(pick(["You sit on the clifftop bench with the whole bay below. A gull lands on the end of the bench and stares at you. You stare back. The gull wins.", "The wind smells of salt and cut grass. Down on the sands, someone's dog is chasing the waves and losing."]), 6500); swCharm("gull"); render(); return; }
+  if (id === "swtide") { speak(`The tide board, chalked up by the harbourmaster: high water ${["7:12", "8:04", "9:31", "10:48"][dayKey().charCodeAt(9) % 4]} this morning, and again this evening. "Spring tides Thursday."`, 6000); render(); return; }
   if (id === T.station && T.by === "van") { bvView = "map"; sfx("paper", true); if (evanInVan()) speak(pick(["Evan's fast asleep in the back, one arm flung out, under the pink blanket.", "Shh. Evan's asleep in the van, snoring very softly.", "Evan's curled up in the back with his toy, fast asleep."]), 4500); render(); return; }   // round 141: the campervan's road map
   // round 143: Bellbird Valley's activities out of doors: the balloons, the berry rows, the canoes, the campfire; and the rope swing
   const bbOut = {bvballoons: "balloon", bvberries: "berries", bvcanoe: "canoe", bvfire: "fire", bvsurf: "surf", bvwhales: "whales", bvboats: "pots", bvpenguins: "penguins", bvnippers: "nippers", bvtfalls: "swim", bvtplatypus: "platypus", bvtcalves: "calves", bvttrees: "shake", bvtpanning: "pan", bvttrain: "steam", bvhrows: "harvest", bvhpiste: "petanque", bvhhives: "bees", bvhmaze: "maze", bvhbridge: "sticks", bvhsunset: "bell"}[id];
@@ -2999,6 +3043,8 @@ function arriveSpot(id){
 function arriveVillageSpot(id){
   atSpot = id;
   const v = VILLAGE[id];
+  if (v.bridge && (id === "swToEast" || id === "swToQuay") && bridgeOpen(sgHM())) { speak("Clang, clang: the swing bridge is opening! The whole deck swings round on its pivot, and a fishing coble chugs through the gap, its skipper waving. Then it swings back, and everyone crosses.", 6500); swCharm("bridge");
+    if (inParty(F, "evan") && !evanNight()) evanSays(pick(["the bridge is MOVING!", "bye bye boat!", "again! again!"])); }
   if (v.bridge) { atSpot = null; setScene(v.bridge, ARRIVE[scene + ">" + v.bridge]); return; }
   if (townOf(scene)) { townSpot(id); return; }
   if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }

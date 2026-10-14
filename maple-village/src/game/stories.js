@@ -36,7 +36,7 @@ function eligible(F, id, day){
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 // Ronda's locals tell theirs on a day trip, quest or no quest (Mel's on holiday); the two-a-day limit still holds
-const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason"];   // Ronda's and Kyoto's, and Jason in Cinque Terre
+const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet"];   // Ronda's, Kyoto's and Saltwick's, and Jason in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
   if (id === "jason") return eligible(F, id, day);   // Jason (Mel's friend) tells his whenever she visits, a chapter a day, outside the two-a-day limit
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;
@@ -62,7 +62,11 @@ const REWARDS = {
   chashaku: () => "Okada's grandmother's bamboo tea scoop, to take home to him",
   spoon: (F, addInv) => { addInv("s_spoon", 1); return "Tomás's olive-wood spoon (a keepsake)"; },
   poem: (F, addInv) => { addInv("s_poem", 1); return "a poem from Jason, in his neat handwriting (a keepsake)"; },
-  oilcake: F => { storyState(F).flags.oilcake = true; applyFlags(F); return "Ines's abuela's olive oil cake, on the tapas menu"; }
+  oilcake: F => { storyState(F).flags.oilcake = true; applyFlags(F); return "Ines's abuela's olive oil cake, on the tapas menu"; },
+  // Saltwick Harbour's locals
+  storrhat: (F, addInv) => { addInv("sw_hat", 1); return "Jack Storr's old oilskin hat, from Nan"; },
+  kittiwake: (F, addInv) => { addInv("sw_ship", 1); return "the Kittiwake in a bottle, made by Tom (a keepsake)"; },
+  jetear: (F, addInv) => { addInv("sw_jetear", 1); return "a pair of Priya's jet earrings"; }
 };
 // flags that change the game: the koi tip, Farid's pastries on the menu
 export function applyFlags(F){

@@ -13,7 +13,7 @@
 //   rd_old     | rd_bridge
 
 import { BB_TOWNS, BB_PLACES, BB_BRIDGES, BB_ARRIVE, BB_BOUNDS, BB_OBST, BB_GOODS, BB_KEEP } from "./bellbird.js";
-import { SW_TOWNS, SW_PLACES, SW_BRIDGES, SW_ARRIVE, SW_BOUNDS, SW_OBST } from "./saltwick.js";
+import { SW_TOWNS, SW_PLACES, SW_BRIDGES, SW_ARRIVE, SW_BOUNDS, SW_OBST, SW_GOODS } from "./saltwick.js";
 import { PAINTINGS } from "./terrace-people.js";
 export const TOWNS = {
   ronda: {
@@ -643,7 +643,7 @@ Object.assign(KEEP_LINES, {c_magnet: "A tiny stack of coloured houses over a blu
 ["c_magnet", "c_linen"].forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
 TOWN_GOODS.c_magnet.magnet = true;
 // Bellbird Valley's goods (round 142: data/bellbird.js)
-Object.assign(TOWN_GOODS, BB_GOODS, PAINTINGS); Object.assign(KEEP_LINES, BB_KEEP);   // (and round 152: the terrace keepsakes)
+Object.assign(TOWN_GOODS, BB_GOODS, PAINTINGS, SW_GOODS); Object.assign(KEEP_LINES, BB_KEEP);   // (and round 152: the terrace keepsakes)
 Object.keys(BB_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
 TOWN_GOODS.b_magnet.magnet = true; TOWN_GOODS.b_crmagnet.magnet = true;
 Object.keys(PAINT.colours).forEach(c => Object.keys(PAINT.patterns).forEach(p => { TOWN_GOODS[`ptile_${c}_${p}`] = {n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.`}; }));
