@@ -17,12 +17,14 @@ branch and folder and is never changed from here. Today's personal game is bookm
   journal and the routines board, remove the other room and town hall tools; 3 coins a task.
 - Phase 3 (Mel, 2026-10-14): villagers without homes take the family's places; hearts only come from requests; the
   child's room becomes a guest room for friends to stay, with written schedules.
+- Phase 4 (Mel, 2026-10-14): pet species fixed per game; the look covers body (woman, man, neither), skin, hair and
+  clothes; pet names are suggested but changeable; the Singapore snacks stay.
 
 ## Phases
 1. Set up: this branch and worktree, the bookmark, the leak check. (done)
 2. Strip out connectors and productivity code; build the quest board (your own tasks + village requests). (done)
 3. Remove the family; rewrite the scenes and dialogue that depended on them. (done)
-4. Character creation (name, pronouns, look) and five pets: fox, rabbit, tortoise, quokka, capybara.
+4. Character creation (name, pronouns, look) and five pets: fox, rabbit, tortoise, quokka, capybara. (done)
 5. Welcome screen and three save slots, on the device.
 6. Firebase: sign-in (Google, email link, guest), cloud saves, hosting, security rules.
 7. Polish: first-day tutorial, settings, credits, balance, beta testers.
@@ -97,3 +99,18 @@ and where they're from, and a thank-you letter arrives the morning after. One gu
 
 The public build (`node build.mjs`) now strips source comments from the JS, CSS and HTML. Leak check after phase 3:
 only "Maple" (36, the fox's name, phase 4) and window.claude (1, the save hookup, phase 6) are left.
+
+## Phase 4: you and your pet (done)
+A new game opens on the setup card (game/setup.js): your name and pronouns (she/her, he/him, they/them or your own),
+then how you look with a live preview (body: woman, man or neither; eight skin tones; ponytail, long, bob, short, bun
+or curly hair in ten colours; ten top colours; shorts, trousers or a skirt in eight colours), then your pet. State:
+`F.me = {name, pron: {they, them, their}, look}`, `F.pet` (the species) and `F.name` (its name). Narration says "you";
+the pronouns are there for anyone talking about you. Change your look from the wardrobe or the settings, and your
+name and your pet's name in the settings; the species stays for the game.
+
+Pets (art/pets.js, art/pets-art.js): fox, rabbit, tortoise, quokka and capybara, each drawn for the backpack portrait,
+the nap, the little follower (standing and curled) and the head in the bike basket and the car, in the same frames so
+the accessories and animations fit all five. Suggested names (Ember, Clover, Pebble, Sunny, Mochi and friends), never
+the personal edition's. A tortoise ambles behind you, a rabbit bounds; a capybara (and a tortoise) naps longer. Lines
+can say {pet} and {kind}; speak(), flash() and the villagers' bubbles fill them in. Dev builds skip the setup card
+unless the page has ?setup=1. The leak check now finds nothing but window.claude (the save hookup, phase 6).
