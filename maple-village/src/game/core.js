@@ -1397,9 +1397,16 @@ function giveTo(id, w){
 const SIGNOFF = {mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers Zeh, Marcus", angelina: "Love, Angellina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)"};
 const BQ_NOTE = {mama: "Ma Ma put them by the TV. So pretty, I look at them every day.", gonggong: "Gong Gong put them in water for Ma Ma. Okay, also for me.", mum: "They're on the dining table. Dad keeps saying they're from him.", dad: "I'm going to draw them before they fade.",
   marcus: "Angie put them in a vase. The flat smells amazing.", angelina: "They're on my desk while I study. Thank you!", darren: "In a jar by the kettle. Very fancy.", evan: "I smelled ALL of them."};
+// round 203 (Mel: "thank you notes... describe the same item twice"): a wrapped gift is "the parcel in green paper",
+// and when their own words already name the gift, the note doesn't name it first as well
+const nameWords = n => n.toLowerCase().replace(/^(a|an|the|bar of|box of|jar of|bottle of|pot of|slab of) /, "").split(/[^a-z']+/).filter(w => w.length > 3 && !["with", "wrapped", "paper", "little"].includes(w));
+const namesIt = (n, line) => { const l = line.toLowerCase(); return nameWords(n).filter(w => l.includes(w)).length >= Math.min(2, nameWords(n).length || 9); };
 function thankNote(t){
   const it = ITEMS[t.item] || {n: "present", say: ""}, line = it.kind === "bouquet" ? BQ_NOTE[t.who] || "They're beautiful." : (it.says && it.says[t.who]) || it.say || "";
-  return `${t.who === "evan" ? "Dear Mama" : "Dear Mel"},\n\nThank you for the ${it.n.toLowerCase()}! ${line}\n\n${SIGNOFF[t.who] || ""}`;
+  let open;
+  if (it.wrapped) { const paper = (/wrapped in (.+ paper)$/.exec(it.n) || [])[1] || "pretty paper"; open = `Thank you for the parcel in ${paper}! I opened it straight away.`; }
+  else open = line && namesIt(it.n, line) ? "Thank you so much!" : `Thank you for the ${it.n.toLowerCase()}!`;
+  return `${t.who === "evan" ? "Dear Mama" : "Dear Mel"},\n\n${open} ${line}\n\n${SIGNOFF[t.who] || ""}`;
 }
 // thank-you notes that have arrived (they take about ten minutes to come back)
 const thanksMail = () => (F.thanks || []).filter(t => t.at <= Date.now()).map(t => ({id: t.id, from: "postie", at: t.at, title: `Thank you from ${GIFT_NAME[t.who] || "someone"}`, body: thankNote(t)}));

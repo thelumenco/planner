@@ -76,7 +76,8 @@ export function tellStory(F, id, addInv, day = dayKey()){
   const r = storyReady(F, id, day); if (!r) return null;
   const s = storyState(F); s.heard = {...s.heard, [id]: r.k + 1}; s.day = {...s.day, [id]: day}; s.log = [...s.log, {id, k: r.k, day}].slice(-200);
   const reward = r.ch.reward && REWARDS[r.ch.reward] ? REWARDS[r.ch.reward](F, addInv) : "";
-  return {lines: r.ch.lines, reward, done: r.k + 1 >= STORIES[id].length};
+  // round 203 (Mel: "I have no context for what they're saying"): from the second chapter on, they first remind Mel where they'd got to
+  return {lines: r.k > 0 && r.ch.recap ? [r.ch.recap, ...r.ch.lines] : r.ch.lines, reward, done: r.k + 1 >= STORIES[id].length};
 }
 // the friendship view's "Stories so far": who's told what, in order (names from NPCS)
 export function storiesHTML(F, names){

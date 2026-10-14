@@ -4259,6 +4259,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(gs.takeWrapped(F, 0) === id && F.inv[id] === 1 && !gs.giftState(F).wrapped.length, "and it can come back out");
   check(!/Put out:/.test(wr.wrapPanel(F, {}, {where: "giftshop", table: []})), "the wrapping table just points to the basket now");
 }
+{
+  console.log("\nStories pick up where they left off (round 203)");
+  const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
+  const missing = Object.entries(sd.STORIES).flatMap(([id, chs]) => chs.map((c, i) => i > 0 && !c.recap ? id + ":" + i : null).filter(Boolean));
+  check(!missing.length, "every chapter after the first starts by reminding Mel where they'd got to" + (missing.length ? ": missing " + missing.slice(0, 5).join(", ") : ""));
+  check(!/[\u2013\u2014]/.test(JSON.stringify(sd.STORIES)), "no dashes in the stories");
+  const day = "2026-10-14", F = {met: {celeste: true}, storyDay: day, story: {heard: {celeste: 1}, day: {}, log: [], flags: {}}}, t = st.tellStory(F, "celeste", () => {}, day);
+  check(t && t.lines[0] === sd.STORIES.celeste[1].recap && t.lines.length === sd.STORIES.celeste[1].lines.length + 1, "Celeste's second chapter opens with the reminder: " + (t ? t.lines[0] : ""));
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");
