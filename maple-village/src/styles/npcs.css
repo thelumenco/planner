@@ -322,7 +322,7 @@
    nonnas, Gong Gong watches the mussel boats come in with his hands clasped behind his back, Darren jumps off the rocks
    with a splash, Marcus bobs in his mask, snorkel and flippers at Byron's Grotto, Angellina writes a poem on the poets'
    bench and looks up for the next line */
-.ch.npc.act-swim:not(.walk) .legL,.ch.npc.act-swim:not(.walk) .legR{opacity:0}
+.ch.npc.act-swim:not(.walk) .legL,.ch.npc.act-swim:not(.walk) .legR,.ch.npc.act-swim:not(.walk) .flip > g > ellipse{opacity:0}
 .ch.npc.act-swim:not(.walk) .flip > g{animation:swimB 2.4s ease-in-out infinite alternate}
 .ch.npc.act-swim:not(.walk) .armR{animation:strokeR 2.4s ease-in-out infinite}.ch.npc.act-swim:not(.walk) .armL{animation:strokeL 2.4s ease-in-out infinite}
 .ch.npc .ripple{transform-box:fill-box;transform-origin:50% 50%;animation:rippleO 2.4s ease-out infinite}.ch.npc .ripple2{animation-delay:-1.2s}
@@ -337,7 +337,7 @@
 .ch.npc .chatter{animation:chatL 1.8s steps(1) infinite}
 @keyframes chatA{0%,100%{transform:rotate(-40deg)}18%{transform:rotate(-82deg)}34%{transform:rotate(-58deg)}52%{transform:rotate(-96deg)}70%{transform:rotate(-64deg)}}
 @keyframes chatL{0%,45%,90%{opacity:1}30%,60%,100%{opacity:0}}
-.ch.npc.act-boatwatch:not(.walk) .armR{transform:rotate(24deg)}.ch.npc.act-boatwatch:not(.walk) .armL{transform:rotate(-24deg)}
+.ch.npc.act-boatwatch:not(.walk) .armR{transform:rotate(-9deg) scaleY(.7)}.ch.npc.act-boatwatch:not(.walk) .armL{transform:rotate(9deg) scaleY(.7)}
 .ch.npc.act-boatwatch:not(.walk) .flip > g{animation:swayG 4s ease-in-out infinite alternate}
 @keyframes swayG{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
 .ch.npc.act-rockjump:not(.walk) .armR{transform:rotate(-166deg)}.ch.npc.act-rockjump:not(.walk) .armL{transform:rotate(166deg)}
