@@ -31,6 +31,7 @@ body.nb-open{overflow:hidden}
 .nbbody .hl{color:#2F2B28}
 .nbfirst{margin-bottom:6px!important}
 .nbnotes ul{margin:0;padding-left:20px}
+.nbnotes p.gap{margin-top:32px}
 .nbnotes a,.nbbody a:not(.btn){color:#2F3B73;font-weight:600;text-decoration:underline;text-decoration-color:var(--peri2);text-underline-offset:3px;word-break:break-all}
 .nbnone{color:#8A8279;font-style:italic}
 .nbpep{font-family:"Klee One",serif;color:#8A8279;margin-top:6px!important}

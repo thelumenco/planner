@@ -93,12 +93,13 @@ const linkify = s => { const m = /^\s*([A-Za-z][\w '’-]{0,30}):\s*(https?:\/\/
   return esc(s).replace(URL_RE, u => chip(u, chipName(u.replace(/&amp;/g, "&")))); };
 function notesHTML(text){
   const lines = String(text || "").split(/\r?\n/);
-  let out = "", list = false;
+  let out = "", list = false, gap = false;   // round 195: a blank line leaves one ruled line empty, so letters breathe
   for (const ln of lines) {
     const m = ln.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)/);
-    if (m) { if (!list) { out += "<ul>"; list = true; } out += `<li>${linkify(m[1])}</li>`; continue; }
+    if (m) { if (!list) { out += "<ul>"; list = true; } out += `<li>${linkify(m[1])}</li>`; gap = false; continue; }
     if (list) { out += "</ul>"; list = false; }
-    if (ln.trim()) out += `<p>${linkify(ln)}</p>`;
+    if (!ln.trim()) { gap = !!out; continue; }
+    out += `<p${gap ? ' class="gap"' : ""}>${linkify(ln)}</p>`; gap = false;
   }
   return out + (list ? "</ul>" : "");
 }

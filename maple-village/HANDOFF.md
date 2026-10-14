@@ -2444,3 +2444,6 @@ Mel: "white chocolate... seashell shape and mint and then I wanted to add pear b
 about the heart mould sat mid-line in cocoa.js and swallowed the `POETIC` names, so `bonbonName` threw for about a third of
 two-filling pairings: the bonbon table stopped redrawing (and the error mid-render is likely the "hang" too). Fixed, with a
 test naming every pairing of every filling in all three shells.
+
+## Round 195: letters breathe
+- `notesHTML` (ui/notebook.js) keeps a blank line as one empty ruled line (`p.gap`, 32px), so long letters read in paragraphs.

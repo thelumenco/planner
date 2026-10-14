@@ -363,6 +363,7 @@ body.nb-open{overflow:hidden}
 .nbbody .hl{color:#2F2B28}
 .nbfirst{margin-bottom:6px!important}
 .nbnotes ul{margin:0;padding-left:20px}
+.nbnotes p.gap{margin-top:32px}
 .nbnotes a,.nbbody a:not(.btn){color:#2F3B73;font-weight:600;text-decoration:underline;text-decoration-color:var(--peri2);text-underline-offset:3px;word-break:break-all}
 .nbnone{color:#8A8279;font-style:italic}
 .nbpep{font-family:"Klee One",serif;color:#8A8279;margin-top:6px!important}
@@ -21236,7 +21237,7 @@ ${r.n}`;
   };
   function notesHTML(text) {
     const lines = String(text || "").split(/\r?\n/);
-    let out = "", list5 = false;
+    let out = "", list5 = false, gap = false;
     for (const ln of lines) {
       const m = ln.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)/);
       if (m) {
@@ -21245,13 +21246,19 @@ ${r.n}`;
           list5 = true;
         }
         out += `<li>${linkify(m[1])}</li>`;
+        gap = false;
         continue;
       }
       if (list5) {
         out += "</ul>";
         list5 = false;
       }
-      if (ln.trim()) out += `<p>${linkify(ln)}</p>`;
+      if (!ln.trim()) {
+        gap = !!out;
+        continue;
+      }
+      out += `<p${gap ? ' class="gap"' : ""}>${linkify(ln)}</p>`;
+      gap = false;
     }
     return out + (list5 ? "</ul>" : "");
   }
