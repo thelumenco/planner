@@ -1774,8 +1774,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 <g class="ch" id="mel" data-ent="mel"><g class="flip"><g filter="url(#wob)">
               <ellipse cx="0" cy="0" rx="11" ry="3.5" fill="rgba(60,40,30,.18)"/>
               <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
-                <g class="legL"><rect x="-6.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="-3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><rect class="otrouser" x="-8.2" y="-19" width="7.4" height="17.4" rx="1.6" style="display:none"/><ellipse class="oshoe" cx="-3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
-                <g class="legR"><rect x="1.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><rect class="otrouser" x="0.8" y="-19" width="7.4" height="17.4" rx="1.6" style="display:none"/><ellipse class="oshoe" cx="3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
+                <g class="legL"><rect x="-6.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="-3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><rect class="otrouser" x="-8.2" y="-25" width="8.4" height="23.4" rx="1.6" style="display:none"/><ellipse class="oshoe" cx="-3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
+                <g class="legR"><rect x="1.2" y="-15" width="5" height="13" rx="2.2" style="fill:var(--skin)"/><ellipse cx="3.7" cy="-1.6" rx="3.6" ry="2.1" style="fill:var(--sock)"/><rect class="otrouser" x="-0.2" y="-25" width="8.4" height="23.4" rx="1.6" style="display:none"/><ellipse class="oshoe" cx="3.7" cy="-1.6" rx="3.9" ry="2.3" style="display:none"/></g>
                 <path id="oHips" d="M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z" style="fill:var(--denim)"/><path id="oHipSides" d="M-8.6 -23 l0.4 8.6 M8.6 -23 l-0.4 8.6" fill="none" style="display:none"/>
                 <g class="armL"><rect x="-12" y="-34" width="4.2" height="13.5" rx="2.1" style="fill:var(--skin)"/><rect class="osleeve" x="-12" y="-34" width="4.2" height="10.5" rx="2.1" style="display:none"/></g>
                 <g class="armR"><rect x="7.8" y="-34" width="4.2" height="13.5" rx="2.1" style="fill:var(--skin)"/><rect class="osleeve" x="7.8" y="-34" width="4.2" height="10.5" rx="2.1" style="display:none"/></g>
@@ -43425,10 +43425,7 @@ ${SIGNOFF[t2.who] || ""}`;
     m.querySelectorAll(".otrouser").forEach((e) => fill2(e, long ? c("bottom", "#2F2B28") : null));
     {
       const hips = $("oHips"), sides = $("oHipSides");
-      if (hips) {
-        hips.setAttribute("d", long ? "M-8.4 -23 h16.8 v6 h-16.8z" : "M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z");
-        hips.style.stroke = long ? "none" : "";
-      }
+      if (hips) hips.style.display = long ? "none" : "";
       if (sides) sides.style.display = "none";
     }
     const bag2 = $("oBag");
