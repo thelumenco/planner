@@ -15,11 +15,13 @@ branch and folder and is never changed from here. Today's personal game is bookm
 - Firebase (hosting, sign-in, cloud saves) in phase 6.
 - Phase 2 (Mel, 2026-10-14): the four app houses become villagers' homes; up to 10 paid task ticks a day; keep the
   journal and the routines board, remove the other room and town hall tools; 3 coins a task.
+- Phase 3 (Mel, 2026-10-14): villagers without homes take the family's places; hearts only come from requests; the
+  child's room becomes a guest room for friends to stay, with written schedules.
 
 ## Phases
 1. Set up: this branch and worktree, the bookmark, the leak check. (done)
 2. Strip out connectors and productivity code; build the quest board (your own tasks + village requests). (done)
-3. Remove the family; rewrite the scenes and dialogue that depended on them.
+3. Remove the family; rewrite the scenes and dialogue that depended on them. (done)
 4. Character creation (name, pronouns, look) and five pets: fox, rabbit, tortoise, quokka, capybara.
 5. Welcome screen and three save slots, on the device.
 6. Firebase: sign-in (Google, email link, guest), cloud saves, hosting, security rules.
@@ -66,3 +68,32 @@ Mr Okada early in the morning too): data/npcs.js `HOMES`. The Fresh Pages librar
 
 Tests: `node test/smoke.mjs` has new sections for the quest board rules and a request handed over in the game; the
 sections for removed features are gone. Each section now records a failure and carries on instead of stopping the run.
+
+## Phase 3: no family (done)
+Who's in the family's places (ids swapped in code, every line rewritten in the villager's own voice):
+- Hana (the market) and Theo (town clerk, piano, double bass, sketching) live in the blue house on the foreshore
+  (scene `hanatheo`). Hana leads the 8am class on the field.
+- Farid (the orchard, a baker who bakes too much) and Mei (the flower farm, sings to the roses, fishes) share the
+  orchard cottage. Farid keeps the orchard's stall, the 3pm tea and cake, the Christmas wreaths.
+- Tomi (the olive press, games, paddleboarding) and Posy (the gift shop, reads psychology for fun), engaged, live in
+  the lilac house next door (scene `tomiposy`).
+- Bo (carpenter) sets up the garden tools and builds the extras, and does the evening farm tours.
+These seven are your close friends: they come on day trips, get gifts (the market's Gifts tab), come to the Wednesday
+and Sunday village supper and the Friday bonfire. Their home routines are in data/npcs.js `AT_HOME`. Hearts still only
+come from village requests.
+
+The child's room is gone. Nippers is Coach Dimi's grown-ups' surf club morning; Santa's grotto, the field fair's kite
+and face paint, and the sunflower maze certificate are the player's own. The toys in the shop are things for your home
+or your pet. Jason and Luca are now Ornella (a retired ferry captain who writes a verse every morning) and Dario (the
+boat mechanic who collects English idioms), pen pals you meet in Vernazza. The player is "you" everywhere; letters
+open "Dear friend" until character creation names you (game/me.js). National Day and the Merlion are gone; the rainy
+months are just the rainy months.
+
+The guest room (game/guests.js, data/guests.js, `F.guest`): the guest book on the desk invites anyone in your address
+book. They come on the 10:30 train the next morning and stay three days: an arrival day, one whole day (outdoors or
+gentle, depending on who it is) and a last breakfast before the 11 o'clock train. Each slot of each day is written in
+the guest book ("Today's plan"), they appear in Who's where, sleep in the guest room, say things about where they are
+and where they're from, and a thank-you letter arrives the morning after. One guest at a time; no coins, no hearts.
+
+The public build (`node build.mjs`) now strips source comments from the JS, CSS and HTML. Leak check after phase 3:
+only "Maple" (36, the fox's name, phase 4) and window.claude (1, the save hookup, phase 6) are left.
