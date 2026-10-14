@@ -113,7 +113,7 @@ import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpe
 import { diningTable, skyWash, tapeLabel } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { discoNow, discoOn, DISCO_FROM, aperitivoNow, bonfireNow, vanNow, FIRE, movieNow, bayMarketNow, BAY_STALLS, KITE_SELLER, SCREEN, lastFriday, tourNow, eventNow, eventOn, eventsOn, xmasOn, XMAS_FROM, XMAS_TO, XMAS_LIT, XMAS_TREE, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, dinnerOn, dinnerNow, dinnerSeat, DINING, HOST_NAME, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
+import { discoNow, discoOn, DISCO_FROM, aperitivoNow, bonfireNow, vanNow, FIRE, movieNow, bayMarketNow, BAY_STALLS, KITE_SELLER, SCREEN, lastFriday, tourNow, eventNow, eventOn, eventsOn, xmasOn, XMAS_FROM, XMAS_TO, XMAS_LIT, XMAS_TREE, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, DINING, tableSeat, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), berries:0, earned:0, steps:0, stepMs:0, water:0, crown:false, npcSaid:{}, harvested:0, updatedAt:0});
@@ -573,7 +573,7 @@ function villageCalendar(){
   const fests = FESTIVALS.flatMap(f => f.dates.map(k => ({f, k, from: addD(k, -f.before), to: addD(k, f.after)}))).filter(x => x.to >= today && x.k <= addD(today, FEST_DAYS)).sort((a, b) => a.k.localeCompare(b.k));
   const days = [];
   for (let i = 0; i < CAL_DAYS; i++) {
-    const k = addD(today, i), dn = dinnerOn(k), list = [];
+    const k = addD(today, i), list = [];
     for (const ev of eventsOn(k)) list.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? ` (our wine stall's there${F.cocoa && F.cocoa.up && F.cocoa.up.cart ? `, and ${cocoaState(F).name}'s chocolate cart` : ""})` : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name})` : ev.kind === "xmas" ? ` (the tree's lit at 5:30${k.slice(5) === "11-20" ? ", for the very first time tonight" : ""})` : ""}`);
     if (xmasOn(k)) { const d = new Date(k + "T00:00:00Z").getUTCDay(); if (d === 5) list.push("Carols by the Christmas tree, 7pm"); if (d === 0 || d === 6) list.push("Santa's grotto on the field, 5 to 8pm"); if (k.slice(5) === "12-24") list.push("The lantern walk round the field, 8:15pm"); if (k.slice(5) === "12-01") list.push("Hamper orders start at the post office"); }
     if (F.cocoa && F.cocoa.up && F.cocoa.up.workshop && new Date(k + "T00:00:00Z").getUTCDay() === 6) list.push(`Bonbon workshop at ${cocoaState(F).name}, 2 to 4pm`);
@@ -582,7 +582,6 @@ function villageCalendar(){
     if (vineState(F).terrace && new Date(k + "T00:00:00Z").getUTCDay() === 0) list.push(`${mothersDay(k) ? "Mother's Day long lunch" : "Sunday long lunch"} on the terrace, 12 to 3pm (${bookingsFor(k).reduce((n, b) => n + b.size, 0)} booked)`);
     if (vineState(F).terrace) { const oc = occasionOn(k), w = oc === "wedding" && weddingOn(k), hm2 = m => hhmm(m % (24*60)); if (oc) list.push(w ? `A wedding on the terrace: ${w.couple}, 2 to 7pm` : `${OCC[oc].n} on the terrace, ${hm2(OCC[oc].from)} to ${hm2(OCC[oc].to)}`); }
     if (k.slice(5) === "11-20") list.push("Mulled wine season starts: the big pot's on in the wine shop kitchen, till Boxing Day");   // round 153
-    if (dn) list.push(`Village supper at ${HOST_NAME[dn.host]}, 6:30pm`);
     fests.filter(x => x.k === k).forEach(x => list.push(`${x.f.name}!`));
     if (list.length) days.push({k, list});
   }
@@ -2064,8 +2063,6 @@ function setScene(id, at){
     if (id === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM())) setTimeout(() => { speak("Disco night! The glitter ball's spinning, the lights are flashing, and the whole floor's dancing. Stand at the tasting bar to pour: they're thirsty.", 6500); ; }, 1200);
     if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5000), 1200);
     if (id === "wineshop" && isHere("tomi") && isHere("posy") && sgHM() >= 19*60 + 30 && S.dateSaid !== dayKey()) { S.dateSaid = dayKey(); setTimeout(() => speak("Tomi and Posy are on a date night at the middle table. Act natural.", 5000), 1600); }
-    { const dn = dinnerOn(dayKey()), m = sgHM(); if (dn && m >= 17*60 + 30 && m < dn.to && S.dinnerSaid !== dayKey()) { S.dinnerSaid = dayKey();
-      setTimeout(() => speak(m < dn.from ? `Village supper tonight at ${HOST_NAME[dn.host]}, 6:30! Tap the table when you get there.` : `Supper's on at ${HOST_NAME[dn.host]}! Everyone's at the table.`, 6000), 2600); } }
     if (id === "shore" && S.shoreSaid !== dayKey()) { S.shoreSaid = dayKey(); const fam = ["hana", "theo", "tomi", "posy"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
       setTimeout(() => speak(`The foreshore. Sea breeze, Norfolk pines, and keep an eye out for dolphins.${fam.length ? ` ${fam.join(fam.length > 2 ? ", " : " and ").replace(/, ([^,]*)$/, " and $1")} ${fam.length > 1 ? "are" : "is"} out too.` : ""}`, 5500), 1200); }
     if (id === "field") { const ev = eventNow(dayKey(), sgHM()); if (ev && S.eventSaid !== dayKey()) { S.eventSaid = dayKey(); setTimeout(() => speak(ev.kind === "market" ? "It's the Sunday farmers market! Stalls all along the top, our wine stall with Ines, and fruit and flowers from the orchard." : ev.kind === "night" ? "The night market! Fairy lights, street food all along the top, and a jazz duo on the little stage." : "It's the field fair! Kites, face painting, lemonade. Where to start?", 6000), 1200); } }
@@ -2113,7 +2110,7 @@ function arriveSpot(id){
   atSpot = id;
   if (id === "mydoor") { setScene("room", INNER.room.arrive); return; }
   if (scene === "cottage" && id === "tea") { orView = "tea"; sfx("paper", true); render(); return; }
-  if (id === "dine") { sitForDinner(); return; }
+  if (id === "dine") sitAtTable();
   if (scene === "chico" && ["habcounter", "bolts", "buttonjar", "habtable"].includes(id)) { habView = true; habSt.tab = id === "buttonjar" ? "buttons" : habSt.tab || "fabric"; sfx("paper", true); if (isHere("ada") && sewOpen()) npcSay("ada", pick(["What are we making?", "Gingham's on the left. Everything else is on the right. Mostly.", "Feel that linen. Go on."])); render(); return; }
   if (scene === "luna" && ["tailtable", "rail", "sewing", "mirror"].includes(id)) { tailView = true; sfx("paper", true); if (isHere("idris") && sewOpen() && !TL.orderState(F)) npcSay("idris", pick(["Right. What shall we make?", "Stand there. Arms out. Lovely.", "Show me what Ada sold you."])); render(); return; }
   if (id === "gbook") { guestView = true; sfx("paper", true); render(); return; }
@@ -2796,34 +2793,23 @@ function whosWhereHTML(){
   const day = dayKey(), t = sgHM(), hhmm = m => fmtTime(m);
   const row = n => { const sch = daySchedule(n.id, day), cur = sch.find(x => t >= x.from && t < x.to);
     const cls = classOn(day), word = a => a === "lead" && cls ? `leading ${cls.kind}` : a === "exercise" && cls && n.id !== "hana" ? `${cls.kind} with Hana` : ACT_WORD[a];
-    const what = x => x.club ? "the wine club at the cellar door" : x.dinner ? `supper at ${HOST_NAME[x.scene] || placeName(x.scene)}` : `${placeName(x.scene)}${x.act && word(x.act) ? ` (${word(x.act)})` : ""}`;
+    const what = x => x.club ? "the wine club at the cellar door" : `${placeName(x.scene)}${x.act && word(x.act) ? ` (${word(x.act)})` : ""}`;
     return `<details class="whowhere"><summary><b>${esc(n.name)}</b> <small class="muted">${cur ? `now: ${esc(what(cur))}` : "not about just now"}</small></summary>
       <ul>${sch.map(x => `<li class="${x === cur ? "now" : ""}"><span>${hhmm(x.from)}–${hhmm(x.to)}</span> ${esc(what(x))}</li>`).join("") || "<li>Not in the village today.</li>"}</ul></details>`; };
   const fam = WHO_FAMILY.map(id => NPCS.find(n => n.id === id)).filter(Boolean);
   const town = NPCS.filter(n => !WHO_FAMILY.includes(n.id) && !n.tourist && !n.kid && !n.local);
   const gid = GU.guestHere(F, day), guest = gid && NPCS.find(n => n.id === gid);
-  const dn = dinnerOn(day);
   const club = owns(F, "cellar") && wineClubOn(day);
-  return `<h3 class="ph3">Who's where today</h3>${dn ? `<p class="muted">Village supper tonight at ${HOST_NAME[dn.host]}, 6:30.</p>` : ""}${club ? `<p class="muted">Wine club tonight at the cellar door, 6 to 9pm.</p>` : ""}${guest ? `<p class="eyebrow">Staying with you</p>${row(guest)}` : ""}<p class="eyebrow">Close friends</p>${fam.map(row).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row).join("")}`;
+  return `<h3 class="ph3">Who's where today</h3>${club ? `<p class="muted">Wine club tonight at the cellar door, 6 to 9pm.</p>` : ""}${guest ? `<p class="eyebrow">Staying with you</p>${row(guest)}` : ""}<p class="eyebrow">Close friends</p>${fam.map(row).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row).join("")}`;
 }
 // Ah Gong and Ah Ma (Mel's dad and mum) with Evan: every minute or two when they're on the same screen, a little
 // exchange (Ah Gong: "Ah Gong loves who the most?"; Evan's cheeky with them), and once a day a surprise toy for him
 const SURPRISES = [["dino", "a little dinosaur"], ["plane", "a toy aeroplane"], ["robot", "a wind-up robot"]];
 let banterAt = Date.now() + 20000;
-// Family dinner: Mel takes her seat at the table (once a night it's a little xp, and a lot of hearts)
-function sitForDinner(){
-  const d = dinnerNow(dayKey(), sgHM()), next = dinnerOn(dayKey());
-  if (!d || d.host !== scene) {
-    speak(d ? `Dinner's at ${HOST_NAME[d.host]} tonight. Everyone's there already!` : next && sgHM() < next.from ? `Village supper tonight at ${HOST_NAME[next.host]}, 6:30.` : "The supper table. Suppers are on Wednesdays and Sundays, at a different house each time.", 4500); render(); return; }
-  const seat = dinnerSeat(scene, "mel"); mel.tx = seat[0]; mel.ty = seat[1]; mel.path = []; setTimeout(() => { mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = -1; }, 700);
-  if (S.dinnerDay !== dayKey()) { S.dinnerDay = dayKey(); gainXp(3); [0, 250, 500, 750].forEach((t, k) => setTimeout(() => mprop("heart", seat[0] - 120 + k*70, seat[1] - 70, 1800), t)); save(); }
-  const who = ["farid", "hana", "mei", "theo"].find(isHere);
-  if (who) setTimeout(() => npcSay(who, pick(who === "farid" ? ["Eat up! I made far too much again.", "Come, sit by me. There's bread."] : who === "hana" ? ["Have more, love! There's plenty.", "Everyone's here. This is the best."] : who === "mei" ? ["Pass the soup, would you?", "I'll just listen. I like listening."] : ["Who wants to hear what I played today?", "For the record: this is my third helping."])), 1200);
-  // bring two tomatoes and two eggs and Farid makes his tomato and egg for the table (once a supper)
-  if (S.tomeggDay !== dayKey() && (F.inv.tomato || 0) >= 2 && (F.inv.egg || 0) >= 2) { S.tomeggDay = dayKey(); addInv("tomato", -2); addInv("egg", -2); gainXp(2);
-    setTimeout(() => { if (isHere("farid")) npcSay("farid", "Tomatoes and eggs! Tomato and egg, coming up. Everybody eat!"); }, 2600);
-    speak("You hand Farid two tomatoes and two eggs. Ten minutes later: his tomato and egg, over rice. Everyone goes quiet, then asks for seconds.", 6500); save(); render(); return; }
-  speak((F.inv.tomato || 0) || (F.inv.egg || 0) ? "Village supper. Everyone round one table, all talking at once. (Two tomatoes and two eggs and Farid will make his tomato and egg.)" : "Village supper. Everyone round one table, all talking at once. The best.", 4500); render();
+// the dining table at a friend's house (or yours): pull out a chair and sit for a bit
+function sitAtTable(){
+  const seat = tableSeat(scene); if (!seat) return;
+  mel.tx = seat[0]; mel.ty = seat[1]; mel.path = []; setTimeout(() => { mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = -1; }, 700);
 }
 // Hana's exercise class on the exercise lawn at the field: you join on the spare mat (once a day it earns a little)
 let melEx = null;

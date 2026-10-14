@@ -268,21 +268,22 @@ export function notesArt(x, y, n){
 // a house's dining table (data/dining.js: round or short, wood or glass): top, legs and place settings
 // (x = centre, y = front edge on the floor)
 export function diningTable(x, y, host = "home"){
-  const t = TABLES[host] || TABLES.home, w = halfW(t), S = SEATS(t);
+  const t = TABLES[host] || TABLES.home, w = halfW(t);
   const top = t.glass ? "#D6ECF2" : "#D9B48A", edge = t.glass ? "#A9CFDA" : "#B98A5A";
-  const plates = [...S.back.map(([dx]) => [x + dx, y - 33]), ...S.front.map(([dx]) => [x + dx, y - 19]), [x - w + 14, y - 26], [x + w - 14, y - 26]];
-  const plateF = plates.map(([px, py]) => `<ellipse cx="${px}" cy="${py}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("");
-  const plateL = plates.map(([px, py]) => `<ellipse cx="${px}" cy="${py}" rx="9" ry="3.6"/>`).join("");
-  const dish = `<ellipse cx="${x}" cy="${y - 27}" rx="15" ry="5.5" style="fill:#F3C969"/><circle cx="${x - 7}" cy="${y - 29}" r="3" style="fill:#E8566C"/><circle cx="${x + 6}" cy="${y - 28}" r="3" style="fill:#9CC27E"/><rect x="${x + 24}" y="${y - 37}" width="6" height="12" rx="2" style="fill:#8FB3E8"/><rect x="${x - 30}" y="${y - 35}" width="6" height="10" rx="2" style="fill:#F2A0B8"/>`;
+  // no places laid: a fruit bowl on the wooden tables, a jug of flowers on the glass ones
+  const plateF = "", plateL = t.glass ? `<path d="M${x - 6} ${y - 26} h12 l-2 -14 h-8z"/>` : `<path d="M${x - 16} ${y - 30} q16 10 32 0"/>`;
+  const dish = t.glass
+    ? `<path d="M${x - 6} ${y - 26} h12 l-2 -14 h-8z" style="fill:#FFFDF6"/><circle cx="${x - 7}" cy="${y - 44}" r="4" style="fill:#F2A0B8"/><circle cx="${x + 1}" cy="${y - 48}" r="4" style="fill:#F3C969"/><circle cx="${x + 8}" cy="${y - 43}" r="4" style="fill:#C9A3E0"/><path d="M${x - 3} ${y - 40} l-3 -3 M${x + 1} ${y - 40} v-5 M${x + 3} ${y - 40} l4 -2" style="stroke:#5E8A48;fill:none"/>`
+    : `<circle cx="${x - 7}" cy="${y - 33}" r="5" style="fill:#E8566C"/><circle cx="${x + 4}" cy="${y - 34}" r="5" style="fill:#F3C969"/><circle cx="${x - 1}" cy="${y - 38}" r="4.5" style="fill:#9CC27E"/><path d="M${x - 16} ${y - 30} q16 10 32 0z" style="fill:#C99A63"/>`;
   const shine = t.glass ? `<path d="M${x - w + 22} ${y - 34} l18 -3 M${x + w - 50} ${y - 20} l22 -3" style="stroke:#FFFFFF;stroke-width:2.2;fill:none" opacity=".8"/>` : "";
   if (t.shape === "round"){
     const legF = t.glass ? `<path d="M${x - 4} ${y - 12} h8 v10 h-8z M${x - 22} ${y} q22 -6 44 0" style="fill:#6F7378"/>` : `<path d="M${x - 8} ${y - 12} h16 l3 10 h-22z M${x - 24} ${y} q24 -7 48 0" style="fill:#B98A5A"/>`;
     return sk(`${legF}<ellipse cx="${x}" cy="${y - 22}" rx="${w}" ry="18" style="fill:${edge}"/><ellipse cx="${x}" cy="${y - 26}" rx="${w}" ry="17" style="fill:${top}"${t.glass ? ' opacity=".9"' : ""}/>${shine}${plateF}${dish}`,
-      `<path d="M${x - 24} ${y} q24 -7 48 0"/><path d="M${x - w} ${y - 26} v4 a${w} 18 0 0 0 ${2*w} 0 v-4"/><ellipse cx="${x}" cy="${y - 26}" rx="${w}" ry="17"/>${plateL}<ellipse cx="${x}" cy="${y - 27}" rx="15" ry="5.5"/>`);
+      `<path d="M${x - 24} ${y} q24 -7 48 0"/><path d="M${x - w} ${y - 26} v4 a${w} 18 0 0 0 ${2*w} 0 v-4"/><ellipse cx="${x}" cy="${y - 26}" rx="${w}" ry="17"/>${plateL}`);
   }
   const legs = t.glass ? `<path d="M${x - w + 8} ${y - 8} v8 M${x + w - 8} ${y - 8} v8" style="stroke:#4A4E54;stroke-width:3"/>` : "";
   return sk(`<rect x="${x - w}" y="${y - 40}" width="${2*w}" height="28" rx="4" style="fill:${top}"${t.glass ? ' opacity=".9"' : ""}/><rect x="${x - w}" y="${y - 14}" width="${2*w}" height="${t.glass ? 4 : 8}" rx="2" style="fill:${edge}"/>${shine}${plateF}${dish}`,
-    `<rect x="${x - w}" y="${y - 40}" width="${2*w}" height="28" rx="4"/><rect x="${x - w}" y="${y - 14}" width="${2*w}" height="${t.glass ? 4 : 8}" rx="2"/>${t.glass ? "" : `<path d="M${x - w + 10} ${y - 6} v6 M${x + w - 10} ${y - 6} v6"/>`}${legs}${plateL}<ellipse cx="${x}" cy="${y - 27}" rx="15" ry="5.5"/>`);
+    `<rect x="${x - w}" y="${y - 40}" width="${2*w}" height="28" rx="4"/><rect x="${x - w}" y="${y - 14}" width="${2*w}" height="${t.glass ? 4 : 8}" rx="2"/>${t.glass ? "" : `<path d="M${x - w + 10} ${y - 6} v6 M${x + w - 10} ${y - 6} v6"/>`}${legs}${plateL}`);
 }
 // the chairs round it, each house its own kind: [colour, back shape, leg colour]
 const CHAIRS = {ladder: ["#C99A63", "ladder", null], cushion: ["#F3EDE4", "round", "#B98A5A"], painted: ["#9CC27E", "spindle", null], modern: ["#F3C969", "shell", "#3E4248"]};

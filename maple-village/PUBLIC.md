@@ -80,8 +80,9 @@ Who's in the family's places (ids swapped in code, every line rewritten in the v
 - Tomi (the olive press, games, paddleboarding) and Posy (the gift shop, reads psychology for fun), engaged, live in
   the lilac house next door (scene `tomiposy`).
 - Bo (carpenter) sets up the garden tools and builds the extras, and does the evening farm tours.
-These seven are your close friends: they come on day trips, get gifts (the market's Gifts tab), come to the Wednesday
-and Sunday village supper and the Friday bonfire. Their home routines are in data/npcs.js `AT_HOME`. Hearts still only
+These seven are your close friends: they come on day trips, get gifts (the market's Gifts tab), and come to the Friday
+bonfire. (The Wednesday and Sunday village supper was a personal-edition thing and is gone; each house keeps its
+own dining table, round or short, wood or glass, with its own chairs, and you can sit at it.) Their home routines are in data/npcs.js `AT_HOME`. Hearts still only
 come from village requests.
 
 The child's room is gone. Nippers is Coach Dimi's grown-ups' surf club morning; Santa's grotto, the field fair's kite

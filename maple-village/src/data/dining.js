@@ -1,5 +1,5 @@
-// The village supper's tables, one per house: round or a short rectangle, wood or glass, each house with its own
-// chairs. Eight sit down: three along the back, one at each end, three along the front (see game/tours.js).
+// The dining tables in your house and your friends' houses: round or a short rectangle, wood or glass, each house with
+// its own chairs. Eight chairs: three along the back, one at each end, three along the front.
 export const TABLES = {
   home: {shape: "round", glass: false, chair: "ladder"},       // honey wood, ladder-back chairs
   hanatheo: {shape: "round", glass: true, chair: "cushion"},   // glass top, cream cushioned chairs
