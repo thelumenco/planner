@@ -361,7 +361,7 @@ export const NPCS = [
     // (and plays for Paloma's flamenco in the tapas bar, 1 to 3 and 8 to 10)
     routine: [slot("11:00", "13:00", "rd_plaza", [306, 378], {act: "guitar", dir: -1}), slot("13:00", "15:00", "rd_tapas", [404, 520], {act: "guitar", dir: 1}), slot("15:30", "18:00", "rd_station", [232, 500], {act: "guitar", dir: -1}),
       slot("18:00", "20:00", "rd_plaza", [306, 378], {act: "guitar", dir: -1}), slot("20:00", "22:00", "rd_tapas", [404, 520], {act: "guitar", dir: 1})],
-    lines: ["This one's a bulería. Clap on twelve. No, twelve. Never mind.", "A guitar is just wood and string and a bit of heartbreak.", "Your family has good ears. Especially the lady who dances.", "Requests? I know three songs. And forty more."],
+    lines: ["This one's a bulería. Clap on twelve. No, twelve. Never mind.", "A guitar is just wood and string and a bit of heartbreak.", "You have good ears. Especially the lady who dances.", "Requests? I know three songs. And forty more."],
     actLines: {guitar: ["*strums*", "Olé!", "This one's for the pigeons."]},
     away: "Manolo's guitar case is shut. He's having a coffee somewhere."
   },

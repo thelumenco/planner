@@ -4,8 +4,9 @@
 // little "…" over their head; tap them to hear it. What's been heard is kept in F.story and listed in the friendship
 // view ("Stories so far").
 // State: F.story = {heard: {npc: n}, day: {npc: lastDay}, log: [{id, k, day}], flags: {}}
-import { boostedStory } from "./quests.js";
+import { boostedStory, hearts, MAX_HEARTS } from "./quests.js";
 import { STORIES } from "../data/stories.js";
+import { NPCS } from "../data/npcs.js";
 import { esc, dayKey } from "../util.js";
 import { FISH } from "./fishing.js";
 import { TAPAS } from "./kitchen.js";
@@ -26,10 +27,16 @@ function gateOk(F, g){
   return false;
 }
 // a chapter that could be told today (gates met, villager met, not told today) -> {k, ch} or null
+// Honeybrook villagers open up as their hearts grow (quests.js: from requests and gifts): the first chapter once
+// you've met, the last at five hearts, the ones between spread evenly. Travel locals keep the trip-day rules.
+export const heartsFor = (k, n) => k === 0 ? 0 : k >= n - 1 ? MAX_HEARTS : Math.max(1, Math.round(k*(MAX_HEARTS - 1)/(n - 1)));
+const isLocal = id => LOCALS.includes(id) || !!(NPCS.find(x => x.id === id) || {}).local;
+export const nextHearts = (F, id) => { const list = STORIES[id], k = storyState(F).heard[id] || 0; return !list || k >= list.length || isLocal(id) ? null : heartsFor(k, list.length); };
 function eligible(F, id, day){
   const list = STORIES[id]; if (!list) return null;
   const s = storyState(F), k = s.heard[id] || 0, ch = list[k];
   if (!ch || s.day[id] === day || !(F.met && F.met[id])) return null;
+  if (!isLocal(id) && hearts(F, id) < heartsFor(k, list.length)) return null;
   return (ch.needs || []).every(g => gateOk(F, g)) ? {k, ch} : null;
 }
 // At most two villagers tell you a chapter each day (not everyone at once). Today's tellers are picked from
@@ -39,6 +46,7 @@ const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.
 // Ronda's locals tell theirs on a day trip, quest or no quest (you're on holiday); the two-a-day limit still holds
 const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason"];   // Ronda's and Kyoto's, and Ornella in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
+  if (!isLocal(id)) return eligible(F, id, day);   // a villager in Honeybrook: whenever their hearts allow, a chapter a day
   if (id === "jason") return eligible(F, id, day);   // Ornella (your pen pal) tells hers whenever you visit, a chapter a day, outside the two-a-day limit
   if (boostedStory(F, id, day)) return eligible(F, id, day);   // their request was finished today: their next chapter's ready, outside the two-a-day limit
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;
@@ -80,9 +88,26 @@ export function tellStory(F, id, addInv, day = dayKey()){
   const reward = r.ch.reward && REWARDS[r.ch.reward] ? REWARDS[r.ch.reward](F, addInv) : "";
   return {lines: r.ch.lines, reward, done: r.k + 1 >= STORIES[id].length};
 }
-// the friendship view's "Stories so far": who's told what, in order (names from NPCS)
+// the friendship view's "Stories so far": a record to look back on, one card per teller (in the order you first heard
+// them, the latest teller's card open), headed with their name and job (from NPCS; `names` from core.js wins for the
+// name), each chapter numbered and in order, with its bubbles as they were said
+const PLACES = {ronda: "Ronda", kyoto: "Kyoto", cinque: "Cinque Terre"};
 export function storiesHTML(F, names){
   const s = storyState(F), ids = Object.keys(STORIES).filter(id => s.heard[id]);
-  if (!ids.length) return `<h3 class="ph3">Stories so far</h3><p class="muted">Everyone in Honeybrook has a story. Chat to people on days you've done a quest, and they'll tell you theirs, a little at a time. Look for the "…" over their heads.</p>`;
-  return `<h3 class="ph3">Stories so far</h3>` + ids.map(id => `<details class="storylog"><summary><b>${esc(names[id] || id)}</b> <small>${s.heard[id]} of ${STORIES[id].length}${s.heard[id] >= STORIES[id].length ? " · the whole story" : ""}</small></summary>${STORIES[id].slice(0, s.heard[id]).map(ch => `<p>${ch.lines.map(esc).join(" ")}</p>`).join("")}</details>`).join("");
+  if (!ids.length) return `<h3 class="ph3">Stories so far</h3><p class="muted">Everyone in Honeybrook has a story. Help your neighbours and bring them gifts: as their hearts grow, they'll tell you theirs, a little at a time. Look for the "…" over their heads.</p>`;
+  const first = {}, last = {};
+  s.log.forEach((e, i) => { if (!(e.id in first)) first[e.id] = i; last[e.id] = i; });
+  const pos = id => id in first ? first[id] : 1e6 + Object.keys(STORIES).indexOf(id);
+  ids.sort((a, b) => pos(a) - pos(b));
+  const latest = ids.reduce((m, id) => (last[id] ?? -1) > (last[m] ?? -1) ? id : m, ids[0]);
+  const card = id => {
+    const n = NPCS.find(x => x.id === id) || {}, heard = Math.min(s.heard[id], STORIES[id].length), all = STORIES[id].length;
+    const where = n.local && PLACES[n.local] ? ` · ${PLACES[n.local]}` : "";
+    const chapters = STORIES[id].slice(0, heard).map((ch, k) =>
+      `<p><small style="display:block;color:#8A8279;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase">Chapter ${k + 1}</small>${ch.lines.map(l => esc(l)).join(" ")}</p>`).join("");
+    const more = heard >= all ? `<p><small style="color:#8A8279">The whole story.</small></p>` : `<p><small style="color:#8A8279">More to come, ${all - heard} chapter${all - heard === 1 ? "" : "s"} left.${nextHearts(F, id) != null && hearts(F, id) < nextHearts(F, id) ? ` The next one at ${nextHearts(F, id)} heart${nextHearts(F, id) === 1 ? "" : "s"}.` : ` Look for the "…" over their head.`}</small></p>`;
+    const job = n.job ? esc(n.job) + (where && !n.job.includes(PLACES[n.local]) ? where : "") : where.slice(3);
+    return `<details class="storylog"${id === latest ? " open" : ""}><summary><span style="display:block;flex:1;min-width:0"><b style="display:block">${esc(names[id] || n.name || id)}</b>${job ? `<small style="display:block">${job}</small>` : ""}<small style="display:block;color:#8A8279">${heard} of ${all} chapters heard</small></span></summary>${chapters}${more}</details>`;
+  };
+  return `<h3 class="ph3">Stories so far</h3><p class="muted">Every chapter you've been told, by who told it, in order. Tap a name to open their story.</p>` + ids.map(card).join("");
 }

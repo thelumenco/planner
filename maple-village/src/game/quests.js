@@ -138,16 +138,35 @@ export function handOver(F, who, takeInv, giveInv, day = dayKey()){
   b.story[who] = day;   // their next story chapter is ready today (stories.js)
   b.done = (b.done || 0) + 1;
   const out = {coins: r.n*r.each, hearts: now, r};
-  if (now > before && now === 2) out.letter = letter(F, r, "thanks");
-  if (now > before && now === 4) { const g = giftFor(F, day); giveInv(g.id, g.n); out.gift = g; out.letter = letter(F, r, "gift", g); }
-  if (now > before && now === 5) out.letter = letter(F, r, "friends");
+  out.giveInv = giveInv; if (now > before) milestone(F, r, now, out, day); delete out.giveInv;
   return out;
+}
+// Gifts (phase 4): anyone in the village can be given something, once a day each (in person, or sent round). A
+// favourite (something they'd ask for, or a gift that suits them) is worth a heart; anything else, half a heart.
+// Hearts from gifts bring the same letters as hearts from requests. -> {fav, hearts, half, gift?, letter?} or null
+export const giftedToday = (F, who, day = dayKey()) => ((board(F).gifted || {})[who]) === day;
+export function giveTo(F, who, name, item, fav, giveInv, day = dayKey()){
+  const b = board(F); b.gifted = b.gifted || {}; b.giftPts = b.giftPts || {};
+  if (b.gifted[who] === day) return null;
+  b.gifted[who] = day;
+  const before = hearts(F, who); b.giftPts[who] = (b.giftPts[who] || 0) + (fav ? 2 : 1);
+  while (b.giftPts[who] >= 2 && (b.hearts[who] || 0) < MAX_HEARTS) { b.giftPts[who] -= 2; b.hearts[who] = (b.hearts[who] || 0) + 1; }
+  const now = hearts(F, who); if (now >= MAX_HEARTS) b.giftPts[who] = 0;
+  const out = {fav, hearts: now, half: now < MAX_HEARTS && b.giftPts[who] === 1, giveInv}, r = {who, name, item, n: 1};
+  for (let h = before + 1; h <= now; h++) milestone(F, r, h, out, day);
+  delete out.giveInv;
+  return out;
+}
+function milestone(F, r, h, out, day){
+  if (h === 2) out.letter = letter(F, r, "thanks");
+  if (h === 4) { const g = giftFor(F, day); out.giveInv && out.giveInv(g.id, g.n); out.gift = g; out.letter = letter(F, r, "gift", g); }
+  if (h === 5) out.letter = letter(F, r, "friends");
 }
 function giftFor(F, day){ const crops = inSeasonCrops(day), c = crops[hash(day) % Math.max(1, crops.length)] || "tulip"; const seed = Object.keys(ITEMS).find(k => ITEMS[k].crop === c && ITEMS[k].kind === "seed") || "tulip_seed"; return {id: seed, n: 3}; }
 const LETTERS = {
-  thanks: (r) => ({title: `Thank you, from ${r.name}`, body: `I just wanted to say thank you for the ${itemName(r.item, r.n)}. It made my week. Come and say hello any time.\n\n${r.name}`}),
+  thanks: (r) => ({title: `Thank you, from ${r.name}`, body: `I just wanted to say thank you for the ${itemName(r.item, r.n)}, and for being so kind lately. It made my week. Come and say hello any time.\n\n${r.name}`}),
   gift: (r, g) => ({title: `A little something from ${r.name}`, body: `You've been such a help lately. I've tucked ${g.n} ${(ITEMS[g.id] || {}).n ? ITEMS[g.id].n.toLowerCase() : "seed packets"} in with this note, for your garden.\n\n${r.name}`}),
-  friends: (r) => ({title: `${r.name} says: friends for life`, body: `Five favours, and every one done with a smile. I'm so glad you live in Honeybrook. My door's always open.\n\n${r.name}`})
+  friends: (r) => ({title: `${r.name} says: friends for life`, body: `Five hearts' worth of kindness, and every bit of it with a smile. I'm so glad you live in Honeybrook. My door's always open.\n\n${r.name}`})
 };
 function letter(F, r, kind, g){ const l = Object.assign({id: `vl-${r.who}-${kind}`, from: r.name, at: Date.now()}, LETTERS[kind](r, g)); board(F).letters = [l, ...board(F).letters.filter(x => x.id !== l.id)].slice(0, 40); return l; }
 export const villageLetters = F => board(F).letters;
