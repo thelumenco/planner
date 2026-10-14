@@ -7,6 +7,9 @@ import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+// The game's clock is the player's own timezone. The tests were written for UTC+8 wall-clock times ("04:00Z" = noon):
+// wall() turns one into the same wall-clock time here, whatever this machine's timezone.
+const wall = iso => { const d = new Date(Date.parse(iso) + 8*3600e3); return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes()).getTime(); };
 async function loadPlaywright() {
   try { return await import("playwright"); } catch {}
   const g = execSync("npm root -g").toString().trim();
@@ -2547,10 +2550,10 @@ try {
     check(r && r.items.length && r.items.every(([f]) => f === "cup" || f === "cone") && F.coins === r.coins && again === null, "tap someone and they buy a cup or a cone (never floats or waffles), once a day each, and the coins come to Mel");
     const back = sc.returnTrolley(F); check(back.back === 25 - r.items.length && back.n === r.items.length, "wheel it back in time and what's left goes back in the freezer");
     sc.loadTrolley(F, ["c"]); s.trolley.at -= 3*3600e3; check(sc.trolleyMelted(s) && sc.trolleySell(F, "theo", "2026-10-12", {}) === null && sc.returnTrolley(F).melted === 10, "after two hours the ice packs give up: no more sales, and the leftovers melt");
-    s.up.bike = 1; s.display = ["d"]; s.at = Date.parse("2026-10-12T04:00:00Z") - 60e3; const off = globalThis.__mapleOffset; globalThis.__mapleOffset = Date.parse("2026-10-12T04:00:00Z") - Date.now();
+    s.up.bike = 1; s.display = ["d"]; s.at = wall("2026-10-12T04:00:00Z") - 60e3; const off = globalThis.__mapleOffset; globalThis.__mapleOffset = wall("2026-10-12T04:00:00Z") - Date.now();
     Math.random = () => .001; const out = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
     check(out.orders && out.orders[0].shop === "scoop" && /^a (cup|cone) of /.test(out.orders[0].what) && out.orders[0].coins >= sc.DELIVERY.fee + 1, "with the bike, villagers order a cup or a cone from wherever they are (shop price + a delivery fee)");
-    s.at = Date.parse("2026-10-12T14:30:00Z") - 60e3; globalThis.__mapleOffset = Date.parse("2026-10-12T14:30:00Z") - Date.now(); Math.random = () => .001; const late = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+    s.at = wall("2026-10-12T14:30:00Z") - 60e3; globalThis.__mapleOffset = wall("2026-10-12T14:30:00Z") - Date.now(); Math.random = () => .001; const late = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
     check(!(late && late.orders && late.orders.length) && sc.deliveryHours(21*60 + 59) && !sc.deliveryHours(22*60) && !sc.deliveryHours(9*60 + 59) && sc.riderOn(20*60) && !sc.riderOn(13*60 + 10), "delivery orders run 10am to 10pm (late-night suppers), and none come in after"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`trolley pageerror: ${e.message}`));
@@ -3050,7 +3053,7 @@ try {
   const mm = lu.bookingsFor("2026-10-25").find(b => b.ids.includes("mama")); check(!mm || mm.at >= 13*60, "Ma Ma comes after her market stall shuts");
   // sales: a pair gets through about a bottle an hour, the dearer ones more
   const F = {coins: 0, inv: {}, vine: {terrace: true}}; const v = vy.vineState(F); v.shelf = [{id: "a", name: "House red", type: "red", n: 40, price: 18, open: 0}, {id: "b", name: "Reserva", type: "tempranillo", n: 40, price: 28, open: 0}];
-  const realNow = Date.now, t0 = Date.parse("2026-10-11T07:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 180*60000; const out = vy.sellTick(F, {}); Date.now = realNow;
+  const realNow = Date.now, t0 = wall("2026-10-11T07:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 180*60000; const out = vy.sellTick(F, {}); Date.now = realNow;
   check(out && out.lunchB >= 6 && out.lunchB <= 30 && v.today.lunchB === out.lunchB, `three hours of lunch: ${out && out.lunchB} bottles to the table`);
   check(80 - v.shelf.reduce((n, x) => n + x.n, 0) >= out.lunchB, "the bottles come off the shelves");
   { const B = {coins: 9999, inv: {}, goals: {}}, bv = vy.vineState(B); let spent = 0; for (let i = 0; i < 8; i++) { const c = B.coins; vy.buy(B, "barrel"); spent += c - B.coins; }
@@ -3185,7 +3188,7 @@ try {
   check(oc.paintDone(ps) && oc.finishPaint(G, ps, add) === "p_view" && G.inv.p_view === 1 && !oc.finishPaint(G, ps, add), "sip and paint: three layers, and your painting comes home");
   // sales: a wedding afternoon sells sparkling
   { const W = {coins: 0, inv: {}, vine: {terrace: true}}, v = vy.vineState(W); v.shelf = [{id: "s", name: "Cuvée", type: "sparkling", n: 40, price: 24, open: 0}, {id: "r", name: "House red", type: "red", n: 40, price: 24, open: 0}];
-    const realNow = Date.now, t0 = Date.parse("2026-10-24T11:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 300*60000; const out = vy.sellTick(W, {}); Date.now = realNow;
+    const realNow = Date.now, t0 = wall("2026-10-24T11:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 300*60000; const out = vy.sellTick(W, {}); Date.now = realNow;
     check(out && out.occB >= 6 && 40 - v.shelf[0].n > 40 - v.shelf[1].n, `a wedding on the terrace: ${out && out.occB} bottles, mostly sparkling`); }
   // in the browser: trivia on a Wednesday night, the book's Coming up page
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -3286,7 +3289,7 @@ try {
     xm.packAdd(F, "honey_lav"); const hp = xm.packTie(F);
     check(hp && hp.id === "hamper_1" && F.inv.hamper_1 === 1 && it.ITEMS.hamper_1 && it.ITEMS.hamper_1.hamper && it.ITEMS.hamper_1.sell <= it.ITEMS.hamper_1.price && /hamper$/.test(it.ITEMS.hamper_1.n), `tie the bow: "${hp && hp.name}" hamper, worth what's in it plus the basket, never more than it costs`);
     check(xm.hamperName(["chz_cheddar", "chz_blue", "chz_brie"], "small") === "The Cheese Lover's" && xm.hamperName(["honey", "bar_dark", "box4"], "small") === "Sweet Tooth" && xm.hamperName([{wine: "Red"}, "chz_cheddar", "chz_blue"], "small") === "Wine and Cheese", "hampers are named after what's in them");
-    const now = Date.parse("2026-12-03T08:00:00Z"); F.bellbird = {stamps: {bv_perfume: 1}};
+    const now = wall("2026-12-03T08:00:00Z"); F.bellbird = {stamps: {bv_perfume: 1}};
     check(xm.recipsFor(F).some(r => r.id === "lvarnaud") && !xm.recipsFor(F).some(r => r.id === "bvkel"), "Penny posts to the family, villagers, and trip friends Mel's met");
     const sent = xm.sendHamper(F, "hamper_1", "lvarnaud", now); check(sent && !F.inv.hamper_1 && xm.hamperMail(F, now).length === 0 && xm.hamperMail(F, now + 864e5).length === 1, "a hamper to Madame Arnaud: her postcard comes the next day");
     const back = xm.collectReplies(F, now + 864e5); check(back.length === 1 && F.inv.b_lavbunch === 1 && /lavender/.test(xm.hamperMail(F, now + 864e5)[0].body), "with a little something from Rosehill");
@@ -3372,11 +3375,11 @@ try {
   console.log("\nThe Cocoa Room's vending machine (round 182)");
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 500, goals: {cocoa: 1}}, c = cc.cocoaState(F);
   c.bars.dark = 10; c.plan.on = false; check(cc.buyCcUp(F, "vending") && F.coins === 100, "the vending machine, 400 coins from the catalogue");
-  const off = globalThis.__mapleOffset, rnd = Math.random, mon = Date.parse("2026-10-12T04:00:00Z");   // Monday noon: the shop's shut
+  const off = globalThis.__mapleOffset, rnd = Math.random, mon = wall("2026-10-12T04:00:00Z");   // Monday noon: the shop's shut
   c.at = mon - 30*60e3; globalThis.__mapleOffset = mon - Date.now(); Math.random = () => .005; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
   check(c.bars.dark < 10 && c.vend === (10 - c.bars.dark)*c.prices.bar && F.coins === 100, `shut on Monday: bars sell from the machine at the full price, and the coins wait in it (${10 - c.bars.dark} sold, ${c.vend} coins)`);
   const box = c.vend; check(cc.emptyVending(F) === box && F.coins === 100 + box && !c.vend, "empty it at the counter");
-  const late = Date.parse("2026-10-12T15:30:00Z"); c.at = late - 20*60e3; globalThis.__mapleOffset = late - Date.now(); Math.random = () => .005; const b0 = c.bars.dark; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+  const late = wall("2026-10-12T15:30:00Z"); c.at = late - 20*60e3; globalThis.__mapleOffset = late - Date.now(); Math.random = () => .005; const b0 = c.bars.dark; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
   check(c.bars.dark === b0, "nothing after 11 at night");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 try {
@@ -3387,7 +3390,7 @@ try {
   const ids = Object.keys(pp.COLOURS).flatMap(c => Object.keys(pp.ADDS).map(a => pp.sheetId(c, a)));
   check(ids.length === 28 && ids.every(id => it.ITEMS[id] && it.ITEMS[id].paper && it.ITEMS[id].price >= 5) && ids.every(id => ic.paperIcon(id) && ic.paperIcon("ppulp" + id.slice(2)) && ic.paperIcon("ppwet" + id.slice(2)) && ic.paperIcon("pppress" + id.slice(2))) && ic.paperIcon("ppscraps") && ic.paperIcon("ppsoak"),
     "28 papers (four colours, seven add-ins), each with its own picture at every step");
-  const F = {coins: 100, inv: {bq_lavender: 1}, goals: {cocoa: 1, mill: 1}, scoop: {}, vine: {shelf: []}}, p = pp.paperState(F), t0 = Date.parse("2026-10-13T03:00:00Z");
+  const F = {coins: 100, inv: {bq_lavender: 1}, goals: {cocoa: 1, mill: 1}, scoop: {}, vine: {shelf: []}}, p = pp.paperState(F), t0 = wall("2026-10-13T03:00:00Z");
   p.scrapDay = "2026-10-11";
   check(pp.homeShops(F).length === 4 && pp.scrapsWaiting(F, "2026-10-13") === 8 && pp.collectScraps(F, "2026-10-13") === 8 && p.scraps === 8 && pp.scrapsWaiting(F, "2026-10-13") === 0, "each shop at home saves a bundle of scraps a day; they come up in the van");
   check(pp.startSoak(F, t0) && p.scraps === 6 && !pp.beat(F, "blush", t0 + 60e3) && !pp.startSoak(F, t0), "two bundles into the tub: not soft yet, and one batch at a time");
@@ -3462,12 +3465,12 @@ try {
   const pp = await import(new URL("../src/game/paperie.js", import.meta.url)), go = await import(new URL("../src/game/goals.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), wr = await import(new URL("../src/game/wrap.js", import.meta.url)), np = await import(new URL("../src/data/lv-people.js", import.meta.url));
   check(go.GOALS.paperkeeper && go.GOALS.paperkeeper.needs === "paperie" && np.LV_PEOPLE.some(n => n.id === "lvlise" && n.routine[0].scene === "bv_hpaper" && n.routine[0].needs === "paperkeeper"), "Lise keeps the paperie (600 coins, once it's yours)");
   check(pp.keeperIn("2026-10-14", 11*60) && !pp.keeperIn("2026-10-12", 11*60) && !pp.keeperIn("2026-10-14", 18*60) && pp.paperSeason("2026-12-10") && !pp.paperSeason("2026-10-14"), "10 till 5, closed Mondays; December's a gift season");
-  const F = {coins: 1000, goals: {paperie: 1}, inv: {}}, p = pp.paperState(F), wed = Date.parse("2026-10-14T03:00:00Z");   // Wednesday 11am
+  const F = {coins: 1000, goals: {paperie: 1}, inv: {}}, p = pp.paperState(F), wed = wall("2026-10-14T03:00:00Z");   // Wednesday 11am
   p.stock = {pp_blush_rose: 10}; p.at = wed - 60*60e3; let rnd = Math.random; Math.random = () => .99; let out = pp.paperTick(F, false, wed); Math.random = rnd;
   check(out.coins === 0 && out.wage === 0 && p.stock.pp_blush_rose === 10, "no keeper, and Mel's away: the paperie's shut");
   F.goals.paperkeeper = 1; p.line = [{col: "sage", add: "seeds", n: 6, done: wed - 1}]; p.at = wed - 60*60e3; Math.random = () => .01; out = pp.paperTick(F, false, wed); Math.random = rnd;
   check(out.wage === pp.WAGE && out.coins > 0 && out.down === 6 && p.stock.pp_sage_seeds >= 0 && F.coins === 1000 - pp.WAGE + out.coins, `with Lise: she opens (her wage, ${pp.WAGE}), sells while Mel's home (${out.coins} coins), and takes the dry sheets down`);
-  const sat = Date.parse("2026-10-17T08:00:00Z"); p.stock = {pp_blush_rose: 6}; p.at = sat - 5*60e3; Math.random = () => .99; out = pp.paperTick(F, false, sat); Math.random = rnd;
+  const sat = wall("2026-10-17T08:00:00Z"); p.stock = {pp_blush_rose: 6}; p.at = sat - 5*60e3; Math.random = () => .99; out = pp.paperTick(F, false, sat); Math.random = rnd;
   check(out.cls === pp.CLASS.size*pp.CLASS.fee && p.stock.pp_blush_rose === 2 && p.classDay === "2026-10-17", "Saturday's card class: four people, four sheets, 32 coins");
   check(it.CROPS.wildflower && it.ITEMS.pp_sage_seeds.plantable && it.ITEMS.pp_sage_seeds.crop === "wildflower" && it.ITEMS.tag_seeded.plantable && it.ITEMS.wildflower.kind === "flower", "seeded paper and seeded tags plant in the garden and come up as wildflowers");
   const G = {coins: 100, inv: {box4: 1, pp_blush_none: 1, tag_seeded: 1}, goals: {paperie: 1}}, id = wr.wrapIt(G, {item: "box4", paper: "pp_blush_none", tag: "seeded"}), t0 = Date.now();
