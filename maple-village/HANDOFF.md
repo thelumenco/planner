@@ -2473,3 +2473,6 @@ Mel: "When I take down the painting, can I gift it?" PAINTINGS (terrace-people.j
   that week; only one box however long Mel's away. Stock in `F.giftshop.travel`.
 - giftshop.js sells them at the friend's own price (all Mel's). gallery.js `makersPanel` has a "From our travels" section with Take one (`takeTravel`).
 - Test block "round 198".
+
+## Round 199: Mel's olive oil in the basket
+Mel: "I took four bottles of olive oil... put it in the basket, and it disappeared immediately". Basket oil joined the mill's own bottles (`c.oil`), and Tomi (`inesStep`, 2 to 5:30pm) infuses as soon as there's oil, a free jar and basket herbs; his `craft(..., "basket")` also took oil from Mel's backpack first. Now Mel's oil stays in `basket.oliveoil` ("Your olive oil"); Tomi uses only `c.oil` ("The mill's own olive oil", `unbasket:milloil`); Mel's bench takes backpack, then her basket, then the mill's bottles. Upstairs, a flash says when Tomi starts an infusion.

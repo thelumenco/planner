@@ -28596,7 +28596,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F2.inv[id] -= n;
     if (F2.inv[id] <= 0) delete F2.inv[id];
   };
-  var oilHave = (F2, c) => have(F2, "oliveoil") + c.oil;
+  var oilHave = (F2, c) => have(F2, "oliveoil") + (c.basket.oliveoil || 0) + c.oil;
   var basketable = (id) => !!HERB[id] || id === "goatmilk" || id === "oliveoil" || id === "beeswax";
   var got2 = (F2, c, id) => have(F2, id) + (c.basket[id] || 0);
   var use3 = (F2, c, id, n = 1) => {
@@ -28607,9 +28607,19 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (c.basket[id] <= 0) delete c.basket[id];
     }
   };
-  var useOil = (F2, c, n) => {
-    const a = Math.min(n, have(F2, "oliveoil"));
+  var useOil = (F2, c, n, tomi) => {
+    if (tomi) {
+      c.oil -= n;
+      return;
+    }
+    let a = Math.min(n, have(F2, "oliveoil"));
     if (a) take(F2, "oliveoil", a);
+    n -= a;
+    a = Math.min(n, c.basket.oliveoil || 0);
+    if (a) {
+      c.basket.oliveoil -= a;
+      if (c.basket.oliveoil <= 0) delete c.basket.oliveoil;
+    }
     c.oil -= n - a;
   };
   function renderWax(F2) {
@@ -28628,8 +28638,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (adds.some((a) => !((src === "basket" ? c.basket[a] || 0 : got2(F2, c, a)) > 0))) return { msg: "You're missing something for that." };
     if (kind === "oil") {
       if (c.steep.length >= CRAFT.jars) return { msg: "All three steeping jars are full." };
-      if (oilHave(F2, c) < CRAFT.oilPer) return { msg: "You'll need two bottles of olive oil (press some downstairs)." };
-      useOil(F2, c, CRAFT.oilPer);
+      if ((src === "basket" ? c.oil : oilHave(F2, c)) < CRAFT.oilPer) return { msg: "You'll need two bottles of olive oil (press some downstairs)." };
+      useOil(F2, c, CRAFT.oilPer, src === "basket");
       base = null;
     } else if (kind === "soap") {
       if (c.cure.length >= CRAFT.rack) return { msg: "The curing rack's full." };
@@ -28715,7 +28725,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function fromBasket(F2, id, n = 99) {
     const c = craftState(F2);
-    if (id === "oliveoil") {
+    if (id === "milloil") {
       const k2 = Math.min(n, c.oil);
       if (!k2) return 0;
       c.oil -= k2;
@@ -28734,11 +28744,6 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function toBasket(F2, herb2, n = 99) {
     const c = craftState(F2), k = Math.min(n, have(F2, herb2));
     if (!basketable(herb2) || !k) return 0;
-    if (herb2 === "oliveoil") {
-      take(F2, herb2, k);
-      c.oil += k;
-      return k;
-    }
     take(F2, herb2, k);
     c.basket[herb2] = (c.basket[herb2] || 0) + k;
     return k;
@@ -28823,7 +28828,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (tab === "basket") {
       const herbs = [...Object.keys(HERB), "goatmilk", "oliveoil"], inBag2 = herbs.filter((a) => have(F2, a)), bn = (a) => a === "goatmilk" ? "Goat's milk" : a === "oliveoil" ? "Olive oil" : nm4(a);
       return h3 + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk, olive oil. The bench takes from it as well as your backpack, and Tomi infuses oil with the herbs while he's in, using the oils you've worked out.</p>
-      <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some((a) => c.basket[a] > 0) || c.oil > 0 ? `<ul class="hlist wlist">${(c.oil > 0 ? ["oliveoil"] : []).concat(Object.keys(c.basket).filter((a) => c.basket[a] > 0)).map((a) => `<li><span class="wpic">${icon((ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(a === "oliveoil" ? "Plain olive oil" : bn(a))}</b><small>${a === "oliveoil" ? `${c.oil} bottle${c.oil === 1 ? "" : "s"} (yours and Tomi's pressing)` : `${c.basket[a]} in the basket`}</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
+      <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some((a) => c.basket[a] > 0) || c.oil > 0 ? `<ul class="hlist wlist">${Object.keys(c.basket).filter((a) => c.basket[a] > 0).concat(c.oil > 0 ? ["milloil"] : []).map((a) => `<li><span class="wpic">${icon(a === "milloil" ? "oliveoil" : (ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(a === "milloil" ? "The mill's own olive oil" : a === "oliveoil" ? "Your olive oil" : bn(a))}</b><small>${a === "milloil" ? `${c.oil} bottle${c.oil === 1 ? "" : "s"} from Tomi's pressing (he infuses with these)` : a === "oliveoil" ? `${c.basket[a]} bottle${c.basket[a] === 1 ? "" : "s"}, kept for you (Tomi won't touch them)` : `${c.basket[a]} in the basket`}</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
       <p class="eyebrow" style="margin:10px 0 6px">From your backpack</p>
       ${inBag2.length ? `<div class="actions">${inBag2.map((a) => `<button class="btn small alt" data-mc="basket:${a}">${HERB[a] ? dots2([a]) : ""} Put in ${have(F2, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from Ma Ma's orchard and the garden, flowers from her flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut9;
     }
@@ -45664,6 +45669,7 @@ ${SIGNOFF[t2.who] || ""}`;
       if (d.started || d.pressed || d.infused) {
         save2();
         if (scene === "mill" && isHere("tomi") && !quietNow()) npcSay("tomi", d.infused ? `${d.infused}, steeping. Six hours. I'll count.` : d.started ? "The crate was full, so in they go. An hour under the stone." : "Bottled! Onto the shelf with them.");
+        else if (d.infused && scene === "millup") flash(`Tomi's started ${d.infused} steeping, with the mill's own oil`);
       }
     }
     {
