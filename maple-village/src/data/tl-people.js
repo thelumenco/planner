@@ -103,7 +103,7 @@ export const TL_PEOPLE = [
     "Meg. I make the cheese. Bill makes the milk. Well. The cows do.", "Meg's in the cool room."),
   P("tlrosa", "Rosa", "Runs the farm shop at the dairy", {skin: "#F2D3BC", hair: "#5A3A2A", hairStyle: "long", top: "#F4C7CF", bottom: "#4F5A6A", extra: "apron"},
     [slot("9:00", "17:00", "bv_tshop", DESK, {dir: -1})],
-    ["Chocolate malted. Trust me.", "This morning's milk. Still cold from the vat.", "Dad says I'm in charge of the shop. Mum says I'm in charge of Dad."],
+    ["Chocolate malted. Trust me.", "This morning's milk. Still cold from the vat.", "Bill says I'm in charge of the shop. Meg says I'm in charge of Bill."],
     "Rosa! Milkshake? We do them so thick the straw stands up.", "The farm shop's shut. Rosa's helping with the milking."),
   P("tlnoah", "Noah", "Looks after the calves", {skin: "#F2D3BC", hair: "#C9785A", hairStyle: "spiky", top: "#9CC27E", bottom: "#4F9CC4", hat: "cap"},
     [slot("8:00", "12:00", "td_paddock", [[360, 430], [420, 440]]), slot("12:00", "15:00", "td_yard", [[240, 400], [300, 460]]), slot("15:00", "17:00", "td_paddock", [[370, 440], [410, 430]])],

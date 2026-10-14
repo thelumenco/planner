@@ -4,7 +4,7 @@
 // with the tearoom and the lighthouse, Hamish at the gift shop. Fern Gully: Tash the ranger, Rowan at the Toadstool.
 // Fisher's Harbour: Mags and her deckhand Davo, Lorraine at the Anchor and Kev at the end of the bar, old Ned at the
 // smokehouse. The Sisters: Sunny at the kiosk, Ari and Jade on patrol at the surf club. Koala Cove: Fay at the park
-// store, Reg at the laundry café, Coach Dimi with the Nippers. And the travelling neighbours at the caravan park
+// store, Reg at the laundry café, Coach Dimi with the Nippers (and a grown-ups' morning). And the travelling neighbours at the caravan park
 // (neighbour: true): Gloria and Bernie in a silver Airstream, the Kapoors on the big lap (Raj, Meena, Tia and Om),
 // and two surfer brothers, Lachie and Mitch, with a rooftop tent. Day-trippers (tourist: true) along the way.
 const hm = s => { const [h, m] = s.split(":").map(Number); return h*60 + (m || 0); };
@@ -60,8 +60,8 @@ export const CR_PEOPLE = [
     "Rowan. Soup's on, the stove's hot, sit wherever.", "The Toadstool's closed. Rowan's gone home through the ferns."),
   P("crhikers", "Leah", "Walking the coast with her dad", {skin: "#EAC4A0", hair: "#C9A06A", hairStyle: "long", top: "#7FA35A", bottom: "#3A3430", extra: "satchel"},
     [slot("9:00", "11:30", "cg_ferns", [[300, 440], [220, 470]]), slot("11:30", "12:30", "bv_mushcafe", [[200, 500], [330, 520]]), slot("12:30", "15:00", "cg_cove", [[280, 320], [340, 360]])],
-    ["Dad's counting tree ferns. He's lost count twice.", "A waterfall onto a beach! I didn't know that was allowed.", "We've walked 40 kilometres this week. My boots are crying."],
-    "Leah. Walking the coast track with Dad. He stops at every fern.", "Leah's walked on.", {tourist: true}),
+    ["My dad's counting tree ferns. He's lost count twice.", "A waterfall onto a beach! I didn't know that was allowed.", "We've walked 40 kilometres this week. My boots are crying."],
+    "Leah. Walking the coast track with my dad. He stops at every fern.", "Leah's walked on.", {tourist: true}),
 
   /* ---------- Fisher's Harbour ---------- */
   P("crmags", "Mags", "Cray fisher, out every morning", {skin: "#D9A882", hair: "#9A928A", hairStyle: "short", top: "#E8913A", bottom: "#3A3430", hat: "cap"},
@@ -112,10 +112,10 @@ export const CR_PEOPLE = [
     [slot("8:00", "15:00", "bv_laundry", DESK, {dir: -1})],
     ["Banana bread, toasted, butter. The coast's best, they say. I agree with them.", "A coffee while your washing goes round. Civilisation.", "Fay's my wife. She runs the park. I run the banana bread."],
     "Reg! Coffee? Banana bread? Both? The washing'll take half an hour anyway.", "The laundry café's shut. Reg is asleep in a deckchair."),
-  P("crdimi", "Coach Dimi", "Runs Nippers on the beach", {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#C8432F", bottom: "#F3D34A", hat: "cap"},
+  P("crdimi", "Coach Dimi", "Runs Nippers and the grown-ups' surf club mornings", {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#C8432F", bottom: "#F3D34A", hat: "cap"},
     [slot("9:00", "12:00", "cc_mouth", [[320, 420], [360, 440], [280, 430]], {act: "lead"}), slot("12:00", "13:00", "bv_rechall", [[180, 500], [340, 500]])],
-    ["Nippers! Little lifesavers! Caps on, everyone!", "Beach flags: lie down, face away, wait for the whistle, run!", "They start at five. By twelve they can save you. True story."],
-    "Coach Dimi. Nippers every morning in the holidays. Got a little one? Bring them down!", "Coach Dimi's packed up the flags."),
+    ["Nippers! Little lifesavers! Caps on, everyone!", "Beach flags: lie down, face away, wait for the whistle, run!", "Grown-ups too! Beach flags, round the buoy, and nobody's too old."],
+    "Coach Dimi. Nippers for the little ones, and a grown-ups' morning too: beach flags and a swim round the buoy. You in?", "Coach Dimi's packed up the flags."),
   // the travelling neighbours at the caravan park
   P("crgloria", "Gloria", "On the road in a silver Airstream with Bernie", {skin: "#F6D9C4", hair: "#E6E2DA", hairStyle: "bob", top: "#E8566C", bottom: "#FFFDF6", hat: "sunhat"},
     [slot("8:00", "12:00", "cc_park", [410, 360], {act: "read", dir: -1}), slot("12:00", "14:00", "bv_laundry", [[200, 500], [320, 520]]), slot("14:00", "18:00", "cc_park", [[260, 420], [320, 380]])],
@@ -135,7 +135,7 @@ export const CR_PEOPLE = [
     "Meena. We're doing the big lap. Raj drives, I navigate, the kids argue.", "Meena's at the van.", {neighbour: true}),
   P("crtia", "Tia", "Doing the big lap (and Nippers)", {skin: "#B9825E", hair: "#1E1A18", hairStyle: "bob", top: "#C8432F", bottom: "#F3D34A"},
     [slot("9:00", "12:00", "cc_mouth", [[330, 430], [350, 440]]), slot("12:00", "17:00", "cc_park", [[260, 430], [300, 470]])],
-    ["I won the beach flags! Twice!", "Evan can do Nippers too! He just has to run!", "A parrot sat on my head! For a whole minute!"],
+    ["I won the beach flags! Twice!", "Grown-ups do beach flags too! They're slower than me.", "A parrot sat on my head! For a whole minute!"],
     "I'm Tia! I'm nine! I'm a Nipper!", "Tia's in the van.", {neighbour: true, kid: true}),
   P("crom", "Om", "Doing the big lap (counting koalas)", {skin: "#B9825E", hair: "#1E1A18", hairStyle: "spiky", top: "#9CC27E", bottom: "#4F9CC4"},
     [slot("9:00", "12:00", "cc_mouth", [[220, 400], [260, 410]]), slot("12:00", "17:00", "cc_park", [[440, 440], [420, 460]])],

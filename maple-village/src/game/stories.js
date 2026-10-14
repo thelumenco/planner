@@ -1,5 +1,5 @@
 // The villagers' backstories (round 104, data/stories.js): told a chapter at a time in their speech bubbles.
-// When: at most one new chapter per villager per day, only on a day Mel has finished at least one real-life quest
+// When: at most one new chapter per villager per day, only on a day you've finished at least one real-life quest
 // (F.storyDay, set in core.js countQuest), and only once its gates are met. A villager with a chapter ready shows a
 // little "…" over their head; tap them to hear it. What's been heard is kept in F.story and listed in the friendship
 // view ("Stories so far").
@@ -32,14 +32,14 @@ function eligible(F, id, day){
   if (!ch || s.day[id] === day || !(F.met && F.met[id])) return null;
   return (ch.needs || []).every(g => gateOk(F, g)) ? {k, ch} : null;
 }
-// At most two villagers tell Mel a chapter each day (Mel asked: not everyone at once). Today's tellers are picked from
+// At most two villagers tell you a chapter each day (not everyone at once). Today's tellers are picked from
 // those with a chapter ready, in an order that changes day to day; once two have told theirs, that's it till tomorrow.
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
-// Ronda's locals tell theirs on a day trip, quest or no quest (Mel's on holiday); the two-a-day limit still holds
-const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason"];   // Ronda's and Kyoto's, and Jason in Cinque Terre
+// Ronda's locals tell theirs on a day trip, quest or no quest (you're on holiday); the two-a-day limit still holds
+const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason"];   // Ronda's and Kyoto's, and Ornella in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
-  if (id === "jason") return eligible(F, id, day);   // Jason (Mel's friend) tells his whenever she visits, a chapter a day, outside the two-a-day limit
+  if (id === "jason") return eligible(F, id, day);   // Ornella (your pen pal) tells hers whenever you visit, a chapter a day, outside the two-a-day limit
   if (boostedStory(F, id, day)) return eligible(F, id, day);   // their request was finished today: their next chapter's ready, outside the two-a-day limit
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;
   const s = storyState(F), told = Object.keys(s.day).filter(x => s.day[x] === day && x !== "jason").length, left = TELLERS_PER_DAY - told;
@@ -52,7 +52,7 @@ export function storyReady(F, id, day = dayKey()){
 const REWARDS = {
   henri: (F, addInv) => { addInv("s_recipebook", 1); addInv("s_praline", 2); return "Henri's recipe book (a keepsake) and two boxes of his hazelnut pralines"; },
   margaux: F => { F.vine = F.vine || {}; F.vine.cellar = F.vine.cellar || []; F.vine.cellar.push({id: "wmargaux", name: "Margaux 1984", type: "red", n: 1}); return "a bottle of Margaux 1984, in your cellar"; },
-  label: (F, addInv) => { addInv("s_label", 1); return "Dad's Marchand label (a keepsake for a shelf)"; },
+  label: (F, addInv) => { addInv("s_label", 1); return "Theo's Marchand label (a keepsake for a shelf)"; },
   blossom: (F, addInv) => { addInv("honey_blossom", 1); return "a jar of orchard blossom honey"; },
   toast: (F, addInv) => { addInv("s_toast", 2); return "two Postman's toasts"; },
   sign: F => { storyState(F).flags.sign = true; return "the old Marchand & Fille sign, back over the Cocoa Room door"; },
@@ -63,7 +63,7 @@ const REWARDS = {
   pastry: F => { storyState(F).flags.pastry = true; applyFlags(F); return "Farid's honey and pistachio pastries, on the tapas menu"; },
   chashaku: () => "Okada's grandmother's bamboo tea scoop, to take home to him",
   spoon: (F, addInv) => { addInv("s_spoon", 1); return "Tomás's olive-wood spoon (a keepsake)"; },
-  poem: (F, addInv) => { addInv("s_poem", 1); return "a poem from Jason, in his neat handwriting (a keepsake)"; },
+  poem: (F, addInv) => { addInv("s_poem", 1); return "a verse from Ornella, in her big sloping hand (a keepsake)"; },
   oilcake: F => { storyState(F).flags.oilcake = true; applyFlags(F); return "Ines's abuela's olive oil cake, on the tapas menu"; }
 };
 // flags that change the game: the koi tip, Farid's pastries on the menu

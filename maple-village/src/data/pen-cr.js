@@ -1,4 +1,4 @@
-// Letter voices for the Coast Road's people (round 191): how each one writes back when Mel posts them a gift or a letter.
+// Letter voices for the Coast Road's people (round 191): how each one writes back when you post them a gift or a letter.
 // (back: things from their own stops are registered from the region's goods at runtime, see ronda.js)
 export const PEN_CR = {
   /* ---------- Breakwater ---------- */
@@ -74,7 +74,7 @@ export const PEN_CR = {
   crmags: {sign: "Fair seas, Mags (and Sea Biscuit)",
     food: "Ate it on the deck coming back in, with the gulls following. Davo got a corner.",
     drink: "It's in the wheelhouse, wedged in tight. I'll have it the day we land a full catch.",
-    made: "It's in the wheelhouse beside Dad's old compass. Sea Biscuit's never looked so posh.",
+    made: "It's in the wheelhouse beside my dad's old compass. Sea Biscuit's never looked so posh.",
     flower: "They're in a bait bucket on the wharf, washed out first, I promise. The old fellas think I've gone soft.",
     other: "Out at four, back by ten, and a parcel waiting at the co-op. Best catch of the week.",
     letter: "Your letter came while I was mending pots on the wharf. I read it twice and then got back to the knots.",
@@ -144,7 +144,7 @@ export const PEN_CR = {
     other: "Grandma's name's on the honour board, and now there's a parcel with mine on it. Good week.",
     letter: "Your letter came on canteen morning. I read it between sausages and got sauce on the corner.",
     news: ["Watched the penguins come in at dusk on Wednesday. Forty of them, all in a hurry.", "Sold more snags last weekend than ever. That's another rescue board, nearly."],
-    back: "b_cap", backNote: "A Nippers cap from the canteen, red and yellow, for the next little lifesaver you know."},
+    back: "b_cap", backNote: "A surf club cap from the canteen, red and yellow, for your next swim between the flags."},
 
   /* ---------- Koala Cove ---------- */
   crfay: {sign: "Love, Fay (the park store)",
@@ -214,21 +214,21 @@ export const PEN_CR = {
     back: null, backNote: ""},
   crtia: {sign: "From Tia (Nipper, age nine)",
     food: "I ate mine after swimming. Om asked for a bite and I gave him a small one.",
-    drink: "Mum says it's for grown-ups, so I'm keeping it safe for her.",
+    drink: "Meena says it's for grown-ups, so I'm keeping it safe for her.",
     made: "I keep it in my special box with my beach flags ribbon. It's the best thing in there.",
     flower: "I put one behind my ear and the rest in a cup. A parrot nearly ate them!",
     other: "Thank you! I'm going to show everyone at the new beach.",
     letter: "I got a letter with my name on it. I read it out loud in the van, twice.",
-    news: ["The new camp has a beach with flags. I've been practising my starts.", "I can swim to the second buoy now. Dad came too, but slower."],
+    news: ["The new camp has a beach with flags. I've been practising my starts.", "I can swim to the second buoy now. Raj came too, but slower."],
     back: null, backNote: ""},
   crom: {sign: "From Om (koala counter)",
     food: "I ate it slowly so it would last. It lasted a long time.",
-    drink: "It's for Mum and Dad. I'm guarding it.",
+    drink: "It's for Meena and Raj. I'm guarding it.",
     made: "I keep it next to my koala notebook. It's very nice.",
     flower: "They're in a cup. I counted them. There are lots.",
     other: "Thank you. I'm six and I got a parcel. That's very good.",
-    letter: "I got a letter. Mum helped with the long words. I knew most of them.",
-    news: ["Fifty-one koalas now. Two were awake.", "We saw a koala on a fence post on the road. That counts. Dad says it counts."],
+    letter: "I got a letter. Meena helped with the long words. I knew most of them.",
+    news: ["Fifty-one koalas now. Two were awake.", "We saw a koala on a fence post on the road. That counts. Raj says it counts."],
     back: null, backNote: ""},
   crlachie: {sign: "Cheers, Lachie (and Mitch, who says hi)",
     food: "Ate it on the tailgate after a surf. Mitch tried to steal it. He failed.",

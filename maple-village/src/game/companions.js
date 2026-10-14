@@ -3,8 +3,8 @@
 //              the wine shop, home, your room and the Cocoa Room, one in the greenhouse and the
 //              mill, and the home fridge for magnets. Town souvenirs marked keep can go up too. F.keeps = {spot: item id}; putting one where
 //              another stands sends the old one back to the backpack, and a placed one can be taken back down.
-//   pets       adopted at the market's adoption corner (Noor), then given to someone in the family, who looks after
-//              it on the screen Mel picks. F.companions = [{id, kind, name, owner, scene, spot, since, patDay, playDay}].
+//   pets       adopted at the market's adoption corner (Noor), then given to one of your friends, who looks after
+//              it on the screen you pick. F.companions = [{id, kind, name, owner, scene, spot, since, patDay, playDay}].
 //              Tap a pet to pat it; when its owner is on the same screen they play together (a little xp, once a day).
 import { esc, dayKey, hash } from "../util.js";
 import { ITEMS } from "../data/items.js";
@@ -76,19 +76,19 @@ export const PETS = {
 };
 // where a pet can live, and the open floor spots it sits on there (it picks one when it moves in)
 export const PET_HOMES = {
-  home: {n: "Home (the living room)", spots: [[160, 520], [370, 520], [330, 330]], indoor: true}, kidroom: {n: "Evan's room", spots: [[160, 520], [360, 500]], indoor: true},
+  home: {n: "Home (the living room)", spots: [[160, 520], [370, 520], [330, 330]], indoor: true}, kidroom: {n: "The guest room", spots: [[160, 520], [360, 500]], indoor: true},
   room: {n: "Your room", spots: [[300, 560], [200, 300]], indoor: true}, garage: {n: "The garage", spots: [[220, 380], [330, 560]], indoor: true},
-  cottage: {n: "Ma Ma and Gong Gong's cottage", spots: [[180, 470], [360, 470]], indoor: true}, hanatheo: {n: "Mum and Dad's", spots: [[200, 470], [380, 500]], indoor: true},
-  tomiposy: {n: "Marcus and Angellina's", spots: [[200, 420], [380, 560]], indoor: true}, scoopshop: {n: "The Scoop Shack", spots: [[140, 450], [420, 440]], indoor: true},
+  cottage: {n: "Farid and Mei's cottage", spots: [[180, 470], [360, 470]], indoor: true}, hanatheo: {n: "Hana and Theo's", spots: [[200, 470], [380, 500]], indoor: true},
+  tomiposy: {n: "Tomi and Posy's", spots: [[200, 420], [380, 560]], indoor: true}, scoopshop: {n: "The Scoop Shack", spots: [[140, 450], [420, 440]], indoor: true},
   wineshop: {n: "The wine shop", spots: [[160, 470], [420, 470]], indoor: true}, 
-  base: {n: "Home base (the garden)", spots: [[200, 400], [330, 430], [420, 360]]}, orchard: {n: "Ma Ma's orchard", spots: [[260, 470], [150, 330]]},
+  base: {n: "Home base (the garden)", spots: [[200, 400], [330, 430], [420, 360]]}, orchard: {n: "The orchard", spots: [[260, 470], [150, 330]]},
   vineyard: {n: "The vineyard", spots: [[200, 560], [330, 570]]}, field: {n: "The field", spots: [[140, 520], [300, 440]]}, shore: {n: "The foreshore", spots: [[250, 470], [210, 300]]},
   bay: {n: "The bay (by the deck)", spots: [[260, 420], [300, 560]]}
 };
-export const OWNER_NAME = {bo: "Darren", farid: "Ma Ma", mei: "Gong Gong", hana: "Mum", theo: "Dad", tomi: "Marcus", posy: "Angellina"};
+export const OWNER_NAME = {bo: "Bo", farid: "Farid", mei: "Mei", hana: "Hana", theo: "Theo", tomi: "Tomi", posy: "Posy"};
 export const companions = F => (F.companions = F.companions || []);
 export const homesFor = kind => Object.keys(PET_HOMES).filter(h => !PETS[kind].indoor || PET_HOMES[h].indoor);
-// adopt: a pet item from the backpack goes to its new owner, living where Mel chose
+// adopt: a pet item from the backpack goes to its new owner, living where you chose
 export function adopt(F, item, owner, home){
   const it = ITEMS[item], kind = it && it.pet; if (!kind || !(F.inv[item] > 0) || !OWNER_NAME[owner] || !homesFor(kind).includes(home)) return null;
   const list = companions(F), taken = list.map(c => c.name), name = PETS[kind].names.find(n => !taken.includes(n)) || PETS[kind].names[0] + " " + (list.length + 1);
@@ -103,9 +103,9 @@ const PLAY = {kitten: ["{o} dangles a ribbon. {p} pounces!", "{p} curls up on {o
   bunny: ["{o} offers {p} a carrot top. Nibble nibble.", "{p} does a happy binky around {o}'s feet."], hamster: ["{o} lets {p} run across their hands.", "{p} stuffs both cheeks with seeds while {o} giggles."],
   goldfish: ["{o} sprinkles a pinch of flakes. {p} does a little twirl.", "{o} taps the bowl gently. {p} swims over to say hello."], budgie: ["{p} hops onto {o}'s finger and chirps a song.", "{o} whistles. {p} whistles back!"],
   tortoise: ["{o} feeds {p} a strawberry. Very, very slowly, it's gone.", "{p} pokes its head out to see {o}."], duckling: ["{p} waddles after {o} everywhere.", "{o} fills a little dish of water. {p} splashes in it."]};
-const OWNER_SAYS = {bo: ["Who's a good {k}? You are.", "{p} and I are watching the game later."], farid: ["Aiyo, {p} so cute! Ma Ma give you snack.", "{p} keeps Ma Ma company in the afternoon."],
-  mei: ["{p} and Gong Gong, two old friends.", "Gong Gong talks to {p} every morning."], hana: ["{p} came to Zumba with me! Well, watched.", "Isn't {p} the sweetest?"], theo: ["I'm drawing {p}. Hold still, {p}!", "{p} likes my piano playing."],
-  tomi: ["{p} is my new gym buddy, Zeh.", "Best present, Zeh. Seriously."], posy: ["{p} sits with me while I study.", "I love {p} so much. Thank you, Mel!"]};
+const OWNER_SAYS = {bo: ["Who's a good {k}? You are.", "{p} sits on the bench while I work. Measure twice, cut once, {p}."], farid: ["Look at {p}! I baked a little biscuit just for you.", "{p} keeps me company in the orchard. The trees like {p} too."],
+  mei: ["{p} and me, two old friends.", "I sing to {p} every morning. {p} listens."], hana: ["{p} came to Zumba with me, love! Well, watched.", "Isn't {p} the sweetest?"], theo: ["I'm sketching {p}. Hold still, {p}!", "{p} has been officially registered. I stamped it myself."],
+  tomi: ["{p} is my new gaming buddy. One more round, {p}?", "Best present ever. Seriously."], posy: ["{p} sits with me while I study.", "I love {p} so much. Thank you!"]};
 export const fill = (s, c) => s.replace(/\{o\}/g, OWNER_NAME[c.owner]).replace(/\{p\}/g, c.name).replace(/\{k\}/g, PETS[c.kind].n);
 export const playLine = c => fill(PLAY[c.kind][hash(c.id + dayKey()) % PLAY[c.kind].length], c);
 export const ownerLine = c => fill(OWNER_SAYS[c.owner][hash(c.id + dayKey() + "o") % OWNER_SAYS[c.owner].length], c);

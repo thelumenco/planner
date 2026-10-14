@@ -19,7 +19,7 @@ Object.entries(NEW).forEach(([id, [n, sell, what]]) => { if (!ITEMS[id]) ITEMS[i
 
 export function woodsState(F){ F.woods = F.woods || {}; return F.woods; }
 export const foragedToday = (F, day = dayKey()) => woodsState(F).forageDay === day;
-// -> {id, n, line} (already in the backpack) or null if Mel's foraged today
+// -> {id, n, line} (already in the backpack) or null if the player's foraged today
 export function forage(F, addInv, day = dayKey()){
   const w = woodsState(F); if (w.forageDay === day) return null;
   const f = FORAGE[seasonOf(day)], n = f.n + (f.id === "mushroom" && rainyOn(day) ? 1 : 0);
@@ -33,6 +33,6 @@ export function rangerPanel(F, wrenHere, day = dayKey()){
     <li><span class="wpic">${icon(f.id, 26)}</span><span class="wtxt"><b>In season: ${esc(it.n.toLowerCase())}</b><small>At the foraging patch, once a day.${f.id === "mushroom" ? " One more after rain." : ""} For ${esc(NEW[f.id][2])}.${foragedToday(F, day) ? " (You've been today.)" : ""}</small></span></li>
     <li><span class="wpic">${icon("trout", 26)}</span><span class="wtxt"><b>The waterfall pool</b><small>Brown trout, grayling (daytime) and minnows. Bring a rod and worms.</small></span></li>
     <li><span class="wpic">${icon("bike", 26)}</span><span class="wtxt"><b>Bike hire</b><small>By the cabin, at the station and in the town square. An hour for 5 coins.</small></span></li>
-    <li><span class="wpic">${icon("taxi", 26)}</span><span class="wtxt"><b>The river taxi</b><small>From the pool down to Makers' Lane, home, the lake and the sea, 7am to 9pm. The quick way to Ma Ma's.</small></span></li></ul>`;
+    <li><span class="wpic">${icon("taxi", 26)}</span><span class="wtxt"><b>The river taxi</b><small>From the pool down to Makers' Lane, home, the lake and the sea, 7am to 9pm. The quick way to the orchard and the flower farm.</small></span></li></ul>`;
   return h + shut;
 }

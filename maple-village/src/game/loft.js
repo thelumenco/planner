@@ -1,8 +1,8 @@
-// The drying loft (round 132), up the ladder in the barrel shed: what Mel learned in Cinque Terre, made at home with her
-// own produce. The slow things fetch the most at the market (Mel: effort should pay, and the longer it takes, the more).
+// The drying loft (round 132), up the ladder in the barrel shed: what the player learned in Cinque Terre, made at home with her
+// own produce. The slow things fetch the most at the market (effort should pay, and the longer it takes, the more).
 //   raisin wine   six bunches of her own grapes dry on the cane racks for 3 days (once Signor Bruno's shown her, at
 //                 the monorail harvest), then go into the little cask for 4 more: 3 bottles of raisin wine (36 each)
-//   limoncino     three lemons from Ma Ma's tree steep in a bottle for 5 days: 2 bottles (18 each)
+//   limoncino     three lemons from the orchard steep in a bottle for 5 days: 2 bottles (18 each)
 //   anchovies     six fresh anchovies (the sea, the bay) packed in salt for 4 days: 2 jars (15 each)
 //   pesto         at the mortar, right away (once Nonna Pina's shown her): basil and garlic from the greenhouse, pine
 //                 nuts, her own olive oil and any cheese: 2 jars (7 each; quick, so cheap)
@@ -15,7 +15,7 @@ import { ITEMS } from "../data/items.js";
 const DAY = 24*H;
 Object.assign(ITEMS, {
   w_raisin: {n: "Your raisin wine", kind: "gift", to: ["theo", "mei", "hana", "bo", "tomi"], price: 36, sell: 36, crafted: true, say: "Your own raisin wine? Amber, like honey. You MADE this? Just a tiny glass. Maybe two.", what: "dried on the racks and aged in the cask: the slowest thing you make"},
-  limoncino: {n: "Your limoncino", kind: "gift", to: ["hana", "farid", "posy", "bo"], price: 18, sell: 18, crafted: true, say: "Homemade limoncino from Ma Ma's lemons! Into the freezer. Then a tiny glass.", what: "steeped from Ma Ma's lemons: for the family, the market, or gelato"},
+  limoncino: {n: "Your limoncino", kind: "gift", to: ["hana", "farid", "posy", "bo"], price: 18, sell: 18, crafted: true, say: "Homemade limoncino from the orchard lemons! Into the freezer. Then a tiny glass.", what: "steeped from the orchard's lemons: for your friends, the market, or gelato"},
   anchovy_salt: {n: "Jar of salted anchovies", kind: "ingredient", price: 15, sell: 15, crafted: true, what: "packed in salt in the loft: anchovy and lemon toasts at the kitchen"}
 });
 export const LOFT = {
@@ -33,7 +33,7 @@ const grapesHave = inv => GRAPES.reduce((n, k) => n + (inv[k] || 0), 0);
 const cheeseOf = inv => ["cheese", ...Object.keys(inv).filter(k => /^chz_/.test(k))].find(k => inv[k] > 0);
 const take = (inv, k, n) => { inv[k] -= n; if (!inv[k]) delete inv[k]; };
 export const left = (b, now = Date.now(), days) => b ? Math.max(0, b.at + days*DAY - now) : 0;
-// what's missing for a batch (a list of words), or [] if Mel has it all
+// what's missing for a batch (a list of words), or [] if the player has it all
 export function missing(F, k){
   const inv = F.inv || {}, need = LOFT[k].need || {}, out = [];
   Object.entries(need).forEach(([id, n]) => { const have = id === "grapes" ? grapesHave(inv) : id === "cheese" ? (cheeseOf(inv) ? 1 : 0) : inv[id] || 0; if (have < n) out.push(`${n - have} more ${id === "grapes" ? "bunches of grapes" : id === "pinenuts" ? "bag of pine nuts" : id === "oliveoil" ? "bottle of olive oil" : id}`); });
@@ -66,7 +66,7 @@ export function loftPanel(F, now = Date.now()){
   else if (L.rack) { const t = left(L.rack, now, LOFT.rack.days); h += row(F, "rack", "The cane racks: drying grapes", "grape_white", t ? `Six bunches, slowly turning to raisins: ${hrs(t)} to go.` : "Wrinkled and sweet: ready for the cask.") + `${t ? "" : `<button class="btn small primary" data-lf="collect:rack">Into the cask</button>`}</li>`; }
   else { const m = missing(F, "rack"); h += row(F, "rack", "Raisin wine: lay grapes on the racks", "grape_white", `Six bunches of your grapes (from the barrel shed's crates). 3 days on the racks, then 4 in the cask: 3 bottles, 36 each.${m.length ? ` You need ${m.join(", ")}.` : ""}`) + `<button class="btn small primary" data-lf="start:rack" ${m.length ? "disabled" : ""}>Lay them out</button></li>`; }
   // the steeping shelf (limoncino) and the salting barrel (anchovies)
-  for (const [k, title, pic, what] of [["lemon", "Limoncino", "limoncino", "Three lemons from Ma Ma's tree, peeled and steeped for 5 days: 2 bottles, 18 each."], ["salt", "Salted anchovies", "anchovy_salt", "Six fresh anchovies from the sea, packed in salt for 4 days: 2 jars, 15 each."]]) {
+  for (const [k, title, pic, what] of [["lemon", "Limoncino", "limoncino", "Three lemons from the orchard, peeled and steeped for 5 days: 2 bottles, 18 each."], ["salt", "Salted anchovies", "anchovy_salt", "Six fresh anchovies from the sea, packed in salt for 4 days: 2 jars, 15 each."]]) {
     const b = L[k], t = b ? left(b, now, LOFT[k].days) : 0, m = missing(F, k);
     if (b) h += row(F, k, `${title}: ${t ? "on its way" : "ready!"}`, pic, t ? `Ready in ${hrs(t)}.` : "Done. Take it down.") + `${t ? "" : `<button class="btn small primary" data-lf="collect:${k}">Take it</button>`}</li>`;
     else h += row(F, k, title, pic, `${what}${m.length ? ` You need ${m.join(", ")}.` : ""}`) + `<button class="btn small primary" data-lf="start:${k}" ${m.length ? "disabled" : ""}>Start</button></li>`;

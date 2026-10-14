@@ -1,4 +1,4 @@
-// Bellbird Valley's rooms (round 142): every room at the six Vines stops has a panel when Mel taps its middle. The
+// Bellbird Valley's rooms (round 142): every room at the six Vines stops has a panel when you tap its middle. The
 // shops sell TOWN_GOODS (bought with the shared data-rbuy buttons); the cafés have things to eat or drink there and
 // then (data-bb="treat:<room>:<k>"); a few rooms are just for looking (the platypus window, the noticeboard). The op
 // shop's treasures change every day: four out of the box at a time. The chocolaterie has a free tasting once a day.
@@ -42,7 +42,7 @@ export const TREATS = {
   bv_mushcafe: {soup: ["Mushroom soup", 5, "Thick, earthy, with crusty bread and a swirl of cream. Warms you right through."], toastie: ["A toasted sandwich", 4, "Cheese and tomato, crisp from the wood stove."]},
   bv_pub: {parma: ["A chicken parma and chips", 10, "A schnitzel the size of the plate, ham, sauce and cheese on top, chips underneath. The Anchor's famous for it."], squash: ["A lemon squash", 3, "Fizzy, sweet, sour, very cold."]},
   bv_kiosk: {hotchips: ["Hot chips", 4, "Salty, hot, in a paper cone, eaten at the railing with the wind in your hair."], icecream: ["An ice cream", 3, "Vanilla in a cone, melting fast in the sea breeze."]},
-  bv_slsc: {sizzle: ["A sausage sizzle", 3, "A snag in white bread with onions and sauce. For the club."], juice: ["A frozen juice stick", 2, "Blue. Just blue. Evan's tongue will be blue for an hour."]},
+  bv_slsc: {sizzle: ["A sausage sizzle", 3, "A snag in white bread with onions and sauce. For the club."], juice: ["A frozen juice stick", 2, "Blue. Just blue. Your tongue will be blue for an hour."]},
   bv_laundry: {bananabread: ["Banana bread", 4, "Thick, toasted, with butter. The best on the coast, everyone says, and they're right."], longblack: ["A long black", 4, "Strong, hot, while the washing goes round."]},
   // the Tablelands (round 158)
   bv_tcafe: {pie: ["A hot pie", 4, "Steak and pepper, the pastry flaking everywhere, a dollop of sauce on top. Eaten at the window with the mist outside."], scone: ["A pumpkin scone", 3, "Golden, soft, warm, with butter melting in. The café's famous for them."], hotchoc: ["A hot chocolate", 4, "A big mug, a marshmallow bobbing on top, for warming your hands after the falls."]},
@@ -78,19 +78,18 @@ export function chocTaste(F){ if (!chocFree(F)) return false; bbState(F).choc = 
 export const platypusOdds = hm => hm < 9*60 || hm >= 17*60 ? .7 : .35;
 export function watchWater(F, hm, rng = Math.random){ const seen = rng() < platypusOdds(hm); if (seen) { const s = bbState(F); s.platypus = (s.platypus || 0) + 1; } return seen; }
 // the camp kitchen's noticeboard: notes from other campers
-export const NOTES = ["LOST: one blue thong, left foot. If found, keep it, I've given up. — Ron (site 4)", "Free to a good home: half a bag of charcoal and a very good tea towel.", "Kids' cricket on the oval, 4pm, everyone welcome. Bring a bat if you've got one, we've only got the one.",
-  "To whoever left the lemon cake on the table: you're a legend. — the Nguyens", "Saw a platypus at the bend upstream, 6am, two days running! — Hanne", "Bev's doing scones Saturday. Biscuit the dog is NOT allowed any more scones.", "Firewood's at the store, $5 a bag. Please don't take the fence.", "Rope swing is OPEN. Rope swing is FUN. Rope swing is not for adults over 90kg. — management"];
+export const NOTES = ["LOST: one blue thong, left foot. If found, keep it, I've given up. Ron (site 4)", "Free to a good home: half a bag of charcoal and a very good tea towel.", "Kids' cricket on the oval, 4pm, everyone welcome. Bring a bat if you've got one, we've only got the one.",
+  "To whoever left the lemon cake on the table: you're a legend. From the Nguyens", "Saw a platypus at the bend upstream, 6am, two days running! Hanne", "Bev's doing scones Saturday. Biscuit the dog is NOT allowed any more scones.", "Firewood's at the store, $5 a bag. Please don't take the fence.", "Rope swing is OPEN. Rope swing is FUN. Rope swing is not for adults over 90kg. The Management"];
 
 // each room's panel
 export function bbRoomPanel(F, room, o = {}){
-  const evan = false;
   switch (room) {
-    case "bv_store": return head(room, `Mrs Dunn has run the store for forty years. There's a post office counter, a jar of Freddos, and a fly screen door that bangs.`) + treats(F, room) + listOf(F, shopGoods(room), "Off the shelves") + (("")) + shut;
-    case "bv_shed": return head(room, `No one minds the shed: everything has a price on a bit of cardboard, and the money goes in the honesty tin. Mel counts out the right coins, carefully.`) + treats(F, room, "From the honesty box") + listOf(F, shopGoods(room), "To take home") + shut;
+    case "bv_store": return head(room, `Mrs Dunn has run the store for forty years. There's a post office counter, a jar of Freddos, and a fly screen door that bangs.`) + treats(F, room) + listOf(F, shopGoods(room), "Off the shelves") + shut;
+    case "bv_shed": return head(room, `No one minds the shed: everything has a price on a bit of cardboard, and the money goes in the honesty tin. You count out the right coins, carefully.`) + treats(F, room, "From the honesty box") + listOf(F, shopGoods(room), "To take home") + shut;
     case "bv_opshop": { const today = opshopToday();
       return head(room, `Joan and Marg run the op shop on Tuesdays and every other day they feel like it. The money goes to the bush fire brigade. New things come in every day.`, "stripe") + listOf(F, today, "Today's treasures") + `<p class="muted">Different things tomorrow. "You never know what's coming in," says Marg. "Last week, a canoe."</p>` + shut; }
     case "bv_coffee": return head(room, `Rosie's coffee caravan opens at dawn for the balloon crowd. The chalkboard has three things on it, and they're all good.`) + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut;
-    case "bv_balloonshed": return head(room, `Rosie's dad Gus flies the balloons: dawn, and the golden hour before sunset. The baskets are taller than Evan.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:balloon">A balloon ride</button></div>` + listOf(F, shopGoods(room), "From the shop") + shut;
+    case "bv_balloonshed": return head(room, `Rosie's dad Gus flies the balloons: dawn, and the golden hour before sunset. The baskets come up to your chest.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:balloon">A balloon ride</button></div>` + listOf(F, shopGoods(room), "From the shop") + shut;
     case "bv_gallery": return head(room, `Paintings of the valley by local artists, a long window over the real thing, and scones that come out every twenty minutes.`) + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut;
     case "bv_tasting": return head(room, `Kel's family have grown grapes here for three generations. Pinot the cellar dog is asleep under the bar, as usual.`, "stripe") + treats(F, room, "A tasting") + listOf(F, shopGoods(room), "Bottles to take home") + cuttingsList(F) + shut;
     case "bv_cave": return head(room, `The barrel cave, dug into the hill. Racks of sparkling wine stand tilted neck-down in the cool, waiting for someone to give each bottle a little turn.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:riddle">Help Jono turn the bottles</button></div>` + shut;
@@ -117,7 +116,7 @@ export function bbRoomPanel(F, room, o = {}){
     case "bv_pub": return head(room, `The Anchor: a fire in winter, the doors open in summer, a dartboard, and a ship's wheel over the bar. The parma's famous up and down the coast.`, "stripe") + treats(F, room) + shut;
     case "bv_smokehouse": return head(room, `Rows of fish going gold in the smoke, and the smell of woodchips. Old Ned's family have smoked fish here since 1890.`) + listOf(F, shopGoods(room), "From the smokehouse") + shut;
     case "bv_kiosk": return head(room, `The lookout kiosk: hot chips, coffee, and a map of every ship wrecked on this coast (there are a lot).`) + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut;
-    case "bv_slsc": return head(room, `The surf lifesaving club: volunteers on patrol every weekend since 1932. The canteen helps pay for the rescue boards.`, "stripe") + treats(F, room) + listOf(F, shopGoods(room), "For little lifesavers") + `<div class="actions"><button class="btn alt" data-bba="open:nippers">Nippers for Evan</button></div>` + shut;
+    case "bv_slsc": return head(room, `The surf lifesaving club: volunteers on patrol every weekend since 1932. The canteen helps pay for the rescue boards.`, "stripe") + treats(F, room) + listOf(F, shopGoods(room), "From the club shop") + `<div class="actions"><button class="btn alt" data-bba="open:nippers">A surf club morning</button></div>` + shut;
     case "bv_hide": return head(room, `A low timber hide in the dunes, a long window onto the beach. The penguins come home at dusk, after a day fishing at sea.`) + `<div class="actions"><button class="btn primary" data-bba="open:penguins">Watch for the penguins</button></div>` + shut;
     case "bv_parkstore": return head(room, `The park store sells a bit of everything, and one scoop of bird seed a go: "The parrots'd eat the whole bag and then the bag," says Fay.`) + listOf(F, shopGoods(room), "Off the shelves") + shut;
     case "bv_laundry": return head(room, `The laundry café: washing machines on one side, a coffee machine on the other, a book-swap shelf, and banana bread the whole coast talks about.`) + treats(F, room) + `<p class="muted">The book-swap shelf: take one, leave one. Someone's left a very battered copy of a sailing book.</p>` + shut;

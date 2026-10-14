@@ -1,4 +1,4 @@
-// Bellbird Valley's Coast Road (round 148, Mel): the second region, inspired by the Great Ocean Road. The road leaves
+// Bellbird Valley's Coast Road (round 148): the second region, inspired by the Great Ocean Road. The road leaves
 // the valley at Valley Gate and runs along the cliffs: surf beaches, a white lighthouse, a rainforest gully that
 // drops to a hidden cove, a fishing harbour, sea stacks with a penguin parade, and a caravan park with koalas and king
 // parrots. The sea's on every stop. Same system as the Vines (data/bellbird.js): every stop's a van "town" of two
@@ -13,7 +13,7 @@
 
 const VAN = {by: "van", fare: 0, free: [], outFrom: 7*60, outTo: 18*60, backTo: 22*60};
 const FAM = ["hana", "theo", "farid", "mei", "bo", "tomi", "posy"];
-// the family's wander points: two each per screen, picked from a screen's open ground
+// your friends' wander points: two each per screen, picked from a screen's open ground
 const famSpots = per => Object.fromEntries(FAM.map((id, i) => [id, Object.fromEntries(Object.entries(per).map(([sc, pts]) => [sc, [pts[i % pts.length], pts[(i + 3) % pts.length]]]))]));
 const room = (door, n, say) => ({door, n, music: door.replace(/^bv/, "bv_"), party: [[200, 560], [330, 560], [120, 540], [420, 540]], say});
 
@@ -21,11 +21,9 @@ export const CR_TOWNS = {
   bv_breakwater: {...VAN, n: "Breakwater", region: "coast", screens: ["cw_beach", "cw_street"], arrive: ["cw_beach", [130, 560]], station: "bvvan_breakwater", music: "bb_breakwater",
     blurb: "A surf town where the Coast Road meets the sea: a long beach with good little waves, a surf shop, fish and chips, and a bakery with a queue.",
     arriveLine: "The Coast Road! Round the last bend and there it is: the sea, very blue, a long curve of beach, and surfers bobbing out past the break.",
-    evanArrive: ["THE SEA! the big sea!", "waves, Mama! big waves!", "can I go in? can I?"],
-    evanScreen: {cw_beach: ["sand! sand everywhere!", "a surfboard! standing up!"], cw_street: ["chips! I smell chips!", "a seagull took that man's chip!"]},
     hints: {cw_beach: "Breakwater: the surf beach, the surf shop and the van. East: the main street.", cw_street: "The main street: fish and chips, the bakery, the Norfolk pines and the esplanade. West: back to the beach."},
     spots: famSpots({cw_beach: [[250, 420], [330, 400], [220, 480], [380, 330], [180, 400], [300, 470]], cw_street: [[220, 380], [320, 400], [260, 450], [180, 330], [380, 340], [300, 330]]}),
-    acts: {   // round 150: what the family does here (and nowhere else)
+    acts: {   // round 150: what your friends do here (and nowhere else)
       tomi: {cw_beach: {act: "bodyboard", at: [220, 300], dir: 1}},
       hana: {cw_beach: {act: "yoga", at: [96, 400], dir: 1, hours: [[7*60, 11*60], [16*60, 18*60 + 30]]}}
     }, rooms: {
@@ -34,10 +32,10 @@ export const CR_TOWNS = {
       bv_bakery: room("bvbakery", "Crumb & Co. bakery", "The bakery: pies in the warmer, vanilla slices, cinnamon scrolls, and a queue of sandy surfers out the door.")},
     lines: {hana: ["The sea air! I can feel my skin thanking me.", "Look at the little kids on the foam boards. So brave."],
       theo: ["Those Norfolk pines must be a hundred years old.", "Fish and chips on the beach. Some things you don't improve on."],
-      farid: ["Ma Ma will watch from here. Too many waves.", "The bakery smells like heaven. Ma Ma is going in."],
-      mei: ["Gong Gong used to swim like that. Long time ago.", "Good wind today. The surfers are happy."],
+      farid: ["I'll watch from here, thank you. Too many waves for me.", "That bakery smells like my uncle's on a Saturday. I'm going in."],
+      mei: ["I'll sit on the sand and listen to the waves.", "Good wind today. The surfers are happy."],
       bo: ["I'm getting a pie. Then another pie.", "Watch the gulls. They're professionals."],
-      tomi: ["Zeh, I'm getting on a board. Film it. Don't film the falling.", "This is the life."],
+      tomi: ["I'm getting on a board. Film it. Don't film the falling.", "This is the life."],
       posy: ["The water's so clear you can see the sand ripples.", "I want a little beach house here one day."]},
     say: {bvsurf: "The surf: little rolling waves, perfect for learning. Jet's lessons are on the hour, from the flags.",
       bvflags: "The red and yellow flags: swim between them. The lifeguard waves from her tall chair.",
@@ -48,8 +46,6 @@ export const CR_TOWNS = {
   bv_lighthouse: {...VAN, n: "Lighthouse Point", region: "coast", screens: ["cl_light", "cl_cliff"], arrive: ["cl_light", [150, 560]], station: "bvvan_lighthouse", music: "bb_lighthouse",
     blurb: "A white lighthouse with a red cap on a headland of heath and wildflowers, the old keeper's cottage, and a cliff walk where the whales go by in winter.",
     arriveLine: "Up on the headland: the white lighthouse with its red cap, the wind in the heath, and the whole ocean spread out below, glittering.",
-    evanArrive: ["a LIGHTHOUSE! a real one!", "it's so tall, Mama!", "is there a light inside?"],
-    evanScreen: {cl_light: ["the lighthouse has a red hat!", "a little house!"], cl_cliff: ["the sea is way down there!", "is that a whale? IS IT?"]},
     hints: {cl_light: "Lighthouse Point: the lighthouse, the keeper's cottage tearoom and the van. South: the cliff walk.", cl_cliff: "The cliff walk: the whale lookout, the heath and the gift shop. North: back to the lighthouse."},
     spots: famSpots({cl_light: [[260, 420], [320, 470], [220, 380], [300, 340], [380, 430], [200, 470]], cl_cliff: [[200, 380], [260, 440], [180, 300], [300, 300], [220, 520], [280, 560]]}),
     acts: {
@@ -60,11 +56,11 @@ export const CR_TOWNS = {
       bv_tearoom: room("bvtearoom", "The keeper's cottage tearoom", "The keeper's cottage, now a tearoom: lace curtains, a ship in a bottle, scones on the dresser, and the old logbooks on a shelf."),
       bv_giftshop: room("bvgiftshop", "The Point gift shop", "The gift shop: lighthouse models, shell wind chimes, postcards and tea towels, and the sound of the sea through the open door.")},
     lines: {hana: ["Imagine living out here. Just you, the light and the sea.", "Look at the wildflowers in the heath. Purple and yellow."],
-      theo: ["A first-order lens. They don't make them like that any more.", "I'd like to paint that lighthouse. In this light."],
-      farid: ["Very windy. Ma Ma's hat nearly went to sea.", "Scones in the cottage. Ma Ma is ready."],
-      mei: ["Gong Gong will look for whales. You go on.", "The old keepers wrote down every ship. Every one."],
+      theo: ["A first-order lens. They don't make them like that any more.", "I'd like to sketch that lighthouse. In this light."],
+      farid: ["Very windy. My hat nearly went to sea.", "Scones in the cottage! I want to see how they do theirs."],
+      mei: ["I'll stay and look for whales. You go on.", "The old keepers wrote down every ship. Every one."],
       bo: ["How many stairs, do you reckon? Bet you it's over a hundred.", "Whale watching. Patience. Snacks help."],
-      tomi: ["Zeh, the view from the top is going to be unreal.", "This wind! Hold onto Evan."],
+      tomi: ["The view from the top is going to be unreal.", "This wind! Hold onto your hat."],
       posy: ["The light keeps changing on the water. I need to paint it.", "Ships used to see this light from twenty miles out."]},
     say: {bvwhales: "The whale lookout: a railing on the cliff edge, a sign of whale shapes, and the whole ocean in front of you.",
       bvheath: "The coastal heath: low, wind-bent bushes, purple and yellow flowers, and honeyeaters darting about.",
@@ -74,8 +70,6 @@ export const CR_TOWNS = {
   bv_gully: {...VAN, n: "Fern Gully", region: "coast", screens: ["cg_ferns", "cg_cove"], arrive: ["cg_ferns", [150, 560]], station: "bvvan_gully", music: "bb_gully",
     blurb: "Cool rainforest in the hills behind the coast: giant tree ferns, mountain ash, a treetop walk, and a creek that falls down a waterfall onto a hidden cove.",
     arriveLine: "Into the rainforest: suddenly cool and green and dripping, tree ferns taller than the van, and somewhere below, the sound of a waterfall and the sea.",
-    evanArrive: ["it's like a dinosaur forest!", "giant ferns!", "where's the waterfall?"],
-    evanScreen: {cg_ferns: ["the trees go up to the sky!", "a fern like an umbrella!"], cg_cove: ["a waterfall on the beach!", "a secret beach, Mama!"]},
     hints: {cg_ferns: "Fern Gully: the tree ferns, the treetop walk, the ranger's hut, the mushroom café and the van. South: down to the hidden cove.", cg_cove: "The hidden cove: the waterfall onto the sand, the glow-worm grotto in the cliff, and the sea. North: back up to the ferns."},
     spots: famSpots({cg_ferns: [[260, 430], [320, 470], [220, 500], [300, 400], [380, 470], [200, 440]], cg_cove: [[260, 300], [320, 340], [220, 380], [300, 260], [380, 360], [200, 320]]}),
     acts: {
@@ -87,10 +81,10 @@ export const CR_TOWNS = {
       bv_grotto: room("bvgrotto", "The glow-worm grotto", "The glow-worm grotto: a low overhang in the cliff, cool and dripping. In the dark, the ceiling is speckled with tiny blue-green stars.")},
     lines: {hana: ["Smell that! Wet earth and ferns.", "A beach at the bottom of a rainforest. How is that real?"],
       theo: ["Look at the fungi on that log. Orange, like little shelves.", "Mountain ash. The tallest flowering trees in the world."],
-      farid: ["So cool here. Ma Ma likes it.", "Mushroom soup in the café. Ma Ma's choice."],
-      mei: ["Listen. A lyrebird. Copying a camera.", "Gong Gong will rest by the creek."],
+      farid: ["So cool and green. I've said hello to every fern.", "Mushroom soup in the café. I'm asking for the recipe."],
+      mei: ["Listen. A lyrebird. Copying a camera.", "I'll rest by the creek a while."],
       bo: ["Treetop walk. I'm counting the steps. All of them.", "Glow-worms are just shiny bugs, but I'm still excited."],
-      tomi: ["Zeh, this is like a movie.", "A waterfall straight onto the beach. Unreal."],
+      tomi: ["This is like a movie.", "A waterfall straight onto the beach. Unreal."],
       posy: ["Everything's dripping and green. I love it.", "The glow-worms only come out in the dark. Can we stay?"]},
     say: {bvtreetop: "The treetop walk: a steel walkway high up in the canopy, swaying a little, with the ferns far below.",
       bvcreek: "The creek: clear brown water tumbling over mossy rocks, on its way down to the sea.",
@@ -101,8 +95,6 @@ export const CR_TOWNS = {
   bv_harbour: {...VAN, n: "Fisher's Harbour", region: "coast", screens: ["ch_wharf", "ch_cottages"], arrive: ["ch_wharf", [120, 330]], station: "bvvan_harbour", music: "bb_harbour",
     blurb: "A working fishing harbour: a timber wharf, cray boats, the fishermen's co-op, an old pub, a smokehouse, and a row of little cottages along the bay.",
     arriveLine: "Down into the harbour: cray boats tied up at the wharf, gulls on every post, ropes and pots stacked high, and the smell of salt and smoke.",
-    evanArrive: ["BOATS! lots of boats!", "that bird is staring at me", "can we go on a boat?"],
-    evanScreen: {ch_wharf: ["a boat with a cage!", "fishies in the water!"], ch_cottages: ["little houses!", "a tiny beach!"]},
     hints: {ch_wharf: "Fisher's Harbour: the wharf and the boats, the co-op and the van. East: the cottages.", ch_cottages: "The cottages along the bay: the old pub, the smokehouse and a little beach. West: back to the wharf."},
     spots: famSpots({ch_wharf: [[200, 300], [260, 320], [380, 300], [440, 330], [300, 280], [180, 340]], ch_cottages: [[200, 340], [300, 380], [380, 340], [260, 450], [160, 400], [420, 400]]}),
     acts: {
@@ -113,11 +105,11 @@ export const CR_TOWNS = {
       bv_pub: room("bvpub", "The Anchor Hotel", "The Anchor: an old pub with a fire, a dartboard, a ship's wheel over the bar, and photos of every big catch since 1920."),
       bv_smokehouse: room("bvsmokehouse", "The smokehouse", "The smokehouse: rows of fish turning gold in the smoke, the smell of woodchips, and jars of smoked trout pâté.")},
     lines: {hana: ["The colours of the boats! Red, blue, yellow.", "Those little cottages are like a postcard."],
-      theo: ["Look at the old timber in that wharf. Generations of it.", "A crayfish fresh off the boat. That's dinner sorted."],
-      farid: ["Ma Ma wants prawns. Straight off the boat. The best.", "Very fresh fish. Ma Ma can tell by the eyes."],
-      mei: ["Gong Gong grew up near a harbour like this.", "The fishermen are back early. Good catch."],
+      theo: ["Look at the old timber in that wharf. Generations of it.", "A crayfish fresh off the boat. That's supper sorted, officially."],
+      farid: ["Prawns straight off the boat. The best there is.", "Very fresh fish. You can tell by the eyes."],
+      mei: ["I could sit on that wharf with a rod all day.", "The fishermen are back early. Good catch."],
       bo: ["I'm getting chips. I'll guard them with my life.", "Those gulls have no fear."],
-      tomi: ["Zeh, imagine heading out at four in the morning.", "Smoked fish. Yes."],
+      tomi: ["Imagine heading out at four in the morning.", "Smoked fish. Yes."],
       posy: ["The pub's from 1920! Imagine the stories.", "I love the little beach by the cottages."]},
     say: {bvboats: "The cray boats: blue and red, stacked with cane pots. Mags is getting hers ready for the morning.",
       bvgulls: "The gulls: one on every post, watching every chip in a hundred metres.",
@@ -128,8 +120,6 @@ export const CR_TOWNS = {
   bv_sisters: {...VAN, n: "The Sisters", region: "coast", screens: ["cs_lookout", "cs_beach"], arrive: ["cs_lookout", [130, 310]], station: "bvvan_sisters", music: "bb_sisters",
     blurb: "Golden limestone stacks standing in the surf off the cliffs, a boardwalk lookout, steps down to the beach, and little penguins coming home at dusk.",
     arriveLine: "Out to the cliffs: the boardwalk, the wind, and there they are below, the Sisters, great golden stacks of rock standing in the white surf.",
-    evanArrive: ["big rocks in the sea!", "they're like giants, Mama!", "is it windy? IT IS WINDY"],
-    evanScreen: {cs_lookout: ["the rocks are in the WATER", "they're so big!"], cs_beach: ["the giant rocks are so close!", "penguins live here!"]},
     hints: {cs_lookout: "The Sisters: the boardwalk lookout, the kiosk and the van. Down the steps: the beach.", cs_beach: "The beach below the cliffs: the surf club, the penguin hide, and the stacks right there. Up the steps: the lookout."},
     spots: famSpots({cs_lookout: [[220, 330], [300, 360], [360, 320], [260, 390], [180, 360], [420, 360]], cs_beach: [[200, 300], [260, 360], [320, 280], [220, 400], [380, 380], [300, 410]]}),
     acts: {
@@ -141,10 +131,10 @@ export const CR_TOWNS = {
       bv_hide: room("bvhide", "The penguin hide", "The penguin hide: a low timber shelter in the dunes, benches, a long window onto the beach, and a sign: no torches, no flash, whisper.")},
     lines: {hana: ["They're so golden in this light.", "Penguins! Tiny ones! I can't wait."],
       theo: ["Thousands of years of waves did that.", "There used to be more of them. The sea takes them, one by one."],
-      farid: ["Very beautiful. Ma Ma will take a photo. Many photos.", "Steps down to the beach. Ma Ma counts. Many steps."],
-      mei: ["Gong Gong likes the wind. It blows the cobwebs away.", "Look for shells, Ma Ma."],
+      farid: ["Very beautiful. I'll take a photo. Many photos.", "So many steps down to the beach. I'm counting every one."],
+      mei: ["I like the wind here. It blows the cobwebs away.", "Look for shells, Farid."],
       bo: ["The light at sunset here is meant to be crazy.", "Hot chips at a lookout. Correct."],
-      tomi: ["Zeh, this is the photo. This is the one.", "Imagine the shipwrecks out there."],
+      tomi: ["This is the photo. This is the one.", "Imagine the shipwrecks out there."],
       posy: ["The penguins come home every single night. Every night!", "It's like the edge of the world."]},
     say: {bvplatform: "The lookout platform: the boardwalk ends at a railing over the cliff, and the Sisters stand in the surf below.",
       bvpenguins: "The shoreline where the penguins come in: little tracks in the sand, and a rope to keep people back.",
@@ -154,9 +144,7 @@ export const CR_TOWNS = {
   bv_cove: {...VAN, n: "Koala Cove", region: "coast", screens: ["cc_park", "cc_mouth"], arrive: ["cc_park", [150, 560]], station: "bvvan_cove", music: "bb_cove",
     blurb: "A caravan park among the gums where a river meets the sea: koalas asleep in the branches, king parrots that land on your arm, and the beach just across the road.",
     arriveLine: "Into the caravan park: big gums, koalas asleep in the forks, red and green king parrots on every railing, and the sound of the surf across the road.",
-    evanArrive: ["KOALAS! up in the tree!", "red birds! red and green birds!", "can we stay forever?"],
-    evanScreen: {cc_park: ["a parrot on that man's head!", "the koala's asleep"], cc_mouth: ["the river goes into the sea!", "Nippers! I want to do Nippers!"]},
-    hints: {cc_park: "Koala Cove: the caravan park, the king parrots, the koala gums, the park store, the laundry café and the van. East: the river mouth.", cc_mouth: "The river mouth: the beach, Nippers on the sand, and the rec hall. West: back to the park."},
+    hints: {cc_park: "Koala Cove: the caravan park, the king parrots, the koala gums, the park store, the laundry café and the van. East: the river mouth.", cc_mouth: "The river mouth: the beach, Coach Dimi's surf club mornings on the sand, and the rec hall. West: back to the park."},
     spots: famSpots({cc_park: [[260, 420], [320, 460], [220, 480], [300, 380], [380, 470], [200, 400]], cc_mouth: [[220, 360], [300, 380], [380, 340], [260, 430], [180, 420], [420, 420]]}),
     acts: {
       hana: {cc_park: {act: "parrot", at: [236, 440], dir: 1}},
@@ -168,14 +156,14 @@ export const CR_TOWNS = {
       bv_rechall: room("bvrechall", "The rec hall", "The rec hall: a ping-pong table, a piano, jigsaws, and a board of everyone's high scores on the old pinball machine.")},
     lines: {hana: ["A parrot just landed on me! Look!", "Koalas! Three in that one tree!"],
       theo: ["Caravan parks haven't changed since I was a kid. I love that.", "The river mouth's moved since last time. The sea decides."],
-      farid: ["The birds are so bright. Like little lanterns.", "Ma Ma will do the washing. Then coffee."],
-      mei: ["Gong Gong will sit under the tree. Watch the koalas sleep.", "Quoits! Gong Gong was champion, once."],
+      farid: ["The birds are so bright. Like little lanterns.", "I'll put the washing on. Then coffee and banana bread."],
+      mei: ["I'll sit under the tree and watch the koalas sleep.", "Quoits! I was champion, once."],
       bo: ["Banana bread from a laundry. Only on the coast.", "That koala hasn't moved in an hour. Goals."],
-      tomi: ["Zeh, the river and the sea right next to each other.", "Nippers! Evan's going to be a lifesaver."],
+      tomi: ["The river and the sea, right next to each other.", "Coach Dimi does a grown-ups' morning. Beach flags! I'm in."],
       posy: ["I'm writing postcards to everyone. Everyone.", "The parrots are so cheeky."]},
     say: {bvparrots: "The king parrots: red heads, green wings, very bold. They'll land on your arm if you stand still.",
       bvkoalas: "The koala gums: look up. One, two, three koalas asleep in the forks, one with a baby on her back.",
-      bvnippers: "Nippers on the beach: little lifesavers in red and yellow caps, running to the flags.",
+      bvnippers: "Coach Dimi's surf club mornings: red and yellow caps, a row of beach flags in the sand and a buoy past the break. Grown-ups welcome.",
       bvrivermouth: "The river mouth: brown river water meeting the blue sea, pelicans standing about.",
       bvparkstore: "The park store: a timber shop with an ice-cream sign and a parrot on the roof.",
       bvlaundry: "The laundry café: washing flapping on the line out the back, coffee smell out the front.",
@@ -221,7 +209,7 @@ export const CR_PLACES = {
   bvparrots: P("cc_park", "The king parrots", [270, 400], [270, 330], "The king parrots."), bvkoalas: P("cc_park", "The koala gums", [460, 420], [460, 300], "The koalas."),
   bvparkstore: P("cc_park", "The park store", [130, 256], [130, 150], "The park store."), bvlaundry: P("cc_park", "The laundry café", [390, 256], [390, 150], "The laundry café."),
   bvToMouth: P("cc_park", "To the river mouth", [504, 480], [476, 420], "East to the river mouth.", {bridge: "cc_mouth"}),
-  bvnippers: P("cc_mouth", "Nippers", [330, 440], [330, 380], "Nippers."), bvrivermouth: P("cc_mouth", "The river mouth", [240, 340], [240, 280], "The river mouth."),
+  bvnippers: P("cc_mouth", "The surf club morning", [330, 440], [330, 380], "Coach Dimi's surf club morning."), bvrivermouth: P("cc_mouth", "The river mouth", [240, 340], [240, 280], "The river mouth."),
   bvrechall: P("cc_mouth", "The rec hall", [400, 256], [400, 150], "The rec hall."),
   bvToPark: P("cc_mouth", "Back to the park", [16, 480], [44, 420], "West to the park.", {bridge: "cc_park"})
 };
@@ -278,13 +266,13 @@ export const CR_GOODS = {
   honey_heath: {n: "Coastal heath honey", kind: "ingredient", price: 7, sell: 4, shop: "bv_mushcafe", art: ["jar", "#E3B04B", "#9DAA78"], what: "for gelato and bonbons: floral and a bit wild, from the hives on the heath"},
   scallop: {n: "Scallops", kind: "ingredient", price: 7, sell: 4, shop: "bv_coop", art: ["disc", "#F3E7C8", "#E8913A"], what: "scallop pies at the kitchen (a Coast Road special)"},
   b_pate: {n: "Smoked trout pâté", kind: "gift", to: ["theo", "mei", "bo", "hana"], price: 8, shop: "bv_smokehouse", art: ["jar", "#E3B47A", "#8A5A3A"], say: "Smoked trout pâté! On crackers, with a squeeze of lemon. Gone in a minute."},
-  b_smoked: {n: "A whole smoked trout", kind: "gift", to: ["mei", "farid", "theo"], price: 10, shop: "bv_smokehouse", art: ["fish", "#D9A05A"], say: "A smoked trout, golden all over. Gong Gong is very happy."},
+  b_smoked: {n: "A whole smoked trout", kind: "gift", to: ["mei", "farid", "theo"], price: 10, shop: "bv_smokehouse", art: ["fish", "#D9A05A"], say: "A smoked trout, golden all over. That's supper sorted."},
   b_postcard: {n: "A postcard of the Sisters", kind: "gift", to: "family", price: 2, shop: "bv_kiosk", art: ["box", "#E8913A", "#4F93B4"], say: "A postcard of those rocks at sunset! I'm putting it on the fridge."},
   b_penguin: {n: "Plush little penguin", kind: "gift", to: ["posy", "farid"], price: 9, shop: "bv_kiosk", art: ["plush", "#4E6E8C"], say: "A little penguin! Blue and white and very small. Like the real ones!"},
-  b_cap: {n: "A Nippers cap", kind: "gift", to: [], price: 5, shop: "bv_slsc", art: ["beanie", "#E8566C"], say: "A Nippers cap! Red and yellow! I'm a lifesaver now, Mama!"},
+  b_cap: {n: "A surf club cap", kind: "gift", to: [], price: 5, shop: "bv_slsc", art: ["beanie", "#E8566C"], say: "A surf club cap! Red and yellow! I'm practically a lifesaver now."},
   b_surfphoto: {n: "Photo of your first wave", kind: "keepsake", price: 0, art: ["tile", "#9CC4D0", "#F3C969"], line: "You on your very first wave at Breakwater: arms out, knees bent, mouth wide open. Jet printed it at the surf shop."},
   b_whalecard: {n: "Whale sighting card", kind: "keepsake", price: 0, art: ["tile", "#FFFDF6", "#4E6E8C"], line: "A card from the lighthouse at Lighthouse Point, stamped with a little humpback and the date, and signed by Win: you saw whales from the balcony."},
-  b_nipmedal: {n: "Evan's Nippers medal", kind: "keepsake", price: 0, art: ["disc", "#F3C969", "#E8566C"], line: "Evan's first Nippers medal, on a red and yellow ribbon, from Coach Dimi at Koala Cove. He wanted to wear it in the bath."},
+  b_nipmedal: {n: "Your surf club medal", kind: "keepsake", price: 0, art: ["disc", "#F3C969", "#E8566C"], line: "Your first surf club medal, on a red and yellow ribbon, from Coach Dimi at Koala Cove: beach flags, a swim round the buoy, and sand in everything. You might wear it in the bath."},
   b_seed: {n: "A scoop of bird seed", kind: "ingredient", price: 2, sell: 1, shop: "bv_parkstore", art: ["box", "#E3B04B", "#C9A86A"], what: "for the king parrots at Koala Cove: hold out your arm"}
 };
 export const CR_KEEP = {b_crmagnet: "A tiny lighthouse and a wave, from the Coast Road.", b_teatowel: "A tea towel with a map of the whole Coast Road."};

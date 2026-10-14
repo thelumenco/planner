@@ -1,5 +1,5 @@
-// Things that change the village over time: upgrades unlocked by finished quests, Singapore festivals and wet-season
-// rain, and the evening lanterns on the pond. Drawn on top of the village (see villageArt in scenes.js).
+// Things that change the village over time: upgrades unlocked by finished quests, festivals through the year and
+// winter rain, and the evening lanterns on the pond. Drawn on top of the village (see villageArt in scenes.js).
 import { sk } from "./scenes.js";
 import { iconAt } from "./icons.js";
 import { hash } from "../util.js";
@@ -62,11 +62,10 @@ export function upgradesArt(n, where){
   return h;
 }
 
-/* ---------- festivals + weather (Singapore). Lunar dates move: check the table each year. ---------- */
+/* ---------- festivals + weather. Lunar dates move: check the table each year. ---------- */
 export const FESTIVALS = [
   {id: "newyear",   name: "New Year",           dates: ["2026-12-31", "2027-12-31"], before: 1, after: 1},
   {id: "cny",       name: "Chinese New Year",   dates: ["2027-02-06", "2028-01-26"], before: 10, after: 14},
-  {id: "national",  name: "National Day",       dates: ["2026-08-09", "2027-08-09"], before: 8, after: 1},
   {id: "midautumn", name: "Mid-Autumn",         dates: ["2026-09-25", "2027-09-15"], before: 7, after: 2},
   {id: "deepavali", name: "Deepavali",          dates: ["2026-11-08", "2027-10-28"], before: 7, after: 2},
   {id: "christmas", name: "Christmas",          dates: ["2026-12-25", "2027-12-25"], before: 10, after: 1},
@@ -79,8 +78,8 @@ export function festivalOn(day){
   for (const f of FESTIVALS) for (const k of f.dates) { const x = dayNum(k); if (d >= x - f.before && d <= x + f.after) return f; }
   return null;
 }
-// Wet season (Nov to Jan): roughly one day in three is a proper downpour, and another one in ten a light shower. The
-// rest of the year a shower blows through about one day in seven: brollies up, nothing called off.
+// The rainy months (November to January): roughly one day in three is a proper downpour, and another one in ten a
+// light shower. The rest of the year a shower blows through about one day in seven: brollies up, nothing called off.
 // rainLevel: 0 dry, 1 a light shower, 2 a downpour (paddling's off).
 export function rainLevel(day){ const h = hash(day + "rain") % 100; return [11, 12, 1].includes(+day.slice(5, 7)) ? (h < 34 ? 2 : h < 44 ? 1 : 0) : (h < 14 ? 1 : 0); }
 export const rainyOn = day => rainLevel(day) > 0;
@@ -99,7 +98,6 @@ export function festivalArt(f){
       return rang + `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width=".9">${d}</g>`; }
     case "christmas": { let b = ""; for (let i = 0; i < 9; i++) { const t = i/8, x = 192 + 136*t, y = 296 - Math.sin(Math.PI*t)*22; b += `<circle class="twinkle" cx="${x.toFixed(1)}" cy="${(y + 3).toFixed(1)}" r="2.4" fill="${["#D9433A", "#F3C969", "#7FA36E"][i % 3]}"/>`; }
       return `<g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.2"><path d="M192 296 Q260 252 328 296" fill="none"/><path d="M318 410 l14 -34 l14 34z" style="fill:#7FA36E"/><rect x="329" y="410" width="6" height="8" style="fill:var(--wood)"/></g>${iconAt("sparkle", 332, 372, 14)}<g>${b}</g>`; }
-    case "national": return bunting(200, 92, 320, 92, ["#D9433A", "#FFFDF6"]) + bunting(196, 300, 324, 300, ["#D9433A", "#FFFDF6"]);
     case "newyear": return `<g class="twinkle">${[[120, 60], [400, 70], [260, 240], [60, 380], [470, 420], [180, 560]].map(([x, y]) => iconAt("sparkle", x, y, 18)).join("")}</g>`;
   }
   return "";

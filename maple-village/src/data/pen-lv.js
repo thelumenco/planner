@@ -1,5 +1,5 @@
 // (back: things from their own stops are registered from the region's goods at runtime, see ronda.js)
-// Letter voices for the Lavender Hills' people (round 190): how each one writes back when Mel posts them a gift or a letter.
+// Letter voices for the Lavender Hills' people (round 190): how each one writes back when you post them a gift or a letter.
 export const PEN_LV = {
   /* ---------- Lavender Ridge ---------- */
   lvemile: {sign: "Émile, from the still",

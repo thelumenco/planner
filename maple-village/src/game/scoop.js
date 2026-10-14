@@ -1,17 +1,17 @@
-// The Scoop Shack: Mel's ice cream shop on the bay, north of the foreshore. Open 10am to 8pm.
-//   ingredients  stocked into the kitchen fridge from the backpack, or straight off Ma Ma's farm shop shelves
-//                (fruit and flower stems); milk from Mel's goats or Hana's market
+// The Scoop Shack: The player's ice cream shop on the bay, north of the foreshore. Open 10am to 8pm.
+//   ingredients  stocked into the kitchen fridge from the backpack, or straight off the orchard's farm shop shelves
+//                (fruit and flower stems); milk from the player's goats or Hana's market
 //   discovery    at the mixing bench, any 1 to 4 ingredients make a flavour, and every combination is a new one
 //                (never a bad recipe). The first tub is made there and then. With milk it's a gelato, without a
 //                (dairy-free) sorbet
-//   tubs         Mel makes them herself: another tub (20 scoops) of a flavour she knows, from the recipe book on
+//   tubs         the player makes them herself: another tub (20 scoops) of a flavour she knows, from the recipe book on
 //                the kitchen wall or the mixing bench, uses one of each of its ingredients from the fridge
-//   sales        customers buy cups, cones, floats and waffles while it's open; the takings come to Mel. Prices
+//   sales        customers buy cups, cones, floats and waffles while it's open; the takings come to the player. Prices
 //                are set per type, and a flavour marked special costs a little more
-//   for Mel      a free one at the counter (and one for Evan), or one to take away and give
+//   for you      a free one at the counter, or one to take away and give
 //   upgrades     bought from the catalogue in the shop (s.up): an honesty freezer out front that sells cups while
 //                the shop's shut (coins wait in its box), a striped awning and fairy lights over the deck (tips),
-//                a neon cone sign (busier evenings), a delivery bike (Tomo pedals ice creams round to the family
+//                a neon cone sign (busier evenings), a delivery bike (Tomo pedals ice creams round to your friends
 //                from anywhere), and the chocolate dip station: a little room off the shop with dips and toppings,
 //                each bought separately, for dipped cones and waffles
 import { esc, dayKey, sgHM, hash, LOC } from "../util.js";
@@ -60,7 +60,7 @@ export const INGR = {
     // from Bellbird Valley (round 142)
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
-  yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
+  yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from the player's own chocolate shop (cocoa.js sendScoop)
   ...Object.fromEntries(Object.values(TREES).map(t => [t.fruit, [t.fruit[0].toUpperCase() + t.fruit.slice(1), t.fruit[0].toUpperCase() + t.fruit.slice(1), FRUIT_COL[t.fruit] || "#F3C969"]])),
   ...Object.fromEntries(Object.entries(FLOWERS).map(([id, f]) => ["fl_" + id, [f.n, f.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f.col || "#F4C7CF"]]))
 };
@@ -79,7 +79,7 @@ export function scoopState(F){
   return s;
 }
 export const recipeOf = (s, id) => s.recipes.find(r => r.id === id);
-// The display holds 8 flavours (s.display, in slot order). Until Mel arranges it herself, it fills itself with
+// The display holds 8 flavours (s.display, in slot order). Until the player arranges it herself, it fills itself with
 // whatever's in stock. Customers (and the honesty freezer) only buy what's in the display.
 export const SLOTS = 8;
 export const displayIds = s => Array.isArray(s.display) ? s.display.filter(id => recipeOf(s, id)).slice(0, SLOTS) : s.recipes.filter(r => s.tubs[r.id] > 0).slice(0, SLOTS).map(r => r.id);
@@ -104,7 +104,7 @@ export const UPGRADES = {
   honesty: {n: "Honesty freezer", price: 400, line: "A little freezer out front with pre-scooped cups and a wooden coin box. It sells while the shop's shut (7 to 10am, 8 to 10pm), and the coins wait in the box for you."},
   awning: {n: "Striped awning and fairy lights", price: 250, line: "A pink striped awning over the deck, strung with fairy lights that glow in the evenings. Customers linger, and leave tips."},
   neon: {n: "Neon cone sign", price: 350, line: "A pink neon cone by the door. It glows from 5pm, so more people find you in the evenings."},
-  bike: {n: "Delivery bike", price: 800, line: "A mint delivery bike with a cool box, for all three shops. From 10am to 10pm Tomo pedals villagers' orders round: ice creams from here, chocolates from the Cocoa Room, tapas, small plates and bottles from the winery (late-night suppers too). And you can send something to the family from anywhere."},
+  bike: {n: "Delivery bike", price: 800, line: "A mint delivery bike with a cool box, for all three shops. From 10am to 10pm Tomo pedals villagers' orders round: ice creams from here, chocolates from the Cocoa Room, tapas, small plates and bottles from the winery (late-night suppers too). And you can send something to your friends from anywhere."},
   dip: {n: "Chocolate dip station", price: 500, line: "A little room off the shop: warm pots of chocolate and a shelf of toppings. Cones and waffles can be dipped and topped (customers pay a bit extra), and you can make your own. Comes with milk chocolate and rainbow sprinkles; more dips and toppings to buy."}
 };
 export const DIPS = {
@@ -147,7 +147,7 @@ function cartMinute(s, day, hm, opts){
   if (!cartOn(day, hm)) return null;
   const stocked = onDisplay(s); if (!stocked.length) return null;
   const price = s.prices.cup + s.prices.cone, pf = Math.pow(8/Math.max(2, price), 1.3);
-  if (Math.random() >= .05*pf*(opts.cart ? 1.6 : 1)) return null;   // (round 130: busier, Mel asked)
+  if (Math.random() >= .05*pf*(opts.cart ? 1.6 : 1)) return null;   // (round 130: busier)
   const fmt = Math.random() < .45 ? "cup" : "cone", r = stocked[Math.floor(Math.random()*stocked.length)];
   s.tubs[r.id]--; if (s.tubs[r.id] <= 0) delete s.tubs[r.id];
   let coins = priceOf(s, fmt, r); if (fmt === "cone" && hasUp(s, "dip") && Math.random() < .3) coins += s.prices.dip;
@@ -161,7 +161,7 @@ const NOTES = ["Best pandan ever. Sorry, only had coins for one! x", "For the li
 
 /* ---------- discovering flavours ---------- */
 const GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"], SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
-const POETIC = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
+const POETIC = ["Dolphin Bay", "Jetty Sunset", "Village Green", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Harbour Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
 export function nameFor(ings){
   const dairy = isDairy(ings), flav = ings.filter(i => i !== "milk"), h = hash(ings.join("+"));
   if (!flav.length) return "Fior di Latte";
@@ -199,8 +199,8 @@ export function stockFridge(F, id, n, from, orch){
   else { const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id, have = orch.stock[key] || 0; n = Math.min(n, have); if (n <= 0) return 0; orch.stock[key] -= n; if (orch.stock[key] <= 0) delete orch.stock[key]; }
   s.fridge[id] = (s.fridge[id] || 0) + n; return n;
 }
-// take things back out of the fridge (Mel's request, round 119): into the backpack, or, for flower stems (which
-// aren't backpack items), back onto Ma Ma's farm shop shelf where they came from. -> how many, and where
+// take things back out of the fridge (round 119): into the backpack, or, for flower stems (which
+// aren't backpack items), back onto the orchard's farm shop shelf where they came from. -> how many, and where
 export function takeBack(store, id, n, F, orch){
   const have = store[id] || 0; n = Math.min(n, have); if (n <= 0) return null;
   store[id] -= n; if (store[id] <= 0) delete store[id];
@@ -208,12 +208,12 @@ export function takeBack(store, id, n, F, orch){
   const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id; orch.stock[key] = (orch.stock[key] || 0) + n; return {n, to: "farm"};
 }
 export const unstockFridge = (F, id, n, orch) => takeBack(scoopState(F).fridge, id, n, F, orch);
-// what Ma Ma's farm shop has on its shelves that could go in the fridge (fruit, and flower stems)
+// what the orchard's farm shop has on its shelves that could go in the fridge (fruit, and flower stems)
 export const farmShelf = orch => Object.keys(orch.stock || {}).filter(k => orch.stock[k] > 0).map(k => k.startsWith("stem:") ? "fl_" + k.slice(5) : k).filter(isIngr);
 
 /* ---------- making tubs ---------- */
 export const canMake = (s, r) => r && hasAll(s, r.ings) && !churnFull(s);
-// Mel makes another tub of a flavour she knows: one of each ingredient from the fridge, 20 scoops into the freezer
+// The player makes another tub of a flavour she knows: one of each ingredient from the fridge, 20 scoops into the freezer
 // (and straight into the display if it's arranged and has a free slot)
 export function makeTub(F, rid){
   const s = scoopState(F), r = recipeOf(s, rid); if (!canMake(s, r)) return null;
@@ -272,7 +272,7 @@ export function collectBox(F){ const s = scoopState(F), n = s.box; if (!n) retur
 
 /* ---------- gifts: an ice cream to take away ---------- */
 // every flavour in each type becomes a backpack gift ("Mango Sorbet cone"); sorbets suit everyone, gelato everyone
-// but Marcus (lactose intolerant)
+// but Tomi (lactose intolerant)
 const NO_DAIRY = ["bo", "farid", "mei", "hana", "theo", "posy"];
 export const giftId = (r, fmt) => `gel_${fmt}_${r.id.replace(/[^a-z0-9]+/g, "-")}`;
 // dipped ones ("Mango Gelato cone, dark-chocolate dipped with sprinkles") are registered as they're made (s.dipIds)
@@ -284,13 +284,13 @@ function registerDip(s, id){
   const r = s.recipes.find(x => x.id.replace(/[^a-z0-9]+/g, "-") === m[4]); if (!r) return;
   const top = m[3] === "none" ? null : m[3], dairy = r.dairy || DAIRY_DIP.includes(m[2]);
   ITEMS[id] = {n: dipName(r, m[1], m[2], top), kind: "gift", to: dairy ? NO_DAIRY : "family", tab: "scoop", ico: "ic_" + m[1], gel: true, dip: true,
-    say: `Dipped AND topped? You spoil me. ${r.name}, wow.`, says: {tomi: "Dark choc and sorbet, so no tummy trouble. Legend, Zeh.", farid: "So fancy! Ma Ma eat slowly, slowly.", theo: "Now that's an ice cream. Your mum wants a bite. She can't have one."}};
+    say: `Dipped AND topped? You spoil me. ${r.name}, wow.`, says: {tomi: "Dark choc and sorbet, so no tummy trouble. Legend.", farid: "So fancy! I shall eat it slowly and make it last.", theo: "Now that is an ice cream. Hana wants a bite. Officially, she can't have one."}};
 }
 export function registerItems(F){
   const s0 = scoopState(F); s0.dipIds.forEach(id => registerDip(s0, id)); Object.keys(F.inv || {}).filter(k => k.startsWith("gel_dip_")).forEach(id => registerDip(s0, id));
   s0.recipes.forEach(r => Object.keys(FORMATS).forEach(fmt => { const id = giftId(r, fmt);
     ITEMS[id] = {n: `${r.name} ${FORMATS[fmt].n.toLowerCase()}`, kind: "gift", to: r.dairy ? NO_DAIRY : "family", tab: "scoop", ico: "ic_" + fmt, gel: true,
-      say: `Ice cream! ${r.name}? Ooh, I've never had that one.`, says: {tomi: "A sorbet, so no tummy trouble. Nice one, Zeh.", farid: "Ice cream for Ma Ma? Aiyo, so cold! So nice.", theo: "Ah Gong loves ice cream. Don't tell your mum."}}; }));
+      say: `Ice cream! ${r.name}? Ooh, I've never had that one.`, says: {tomi: "A sorbet, so no tummy trouble. Nice one.", farid: "Ice cream for me? Oh, so cold! So nice. It would go beautifully with almond cake.", theo: "I am very fond of ice cream. Don't tell Hana."}}; }));
 }
 export function takeAway(F, rid, fmt){
   const s = scoopState(F), r = recipeOf(s, rid); if (!r || !(s.tubs[rid] > 0) || !FORMATS[fmt]) return null;
@@ -335,7 +335,7 @@ export function honestyPanel(F){
   if (s.notes.length) h += `<p class="eyebrow" style="margin:10px 0 6px">Notes left with the coins</p><ul class="hlist">${s.notes.map(n => `<li><small>"${esc(n.t)}"</small></li>`).join("")}</ul>`;
   return h + `<div class="actions">${s.box ? `<button class="btn primary" data-gcollect="1">Collect the coins</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
 }
-// the dip station: its chocolate pots, the toppings shelf, and the bar where Mel makes one
+// the dip station: its chocolate pots, the toppings shelf, and the bar where the player makes one
 export function dipPotsPanel(F){
   const s = scoopState(F);
   return `<span class="tape stripe" aria-hidden="true"></span><h2>The chocolate pots</h2><p class="sub">Warm dips for cones and waffles. Customers pay ${s.prices.dip} ${coin()} extra for a dipped one (set it on the menu); more dips, more takers.</p>
@@ -407,8 +407,8 @@ export function fridgePanel(F, orch){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The fridge</h2><p class="sub">What your gelato's made from. Each tub uses one of each of a flavour's ingredients.</p>`;
   h += inF.length ? `<ul class="hlist wlist">${inF.map(id => cell(id, `${s.fridge[id]} in the fridge`, `<span class="orbtns"><button class="btn small alt" data-gback="${id}:1">Take 1</button><button class="btn small alt" data-gback="${id}:99">All</button></span>`)).join("")}</ul>` : `<p class="muted">Empty. Add fruit, berries, flowers, milk, honey...</p>`;
   if (bag.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From your backpack</p><ul class="hlist wlist">${bag.map(id => cell(id, `${F.inv[id]} with you`, `<span class="orbtns"><button class="btn small primary" data-gfill="bag:${id}:1">Add 1</button><button class="btn small alt" data-gfill="bag:${id}:99">All</button></span>`)).join("")}</ul>`;
-  if (shelf.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From Ma Ma's farm shop</p><ul class="hlist wlist">${shelf.map(id => { const n = orch.stock[id.startsWith("fl_") ? "stem:" + id.slice(3) : id];
-    return cell(id, `${n} on her shelf`, `<span class="orbtns"><button class="btn small primary" data-gfill="farm:${id}:1">Add 1</button><button class="btn small alt" data-gfill="farm:${id}:99">All</button></span>`); }).join("")}</ul>`;
+  if (shelf.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From the orchard's farm shop</p><ul class="hlist wlist">${shelf.map(id => { const n = orch.stock[id.startsWith("fl_") ? "stem:" + id.slice(3) : id];
+    return cell(id, `${n} on the shelf`, `<span class="orbtns"><button class="btn small primary" data-gfill="farm:${id}:1">Add 1</button><button class="btn small alt" data-gfill="farm:${id}:99">All</button></span>`); }).join("")}</ul>`;
   if (!bag.length && !shelf.length) h += `<p class="muted">Nothing to add right now. Milk comes from your goats or Hana's market; fruit and flowers from the orchard.</p>`;
   return h + shut;
 }
@@ -434,7 +434,7 @@ export function churnLine(s){
   if (!s.churn.length) return `<p class="muted">The churner's free: a tub takes an hour to blend and freeze, two at a time.</p>`;
   return `<p class="eyebrow" style="margin:10px 0 6px">In the churner (${s.churn.length} of ${CHURNS})</p><ul class="hlist">${s.churn.map(b => { const r = recipeOf(s, b.id); return r ? `<li>${dot(r.col)} <b>${esc(r.name)}</b> <small class="muted">${b.isNew ? "new! " : ""}ready in ${churnLeft(b)}</small></li>` : ""; }).join("")}</ul>`;
 }
-// the recipe book on the kitchen wall: every flavour Mel knows, how much is left, and another tub at a tap
+// the recipe book on the kitchen wall: every flavour the player knows, how much is left, and another tub at a tap
 export function recipePanel(F){
   const s = scoopState(F), day = dayKey();
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The recipe book</h2><p class="sub">Every flavour you've discovered. A tub is 20 scoops, uses one of each ingredient from the fridge, and takes an hour in the churner. ${s.made[day] ? `${s.made[day]} made today.` : ""}</p>`;
@@ -457,8 +457,8 @@ export function freezerPanel(F, st = {}){
   return h + shut;
 }
 export const RENO_LINE = "Boarded up for now, with scaffolding out front. The sign says: \"Coming soon: a craft brewery? A chocolatier?\" Someone's pencilled \"both!!\" underneath.";
-// Round 136 (Mel: "feels like I'm not getting anything"): a heads-up when the display's down to its last few scoops
-// (and when it's run dry), and the day's takings once the shop shuts at 8 (or yesterday's, if Mel wasn't around).
+// Round 136 ("feels like I'm not getting anything"): a heads-up when the display's down to its last few scoops
+// (and when it's run dry), and the day's takings once the shop shuts at 8 (or yesterday's, if the player wasn't around).
 // -> a list of lines to say. State: s.warned ("day:low" | "day:out"), s.reported (the last day told).
 export const LOW_SCOOPS = 5;
 const hmTxt = m => `${((Math.floor(m/60) + 11) % 12) + 1}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m < 12*60 ? "am" : "pm"}`;
@@ -479,9 +479,9 @@ export function scoopNews(s, day, hm){
   return out;
 }
 
-/* ---------- the ice cream trolley (round 137, Mel's idea) ---------- */
+/* ---------- the ice cream trolley (round 137) ---------- */
 // Load up to three flavours, ten scoops each, from the shop's tubs, and push it round Honeybrook: tap people to sell
-// them a cup or a cone (never floats or waffles out and about). It's heavy, so Mel walks slower (70% full, back to
+// them a cup or a cone (never floats or waffles out and about). It's heavy, so the player walks slower (70% full, back to
 // normal as it empties), and she can't ride or drive with it. The ice packs last two hours: wheel it back into the
 // shop in time and what's left goes back in the freezer; leave it too long and the leftovers melt.
 // Each person buys at most once a day. On top of the shop's own sales. State: s.trolley = {tubs: {id: n}, at, n, coins,
@@ -516,7 +516,7 @@ export function trolleySell(F, id, day, o = {}){
   for (let i = 0; i < (two ? 2 : 1); i++) { const ids = Object.keys(tr.tubs).filter(k => tr.tubs[k] > 0); if (!ids.length) break;
     const rid = ids[Math.floor(Math.random()*ids.length)], r = recipeOf(s, rid), fmt = Math.random() < .55 ? "cone" : "cup";
     tr.tubs[rid]--; coins += priceOf(s, fmt, r); items.push([fmt, r ? r.name : "ice cream"]); }
-  if (o.family && Math.random() < .5) coins++;   // family round it up
+  if (o.family && Math.random() < .5) coins++;   // friends round it up
   tr.n += items.length; tr.coins += coins; F.coins += coins;
   const t = s.sold[day] = s.sold[day] || {n: 0, coins: 0}; t.trolley = (t.trolley || 0) + items.length; t.trolleyCoins = (t.trolleyCoins || 0) + coins;
   return {coins, items};
@@ -538,16 +538,16 @@ export function trolleyPanel(F, st = {}){
 // pedals it round: a cup or a cone from the Scoop Shack's display (never floats or waffles: they'd melt), chocolates
 // from the Cocoa Room's case and wall, and tapas, small plates and bottles from the winery (picnics too). Each order
 // uses real stock and pays the shop's price plus a delivery fee. On top of the shops' own sales.
-export const DELIVERY = {fee: 2, scoop: .045, cocoa: .036, winery: .04};   // doubled (Mel: "Tomo doesn't seem to be delivering much"): about two to three an hour from each shop, when there's stock
+export const DELIVERY = {fee: 2, scoop: .045, cocoa: .036, winery: .04};   // doubled ("Tomo doesn't seem to be delivering much"): about two to three an hour from each shop, when there's stock
 export const bikeOwned = F => !!(F.scoop && F.scoop.up && F.scoop.up.bike);
-// round 155 (Mel: "I'm getting delivery orders even when it's outside of delivery bike hours"): orders only come in
-// during the bike's hours, whichever shop they're from. Then (Mel: "late night suppers"): 10am to 10pm. Tomo waits
+// round 155 ("I'm getting delivery orders even when it's outside of delivery bike hours"): orders only come in
+// during the bike's hours, whichever shop they're from. Then ("late night suppers"): 10am to 10pm. Tomo waits
 // tables till 6, then it's just the bike; the Scoop Shack and the Cocoa Room shut at 8, so after that it's the
 // winery's suppers (tapas, small plates, a bottle)
 export const DELIV_HOURS = [10*60, 22*60];
 export const deliveryHours = hm => hm >= DELIV_HOURS[0] && hm < DELIV_HOURS[1];
 export const riderOn = hm => deliveryHours(hm) && !(hm >= 13*60 && hm < 13*60 + 45);   // Tomo's out on the bike (not on his lunch)
-// round 152 (Mel: "the mint bike is like permanently outside the shop"): after each order Tomo's out on the bike for
+// round 152 ("the mint bike is like permanently outside the shop"): after each order Tomo's out on the bike for
 // twenty minutes, and it's gone from beside the shop (a little chalkboard says so)
 export const BIKE_TRIP = 20*60000;
 export const bikeAway = (s, t = Date.now() + (globalThis.__mapleOffset || 0)) => !!(s && s.bikeOut && t - s.bikeOut >= 0 && t - s.bikeOut < BIKE_TRIP);

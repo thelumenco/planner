@@ -1,18 +1,18 @@
-// The terrace's week (round 152, Mel: "the terrace doesn't get much action other than Sunday lunch"). Once the wine
+// The terrace's week (round 152: "the terrace doesn't get much action other than Sunday lunch"). Once the wine
 // shop has its terrace:
 //   weddings: the second Saturday of every month (and the fourth too, October to March, wedding season), 2 to 7pm. An
 //     out-of-town couple and their people (data/terrace-people.js): the ceremony under the flower arch at 2, the
 //     wedding breakfast at the long table at 3, the first dance at 5 and then everyone up dancing, the bouquet at 6:30.
 //     Booked weeks ahead: the bookings book shows them coming. Sparkling by the case.
 //   trivia night: every Wednesday, 7 to 9pm. Amara with the microphone, questions up on a projector screen on the
-//     pergola, village teams at the long table, and Mel can join in with Darren and Angellina: 10 a team, five rounds of
+//     pergola, village teams at the long table, and you can join in with Posy: 10 a team, five rounds of
 //     four, and the winners take the pot.
-//   sip and paint: every Thursday, 2 to 4pm. Dad teaches (his easel at home finally gets company), villagers at easels,
-//     a glass of something; Mel can paint too, and takes her painting home.
-//   the occasions: Valentine's dinner (14 February, 6 to 10pm, candles and couples), Christmas Day lunch (the whole
-//     family at the long table, crackers and paper crowns, 12 to 4), New Year's Eve (8pm till half past midnight,
-//     dancing and a countdown), and Mother's Day (the second Sunday in May: the long lunch, with Mum and Ma Ma as guests
-//     of honour; lunch.js).
+//   sip and paint: every Thursday, 2 to 4pm. Theo teaches (his sketchbook finally gets company), villagers at easels,
+//     a glass of something; you can paint too, and take your painting home.
+//   the occasions: Valentine's dinner (14 February, 6 to 10pm, candles and couples), Christmas Day lunch (all your
+//     friends at the long table, crackers and paper crowns, 12 to 4), New Year's Eve (8pm till half past midnight,
+//     dancing and a countdown), and Mother's Day (the second Sunday in May: the long lunch, a toast to everyone who
+//     mothers us; lunch.js).
 import { esc, dayKey, hash } from "../util.js";
 import { SEATS } from "./lunch.js";
 import { WEDDINGS } from "../data/terrace-people.js";
@@ -98,7 +98,7 @@ export const QUIZ = {entry: 10, house: 10, rounds: [
     ["What's the capital of Australia?", ["Sydney", "Canberra", "Melbourne"], 1], ["Which ocean is the largest?", ["Atlantic", "Indian", "Pacific"], 2],
     ["Jeju Island belongs to which country?", ["South Korea", "Japan", "China"], 0], ["The Cinque Terre is a string of villages in which country?", ["Italy", "France", "Croatia"], 0],
     ["Ronda, with its deep gorge and bridge, is in which country?", ["Spain", "Portugal", "Morocco"], 0], ["What's the longest river in Africa?", ["The Nile", "The Congo", "The Niger"], 0],
-    ["Which city has the Eiffel Tower?", ["Paris", "Lyon", "Brussels"], 0], ["Singapore's famous lion-headed statue is called the...", ["Merlion", "Lionfish", "Sealion"], 0]]],
+    ["Which city has the Eiffel Tower?", ["Paris", "Lyon", "Brussels"], 0], ["The Little Mermaid statue sits by the harbour in which city?", ["Copenhagen", "Oslo", "Stockholm"], 0]]],
   ["Animals", [
     ["What's a baby kangaroo called?", ["A kit", "A joey", "A cub"], 1], ["How many legs does a spider have?", ["Six", "Eight", "Ten"], 1],
     ["What do koalas mostly eat?", ["Bamboo", "Eucalyptus leaves", "Grass"], 1], ["Which bird is famous for copying sounds, including chainsaws?", ["The lyrebird", "The magpie", "The kookaburra"], 0],
@@ -122,14 +122,14 @@ export function triviaAnswer(st, a){ if (st.done || st.picked != null) return nu
 export function triviaNext(st){ if (st.picked == null) return; st.picked = null; st.q++; if (st.q >= 4) { st.q = 0; st.r++; } if (st.r >= st.rounds.length) st.done = true; }
 export function triviaResult(st){ const rivals = rivalScores(st.day), best = Math.max(...rivals.map(t => t.score)), pot = QUIZ.entry*(rivals.length + 1) + QUIZ.house;
   return {rivals, pot, place: 1 + rivals.filter(t => t.score > st.score).length, win: st.score > best, tie: st.score === best}; }
-export const TEAM_NAMES = ["Mel's Marvels", "Quiz Khalifa", "The Honey Badgers", "Vin Diesel"];
+export const TEAM_NAMES = ["The Know-It-Owls", "Quiz Khalifa", "The Honey Badgers", "Vin Diesel"];
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 export function triviaPanel(F, st, o = {}){
   const tape = `<span class="tape stripe" aria-hidden="true"></span>`;
   let h = tape + `<h2>Trivia night</h2>`;
   if (!o.on) return h + `<p class="sub">Every Wednesday, 7 to 9pm on the terrace: Amara on the microphone, the questions up on the big screen, and teams round the long table. Ten coins a team; the winners take the pot.</p>` + shut;
   if (o.played) return h + `<p class="sub">You've played tonight. ${esc(o.played)}</p>` + shut;
-  if (!st) return h + `<p class="sub">Amara taps the microphone. "Teams! Grab your pencils." Darren and Angellina have saved you a seat. Pick a team name, ten coins in the jar, and you're in. Five rounds of four.</p>
+  if (!st) return h + `<p class="sub">Amara taps the microphone. "Teams! Grab your pencils." Posy has saved you a seat, and Bo's waving from the far end. Pick a team name, ten coins in the jar, and you're in. Five rounds of four.</p>
     <p class="eyebrow" style="margin:10px 0 6px">Your team</p><div class="gchips">${TEAM_NAMES.map((n, i) => `<button class="gchip" data-trv="join:${i}" ${F.coins >= QUIZ.entry ? "" : "disabled"}>${esc(n)}</button>`).join("")}</div><p class="muted">Ten coins a team. Tonight's pot: ${QUIZ.entry*4 + QUIZ.house} coins.</p>` + shut;
   if (st.done) { const r = triviaResult(st); const table = [...r.rivals, {n: st.team, score: st.score, me: true}].sort((a, b) => b.score - a.score);
     return h + `<p class="sub">${r.win ? `${esc(st.team)} win! Amara hands over the jar: ${r.pot} coins.` : r.tie ? "A tie for first! A tiebreaker: how many steps up to the lighthouse balcony at Lighthouse Point?" : `${["", "Second", "Third", "Fourth"][r.place - 1] || "A brave effort"}. There's always next Wednesday.`}</p>
@@ -159,12 +159,12 @@ export function paintingSvg(subject, cols, w = 140){ const [a = "#FFFDF6", b = "
 }
 export function paintPanel(F, st, o = {}){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Sip and paint</h2>`;
-  if (!o.on) return h + `<p class="sub">Every Thursday, 2 to 4pm on the terrace: Dad teaches, everyone gets an easel and a glass, and you go home with a painting. ${PAINT_PRICE} coins.</p>` + shut;
-  if (o.painted) return h + `<p class="sub">You've painted today. Dad's still going round everyone's easels with a little brush, fixing horizons.</p>` + shut;
-  if (!st) return h + `<p class="sub">Dad clinks a glass. "Right! Nobody's Monet, and nobody needs to be. Three layers: the background, the middle, the thing you love. Pick what you're painting."</p><div class="actions">${Object.entries(PAINT_SUBJECTS).map(([k, s]) => `<button class="btn small primary" data-pnt="sub:${k}" ${F.coins >= PAINT_PRICE ? "" : "disabled"}>${esc(s.n)}</button>`).join("")}</div><p class="muted">${PAINT_PRICE} coins, with a glass of the house white.</p>` + shut;
+  if (!o.on) return h + `<p class="sub">Every Thursday, 2 to 4pm on the terrace: Theo teaches, everyone gets an easel and a glass, and you go home with a painting. ${PAINT_PRICE} coins.</p>` + shut;
+  if (o.painted) return h + `<p class="sub">You've painted today. Theo's still going round everyone's easels with a little brush, straightening horizons.</p>` + shut;
+  if (!st) return h + `<p class="sub">Theo clinks a glass. "Right. For the record, nobody here is Monet, and nobody needs to be. Three layers: the background, the middle, the thing you love. Pick what you're painting."</p><div class="actions">${Object.entries(PAINT_SUBJECTS).map(([k, s]) => `<button class="btn small primary" data-pnt="sub:${k}" ${F.coins >= PAINT_PRICE ? "" : "disabled"}>${esc(s.n)}</button>`).join("")}</div><p class="muted">${PAINT_PRICE} coins, with a glass of the house white.</p>` + shut;
   const s = PAINT_SUBJECTS[st.subject];
   h += `<div class="pntcanvas">${paintingSvg(st.subject, st.cols, 200)}</div>`;
-  if (paintDone(st)) return h + `<p class="sub">Dad stands back with his hands on his hips. "Now THAT's going on a wall."</p><div class="actions"><button class="btn primary" data-pnt="done">Take it home</button></div>`;
+  if (paintDone(st)) return h + `<p class="sub">Theo stands back with his hands behind his back. "Now THAT is going on a wall. I'd stamp it myself."</p><div class="actions"><button class="btn primary" data-pnt="done">Take it home</button></div>`;
   const [step, cols] = s.steps[st.cols.length];
   return h + `<p class="eyebrow">${esc(step)}</p><div class="actions">${cols.map((c, i) => `<button class="btn small alt pntcol" data-pnt="col:${i}" aria-label="Colour ${i + 1}"><span style="background:${c}"></span></button>`).join("")}</div>`;
 }
@@ -177,13 +177,13 @@ const hhmm = m => { m %= 24*60; const h = Math.floor(m/60); return `${h % 12 || 
 // weddings show up to six weeks ahead; the weekly nights two weeks ahead; the special days a month ahead
 export function comingUp(day = dayKey()){
   const out = [];
-  for (let i = 0; i < 42; i++) { const d = addDays(day, i), k = occasionOn(d); if (!k) { if (mothersDay(d) && i < 31) out.push({day: d, n: "Mother's Day long lunch", when: "12 to 3pm", note: "Mum and Ma Ma are guests of honour"}); continue; }
+  for (let i = 0; i < 42; i++) { const d = addDays(day, i), k = occasionOn(d); if (!k) { if (mothersDay(d) && i < 31) out.push({day: d, n: "Mother's Day long lunch", when: "12 to 3pm", note: "a toast to everyone who mothers us"}); continue; }
     if ((k === "trivia" || k === "paint") && i >= 14) continue; if ((k === "christmas" || k === "nye" || k === "valentine") && i >= 31) continue;
     const o = OCC[k], w = k === "wedding" ? weddingOn(d) : null;
-    out.push({day: d, n: w ? `The wedding of ${w.couple}` : o.n, when: `${hhmm(o.from)} to ${hhmm(o.to)}`, note: w ? `${w.from}; sparkling by the case` : k === "trivia" ? "teams of three, 10 a team" : k === "paint" ? "Dad teaching" : ""}); }
+    out.push({day: d, n: w ? `The wedding of ${w.couple}` : o.n, when: `${hhmm(o.from)} to ${hhmm(o.to)}`, note: w ? `${w.from}; sparkling by the case` : k === "trivia" ? "teams of three, 10 a team" : k === "paint" ? "Theo teaching" : ""}); }
   return out;
 }
 export function comingUpHTML(day = dayKey(), terrace = true){
-  if (!terrace) return `<p class="muted">You'll need the terrace first: Darren can build it, from the vineyard stall.</p>`;
+  if (!terrace) return `<p class="muted">You'll need the terrace first: Bo can build it, from the vineyard stall.</p>`;
   return `<ul class="hlist lunchbook">${comingUp(day).map(e => `<li><b>${esc(fmtD(e.day))}</b><span>${esc(e.n)}</span><small>${esc(e.when)}${e.note ? ` · ${esc(e.note)}` : ""}</small></li>`).join("")}</ul>`;
 }

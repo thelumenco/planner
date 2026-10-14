@@ -1,8 +1,8 @@
-// The paperie in Montrose (round 183, Mel: "I want handmade paper, like deckled paper... you have to shred it, then
+// The paperie in Montrose (round 183: "I want handmade paper, like deckled paper... you have to shred it, then
 // there's a paper slurry, and then you got to press it, and then you got to dry it... I also want seeded paper...
 // as I add each item, the look changes"). A goal (1,500 coins), bought at the empty shopfront in Montrose's lanes
-// (Lavender Hills, a van day trip). Mel makes every sheet herself in the back room, one batch at a time:
-//   scraps   bundles of scrap paper: wine labels, chocolate wrappers, receipts. Each of Mel's shops at home puts one
+// (Lavender Hills, a van day trip). The player makes every sheet herself in the back room, one batch at a time:
+//   scraps   bundles of scrap paper: wine labels, chocolate wrappers, receipts. Each of the player's shops at home puts one
 //            aside a day (up to 12 wait), and they ride up in the van when she visits; or buy a bundle here (3 coins)
 //   soak     two bundles torn into the tub of water: soft in 15 minutes
 //   beat     into pulp in the vat, in a colour: natural (free), blush or sage (2 coins of pigment), ink blue (3)
@@ -11,7 +11,7 @@
 //   pull     the mould and deckle through the vat: six wet sheets, couched onto felts
 //   press    the screw press squeezes the water out: 5 minutes
 //   dry      pegged on the line: dry by the same time tomorrow (so they're ready next visit). Torn deckle edges.
-// Dry sheets go on the shop's shelves, or into the backpack (they're gifts too). Round 1: the shop sells while Mel's
+// Dry sheets go on the shop's shelves, or into the backpack (they're gifts too). Round 1: the shop sells while the player's
 // in Montrose (she turns the sign round); a keeper, the class and the seasonal rushes come later.
 // State: F.paperie = {scraps, scrapDay, soak: {done}, soaked, pulp: {col, add}, wet: {col, add, n}, press: {col, add,
 // n, done}, line: [{col, add, n, done}], stock: {id: n}, sold: {day: {n, coins}}, at, made}
@@ -41,13 +41,13 @@ const now = () => Date.now() + (globalThis.__mapleOffset || 0);
 export const sheetId = (col, add) => `pp_${col}_${add}`;
 export const sheetName = (col, add) => add === "seeds" ? `Seeded ${COLOURS[col].n.toLowerCase()} paper` : `${COLOURS[col].n} handmade paper${add === "none" ? "" : " " + ADDS[add].word}`;
 export const sheetPrice = (col, add) => BASE + ADDS[add].bonus + (col === "ink" ? 1 : 0);
-// every sheet Mel can make is an item (a gift, or stock for the shelves)
+// every sheet the player can make is an item (a gift, or stock for the shelves)
 for (const col of Object.keys(COLOURS)) for (const add of Object.keys(ADDS)) ITEMS[sheetId(col, add)] = {n: sheetName(col, add), kind: "gift", to: ["hana", "posy", "farid", "tomi"], price: sheetPrice(col, add), ico: sheetId(col, add), paper: true,
   what: "A deckled sheet, made by hand in Montrose.", say: add === "seeds" ? "Paper with seeds in it? I can plant this? I'm planting this." : "Handmade paper! Look at the edges. I'm going to write you a proper letter on this."};
 
 export function paperState(F){ const p = F.paperie = F.paperie || {}; p.scraps = p.scraps || 0; p.line = p.line || []; p.stock = p.stock || {}; p.sold = p.sold || {}; return p; }
 
-// scraps from home: one bundle a day from each shop Mel runs, waiting till she drives up (12 at most)
+// scraps from home: one bundle a day from each shop the player runs, waiting till she drives up (12 at most)
 export function homeShops(F){ const g = F.goals || {}; return [F.scoop && "the Scoop Shack", g.cocoa && "the Cocoa Room", F.vine && F.vine.shelf && "the wine shop", g.mill && "the mill", g.giftshop && "the gift shop"].filter(Boolean); }
 export function scrapsWaiting(F, day){
   const p = paperState(F); if (!p.scrapDay) return 0;
@@ -86,9 +86,9 @@ export function takeDown(F, t = now()){
 export function toBag(F, id, n = 1){ const p = paperState(F), k = Math.min(n, p.stock[id] || 0); if (!k) return 0; p.stock[id] -= k; if (!p.stock[id]) delete p.stock[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + k; return k; }
 export function toShelf(F, id, n = 99){ const p = paperState(F), k = Math.min(n, (F.inv || {})[id] || 0); if (!k || !ITEMS[id] || !ITEMS[id].paper) return 0; F.inv[id] -= k; if (F.inv[id] <= 0) delete F.inv[id]; p.stock[id] = (p.stock[id] || 0) + k; return k; }
 
-// round 3 (round 186): Lise keeps the shop when Mel's away (10 to 5, closed Mondays; a goal, "paperkeeper"), for a wage
+// round 3 (round 186): Lise keeps the shop when the player's away (10 to 5, closed Mondays; a goal, "paperkeeper"), for a wage
 // each day she opens. She takes dry sheets off the line onto the shelves too. Saturdays 2 to 4 there's a card-making
-// class (four people, four sheets off the shelves, 8 coins each) if Lise or Mel is there to run it. And the shop's
+// class (four people, four sheets off the shelves, 8 coins each) if Lise or the player is there to run it. And the shop's
 // busier in the gift seasons: the fortnight before Valentine's, early May (Mother's Day) and December.
 export const KEEP = {from: 10*60, to: 17*60, closed: [1]}, WAGE = 12, CLASS = {dow: 6, from: 14*60, to: 16*60, size: 4, fee: 8};
 const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
@@ -99,7 +99,7 @@ export const classOn = (day, hm) => dowOf(day) === CLASS.dow && hm >= CLASS.from
 const sheetsIn = p => Object.values(p.stock).reduce((a, n) => a + n, 0);
 function takeSheets(p, n){ let k = 0; while (k < n) { const ids = Object.keys(p.stock).filter(id => p.stock[id] > 0); if (!ids.length) break; const id = ids[k % ids.length]; p.stock[id]--; if (!p.stock[id]) delete p.stock[id]; k++; } return k; }
 
-// minute by minute since the last look (at most two days): here = Mel's in Montrose
+// minute by minute since the last look (at most two days): here = the player's in Montrose
 export function paperTick(F, here, t = now()){
   const p = paperState(F), out = {n: 0, coins: 0, wage: 0, cls: 0, down: 0}, kept = keeperHired(F);
   if (!p.at || (!here && !kept)) { p.at = t; return out; }
@@ -122,14 +122,14 @@ export function paperTick(F, here, t = now()){
 CROPS.wildflower = {n: "Wildflowers", ns: "bunches of wildflowers", dur: 48*3600e3, yield: 3, ico: "wildflower"};
 ITEMS.wildflower = {n: "Wildflowers", kind: "flower", sell: 3, ico: "wildflower", say: "Wildflowers! Cornflowers, poppies, a daisy. From the seed paper?"};
 for (const col of Object.keys(COLOURS)) Object.assign(ITEMS[sheetId(col, "seeds")], {crop: "wildflower", plantable: true});
-// and family who get a gift with a seeded tag plant it: two days later, a letter about the flowers
+// and friends who get a gift with a seeded tag plant it: two days later, a letter about the flowers
 export function bloomFor(F, id, who, at = now()){ const it = ITEMS[id]; if (!it || !it.wrapped) return false;
   const w = (paperState(F).wraps || []).find(r => r.id === id); if (!w || w.tag !== "seeded") return false;
   const p = paperState(F); p.blooms = [...(p.blooms || []), {who, at: at + 2*864e5, id: `bloom-${who}-${at}`}].slice(-20); return true; }
-const BLOOM = {hana: "Dear Mel,\n\nThat little seed tag! I planted it by the front step like you said, and look: cornflowers and two poppies, already. Dad waters them every morning and pretends he isn't.\n\nLove, Mum xx",
-  theo: "Mel,\n\nThe tag came up. Poppies. I've drawn them twice.\n\nLove, Dad", tomi: "Zeh,\n\nAngie planted your seed tag in the window box. It's a tiny meadow now. The neighbours are jealous.\n\nMarcus",
-  posy: "Hi Mel!\n\nThe seed tag grew!! Little blue flowers in my window box. I talk to them while I study.\n\nLove, Angellina", grands: "Ah girl,\n\nGong Gong planted the paper with the seeds next to Ma Ma's herbs. Now there are flowers! Pretty pretty. Ma Ma puts some by the altar.\n\nMa Ma (and Gong Gong)",
-  bo: "Mel,\n\nThe seed tag from the present came up by the back door. Wildflowers. I didn't kill them. Proud of me?\n\nD"};
+const BLOOM = {hana: "Dear friend,\n\nThat little seed tag! I planted it by the front step like you said, and look: cornflowers and two poppies, already. Theo waters them every morning and pretends he isn't.\n\nLove, Hana xx",
+  theo: "Dear friend,\n\nThe tag came up. Poppies. I have sketched them twice and entered them, officially, in the garden register.\n\nTheo", tomi: "Hey!\n\nPosy planted your seed tag in the window box. It's a tiny meadow now. The neighbours are jealous.\n\nTomi",
+  posy: "Hi!\n\nThe seed tag grew!! Little blue flowers in my window box. I read that talking to plants helps, so I talk to them every morning.\n\nLove, Posy", grands: "Dear friend,\n\nMei planted the paper with the seeds next to the herbs by the cottage door. Now there are flowers! Mei sings to them in the mornings, and I have baked a cake to celebrate. Two cakes, actually.\n\nFarid (and Mei)",
+  bo: "Dear friend,\n\nThe seed tag from the present came up by the workshop door. Wildflowers. I didn't kill them. Proud of me?\n\nBo"};
 export const bloomMail = (F, t = now()) => (paperState(F).blooms || []).filter(b => b.at <= t).map(b => ({id: b.id, from: "postie", at: b.at, title: "The seed tag came up", body: BLOOM[b.who] || BLOOM.hana}));
 
 /* ---------- panels ---------- */

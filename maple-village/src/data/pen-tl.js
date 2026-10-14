@@ -1,4 +1,4 @@
-// Letter voices for the Tablelands' people (round 191): how each one writes back when Mel posts them a gift or a letter.
+// Letter voices for the Tablelands' people (round 191): how each one writes back when you post them a gift or a letter.
 // (back: things from their own stops are registered from the region's goods at runtime, see ronda.js)
 export const PEN_TL = {
   /* ---------- Misty Falls ---------- */
@@ -118,21 +118,21 @@ export const PEN_TL = {
     back: "b_cheddar", backNote: "A little wheel of the new vintage. Let it sit out a bit before you cut it. Cheese is patient."},
   tlrosa: {sign: "Love, Rosa (farm shop, Greenhill)",
     food: "Had it with a chocolate malted at the end of the day. Best combination going, honestly.",
-    drink: "It's in the shop fridge behind the milk, with a note on it that says Rosa's. Mum's orders.",
-    made: "It's on the counter by the till now. Mum says it makes the shop look grown up.",
+    drink: "It's in the shop fridge behind the milk, with a note on it that says Rosa's. Meg's orders.",
+    made: "It's on the counter by the till now. Meg says it makes the shop look grown up.",
     flower: "In one of the old glass milk bottles on the counter. Customers keep trying to buy them.",
-    other: "A parcel just for me, not the shop. Dad asked if it was for him. It wasn't.",
+    other: "A parcel just for me, not the shop. Bill asked if it was for him. It wasn't.",
     letter: "Your letter came with the morning post. I read it behind the counter while the milkshake machine whirred.",
-    news: ["We've started a honey and cinnamon milkshake. So thick the straw stands up, still.", "Dad tried to run the shop for an afternoon. Mum says never again."],
+    news: ["We've started a honey and cinnamon milkshake. So thick the straw stands up, still.", "Bill tried to run the shop for an afternoon. Meg says never again."],
     back: null, backNote: ""},
   tlnoah: {sign: "From Noah (and Buttercup)",
     food: "I had some and Buttercup tried to lick it. She's not allowed. Calves have milk.",
-    drink: "Mum says it's a grown-up drink so it's in the top cupboard. I'm keeping it for when I have two hundred cows.",
+    drink: "Meg says it's a grown-up drink so it's in the top cupboard. I'm keeping it for when I have two hundred cows.",
     made: "It's on my windowsill so I can see it when I wake up to feed the calves.",
-    flower: "I put them in the calf shed but Buttercup ate one. Mum put the rest in the kitchen.",
+    flower: "I put them in the calf shed but Buttercup ate one. Meg put the rest in the kitchen.",
     other: "I got a parcel! It's on my shelf next to my toy tractor.",
-    letter: "I got a letter! Mum helped me read the long words. I read it to the calves too.",
-    news: ["We've got three new calves. I named them Clover, Pickle and Moo.", "Buttercup still sucks my fingers. Dad says she's nearly too big for it."],
+    letter: "I got a letter! Meg helped me read the long words. I read it to the calves too.",
+    news: ["We've got three new calves. I named them Clover, Pickle and Moo.", "Buttercup still sucks my fingers. Bill says she's nearly too big for it."],
     back: null, backNote: ""},
 
   /* ---------- Nutwood Farm ---------- */

@@ -1,12 +1,12 @@
-// The gift shop's gallery wall and makers' shelf (round 196, Mel: "the paintings, I do want them to be for sale, but
+// The gift shop's gallery wall and makers' shelf (round 196: "the paintings, I do want them to be for sale, but
 // the money, maybe they just pay me like a token 10 coins... the money goes to the person who made it and then the
 // following week they could... write a letter to say thank you, I'm so excited about selling my painting").
-// Gallery: four frames on the back wall, between the round windows. Local painters (Dad from the sip and paint, Juniper,
-// Mr Okada, Mei) bring a new painting on Mondays to fill an empty frame. When one sells Mel keeps a token TOKEN coins and
-// the rest goes to the painter, who writes to her about it a week later. Mel can hang her own sip-and-paint paintings
+// Gallery: four frames on the back wall, between the round windows. Local painters (Theo from the sip and paint, Juniper,
+// Mr Okada, Mei) bring a new painting on Mondays to fill an empty frame. When one sells the player keeps a token TOKEN coins and
+// the rest goes to the painter, who writes to her about it a week later. The player can hang her own sip-and-paint paintings
 // there too: never for sale, and they come down again whenever she likes.
-// Makers' shelf: villagers' small handmade things on consignment (about a fifth, CUT, to Mel; the rest to the maker).
-// They top it up on Mondays. Mel can buy one herself at the full price (it all goes to the maker).
+// Makers' shelf: villagers' small handmade things on consignment (about a fifth, CUT, to the player; the rest to the maker).
+// They top it up on Mondays. The player can buy one herself at the full price (it all goes to the maker).
 // State: F.giftshop.gallery = {frames: [{by, t, price} | {own: itemId} | null] x4, sold: [{by, t, at}], filled: day}
 //        F.giftshop.makers = {stock: {itemId: n}, filled: day, week: {maker: coins}}
 import { esc } from "../util.js";
@@ -14,14 +14,15 @@ import { ITEMS } from "../data/items.js";
 import { icon } from "../art/icons.js";
 import { PAINTINGS } from "../data/terrace-people.js";
 import { lines, person, tradeOf } from "./contacts.js";
+import { dearMe } from "./me.js";
 
 export const TOKEN = 10, CUT = .2, FRAMES = 4;
 const D = 864e5;
 // the painters, what they paint (title, price, two colours for the little picture on the wall), and how they write
 export const PAINTERS = {
-  theo: {name: "Dad", what: "Sip-and-paint landscapes", sign: "Love, Dad",
-    works: [["The terrace at dusk", 48, "#E9A87A", "#5A6B8C", "dusk"], ["Vines in October", 44, "#C98A3A", "#7A8C4A", "vines"], ["The jetty, early", 40, "#9FC3D9", "#E8D3A6", "jetty"], ["Lavender rows", 46, "#A68FCB", "#F3DDB0", "rows"], ["Ma Ma's orchard", 42, "#7FA35A", "#F3C969", "orchard"]],
-    note: ["Mel! Somebody bought my painting. A real person, with real money. I've told everyone at the class. Twice.", "Posy rang to say '{t}' sold. I had to sit down. Your mother says I'm insufferable now. She's right.", "'{t}' has gone to a good home, Posy says. I hope they hang it where the light's kind. I've already started the next one."]},
+  theo: {name: "Theo", what: "Landscapes, sketched by the water", sign: "Yours, officially, Theo",
+    works: [["The terrace at dusk", 48, "#E9A87A", "#5A6B8C", "dusk"], ["Vines in October", 44, "#C98A3A", "#7A8C4A", "vines"], ["The jetty, early", 40, "#9FC3D9", "#E8D3A6", "jetty"], ["Lavender rows", 46, "#A68FCB", "#F3DDB0", "rows"], ["The orchard", 42, "#7FA35A", "#F3C969", "orchard"]],
+    note: ["Somebody bought my painting. A real person, with real money. I have told everyone at the town hall. Twice.", "Posy rang to say '{t}' sold. I had to sit down. Hana says I'm insufferable now. She's right.", "'{t}' has gone to a good home, Posy says. I hope they hang it where the light's kind. I've already started the next one."]},
   juniper: {name: "Juniper", what: "Watercolours from the library garden", sign: "With love, Juniper (from behind the returns desk)",
     works: [["Rain on the reading room", 32, "#BFD6E6", "#8A8279", "rain"], ["Wisteria by the steps", 36, "#C3A9E0", "#9EBE8C", "wisteria"], ["The library cat, asleep", 28, "#E8C49A", "#5A4A3E", "cat"], ["Autumn, through the window", 34, "#D98A4A", "#F3E7C8", "window"]],
     note: ["I've been grinning at the date stamp all morning. '{t}' sold! I may frame the receipt.", "Thank you for giving my little watercolours a wall. '{t}' found a home, and I found I can't stop telling the regulars.", "Someone bought '{t}'. I keep imagining it on their wall, getting rained on in a painted sort of way."]},
@@ -32,7 +33,7 @@ export const PAINTERS = {
     works: [["Sweet peas, in a jar", 30, "#F4C7CF", "#7FA35A", "jar"], ["Dahlia study", 34, "#D9534F", "#5E8A3A", "dahlia"], ["Cosmos in the wind", 28, "#F3B6D0", "#9EBE8C", "cosmos"], ["The first rose", 32, "#E8566C", "#6A8A4A", "rose"]],
     note: ["'{t}' sold! I've been telling the dahlias. They're very proud.", "I painted '{t}' between waterings and never thought anyone would want it. Thank you for hanging it up.", "Posy says '{t}' went to a lady who smelled it first. That's the nicest thing anyone's ever done to one of my paintings."]}
 };
-// the makers and their things (kind "gift", so Mel can buy one to give)
+// the makers and their things (kind "gift", so the player can buy one to give)
 export const MAKERS = {
   lin: {name: "Auntie Lin", item: "mk_cards"}, bo: {name: "Bo", item: "mk_spoon"}, noor: {name: "Noor", item: "mk_pettoy"},
   wren: {name: "Wren", item: "mk_bird"}, hana: {name: "Hana", item: "mk_honeybutter"}, felix: {name: "Felix", item: "mk_wraps"}
@@ -60,7 +61,7 @@ export function stockUp(F, day){
   if (!g.filled || (dow(day) === 1 && g.filled !== day)) {
     g.filled = day; const hung = new Set(g.frames.filter(f => f && f.by).map(f => f.by));
     const queue = Object.keys(PAINTERS).filter(p => !hung.has(p)).sort((a, b) => hashS(day + a) - hashS(day + b));
-    // while Mel has a painting of her own (in her backpack or already up), the painters leave one frame for her
+    // while the player has a painting of her own (in her backpack or already up), the painters leave one frame for her
     const mine = ownPaintings(F).length || g.frames.some(f => f && f.own); let room = (mine ? FRAMES - 1 : FRAMES) - g.frames.filter(f => f && f.by).length;
     g.frames = g.frames.map(f => { if (f || !queue.length || room <= 0) return f; room--; const by = queue.shift(), done = new Set(g.sold.filter(s => s.by === by).map(s => s.t)), w = PAINTERS[by].works, pick = w.find(x => !done.has(x[0])) || w[hashS(day + by) % w.length]; n++;
       return {by, t: pick[0], price: pick[1], c1: pick[2], c2: pick[3], m: pick[4]}; });
@@ -72,19 +73,19 @@ export function stockUp(F, day){
 const motifOf = f => { if (f.m || !f.by) return f.m || OWN_MOTIF[f.own]; const w = (PAINTERS[f.by] || {works: []}).works.find(x => x[0] === f.t); return w && w[4]; };
 export const framesNow = F => galleryState(F).frames.map(f => f && !f.m ? {...f, m: motifOf(f)} : f);
 export const forSale = F => galleryState(F).frames.filter(f => f && f.by);
-// a shopper buys a painting: Mel keeps the token, the painter's letter comes a week later
+// a shopper buys a painting: The player keeps the token, the painter's letter comes a week later
 export function sellPainting(F, i, at){
   const g = galleryState(F), f = g.frames[i]; if (!f || !f.by) return 0;
   g.frames[i] = null; g.sold = [...g.sold, {by: f.by, t: f.t, price: f.price, at: at + 7*D, id: `gal-${f.by}-${at}`}].slice(-40); return Math.min(TOKEN, f.price);
 }
-// a shopper (or Mel) buys from the makers' shelf: Mel's cut, or nothing when she buys it herself
+// a shopper (or the player) buys from the makers' shelf: The player's cut, or nothing when she buys it herself
 export function sellMade(F, id){ const m = makersState(F); if (!(m.stock[id] > 0)) return 0; m.stock[id]--; const it = ITEMS[id];
   m.week[it.maker] = (m.week[it.maker] || 0) + it.price; return Math.max(1, Math.round(it.price*CUT)); }
 export function buyMade(F, id){ const it = ITEMS[id]; if (!it || !(makersState(F).stock[id] > 0) || (F.coins || 0) < it.price) return false;
   F.coins -= it.price; sellMade(F, id); F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; return true; }
-// round 198: one of the travel boxes' things, into Mel's backpack (she's already paid for it)
+// round 198: one of the travel boxes' things, into the player's backpack (she's already paid for it)
 export function takeTravel(F, id){ const tr = (F.giftshop || {}).travel || {}; if (!(tr[id] > 0)) return false; tr[id]--; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; return true; }
-// Mel's own paintings (the sip-and-paint keepsakes): up on the wall, never for sale
+// The player's own paintings (the sip-and-paint keepsakes): up on the wall, never for sale
 export const ownPaintings = F => Object.keys(F.inv || {}).filter(id => /^p_/.test(id) && F.inv[id] > 0 && ITEMS[id]);
 export function hangOwn(F, id){ const g = galleryState(F), i = g.frames.indexOf(null); if (i < 0 || !(F.inv[id] > 0)) return false;
   F.inv[id]--; if (!F.inv[id]) delete F.inv[id]; const a = (PAINTINGS[id] || {}).art || [0, "#A68FCB", "#F3DDB0"]; g.frames[i] = {own: id, c1: a[1], c2: a[2], m: OWN_MOTIF[id] || "rows"}; return true; }
@@ -92,9 +93,9 @@ const OWN_MOTIF = {p_view: "rows", p_cypress: "cypress", p_still: "still"};
 export function takeDown(F, i){ const g = galleryState(F), f = g.frames[i]; if (!f || !f.own) return false; g.frames[i] = null; F.inv[f.own] = (F.inv[f.own] || 0) + 1; return true; }
 // the painters' letters, a week after a sale
 export const galleryMail = (F, t) => galleryState(F).sold.filter(s => s.at <= t && PAINTERS[s.by]).map(s => { const p = PAINTERS[s.by], line = p.note[hashS(s.id) % p.note.length].replace(/\{t\}/g, s.t);
-  return {id: s.id, from: "postie", at: s.at, title: `${p.name}'s painting sold`, body: `${s.by === "theo" ? "Hello love" : "Dear Mel"},\n\n${line}\n\n${p.sign}`}; });
+  return {id: s.id, from: "postie", at: s.at, title: `${p.name}'s painting sold`, body: `${dearMe(F)},\n\n${line}\n\n${p.sign}`}; });
 
-/* ---------- the pictures (round 197, Mel: "the paintings all look the same") ---------- */
+/* ---------- the pictures (round 197: "the paintings all look the same") ---------- */
 // what's painted inside a frame's canvas (x, y, w, h): each work its own little scene, in its two colours
 const SKY = "#F6F1E8", INK = "#2F2B28";
 export function paintSVG(x, y, w, h, f){
@@ -142,7 +143,7 @@ export function makersPanel(F){
   let h = `<h2>The makers' shelf</h2><p class="sub">Little handmade things from around Honeybrook, on consignment: when one sells, the maker gets the money and you keep about a fifth. They top it up on Mondays.</p><ul class="hlist wlist">`;
   h += Object.entries(MAKERS).map(([k, mk]) => { const it = ITEMS[mk.item], n = m.stock[mk.item] || 0;
     return `<li><span class="wpic">${icon(mk.item, 28)}</span><span class="wtxt"><b>${esc(it.n)}</b><small>${esc(mk.name)} · ${it.price} coins · ${n ? `${n} on the shelf` : "sold out till Monday"}</small></span><span class="orbtns"><button class="btn small alt" data-gg="buy:${mk.item}" ${n && (F.coins || 0) >= it.price ? "" : "disabled"}>Buy one</button></span></li>`; }).join("") + `</ul>`;
-  // round 198: from our travels: friends' own goods, in weekly boxes Mel has paid for (so the takings are all hers)
+  // round 198: from our travels: friends' own goods, in weekly boxes the player has paid for (so the takings are all hers)
   const tr = (F.giftshop || {}).travel || {}, ls = lines(F), ids = [...new Set([...ls.map(l => l.item), ...Object.keys(tr).filter(id => tr[id] > 0)])].filter(id => ITEMS[id]);
   h += `<p class="eyebrow" style="margin:14px 0 6px">From our travels</p>`;
   h += ids.length ? `<ul class="hlist wlist">${ids.map(id => { const l = ls.find(x => x.item === id), who = l && person(l.id) ? person(l.id).name : "a friend", n = tr[id] || 0;

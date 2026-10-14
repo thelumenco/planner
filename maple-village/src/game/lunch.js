@@ -1,9 +1,9 @@
-// The Sunday long lunch on the terrace (round 146, Mel). Once the wine shop has its terrace, every Sunday from 12 to 3
+// The Sunday long lunch on the terrace (round 146). Once the wine shop has its terrace, every Sunday from 12 to 3
 // one long table on the alfresco terrace fills up with people who've booked: villagers, families up for the day,
-// tourists, now and then a birthday, and one lot of Mel's own family (a different pair each week). The bookings book
+// tourists, now and then a birthday, and one pair of your close friends (a different pair each week). The bookings book
 // (on the lectern by the terrace doors) shows who's coming next Sunday, filling up as
-// the week goes on: so Mel can stock the shelves to suit. At lunch the tables order whole bottles (a pair gets
-// through about one an hour, and they go for the dearer bottles) and plates from the kitchen; with Mel out on the
+// the week goes on: so you can stock the shelves to suit. At lunch the tables order whole bottles (a pair gets
+// through about one an hour, and they go for the dearer bottles) and plates from the kitchen; with you out on the
 // terrace hosting, they order faster and tip. The art is art/terrace.js; sales are in vineyard.js sellTick.
 import { esc, dayKey, hash } from "../util.js";
 
@@ -15,7 +15,7 @@ export const lunchNow = (day, hm) => lunchOn(day) && hm >= LUNCH.from && hm < LU
 // the Sunday whose bookings are showing: today if it's Sunday, else the coming one
 export const nextSunday = (day = dayKey()) => addDays(day, (7 - dow(day)) % 7);
 
-// who might book (no one who keeps a stall at the Sunday market; and Ma Ma comes after hers closes at one)
+// who might book (no one who keeps a stall at the Sunday market; and Farid comes after his closes at one)
 const PARTIES = [
   {ids: ["hana", "pip"]}, {ids: ["okada", "lin"]}, {ids: ["juniper", "bo"]}, {ids: ["opal", "theo"]},
   {ids: ["aiko", "hiro"], from: "Up from the city"}, {ids: ["rosa", "bastien"], from: "On holiday"},
@@ -30,7 +30,7 @@ const cache = {};
 export function bookingsFor(sunday){
   if (cache[sunday]) return cache[sunday];
   const out = [], used = new Set(), take = p => { if (p.ids.some(id => used.has(id))) return false; p.ids.forEach(id => used.add(id)); out.push({...p, size: p.ids.length}); return true; };
-  // round 152: Mother's Day (the second Sunday in May): the whole family, Mum and Ma Ma guests of honour, and the
+  // round 152: Mother's Day (the second Sunday in May): all your friends, a toast to everyone who mothers us, and the
   // village's families round the rest of the table
   const mday = sunday.slice(5, 7) === "05" && +sunday.slice(8) >= 8 && +sunday.slice(8) <= 14;
   if (mday) take({ids: ["hana", "farid", "theo", "mei", "tomi", "posy", "bo"], family: true, mothers: true});
@@ -39,7 +39,7 @@ export function bookingsFor(sunday){
   const order = PARTIES.map((p, i) => [hash(sunday + ":" + i), p]).sort((a, b) => a[0] - b[0]).map(([, p]) => p);
   const want = 9 + hash(sunday) % 3;   // nine to eleven seats taken
   for (const p of order) { if (out.reduce((n, b) => n + b.size, 0) + p.ids.length > Math.min(want + 1, LUNCH.seats)) continue; take(p); if (out.reduce((n, b) => n + b.size, 0) >= want) break; }
-  // arrivals between 12 and half past, family after
+  // arrivals between 12 and half past, your friends after
   out.forEach((b, i) => { if (b.at == null) b.at = LUNCH.from + (hash(sunday + ":at" + i) % 3)*15; });
   return (cache[sunday] = out);
 }
@@ -70,9 +70,9 @@ const pretty = d => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", {day:
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 export function bookPanel(F, nameOf, opts = {}){
   const day = opts.day || dayKey(), {sunday, list, all} = bookOpen(day), seats = seatsTaken(list), shelf = opts.shelf || 0;
-  const label = b => b.mothers ? "The whole family, for Mother's Day (Mum and Ma Ma are guests of honour)" : b.birthday ? `Birthday lunch for ${nameOf(b.ids[2] || b.ids[0])}` : b.family ? `${b.ids.map(nameOf).join(" and ")} (family!)` : b.ids.length === 1 ? nameOf(b.ids[0]) : `${nameOf(b.ids[0])} and ${b.ids.length === 2 ? nameOf(b.ids[1]) : `${b.ids.length - 1} more`}`;
+  const label = b => b.mothers ? "All your friends, for Mother's Day (a toast to everyone who mothers us)" : b.birthday ? `Birthday lunch for ${nameOf(b.ids[2] || b.ids[0])}` : b.family ? `${b.ids.map(nameOf).join(" and ")} (old friends!)` : b.ids.length === 1 ? nameOf(b.ids[0]) : `${nameOf(b.ids[0])} and ${b.ids.length === 2 ? nameOf(b.ids[1]) : `${b.ids.length - 1} more`}`;
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The bookings book</h2><p class="sub">Sunday long lunch on the terrace, ${pretty(sunday)}, 12 to 3. ${seats} of ${LUNCH.seats} seats booked${list.length < all ? " so far: more will ring this week" : ""}.</p>`;
-  if (!opts.terrace) return h + `<p class="muted">You'll need the terrace first: Darren can build it, from the vineyard stall.</p>` + shut;
+  if (!opts.terrace) return h + `<p class="muted">You'll need the terrace first: Bo can build it, from the vineyard stall.</p>` + shut;
   h += `<ul class="hlist lunchbook">${list.map(b => `<li><b>${fmt(b.at)}</b><span>${esc(label(b))}</span><small>${b.size} ${b.size === 1 ? "seat" : "seats"}${b.from ? ` · ${esc(b.from)}` : ""}</small></li>`).join("")}</ul>`;
   const want = Math.ceil(seats/2*3);
   h += `<p class="muted">Expect about ${want} bottles over lunch (a pair gets through one an hour, and Sunday tables go for the good stuff). You've ${shelf} on the shelves.${shelf < want ? " Worth bottling a bit more before Sunday." : ""} Host out on the terrace yourself and they'll order faster, and tip.</p>`;

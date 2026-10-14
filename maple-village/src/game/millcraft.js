@@ -1,4 +1,4 @@
-// The mill workshop (round 153, Mel: "infused olive oils that sell for more; goat's milk soaps, lotions, olive oil
+// The mill workshop (round 153: "infused olive oils that sell for more; goat's milk soaps, lotions, olive oil
 // soaps, all mixed with berries, fruits and herbs"). At the workbench upstairs in the old mill, beside the press:
 //   infused oils: two bottles of olive oil and one or two herbs or fruits (rosemary, garlic, basil, thyme, chives,
 //     lemon, orange, lavender) steep for six hours: two bottles worth half as much again as plain oil.
@@ -6,11 +6,11 @@
 //     orange, lemon, raspberries); a day curing on the rack, then six bars.
 //   lotions: goat's milk, olive oil and one scent (lavender, rose, every honey but comb, orange, lemon, mint): an hour, three jars.
 // Like the gelato flavours, every new mix is found once and named, then made again. Herbs come from the garden and the
-// greenhouse, lavender and roses from Ma Ma's flower farm (her bouquets); fruit from the orchard.
+// greenhouse, lavender and roses from Mei's flower farm (her bouquets); fruit from the orchard.
 // What's made goes onto the mill's shelves (the store). Until the Mill Shop's open the wine shop sells a little of it
-// from a "from the mill" shelf by the counter; once it's open, Hazel sells it all day downstairs. Mel can take things
+// from a "from the mill" shelf by the counter; once it's open, Hazel sells it all day downstairs. The player can take things
 // for herself or to give away. And Tomi (Ines's little brother), at the mill 10 to 5 but Sundays, presses whatever's in the olive crate into the mill's own
-// bottles and carries them up to the basket (round 200: that's all; the infusing is Mel's).
+// bottles and carries them up to the basket (round 200: that's all; the infusing is the player's).
 // State: F.craft = {recipes: [{id, kind, base, adds, name}], steep: [{id, start, dur}], cure: [{id, start, dur}],
 //   pot: {id, start, dur} | null, store: {itemId: n}, basket: {herb: n}, oil: n (the mill's own plain bottles), sold}
 import { esc, dayKey } from "../util.js";
@@ -25,10 +25,10 @@ export const HERB = {
   lemon: {n: "Lemon", col: "#F3D24A", oil: true, soap: true, lotion: true}, orange: {n: "Orange", col: "#E8913A", oil: true, soap: true, lotion: true},
   raspberry: {n: "Raspberries", col: "#C2334D", soap: true}, honey: {n: "Honey", col: "#E3B04B", soap: true, lotion: true},
   bq_lavender: {n: "Lavender", col: "#A68FCB", oil: true, soap: true, lotion: true}, bq_rose: {n: "Rose", col: "#E8A0B4", soap: true, lotion: true},
-  // round 154 (Mel): more fruit from the garden and orchard, and more of Ma Ma's flowers
+  // round 154: more fruit from the garden and orchard, and more of Farid's flowers
   strawberry: {n: "Strawberry", col: "#E8566C", soap: true, lotion: true}, blueberry: {n: "Blueberry", col: "#5A6AB8", soap: true}, apple: {n: "Apple", col: "#9CC27E", soap: true},
   bq_sweetpea: {n: "Sweet pea", col: "#E8B4D8", soap: true, lotion: true}, bq_camellia: {n: "Camellia", col: "#E86A8A", soap: true, lotion: true}, bq_heather: {n: "Heather", col: "#B07AB8", soap: true},
-  // round 167 (Mel: "honey should also be an ingredient in the mill stuff"): every honey, from the hives and the trips
+  // round 167 ("honey should also be an ingredient in the mill stuff"): every honey, from the hives and the trips
   honey_lav: {n: "Lavender honey", col: "#C9A3E0", soap: true, lotion: true}, honey_blossom: {n: "Blossom honey", col: "#F3C9A0", soap: true, lotion: true},
   honey_cream: {n: "Creamed honey", col: "#F3E1A0", soap: true, lotion: true}, honeycomb: {n: "Honeycomb", col: "#E8B04A", soap: true},
   honey_sun: {n: "Sunflower honey", col: "#F3C93A", soap: true, lotion: true}, honey_heath: {n: "Heath honey", col: "#C9A060", soap: true, lotion: true},
@@ -36,12 +36,12 @@ export const HERB = {
 };
 export const KINDS = {oil: {n: "Infused oils", max: 2, price: 28, sell: 24}, soap: {n: "Soaps", max: 2, price: 8, sell: 6}, lotion: {n: "Lotions", max: 1, price: 16, sell: 13},
   balm: {n: "Lip balms", max: 1, price: 6, sell: 5}, lipoil: {n: "Lip oils", max: 1, price: 10, sell: 8}};
-// round 187 (Mel: "can lip balms and lip oils be part of the mill shop offers... and they can be dyed by the flowers I have"):
+// round 187 ("can lip balms and lip oils be part of the mill shop offers... and they can be dyed by the flowers I have"):
 //   beeswax  melted down from honeycomb at the bench (one comb, two blocks), or a block from Sunflower Hill's honey house
 //   balm     a block of beeswax, a bottle of olive oil and one flavour, and if she likes a flower for the colour: an hour
 //            setting in the tins, four tins
 //   lip oil  a bottle of olive oil, one flavour and (if she likes) a flower: a day steeping in the rollers, three bottles
-// The dye is a stem of any flower from Ma Ma's flower farm (its shed), or a tulip or sunflower from Mel's garden; the
+// The dye is a stem of any flower from Mei's flower farm (its shed), or a tulip or sunflower from the player's garden; the
 // tin's lid and the oil take its colour.
 for (const a of ["honey", "honey_lav", "honey_blossom", "honey_cream", "honey_sun", "honey_heath", "euchoney", "mint", "orange", "lemon", "bq_lavender", "bq_rose", "strawberry", "bq_sweetpea", "bq_camellia"]) if (HERB[a]) Object.assign(HERB[a], {balm: true, lipoil: true});
 if (HERB.raspberry) HERB.raspberry.lipoil = true;
@@ -69,7 +69,7 @@ export function registerCraft(F){ craftState(F).recipes.forEach(r => { const k =
     say: r.kind === "oil" ? `Your own ${r.name.toLowerCase()}! On bread, tonight. Thank you!` : r.kind === "soap" ? `Handmade ${r.name.toLowerCase()}? It smells beautiful.` : `${r.name}! My hands needed this. Thank you.`}; }); }
 const have = (F, id) => (F.inv || {})[id] || 0;
 const take = (F, id, n = 1) => { F.inv[id] -= n; if (F.inv[id] <= 0) delete F.inv[id]; };
-// plain oil for the bench: the backpack first, then the basket (round 199/200: Mel: "I put four bottles of olive oil in the
+// plain oil for the bench: the backpack first, then the basket (round 199/200: The player: "I put four bottles of olive oil in the
 // basket and it disappeared": Tomi was infusing with them. He doesn't infuse any more; his pressing goes into the basket).
 const oilHave = (F, c) => have(F, "oliveoil") + (c.basket.oliveoil || 0) + c.oil;
 // round 168: the mill's basket holds anything the bench uses (herbs, fruit, flowers, honey, goat's milk); the bench
@@ -122,7 +122,7 @@ export function toBasket(F, herb, n = 99){ const c = craftState(F), k = Math.min
   take(F, herb, k); c.basket[herb] = (c.basket[herb] || 0) + k; return k; }
 
 /* ---------- Tomi at the press, and Hazel at the shop (both on the clock) ---------- */
-// Tomi (10 to 5, not Sundays, once the mill's open) has three jobs and only three (round 200, Mel: "take the olives from the
+// Tomi (10 to 5, not Sundays, once the mill's open) has three jobs and only three (round 200: "take the olives from the
 // crate, press it into bottles of olive oil, and then put them into the basket upstairs... That's it"). Nothing else upstairs.
 export const PRESSER = {from: 14*60, to: 17*60 + 30}, SHOPKEEP = {from: 10*60, to: 17*60, closed: [1]};
 export function inesStep(F, m, v, t = Date.now()){
@@ -133,7 +133,7 @@ export function inesStep(F, m, v, t = Date.now()){
 }
 // what sells, and how fast: the Mill Shop all day while Hazel's in; before that, a little from the wine shop's shelf
 // where: "shop" (the Mill Shop: busier at weekends, when the day-trippers walk up the lane), "wineshop" (its little mill
-// shelf), "market" (the crate on Mel's wine stall at the Sunday market), "grace" (Grace's soap stall stocks Mel's soaps)
+// shelf), "market" (the crate on the player's wine stall at the Sunday market), "grace" (Grace's soap stall stocks the player's soaps)
 export function craftSellMinute(F, day, hm, where){
   const c = craftState(F), ids = Object.keys(c.store).filter(id => c.store[id] > 0 && ITEMS[id] && (where !== "grace" || ITEMS[id].mill === "soap")); if (!ids.length) return 0;
   const dw = new Date(day + "T00:00:00Z").getUTCDay(), we = dw === 0 || dw === 6, shopOpen = where === "shop" && hm >= SHOPKEEP.from && hm < SHOPKEEP.to && !SHOPKEEP.closed.includes(dw);
@@ -169,7 +169,7 @@ export function benchPanel(F, st = {}, o = {}){
     return h + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk, olive oil, beeswax. The bench takes from it as well as your backpack. Tomi brings up the oil he presses and leaves it here for you.</p>
       <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some(a => c.basket[a] > 0) || c.oil > 0 ? `<ul class="hlist wlist">${Object.keys(c.basket).filter(a => c.basket[a] > 0).concat(c.oil > 0 ? ["milloil"] : []).map(a => `<li><span class="wpic">${icon(a === "milloil" ? "oliveoil" : (ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(a === "milloil" ? "The mill's own olive oil" : a === "oliveoil" ? "Your olive oil" : bn(a))}</b><small>${a === "milloil" ? `${c.oil} bottle${c.oil === 1 ? "" : "s"} from Tomi's pressing (he infuses with these)` : a === "oliveoil" ? `${c.basket[a]} bottle${c.basket[a] === 1 ? "" : "s"}, yours and Tomi's pressing` : `${c.basket[a]} in the basket`}</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
       <p class="eyebrow" style="margin:10px 0 6px">From your backpack</p>
-      ${inBag.length ? `<div class="actions">${inBag.map(a => `<button class="btn small alt" data-mc="basket:${a}">${HERB[a] ? dots([a]) : ""} Put in ${have(F, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from Ma Ma's orchard and the garden, flowers from her flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut; }
+      ${inBag.length ? `<div class="actions">${inBag.map(a => `<button class="btn small alt" data-mc="basket:${a}">${HERB[a] ? dots([a]) : ""} Put in ${have(F, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from the orchard and the garden, flowers from Mei's flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut; }
   const ok = HERB_OF(tab), base = st.base || "goatmilk", pick = st.adds || [];
   const lip = tab === "balm" || tab === "lipoil", rollers = c.lipoil || [];
   const busy = tab === "oil" ? c.steep.length >= CRAFT.jars : tab === "soap" ? c.cure.length >= CRAFT.rack : tab === "balm" ? !!c.balm : tab === "lipoil" ? rollers.length >= CRAFT.rollers : !!c.pot;
@@ -184,7 +184,7 @@ export function benchPanel(F, st = {}, o = {}){
     const pick = st.adds || [], dye = st.dye || null, flav = HERB_OF(tab).filter(a => got(F, c, a)), dyes = Object.keys(FLOWERS).filter(d => dyeHave(F, d) > 0);
     h += `<div class="ppbatch">${icon(`${tab}_${dye || "none"}`, 64)}</div>`;
     h += `<p class="eyebrow" style="margin:10px 0 6px">The flavour (one)</p>${flav.length ? `<div class="gchips">${flav.map(a => `<button class="gchip${pick.includes(a) ? " on" : ""}" data-mc="add:${a}" aria-pressed="${pick.includes(a)}"><i class="mulldot" style="background:${HERB[a].col}"></i><span>${esc(nm(a))}</span></button>`).join("")}</div>` : `<p class="muted">No flavours with you: honey, mint, orange, lemon, lavender, rose, strawberries...</p>`}`;
-    h += `<p class="eyebrow" style="margin:10px 0 6px">The colour (a flower, if you like)</p><div class="gchips"><button class="gchip${!dye ? " on" : ""}" data-mc="dye:" aria-pressed="${!dye}"><span>None</span></button>${dyes.map(d => `<button class="gchip${dye === d ? " on" : ""}" data-mc="dye:${d}" aria-pressed="${dye === d}"><i class="mulldot" style="background:${FLOWERS[d].col}"></i><span>${esc(capW(FLOWERS[d].one))} (${dyeHave(F, d)})</span></button>`).join("")}</div>${dyes.length ? "" : `<p class="muted">Stems from Ma Ma's flower farm (in its shed) or tulips and sunflowers from your garden make the colours.</p>`}`;
+    h += `<p class="eyebrow" style="margin:10px 0 6px">The colour (a flower, if you like)</p><div class="gchips"><button class="gchip${!dye ? " on" : ""}" data-mc="dye:" aria-pressed="${!dye}"><span>None</span></button>${dyes.map(d => `<button class="gchip${dye === d ? " on" : ""}" data-mc="dye:${d}" aria-pressed="${dye === d}"><i class="mulldot" style="background:${FLOWERS[d].col}"></i><span>${esc(capW(FLOWERS[d].one))} (${dyeHave(F, d)})</span></button>`).join("")}</div>${dyes.length ? "" : `<p class="muted">Stems from Mei's flower farm (in its shed) or tulips and sunflowers from your garden make the colours.</p>`}`;
     const ready = pick.length === 1;
     return h + `<div class="actions"><button class="btn primary" data-mc="make" ${ready ? "" : "disabled"}>${ready ? (c.recipes.some(r => r.id === keyOf(tab, null, pick, dye)) ? `Make ${esc(craftName(tab, null, pick, dye))}` : "Try something new") : "Make it"}</button></div>` + shut;
   }
@@ -235,10 +235,10 @@ export function millSlot(id, day, hm, open, tourists, busy = []){
 // kept for the earlier tests' sake: the browsing visits on their own
 export const millVisitSlot = (id, day, hm, open, tourists, busy = []) => { const s = millSlot(id, day, hm, open, tourists, busy); return s && s.millvisit ? s : null; };
 
-/* ---------- Mel at a tasting ---------- */
+/* ---------- the player at a tasting ---------- */
 export const NOTES = ["Fruity", "Grassy", "Peppery", "Bitter", "Almond", "Tomato leaf", "Herby", "Citrus", "Floral", "Garlicky"];
 const ADD_NOTE = {rosemary: "Herby", thyme: "Herby", basil: "Herby", chives: "Herby", lemon: "Citrus", orange: "Citrus", bq_lavender: "Floral", garlic: "Garlicky"};
-// the oils on the table today: Mel's own plain oil, then up to three of her infused ones -> [{name, notes}]
+// the oils on the table today: The player's own plain oil, then up to three of her infused ones -> [{name, notes}]
 export function tastingOils(F){ const c = craftState(F), out = [{name: "Your own olive oil, plain", notes: ["Fruity", "Grassy", "Peppery"]}];
   c.recipes.filter(r => r.kind === "oil").slice(0, 3).forEach(r => out.push({name: r.name, notes: [...new Set(["Fruity", ...r.adds.map(a => ADD_NOTE[a]).filter(Boolean), "Peppery"])].slice(0, 3)}));
   if (out.length < 3) out.push({name: "Elena's olives, pressed young", notes: ["Grassy", "Bitter", "Tomato leaf"]}, {name: "A late-harvest oil from up the hill", notes: ["Fruity", "Almond", "Peppery"]});
@@ -271,12 +271,12 @@ export function workshopPanel(F, o = {}){
   return h + `<p class="sub">Hazel's at the head of the table, five day-trippers in aprons, everyone stirring. "Gently! Like you're tucking it in." Lend a hand?</p><div class="actions"><button class="btn primary" data-tst="help">Help Hazel</button></div>` + shut;
 }
 const UNMADE = [["soap", "goatmilk", ["bq_lavender", "honey"]], ["soap", "oliveoil", ["rosemary", "lemon"]], ["soap", "goatmilk", ["strawberry", "bq_sweetpea"]], ["lotion", null, ["bq_camellia"]], ["soap", "goatmilk", ["blueberry", "bq_heather"]], ["oil", null, ["garlic", "chives"]], ["soap", "oliveoil", ["orange", "thyme"]]];
-// helping: tips, and Hazel tells Mel about a mix she hasn't made yet
+// helping: tips, and Hazel tells the player about a mix she hasn't made yet
 export function helpWorkshop(F){ const c = craftState(F); c.helped = dayKey(); const tips = 12; F.coins = (F.coins || 0) + tips;
   const next = UNMADE.find(([k, b, a]) => !c.recipes.some(r => r.kind === k && (r.base || null) === (k === "soap" ? b : null) && r.adds.join() === [...a].sort().join()));
   return {tips, hint: next ? craftName(next[0], next[1], next[2]) : null}; }
 /* ---------- the pop-up crate in the campervan ---------- */
-// Mel packs a crate at the van's fold-down table: things off the mill's shelves and bottles off the wine shop's shelves
+// The player packs a crate at the van's fold-down table: things off the mill's shelves and bottles off the wine shop's shelves
 // (up to two dozen). On a campervan trip, with the crate out by the van, passers-by buy from it while she's at the stop.
 export const VAN_CRATE = {max: 24, p: .04};
 export function vanCrate(F){ const c = craftState(F); c.van = c.van || {items: {}, wine: []}; return c.van; }

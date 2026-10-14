@@ -84,11 +84,11 @@ export const NPCS = [
     react: {harvest: "Look at that harvest! Your soil is coming along.", ready: "Something's ready in your garden. Don't leave it sulking!"}
   },
   {
-    id: "pip", pitch: 1.45, name: "Pip", job: "Evan's best friend",
-    intro: "I'm Pip! I'm Evan's best friend and I'm the FASTEST. Watch!", kid: true,
+    id: "pip", pitch: 1.45, name: "Pip", job: "The fastest child in Honeybrook",
+    intro: "I'm Pip! I'm seven and I'm the FASTEST. Watch!", kid: true,
     look: {skin: "#D6A27C", hair: "#1F1A17", hairStyle: "spiky", top: "#F28C6A", bottom: "#4C7BB0", extra: "helmet"},
     routine: [slot("16:30", "17:30", "vineyard", [[110, 604], [262, 600], [410, 608], [200, 586], [330, 590]]), slot("15:00", "18:30", "base", [[230, 350], [300, 380], [200, 420], [360, 516], [160, 560], [300, 600]])],
-    lines: ["Race you to the pond!", "Evan is SO fast. Almost as fast as me.", "Did you know foxes can't ride bikes? I asked Maple.", "I found a snail! His name is Gary."],
+    lines: ["Race you to the pond!", "Nobody is as fast as me. Nobody.", "Did you know foxes can't ride bikes? I asked Maple.", "I found a snail! His name is Gary."],
     react: {}
   },
   {
@@ -193,23 +193,23 @@ export const NPCS = [
   // leading the weekend tours)
   {
     id: "farid", pitch: 0.85, name: "Farid", job: "Works the fruit orchard",
-    intro: "Farid! I prune, I fertilise, I carry Ma Ma's ladders. She says I talk to the trees too much. She's one to talk.",
+    intro: "Farid! I keep the orchard: prune, fertilise, climb the ladders. Mei says I talk to the trees too much. She sings to the roses, so.",
     look: {skin: "#B07A55", hair: "#2A211D", hairStyle: "short", top: "#7FA35A", bottom: "#5E5A55", hat: "cap"},
     routine: [slot("8:00", "12:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 510], [310, 330]], {act: "farm"}),
       slot("12:00", "13:00", "orchard", [470, 330], {act: "sit"}),
       slot("13:00", "17:30", "orchard", [[160, 420], [260, 510], [360, 330], [410, 420]], {act: "water"})],
-    lines: ["Ma Ma's the boss. I just carry things.", "The apples are looking good this week.", "Want to help? Kidding. Ma Ma would never let you lift anything.", "Best office in the village, this."],
-    actLines: {guide: ["Over here we've got the fruit trees. Ma Ma's pride and joy.", "You can taste one at the farm shop after!", "Step around the hose, please. Everyone always forgets the hose."], farm: ["Pruning the old branches. More fruit next time.", "Mulch. Very glamorous."], water: ["Deep water, twice a week. Ma Ma's rule.", "These trees drink more than I do."]},
+    lines: ["The trees are the boss. I just carry things.", "The apples are looking good this week.", "I baked too much again. There's cake at the cottage at three.", "Best office in the village, this."],
+    actLines: {guide: ["Over here we've got the fruit trees. My pride and joy.", "You can taste one at the farm shop after!", "Step around the hose, please. Everyone always forgets the hose."], farm: ["Pruning the old branches. More fruit next time.", "Mulch. Very glamorous."], water: ["Deep water, twice a week. That's the rule.", "These trees drink more than I do."]},
     away: "Farid's gone home for the day."
   },
   {
     id: "mei", pitch: 1.2, name: "Mei", job: "Works the flower farm",
-    intro: "Hi, I'm Mei! I look after the flower beds. Ma Ma taught me everything, including how to sing to the roses. Don't laugh.",
+    intro: "Hi, I'm Mei. I look after the flower beds. My mother taught me to sing to the roses. Don't laugh.",
     look: {skin: "#EAC4A4", hair: "#2B2320", hairStyle: "bob", top: "#F4C7CF", bottom: "#5E6E8C", hat: "sunhat"},
     routine: [slot("7:00", "8:00", "hwoods", [[132, 590], [180, 560], [100, 600]], {dow: [0]}), slot("8:00", "12:00", "flowers", [[160, 300], [260, 380], [360, 470], [210, 470], [310, 300]], {act: "water"}),
       slot("12:00", "13:00", "flowers", [44, 486], {act: "sit"}),
       slot("13:00", "17:30", "flowers", [[160, 380], [260, 470], [360, 300], [410, 380]], {act: "farm"})],
-    lines: ["The dahlias are showing off today.", "Ma Ma says flowers know when you're happy.", "Bouquet for someone special? Just say.", "I could do this forever."],
+    lines: ["The dahlias are showing off today.", "My mother said flowers know when you're happy.", "Bouquet for someone special? Just say.", "I could do this forever."],
     actLines: {guide: ["These beds bloom again every day or so. Isn't that lovely?", "That one's my favourite. Don't tell the others.", "Bouquets at the farm shop, if anyone's feeling romantic."], water: ["Gentle on the petals.", "Morning water, happy flowers."], farm: ["Deadheading. Snip, snip.", "Cutting a few for the shop."]},
     away: "Mei's finished for the day."
   },
@@ -250,21 +250,21 @@ export const NPCS = [
       slot("13:00", "18:00", "hfarm", [[186, 286], [200, 524], [300, 520], [310, 286]])],
     intro: "Felix. I keep the bees up here at Wildflower Farm. Lavender honey, orchard blossom, wildflower... they decide, not me.",
     lines: ["The bees are cheerful today. Can you hear them?", "Never wear blue near a hive. They think you're a flower.", "Elena says I talk to the bees more than to her. She's not wrong.", "Hive three is my favourite. Don't tell the others."],
-    hellos: ["Morning, Mel!", "Ah, a helper!"], away: "Felix is in the farmhouse with his feet up."},
+    hellos: ["Morning!", "Ah, a helper!"], away: "Felix is in the farmhouse with his feet up."},
   {id: "elena", pitch: 1.05, name: "Elena", job: "Runs the dairy at Wildflower Farm",
     look: {skin: "#D9A882", hair: "#5A3A2A", hairStyle: "bun", top: "#9C8CD9", bottom: "#3E4A43", extra: "apron"},
     routine: [slot("06:00", "11:00", "hfarm", [[30, 400], [260, 400], [490, 420], [440, 516]]), slot("11:00", "13:00", "barn", [[262, 520], [380, 560], [160, 560]]),
       slot("13:00", "18:00", "hfarm", [[200, 600], [260, 524], [440, 512], [458, 270]])],
     intro: "I'm Elena. Cows, goats, and soon a proper cheese cave in the barn. The cheese at my market stall? Aged right here.",
     lines: ["Daisy's the boss of the paddock. Mochi just pretends.", "Milking at six. The goats prefer six-fifteen.", "A good cheese takes patience. So does a good goat.", "Pepper ate my notebook again."],
-    hellos: ["Hi Mel! Grab a bucket.", "Morning! Hay's in the barn."], away: "Elena's done for the day. Even the goats are asleep."},
+    hellos: ["Hi! Grab a bucket.", "Morning! Hay's in the barn."], away: "Elena's done for the day. Even the goats are asleep."},
   // Amara serves at the Cocoa Room's counter (once Mel opens it, goals.js "cocoa"), Tuesday to Sunday
   {id: "amara", pitch: 1.15, name: "Amara", job: "Serves at the Cocoa Room",
     look: {skin: "#A8754F", hair: "#1F1A17", hairStyle: "bun", top: "#8A5A3A", bottom: "#F3E7C9", extra: "apron"},
     routine: [slot("10:45", "20:15", "cocoa", [300, 268], {dow: [0, 2, 3, 4, 5, 6], needs: "cocoa"})],
     intro: "Hi, I'm Amara! I wrap, I sell, and I sneak the broken bits. Don't tell.",
     lines: ["The dark one's flying off the wall today.", "Someone bought six bars. Six!", "It smells like heaven in here, all day long.", "I told a tourist you make it from the bean. They nearly cried."],
-    hellos: ["Hi Mel! The wall's looking good.", "Boss! Want a taste?"], away: "Amara's off. The Cocoa Room's quiet."},
+    hellos: ["Hi! The wall's looking good.", "Boss! Want a taste?"], away: "Amara's off. The Cocoa Room's quiet."},
   // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep): Monday to Saturday 9:30-4:30, evening classes Mon and Tue
   {id: "mateo", pitch: .95, name: "Mateo", job: "Kitchen hand at the Cocoa Room",
     look: {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#F6F2EA", bottom: "#4A2E22", extra: "apron"},
@@ -277,7 +277,7 @@ export const NPCS = [
       slot("17:00", "20:30", "hlane", [186, 298], {act: "sit", dow: [0, 3, 4, 5, 6]}), slot("20:30", "22:30", "honeysuckle", [300, 470], {act: "sit", dow: [0, 3, 4, 5, 6]})],   // home: Honeysuckle, with Lila
     intro: "Hola! I'm Mateo. I'm in your kitchen Monday to Saturday, and I study food science at the poly on Monday and Tuesday nights. The bonbons are all yours, boss.",
     lines: ["Your bonbon shelf is full. I didn't touch a crumb!", "Exams next week. Tempering is very calming.", "My lecturer says I'm the only one who's ground beans by hand.", "The grinder's singing today.", "Forty dark bars on the wall. A personal best.", "I bought beans this morning. Don't worry, I kept to your budget."],
-    hellos: ["Morning, boss! Roaster's warm.", "Hi Mel! Smell that?"], away: "Mateo's gone home. The kitchen's quiet."},
+    hellos: ["Morning, boss! Roaster's warm.", "Hi! Smell that?"], away: "Mateo's gone home. The kitchen's quiet."},
   // Lila, the Cocoa Room's second assistant (cocoa.js upgrade "assistant"): Mondays (Amara's day off) and weekend afternoons
   {id: "lila", pitch: 1.2, name: "Lila", job: "Serves at the Cocoa Room",
     look: {skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#C2505F", bottom: "#F3E7C9", extra: "apron"},
@@ -285,7 +285,7 @@ export const NPCS = [
       slot("10:45", "20:15", "cocoa", [240, 268], {dow: [1], needs: "cc_assistant"}), slot("13:00", "20:15", "cocoa", [[180, 420], [400, 440], [240, 268]], {dow: [0, 6], needs: "cc_assistant"})],
     intro: "Hi! I'm Lila. Mondays are mine, and I help Amara at weekends. I'm working my way through every bonbon. For research.",
     lines: ["Mondays are quiet, but the regulars are lovely.", "I wrapped forty boxes on Saturday. My fingers are ribbon now.", "Someone asked if we deliver to the moon.", "The fountain is hypnotic. I keep staring at it."],
-    hellos: ["Hi Mel!", "Morning, boss!"], away: "Lila's not on today."},
+    hellos: ["Hi!", "Morning, boss!"], away: "Lila's not on today."},
   // Noor runs the pet adoption corner at the Sunday farmers market and the field fair (tours.js); no routine otherwise
   // Noor lives at Clover on the cottage lane, with a pen of rescues in the garden
   {id: "noor", pitch: 1.1, name: "Noor", job: "Finds homes for rescued pets", routine: [slot("18:30", "19:30", "clover", [262, 470], {act: "sit"}), slot("08:00", "12:00", "hlane", [[198, 456], [150, 470], [236, 470]], {dow: [1, 2, 3, 4, 5, 6]}), slot("16:00", "19:30", "hlane", [176, 456], {act: "sit"})],
@@ -323,7 +323,7 @@ export const NPCS = [
     ["ava", "Ava", {skin: "#D9A882", hair: "#2B2320", hairStyle: "bun", top: "#8FB3E8", bottom: "#F3C969"}]
   ].map(([id, name, look]) => ({id, pitch: 1.45, name, job: "Here for the playground", tourist: true, kid: true, look, routine: [],
     intro: `I'm ${name}! Wanna race?`,
-    lines: ["Push me on the swing!", "Again! Again!", "The roundabout is the BEST.", "I'm not dizzy. Okay, a bit dizzy.", "Can Evan play too?"],
+    lines: ["Push me on the swing!", "Again! Again!", "The roundabout is the BEST.", "I'm not dizzy. Okay, a bit dizzy.", "Will you play too?"],
     away: `${name}'s gone home.`})),
   // The wine shop's cook: on her shifts she runs the kitchen from whatever's in the larder (see cookTick)
   // Honeybrook Woods' ranger (round 103): cycles up from Makers' Lane in the morning, walks the trails, keeps the
@@ -413,7 +413,7 @@ export const NPCS = [
     intro: "Paloma. I dance. Manolo plays, I dance, and if you clap in the right places, I dance better. Olé!",
     look: {skin: "#D9A47E", hair: "#1E1A18", hairStyle: "bun", top: "#C8343A", bottom: "#C8343A"},
     routine: [slot("13:00", "15:00", "rd_tapas", [462, 516], {act: "dance", dir: -1}), slot("20:00", "22:00", "rd_tapas", [462, 516], {act: "dance", dir: -1})],
-    lines: ["Clap on three, six, eight, ten and twelve. It's easy! It's not easy.", "Flamenco is not happy, not sad. It's both, at the same time.", "My grandmother danced on this same stage. Well, the old one. It fell down.", "¡Venga, Evan! Clap with me!"],
+    lines: ["Clap on three, six, eight, ten and twelve. It's easy! It's not easy.", "Flamenco is not happy, not sad. It's both, at the same time.", "My grandmother danced on this same stage. Well, the old one. It fell down.", "¡Venga! Clap with me!"],
     away: "Paloma's resting her feet. The show's at one and at eight."
   },
   {
@@ -491,7 +491,7 @@ export const NPCS = [
     intro: "Mori. I play Go here every day. Forty years. I win most days. Not always against myself.",
     look: {skin: "#D9A47E", hair: "#E8E4DE", hairStyle: "short", top: "#3E5E7A", bottom: "#4A4440", hat: "cap"},
     routine: [slot("9:30", "17:30", "kt_temple", [330, 470], {act: "sit", dir: -1})],
-    lines: ["Black stone, white stone. The whole world on one board.", "Your grandfather plays like a river. Very patient. Then suddenly, flood.", "Sit, watch. You'll learn more watching than playing.", "Again tomorrow? Good. Bring your grandfather."],
+    lines: ["Black stone, white stone. The whole world on one board.", "Your friend plays like a river. Very patient. Then suddenly, flood.", "Sit, watch. You'll learn more watching than playing.", "Again tomorrow? Good. Bring your friend."],
     away: "Mr Mori's gone home for supper. The Go board waits under its cloth."
   },
   {
@@ -539,7 +539,7 @@ export const NPCS = [
       ["Look at the eaves. They curve up so the rain jumps off. Clever.", "No nails in that pagoda. Just joints. Like a puzzle.", "I'll be drawing roofs in my sleep tonight."]],
     ["tess", "Tess", {skin: "#8A5A3A", hair: "#1E1A18", hairStyle: "curly", top: "#9CC27E", bottom: "#F3ECDD", hat: "sunhat"}, "From Melbourne, travelling with her mum", "Tess! From Melbourne, here with my mum. She's bought six teapots. We have one suitcase.",
       [slot("9:30", "11:30", "kt_tea", [260, 300], {act: "sit"}), slot("11:30", "13:30", "kt_market", [[220, 470], [320, 520]]), slot("13:30", "15:30", "kt_lane", [[260, 540], [320, 300]]), slot("15:30", "17:30", "kt_temple", [[240, 400], [300, 560]]), slot("17:30", "19:30", "kt_river", [[180, 500], [320, 270]])],
-      ["Mum's in the pottery buying a seventh teapot. Send help.", "The koi in the temple pond are bigger than my cat.", "I didn't think anywhere could be this quiet and this busy at once."]]
+      ["My mum's in the pottery buying a seventh teapot. Send help.", "The koi in the temple pond are bigger than my cat.", "I didn't think anywhere could be this quiet and this busy at once."]]
   ].map(([id, name, look, job, intro, routine, lines]) => ({id, local: "kyoto", tourist: true, pitch: .95 + (id.charCodeAt(0) % 4)*.07, name, job, intro, look, routine, lines, away: `${name}'s off seeing another bit of Kyoto.`})),
   // Round 129: Jeju's people (local: "jeju"). Halmang Kim is a diver (haenyeo), seventy-four, and Seo-yeon is learning
   // from her; Mr Ko grows tangerines; Ha-eun keeps the café in her grandmother's house; Mi-ok and Mrs Boo have stalls at
@@ -614,7 +614,7 @@ export const NPCS = [
     intro: "Kang. Nets. Fifty years of nets. Sit, if you like. The gulls will keep you company.",
     look: {skin: "#C99A78", hair: "#D6D0C6", hairStyle: "short", top: "#5E7A8A", bottom: "#5A4A3E", hat: "cap"},
     routine: [slot("9:00", "17:00", "jj_harbour", [300, 480], {act: "nets", dir: 1})],
-    lines: ["A net with a hole catches nothing. A man with a hole in his day catches up.", "Your grandfather? He mends a good knot. Tell him to come back.", "Squid tonight. You can smell it in the wind.", "Pass me that needle. Thank you."],
+    lines: ["A net with a hole catches nothing. A man with a hole in his day catches up.", "Your friend? She mends a good knot. Tell her to come back.", "Squid tonight. You can smell it in the wind.", "Pass me that needle. Thank you."],
     away: "Mr Kang's gone for lunch: grilled mackerel, every day."
   },
   {
@@ -715,52 +715,53 @@ export const NPCS = [
   },
   {
     id: "nino", local: "cinque", pitch: 0.68, name: "Nino", job: "Plays bocce in the piazza, every afternoon",
-    intro: "Nino. Retired. Very busy. Bocce at eleven, lunch at one, bocce at three. You play? No? Your grandfather plays, I think. I see it in his eyes.",
+    intro: "Nino. Retired. Very busy. Bocce at eleven, lunch at one, bocce at three. You play? No? Your friends play, I think. I see it in their eyes.",
     look: {skin: "#C99A78", hair: "#E6E2DA", hairStyle: "short", top: "#F3E7C8", bottom: "#5A4A3E", hat: "cap"},
     routine: [slot("10:30", "13:00", "ct_vernazza", [270, 470], {act: "bocce", dir: 1}), slot("15:00", "19:00", "ct_vernazza", [270, 470], {act: "bocce", dir: 1})],
-    lines: ["Close to the little ball. That's all. That's the whole game. It takes a lifetime.", "Sixty years in this piazza. I've seen everything. Twice.", "Your grandfather! Ha! He's good. Too good. I'll beat him tomorrow.", "Siesta is not lazy. Siesta is wisdom."],
+    lines: ["Close to the little ball. That's all. That's the whole game. It takes a lifetime.", "Sixty years in this piazza. I've seen everything. Twice.", "Your friend with the flowers! Ha! She's good. Too good. I'll beat her tomorrow.", "Siesta is not lazy. Siesta is wisdom."],
     away: "Nino's home for lunch and a sleep."
   },
-  // Jason (round 135, for Mel): her friend since they were teenagers at secondary school. They came to Cinque Terre
-  // together in 2015 (an Airbnb in Vernazza; he climbed every one of Corniglia's steps; he waited on the dark harbour
-  // with a pizza when her train came in hours late after a strike in Florence). In the game he's moved here for good:
-  // the second floor of the yellow house by the harbour, a happy life with Luca. Slightly tall, neat, fair, black
-  // hair and black spectacles, a white short-sleeved shirt printed with coconut trees, and navy chinos. Speaks a little formally, quotes things, very funny.
-  // His day: a poem at the café, a walk (he still climbs the steps), lunch at Beppe's, the beach, a gelato, and the
-  // sunset on the harbour wall with Luca.
+  // Ornella (id "jason"): a Vernazza local the player meets on the trip and can keep as a pen pal. Seventy-two, a
+  // retired ferry captain (thirty-one years bringing the coast ferry into the harbour), now "on shore leave,
+  // indefinitely". Lives on the second floor of the yellow house by the harbour. Brisk, salty, warm and funny; a
+  // little verse in her notebook every morning, the Corniglia steps, a swim at Monterosso whatever the weather, and
+  // the sunset on the harbour wall with Dario, her old deckhand. White hair in a bun, a navy jumper, a captain's cap.
   {
-    id: "jason", local: "cinque", pitch: 0.92, name: "Jason", job: "Lives in Vernazza now. Writes poetry, walks, watches the sunset",
-    intro: "Mel. Well, well, well. I trust you came by train, and not by strike? I live here now, you know: the second floor of the yellow house by the harbour, geraniums on the balcony. Come up whenever you like. There are far fewer stairs than Corniglia.",
-    look: {skin: "#F6DCC6", hair: "#1E1A18", hairStyle: "short", top: "#FFFDF6", palms: true, sleeves: "#FFFDF6", bottom: "#2E3A5A", tall: true, specs: true},
+    id: "jason", local: "cinque", pitch: 1.0, name: "Ornella", job: "Retired ferry captain. Writes verses at the café, swims every day",
+    intro: "Ornella. Thirty-one years I brought the ferry into this harbour, and not once did I scrape the paint. You came by train? A pity. The sea is the proper front door. I'm in the yellow house by the harbour, second floor, geraniums. Wave when you pass. I'll be watching the boats anyway.",
+    look: {skin: "#E8C2A0", hair: "#E6E2DA", hairStyle: "bun", top: "#2E3A5A", sleeves: "#2E3A5A", bottom: "#F3E7C8", hat: "cap"},
     routine: [slot("8:00", "10:30", "ct_vernazza", [332, 296], {act: "poem", dir: -1}), slot("10:30", "12:30", "ct_corniglia", [[372, 420], [300, 460], [400, 380]]),
       slot("12:30", "14:00", "ct_focacceria", [[200, 520], [330, 540]]), slot("14:00", "16:30", "ct_monterosso", [[200, 480], [340, 470], [260, 420]]),
       slot("16:30", "18:00", "ct_gelato", [[200, 500], [330, 520]]), slot("18:00", "21:45", "ct_vernazza", [222, 418], {act: "sit", dir: -1})],
-    hellos: ["Mel! Sit, sit. I've ordered for you already. I know your tastes.", "Ah, there you are. The day has improved considerably.", "Mel! Come and admire the view with me. I've been admiring it alone, and it's wasted on one."],
+    hellos: ["Ah, there you are. Sit. The coffee's coming, whether you want it or not.", "Ciao! The wind's gone round to the south, and now you're here. The day's improving.", "Come and judge the boats with me. Half of them are moored like amateurs."],
     lines: [
-      "'To live is the rarest thing in the world. Most people exist, that is all.' Wilde. I have decided to be rare.",
-      "Three hundred and eighty-two steps up to Corniglia. I climbed every one of them in 2015, and I have been insufferable about it ever since.",
-      "Byron swam across the gulf down the coast, you know. I prefer to admire it from a café. Each to his own heroics.",
-      "Luca says my shirts frighten the fish. I say the fish have no taste.",
-      "'Shall I compare thee to a summer's day?' No. The day would only sulk.",
-      "The light does something to the houses at six o'clock. I keep trying to write it down, and the sea keeps getting there first.",
-      "Second floor, a harbour view, and a neighbour who sings Puccini, badly, at seven in the morning. Paradise has its terms.",
-      "One must have a little ritual. Mine is an espresso, a poem, and pretending I'm not watching the boats.",
-      "'The world is too much with us.' Wordsworth. Not here, though. Here the world is exactly enough.",
-      "I am told I dress 'flamboyantly'. I prefer 'legibly'. One should be able to read a man from across a piazza.",
-      "Do you remember the pizza? On the harbour stones, in the dark, after your train? Best meal of my life. Don't tell Beppe."
+      "Thirty-one years on the ferry. I can tell the weather by the colour of the church bell. Today: fair, with a chance of tourists.",
+      "Three hundred and eighty-two steps up to Corniglia. I'm seventy-two, and I still pass the young ones on the way up. I say 'buongiorno' very cheerfully as I go by.",
+      "I swim at Monterosso every day, January too. The sea is cold and I am stubborn. We have an understanding.",
+      "Dario was my deckhand once. Sixteen, all elbows, seasick on a flat calm. Now he mends every engine in the harbour. I take all the credit.",
+      "A good knot is a kind of poem. It says exactly what it means, and it holds.",
+      "Retired? I'm not retired. I'm on shore leave. Indefinitely.",
+      "The houses go pink at six. I saw it ten thousand times from the wheelhouse, and I still stop whatever I'm doing.",
+      "Never trust a cloud shaped like an anvil, or a man who ties up with a granny knot.",
+      "My barometer has said 'change' since 1984. One day it'll be right, and it'll be unbearable about it.",
+      "One must have a little ritual. Mine is a coffee, four lines in my notebook, and pretending I'm not inspecting everybody's mooring.",
+      "The first time I saw you, you were on the harbour wall with your map upside down. I liked you at once."
     ],
-    actLines: {poem: ["Hush. A rhyme for 'harbour' is proving elusive.", "Today's poem is about a cat in a boat. It's going terribly. He won't sit still. The cat, not the poem.", "Ah, Mel. I'm on my third draft. The first two were by a lesser poet."],
-      sit: ["Watch the houses go pink. Every evening, and it never once repeats itself.", "Luca says the sunset is just the earth turning. I say so is everything worth watching.", "Stay a little. There's always a train. Well. There's usually a train."]},
-    away: "Jason's upstairs with a book. His balcony door is open, and there's music."
+    actLines: {poem: ["Hush. I need a rhyme for 'starboard'. 'Cupboard' is the best I have, and I'm not proud of it.", "Today's verse is about the cat on Aldo's boat. He's a better sailor than Aldo. That's the whole verse.", "Four lines a morning. The first three come easily. The fourth I have to chase round the harbour."],
+      sit: ["Watch the lights come on in the houses, one by one, like boats coming home.", "Dario says a sunset is just science. I say so is a good engine, and he loves those.", "Stay a while. The last train's at ten. I know the timetable by heart."]},
+    away: "Ornella's upstairs. Her balcony door is open, and a radio's reading out the shipping forecast."
   },
+  // Dario (id "luca"): Vernazza's boat mechanic, in his late twenties; once Ornella's deckhand on the ferry. Cheerful,
+  // chatty, learning English from old films and collecting idioms (which he gets nearly right). Another pen pal.
   {
-    id: "luca", local: "cinque", pitch: 0.8, name: "Luca", job: "Mends the fishing boats' engines in Vernazza. Jason's partner",
-    intro: "Ciao! Luca. I fix the engines on the boats. Jason fixes my grammar. It is a fair trade. You're Mel? He talks about you all the time. The train, the pizza, the steps. Every story, the steps get more.",
-    look: {skin: "#D8A47E", hair: "#3A2A20", hairStyle: "short", top: "#F3E7C8", bottom: "#3E5E7A"},
+    id: "luca", local: "cinque", pitch: 0.8, name: "Dario", job: "Mends the fishing boats' engines in Vernazza. Collects English idioms",
+    intro: "Ciao! Dario. I fix the engines on the boats. You speak English? Fantastic. I am learning. Ornella says I speak like an old film. Anyway, nice to meet you: it's a piece of pie! No. Cake. A piece of cake. You see? Learning.",
+    look: {skin: "#C99A78", hair: "#1E1A18", hairStyle: "curly", top: "#C9483A", bottom: "#3E5E7A"},
     routine: [slot("8:00", "13:00", "ct_vernazza", [[200, 440], [180, 470], [230, 450]]), slot("15:00", "18:00", "ct_vernazza", [[200, 440], [230, 450]]), slot("18:00", "21:45", "ct_vernazza", [246, 420], {act: "sit", dir: -1})],
-    lines: ["He writes poems about the sea. I tell him the sea is mostly diesel. He doesn't listen. Good.", "I met him when the ferry broke down outside the harbour. I came out with my toolbox. He came out with a book. He's still here.",
-      "He made me read Shakespeare. I made him eat raw anchovies. We are both braver now.", "Every evening, the harbour wall, the sunset. Ten years I lived here and never sat still. Now I sit."],
-    away: "Luca's out in a boat, fixing somebody's engine."
+    lines: ["Ornella was my captain when I was sixteen. I was sick over the side every day for a month. She never told anybody. Now she tells everybody.", "Today's idiom: 'it's raining cats and dogs'. Very strange. Here it only rains water. And sometimes lemons, in a strong wind.",
+      "This engine is older than me. It's also more stubborn than Ornella. Almost.", "Every evening, the harbour wall, the sunset. Ornella names the stars. I name the engines I can hear. We are both right.",
+      "When I finish an engine I say 'Bob's your uncle'. Nobody here has an uncle Bob. It's still very satisfying."],
+    away: "Dario's out in a boat, fixing somebody's engine. You can hear him singing over the motor."
   },
   // round 134: the people who keep each room busy all day (the town playbook: 2-4 people in every room)
   {
@@ -864,7 +865,7 @@ export const NPCS = [
     look: {skin: "#E8C4A0", hair: "#3A2A22", hairStyle: "bun", top: "#F4C7CF", bottom: "#3F4A6B", extra: "apron"},
     routine: [slot("9:45", "14:00", "scoopshop", [300, 268]), slot("14:00", "14:30", "bay", [196, 360], {act: "sit"}), slot("14:30", "20:15", "scoopshop", [300, 268])],
     lines: ["Cup or cone? Trick question: both.", "The deck's lovely this time of day.", "Someone ordered four scoops before lunch. Respect.", "Tomo's run off his feet on the deck. Bless him."],
-    hellos: ["Hi Mel! What'll it be?", "Ciao, boss!", "The new flavour's flying out!"],
+    hellos: ["Hi! What'll it be?", "Ciao, boss!", "The new flavour's flying out!"],
     away: "Sofia's finished for the day. The counter's closed."
   },
   {
@@ -890,6 +891,26 @@ export const NPCS = [
 // at home in the evening, and Mr Okada before his early walk too.
 const HOMES = {bo: [["chord", 1200, 1290]], lin: [["chico", 1140, 1260]], juniper: [["luna", 1200, 1290]], okada: [["ohayo", 360, 435], ["ohayo", 1260, 1320]]};
 for (const [id, slots] of Object.entries(HOMES)) { const n = NPCS.find(x => x.id === id); if (n) slots.forEach(([scene, from, to]) => n.routine.push({from, to, scene, wander: [[200, 340], [320, 350], [260, 430]]})); }
+// Three houses for six friends: Hana and Theo on the foreshore, Tomi and Posy next door, Farid and Mei in the orchard
+// cottage. Their working days stay as they were; these are the mornings and evenings at home (a slot that matches
+// earlier in a routine still wins, so a Friday at the wine shop comes first). `first` slots go to the front.
+const AT_HOME = {
+  hana: [slot("18:00", "19:00", "shore", SHORE_WALK, {dow: [2, 4]}), slot("19:00", "22:50", "hanatheo", [270, 476], {act: "sit"}), slot("22:50", "23:00", "hanatheo", [454, 352]),
+    slot("6:45", "7:45", "shore", SHORE_WALK, {dow: [0, 2, 3, 5, 6]})],
+  theo: [slot("7:00", "8:45", "shore", [212, 372], {act: "type", dir: -1}), slot("8:45", "9:00", "village", [[230, 420], [300, 470]]),
+    slot("19:00", "22:50", "hanatheo", [112, 292], {act: "type", dow: [0, 2, 4, 6]}), slot("19:00", "22:50", "hanatheo", [262, 300], {act: "type"}), slot("22:50", "23:00", "hanatheo", [434, 360])],
+  farid: [slot("7:00", "8:00", "cottage", [[300, 330], [200, 360]]), slot("17:30", "22:50", "cottage", [398, 352], {act: "sit"}), slot("22:50", "23:00", "cottage", [66, 352])],
+  mei: [slot("6:30", "7:45", "field", [76, 300], {act: "fish", dow: [1, 3], dir: 1}), slot("17:30", "18:30", "orchard", [[160, 330], [260, 420], [360, 510]], {act: "water"}),
+    slot("18:30", "22:50", "cottage", [458, 358], {act: "sit"}), slot("22:50", "23:00", "cottage", [86, 360])],
+  tomi: [slot("8:30", "9:30", "shore", SHORE_WALK, {dow: [1, 2, 3, 4, 5, 6]}), slot("16:00", "17:00", "shore", SEA, {dow: [0, 6], act: "sup", free: true}),
+    slot("17:00", "18:00", "shore", SHORE_WALK), slot("18:00", "22:50", "tomiposy", [90, 428], {act: "game"}), slot("22:50", "23:00", "tomiposy", [454, 362])],
+  posy: [slot("8:00", "9:45", "tomiposy", [322, 302], {act: "type"}), slot("18:00", "19:00", "shore", SHORE_WALK, {dow: [0, 2, 3, 4]}),
+    slot("19:00", "22:50", "tomiposy", [132, 428], {act: "sit"}), slot("22:50", "23:00", "tomiposy", [434, 370])]
+};
+// Farid's afternoon tea at the cottage (core.js haveTea) comes before his orchard shift
+const FIRST = {farid: [slot("15:00", "16:00", "cottage", [154, 564], {act: "sit"})]};
+for (const [id, slots] of Object.entries(AT_HOME)) { const n = NPCS.find(x => x.id === id); if (n) n.routine.push(...slots); }
+for (const [id, slots] of Object.entries(FIRST)) { const n = NPCS.find(x => x.id === id); if (n) n.routine.unshift(...slots); }
 
 // Agent NPCs: one per automation. `from` on a mail item picks the messenger (unknown -> postie).
 // round 154: Grace, staying the season with her gran Hazel, has a week too (her Sunday stall comes from tours.js)

@@ -4,7 +4,7 @@
 // Cellar Door: Kel the winemaker, Jono in the barrel cave, Mick and Bec at the Long Table. At the berry farm: Shaz's
 // jam kitchen, Sophie's chocolaterie, Dee at the Berry Barn. At Gum Creek: Ranger Jack, Dr Mira and Kim at the
 // wildlife hospital, Noor at the visitor centre, Doug at the platypus window. At Riverside Camp: Wal at the camp
-// store and Bodhi at the canoe shed, and the travelling neighbours (neighbour: true), all on the road like Mel: Bev and
+// store and Bodhi at the canoe shed, and the travelling neighbours (neighbour: true), all on the road like you: Bev and
 // Ron in their caravan (with Biscuit the dog), Kai and Lou in a Kombi, the Nguyens and their two kids, Hanne cycling
 // round Australia, and Archie, who's been on the road for eleven years. From five they all gather round the fire.
 // And day-trippers (tourist: true): cyclists, a book club, photographers, a family picking berries.
@@ -44,7 +44,7 @@ export const BB_PEOPLE = [
   /* ---------- Balloon Lookout ---------- */
   P("bvrosie", "Rosie", "Runs the coffee caravan by the balloons", {skin: "#F2D3BC", hair: "#C9785A", hairStyle: "bobfringe", top: "#F3C969", bottom: "#3E5E7A", extra: "apron"},
     [slot("6:30", "14:00", "bv_coffee", [400, 290], {dir: -1}), slot("16:30", "19:00", "bv_coffee", [400, 290], {dir: -1})],
-    ["Flat white? You look like a flat white person.", "Dad's been flying since before I was born. I've been making coffee since I was nine.", "Babycino for the little one, on the house."],
+    ["Flat white? You look like a flat white person.", "Gus has been flying since before I was born. I've been making coffee since I was nine.", "Anzac biscuit with that? Still warm. Go on."],
     "Rosie! Coffee's on. Dawn flights get the first cup, everyone else gets the second.", "The coffee caravan's hatch is down. Rosie's off till the golden hour."),
   P("bvgus", "Gus", "Flies the hot air balloons", {skin: "#D9A882", hair: "#9A928A", hairStyle: "short", top: "#5A6A7A", bottom: "#5A4A3E", hat: "cap"},
     [slot("6:00", "9:00", "bl_paddock", [[290, 420], [350, 400], [250, 380]], {act: "point"}), slot("9:00", "16:00", "bv_balloonshed", [400, 300], {act: "repair", dir: -1}), slot("16:30", "19:30", "bl_paddock", [[290, 420], [350, 400]], {act: "point"})],
@@ -120,7 +120,7 @@ export const BB_PEOPLE = [
     "Jen. Mason and I are picking. Well, I'm picking. He's eating.", "Jen and Mason have gone home.", {tourist: true}),
   P("bvmason", "Mason", "Picking berries (eating them)", {skin: "#E8C4A0", hair: "#5A3A2A", hairStyle: "spiky", top: "#E8566C", bottom: "#4F9CC4"},
     [slot("9:00", "11:00", "bb_rows", [[250, 500], [400, 490]], {act: "pick"}), slot("11:00", "12:30", "bv_berrycafe", [[240, 520], [340, 540]]), slot("12:30", "14:30", "bb_choc", [[120, 480], [180, 470]])],
-    ["I've got red hands! Strawberry hands!", "Can Evan come on the slide?", "Chocolate fountain! CHOCOLATE FOUNTAIN!"],
+    ["I've got red hands! Strawberry hands!", "Watch me go down the slide! Watch!", "Chocolate fountain! CHOCOLATE FOUNTAIN!"],
     "I'm Mason! I'm five! I ate a raspberry with a bug on it!", "Mason's gone home.", {tourist: true, kid: true}),
 
   /* ---------- Gum Creek Sanctuary ---------- */
@@ -160,9 +160,9 @@ export const BB_PEOPLE = [
     "Wal. I run the camp, the store, and the fire on a cold night. Need anything? Probably got it.", "Wal's doing his rounds of the campsites."),
   P("bvbodhi", "Bodhi", "Hires out the canoes", {skin: "#C99A78", hair: "#E8C48E", hairStyle: "long", top: "#4F9CC4", bottom: "#E8C27A"},
     [slot("9:00", "12:00", "bv_canoe", [404, 300], {dir: -1}), slot("12:00", "17:00", "br_river", [[180, 360], [320, 340], [140, 380]])],
-    ["Paddle on the left, you go right. On the right, you go left. Nobody believes me.", "Life jackets on, little legend. Safety first, fun second. Close second.", "The swing's the best bit. Hold on, let go at the top."],
+    ["Paddle on the left, you go right. On the right, you go left. Nobody believes me.", "Life jackets on, everyone. Safety first, fun second. Close second.", "The swing's the best bit. Hold on, let go at the top."],
     "Bodhi. I do the canoes. Best office in the world: the river.", "Bodhi's out on the river."),
-  // the travelling neighbours: on the road like Mel, and at the fire from five
+  // the travelling neighbours: on the road like you, and at the fire from five
   P("bvbev", "Bev", "On the road in a caravan with Ron (and Biscuit)", {skin: "#F6D9C4", hair: "#D6D0C6", hairStyle: "curly", top: "#E89A9A", bottom: "#5A6A7A", extra: "glasses"},
     [slot("8:00", "12:00", "br_park", [420, 380], {act: "knit", dir: -1}), slot("12:00", "14:00", "bv_campkitchen", [[160, 520], [300, 540]]), slot("14:00", "17:00", "br_park", [420, 380], {act: "knit", dir: -1}), slot("17:00", "21:45", "br_park", FIRE[0], {act: "knit", ...at(0)})],
     ["Biscuit! Leave the man's sausage alone!", "Two years on the road. We sold the house. Best thing we ever did.", "I'm knitting Ron a beanie. He'll lose it by Tuesday.", "Scones Saturday! Bring your own jam."],
@@ -189,7 +189,7 @@ export const BB_PEOPLE = [
     "Linh. Tuan's cooking, the kids are swimming, I'm reading. Bliss.", "The Nguyens are in their tent.", {neighbour: true}),
   P("bvbao", "Bao", "Camping with his family", {skin: "#D9A882", hair: "#1E1A18", hairStyle: "spiky", top: "#E8566C", bottom: "#4F9CC4"},
     [slot("9:00", "16:00", "br_river", [[380, 400], [440, 360], [320, 410]]), slot("17:00", "20:00", "br_park", [[220, 560], [340, 580]])],
-    ["The rope swing! Did you see me? DID YOU SEE?", "I found a yabby! It pinched me!", "Can Evan come to the river?"],
+    ["The rope swing! Did you see me? DID YOU SEE?", "I found a yabby! It pinched me!", "Do you want to see my yabby? He's in a bucket."],
     "I'm Bao! I'm eight! I did the rope swing nine times!", "Bao's in the tent, pretending to sleep.", {neighbour: true, kid: true}),
   P("bvmai", "Mai", "Camping with her family", {skin: "#E2B590", hair: "#1E1A18", hairStyle: "bob", top: "#F3C969", bottom: "#9A7AB8"},
     [slot("9:00", "16:00", "br_river", [[360, 420], [300, 400], [420, 420]]), slot("17:00", "20:00", "br_park", [[240, 580], [320, 560]])],

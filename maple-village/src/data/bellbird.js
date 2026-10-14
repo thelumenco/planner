@@ -1,10 +1,10 @@
-// Bellbird Valley (round 141, Mel): the campervan road trip. One big valley of single stops joined by country roads,
+// Bellbird Valley (round 141): the campervan road trip. One big valley of single stops joined by country roads,
 // in four regions (the Vines, inspired by the Yarra Valley; the Coast Road, the Great Ocean Road; the Lavender Hills,
 // Provence; the Tablelands, the Atherton Tablelands). Built a region at a time: the Vines first.
 // Every stop is two outdoor screens (side by side or one above the other) with two or three rooms, and it's a "town"
-// to the trip system (TOWNS, merged in towns.js): F.trip.town is the stop Mel's at, and the campervan parked there is
-// its station (tap it for the road map: drive on, or home). Day trips only (Mel plays in short afternoon and evening
-// bursts): out 7am to 6pm, home by 10pm. Places all start "bv".
+// to the trip system (TOWNS, merged in towns.js): F.trip.town is the stop you're at, and the campervan parked there is
+// its station (tap it for the road map: drive on, or home). Day trips only (the game is played in short afternoon and
+// evening bursts): out 7am to 6pm, home by 10pm. Places all start "bv".
 //
 //   Valley Gate        bv_gate:    bg_gate | bg_bridge          (side by side)
 //   Balloon Lookout    bv_lookout: bl_paddock / bl_valley       (one above the other)
@@ -23,14 +23,12 @@ export const BB_TOWNS = {
   bv_gate: {...VAN, n: "Valley Gate", region: "vines", screens: ["bg_gate", "bg_bridge"], arrive: ["bg_gate", [150, 520]], station: "bvvan_gate", music: "bb_vines",
     blurb: "The turn-off into Bellbird Valley: a big timber sign, a farm-gate stand with an honesty box, the general store, and an old bridge over the creek.",
     arriveLine: "Bellbird Valley! A big timber sign at the turn-off, gum trees, golden grass, and a sound like little bells in the trees: the bellbirds.",
-    evanArrive: ["birdies going ding ding!", "big sign, Mama!", "are we camping?"],
-    evanScreen: {bg_gate: ["a shop!", "eggs in a box!"], bg_bridge: ["a bridge! a wooden bridge!", "water! can I throw a stick?"]},
     hints: {bg_gate: "Valley Gate: the turn-off, the general store, the farm-gate shed, and the van. East: the old bridge.", bg_bridge: "The old bridge over the creek, the church-hall op shop, and the bellbirds. West: back to the van."},
     spots: fam({hana: {bg_gate: [[260, 440], [320, 470]], bg_bridge: [[300, 420], [200, 470]]}, theo: {bg_gate: [[220, 470], [360, 430]], bg_bridge: [[360, 330], [240, 480]]},
       farid: {bg_gate: [[300, 460], [250, 420]], bg_bridge: [[380, 460], [300, 500]]}, mei: {bg_gate: [[230, 520], [240, 530]], bg_bridge: [[260, 520], [270, 530]]},
       bo: {bg_gate: [[380, 480], [180, 440]], bg_bridge: [[200, 360], [420, 480]]}, tomi: {bg_gate: [[420, 440], [300, 520]], bg_bridge: [[440, 380], [300, 460]]},
       posy: {bg_gate: [[340, 520], [280, 400]], bg_bridge: [[330, 480], [420, 420]]}}),
-    acts: {   // round 144: what the family does here (and nowhere else)
+    acts: {   // round 144: what your friends do here (and nowhere else)
       farid: {bv_opshop: {act: "rummage", at: [150, 450], dir: -1}},
       mei: {bg_bridge: {act: "binoculars", at: [150, 470], dir: -1}},
       posy: {bg_gate: {act: "crown", at: [150, 372], dir: -1}}
@@ -39,11 +37,11 @@ export const BB_TOWNS = {
       bv_shed: {door: "bvshed", n: "The farm-gate shed", music: "bv_shed", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The farm-gate shed: crates of apples, trays of eggs, honey and jam on a plank shelf, buckets of flowers, and a tin for the money."},
       bv_opshop: {door: "bvopshop", n: "The op shop", music: "bv_opshop", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The op shop: racks of cardigans, shelves of china, old records, a box of board games, and Joan and Marg drinking tea behind the counter."}},
     lines: {hana: ["Listen! The bellbirds. Like a hundred tiny bells.", "An honesty box! Nobody does that any more. I love it here already."],
-      theo: ["Look at the old timber on that bridge. Built to last.", "The general store's got a post office counter. When did you last see one of those?"],
-      farid: ["Eggs, honey, apples, all in a little shed. You put the money in the tin. Very good system.", "Ma Ma wants to see the op shop. Treasures inside, Ma Ma can feel it."],
-      mei: ["Gong Gong will sit by the creek. You go explore.", "These trees have white trunks like they've been painted. Gum trees."],
+      theo: ["Look at the old timber on that bridge. Built to last.", "The general store's got a post office counter. With a proper date stamp, I hope."],
+      farid: ["Eggs, honey, apples, all in a little shed, and you put the money in the tin. Very good system.", "I want a look in the op shop. There's an old cake tin in there waiting for me, I can feel it."],
+      mei: ["I'll sit by the creek a while. You go and explore.", "These trees have white trunks, like someone painted them. Gum trees."],
       bo: ["Right, map says we can go north to the balloons or down to the creek. Your call.", "Coffee at the general store first. Non-negotiable."],
-      tomi: ["Zeh, a whole valley of wineries. Pace yourself, everyone.", "Bellbird Valley. Even the name's chill."],
+      tomi: ["A whole valley of wineries. Pace yourselves, everyone.", "Bellbird Valley. Even the name's chill."],
       posy: ["The light here is so golden.", "Wattle! Look, the little yellow fluffy flowers."]},
     say: {bvsign: "The Bellbird Valley sign: big old timbers, carved letters, and a wattle tree beside it, yellow in spring.",
       bvstand: "The farm-gate stand: eggs, honey, apples and a bucket of flowers on a trestle, with a tin honesty box. 'Back at 4. Gus.'",
@@ -55,8 +53,6 @@ export const BB_TOWNS = {
   bv_lookout: {...VAN, n: "Balloon Lookout", region: "vines", screens: ["bl_paddock", "bl_valley"], arrive: ["bl_paddock", [150, 540]], station: "bvvan_lookout", music: "bb_lookout",
     blurb: "A hilltop paddock where the hot-air balloons go up at dawn and golden hour, and the whole valley below.",
     arriveLine: "Up on the hill: a paddock with two hot-air balloons half full of air, burners roaring, and below, the whole valley in patchwork stripes of vines.",
-    evanArrive: ["BIG BALLOONS!", "fire! woosh!", "I want to go up!"],
-    evanScreen: {bl_paddock: ["the balloon is breathing!", "a caravan with coffee!"], bl_valley: ["so far down!", "tiny balloons in the sky!"]},
     hints: {bl_paddock: "Balloon Lookout: the launch paddock, the balloon shed, the coffee caravan, and the van. South: the view.", bl_valley: "The lookout: the whole valley below, picnic rugs, and the gallery café. North: back up to the paddock."},
     spots: fam({hana: {bl_paddock: [[300, 460], [220, 500]], bl_valley: [[260, 300], [320, 340]]}, theo: {bl_paddock: [[360, 480], [260, 520]], bl_valley: [[380, 300], [200, 330]]},
       farid: {bl_paddock: [[240, 470], [300, 520]], bl_valley: [[300, 360], [240, 380]]}, mei: {bl_paddock: [[200, 520], [210, 530]], bl_valley: [[230, 330], [240, 340]]},
@@ -72,10 +68,10 @@ export const BB_TOWNS = {
       bv_gallery: {door: "bvgallery", n: "The gallery café", music: "bv_gallery", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The gallery café: paintings of the valley on every wall, a long window over the view, and the smell of scones."}},
     lines: {hana: ["Look how slowly they rise. Like they're thinking about it.", "Breakfast up here with that view. Yes please."],
       theo: ["Hot air rises. The rest is nerve.", "From up there you'd see every vine row in the valley."],
-      farid: ["Ma Ma stays on the ground. Ma Ma likes the ground.", "So peaceful. Only the roar of the fire, then quiet."],
-      mei: ["When Gong Gong was young, nobody flew in a basket.", "The mist sits in the valley like milk in a bowl."],
-      bo: ["I'd go up. You'd go up? Evan would definitely go up.", "That's a lot of propane."],
-      tomi: ["Zeh, imagine proposing up there. Not that I'm planning anything. Angie, I'm not.", "The coffee caravan does a mean flat white."],
+      farid: ["I'll stay on the ground, thank you. The ground and I get on very well.", "So peaceful. Only the roar of the burner, then quiet."],
+      mei: ["When I was young, nobody flew in a basket.", "The mist sits in the valley like milk in a bowl."],
+      bo: ["I'd go up. You'd go up? Right, we're going up.", "That's a lot of propane."],
+      tomi: ["Imagine getting married up there. Posy, I'm only saying. Don't make that face.", "The coffee caravan does a mean flat white."],
       posy: ["The colours of the balloons against the sky! I need a photo.", "Golden hour up here is unreal."]},
     say: {bvballoons: "The balloons: great striped envelopes swelling on the grass, burners roaring, baskets tipped on their sides waiting.",
       bvcoffee: "The coffee caravan: a little cream caravan with a hatch, a chalkboard and a queue of people in fleeces.",
@@ -86,8 +82,6 @@ export const BB_TOWNS = {
   bv_cellar: {...VAN, n: "The Cellar Door", region: "vines", screens: ["bc_vines", "bc_lawn"], arrive: ["bc_vines", [140, 540]], station: "bvvan_cellar", music: "bb_cellar",
     blurb: "A stone cellar door among the vines: tastings, a barrel cave with riddling racks, and a long-lunch restaurant on a lawn under a huge plane tree.",
     arriveLine: "The Cellar Door: rows of vines following the curves of the hill, a stone building with a tin roof, and a kelpie trotting over to see who's arrived.",
-    evanArrive: ["a doggy! a doggy!", "grapes everywhere!", "is it a castle?"],
-    evanScreen: {bc_vines: ["so many grapes!", "the doggy is following us!"], bc_lawn: ["beanbags!", "a big big tree!"]},
     hints: {bc_vines: "The vines: the cellar door, the barrel cave in the hill, and the van. East: the lawn.", bc_lawn: "The lawn: the plane tree, beanbags, music, and the restaurant. West: the vines."},
     spots: fam({hana: {bc_vines: [[300, 470], [240, 520]], bc_lawn: [[260, 440], [320, 480]]}, theo: {bc_vines: [[360, 480], [420, 520]], bc_lawn: [[200, 460], [300, 520]]},
       farid: {bc_vines: [[260, 480], [300, 530]], bc_lawn: [[360, 440], [300, 500]]}, mei: {bc_vines: [[220, 540], [230, 550]], bc_lawn: [[240, 500], [250, 510]]},
@@ -103,10 +97,10 @@ export const BB_TOWNS = {
       bv_restaurant: {door: "bvrestaurant", n: "The Long Table", music: "bv_restaurant", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The Long Table: one huge table down the middle, white cloths, jugs of wildflowers, and a view of the vines."}},
     lines: {hana: ["A tasting! Only a little one. Maybe two.", "That dog's adopted us."],
       theo: ["Pinot Noir and Chardonnay. Cool climate, they said. Like home, with more sunshine.", "They make sparkling the old way here. In the bottle."],
-      farid: ["Ma Ma will have the grape juice.", "Long lunch on the lawn. Ma Ma approves of this country."],
-      mei: ["Gong Gong found a beanbag. Gong Gong is not getting up.", "Good tree. Very old. Good shade."],
+      farid: ["I'll have the grape juice, please.", "A long lunch on the lawn. I approve of this country."],
+      mei: ["I found a beanbag. I am not getting up.", "Good tree. Very old. Good shade."],
       bo: ["I'm driving. I'll have the sparkling water. Somebody remember that.", "The cave's cut right into the hill. Cool in summer."],
-      tomi: ["Zeh, the Pinot here. Honestly.", "Long lunch. Long. Lunch. Two of my favourite words."],
+      tomi: ["The Pinot here. Honestly.", "Long lunch. Long. Lunch. Two of my favourite words."],
       posy: ["There's a wedding on the lawn! Look at the dress!", "Beanbags and a guitar under a tree. This is the dream."]},
     say: {bvrows: "The vines: rows of Pinot Noir and Chardonnay curving round the hill, roses at the end of each row to warn of mildew.",
       bvtasting: "The cellar door: a stone building with a tin roof and a long wooden bar inside.",
@@ -118,8 +112,6 @@ export const BB_TOWNS = {
   bv_berry: {...VAN, n: "Berry Farm & Chocolaterie", region: "vines", screens: ["bb_rows", "bb_choc"], arrive: ["bb_rows", [140, 540]], station: "bvvan_berry", music: "bb_berry",
     blurb: "Pick-your-own berry rows with a café and a jam kitchen, and a big chocolaterie with free tastings and a playground.",
     arriveLine: "The Berry Farm: rows and rows of strawberries and raspberry canes, a red barn café, and from somewhere down the hill, the smell of chocolate.",
-    evanArrive: ["strawberries!", "can I pick?", "I smell CHOCOLATE"],
-    evanScreen: {bb_rows: ["red ones and pink ones!", "a red barn!", "a butterfly! wait for me, butterfly!", "I nearly caught a white butterfly!"], bb_choc: ["a playground!", "a chocolate house!"]},
     hints: {bb_rows: "The berry rows: pick-your-own, the berry café, the jam kitchen, and the van. South: the chocolaterie.", bb_choc: "The chocolaterie and its playground. North: the berry rows."},
     spots: fam({hana: {bb_rows: [[300, 460], [240, 500]], bb_choc: [[260, 420], [320, 460]]}, theo: {bb_rows: [[380, 480], [260, 530]], bb_choc: [[200, 440], [380, 470]]},
       farid: {bb_rows: [[220, 470], [300, 520]], bb_choc: [[300, 480], [240, 440]]}, mei: {bb_rows: [[200, 540], [210, 550]], bb_choc: [[230, 500], [240, 510]]},
@@ -135,12 +127,12 @@ export const BB_TOWNS = {
       bv_choc: {door: "bvchoc", n: "The chocolaterie", music: "bv_choc", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The chocolaterie: counters of chocolate as far as you can see, a chocolate fountain, and free tastings. Free!"}},
     lines: {hana: ["One for the basket, one for me. That's the rule.", "Free chocolate tastings. Free! I'm going in."],
       theo: ["Raspberries straight off the cane. Nothing like them.", "They'd grow at home, you know. In a sunny corner."],
-      farid: ["Ma Ma picks the best ones. Small and dark. The big ones are water.", "Jam! Ma Ma makes jam better. But this is also good."],
-      mei: ["Gong Gong will watch the playground. Somebody has to.", "Too much chocolate is not possible. Gong Gong has checked."],
-      bo: ["We are not leaving here with less than three bags.", "The chocolate fountain. I see it. Evan sees it. This is a problem."],
-      tomi: ["Zeh, scones with jam AND cream. The correct order is jam first.", "Chocolate-dipped strawberries. That's a food group."],
+      farid: ["Pick the small dark ones. The big ones are mostly water.", "Jam! Mine is better, I'm sorry to say. But this is also good."],
+      mei: ["I'll sit by the playground and watch the swings. Somebody has to.", "Too much chocolate is not possible. I have checked."],
+      bo: ["We are not leaving here with less than three bags.", "The chocolate fountain. I see it. It sees me. This is a problem."],
+      tomi: ["Scones with jam AND cream. The correct order is jam first.", "Chocolate-dipped strawberries. That's a food group."],
       posy: ["A strawberry the size of my fist!", "The chocolaterie smells like heaven."]},
-    say: {bvberries: "The pick-your-own rows: strawberries low in their straw, raspberry canes taller than Evan, and little baskets at the gate.",
+    say: {bvberries: "The pick-your-own rows: strawberries low in their straw, raspberry canes taller than you, and little baskets at the gate.",
       bvberrycafe: "The berry café: a red barn with picnic tables out front and a smell of warm scones.",
       bvjam: "The jam kitchen: a little shed with copper pots on the stove and jars cooling on the windowsill.",
       bvchoc: "The chocolaterie: a big cream building with tall windows, and everyone coming out holding little paper bags.",
@@ -149,8 +141,6 @@ export const BB_TOWNS = {
   bv_creek: {...VAN, n: "Gum Creek Sanctuary", region: "vines", screens: ["bk_bush", "bk_koala"], arrive: ["bk_bush", [140, 540]], station: "bvvan_creek", music: "bb_creek",
     blurb: "A wildlife sanctuary in the bush: kangaroos and wombats, koalas on a boardwalk, the platypus house, and a wildlife hospital.",
     arriveLine: "Gum Creek Sanctuary: tall gums, a mob of kangaroos lazing in the shade, and a kookaburra laughing its head off in a tree.",
-    evanArrive: ["KANGAROOS!", "the bird is laughing!", "where's the koalas?"],
-    evanScreen: {bk_bush: ["kangaroos lying down!", "a wombat hole!"], bk_koala: ["koala sleeping in the tree!", "a duck-billed thing!"]},
     hints: {bk_bush: "The bush walk: kangaroos, wombats, the visitor centre, and the van. East: the koala boardwalk.", bk_koala: "The koala boardwalk, the platypus pool and house, and the wildlife hospital. West: the bush walk."},
     spots: fam({hana: {bk_bush: [[300, 440], [240, 490]], bk_koala: [[260, 440], [320, 480]]}, theo: {bk_bush: [[380, 480], [260, 530]], bk_koala: [[200, 460], [380, 470]]},
       farid: {bk_bush: [[220, 470], [300, 520]], bk_koala: [[300, 500], [240, 440]]}, mei: {bk_bush: [[200, 540], [210, 550]], bk_koala: [[230, 520], [240, 530]]},
@@ -166,10 +156,10 @@ export const BB_TOWNS = {
       bv_hospital: {door: "bvhospital", n: "The wildlife hospital", music: "bv_hospital", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The wildlife hospital: baskets of joeys in knitted pouches, a vet nurse with a bottle, and a koala with a bandaged paw."}},
     lines: {hana: ["Look at that one with the joey in her pouch!", "A kookaburra! It sounds like it's laughing at us."],
       theo: ["A platypus: lays eggs, has a duck's bill, and it's a mammal. Nature showing off.", "Wombats have square poo. True fact. Ask the ranger."],
-      farid: ["The koala sleeps twenty hours a day. Very sensible animal.", "Ma Ma likes the wombat. Round. Strong. Minds its own business."],
-      mei: ["Gong Gong watched a kangaroo for ten minutes. It did nothing. Very good.", "So many birds. Gong Gong needs binoculars."],
-      bo: ["Wildlife hospital. They rescue joeys after the fires. Gets you right here.", "Don't feed the roos the chips, Evan."],
-      tomi: ["Zeh, the koala just looked at me like I owe it money.", "I'm going to make friends with that wombat."],
+      farid: ["The koala sleeps twenty hours a day. Very sensible animal.", "I like the wombat. Round. Strong. Minds its own business."],
+      mei: ["I watched a kangaroo for ten minutes. It did nothing. Very good.", "So many birds. I need my binoculars."],
+      bo: ["Wildlife hospital. They rescue joeys after the fires. Gets you right here.", "Don't feed the roos your chips. They'll only want more."],
+      tomi: ["That koala just looked at me like I owe it money.", "I'm going to make friends with that wombat."],
       posy: ["The baby joey is the cutest thing I've ever seen. I'm going to cry.", "Did you know koalas have fingerprints like ours?"]},
     say: {bvroos: "A mob of kangaroos: lying in the shade, scratching, one standing up very tall to look at you. A joey's head pokes out of a pouch.",
       bvwombat: "A wombat burrow: a big hole under a stump, and fresh square droppings on a log. (Wombats really do that.)",
@@ -181,8 +171,6 @@ export const BB_TOWNS = {
   bv_camp: {...VAN, n: "Riverside Camp", region: "vines", screens: ["br_park", "br_river"], arrive: ["br_park", [150, 540]], station: "bvvan_camp", music: "bb_camp",
     blurb: "A riverside caravan park full of other campervans: fire rings, a camp kitchen, the camp store, and the river with its swimming hole and rope swing.",
     arriveLine: "Riverside Camp: campervans and caravans under the gums, fire rings, washing on a line, and someone strumming a ukulele. You find a spot and pull in.",
-    evanArrive: ["other vans!", "a swing over the water!", "can we have a fire?"],
-    evanScreen: {br_park: ["kids! kids to play with!", "a doggy in the caravan!"], br_river: ["rope swing! rope swing!", "boats! little boats!"]},
     hints: {br_park: "The caravan park: the other campervans, the camp kitchen, the camp store, and your van. South: the river.", br_river: "The river: the swimming hole, the rope swing, the canoe shed. North: the camp."},
     spots: fam({hana: {br_park: [[300, 440], [240, 490]], br_river: [[260, 300], [320, 340]]}, theo: {br_park: [[380, 480], [260, 530]], br_river: [[200, 320], [380, 330]]},
       farid: {br_park: [[220, 470], [300, 520]], br_river: [[300, 360], [240, 300]]}, mei: {br_park: [[200, 540], [210, 550]], br_river: [[230, 330], [240, 340]]},
@@ -198,11 +186,11 @@ export const BB_TOWNS = {
       bv_campstore: {door: "bvcampstore", n: "The camp store", music: "bv_campstore", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The camp store: ice creams, firewood, marshmallows, maps, a rack of thongs and a very old dog asleep by the door."},
       bv_canoe: {door: "bvcanoe", n: "The canoe shed", music: "bv_canoe", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The canoe shed: red and yellow canoes, paddles on hooks, life jackets in every size, and a map of the river."}},
     lines: {hana: ["Everyone's so friendly. That lady's already offered me a cup of tea.", "Washing on a line between two trees. That's camping."],
-      theo: ["I'll get the fire going later. Proper fire. Dad fire.", "Look at that old caravan. Must be from the seventies. Beautiful."],
-      farid: ["Ma Ma sees a camp kitchen. Ma Ma could cook for everyone here.", "The river is cold. Ma Ma will put one foot in. One."],
-      mei: ["Gong Gong found a camp chair. Gong Gong lives here now.", "Good spot. Shade, water, quiet. Like the old days."],
+      theo: ["I'll get the fire going later. A proper one, laid by the book.", "Look at that old caravan. Must be from the seventies. Beautiful."],
+      farid: ["A camp kitchen! I could bake for everyone here. Is there an oven? There's never an oven.", "The river is cold. I will put one foot in. One."],
+      mei: ["I found a camp chair. I live here now.", "Good spot. Shade, water, quiet. Like the old days."],
       bo: ["We could do this every weekend, you know.", "Rope swing. I'm going. Hold my phone."],
-      tomi: ["Zeh, the guy in the Kombi has a ukulele AND a dog. Living the dream.", "Canoe race. Angie, you and me."],
+      tomi: ["The guy in the Kombi has a ukulele AND a dog. Living the dream.", "Canoe race. Posy, you and me."],
       posy: ["Everyone here has a story. I want to hear them all.", "Fairy lights on the caravans! So cute."]},
     say: {bvvans: "The other campervans and caravans: a seventies Kombi with a surfboard, a shiny caravan with a little dog in the window, a family van with bikes on the back.",
       bvfire: "The fire rings: stones in a circle, ash from last night, and camp chairs round them waiting for evening.",
@@ -217,7 +205,7 @@ export const BB_TOWNS = {
 export const BB_NAMES = {bg_gate: "Valley Gate", bg_bridge: "Valley Gate: the old bridge", bl_paddock: "Balloon Lookout", bl_valley: "Balloon Lookout: the view",
   bc_vines: "The Cellar Door", bc_lawn: "The Cellar Door: the lawn", bb_rows: "The Berry Farm", bb_choc: "The Berry Farm: the chocolaterie",
   bk_bush: "Gum Creek Sanctuary", bk_koala: "Gum Creek: the koala boardwalk", br_park: "Riverside Camp", br_river: "Riverside Camp: the river"};
-// where Evan likes to potter on each screen
+// spare wander spots on each screen (kept: core.js still imports the name)
 export const BB_EVAN = {bg_gate: [[240, 470], [320, 430], [200, 560]], bg_bridge: [[150, 470], [360, 450], [320, 300]], bl_paddock: [[250, 480], [360, 520], [200, 560]], bl_valley: [[200, 420], [300, 470], [260, 360]],
   bc_vines: [[240, 470], [330, 500], [200, 560]], bc_lawn: [[260, 500], [340, 440], [180, 470]], bb_rows: [[250, 470], [330, 520], [200, 560]], bb_choc: [[130, 440], [250, 430], [330, 470]],
   bk_bush: [[240, 470], [330, 500], [200, 560]], bk_koala: [[200, 420], [280, 400], [180, 520]], br_park: [[240, 470], [330, 500], [200, 560]], br_river: [[200, 360], [300, 380], [380, 330]]};
@@ -364,7 +352,7 @@ export const BB_GOODS = {
   b_cardigan: {n: "A hand-knitted cardigan", kind: "gift", to: ["farid", "hana", "mei"], price: 7, shop: "bv_opshop", op: true, art: ["tee", "#C98A9A"], say: "A hand-knitted cardigan! Somebody's nan made this. It's so warm. I'm wearing it home."},
   b_jigsaw: {n: "A thousand-piece jigsaw", kind: "gift", to: ["mei", "theo", "bo"], price: 4, shop: "bv_opshop", op: true, art: ["box", "#9FC3D9", "#F3C969"], say: "A jigsaw of a lighthouse! A thousand pieces. One's probably missing. We'll find out in March."},
   b_brooch: {n: "A wattle brooch", kind: "gift", to: ["hana", "farid", "posy"], price: 4, shop: "bv_opshop", op: true, art: ["pin", "#F3C94A"], say: "A little brooch of wattle, gold and green. Vintage! I'm wearing it right now."},
-  b_annual: {n: "A children's annual from 1979", kind: "gift", to: ["tomi"], price: 2, shop: "bv_opshop", op: true, art: ["box", "#E8913A", "#4F9CC4"], say: "A big old picture book of stories! Read me the one about the bunyip. Again!"}
+  b_annual: {n: "A children's annual from 1979", kind: "gift", to: ["tomi"], price: 2, shop: "bv_opshop", op: true, art: ["box", "#E8913A", "#4F9CC4"], say: "A big old annual of stories! The one about the bunyip is a classic. I'm reading it out loud tonight, everyone."}
 };
 export const BB_OPSHOP = Object.keys(BB_GOODS).filter(id => BB_GOODS[id].op);
 export const BB_KEEP = {b_magnet: "A tiny campervan on a road through the vines, a balloon over the top, from Bellbird Valley.", b_brooch: "A little brooch of wattle, gold and green, from the op shop in Bellbird Valley."};

@@ -2,8 +2,8 @@
 // the same data-rbuy buttons as Ronda's and Kyoto's). Three things to take part in, each more than a speech bubble:
 //   the divers' breath song with Halmang Kim (dive, hold, and come up whistling while the depth is in the green;
 //   three dives), sorting tangerines with Mr Ko (small, medium or large, against his clock), and dyeing a scarf with
-//   green persimmons at Mr Moon's (four steps in order; then it hangs on Mel's own washing line at home and darkens
-//   in the sun over three days). Evan joins in each. Also: the café's drinks, abalone porridge at the divers' house,
+//   green persimmons at Mr Moon's (four steps in order; then it hangs on your own washing line at home and darkens
+//   in the sun over three days). Also: the café's drinks, abalone porridge at the divers' house,
 //   and the slow-post box at the market (a postcard to yourself that arrives two weeks later).
 // State: F.jeju = {dives, diveDay, sorts, sortDay, dye: {from}, dyes, treats, juk, shell, sapling, post: [{id, at, to, line}]}
 import { esc, dayKey } from "../util.js";
@@ -37,7 +37,7 @@ export function diveReward(F, st, addInv, day = dayKey()){
   j.diveDay = day; addInv("abalone", 1); return true;
 }
 export const JUK = 9;   // a bowl of abalone porridge
-export function haenyeoPanel(F, st, evan){
+export function haenyeoPanel(F, st, _x){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The divers' house</h2><p class="sub">Halmang Kim is seventy-four and has been diving since she was fifteen. She pats the cushion by the window. "Breathe like the sea. Then whistle when you come up. Everyone will know you're safe."</p>`;
   if (st) {
     if (!st.done) {
@@ -67,7 +67,7 @@ export function sortReward(F, st, addInv, day = dayKey()){
   j.sortDay = day; const n = 3 + (st.good >= 8 ? 1 : 0); addInv("tangerine", n); return n;
 }
 const tangPic = size => { const r = size === "small" ? 10 : size === "medium" ? 15 : 21; return `<svg viewBox="0 0 60 60" width="66" height="66" aria-hidden="true"><circle cx="30" cy="${34}" r="${r}" fill="#F29A2E" stroke="#3b3530" stroke-width="1.4"/><path d="M30 ${34 - r} q5 -7 11 -6" fill="none" stroke="#4E7A3A" stroke-width="2.4"/>${size === "large" ? `<circle cx="30" cy="${34 - r}" r="4" fill="#F28C28" stroke="#3b3530" stroke-width="1"/>` : ""}</svg>`; };
-export function shedPanel(F, st, evan){
+export function shedPanel(F, st, _x){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The packing shed</h2><p class="sub">Mr Ko's family have grown tangerines here for four generations. The radio's on, the crates are piling up, and he looks at you hopefully.</p>`;
   if (st && !st.done) {
     const left = Math.max(0, Math.ceil((SORT.MS - (Date.now() - st.t0))/1000)), size = st.sizes[st.i];
@@ -85,14 +85,14 @@ export const CAFE = {ade: ["Hallabong ade", 5, "Fizzy, cold and sharp, with a sl
   omija: ["Omija tea", 4, "Pink and clear: sweet, sour, salty, bitter and a little spicy all at once. Five flavours in one cup."],
   roll: ["Green tea roll cake", 6, "A soft green sponge rolled round cream, from the tea fields under the mountain."]};
 export function cafeTreat(F, k){ const c = CAFE[k]; if (!c || F.coins < c[1]) return null; F.coins -= c[1]; const j = jejuState(F); j.treats = (j.treats || 0) + 1; return c; }
-export function cafePanel(F, evan){
+export function cafePanel(F, _x){
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The stone-house café</h2><p class="sub">Ha-eun's grandmother lived in this house. Now there's a coffee machine where the kitchen was, and the window looks straight out to sea.</p>
     <h3 class="ph3">Sit down with something</h3><ul class="hlist wlist">${Object.entries(CAFE).map(([k, [n, p, l]]) => `<li><span class="wtxt"><b>${esc(n)}</b><small>${esc(l)}</small></span><button class="btn small primary" data-jj="cafe:${k}" ${F.coins >= p ? "" : "disabled"}>${p} ${coin()}</button></li>`).join("")}</ul>
     ${("")}` + list(F, "jj_cafe", "To take home") + shut;
 }
 
 /* ---------- the market hall, and the slow-post box ---------- */
-// A postcard to yourself (or the family) that the post office keeps for two weeks, then delivers (core.js slowMail).
+// A postcard to yourself (or your friends) that the post office keeps for two weeks, then delivers (core.js slowMail).
 export const POST = {price: 2, days: 14};
 export function slowPost(F, to, day = dayKey()){
   if (F.coins < POST.price) return null; F.coins -= POST.price; const j = jejuState(F);
@@ -107,22 +107,22 @@ export function postPanel(F){
   const j = jejuState(F), waiting = (j.post || []).filter(p => p.at > dayKey());
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The slow-post box</h2><p class="sub">Write a postcard of the crater and the sea, drop it in, and the post office keeps it for two weeks before it's delivered. A little Jeju, arriving when you've almost forgotten.</p>
     ${waiting.length ? `<p class="muted">${waiting.length} on the way: the next one arrives ${esc(waiting[0].at)}.</p>` : ""}
-    <div class="actions"><button class="btn primary" data-jj="post:me" ${F.coins >= POST.price ? "" : "disabled"}>To myself · ${POST.price} ${coin()}</button><button class="btn alt" data-jj="post:family" ${F.coins >= POST.price ? "" : "disabled"}>To the family · ${POST.price} ${coin()}</button></div>` + shut;
+    <div class="actions"><button class="btn primary" data-jj="post:me" ${F.coins >= POST.price ? "" : "disabled"}>To myself · ${POST.price} ${coin()}</button><button class="btn alt" data-jj="post:family" ${F.coins >= POST.price ? "" : "disabled"}>To your friends · ${POST.price} ${coin()}</button></div>` + shut;
 }
 const POST_LINES = {me: "Dear me,\n\nYou're in Jeju as you write this. The wind is enormous and everything smells of tangerines. Remember the divers whistling as they came up? Remember the black stone walls? Go and have a cup of tea. You've earned it.\n\nLove, me (two weeks ago)",
-  family: "Dear everyone,\n\nGreetings from Jeju! Black rocks, orange tangerines, green crater, very blue sea. Evan says hello (he says FWEEEE, which is how the divers say hello).\n\nLove, Mel xx"};
+  family: "Dear everyone,\n\nGreetings from Jeju! Black rocks, orange tangerines, green crater, very blue sea. The divers whistle when they come up: FWEEEE. That's how they say hello, so: FWEEEE!\n\nWish you were here. Love, me x"};
 // the postcards that have arrived (core.js adds them to the mailbox)
 export const slowMail = (F, day = dayKey()) => ((F.jeju && F.jeju.post) || []).filter(p => p.at <= day).map(p => ({id: p.id, from: "postie", at: Date.parse(p.at + "T08:00:00+08:00"), title: p.to === "family" ? "A postcard from Jeju (it took its time)" : "A postcard from you, two weeks ago", body: POST_LINES[p.to] || POST_LINES.me}));
 
 /* ---------- dyeing with green persimmons (the dye workshop) ---------- */
-// Four steps in order (Mr Moon puts your hand right if you go wrong). Then the cloth comes home and hangs on Mel's own
+// Four steps in order (Mr Moon puts your hand right if you go wrong). Then the cloth comes home and hangs on your own
 // washing line; it darkens in the sun over three days (art/jeju-rooms.js dyeCloth) and then it's a keepsake (j_scarf).
 export const DYE = {price: 12, DAYS: 3, steps: ["Crush the green persimmons", "Soak the cloth in the juice", "Wring it out", "Lay it in the sun"]};
 export const dyeDays = (F, day = dayKey()) => { const d = jejuState(F).dye; return d ? Math.max(0, daysBetween(d.from, day)) : -1; };
 export function dyeScarf(F, day = dayKey()){ const j = jejuState(F); if (F.coins < DYE.price || j.dye) return null; F.coins -= DYE.price; j.dye = {from: day}; j.dyes = (j.dyes || 0) + 1; return true; }
 // take it off the line at home -> "ready" (a keepsake now), "drying" (days left), or null
 export function takeDye(F, addInv, day = dayKey()){ const n = dyeDays(F, day); if (n < 0) return null; if (n < DYE.DAYS) return {left: DYE.DAYS - n}; jejuState(F).dye = null; addInv("j_scarf", 1); return {ready: true}; }
-export function dyePanel(F, st = {}, evan){
+export function dyePanel(F, st = {}, _x){
   const j = jejuState(F);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The dye workshop</h2><p class="sub">Mr Moon's hands are orange to the wrist. "Galot," he says, holding up a shirt the colour of rust. "Farmers wore it. Cool, strong, never shows the dirt. The sun does the work."</p>`;
   h += `<h3 class="ph3">Dye a scarf with green persimmons · ${DYE.price} ${coin()}</h3>`;

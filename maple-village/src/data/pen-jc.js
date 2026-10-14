@@ -1,4 +1,4 @@
-// Letter voices for Jeju's and Cinque Terre's people (round 192): how each one writes back when Mel posts them a gift or a letter.
+// Letter voices for Jeju's and Cinque Terre's people (round 192): how each one writes back when you post them a gift or a letter.
 // (back: things from their own towns are registered from the towns' goods at runtime, see ronda.js)
 export const PEN_JC = {
   /* ---------- Jeju ---------- */
@@ -136,7 +136,7 @@ export const PEN_JC = {
     made: "It's on the shelf next to the lemon soap, and I'm sorry to say it smells even better.",
     flower: "In a jug by the painted plates. Che profumo! Not lemons, for once, and I love them.",
     other: "In the window now, so all of Monterosso can see. Everything here is somebody's cousin, and this is from my friend.",
-    letter: "Buongiorno, Mel! Your letter came from across the sea, and I read it by the door, in the sun, with a lemon in my other hand.",
+    letter: "Buongiorno! Your letter came from across the sea, and I read it by the door, in the sun, with a lemon in my other hand.",
     news: ["The lemons by the sea came in enormous this month. Che profumo, the whole street.", "My cousin painted a new set of plates, with little boats this time. Enzo says boats are not lemons. I let him say it."],
     back: "c_soap", backNote: "A bar of the lemon soap. Smell it before you open the paper. Che profumo."},
   aldo: {sign: "Aldo, Manarola",

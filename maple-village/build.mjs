@@ -16,13 +16,14 @@ async function build() {
   const js = await esbuild.build({
     entryPoints: [join(root, "src/main.js")],
     bundle: true, format: "iife", write: false, target: "es2020",
-    legalComments: "none", charset: "utf8"
+    legalComments: "none", charset: "utf8",
+    minifyWhitespace: !dev   // the public file carries no source comments (names stay readable: no identifier mangling)
   });
   const script = js.outputFiles[0].text.replace(/<\/script/gi, "<\\/script");
   const styleFiles = readdirSync(join(root, "src/styles")).sort((a, b) => rank(a) - rank(b));
-  const css = styleFiles.map(f => readFileSync(join(root, "src/styles", f), "utf8")).join("\n");
+  const css = styleFiles.map(f => readFileSync(join(root, "src/styles", f), "utf8")).join("\n").replace(dev ? /$^/ : /\/\*[\s\S]*?\*\//g, "");
   const stub = dev ? `<script>${readFileSync(join(root, "dev/claude-stub.js"), "utf8")}</script>` : "";
-  const html = readFileSync(join(root, "src/index.html"), "utf8")
+  const html = readFileSync(join(root, "src/index.html"), "utf8").replace(dev ? /$^/ : /<!--(?!DEVSTUB)[\s\S]*?-->/g, "")
     .replace("/*STYLES*/", () => css)
     .replace("<!--DEVSTUB-->", () => stub)
     .replace("/*SCRIPT*/", () => script);

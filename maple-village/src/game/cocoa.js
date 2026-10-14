@@ -1,5 +1,5 @@
-// The Cocoa Room: Mel's chocolate shop on the bay (in the shopfront that was under renovation; opened as a big goal,
-// goals.js "cocoa"). Mel makes everything herself, bean to bar:
+// The Cocoa Room: The player's chocolate shop on the bay (in the shopfront that was under renovation; opened as a big goal,
+// goals.js "cocoa"). The player makes everything herself, bean to bar:
 //   beans   a sack of cacao beans from the sacks in the kitchen (25 coins a sack)
 //   roast   a sack at a time in the roaster: ready in 10 minutes
 //   grind   roasted beans in the stone grinder, as milk, dark or white chocolate: ready in 2 hours
@@ -7,13 +7,13 @@
 //   mould   10 pieces make 10 bars in the moulds, onto the bar wall
 //   bonbons a shell (6 pieces of milk, dark or white) and one or two fillings from the kitchen's fillings shelf make
 //           a tray of 12 bonbons. Every new combination is a discovery with its own name; known ones make another tray.
-//           Up to 6 flavours sit in the shop's display case (customers buy 2-4 at a time); Mel can have one, or pack a
+//           Up to 6 flavours sit in the shop's display case (customers buy 2-4 at a time); the player can have one, or pack a
 //           gift box of 4 or 9 from what's on display.
 // Mateo, the kitchen hand (Monday to Saturday, 9:30 to 4:30; evening classes on Mondays and Tuesdays), keeps the bar line going on his own: he roasts, grinds,
 // tempers and moulds whenever a station's free. Tempered chocolate goes onto the bonbon shelf first (c.res), up to
-// Mel's targets (c.keep); only what's beyond that becomes bars (Mel's own pots stay loose: bars or bonbons, her call), so the bonbon chocolate is never moulded. He uses the
+// The player's targets (c.keep); only what's beyond that becomes bars (The player's own pots stay loose: bars or bonbons, her call), so the bonbon chocolate is never moulded. He uses the
 // sacks in the kitchen (leaving c.plan.hold of them alone) and, with auto-buy on, orders a sack when they run out,
-// never taking Mel's coins below c.plan.floor.
+// never taking the player's coins below c.plan.floor.
 // Around the village (step 3):
 //   Scoop Shack  10 pieces of loose dark chocolate go to the gelato fridge as Cocoa Room chocolate (5 of the
 //                ingredient "housechoc"), or to the dip station as its house-made dark pot (20 dips; dipped cones in it
@@ -25,12 +25,12 @@
 // Upgrades (step 4, CC_UPS, bought from the catalogue at the counter; c.up): a window display (busier), a hot chocolate
 // bar (hot chocolate from the loose chocolate, best in the evening and on rainy days), a second grinder (two pots at
 // once: slots grind/ground and grind2/ground2), gift wrapping (customers buy gift boxes; a grand box of 16), a cacao
-// tree at Ma Ma's (a free sack every two days), a chocolate fountain (tips; Evan loves it), a supply deal (10 dark
+// tree at Farid's (a free sack every two days), a chocolate fountain (tips; everyone loves it), a supply deal (10 dark
 // pieces to the Scoop Shack's fridge each morning), weekend workshops (Saturday 2 to 4: a class pays 48 coins), a
 // second assistant (Lila: open Mondays too, a little busier) and a farmers market cart (Mateo, Sunday mornings 8 to 1,
 // at stall place 9 on the field: tours.js MARKET, shown once it's bought).
 // The shop is open 11am to 8pm, Tuesday to Sunday. Amara serves at the counter; customers buy bars off the wall (more
-// often while Mel's serving too). Takings go straight to Mel. Mel can have a bar or take one to give.
+// often while the player's serving too). Takings go straight to the player. The player can have a bar or take one to give.
 import { esc, dayKey, sgHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
 import { mouldPath, shellRibs } from "../art/moulds.js";
@@ -49,8 +49,8 @@ export const CC_UPS = {
   hotchoc: {n: "Hot chocolate bar", price: 400, line: "A steamer on the counter and a row of mugs. Hot chocolate from your own chocolate, 1 piece a cup; best in the evenings and on rainy days."},
   grinder2: {n: "Second grinder", price: 600, line: "Another stone grinder beside the first, so two pots can grind at once."},
   wrap: {n: "Gift wrapping station", price: 350, line: "Ribbons, tissue and boxes. Customers buy bonbons in gift boxes (a little extra each time), and you can pack a grand box of 16."},
-  tree: {n: "Cacao tree at Ma Ma's", price: 500, line: "A cacao tree in Ma Ma's orchard. She looks after it, and a free sack of beans turns up in the kitchen every two days."},
-  fountain: {n: "Chocolate fountain", price: 450, line: "A three-tier fountain on the end of the counter. Customers linger and leave tips. Evan will want to live here."},
+  tree: {n: "Cacao tree at the orchard", price: 500, line: "A cacao tree in Farid's orchard. He looks after it, and a free sack of beans turns up in the kitchen every two days."},
+  fountain: {n: "Chocolate fountain", price: 450, line: "A three-tier fountain on the end of the counter. Customers linger and leave tips. You may never leave."},
   supply: {n: "Supply deal with the Scoop Shack", price: 250, line: "Every morning, 10 pieces of loose dark chocolate go to the Scoop Shack's gelato fridge on their own (when there are 10 spare)."},
   workshop: {n: "Weekend workshops", price: 700, line: "Saturday afternoons, 2 to 4: a class of six makes their own bonbons at the tables, and pays 8 coins each."},
   assistant: {n: "Second assistant", price: 500, line: "Lila joins the team. The shop opens on Mondays too, and it's a little busier with two behind the counter."},
@@ -73,11 +73,11 @@ export function buyCcUp(F, k){
   F.coins -= u.price; c.up[k] = Date.now(); if (k === "tree") c.treeAt = now();
   return {window: "The new window's in: tiered stands, little lights, and a chocolate sculpture of the bay.", hotchoc: "The hot chocolate bar's on the counter, mugs and all. Set its price at the counter.",
     grinder2: "A second stone grinder, rumbling away beside the first.", wrap: "The wrapping station's set up: ribbons, tissue, boxes in every size.",
-    tree: "A cacao tree in Ma Ma's orchard! She says she'll talk to it every morning.", fountain: "The chocolate fountain's flowing. Evan is going to lose his mind.",
+    tree: "A cacao tree in the orchard! Farid says he'll talk to it every morning.", fountain: "The chocolate fountain's flowing. Tomi is going to lose his mind.",
     supply: "Done: the Scoop Shack gets 10 pieces of your dark chocolate every morning, when there's enough spare.", workshop: "Weekend workshops are on: Saturdays, 2 to 4, at the tables.",
-    assistant: "Lila starts Monday! The shop's open seven days now.", vending: "The vending machine's plugged in by the door: rows of your bars behind the glass, a little light on top. Evan has already pressed every button.", cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."}[k] || `${u.n}, on the shelf by the bonbon table. Pick them when you make a tray.`;
+    assistant: "Lila starts Monday! The shop's open seven days now.", vending: "The vending machine's plugged in by the door: rows of your bars behind the glass, a little light on top. Maple has already sniffed every button.", cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."}[k] || `${u.n}, on the shelf by the bonbon table. Pick them when you make a tray.`;
 }
-// the vending machine's coins, into Mel's pocket -> how many
+// the vending machine's coins, into the player's pocket -> how many
 export function emptyVending(F){ const c = cocoaState(F), n = c.vend || 0; c.vend = 0; F.coins += n; return n; }
 export const cartOn = (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 0 && hm >= 8*60 && hm < 13*60;   // the Sunday farmers market
 export const workshopOn = (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 6 && hm >= 14*60 && hm < 16*60;
@@ -107,7 +107,7 @@ export const readyPot = c => ["", "2"].find(g => c["ground" + g]);
 export function startGrind(F, kind){ const c = cocoaState(F), g = freeSlot(c); if (g === undefined || c.roasted < 1 || !KINDS[kind]) return false; c.roasted--; c["grind" + g] = {kind, done: now() + GRIND_MIN*60000}; return true; }
 // a tempered pot: the bonbon shelf first, up to its target; the rest is loose chocolate for bars
 function pour(c, k){ const r = Math.max(0, Math.min(POT, c.keep[k] - c.res[k])); c.res[k] += r; c.choc[k] += POT - r; return r; }
-export function temper(F){ const c = cocoaState(F), g = readyPot(c); if (g === undefined) return null; const k = c["ground" + g]; c.choc[k] += POT; c["ground" + g] = null; return k; }   // Mel's own pots: loose, for bars or bonbons
+export function temper(F){ const c = cocoaState(F), g = readyPot(c); if (g === undefined) return null; const k = c["ground" + g]; c.choc[k] += POT; c["ground" + g] = null; return k; }   // The player's own pots: loose, for bars or bonbons
 export function mould(F, kind){ const c = cocoaState(F); if (!KINDS[kind] || c.choc[kind] < MOULD) return false; c.choc[kind] -= MOULD; c.bars[kind] += MOULD; c.made += MOULD; return true; }
 // the timers finishing: roasted beans out of the roaster, a pot out of the grinder (waiting to be tempered)
 function finish(c, t = now()){
@@ -121,7 +121,7 @@ function finish(c, t = now()){
 export const SHELL = 6, TRAY = 12, CASE = 6;
 // what can go in a bonbon: the gelato fridge's ingredients, minus the savoury ones
 const NOT_FILLING = ["milk", "goatmilk", "yoghurt", "egg", "olives", "corn", "carrot", "tomato", "housechoc", "pea"];
-// and wine from Mel's own bottles: one bottle off the wine shop shelf makes 4 fillings
+// and wine from the player's own bottles: one bottle off the wine shop shelf makes 4 fillings
 export const WINE_FILL = {wine_red: ["Red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Rosé", "Rosé", "#E98AA0"], wine_white: ["White wine", "White Wine", "#E8D57A"], wine_sparkling: ["Sparkling wine", "Bubbly", "#F3E7B0"], wine_pinot: ["Pinot Noir", "Pinot", "#8A2E3E"], wine_chardonnay: ["Chardonnay", "Chardonnay", "#E8C96A"]};
 export const WINE_FILLS = 4;
 const FL = id => INGR[id] || WINE_FILL[id];
@@ -129,7 +129,7 @@ export const isFilling = id => (id in INGR && !NOT_FILLING.includes(id)) || id i
 export const fillName = id => FL(id)[0];
 // (round 176: "Heart" is a mould now. Round 194: this comment used to sit mid-line and hid POETIC, so a third of
 // two-filling bonbons crashed the bonbon table when they were named)
-const STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Cream"], POETIC = ["Jetty Sunset", "Lantern Night", "Ma Ma's Garden", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Maple's Secret", "Night Market"];
+const STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Cream"], POETIC = ["Jetty Sunset", "Lantern Night", "Village Green", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Maple's Secret", "Night Market"];
 const keyOf = (shell, fills) => [shell, ...[...new Set(fills)].sort()].join("+");
 export function bonbonName(shell, fills){
   const f = [...new Set(fills)].sort(), h = hash(keyOf(shell, f)), style = STYLE[h % STYLE.length], sh = shell[0].toUpperCase() + shell.slice(1);
@@ -155,7 +155,7 @@ export function makeBonbons(F, shell, fills, shape){
   c.trays[r.id] = (c.trays[r.id] || 0) + TRAY;
   return {r, isNew};
 }
-// the display case: up to 6 flavours (auto-filled from stock until Mel arranges it)
+// the display case: up to 6 flavours (auto-filled from stock until the player arranges it)
 export const displayIds = c => (Array.isArray(c.display) ? c.display.filter(id => recipeOf(c, id)) : c.bonbons.filter(b => c.trays[b.id] > 0).map(b => b.id)).slice(0, CASE);
 export const onDisplay = c => displayIds(c).map(id => recipeOf(c, id)).filter(b => c.trays[b.id] > 0);
 export function toggleDisplay(c, id){
@@ -163,7 +163,7 @@ export function toggleDisplay(c, id){
   if (ids.includes(id)) { c.display = ids.filter(x => x !== id); return true; }
   if (ids.length >= CASE) return false; c.display = [...ids, id]; return true;
 }
-// the fillings shelf, stocked from the backpack or Ma Ma's farm shop shelves (like the gelato fridge)
+// the fillings shelf, stocked from the backpack or the orchard's farm shop shelves (like the gelato fridge)
 export const backpackFillings = F => Object.keys(F.inv || {}).filter(id => isFilling(id) && F.inv[id] > 0);
 export const farmFillings = orch => farmShelf(orch).filter(isFilling);
 export function stockPantry(F, id, n, from, orch){
@@ -172,12 +172,12 @@ export function stockPantry(F, id, n, from, orch){
   else { const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id; n = Math.min(n, orch.stock[key] || 0); if (n <= 0) return 0; orch.stock[key] -= n; if (orch.stock[key] <= 0) delete orch.stock[key]; }
   c.pantry[id] = (c.pantry[id] || 0) + n; return n;
 }
-// take fillings back off the shelf (into the backpack, or flower stems back to Ma Ma's shelf); wine fillings stay
+// take fillings back off the shelf (into the backpack, or flower stems back to the farm shop shelf); wine fillings stay
 export const unstockPantry = (F, id, n, orch) => id.startsWith("wine_") ? null : takeBack(cocoaState(F).pantry, id, n, F, orch);
 // gift boxes from what's on display: 4 or 9 bonbons, packed in turn from each flavour. All dark shells (dairy-free)
-// makes a box Marcus can have too
+// makes a box Tomi can have too
 export const caseCount = c => onDisplay(c).reduce((a, b) => a + c.trays[b.id], 0);
-// size bonbons from the case: the ones Mel chose (sel: {id: n}, round 184), else in turn from each flavour; true if
+// size bonbons from the case: the ones the player chose (sel: {id: n}, round 184), else in turn from each flavour; true if
 // every shell was dark, null if the choice doesn't add up
 function pick(c, size, sel){
   if (sel) { const ids = Object.keys(sel).filter(id => sel[id] > 0);
@@ -192,7 +192,7 @@ export function packBox(F, size, sel){
   const d = pick(c, size, sel); if (d === null) return null;
   const id = `box${size}${d ? "d" : ""}`; F.inv[id] = (F.inv[id] || 0) + 1; return id;
 }
-// round 184 (Mel: "why can't I choose the specific bonbons when making a gift box or pairing box?"): the picker.
+// round 184 ("why can't I choose the specific bonbons when making a gift box or pairing box?"): the picker.
 // pk = {kind: "box" | "grand" | "pair", size, k (the bottle's shelf id, for a pair), sel: {id: n}}
 export const pickTotal = sel => Object.values(sel || {}).reduce((a, n) => a + n, 0);
 export function pickAdd(F, pk, id, d){ const c = cocoaState(F), cur = pk.sel[id] || 0, n = cur + d;
@@ -200,14 +200,14 @@ export function pickAdd(F, pk, id, d){ const c = cocoaState(F), cur = pk.sel[id]
 export function pickFill(F, pk){ const c = cocoaState(F), shown = onDisplay(c); let i = 0;
   while (pickTotal(pk.sel) < pk.size && i < 400) { const b = shown[i % shown.length]; i++; if (!b) break; if ((pk.sel[b.id] || 0) < c.trays[b.id]) pk.sel[b.id] = (pk.sel[b.id] || 0) + 1; }
   return pickTotal(pk.sel) === pk.size; }
-// the wine shop's shelf (vineyard.js F.vine.shelf): bottles Mel can open for fillings or pair with bonbons
+// the wine shop's shelf (vineyard.js F.vine.shelf): bottles the player can open for fillings or pair with bonbons
 export const wineShelf = F => ((F.vine && F.vine.shelf) || []).filter(b => b.n > 0 && WINE_FILL["wine_" + b.type]);
 export function wineToPantry(F, shelfId){
   const c = cocoaState(F), b = wineShelf(F).find(x => x.id === shelfId); if (!b) return null;
   b.n--; const id = "wine_" + b.type; c.pantry[id] = (c.pantry[id] || 0) + WINE_FILLS; return {id, wine: b.name};
 }
-// a pairing box: a bottle of Mel's wine and 4 bonbons from the case, ribboned together (gift "pairbox")
-// round 189 (Mel: "I'm supposed to be able to pack them and put them in the gift shop"): any bottle on the shelf pairs,
+// a pairing box: a bottle of the player's wine and 4 bonbons from the case, ribboned together (gift "pairbox")
+// round 189 ("I'm supposed to be able to pack them and put them in the gift shop"): any bottle on the shelf pairs,
 // Tempranillo too (wineShelf above is only the ones that can be opened for a filling)
 export const pairShelf = F => ((F.vine && F.vine.shelf) || []).filter(b => b.n > 0);
 export function packPairing(F, shelfId, sel){
@@ -327,7 +327,7 @@ function hotMinute(c, day, hm, opts, out){
 export function haveHot(F){ const c = cocoaState(F), k = ["milk", "dark", "white"].find(x => c.choc[x] > 0); if (!ccUp(c, "hotchoc") || !k) return null; c.choc[k]--; return k; }
 // a grand box of 16 (gift wrapping station): from the case like the others
 export function packGrand(F, sel){ const c = cocoaState(F); if (!ccUp(c, "wrap") || caseCount(c) < BOX16) return null; const d = pick(c, BOX16, sel); if (d === null) return null; const id = d ? "box16d" : "box16"; F.inv[id] = (F.inv[id] || 0) + 1; return id; }
-// a bar for Mel: eaten now, or into the backpack to give (a gift item, bar_<kind>)
+// a bar for the player: eaten now, or into the backpack to give (a gift item, bar_<kind>)
 export function takeBar(F, kind, give){ const c = cocoaState(F); if (!(c.bars[kind] > 0)) return false; c.bars[kind]--; if (give) F.inv[BAR_ID(kind)] = (F.inv[BAR_ID(kind)] || 0) + 1; return true; }
 
 /* ---------- panels ---------- */
@@ -386,10 +386,10 @@ export function pantryPanel(F, orch){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The fillings shelf</h2><p class="sub">What goes inside the bonbons: fruit, flowers, honey, pandan, coffee, nuts... A tray uses one of each filling.</p>`;
   h += inS.length ? `<ul class="hlist wlist">${inS.map(id => cell(id, `${c.pantry[id]} on the shelf`, id.startsWith("wine_") ? "" : `<span class="orbtns"><button class="btn small alt" data-cc="take" data-k="${id}" data-n="1">Take 1</button><button class="btn small alt" data-cc="take" data-k="${id}" data-n="99">All</button></span>`)).join("")}</ul>` : `<p class="muted">Empty for now.</p>`;
   if (bag.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From your backpack</p><ul class="hlist wlist">${bag.map(id => cell(id, `${F.inv[id]} with you`, `<span class="orbtns"><button class="btn small primary" data-cc="fill" data-src="bag" data-k="${id}" data-n="1">Add 1</button><button class="btn small alt" data-cc="fill" data-src="bag" data-k="${id}" data-n="99">All</button></span>`)).join("")}</ul>`;
-  if (shelf.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From Ma Ma's farm shop</p><ul class="hlist wlist">${shelf.map(id => cell(id, `${orch.stock[id.startsWith("fl_") ? "stem:" + id.slice(3) : id]} on her shelf`, `<span class="orbtns"><button class="btn small primary" data-cc="fill" data-src="farm" data-k="${id}" data-n="1">Add 1</button><button class="btn small alt" data-cc="fill" data-src="farm" data-k="${id}" data-n="99">All</button></span>`)).join("")}</ul>`;
+  if (shelf.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From the orchard's farm shop</p><ul class="hlist wlist">${shelf.map(id => cell(id, `${orch.stock[id.startsWith("fl_") ? "stem:" + id.slice(3) : id]} on the shelf`, `<span class="orbtns"><button class="btn small primary" data-cc="fill" data-src="farm" data-k="${id}" data-n="1">Add 1</button><button class="btn small alt" data-cc="fill" data-src="farm" data-k="${id}" data-n="99">All</button></span>`)).join("")}</ul>`;
   const wines = wineShelf(F);
   if (wines.length) h += `<p class="eyebrow" style="margin:12px 0 6px">From the wine shop</p><ul class="hlist wlist">${wines.map(b => cell("wine_" + b.type, `${esc(b.name)} · ${b.n} on the shelf`, `<button class="btn small primary" data-cc="wine" data-k="${esc(b.id)}">Open a bottle (${WINE_FILLS})</button>`)).join("")}</ul>`;
-  if (!bag.length && !shelf.length && !wines.length) h += `<p class="muted">Nothing to add right now. Hana's deli has honey, pandan, coffee, nuts and more; Ma Ma's farm shop has fruit and flowers.</p>`;
+  if (!bag.length && !shelf.length && !wines.length) h += `<p class="muted">Nothing to add right now. Hana's deli has honey, pandan, coffee, nuts and more; the orchard's farm shop has fruit and flowers.</p>`;
   return h + shut;
 }
 export function bonbonPanel(F, st){

@@ -2,8 +2,8 @@
 // buyGood, the same data-rbuy buttons as Ronda's). Four things to take part in, each a little more than a speech bubble:
 //   the tea ceremony with Sachiko (whisk in time with her, then turn the bowl and bow), meditation with Jōshin
 //   (breathe with the circle, then he rings the bell), making a nerikiri sweet with Mr Tanaka (pick the season's
-//   shape, four steps), and throwing a cup at Ishida's wheel (centre the clay three times). Evan joins in each.
-// The yukata shop rents yukata for the day (Mel's dress, Evan's little jinbei). The stamp book: eight ink stamps
+//   shape, four steps), and throwing a cup at Ishida's wheel (centre the clay three times).
+// The yukata shop rents yukata for the day (a yukata to wear round the town). The stamp book: eight ink stamps
 // from round the town; a full book puts a stone lantern by the pond at home.
 // State: F.kyoto = {stamps: {k: day}, lantern, yukata: {day, col}, teas, sits, sweets, cups, fortunes}
 import { esc, dayKey } from "../util.js";
@@ -42,7 +42,7 @@ export function bookHtml(F){
 export const YUKATA = {price: 15, cols: {indigo: ["Indigo with white flowers", "indigo"], red: ["Red with gold fans", "crimson"], sky: ["Pale blue with goldfish", "pale blue"]}};
 export const yukataOn = (F, day = dayKey()) => { const y = kyotoState(F).yukata; return y && y.day === day ? y.col : null; };
 export function rentYukata(F, col, day = dayKey()){ if (!YUKATA.cols[col] || F.coins < YUKATA.price || yukataOn(F, day)) return null; F.coins -= YUKATA.price; kyotoState(F).yukata = {day, col}; return YUKATA.cols[col][0]; }
-export function yukataPanel(F, evanToo){
+export function yukataPanel(F, _x){
   const on = yukataOn(F);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The yukata shop</h2><p class="sub">Rows of cotton summer kimonos, an obi sash to go with each, and wooden sandals. Wear one round Kyoto for the day; bring it back on your way to the train.</p>`;
   h += on ? `<p><b>You're wearing the ${esc(YUKATA.cols[on][0].toLowerCase())} today.</b>${("")}</p>`
@@ -70,13 +70,13 @@ export function teaPanel(F, st){
       <p class="muted">Now the last part: turn the bowl twice, so its prettiest side faces your host, and bow.</p><div class="actions"><button class="btn primary" data-kt="bow">Turn the bowl, and bow</button></div>`;
     return h + `<p class="sub">You drink in three sips. Bitter, then sweet, then quiet. "One meeting, one chance," says Sachiko.</p><div class="actions"><button class="btn alt" data-kt="teaagain">Another bowl</button></div>` + list(F, "kt_tea", "From the tea house") + shut;
   }
-  return h + `<h3 class="ph3">The tea ceremony · ${TEA.price} ${coin()}</h3><p class="muted">Sachiko shows you how: warm the bowl, whisk the matcha, turn the bowl, bow. Evan gets a little sweet (and copies the bow).</p>
+  return h + `<h3 class="ph3">The tea ceremony · ${TEA.price} ${coin()}</h3><p class="muted">Sachiko shows you how: warm the bowl, whisk the matcha, turn the bowl, bow. You get a little sweet with it.</p>
     <div class="actions"><button class="btn primary" data-kt="tea" ${F.coins >= TEA.price ? "" : "disabled"}>Sit down for tea · ${TEA.price} ${coin()}</button></div>` + list(F, "kt_tea", "From the tea house") + shut;
 }
 
 /* ---------- meditation (the temple hall) ---------- */
 // Breathe with Jōshin: the circle grows (breathe in) for four seconds, then shrinks (breathe out). Tap the right one
-// each time, three breaths. Then he strikes the bell (and Evan rings it after, too hard).
+// each time, three breaths. Then he strikes the bell.
 export const BREATH = {HALF: 4000, BREATHS: 3, COUNT_IN: 1500};
 export const sitStart = (now = Date.now()) => ({t0: now + BREATH.COUNT_IN, taps: [], done: false});
 export const breathPhase = (st, now = Date.now()) => now < st.t0 ? "ready" : Math.floor((now - st.t0)/BREATH.HALF) % 2 ? "out" : "in";
@@ -104,10 +104,10 @@ export function hallPanel(F, st, fortune){
 
 /* ---------- nerikiri (the sweet shop) ---------- */
 // Pick the season's shape, then the four steps in order (Mr Tanaka steadies your hand if you go wrong). It goes in a
-// little box, a gift for the family.
+// little box, a gift for a friend.
 export const NERI = {price: 8, shapes: {sakura: ["A cherry blossom", "#F6C7D6", "spring"], ajisai: ["A hydrangea", "#B9A8E0", "summer"], momiji: ["A maple leaf", "#E0782E", "autumn"], tsubaki: ["A camellia", "#C8432F", "winter"]},
   steps: ["Knead the bean paste", "Wrap the filling", "Shape it", "Press in the details"]};
-// (the sweets themselves are TOWN_GOODS nk_<shape>, gifts for the family)
+// (the sweets themselves are TOWN_GOODS nk_<shape>, gifts for your friends)
 export const seasonShape = (day = dayKey()) => Object.keys(NERI.shapes).find(k => NERI.shapes[k][2] === seasonOf(day)) || "momiji";
 export function makeNerikiri(F, shape, addInv){ if (!NERI.shapes[shape] || F.coins < NERI.price) return null; F.coins -= NERI.price; addInv("nk_" + shape, 1); const k = kyotoState(F); k.sweets = (k.sweets || 0) + 1; return "nk_" + shape; }
 export function sweetsPanel(F, st = {}){
@@ -122,11 +122,11 @@ export function sweetsPanel(F, st = {}){
 
 /* ---------- the potter's wheel (the pottery) ---------- */
 // Centre the clay: tap while the marker's in the middle (the same sweep as the fishing reel), three times. Pick a
-// glaze; Ishida fires it and it's a keepsake. Dad's comes out too, if he's there. (Lopsided.)
+// glaze; Ishida fires it and it's a keepsake. Theo's comes out too, if he's there. (Lopsided.)
 export const CUP = {price: 10, glazes: {indigo: "deep indigo", celadon: "pale celadon green", amber: "warm amber"}, ZONE: {at: .5, width: .22}};
 export const cupAt = (t0, now = Date.now()) => { const p = ((now - t0)/900) % 2; return p < 1 ? p : 2 - p; };
 export const centre = (st, now = Date.now()) => { const ok = Math.abs(cupAt(st.t0, now) - CUP.ZONE.at) <= CUP.ZONE.width/2; st.tries++; if (ok) st.good++; return ok; };
-export function throwCup(F, withDad, addInv){ if (F.coins < CUP.price) return null; F.coins -= CUP.price; addInv("k_mycup", 1); if (withDad) addInv("k_dadcup", 1); const k = kyotoState(F); k.cups = (k.cups || 0) + 1; return true; }
+export function throwCup(F, withTheo, addInv){ if (F.coins < CUP.price) return null; F.coins -= CUP.price; addInv("k_mycup", 1); if (withTheo) addInv("k_dadcup", 1); const k = kyotoState(F); k.cups = (k.cups || 0) + 1; return true; }
 export function potteryPanel(F, st = {}){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The pottery</h2><p class="sub">Shelves of drying cups, buckets of slip, a cat asleep on a sack of clay, and the kiln ticking at the back.</p>`;
   h += `<h3 class="ph3">Throw a cup on the wheel · ${CUP.price} ${coin()}</h3>`;

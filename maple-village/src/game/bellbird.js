@@ -1,8 +1,8 @@
 // Bellbird Valley road trips (round 141): the campervan's road map. Step into the van on the lane and open the map on
-// the dashboard: pick who's coming (up to five in the van, Mel included: Evan counts) and a stop you can see on the
+// the dashboard: pick who's coming (up to five in the van, you included) and a stop you can see on the
 // map, and off you drive. At every stop the van's parked on its first screen: tap it for the map again, to drive on to
 // another stop or home. Fuel: 6 coins a leg, plus 1 for each passenger (the cost of the shortest way there).
-// The map only shows what Mel's found: the stops she's been to, and the ones a road away from them (Valley Gate from
+// The map only shows what you've found: the stops you've been to, and the ones a road away from them (Valley Gate from
 // the start). A stamp in the passport for every stop.
 // State: F.trip = {town: stop, day, party, from, by: "van"} (the trip system's, trips.js); F.bellbird = {stamps:
 // {stop: day}, legs: n}.
@@ -18,8 +18,8 @@ export const bbState = F => { F.bellbird = F.bellbird || {}; F.bellbird.stamps =
 const nbrs = id => BB_ROADS.filter(r => r.includes(id)).map(r => r[0] === id ? r[1] : r[0]);
 // how many legs from a to b along the roads (home counts as a place)
 export function legs(a, b){ if (a === b) return 0; const seen = {[a]: 0}, q = [a]; while (q.length) { const x = q.shift(); for (const y of nbrs(x)) if (!(y in seen)) { seen[y] = seen[x] + 1; if (y === b) return seen[y]; q.push(y); } } return Infinity; }
-export const fuelFor = (from, to, party) => legs(from, to)*(LEG + party.filter(id => true).length);
-// what's on Mel's map: the stops she's been to, and those a road away (Valley Gate from the start)
+export const fuelFor = (from, to, party) => legs(from, to)*(LEG + party.length);
+// what's on your map: the stops you've been to, and those a road away (Valley Gate from the start)
 export function known(F){ const st = bbState(F).stamps, seen = new Set(["bv_gate", ...Object.keys(st)]); Object.keys(st).forEach(s => nbrs(s).forEach(n => { if (n !== "home") seen.add(n); })); return STOPS.filter(s => seen.has(s)); }
 export const stamped = (F, stop) => !!bbState(F).stamps[stop];
 export const canSet = (hm = sgHM()) => hm >= 7*60 && hm < 18*60;

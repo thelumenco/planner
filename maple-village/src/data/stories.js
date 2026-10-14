@@ -31,12 +31,12 @@ export const STORIES = {
     {lines: ["I gave it to her this morning. My hands were shaking more than hers."]},
     {lines: ["It was from her father, before he went to sea and didn't come back. Forty years late.", "She hugged me. Then she gave me toast. I believe that's how Hana says thank you."]},
     // round 122: Sachiko in Kyoto kept his grandmother's tea scoop
-    {needs: ["sachiko:3"], lines: ["My grandmother's tea scoop. Sachiko kept it? All these years?", "Grandmother taught half the lane. She'd be glad it was you who brought it. Thank you, Mel. Truly."]}
+    {needs: ["sachiko:3"], lines: ["My grandmother's tea scoop. Sachiko kept it? All these years?", "Grandmother taught half the lane. She'd be glad it was you who brought it. Thank you. Truly."]}
   ],
   hana: [
-    {lines: ["I grew up by the sea. Dad had a little blue boat. He'd bring home fish, and I'd make the toast."]},
+    {lines: ["I grew up by the sea. My father had a little blue boat. He'd bring home fish, and I'd make the toast."]},
     {lines: ["He went out one winter and didn't come back. I was eight."]},
-    {needs: ["okada:5"], lines: ["Mr Okada gave me a letter. From Dad. Forty years in a drawer, and it still smelled of the sea."]},
+    {needs: ["okada:5"], lines: ["Mr Okada gave me a letter. From my father. Forty years in a drawer, and it still smelled of the sea."]},
     {lines: ["He wrote that he'd teach me to sail that summer. So I've decided I'm going to learn anyway.", "And I made something new. Postman's toast: honey, butter, a pinch of sea salt. Here, first ones are yours."], reward: "toast"}
   ],
   juniper: [
@@ -76,30 +76,30 @@ export const STORIES = {
     {lines: ["Margaux opened my first savings account. With a chocolate coin. Some debts aren't on paper."]}
   ],
   felix: [
-    {lines: ["My first bees? A swarm that landed in your grandmother's apple tree. I was twenty, terrified, with a cardboard box."]},
-    {lines: ["Ma Ma still says it's HER blossom honey. Technically, the bees agree with her."]},
-    {needs: ["mama:5"], lines: ["Your Ma Ma's pruning tip worked. The orchard's buzzing. Don't tell her I said she was right."]}
+    {lines: ["My first bees? A swarm that landed in the old apple tree in the orchard. I was twenty, terrified, with a cardboard box."]},
+    {lines: ["Farid still says it's the orchard's blossom honey, not mine. Technically, the bees agree with him."]},
+    {needs: ["farid:2"], lines: ["Farid's pruning tip worked. The orchard's buzzing. Don't tell him I said he was right."]}
   ],
   elena: [
     {lines: ["Before cheese, I was a banker. In the city. Grey suits, grey coffee."]},
-    {lines: ["Your brother Marcus sat two desks down. He used to bring me egg tarts on Fridays."]},
+    {lines: ["Tomi sat two desks down, back then. He used to bring me egg tarts on Fridays."]},
     {lines: ["I left the week I cried at a spreadsheet. Bought two goats with my bonus. Best trade I ever made."]},
-    {needs: ["marcus:2"], lines: ["Marcus came up on Saturday to help in the dairy. He's terrible at milking. He's very good at laughing about it."]}
+    {needs: ["tomi:2"], lines: ["Tomi came up on Saturday to help in the dairy. He's terrible at milking. He's very good at laughing about it."]}
   ],
   tomi: [
-    {lines: ["You know Elena, from the farm? We worked together in the city. She left. I stayed."]},
-    {needs: ["elena:3"], lines: ["Sometimes I think about doing what she did. Then I think about my mortgage. Then I think about goats."]},
-    {lines: ["Angellina says I should 'explore the feeling'. So I'm exploring it. On Saturdays. With a milking stool."]}
+    {lines: ["You know Elena, from the farm? We sat two desks apart in the city, before I came home to the mill."]},
+    {needs: ["elena:3"], lines: ["She left first. Then me. Best thing either of us did. Olives don't send emails."]},
+    {lines: ["Posy says I should 'explore the feeling'. So I'm exploring it. On Saturdays, at Elena's. With a milking stool."]}
   ],
   posy: [
-    {lines: ["Marcus pretends he loves spreadsheets. I'm literally doing a module on that."]},
-    {needs: ["marcus:2"], lines: ["I told him: you don't have to quit to try something. Try it on a Saturday. That's psychology, Mel."]}
+    {lines: ["Tomi pretends he never misses the city. I've read three books about people like Tomi."]},
+    {needs: ["tomi:2"], lines: ["I told him: you don't have to choose. Press olives in the week, milk goats on a Saturday. That's psychology."]}
   ],
   mei: [
     {lines: ["My mum used to sing to the roses. I thought everybody did."]},
-    {lines: ["When she died, Ma Ma brought me to the flower farm every day. She said the flowers needed me. I think I needed them."]},
-    {lines: ["Every year on Mum's birthday I take her a bouquet. This year… would you bring me one? Any kind."]},
-    {needs: ["bouquet"], lines: ["You brought one! Tulips were her favourite. Thank you, Mel. Really."], reward: "bouquet"}
+    {lines: ["When she died, I came to the flower farm every day. Everyone said the flowers needed me. I think I needed them."]},
+    {lines: ["Every year on my mother's birthday I take her a bouquet. This year… would you bring me one? Any kind."]},
+    {needs: ["bouquet"], lines: ["You brought one! Tulips were her favourite. Thank you. Really."], reward: "bouquet"}
   ],
   noor: [
     {lines: ["I used to run a rescue in the city. Thirty animals, one tiny yard."]},
@@ -141,13 +141,13 @@ export const STORIES = {
     {lines: ["There is one sweet I make only one day a year: the first snow. White, round, a little cold. My father taught me on the day he retired."]},
     {lines: ["My daughter wants to make chocolate wagashi. Chocolate! My father would faint.", "...I tried one. It was very good. Don't tell her."]}
   ],
-  // Jason (round 135): Mel's friend, who lives in Vernazza now; told on a trip day, one a day
+  // Ornella (id "jason"): the retired ferry captain in Vernazza; told on a trip day, one a day
   jason: [
-    {lines: ["Do you remember 2015? Your train stuck in Florence for six hours, and me on the harbour stones with a pizza going cold.", "I'd brought a book. I'd have waited all night. I very nearly did."]},
-    {lines: ["Every one of Corniglia's steps, that summer. I counted them aloud, and you pretended not to know me.", "I still climb them, most mornings. They haven't got any fewer. I've got a little more patient."]},
-    {lines: ["I met Luca when the ferry from La Spezia broke down outside the harbour. He came out in a little boat with a toolbox and a terrible joke.", "I stayed for the joke. Then for the man. Then for the view. In that order, he'll tell you. He's wrong, but I let him."]},
-    {lines: ["Every morning, the same table, an espresso, a poem. Most of them are dreadful. About one a month is all right.", "This one's all right. It's for you. Don't read it here, I'll go red. Read it on the train."], reward: "poem"},
-    {lines: ["I've decided what happiness is, Mel. A second-floor window. A harbour. Someone who brings you coffee without asking.", "And an old friend who comes to visit. I have all four today. Imagine that."]}
+    {lines: ["The first ferry I ever captained, I was twenty-nine and the only woman in the harbour office. The old men took bets on how long I'd last.", "Thirty-one years. I outlasted the bets, the old men, and two ferries."]},
+    {lines: ["Every morning I climb Corniglia's steps and count them out loud. People pretend not to know me.", "Let them. At my age, every step is a little flag on a summit."]},
+    {lines: ["The night of the big storm, eleven years ago, the ferry's engine died outside the harbour mouth. A boy of sixteen went down into the engine room with a torch in his teeth.", "He got it going again, then was sick in a bucket. That was Dario. I made him my engineer on the spot."]},
+    {lines: ["Every morning, the same table, a coffee, four lines in my notebook. Most of them are dreadful. About one a month is all right.", "This one's all right. It's for you. Don't read it here, I'll go red. Read it on the train."], reward: "poem"},
+    {lines: ["I've decided what happiness is. A window over a harbour. A swim before breakfast. Somebody who brings you coffee without being asked.", "And a friend from far away who comes back to visit. I have all four today. Imagine that."]}
   ],
   // Ronda's locals (round 107): told on a day trip (no quest needed; the two-a-day limit still holds)
   carmen: [
@@ -179,6 +179,6 @@ export const STORIES = {
   farid: [
     {lines: ["I trained in my uncle's bakery. Up at four, flour in my eyebrows."]},
     {lines: ["I came here for one summer of fruit picking. That was six summers ago."]},
-    {lines: ["Felix's honey, Ma Ma's pistachios… I made my uncle's pastries for Pilar. She's putting them on the tapas menu!"], reward: "pastry"}
+    {lines: ["Felix's honey, the orchard's pistachios… I made my uncle's pastries for Pilar. She's putting them on the tapas menu!"], reward: "pastry"}
   ]
 };

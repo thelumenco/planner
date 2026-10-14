@@ -1,18 +1,18 @@
 // Big, slow goals: things worth saving up for once the vineyard is running.
 import { bikeOn } from "./transport.js";
 import { trolleyPace } from "./scoop.js";
-//   scooter  gets Mel from screen to screen faster (kept in the garage, through the living room's east door)
-//   car      faster still: a cream convertible with room for Maple and Evan
+//   scooter  gets the player from screen to screen faster (kept in the garage, through the living room's east door)
+//   car      faster still: a cream convertible with room for you and Maple
 //   boat     a dolphin cruise boat moored at the jetty on the foreshore
-//   cellar   a cellar door extension off the wine shop: barrel racks, a tasting bar, Mel's wine wall (and a few more visitors)
-// Owned goals live in F.goals; how Mel gets about (walk / scooter / car) in F.ride.
+//   cellar   a cellar door extension off the wine shop: barrel racks, a tasting bar, the player's wine wall (and a few more visitors)
+// Owned goals live in F.goals; how the player gets about (walk / scooter / car) in F.ride.
 import { esc } from "../util.js";
 import { icon } from "../art/icons.js";
 
 export const GOALS = {
   scooter: {n: "Scooter", price: 800, where: "garage", line: "A little electric scooter. Zips you from screen to screen about half again as fast as walking."},
-  car: {n: "Cream convertible", price: 3500, where: "garage", line: "A cream convertible, roof down. Room for you, Maple and Evan, and more than twice as fast as walking."},
-  boat: {n: "Dolphin cruise boat", price: 4500, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take the family out to see the dolphins up close."},
+  car: {n: "Cream convertible", price: 3500, where: "garage", line: "A cream convertible, roof down. Room for you and Maple, and more than twice as fast as walking."},
+  boat: {n: "Dolphin cruise boat", price: 4500, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take your friends out to see the dolphins up close."},
   cocoa: {n: "The Cocoa Room", price: 1000, where: "bay", line: "The boarded-up shopfront on the bay, turned into your own chocolate shop: a shop front with a wall of bars, and a kitchen where you make chocolate from the bean. Amara will run the counter."},
   van: {n: "Campervan", price: 3800, where: "hlane", line: "A cream-and-mint vintage campervan with a pop-top roof, parked at its spot on the cottage lane. A little home from home: do it up inside, sleep under the stars, and one day, road trips."},
   greenhouse: {n: "Greenhouse", price: 400, where: "farm", line: "The old shed at the back of the garden, rebuilt in glass. Grow herbs all year (garlic, basil, mint, rosemary, chives, thyme), and anything out of season from Hana's greenhouse seed packets."},
@@ -24,7 +24,7 @@ export const GOALS = {
   cellar: {n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door, and once a month it hosts the wine club."}
 };
 export const owns = (F, k) => !!(F.goals && F.goals[k]);
-// how much faster Mel moves outdoors, and on what
+// how much faster the player moves outdoors, and on what
 export const ride = F => { if (F.scoop && F.scoop.trolley) return "walk"; if (bikeOn(F)) return "bike"; const r = F.ride; return r === "car" && owns(F, "car") ? "car" : r === "scooter" && owns(F, "scooter") ? "scooter" : r === "walk" ? "walk" : owns(F, "car") ? "car" : owns(F, "scooter") ? "scooter" : "walk"; };
 export const rideSpeed = F => ({walk: 1, bike: 1.3, scooter: 1.6, car: 2.5})[ride(F)]*trolleyPace(F);   // (pushing the ice cream trolley: slower, round 137)   // a hire bike (transport.js) for an hour
 
@@ -34,7 +34,7 @@ export function buyGoal(F, k){
   F.coins -= g.price; F.goals = {...(F.goals || {}), [k]: Date.now()};
   if (k === "scooter" || k === "car") F.ride = k;
   return {scooter: "A shiny new scooter, parked in the garage. You'll zip about on it outdoors from now on.",
-    car: "A cream convertible! Roof down, Maple in the back, Evan waving at everyone. You'll drive between screens from now on.",
+    car: "A cream convertible! Roof down, Maple in the back, ears flapping, and you waving at everyone. You'll drive between screens from now on.",
     boat: "Your dolphin cruise boat is moored at the end of the jetty. Take everyone out!",
     cellar: "The cellar door is open! Through the new door on the wine shop's west wall.",
     paperkeeper: "Lise starts tomorrow! She's already rearranged the ribbon rack by colour.",
@@ -66,8 +66,8 @@ export function garagePanel(F){
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 // The paddleboard jetties: at the foreshore, a paddle about with the dolphins or paddle up the river home; at home,
-// paddle down the river and out to the foreshore (Evan and Maple come too)
-export function jettyPanel(where, evan){
+// paddle down the river and out to the foreshore (Maple comes too)
+export function jettyPanel(where, _unused){
   const fam = ("Maple hops on the front of your board.");
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${where === "shore" ? "The paddleboards" : "Your little jetty"}</h2>`;
   h += where === "shore"

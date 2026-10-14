@@ -16,7 +16,7 @@ import { seasonOf } from "../data/items.js";
 
 const C = {sea: "#4F9CC4", sea2: "#7FBCD8", foam: "#EAF5FA", rock: "#9A8E80", rock2: "#7E7266", path: "#E3D6BE", path2: "#CDBEA0", slate: "#8A8C92",
   shutter: "#6A9276", stone: "#C9BCA8", vine: "#6E9A44", vine2: "#86AE58", terrace: "#B9A88A", lemon: "#F3D34A", leaf: "#4E7A3A", ink: "#2F2B28",
-  houses: ["#EFCB8E", "#E3A588", "#EDBDB8", "#F2DFA8", "#B9D6C2", "#F1E6CF", "#BFD4E2", "#E6AE96", "#F1CDB4", "#D9C2D8"]};   // faded pastels (Mel, round 135)
+  houses: ["#EFCB8E", "#E3A588", "#EDBDB8", "#F2DFA8", "#B9D6C2", "#F1E6CF", "#BFD4E2", "#E6AE96", "#F1CDB4", "#D9C2D8"]};   // faded pastels (round 135)
 const W = ink;
 const ssn = () => seasonOf(dayKey());
 const lab = (x, y, t, col = "#F6E3B4", size = 10) => tapeLabel(x, y, t, col, size);
@@ -24,7 +24,7 @@ const rnd = i => { const v = Math.sin(i*127.1 + 311.7)*43758.5453; return v - Ma
 
 /* ---------- pieces ---------- */
 const shade = (x, y, w, h, d = 10) => `<path d="M${x + w} ${y + 6} l${d} ${d*.7} V${y + h + d*.7} H${x + d} l${-d} ${-d*.7}z" style="fill:#6F7C9C" opacity=".18" pointer-events="none"/>`;
-// a little Ligurian house (Mel, round 135: "they were quite small, three storeys max, more like individual houses"):
+// a little Ligurian house (round 135: "they were quite small, three storeys max, more like individual houses"):
 // faded pastel plaster, two windows a floor at most (so four to six), green shutters, window boxes and pots on the
 // balconies, the odd washing line, a low slate roof. Big boxes are split up: a wide one into houses side by side, a
 // tall one into a house further up the hill peeking over the one in front. A shop keeps its door and sign in the middle.
@@ -121,8 +121,8 @@ function vernazzaScreen(){
   const church = `<g pointer-events="none">${sk(`<rect x="20" y="380" width="80" height="56" style="fill:#E3D6BE"/><path d="M14 382 L60 356 L106 382z" style="fill:${C.slate}"/><rect x="74" y="320" width="22" height="60" style="fill:#D9C9A8"/><path d="M70 322 L85 300 L100 322z" style="fill:${C.slate}"/><rect x="50" y="404" width="20" height="32" rx="10" style="fill:#6B5444"/>`,
     `<rect x="20" y="380" width="80" height="56"/><rect x="74" y="320" width="22" height="60"/>`)}</g>`;
   const houses = stack([[330, 70, 46, 110], [374, 60, 52, 120], [424, 74, 44, 106], [466, 66, 50, 114], [430, 470, 86, 80]], 1)
-    // Jason's flat (round 135): the second floor of the yellow house by the harbour, geraniums all along the balcony
-    + place("ctjason", 478, 472, 30, 9, "Jason's house", casa(446, 386, 60, 84, "#F2DFA8", {balcony: true}) + `<g pointer-events="none">${[458, 468, 484, 494].map((x, i) => `<circle cx="${x}" cy="${i % 2 ? 406 : 404}" r="2.6" style="fill:${i % 2 ? "#F29AB0" : "#E8566C"}"/>`).join("")}</g>`, "Jason's", 404, 446, "#F6E3B4")
+    // Ornella's flat (round 135): the second floor of the yellow house by the harbour, geraniums all along the balcony
+    + place("ctjason", 478, 472, 30, 9, "Ornella's house", casa(446, 386, 60, 84, "#F2DFA8", {balcony: true}) + `<g pointer-events="none">${[458, 468, 484, 494].map((x, i) => `<circle cx="${x}" cy="${i % 2 ? 406 : 404}" r="2.6" style="fill:${i % 2 ? "#F29AB0" : "#E8566C"}"/>`).join("")}</g>`, "Ornella's", 404, 446, "#F6E3B4")
     + `<g data-place="ctfocacceria" aria-label="The focacceria"><ellipse class="hov" cx="394" cy="192" rx="40" ry="10" style="fill:var(--butter)"/>${casa(354, 100, 80, 90, C.houses[1], {door: true, doorX: 40, sign: "FOCACCERIA", doorCol: "#8A5A3A"})}${lab(394, 214, "Focacceria", "#FBE0B8", 10)}</g>`;
   const piazza = place("ctpiazza", 300, 356, 50, 12, "The piazza", cafeUmbrella(270, 330, "#C9483A") + cafeUmbrella(340, 320, "#3E6BAE") + cafeUmbrella(320, 410, "#2E7A5A")
     + sk(`<rect x="250" y="440" width="120" height="30" rx="3" style="fill:#D9C9A8"/>${[[270, 452, "#C9483A"], [300, 458, "#3E6BAE"], [334, 450, "#C9483A"], [352, 460, "#FFFDF6"]].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="3.4" style="fill:${c}"/>`).join("")}`, `<rect x="250" y="440" width="120" height="30" rx="3"/>`), "Piazza", 300, 490, "#F6D3DC");
@@ -216,8 +216,8 @@ export const cinqueRide = () => `<svg class="taxibank" viewBox="0 0 600 90" pres
   <path d="M0 56 H600 V90 H0z" fill="${C.sea}"/><path d="M0 56 Q80 10 160 30 Q240 0 320 26 Q400 4 480 30 Q540 14 600 26 V58 H0z" fill="#9AA88A"/>
   ${[60, 250, 430].map((x, k) => [0, 1, 2, 3].map(i => `<rect x="${x + i*11}" y="${36 - i*3 - k*2}" width="10" height="${16 + i*3}" fill="${C.houses[(i + k*3) % C.houses.length]}"/>`).join("")).join("")}
   ${[150, 340, 540].map(x => `<path d="M${x} 60 q20 -26 40 0z" fill="#2F2B28"/>`).join("")}</g></svg>`;
-// round 134: the little painted boat by the home jetty, after a trip to Cinque Terre (Mel asked)
+// round 134: the little painted boat by the home jetty, after a trip to Cinque Terre
 export const homeBoat = (x, y, col = "#3E6BAE", stripe = "#F3D98A") => gozzo(x, y, col, stripe, "land", 1);
-// the cane drying rack by Mel's barrel shed (round 139): out while six bunches dry to raisins for the raisin wine
+// the cane drying rack by your barrel shed (round 139): out while six bunches dry to raisins for the raisin wine
 export const dryingRack = (x, y) => `<g pointer-events="none"><ellipse cx="${x + 20}" cy="${y + 2}" rx="26" ry="4" fill="#6F7C9C" opacity=".18"/>${sk(`<path d="M${x} ${y} L${x + 6} ${y - 44} L${x + 12} ${y} M${x + 28} ${y} L${x + 34} ${y - 44} L${x + 40} ${y}" style="stroke:#8A6A52" stroke-width="2.4" fill="none"/>${[-36, -24, -12].map(dy => `<path d="M${x + 2} ${y + dy} H${x + 38}" style="stroke:#C9A27E" stroke-width="2"/>`).join("")}`
   + [-36, -24, -12].map((dy, r) => [6, 15, 24, 33].map((dx, i) => `<g>${[[0, 3], [-2, 5.5], [2, 5.5], [0, 8]].map(([a, b2]) => `<circle cx="${x + dx + a}" cy="${y + dy + b2}" r="1.9" style="fill:${(r + i) % 2 ? "#9A6A3A" : "#C9A24A"}"/>`).join("")}</g>`).join("")).join(""), `<path d="M${x} ${y} L${x + 6} ${y - 44} L${x + 12} ${y} M${x + 28} ${y} L${x + 34} ${y - 44} L${x + 40} ${y}"/>`)}</g>`;

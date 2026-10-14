@@ -1,4 +1,4 @@
-// Letter voices for Bellbird Valley's people (round 190): how each one writes back when Mel posts them a gift or a letter.
+// Letter voices for Bellbird Valley's people (round 190): how each one writes back when you post them a gift or a letter.
 // Gifts tucked in (back) are the valley's own goods (BB_GOODS), which join ITEMS at runtime via game/ronda.js.
 export const PEN_BB = {
   /* ---------- Valley Gate ---------- */
@@ -41,13 +41,13 @@ export const PEN_BB = {
 
   /* ---------- Balloon Lookout ---------- */
   bvrosie: {sign: "Love, Rosie (from the coffee caravan)",
-    food: "Had it with the first cup after the dawn flight. Dad got one bite. He says it was a small one.",
+    food: "Had it with the first cup after the dawn flight. Gus got one bite. He says it was a small one.",
     drink: "It's in the caravan fridge, behind the milk. Golden hour on Sunday, I reckon.",
     made: "It's sitting on the hatch ledge so I see it every time I hand out a flat white.",
     flower: "In a mug on the counter. Customers keep asking if they come with the coffee.",
     other: "You're definitely a flat white person, and a very kind one. Thank you.",
     letter: "Read your letter between the dawn rush and the second one. Made the whole morning.",
-    news: ["Dad took the red-striped balloon up three dawns in a row last week. Not a breath of wind.", "We've got a new roast from the farm up the road. It's chocolatey. You'd like it."],
+    news: ["Gus took the red-striped balloon up three dawns in a row last week. Not a breath of wind.", "We've got a new roast from the farm up the road. It's chocolatey. You'd like it."],
     back: "b_beans", backNote: "Some of the new beans, roasted up the road. Grind them fresh and think of the balloons."},
   bvgus: {sign: "Fair winds, Gus",
     food: "Took it up in the basket at dawn. Best breakfast I've had at two thousand feet.",
@@ -276,17 +276,17 @@ export const PEN_BB = {
     news: ["I baked another lemon cake for the new camp. It went in three minutes.", "Still no wifi. Still nobody's complained."],
     back: null, backNote: ""},
   bvbao: {sign: "From Bao (I'm eight)",
-    food: "I ate it on the rope swing. Nearly. Mum said not on the rope swing.",
-    drink: "Dad says it's a grown-up one, so I'm guarding it.",
+    food: "I ate it on the rope swing. Nearly. I got told not on the rope swing.",
+    drink: "It's a grown-up one, so I'm guarding it.",
     made: "I put it in my backpack with my yabby bucket. It's safe there.",
-    flower: "Mum put them in a cup. I said they look like fireworks.",
+    flower: "They're in a cup on the camp table. I said they look like fireworks.",
     other: "THANK YOU. I showed everyone at the camp. Mai too.",
-    letter: "I got a letter! I've never had my own letter. Mum helped me read the long words.",
+    letter: "I got a letter! I've never had my own letter. I got help with the long words.",
     news: ["The new camp has a rope swing too. I did it ten times.", "I caught a yabby. It didn't pinch me this time."],
     back: null, backNote: ""},
   bvmai: {sign: "From Mai (better at the swing)",
     food: "I ate mine slowly so Bao would be jealous. He was.",
-    drink: "Mum said it's for grown-ups, so I'm keeping it safe with my gumnuts.",
+    drink: "It's for grown-ups, so I'm keeping it safe with my gumnuts.",
     made: "I keep it in my gumnut tin. It's the best thing in there.",
     flower: "I put a gumnut in with them. Now they're the best flowers.",
     other: "Thank you! I'm braver than Bao and I got a present. Well, we both did.",

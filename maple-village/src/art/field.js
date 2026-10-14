@@ -1,4 +1,4 @@
-// The field: an open meadow north of Ma Ma's orchard and west of the town square, with a lake (two swans), a picnic
+// The field: an open meadow north of Farid's orchard and west of the town square, with a lake (two swans), a picnic
 // spot, a little football pitch and benches. The lake's river runs out south-east and on into the orchard's top
 // right corner, then east into the river at home.
 import { ink, sgHM } from "../util.js";
@@ -155,7 +155,7 @@ export function fieldArt(){
     <g ${W} fill="none" opacity=".75"><rect x="66" y="530" width="168" height="56" rx="4" style="stroke:#FFFDF6" stroke-width="2.4"/><path d="M150 530 v56" style="stroke:#FFFDF6" stroke-width="2"/><circle cx="150" cy="558" r="10" style="stroke:#FFFDF6" stroke-width="2"/></g>
     ${sk(`<circle cx="176" cy="566" r="5" style="fill:#FFFDF6"/>`, `<path d="M62 544 v28 h-10 v-28z M238 544 v28 h10 v-28z"/><circle cx="176" cy="566" r="5"/><path d="M174 563 l3 2 l-1 3" opacity=".6"/>`)}
     ${tapeLabel(150, 612, "Football pitch", "var(--butter)", 11)}</g>`;
-  // the exercise lawn east of the river: Mum's class most mornings (mats out, a little speaker)
+  // the exercise lawn east of the river: Hana's class most mornings (mats out, a little speaker)
   const lawn = night ? "" : `<g data-place="exlawn" aria-label="Exercise lawn"><ellipse class="hov" cx="456" cy="452" rx="52" ry="30" style="fill:var(--butter)"/>
     ${sk(`${[[418, 444, "#E8566C"], [456, 452, "#7FB8E8"], [494, 444, "#C9A3E0"], [436, 480, "#9CC27E"]].map(([x, y, c]) => `<path d="M${x - 16} ${y + 3} l5 -10 h22 l-5 10z" style="fill:${c}"/>`).join("")}<rect x="476" y="392" width="14" height="18" rx="3" style="fill:#2F2B28"/>`,
       `${[[418, 444], [456, 452], [494, 444], [436, 480]].map(([x, y]) => `<path d="M${x - 16} ${y + 3} l5 -10 h22 l-5 10z"/>`).join("")}<rect x="476" y="392" width="14" height="18" rx="3"/><circle cx="483" cy="403" r="4"/>`)}
@@ -169,7 +169,7 @@ export function fieldArt(){
     ${sk(`<rect x="348" y="12" width="6" height="40" style="fill:var(--wood)"/><rect x="378" y="12" width="6" height="40" style="fill:var(--wood)"/><path d="M344 16 q22 -14 44 0 v6 q-22 -12 -44 0z" style="fill:#E7C6E8"/>`,
       `<rect x="348" y="12" width="6" height="40"/><rect x="378" y="12" width="6" height="40"/><path d="M344 16 q22 -14 44 0 v6 q-22 -12 -44 0z"/>`)}
     ${eventNow(artCtx().day(), sgHM()) ? "" : tapeLabel(366, 70, "Wildflower Farm", "#E7C6E8", 10)}</g>`;   // (no label on market days: the stalls fill the top row)
-  const toOrchard = `<g data-place="toOrchardN" aria-label="Path to Ma Ma's orchard"><ellipse class="hov" cx="260" cy="622" rx="28" ry="16" style="fill:var(--butter)"/>
+  const toOrchard = `<g data-place="toOrchardN" aria-label="Path to the orchard"><ellipse class="hov" cx="260" cy="622" rx="28" ry="16" style="fill:var(--butter)"/>
     ${sk(`<rect x="240" y="594" width="6" height="42" style="fill:var(--wood)"/><rect x="274" y="594" width="6" height="42" style="fill:var(--wood)"/><path d="M236 598 q24 -16 48 0 v6 q-24 -14 -48 0z" style="fill:#9CC27E"/>`,
       `<rect x="240" y="594" width="6" height="42"/><rect x="274" y="594" width="6" height="42"/><path d="M236 598 q24 -16 48 0 v6 q-24 -14 -48 0z"/>`)}
     ${tapeLabel(332, 614, "Orchard", "var(--sage)", 11)}</g>`;
@@ -184,7 +184,7 @@ export function fieldArt(){
   return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + xtree + toTown + toFarm + toOrchard + event
     + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
 }
-// The river's stretch through the top right of Ma Ma's orchard (from the lake, on east to home)
+// The river's stretch through the top right of Farid's orchard (from the lake, on east to home)
 export const orchardRiver = `<g filter="url(#wob)"><path d="M380 0 C400 40 450 66 520 70" fill="none" style="stroke:var(--water)" stroke-width="18" stroke-linecap="round"/>
   <path d="M371 0 C391 42 446 75 520 79 M389 0 C409 38 454 57 520 61" fill="none" style="stroke:var(--line)" stroke-width="1.1" opacity=".55"/></g>
   <path class="ripple" d="M430 52 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>`;

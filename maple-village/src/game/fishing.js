@@ -118,7 +118,7 @@ export function fishPanel(F, spot, st = {}){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(sp.n)}</h2>`;
   h += `<div class="gchips"><button class="gchip${st.view !== "journal" ? " on" : ""}" data-fish="view" data-k="fish"><span>Fishing</span></button><button class="gchip${st.view === "journal" ? " on" : ""}" data-fish="view" data-k="journal"><span>Journal · ${journalCount(F)} of ${Object.keys(FISH).length}</span></button></div>`;
   if (st.view === "journal") return h + journalHtml(F) + shut;
-  if (!s.rod) return h + `<p class="sub">${esc(sp.line)} You'll need a rod. Gong Gong says the tackle shop's best one is 80 coins, and it'll last forever.</p><div class="actions"><button class="btn primary" data-fish="rod" ${F.coins >= ROD ? "" : "disabled"}>Buy a rod · ${ROD} ${coin()}</button></div>` + shut;
+  if (!s.rod) return h + `<p class="sub">${esc(sp.line)} You'll need a rod. Mei says the tackle shop's best one is 80 coins, and it'll last forever.</p><div class="actions"><button class="btn primary" data-fish="rod" ${F.coins >= ROD ? "" : "disabled"}>Buy a rod · ${ROD} ${coin()}</button></div>` + shut;
   h += `<p class="sub">${esc(sp.line)} <b>${worms(s.bait)}</b> in the bait tin. Every quest you finish digs up another.</p>`;
   const c = st.cast;
   if (c && !c.t0) h += `<div class="fishwater"><span class="fbob wait"></span></div><p class="muted">The float sits on the water... wait for the bite.</p><div class="actions"><button class="btn alt" data-fish="reel">Reel in</button></div>`;

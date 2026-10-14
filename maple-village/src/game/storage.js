@@ -1,4 +1,4 @@
-// Storage at home (round 166, Mel: "can my fridge at home be something that I put stuff into and it holds till I
+// Storage at home (round 166: "can my fridge at home be something that I put stuff into and it holds till I
 // need to transfer it to one of my shops"). Two places, both kept forever (nothing goes off):
 //   the fridge (its "Stored" side; the pantry side stays Hestia's real shopping list): food, ingredients, flowers
 //   the storage shelf in the garage: everything else (soaps and oils from the mill, gifts, keepsakes, seeds...)
@@ -16,7 +16,7 @@ import { toRack } from "./mulled.js";
 
 export const PLACES = {fridge: "the fridge", shelf: "the garage shelf"};
 const FRIDGE_KINDS = ["food", "ingredient", "flower", "bouquet"];
-const NEVER = ["tool", "pet", "use"];   // tools stay with Mel; a pet needs a home, not a shelf
+const NEVER = ["tool", "pet", "use"];   // tools stay with the player; a pet needs a home, not a shelf
 
 export function storeState(F){ F.storage = F.storage || {}; const s = F.storage; s.fridge = s.fridge || {}; s.shelf = s.shelf || {}; return s; }
 export const storable = id => !!ITEMS[id] && !NEVER.includes(ITEMS[id].kind);

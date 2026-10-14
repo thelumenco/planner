@@ -1,8 +1,8 @@
-// The Tablelands' things to join in with (round 159), each with Evan in on it when he's come along:
+// The Tablelands' things to join in with (round 159):
 //   a swim in the falls at Misty Falls (8 to 5): swim to the falls, float and look up, duck under the veil of water,
 //     and get out before you're too cold to talk.
 //   a kayak round Crater Lake (Lachlan's boat shed): steer towards whatever shows itself (turtles, ducklings, a
-//     kingfisher...). Evan sits in the front with a little paddle.
+//     kingfisher...).
 //   the platypus at Willow Bend (the platform over the creek): rings on the water mean look; nothing means wait. Move
 //     at the wrong moment and she's gone. Better at dawn and dusk.
 //   bottle-feeding the calves at Greenhill Dairy with Noah: the hungriest first (the one bumping hardest).
@@ -41,7 +41,7 @@ export function swimDo(st, how){ if (st.out) return null;
 
 /* ---------- a kayak round the lake ---------- */
 export const KAYAK = {price: 12, LEGS: 6};
-export const kayakCost = evan => KAYAK.price + ((0));
+export const kayakCost = _ => KAYAK.price + ((0));
 const SIGHTS = ["A turtle, poking its head up for a breath", "A mother duck and seven ducklings in a line", "A kingfisher, a flash of blue off a branch", "Little fish darting in the clear shallows", "The curtain fig's roots, right down to the water", "A water dragon sunning itself on a log", "A rainbow in the mist off the far shore"];
 export function kayakStart(rng = Math.random){ const order = SIGHTS.slice().sort(() => rng() - .5); return {leg: 0, at: Array.from({length: KAYAK.LEGS}, () => rnd(rng, 3)), sights: order, seen: [], last: null}; }
 export function kayakSteer(st, dir){ if (st.leg >= KAYAK.LEGS || ![0, 1, 2].includes(dir)) return null; const hit = st.at[st.leg] === dir; if (hit) st.seen.push(st.sights[st.leg % st.sights.length]); st.last = hit ? st.sights[st.leg % st.sights.length] : "miss"; st.leg++; return st.last; }
@@ -104,7 +104,7 @@ export function panDo(st, how){ if (st.result) return null;
 /* ---------- the steam train ---------- */
 export const STEAM = {price: 8, from: 9*60, to: 16*60, LEGS: 6};
 export const steamOpen = hm => hm >= STEAM.from && hm < STEAM.to;
-export const steamCost = evan => STEAM.price + ((0));
+export const steamCost = _ => STEAM.price + ((0));
 const VIEWS = ["Paddocks and black-and-white cows, all turning to watch", "Into the rainforest: ferns brushing the carriage windows", "Over a trestle bridge, the creek far below", "Past the old mine, its chimney still standing", "A mob of kangaroos bounding alongside", "Through a cutting of red rock, the steam rolling back"];
 export function steamStart(rng = Math.random){ const c1 = 1 + rnd(rng, STEAM.LEGS - 1), cross = [c1, 1 + (c1 + 1 + rnd(rng, STEAM.LEGS - 3)) % (STEAM.LEGS - 1)]; return {leg: 0, cross, whistled: 0, missed: 0, views: VIEWS.slice().sort(() => rng() - .5)}; }
 export function steamDo(st, how){ if (st.leg >= STEAM.LEGS) return null; const c = st.cross.includes(st.leg);
@@ -113,7 +113,7 @@ export const steamDone = st => st.leg >= STEAM.LEGS;
 
 /* ---------- the panels ---------- */
 export function tlPanel(F, kind, st, o = {}){
-  const t = st.t, s = tlState(F), evan = false, hm = o.hm || 12*60;
+  const t = st.t, s = tlState(F), hm = o.hm || 12*60;
   switch (kind) {
     case "swim": { let h = tape("stripe") + `<h2>A swim in the falls</h2>`;
       if (!swimOpen(hm)) return h + `<p class="sub">Swimming's from 8 till 5, while Kirra's about. The pool's dark and still now.</p>` + shut;
@@ -168,9 +168,9 @@ export function tlPanel(F, kind, st, o = {}){
   return "";
 }
 
-// what a button does: changes the run (st.t) and F, and returns {say, sfx, evan, xp, hearts, flash, close}
+// what a button does: changes the run (st.t) and F, and returns {say, sfx, xp, hearts, flash, close}
 export function tlAct(F, kind, st, verb, arg, o = {}){
-  const s = tlState(F), evan = false, hm = o.hm || 12*60, add = o.addInv || (() => {}), rng = o.rng || Math.random, t = st.t;
+  const s = tlState(F), hm = o.hm || 12*60, add = o.addInv || (() => {}), rng = o.rng || Math.random, t = st.t;
   switch (verb) {
     case "swimin": if (!swimOpen(hm)) return null; st.t = {cold: 0, done: [], out: false, last: null}; return {sfx: "pop"};
     case "swim": { if (!t) return null; const r = swimDo(t, arg); if (!r) return null; t.last = r === "out" ? t.last : r; return {sfx: r === "out" ? "tap" : "pop"}; }

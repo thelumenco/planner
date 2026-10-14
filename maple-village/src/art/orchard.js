@@ -1,5 +1,5 @@
-// Ma Ma's orchard and flower farm: the two screens west of home, their trees, beds and bushes, and the potted flowers
-// Mel can set around the village. Reads live state through the art context (G.F()).
+// The orchard and the flower farm: the two screens west of home, their trees, beds and bushes, and the potted flowers
+// you can set around the village. Reads live state through the art context (G.F()).
 import { ink, esc } from "../util.js";
 import { sk, tapeLabel, tree, flowers, house, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
@@ -91,7 +91,7 @@ export function orchardArt(){
     ${tree(40, 50, .8)}${tree(160, 40, .7)}${tree(300, 46, .75)}${orchardRiver}${hedgeRow([200, 300])}
     <g filter="url(#wob)"><path d="M260 150 V270 M0 270 H520 M132 270 V236 M415 270 V252 M160 270 V610 M260 270 V610 M360 270 V610" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
     ${flowers([[200, 150, "#EFA3A6"], [230, 160, "#F3C969"], [300, 150, "#C3CDEE"], [30, 600, "#EFA3A6"], [490, 600, "#F3C969"], [470, 330, "#C3CDEE"]])}`;
-  const cottage = house("cottage", 74, 152, 116, 72, "#FFF6E8", "#C2505F", "Ma Ma's cottage", "var(--blush)",
+  const cottage = house("cottage", 74, 152, 116, 72, "#FFF6E8", "#C2505F", "Farid and Mei's", "var(--blush)",
     {art: `<rect x="84" y="200" width="22" height="14" rx="2" style="fill:#9CC27E"/><circle cx="90" cy="200" r="3" style="fill:#E8566C"/><circle cx="98" cy="199" r="3" style="fill:#F3C969"/>`, lines: `<rect x="84" y="200" width="22" height="14" rx="2"/><path d="M156 120 v-16 h10 v22"/><path class="smoke" d="M161 100 q-4 -6 0 -11 q4 -5 0 -10" opacity=".6"/>`});
   const shop = `<g data-place="farmshop" aria-label="Farm shop"><ellipse class="hov" cx="415" cy="246" rx="62" ry="10" style="fill:var(--butter)"/>
     ${sk(`<rect x="358" y="186" width="114" height="50" rx="3" style="fill:#C9A27E"/><path d="M350 186 h130 l-8 -26 h-114z" style="fill:#F3C969"/><path d="M366 160 l-6 26 M392 160 l-4 26 M418 160 v26 M444 160 l4 26 M470 160 l6 26" style="stroke:#E8566C" stroke-width="6"/>
@@ -130,10 +130,10 @@ export function flowerFarmArt(){
     return `<g data-bed="${i}" aria-label="Flower bed ${i + 1}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="36" ry="10" style="fill:var(--butter)"/><g transform="translate(${x} ${y})" ${W}>${bedBody(p && p.k, st.stage, st.g)}</g></g>`; }).join("")).join("");
   return lampDefs + ground + archGate("toOrchardF", 500, 285, "Orchard", 466, 316, "var(--sage)", "Gate to the orchard")
     + archGate("toShoreFl", 52, 144, "Foreshore", 112, 176, "var(--sky)", "Gate to the foreshore")
-    + tapeLabel(260, 168, "Ma Ma's flower farm", "var(--blush)", 12) + bushes + beds;
+    + tapeLabel(260, 168, "Mei's flower farm", "var(--blush)", 12) + bushes + beds;
 }
 // home base: the gate at the top left, along the path to the orchard
 export function orchardGate(){
   return `<g filter="url(#wob)"><path d="M14 170 C80 172 150 210 214 300" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>`
-    + archGate("toOrchard", 24, 170, "Orchard", 74, 200, "var(--sage)", "Gate to Ma Ma's orchard");
+    + archGate("toOrchard", 24, 170, "Orchard", 74, 200, "var(--sage)", "Gate to the orchard");
 }

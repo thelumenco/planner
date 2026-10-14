@@ -1,6 +1,6 @@
-// The Christmas market (round 172, Mel: "let's do Christmas markets and gift hampers"). Every evening 5 to 9 from 20
+// The Christmas market (round 172: "let's do Christmas markets and gift hampers"). Every evening 5 to 9 from 20
 // November to Christmas Eve on the field (game/tours.js XMAS, eventsOn). This file: the treats eaten on the spot, the
-// mulled wine stall, the tree (lit at 5:30; the very first night, the village counts it down), and Mel's own stall and
+// mulled wine stall, the tree (lit at 5:30; the very first night, the village counts it down), and your own stall and
 // the hampers (round 173).
 // State: F.xmas = {lit: {year: true}, treats: n}
 import { esc } from "../util.js";
@@ -8,11 +8,12 @@ import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
 import { XMAS_LIT, xmasOn, carolsNow, grottoOn, grottoNow, lanternWalkNow, GROTTO } from "./tours.js";
 import { hash } from "../util.js";
+import { dearMe } from "./me.js";
 
 export function xmasState(F){ F.xmas = F.xmas || {}; const x = F.xmas; x.lit = x.lit || {}; x.treats = x.treats || 0; return x; }
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 
-// treats: bought and eaten (or drunk) right there, a cone or a cup for Evan too when he's along
+// treats: bought and eaten (or drunk) right there
 export const TREATS = {
   xm_chestnut: {n: "A cone of roast chestnuts", price: 3, say: ["Hot chestnuts in a paper cone. You peel one and burn your fingers, every single time. Worth it.", "Sweet, smoky, a bit floury. Christmas in a paper cone."]},
   xm_hotchoc: {n: "Hot chocolate", price: 3, say: ["Thick hot chocolate from the Scoop Shack's winter stand. Both hands round the cup.", "Rich and not too sweet. Sofia used the Cocoa Room's dark."]},
@@ -21,7 +22,7 @@ export const TREATS = {
 export const treatsHTML = (st, coins) => (st.treats || []).length ? `<div class="actions">${st.treats.map(id => { const t = TREATS[id];
   return `<button class="btn ${coins >= t.price ? "primary" : "alt"}" data-xtreat="${id}" ${coins >= t.price ? "" : "disabled"}>${icon(id, 18)} ${esc(t.n)} · ${t.price} ${icon("coin", 13)}</button>`; }).join("")}</div>` : "";
 
-// the mulled wine stall: cups from Mel's own pot in the wine shop kitchen
+// the mulled wine stall: cups from your own pot in the wine shop kitchen
 export function mulledStallPanel(F, o = {}){
   const m = F.mull || {}, r = (m.recipes || []).find(x => x.id === m.cupId);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Mulled wine</h2>`;
@@ -32,9 +33,9 @@ export function mulledStallPanel(F, o = {}){
 
 // the tree: dark before half past five, lit after
 export const firstNight = day => day.slice(5) === "11-20";
-// (the very first night it stays dark till the village has counted it down, or five minutes after if Mel's not there)
+// (the very first night it stays dark till the village has counted it down, or five minutes after if you're not there)
 export const treeLit = (day, hm, F) => xmasOn(day) && hm >= XMAS_LIT && hm < 23*60 && (!firstNight(day) || hm >= XMAS_LIT + 5 || !!(F && F.xmas && F.xmas.lit && F.xmas.lit[day.slice(0, 4)]));
-// the countdown's due: the first night, Mel on the field, between 5:28 and 5:35, not yet done this year
+// the countdown's due: the first night, you on the field, between 5:28 and 5:35, not yet done this year
 export const countdownDue = (F, day, hm) => firstNight(day) && hm >= XMAS_LIT - 2 && hm < XMAS_LIT + 5 && !xmasState(F).lit[day.slice(0, 4)];
 export function treePanel(F, day, hm){
   const lit = treeLit(day, hm, F), x = xmasState(F);
@@ -42,14 +43,14 @@ export function treePanel(F, day, hm){
   if (carolsNow(day, hm)) return h + `<p class="sub">Carols by the tree. Everyone's got a song sheet and a cup of something warm; Hana's leading, a bit flat, very loud. Pick the next one.</p>
     <div class="actions">${CAROL_SONGS.map((c, i) => `<button class="btn ${x.sung && x.sung[day] && x.sung[day].includes(i) ? "alt" : "primary"}" data-xcarol="${i}">${esc(c.n)}</button>`).join("")}</div>` + shut;
   if (lanternWalkNow(day, hm)) return h + `<p class="sub">Christmas Eve. The whole village is lining up with paper lanterns for the walk round the field, the last thing before the market closes for the year.</p><div class="actions"><button class="btn primary" data-xlwalk="1">Take a lantern and join in</button></div>` + shut;
-  h += `<p class="sub">${lit ? "The big tree on the football pitch, lit up: hundreds of warm white lights, Hana's straw stars, and a gold star on top that Gong Gong insists is crooked." : firstNight(day) ? "The big tree on the football pitch, dark for now. At half past five the whole village counts down and the lights go on for the first time this year." : "The big tree on the football pitch. The lights come on at half past five, every evening till Christmas Eve."}</p>`;
+  h += `<p class="sub">${lit ? "The big tree on the football pitch, lit up: hundreds of warm white lights, Hana's straw stars, and a gold star on top that Theo insists is crooked." : firstNight(day) ? "The big tree on the football pitch, dark for now. At half past five the whole village counts down and the lights go on for the first time this year." : "The big tree on the football pitch. The lights come on at half past five, every evening till Christmas Eve."}</p>`;
   return h + shut;
 }
 
-/* ---------- round 173: Mel's own stall (place 2) ---------- */
-// Up to six kinds of things she's made: mill oils, soaps and lotions, honey from the hives, her cheeses, Cocoa Room bars
+/* ---------- round 173: your own stall (place 2) ---------- */
+// Up to six kinds of things you've made: mill oils, soaps and lotions, honey from the hives, your cheeses, Cocoa Room bars
 // and boxes, hampers, and bottles off the wine shop's shelves. They sell at their sell price (never above what they
-// cost to buy), faster while she stands behind it. With the Mill Shop open, Hazel minds it while she's away;
+// cost to buy), faster while you stand behind it. With the Mill Shop open, Hazel minds it while you're away;
 // otherwise it's an honesty tin and goes slowly. Unsold things wait in the stall's crate for the next evening.
 // F.xmas.stall = {goods: {id: n}, wine: {shelfId: {name, type, price, n}}}, F.xmas.sold = {day: {n, coins}}
 export const STALL_KINDS = 6;
@@ -66,7 +67,7 @@ export function putWine(F, v, shelfId){ const st = stallState(F), b = v.shelf.fi
   b.n--; const w = st.wine[shelfId] = st.wine[shelfId] || {name: b.name, type: b.type, price: b.price, n: 0}; w.n++; return 1; }
 export function takeWine(F, v, shelfId){ const st = stallState(F), w = st.wine[shelfId]; if (!w || !w.n) return 0; const b = v.shelf.find(x => x.id === shelfId), k = w.n;
   if (b) b.n += k; else v.shelf.push({id: shelfId, name: w.name, type: w.type, n: k, price: w.price, open: 0}); delete st.wine[shelfId]; return k; }
-// one minute of the market: mode "mel" (she's behind it), "hazel" (minding it), "tin" (the honesty tin) -> coins
+// one minute of the market: mode "mel" (you're behind it), "hazel" (minding it), "tin" (the honesty tin) -> coins
 export function stallSellMinute(F, day, mode){
   const st = stallState(F), ids = Object.keys(st.goods).filter(id => st.goods[id] > 0 && ITEMS[id]), wines = Object.keys(st.wine).filter(id => st.wine[id].n > 0);
   if (!ids.length && !wines.length) return 0; const p = mode === "mel" ? .1 : mode === "hazel" ? .05 : .02; if (Math.random() >= p) return 0;
@@ -89,13 +90,13 @@ export function myStallPanel(F, v, o = {}){
 }
 
 /* ---------- round 173: hampers, packed at the post office ---------- */
-// A wicker basket from Penny's hamper table (small: three things, big: six), filled with things Mel's made (the same
+// A wicker basket from Penny's hamper table (small: three things, big: six), filled with things you've made (the same
 // goods as the stall, plus a bottle off the wine shelves). Each packed hamper is its own item, named after what's in
 // it. It's worth what its contents fetch plus the basket, and never more than they'd cost to buy.
 // F.xmas.hampers = [{id, size, items: [id | {wine, type, price}], name}]; F.xmas.pack = {size, items}
 export const BASKETS = {small: {n: "Small basket", holds: 3, price: 4}, big: {n: "Big basket", holds: 6, price: 8}};
 const catOf = x => typeof x === "object" ? "wine" : /^chz_/.test(x) ? "cheese" : HONEYS.includes(x) || /^bar_|^box/.test(x) ? "sweet" : ITEMS[x] && ITEMS[x].mill === "oil" ? "oil" : ITEMS[x] && ITEMS[x].mill ? "pamper" : "other";
-// round 184 (Mel: "yes to hampers for Mother's Day and Valentine's"): Penny's hamper table comes out three times a
+// round 184 ("yes to hampers for Mother's Day and Valentine's"): Penny's hamper table comes out three times a
 // year: Valentine's (the 1st to the 14th of February), Mother's Day (the 1st of May to the second Sunday) and Christmas
 export const mothersDay = y => { const dw = new Date(Date.UTC(y, 4, 1)).getUTCDay(); return 1 + (7 - dw) % 7 + 7; };
 export function hamperSeason(day){
@@ -109,7 +110,7 @@ export const hamperIco = hp => `hamper_${hp.size === "big" ? "big" : "small"}${(
 export function seasonName(items, size, season){
   const base = hamperName(items, size), cats = [...new Set(items.map(catOf))];
   if (season === "valentine") return cats.length === 1 && cats[0] === "sweet" ? "The Sweetheart" : cats.includes("wine") ? "Wine and Roses" : "Be My Valentine";
-  if (season === "mothers") return cats.length === 1 && cats[0] === "pamper" ? "Mum's Pamper" : base === "The Grand Honeybrook" ? "The Grand Mother's Day" : "For Mum, With Love";
+  if (season === "mothers") return cats.length === 1 && cats[0] === "pamper" ? "The Mother's Day Pamper" : base === "The Grand Honeybrook" ? "The Grand Mother's Day" : "With Love, on Mother's Day";
   return base;
 }
 export function hamperName(items, size){
@@ -141,7 +142,7 @@ export function hamperPanel(F, v, o = {}){
   const x = xmasState(F), pk = x.pack;
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The hamper table</h2>`;
   const sea = o.season || "xmas";
-  if (!pk) return h + `<p class="sub">${sea === "valentine" ? `Penny's table is out again for Valentine's: wicker baskets, pink tissue, paper hearts. "For your sweetheart? Or yourself. I won't tell."` : sea === "mothers" ? `Penny's table is out for Mother's Day: wicker baskets, lilac ribbon, sprigs of dried lavender. "Something for your mum, love? Or your ma ma?"` : `Penny's set up a table by the window: wicker baskets, straw, red ribbon and gift tags. "Pick a basket, fill it with things you've made, and I'll tie the bow."`}</p>
+  if (!pk) return h + `<p class="sub">${sea === "valentine" ? `Penny's table is out again for Valentine's: wicker baskets, pink tissue, paper hearts. "For your sweetheart? Or yourself. I won't tell."` : sea === "mothers" ? `Penny's table is out for Mother's Day: wicker baskets, lilac ribbon, sprigs of dried lavender. "For someone who looks after everyone, love? There's always one."` : `Penny's set up a table by the window: wicker baskets, straw, red ribbon and gift tags. "Pick a basket, fill it with things you've made, and I'll tie the bow."`}</p>
     <div class="actions">${Object.entries(BASKETS).map(([k, b]) => `<button class="btn ${F.coins >= b.price ? "primary" : "alt"}" data-xh="start:${k}" ${F.coins >= b.price ? "" : "disabled"}>${esc(b.n)}: ${b.holds} things · ${b.price} ${icon("coin", 13)}</button>`).join("")}</div>
     <p class="muted">A packed hamper makes a lovely gift${sea === "xmas" ? ", sells from your stall at the Christmas market," : ""} and Penny will post one for you.</p>` + postHTML(F, o) + shut;
   const holds = BASKETS[pk.size].holds, val = hamperValue(pk.items, pk.size);
@@ -164,20 +165,19 @@ export const CAROL_SONGS = [
   {n: "The Holly and the Ivy", a: "The holly and the ivy, when they are both full grown...", b: "Of all the trees that are in the wood, the holly bears the crown."},
   {n: "We Wish You a Merry Christmas", a: "We wish you a merry Christmas...", b: "And a happy new year!"}];
 export function singCarol(F, day, i){ const x = xmasState(F); x.sung = x.sung || {}; x.sung[day] = x.sung[day] || []; const fresh = !x.sung[day].includes(i); if (fresh) x.sung[day].push(i); x.carols = (x.carols || 0) + 1; return {song: CAROL_SONGS[i], fresh}; }
-// the lantern walk: once a year Mel gets to keep her lantern
+// the lantern walk: once a year you get to keep your lantern
 export function lanternWalk(F, day){ const x = xmasState(F); x.walk = x.walk || {}; const yr = day.slice(0, 4), first = !x.walk[yr]; x.walk[yr] = true; return first; }
 
-// Santa's grotto: weekend evenings 5 to 8, by the picnic spot. Evan whispers his wish, gets a little present, and the
-// first visit each Christmas, a photo with Santa to keep
-export const WISHES = ["a red fire truck. A BIG one.", "a dinosaur that roars for real.", "snow. Just some snow, please.", "a puppy. Or two puppies.", "a rocket to the moon, for him and Maple.", "that Mama and Papa get a present too."];
+// Santa's grotto: weekend evenings 5 to 8, by the picnic spot. You whisper a wish, get a little present, and the
+// first visit each Christmas, a photo with Santa to keep (nobody's too old for Santa)
+export const WISHES = ["snow. Just a little snow, please, for the lantern walk.", "a whole week with nothing to do but read.", "that the orchard has its best year yet.", "a really good cheese. You'll know it when you taste it.", "that Maple stops stealing socks. Or doesn't. You've grown fond of it.", "that everyone in the village gets a present too."];
 export const GIFTS = [["xm_ginger", "a gingerbread person"], ["xm_yoyo", "a painted yo-yo"], ["xm_star", "a little straw star"]];
 export function grottoPanel(F, day, hm, o = {}){
   const x = xmasState(F); let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Santa's grotto</h2>`;
   if (!grottoOn(day)) return h + `<p class="sub">A little wooden hut with snow painted on the roof and a sign: "Santa's grotto. Saturday and Sunday evenings, 5 till 8." It's shut till the weekend.</p>` + shut;
   if (!grottoNow(day, hm)) return h + `<p class="sub">The grotto's ${hm < GROTTO[0] ? "not open yet: Santa comes at 5" : "shut for tonight. Santa's gone home for his tea"}.</p>` + shut;
-  if ((x.grotto || {})[day]) return h + `<p class="sub">Santa waves through the window. "Evan's been already tonight! I've written his wish in my book, don't you worry."</p>` + shut;
-  return h + `<p class="sub">Santa in his big chair, a sack of little parcels beside him, the elf (it's Pip) checking names on a clipboard. "Is there a young man called Evan coming tonight?"</p><p class="muted">Bring Evan along.</p>` + shut;
-  return h + `<p class="sub">Santa in his big chair, a sack of little parcels beside him. Pip, as the elf, is checking names on a clipboard. Evan's gone very quiet and is holding your hand tight.</p><div class="actions"><button class="btn primary" data-xgrotto="1">Evan goes in to see Santa</button></div>` + shut;
+  if ((x.grotto || {})[day]) return h + `<p class="sub">Santa waves through the window. "You've been already tonight! Your wish is written in my book, don't you worry."</p>` + shut;
+  return h + `<p class="sub">Santa in his big chair, a sack of little parcels beside him. Pip, as the elf, is checking names on a clipboard and trying very hard not to laugh. "Come in, come in," says Santa. "Nobody's too old for a wish."</p><div class="actions"><button class="btn primary" data-xgrotto="1">Go in and see Santa</button></div>` + shut;
 }
 export function grottoVisit(F, day){
   const x = xmasState(F); x.grotto = x.grotto || {}; if (x.grotto[day]) return null; x.grotto[day] = true;
@@ -186,23 +186,23 @@ export function grottoVisit(F, day){
 }
 
 /* ---------- round 174: posting hampers, and orders ---------- */
-// Penny posts a hamper to the family, a villager, or a friend from the campervan trips (once Mel's met them there).
-// The family write back (ten minutes), villagers (half an hour; now and then they want one for someone else), friends
+// Penny posts a hamper to one of the three households of friends, a villager, or a friend from the campervan trips
+// (once you've met them there). The households write back (ten minutes), villagers (half an hour; now and then they want one for someone else), friends
 // far away the next day, with a postcard and a little something from where they live.
 export const RECIPS = [
-  {id: "hanatheo", n: "Mum and Dad", kind: "family"}, {id: "mamagg", n: "Ma Ma and Gong Gong", kind: "family"}, {id: "marcusang", n: "Marcus and Angellina", kind: "family"},
-  {id: "hana", n: "Hana", kind: "village"}, {id: "okada", n: "Mr Okada", kind: "village"}, {id: "juniper", n: "Juniper", kind: "village"}, {id: "opal", n: "Opal", kind: "village"}, {id: "celeste", n: "Celeste", kind: "village"}, {id: "lin", n: "Lin", kind: "village"},
-  {id: "bvkel", n: "Kel at the Cellar Door", kind: "friend", stop: "bv_cellar", gift: "b_print", sign: "Cheers, Kel", body: i => `G'day Mel,\n\nYour hamper made it all the way to the Cellar Door! The ${i} went down a treat with the team at smoko. I've popped a print of the valley in the post, so you don't forget us.`},
-  {id: "crwin", n: "Win at the lighthouse", kind: "friend", stop: "bv_lighthouse", gift: "b_chime", sign: "Warmly, Win", body: i => `Dear Mel,\n\nThe postman carried your hamper up the lighthouse steps, puffing all the way. The ${i} is on the tearoom counter for everyone to admire. Here's a little shell wind chime for your window.`},
-  {id: "tlkirra", n: "Kirra at Misty Falls", kind: "friend", stop: "bv_falls", gift: "b_seedpod", sign: "Kirra", body: i => `Hey Mel,\n\nHamper landed at the ranger station! Shared it round at lunch and the ${i} was gone in minutes. Here's a seed pod from the falls track. Plant it somewhere warm.`},
-  {id: "lvarnaud", n: "Madame Arnaud at Rosehill", kind: "friend", stop: "bv_perfume", gift: "b_lavbunch", sign: "Avec affection, Madame Arnaud", body: i => `Chère Mel,\n\nYour hamper arrived at Rosehill. The ${i}: magnifique. I send you a bunch of our lavender, dried in the old barn. Put it under your pillow.`}];
+  {id: "hanatheo", n: "Hana and Theo", kind: "family"}, {id: "mamagg", n: "Farid and Mei", kind: "family"}, {id: "marcusang", n: "Tomi and Posy", kind: "family"},
+  {id: "okada", n: "Mr Okada", kind: "village"}, {id: "juniper", n: "Juniper", kind: "village"}, {id: "opal", n: "Opal", kind: "village"}, {id: "celeste", n: "Celeste", kind: "village"}, {id: "lin", n: "Lin", kind: "village"},
+  {id: "bvkel", n: "Kel at the Cellar Door", kind: "friend", stop: "bv_cellar", gift: "b_print", sign: "Cheers, Kel", body: i => `G'day!\n\nYour hamper made it all the way to the Cellar Door! The ${i} went down a treat with the team at smoko. I've popped a print of the valley in the post, so you don't forget us.`},
+  {id: "crwin", n: "Win at the lighthouse", kind: "friend", stop: "bv_lighthouse", gift: "b_chime", sign: "Warmly, Win", body: i => `Dear friend,\n\nThe postman carried your hamper up the lighthouse steps, puffing all the way. The ${i} is on the tearoom counter for everyone to admire. Here's a little shell wind chime for your window.`},
+  {id: "tlkirra", n: "Kirra at Misty Falls", kind: "friend", stop: "bv_falls", gift: "b_seedpod", sign: "Kirra", body: i => `Hey there,\n\nHamper landed at the ranger station! Shared it round at lunch and the ${i} was gone in minutes. Here's a seed pod from the falls track. Plant it somewhere warm.`},
+  {id: "lvarnaud", n: "Madame Arnaud at Rosehill", kind: "friend", stop: "bv_perfume", gift: "b_lavbunch", sign: "Avec affection, Madame Arnaud", body: i => `Bonjour, my friend,\n\nYour hamper arrived at Rosehill. The ${i}: magnifique. I send you a bunch of our lavender, dried in the old barn. Put it under your pillow.`}];
 export const recipsFor = F => RECIPS.filter(r => r.kind !== "friend" || !!(F.bellbird && F.bellbird.stamps && F.bellbird.stamps[r.stop]));
 const FAM_NOTE = {
-  hanatheo: (i, hp) => hp.season === "mothers" ? `Dear Mel,\n\nA Mother's Day hamper! Lilac ribbon and everything. I've put the ${i} by my bed and told Dad it's mine, all mine. You're a good girl. The best.\n\nLove, Mum xx (Dad says hello too)`
-    : hp.season === "valentine" ? `Dear Mel,\n\nA Valentine's hamper for your old mum and dad! Dad's pretending it was his idea. We had the ${i} with a cup of tea, like teenagers.\n\nLove, Mum and Dad xx`
-    : `Dear Mel,\n\nThe hamper came this morning! Dad had the ${i} open before I'd even read the tag. We're saving the rest for Christmas Eve, if he lets us.\n\nLove, Mum and Dad xx`,
-  mamagg: (i, hp) => `Ah girl,\n\nSo big, the basket! Gong Gong carried it in like a trophy. Ma Ma is keeping the ${i} for when you all come over. You work too hard, you know. Thank you, thank you.\n\nMa Ma (and Gong Gong)`,
-  marcusang: (i, hp) => `Zeh!\n\nThe ${hp.name} hamper arrived. Angie has claimed the ${i}${hp.items.some(x => /^chz_/.test(x)) ? " (and the cheese, obviously, she says it's for my own good)" : ""}. I've claimed the basket. Thank you, seriously.\n\nMarcus and Angellina`};
+  hanatheo: (i, hp) => hp.season === "mothers" ? `Dear friend,\n\nA Mother's Day hamper! Lilac ribbon and everything. I mother the whole market, love, so I'll take it. The ${i} is by my bed and Theo's been told it's mine, all mine.\n\nLove, Hana xx (Theo says hello, officially)`
+    : hp.season === "valentine" ? `Dear friend,\n\nA Valentine's hamper for two old married folk! Theo's pretending it was his idea. We had the ${i} with a cup of tea, like teenagers.\n\nLove, Hana and Theo xx`
+    : `Dear friend,\n\nThe hamper came this morning! Theo had the ${i} open before I'd even read the tag, and he's usually such a stickler for procedure. We're saving the rest for Christmas Eve, if he lets us.\n\nLove, Hana and Theo xx`,
+  mamagg: (i, hp) => `Dear friend,\n\nWhat a basket! Mei carried it in like a trophy. I'm keeping the ${i} for tea at three, when everyone comes over. You work too hard, you know. Thank you, truly.\n\nFarid (and Mei, who says thank you too)`,
+  marcusang: (i, hp) => `Hey!\n\nThe ${hp.name} hamper arrived. Posy has claimed the ${i}${hp.items.some(x => /^chz_/.test(x)) ? " (and the cheese, obviously: she says it's for my own good)" : ""}. I've claimed the basket. Thank you, seriously.\n\nTomi and Posy`};
 const firstName = hp => { const it = hp.items.find(x => typeof x === "string") || hp.items[0]; return (typeof it === "object" ? `bottle of ${it.wine}` : (ITEMS[it] || {n: "treats"}).n).replace(/^(A|An) /, "").toLowerCase(); };
 export function sendHamper(F, id, to, now){
   const r = RECIPS.find(x => x.id === to), hp = (xmasState(F).hampers || []).find(h => h.id === id); if (!r || !hp || !((F.inv || {})[id] > 0)) return null;
@@ -213,7 +213,7 @@ export function sendHamper(F, id, to, now){
 }
 export function hamperMail(F, now){
   return (xmasState(F).replies || []).filter(p => p.at <= now).map(p => { const r = RECIPS.find(x => x.id === p.to) || {n: "someone"}, hp = (xmasState(F).hampers || []).find(h => h.id === p.hamper) || {name: "Honeybrook", items: []}, i = firstName(hp);
-    const body = r.kind === "family" ? FAM_NOTE[r.id](i, hp) : r.kind === "friend" ? `${r.body(i)}\n\n${r.sign}` : `Dear Mel,\n\nWhat a lovely surprise on my doorstep! The ${i} is already open. ${hp.season === "valentine" ? "Happy Valentine's!" : hp.season === "mothers" ? "Happy Mother's Day to you, too!" : "Merry Christmas to you and yours!"}${p.order ? "\n\nP.S. Could you make one for my sister? I've pinned a note up at the post office." : ""}\n\n${r.n}`;
+    const body = r.kind === "family" ? FAM_NOTE[r.id](i, hp) : r.kind === "friend" ? `${r.body(i)}\n\n${r.sign}` : `${dearMe(F)},\n\nWhat a lovely surprise on my doorstep! The ${i} is already open. ${hp.season === "valentine" ? "Happy Valentine's!" : hp.season === "mothers" ? "Happy Mother's Day to you, too!" : "Merry Christmas to you and yours!"}${p.order ? "\n\nP.S. Could you make one for my sister? I've pinned a note up at the post office." : ""}\n\n${r.n}`;
     return {id: p.id, from: "postie", at: p.at, title: r.kind === "friend" ? `A postcard from ${r.n.replace(/ at .*$/, "")}` : `Thank you from ${r.n}`, body}; });
 }
 // arrived replies whose little something (friends) or new order (villagers) hasn't been handed over yet
@@ -224,7 +224,7 @@ export function collectReplies(F, now){ const x = xmasState(F), out = [];
   return out; }
 // orders, from the 1st of December: two a day pinned up by the hamper table (and any a villager asks for)
 const WANT = {cheese: "something cheesy", sweet: "something sweet", wine: "something to drink", pamper: "something for the bath", oil: "a good olive oil"};
-const ORDER_FOLK = ["Opal's book club", "the Okadas next door", "Juniper's mum", "Bo's teacher", "Lin's grandparents", "Theo's new neighbours", "the library volunteers", "Hana's landlord"];
+const ORDER_FOLK = ["Opal's book club", "the Okadas next door", "Juniper's aunt", "Bo's old teacher", "Lin's walking group", "Theo's colleagues at the town hall", "the library volunteers", "Hana's Zumba regulars"];
 function mkOrder(id, who, h){ const cats = Object.keys(WANT), a = cats[h % cats.length], b = cats[(h >> 3) % cats.length], big = (h >> 6) % 3 === 0;
   return {id, who, wants: a === b ? [a] : [a, b], size: big ? "big" : "small"}; }
 export function ordersOn(F, day){ if (!xmasOn(day) || day.slice(5) < "12-01") return []; const x = xmasState(F), filled = x.filled || {};

@@ -1,9 +1,9 @@
-// Wildflower Farm (Felix and Elena run it; Mel helps and takes a share). State in F.hfarm:
+// Wildflower Farm (Felix and Elena run it; the player helps and takes a share). State in F.hfarm:
 //   fed / brushed / milked   {animalId: day}  (feeding is per herd, brushing and milking per animal)
 //   hives                    [time each hive was last emptied]
 // The cows and goats are milked in the morning, 6 to 10, if they've been fed today or yesterday: a cow gives 2 milk,
-// a goat 1 goat's milk, into Mel's backpack (the rest goes to Elena's dairy and stall). The five hives fill over three
-// days; when Mel collects a full one she gets 2 frames of comb (Felix keeps the rest for his stall). The farm stand by
+// a goat 1 goat's milk, into the player's backpack (the rest goes to Elena's dairy and stall). The five hives fill over three
+// days; when the player collects a full one she gets 2 frames of comb (Felix keeps the rest for his stall). The farm stand by
 // the gate sells milk, goat's milk, honey and eggs.
 // Inside the barn (step 2): the hives give frames, spun into jars at the honey extractor (this week's honey: wildflower,
 // lavender or orchard blossom, turn and turn about); milk becomes yoghurt in the crocks straight away; and the cheese
@@ -15,7 +15,7 @@ import { ITEMS } from "../data/items.js";
 import { stormyOn } from "../art/village-extras.js";
 // Round 99, making it a real job:
 //   trust       every bit of help earns Felix and Elena's trust (h.trust); four levels (LEVELS), each giving something:
-//               a hive of Mel's own, new cheeses and honeys, a shelf at the farm stand and a bigger cave
+//               a hive of the player's own, new cheeses and honeys, a shelf at the farm stand and a bigger cave
 //   moods       an animal fed, brushed and with a mucked-out stall is happy and gives more milk; a goat gets out if
 //               the gate wasn't latched the evening before (round it up)
 //   cheese      wheels want turning every day or so; how faithfully decides the cut: excellent, good or rustic
@@ -36,7 +36,7 @@ export const LEVELS = [{n: "Helper", at: 0, gives: ""}, {n: "Trusted hand", at: 
   {n: "Apprentice", at: 100, gives: "Elena teaches you brie, halloumi and a smoked cheese; Felix teaches creamed honey and cut honeycomb"},
   {n: "Partner", at: 200, gives: "a shelf of your own at the farm stand, and three more shelves in the cave"}];
 export const levelOf = h => LEVELS.reduce((l, x, i) => h.trust >= x.at ? i : l, 0);
-// trust for a bit of help -> the new level's index if this tipped Mel into it (the unlocks come with it)
+// trust for a bit of help -> the new level's index if this tipped the player into it (the unlocks come with it)
 export function gainTrust(F, n){ const h = hfState(F), before = levelOf(h); h.trust += n; const after = levelOf(h); if (after > before) { if (after >= 1 && !h.myHive) h.myHive = {t: clock(), name: "Maple's Meadow"}; return after; } return null; }
 export const STAND = {milk: 3, goatmilk: 4, honey: 6, egg: 3};
 const clock = () => Date.now() + (globalThis.__mapleOffset || 0);
@@ -96,7 +96,7 @@ export function collectHives(F){ const h = hfState(F), full = fullHives(h), t = 
   if (h.myHive && hiveFill(h, "mine") >= 1) { h.myHive.t = t; n += MY_FRAMES; } h.frames += n; return n; }
 export const myHiveFull = h => !!h.myHive && hiveFill(h, "mine") >= 1;
 export function nameHive(F, name){ const h = hfState(F), n = String(name || "").replace(/[<>&"]/g, "").trim().slice(0, 24); if (!h.myHive || !n) return null; h.myHive.name = n; return n; }
-// Felix's specialities, once Mel's his apprentice: a jar of honey whipped into creamed honey; a frame cut as comb
+// Felix's specialities, once the player's his apprentice: a jar of honey whipped into creamed honey; a frame cut as comb
 export function creamHoney(F){ const inv = F.inv || {}, k = ["honey", "honey_lav", "honey_blossom"].find(x => inv[x] > 0); if (!k || levelOf(hfState(F)) < 2) return null; inv[k]--; if (!inv[k]) delete inv[k]; inv.honey_cream = (inv.honey_cream || 0) + 1; F.inv = inv; return k; }
 export function cutComb(F){ const h = hfState(F); if (!h.frames || levelOf(h) < 2) return false; h.frames--; F.inv = F.inv || {}; F.inv.honeycomb = (F.inv.honeycomb || 0) + 1; return true; }
 export const HONEYS = [{id: "honey", n: "wildflower"}, {id: "honey_lav", n: "lavender"}, {id: "honey_blossom", n: "orchard blossom"}];
@@ -110,11 +110,11 @@ export const CHEESES = {
   fresh: {n: "Fresh goat's cheese", milk: "goatmilk", need: 2, days: 1, wedges: 4, id: "chz_fresh", col: "#FFF8EC", words: ["Chèvre", "Little Log", "Fresh", "Curd"]},
   cheddar: {n: "Farmhouse cheddar", milk: "milk", need: 3, days: 4, wedges: 6, id: "chz_cheddar", col: "#F3C969", words: ["Cheddar", "Clothbound", "Farmhouse", "Tasty"]},
   blue: {n: "Honeybrook blue", milk: "milk", need: 3, days: 6, wedges: 6, id: "chz_blue", col: "#DCE3E8", words: ["Blue", "Bleu", "Veined Blue"]},
-  // Elena's to teach, once Mel's her apprentice (level 2)
+  // Elena's to teach, once the player's her apprentice (level 2)
   brie: {n: "Barn brie", milk: "milk", need: 3, days: 3, wedges: 5, id: "chz_brie", col: "#FFF6E0", words: ["Brie", "Soft White", "Bloomy"], lvl: 2},
   halloumi: {n: "Goat's halloumi", milk: "goatmilk", need: 3, days: 2, wedges: 5, id: "chz_halloumi", col: "#F6F1E8", words: ["Halloumi", "Squeaky", "Grilling"], lvl: 2},
   smoked: {n: "Smoked farmhouse", milk: "milk", need: 3, days: 5, wedges: 6, id: "chz_smoked", col: "#D9944A", words: ["Smoked", "Applewood", "Oak Smoked"], lvl: 2},
-  // round 159: Meg's, from Greenhill Dairy in the Tablelands, once she's taught Mel (tlacts.js: h.learnt.havarti)
+  // round 159: Meg's, from Greenhill Dairy in the Tablelands, once she's taught the player (tlacts.js: h.learnt.havarti)
   havarti: {n: "Tableland havarti", milk: "milk", need: 3, days: 3, wedges: 5, id: "chz_havarti", col: "#F6E7B0", words: ["Havarti", "Creamy", "Tableland"], learn: true},
   // round 163: Céline's, from Chapel Hill in the Lavender Hills (lvacts.js: h.learnt.banon)
   banon: {n: "Banon in chestnut leaves", milk: "goatmilk", need: 3, days: 4, wedges: 4, id: "chz_banon", col: "#8A6A42", words: ["Banon", "Chestnut Leaf", "Wrapped"], learn: true}
@@ -128,10 +128,10 @@ export function turnWheels(F){ const h = hfState(F), day = dayKey(); let n = 0; 
 // excellent wedges are their own gift items: a little dearer, a warmer thank-you
 const exName = n => n.startsWith("Wedge of ") ? n.replace("Wedge of ", "Wedge of excellent ") : "Excellent " + n[0].toLowerCase() + n.slice(1);
 Object.values(CHEESES).forEach(c => { const base = ITEMS[c.id]; if (base && !ITEMS[c.id + "_ex"]) ITEMS[c.id + "_ex"] = {...base, n: exName(base.n), price: (base.price || 8) + 5, say: `${base.say} And this one's extraordinary. You made this?!`}; });
-// Round 130 (Mel: things that take effort should fetch more at the market): Mel's own cheeses and honey can be sold
+// Round 130 (things that take effort should fetch more at the market): The player's own cheeses and honey can be sold
 // at the market's Sell tab, for more than plain produce, and an excellent wheel for more again. Never more than they
 // cost to buy anywhere (the farm stand's honey is 6, the market's honeycomb 10), so buying to resell never pays.
-// Tiered by time (Mel): the longer a cheese ripens in the cave, the more it fetches: 9 + 2 a day (fresh 11 ... blue 21).
+// Tiered by time: the longer a cheese ripens in the cave, the more it fetches: 9 + 2 a day (fresh 11 ... blue 21).
 export const CRAFTED_SELL = {...Object.fromEntries(Object.values(CHEESES).map(c => [c.id, 9 + 2*c.days])),
   honey: 6, honey_lav: 10, honey_blossom: 10, honey_cream: 12, honeycomb: 10, yoghurt: 4};
 Object.entries(CRAFTED_SELL).forEach(([id, n]) => { if (!ITEMS[id]) return; ITEMS[id].sell = n; ITEMS[id].crafted = true; if (ITEMS[id + "_ex"]) Object.assign(ITEMS[id + "_ex"], {sell: n + 6, crafted: true}); });
@@ -163,7 +163,7 @@ export function takeWheel(F, i){ const h = hfState(F), w = h.cave[i]; if (!w || 
 /* ---------- Felix and Elena's asks: one a day, for a big helping of trust ---------- */
 export const REQUESTS = [
   {id: "eggs", who: "elena", ask: "Could you bring me 3 eggs? I'm teaching a cheese class tomorrow.", need: {egg: 3}},
-  {id: "apples", who: "felix", ask: "Two apples from Ma Ma's? The bees deserve a treat. Well. I do.", need: {apple: 2}},
+  {id: "apples", who: "felix", ask: "Two apples from the orchard? The bees deserve a treat. Well. I do.", need: {apple: 2}},
   {id: "carrots", who: "elena", ask: "Bring 2 carrots for the goats? Biscuit's been very good. Ish.", need: {carrot: 2}},
   {id: "muck", who: "elena", ask: "Could you muck out both stalls today? My back's complaining.", act: "muck"},
   {id: "brush", who: "felix", ask: "The cows are in the Gazette this week. Could you brush all three for their photo?", act: "brush"},
@@ -198,12 +198,12 @@ export function finishRequest(F){ const h = hfState(F), day = dayKey(), r = requ
   if (r.need) { const inv = F.inv; Object.entries(r.need).forEach(([k, n]) => { inv[k] -= n; if (!inv[k]) delete inv[k]; }); }
   h.reqDone = day; return r; }
 
-/* ---------- the farm stand: Mel's own shelf, once she's a partner ---------- */
+/* ---------- the farm stand: the player's own shelf, once she's a partner ---------- */
 const SELLABLE = id => /^chz_|^honey|^honeycomb$/.test(id) && ITEMS[id];
 export const sellables = F => Object.keys(F.inv || {}).filter(id => F.inv[id] > 0 && SELLABLE(id));
 export const shelfPrice = id => (ITEMS[id] && ITEMS[id].price) || 8;
 export function stockShelf(F, id, n){ const h = hfState(F), inv = F.inv || {}; if (levelOf(h) < 3 || !SELLABLE(id)) return 0; n = Math.min(n, inv[id] || 0); if (n <= 0) return 0; inv[id] -= n; if (!inv[id]) delete inv[id]; h.shelf[id] = (h.shelf[id] || 0) + n; return n; }
-// catch up minute by minute (at most two days): passers-by buy off Mel's shelf, 8am to 6pm, and any hive left too long swarms
+// catch up minute by minute (at most two days): passers-by buy off the player's shelf, 8am to 6pm, and any hive left too long swarms
 export function hfTick(F){
   const h = hfState(F), t = clock(), from = Math.max(h.at || t, t - DAY), out = {coins: 0, n: 0, swarms: swarmCheck(F)};
   for (let at = from + 60000; at <= t; at += 60000) {
@@ -248,7 +248,7 @@ export function standPanel(F){
   if (mine.length) p += `<ul class="hlist wlist">${mine.map(id => `<li><span class="wpic">${icon(id, 22)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${F.inv[id]} with you</small></span><span class="orbtns"><button class="btn small primary" data-hf="shelf" data-k="${id}" data-n="1">Put 1 out</button><button class="btn small alt" data-hf="shelf" data-k="${id}" data-n="99">All</button></span></li>`).join("")}</ul>`;
   return p + shut;
 }
-// the farmhouse: how much Felix and Elena trust Mel, what's next, and today's ask
+// the farmhouse: how much Felix and Elena trust the player, what's next, and today's ask
 export function farmhousePanel(F, here){
   const h = hfState(F), lv = levelOf(h), next = LEVELS[lv + 1], r = requestToday(), done = h.reqDone === dayKey(), ready = requestReady(F);
   const who = r.who === "felix" ? "Felix" : "Elena", pct = next ? Math.round(100*(h.trust - LEVELS[lv].at)/(next.at - LEVELS[lv].at)) : 100;

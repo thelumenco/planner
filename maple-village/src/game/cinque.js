@@ -1,10 +1,10 @@
 // Cinque Terre's rooms and things to join in with (rounds 132–133). The shops sell TOWN_GOODS (bought through ronda.js
 // buyGood, the shared data-rbuy buttons). Three things to take part in, each more than a speech bubble:
-//   pesto with Nonna Pina (the five ingredients in the right order, pounding each one in: two jars, and now Mel can
+//   pesto with Nonna Pina (the five ingredients in the right order, pounding each one in: two jars, and now you can
 //   make it at home in the loft), the harvest on the monorail with Signor Bruno (ride up the terraces, pick the ripe
-//   bunches and leave the green: he shows her how to dry grapes for raisin wine), and painting a fishing boat with the
-//   fishermen in Manarola (hull, stripe, and Evan's letters for the name: a model to keep, and the same boat turns up
-//   by the jetty at home). Evan joins in each. Also: gelato, focaccia and farinata, a tasting at the cantina, a padlock.
+//   bunches and leave the green: he shows you how to dry grapes for raisin wine), and painting a fishing boat with the
+//   fishermen in Manarola (hull, stripe, and a name: a model to keep, and the same boat turns up
+//   by the jetty at home). Also: gelato, focaccia and farinata, a tasting at the cantina, a padlock.
 // State: F.cinque = {pestoLesson, raisin, boat: {hull, stripe, name}, pesto, harvests, boats, padlock, treats, bread}
 import { esc, dayKey } from "../util.js";
 import { icon } from "../art/icons.js";
@@ -29,7 +29,7 @@ export function pestoAdd(st, i){ if (st.step >= 5 || st.pounds < (st.step ? PEST
 export function pestoPound(st){ if (!st.step || st.pounds >= PESTO.POUNDS) return false; st.pounds++; return true; }
 export const pestoDone = st => st.step >= 5 && st.pounds >= PESTO.POUNDS;
 export function finishPesto(F, addInv){ if (F.coins < PESTO.price) return null; F.coins -= PESTO.price; addInv("pesto", 2); const c = cinqueState(F); c.pestoLesson = true; c.pesto = (c.pesto || 0) + 1; return true; }
-export function pestoPanel(F, st, evan){
+export function pestoPanel(F, st, _x){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The pesto kitchen</h2><p class="sub">Nonna Pina is eighty-one and has made pesto every day since she was six. "Never a blender," she says, tapping the marble. "The basil gets frightened."</p>`;
   h += `<h3 class="ph3">Make pesto with Nonna Pina · ${PESTO.price} ${coin()}</h3>`;
   if (!st) h += `<p class="muted">Five ingredients into the marble mortar, in the right order, pounding each one in. Two jars to take home${cinqueState(F).pestoLesson ? "" : ", and she'll tell you her secret so you can make it at home"}.${("")}</p><div class="actions"><button class="btn primary" data-ct="pesto" ${F.coins >= PESTO.price ? "" : "disabled"}>Roll up your sleeves</button></div>`;
@@ -44,13 +44,13 @@ export function pestoPanel(F, st, evan){
 
 /* ---------- the harvest on the monorail (Corniglia, and the cantina) ---------- */
 // Ride the monorail up the terraces, then nine bunches on the vines: pick the ripe (purple-gold) ones, leave the green.
-// All the ripe ones picked and Signor Bruno lays them on his cane racks and shows Mel how: raisin wine at home.
+// All the ripe ones picked and Signor Bruno lays them on his cane racks and shows you how: raisin wine at home.
 export const HARVEST = {N: 9};
 export const harvestStart = (rng = Math.random) => { const ripe = Array.from({length: HARVEST.N}, () => rng() < .6); if (!ripe.some(Boolean)) ripe[0] = true; return {ripe, picked: [], oops: 0, riding: true}; };
 export function pick(st, i){ if (st.riding || st.picked.includes(i)) return null; if (!st.ripe[i]) { st.oops++; return "green"; } st.picked.push(i); return "ok"; }
 export const harvestDone = st => !st.riding && st.ripe.every((r, i) => !r || st.picked.includes(i));
 export function finishHarvest(F, addInv){ const c = cinqueState(F); c.raisin = true; c.harvests = (c.harvests || 0) + 1; if (c.harvestDay !== dayKey()) { c.harvestDay = dayKey(); addInv("grape_white", 3); return 3; } return 0; }
-export function harvestPanel(F, st, evan){
+export function harvestPanel(F, st, _x){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The monorail</h2><p class="sub">Signor Bruno's terraces go straight up the cliff. Everything comes down on the monorail: a tiny rack train on one rail, with a seat for him and a box for the grapes. "Hold on," he says. "And don't look down. Or do. It's beautiful."</p>`;
   if (!st) return h + `<h3 class="ph3">Help with the harvest</h3><p class="muted">Ride up the terraces and pick the ripe bunches. Free: he's glad of the help.${cinqueState(F).raisin ? "" : " He'll show you how he dries them for the sweet wine, too."}${("")}</p><div class="actions"><button class="btn primary" data-ct="ride">Climb aboard</button></div>` + shut;
   if (st.riding) return h + `<p class="muted">Putt-putt-putt... up between the vines, the sea dropping away below.</p><div class="ctride"><span></span></div><div class="actions"><button class="btn primary" data-ct="arrive">At the top: start picking</button></div>`;
@@ -68,10 +68,10 @@ export function cantinaPanel(F){
 
 /* ---------- painting a boat with the fishermen (Manarola) ---------- */
 export const BOAT = {hulls: {blue: ["Sea blue", "#3E6BAE"], red: ["Harbour red", "#C9483A"], green: ["Fisherman's green", "#2E7A5A"], yellow: ["Lemon yellow", "#F3D34A"]},
-  stripes: {white: ["White", "#FFFDF6"], yellow: ["Yellow", "#F3D98A"], red: ["Red", "#C9483A"], blue: ["Pale blue", "#9FC3D9"]}, names: ["Maple", "Evan", "Nonna", "Honeybrook"]};
+  stripes: {white: ["White", "#FFFDF6"], yellow: ["Yellow", "#F3D98A"], red: ["Red", "#C9483A"], blue: ["Pale blue", "#9FC3D9"]}, names: ["Maple", "Stella", "Nonna", "Honeybrook"]};
 export function paintBoat(F, hull, stripe, name, addInv){ if (!BOAT.hulls[hull] || !BOAT.stripes[stripe] || !BOAT.names.includes(name)) return null; const c = cinqueState(F); c.boat = {hull, stripe, name}; c.boats = (c.boats || 0) + 1; if (!F.inv.c_boat) addInv("c_boat", 1); return c.boat; }
 export const boatCols = F => { const b = (F.cinque || {}).boat; return b ? [BOAT.hulls[b.hull][1], BOAT.stripes[b.stripe][1], b.name] : ["#3E6BAE", "#F3D98A", ""]; };
-export function boatPanel(F, st = {}, evan){
+export function boatPanel(F, st = {}, _x){
   const b = cinqueState(F).boat;
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The boats</h2><p class="sub">Aldo and Piero repaint their boats every spring, pulled up in the main street on their trailers. "Every boat a different colour," says Aldo, "so the wives can see from the window who's coming home." They hand you a brush.</p>`;
   const sw = (k, col, on, act) => `<button class="gchip${on ? " on" : ""}" data-ct="${act}:${k}" aria-pressed="${on}"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${col};border:1px solid #3b3530;vertical-align:-2px"></span> <span>${esc((act === "hull" ? BOAT.hulls : BOAT.stripes)[k][0])}</span></button>`;
@@ -86,8 +86,8 @@ export function boatPanel(F, st = {}, evan){
 /* ---------- the gelateria and the focacceria ---------- */
 export const GELATO = {basilico: ["Basil gelato", 3, "Green and sweet and a little peppery. It shouldn't work. It really works."], limone: ["Lemon gelato", 3, "Monterosso lemons, sharp as anything, in a crunchy cone."], fico: ["Fig gelato", 3, "Purple, jammy, with little seeds. Like eating September."]};
 export const FOCACCIA = {plain: ["A slice of focaccia", 2, "Dimpled, oily, salty, crisp on the bottom. Eaten standing up, like everyone else."], farinata: ["Farinata", 3, "A thin chickpea pancake from the wood oven, black pepper on top, too hot to hold."], onion: ["Onion focaccia", 3, "Sweet soft onions baked right into the top."]};
-export function gelatoPanel(F, evan){ return `<span class="tape gingham" aria-hidden="true"></span><h2>The gelateria</h2><p class="sub">Gianni makes everything fresh each morning. "Basil and lemon together," he says, "that's a secret. Tell the ice cream shop at home." Wink.</p>${treats(F, GELATO, "gelato")}${("")}` + shut; }
-export function focacceriaPanel(F, evan){ return `<span class="tape gingham" aria-hidden="true"></span><h2>The focacceria</h2><p class="sub">Beppe slides another tray out of the oven with a long wooden paddle. The whole of Vernazza seems to be in the queue.</p>${treats(F, FOCACCIA, "focaccia")}${("")}` + list(F, "ct_focacceria", "To take home") + shut; }
+export function gelatoPanel(F, _x){ return `<span class="tape gingham" aria-hidden="true"></span><h2>The gelateria</h2><p class="sub">Gianni makes everything fresh each morning. "Basil and lemon together," he says, "that's a secret. Tell the ice cream shop at home." Wink.</p>${treats(F, GELATO, "gelato")}${("")}` + shut; }
+export function focacceriaPanel(F, _x){ return `<span class="tape gingham" aria-hidden="true"></span><h2>The focacceria</h2><p class="sub">Beppe slides another tray out of the oven with a long wooden paddle. The whole of Vernazza seems to be in the queue.</p>${treats(F, FOCACCIA, "focaccia")}${("")}` + list(F, "ct_focacceria", "To take home") + shut; }
 export function limoniPanel(F){ return `<span class="tape gingham" aria-hidden="true"></span><h2>The lemon shop</h2><p class="sub">Signora Franca grows the lemons on the terraces behind the shop and turns them into everything. She cuts you a slice to smell.</p>` + list(F, "ct_limoni") + shut; }
 
 // the room spots and the panel for each

@@ -1,10 +1,10 @@
 // Getting about Honeybrook (round 103).
 //   Bike hire: racks at Honeybrook station, in the woods and in the town square. BIKE_FEE coins for an hour; while it's
-//     out Mel rides it everywhere outdoors (faster than walking, slower than the scooter: goals.js rideSpeed), and
+//     out the player rides it everywhere outdoors (faster than walking, slower than the scooter: goals.js rideSpeed), and
 //     after the hour it goes back to the nearest rack by itself. Villagers ride bikes too (look.bike, npcs.js).
 //   The river taxi: a little launch that runs down the river from the waterfall pool in the woods, past Makers' Lane
 //     and home, across the lake and out to the foreshore, 7am to 9pm. Any stop to any other, TAXI_FEE coins; it's the
-//     quick way from the woods to Ma Ma's (the foreshore stop is one gate from the flower farm, the lake stop one from
+//     quick way from the woods to the orchard (the foreshore stop is one gate from the flower farm, the lake stop one from
 //     the orchard).
 // State: F.bike = {until, col} while a bike is out.
 import { esc, now, sgHM } from "../util.js";
@@ -32,13 +32,13 @@ export function bikePanel(F, ownRide){
   return h + shut;
 }
 
-// The river taxi's stops, downstream order. at: where Mel steps off.
+// The river taxi's stops, downstream order. at: where the player steps off.
 export const STOPS = {
   taxiwoods: {scene: "hwoods", n: "Waterfall pool", at: [168, 290], line: "Honeybrook Woods, under the waterfall"},
   taxilane: {scene: "lane", n: "Makers' Lane", at: [62, 236], line: "Makers' Lane"},
   taxihome: {scene: "base", n: "Home jetty", at: [150, 140], line: "home, at your little jetty"},
   taxilake: {scene: "field", n: "The lake", at: [300, 372], line: "the lake on the field (one gate from the orchard)"},
-  taxishore: {scene: "shore", n: "The foreshore", at: [214, 168], line: "the foreshore (one gate from Ma Ma's flower farm)"}
+  taxishore: {scene: "shore", n: "The foreshore", at: [214, 168], line: "the foreshore (one gate from Mei's flower farm)"}
 };
 export const TAXI_FEE = 4, TAXI_FROM = 7*60, TAXI_TO = 21*60;
 export const taxiRunning = (hm = sgHM()) => hm >= TAXI_FROM && hm < TAXI_TO;

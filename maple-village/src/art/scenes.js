@@ -26,11 +26,6 @@ let G = null;
 export const setArtContext = g => { G = g; };
 export const artCtx = () => G;
 
-// Darren's asleep in their bed from 11pm until his morning starts (7:00 on weekdays, 7:30 at weekends)
-export function darrenAsleep(){
-  const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + LOC()), m = d.getUTCHours()*60 + d.getUTCMinutes(), we = d.getUTCDay() === 0 || d.getUTCDay() === 6;
-  return m >= 23*60 || m < (we ? 7*60 + 30 : 7*60);
-}
 export function tapeLabel(x, y, text, col, size){
   const w = text.length*(size ? size*.56 : 8.2) + 22;
   x = Math.max(w/2 + 8, Math.min(520 - w/2 - 8, x));   // never off the edge of the map
@@ -127,8 +122,8 @@ function townRiver(){
       ${sk(`<rect x="314" y="560" width="40" height="7" rx="2" style="fill:var(--wood)"/><rect x="314" y="548" width="40" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="314" y="560" width="40" height="7" rx="2"/><rect x="314" y="548" width="40" height="6" rx="2"/><path d="M318 554 v6 M350 554 v6 M318 567 v9 M350 567 v9"/>`)}</g>`;
 }
 
-/* ---------- home base: the house, garden, pond, shed and Evan's swing ---------- */
-// Mel's little jetty on the river's south bank: a short boardwalk out over the water and three paddleboards on a
+/* ---------- home base: the house, garden, pond, shed and the swing ---------- */
+// Your little jetty on the river's south bank: a short boardwalk out over the water and three paddleboards on a
 // rack. Paddle down the river and out to the foreshore (and back again from the foreshore's rack)
 function homeJetty(){
   return `<g data-place="homejetty" aria-label="Little jetty: paddle to the foreshore"><ellipse class="hov" cx="150" cy="124" rx="40" ry="11" style="fill:var(--butter)"/>
@@ -156,7 +151,7 @@ export function baseArt(){
   const places =
     bridge("toTown", 260, 30, 110, "To town", 336, 124) + homeJetty() + vineGate() + orchardGate() +
     house("home", 205, 220, 110, 74, "var(--card)", "var(--butter)", "Home", "var(--butter)", homeX) +
-    // Darren's repair corner: ladder against the wall, toolbox
+    // the repair corner: ladder against the wall, toolbox
     sk(`<rect x="326" y="282" width="20" height="12" rx="2" style="fill:var(--rose)"/>`, `<path d="M316 296 l12 -62 M326 296 l12 -62 M318 284 h10 M320 272 h10 M323 260 h10 M325 248 h10"/><rect x="326" y="282" width="20" height="12" rx="2"/><path d="M332 282 v-4 h8 v4"/>`) +
     // letterbox: the morning paper sticks out of it until it's read (#paperIn is toggled by core's render)
     `<g data-place="letterbox" aria-label="Letterbox"><ellipse class="hov" cx="182" cy="314" rx="20" ry="6" style="fill:var(--butter)"/>
@@ -185,8 +180,8 @@ export function baseArt(){
     [[`<path d="M378 354 h16 v18 h-16z" style="fill:var(--sky)"/>`, `<path d="M378 354 h16 v18 h-16z"/>`, 0], [`<path d="M406 356 h14 l3 14 h-20z" style="fill:var(--rose)"/>`, `<path d="M406 356 h14 l3 14 h-20z"/>`, .7], [`<path d="M434 354 h18 v12 h-18z" style="fill:var(--butter)"/>`, `<path d="M434 354 h18 v12 h-18z"/>`, 1.4]]
       .map(([a, l, d]) => `<g class="washing" style="animation-delay:-${d}s">${sk(a, l)}</g>`).join("");
   const fam = (G.F().fam && G.F().fam.owned) || {};
-  // Evan's treehouse (a family keepsake): a little hut up in the swing tree, with a ladder and a flag
-  const treehouse = fam.treehouse ? `<g aria-label="Evan's treehouse">${sk(`<rect x="56" y="244" width="44" height="6" rx="1" style="fill:var(--wood)"/><path d="M60 244 v-20 h36 v20z" style="fill:#F3C969"/><path d="M56 224 l22 -14 l22 14z" style="fill:#C46A4A"/><rect x="72" y="230" width="10" height="14" style="fill:#7B5A42"/><path d="M98 210 l10 3 l-10 3z" style="fill:var(--rose)"/>`,
+  // The treehouse (a keepsake): a little hut up in the swing tree, with a ladder and a flag
+  const treehouse = fam.treehouse ? `<g aria-label="The treehouse">${sk(`<rect x="56" y="244" width="44" height="6" rx="1" style="fill:var(--wood)"/><path d="M60 244 v-20 h36 v20z" style="fill:#F3C969"/><path d="M56 224 l22 -14 l22 14z" style="fill:#C46A4A"/><rect x="72" y="230" width="10" height="14" style="fill:#7B5A42"/><path d="M98 210 l10 3 l-10 3z" style="fill:var(--rose)"/>`,
     `<rect x="56" y="244" width="44" height="6" rx="1"/><path d="M60 244 v-20 h36 v20z M56 224 l22 -14 l22 14z"/><rect x="72" y="230" width="10" height="14"/><path d="M98 216 v-10 M98 210 l10 3 l-10 3z"/><path d="M62 250 l-4 48 M70 250 l-4 48 M61 262 h8 M60 274 h8 M59 286 h8"/>`)}</g>` : "";
   const famArt = (fam.sandpit ? `<g aria-label="Sandpit">${sk(`<rect x="208" y="512" width="56" height="24" rx="5" style="fill:#F2DDA8"/><path d="M246 506 h8 l-2 8 h-4z" style="fill:var(--rose)"/>`, `<rect x="208" y="512" width="56" height="24" rx="5"/><path d="M212 518 h48" opacity=".5"/><path d="M246 506 h8 l-2 8 h-4z M250 506 v-6"/><path d="M220 528 q5 -5 10 0" opacity=".6"/>`)}</g>` : "")
     + (fam.hammock ? sk(`<path d="M398 600 q32 18 64 0 z" style="fill:var(--peach)"/>`, `<path d="M392 622 v-34 M468 622 v-34 M392 594 l6 6 M468 594 l-6 6"/><path d="M398 600 q32 18 64 0"/><path d="M410 604 l2 -3 M430 608 l1 -4 M450 604 l-2 -3" opacity=".6"/>`) : "");
@@ -269,7 +264,7 @@ export function notesArt(x, y, n){
 }
 
 /* ---------- furniture (x,y = centre of the front edge) ---------- */
-// the family dining table's top, apron, legs and place settings (x = centre, y = front edge on the floor)
+// the big dining table's top, apron, legs and place settings (x = centre, y = front edge on the floor)
 export const diningTable = (x, y) => sk(`<rect x="${x - 150}" y="${y - 40}" width="300" height="28" rx="4" style="fill:#D9B48A"/><rect x="${x - 150}" y="${y - 14}" width="300" height="8" rx="2" style="fill:#B98A5A"/>
     <path d="M${x - 40} ${y - 36} h80 l-4 20 h-72z" style="fill:#FFFDF6" opacity=".85"/>
     ${[0, 1, 2, 3, 4].map(b => `<ellipse cx="${x - 120 + b*60}" cy="${y - 33}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}${[0, 1, 2, 3].map(f => `<ellipse cx="${x - 90 + f*60}" cy="${y - 19}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}
@@ -303,7 +298,7 @@ export function furn(kind, x, y){
       return sk(`<rect x="${x-46}" y="${y-96}" width="92" height="62" rx="3" style="fill:#D9B893"/>${p}`, `<rect x="${x-46}" y="${y-96}" width="92" height="62" rx="3"/><path d="M${x-34} ${y-34} l-6 34 M${x+34} ${y-34} l6 34"/>`); }
     case "nook": return sk(`<path d="M${x-40} ${y} v-34 q0 -22 22 -22 h20 q22 0 22 22 v34z" style="fill:var(--peach)"/><rect x="${x-30}" y="${y-30}" width="44" height="18" rx="6" style="fill:var(--cream)"/><circle cx="${x+44}" cy="${y-70}" r="12" style="fill:var(--butter)"/>`,
       `<path d="M${x-40} ${y} v-34 q0 -22 22 -22 h20 q22 0 22 22 v34z"/><rect x="${x-30}" y="${y-30}" width="44" height="18" rx="6"/><path d="M${x+44} ${y-58} v58 M${x+36} ${y} h16"/><path d="M${x+32} ${y-70} h24 l-4 -12 h-16z"/>`);
-    // Ma Ma's cottage: her bed with a crocheted blanket, the TV on its stand, the kitchenette, and the tea table
+    // Farid and Mei's cottage: a bed with a crocheted blanket, the TV on its stand, the kitchenette, and the tea table
     case "grannybed": return sk(`<rect x="${x-50}" y="${y-60}" width="100" height="60" rx="4" style="fill:#8B5E3C"/><rect x="${x-46}" y="${y-56}" width="92" height="22" rx="6" style="fill:#FFFDF6"/><rect x="${x-46}" y="${y-36}" width="92" height="32" rx="4" style="fill:#E8B4C0"/>${[0, 1, 2, 3, 4].map(i => `<circle cx="${x-36 + i*18}" cy="${y-20}" r="5" style="fill:#F3C969"/>`).join("")}`,
       `<rect x="${x-50}" y="${y-60}" width="100" height="60" rx="4"/><rect x="${x-46}" y="${y-56}" width="92" height="22" rx="6"/><rect x="${x-46}" y="${y-36}" width="92" height="32" rx="4"/><path d="M${x-46} ${y-28} h92 M${x-46} ${y-12} h92" opacity=".4"/>`);
     case "tv": return sk(`<rect x="${x-40}" y="${y-28}" width="80" height="28" rx="2" style="fill:#8B5E3C"/><rect x="${x-34}" y="${y-74}" width="68" height="44" rx="4" style="fill:#3E4A43"/><rect x="${x-29}" y="${y-69}" width="58" height="34" rx="2" style="fill:#9CC3E0"/><path d="M${x-29} ${y-46} q14 -10 29 -2 t29 -4 v17 h-58z" style="fill:#9CC27E"/>`,
@@ -314,7 +309,7 @@ export function furn(kind, x, y){
         <rect x="${x-16}" y="${y-36}" width="10" height="8" rx="2" style="fill:#8FB3E8"/><rect x="${x+8}" y="${y-36}" width="10" height="8" rx="2" style="fill:#E8B4C0"/><path d="M${x-6} ${y-24} l10 -6 l6 6z" style="fill:#B9D88A"/>`,
       `<ellipse cx="${x}" cy="${y-24}" rx="40" ry="16"/><path d="M${x} ${y-8} v8 M${x-12} ${y} h24"/><rect x="${x-58}" y="${y-30}" width="14" height="10" rx="3"/><path d="M${x-58} ${y-30} v-16 M${x-56} ${y-20} v14 M${x-46} ${y-20} v14"/><rect x="${x+44}" y="${y-30}" width="14" height="10" rx="3"/><path d="M${x+58} ${y-30} v-16 M${x+46} ${y-20} v14 M${x+56} ${y-20} v14"/>
         <rect x="${x-16}" y="${y-36}" width="10" height="8" rx="2"/><rect x="${x+8}" y="${y-36}" width="10" height="8" rx="2"/><path d="M${x-6} ${y-24} l10 -6 l6 6z"/><path class="smoke" d="M${x-11} ${y-40} q-2 -4 0 -7" opacity=".5"/>`);
-    // Mum and Dad's: Dad's upright piano, his double bass on its stand, the easel with a pencil sketch, Mum's exercise mat
+    // Hana and Theo's: Theo's upright piano, his double bass on its stand, the easel with a pencil sketch, Hana's exercise mat
     case "piano": return sk(`<rect x="${x-50}" y="${y-84}" width="100" height="84" rx="3" style="fill:#2F2B28"/><rect x="${x-46}" y="${y-44}" width="92" height="10" style="fill:#FFFDF6"/>${[0, 1, 2, 3, 4, 5, 6, 7, 8].filter(i => i % 3 !== 2).map(i => `<rect x="${x-42 + i*10}" y="${y-44}" width="5" height="6" style="fill:#2F2B28"/>`).join("")}<rect x="${x-24}" y="${y-76}" width="48" height="20" rx="2" style="fill:#FFFDF6"/><circle cx="${x+34}" cy="${y-90}" r="7" style="fill:#7FA35A"/>`,
       `<rect x="${x-50}" y="${y-84}" width="100" height="84" rx="3"/><rect x="${x-46}" y="${y-44}" width="92" height="10"/><rect x="${x-24}" y="${y-76}" width="48" height="20" rx="2"/><path d="M${x-18} ${y-70} h12 M${x-18} ${y-64} h20 M${x+2} ${y-70} h12" opacity=".6"/><path d="M${x-44} ${y-34} v34 M${x+44} ${y-34} v34" opacity=".5"/><path d="M${x+30} ${y-84} v-4 h8 v4"/>`);
     case "doublebass": return sk(`<path d="M${x} ${y-60} c-20 0 -24 14 -14 24 c-14 10 -12 30 14 32 c26 -2 28 -22 14 -32 c10 -10 6 -24 -14 -24z" style="fill:#B9733F"/><rect x="${x-3}" y="${y-110}" width="6" height="56" style="fill:#2F2B28"/><path d="M${x-4} ${y-114} q4 -8 8 0z" style="fill:#2F2B28"/>`,
@@ -323,7 +318,7 @@ export function furn(kind, x, y){
       `<path d="M${x-26} ${y} l20 -112 M${x+26} ${y} l-20 -112 M${x} ${y-112} v112 M${x-34} ${y-50} h68"/><rect x="${x-30}" y="${y-100}" width="60" height="50" rx="1"/><path d="M${x-22} ${y-62} q10 -16 22 -8 q8 -14 20 -4 M${x-20} ${y-70} l8 -14 l6 8 l6 -12 l8 14" opacity=".7"/><path d="M${x+20} ${y-50} l10 -4" stroke-width="1.6" style="stroke:#F3C969"/>`);
     case "yogamat": return sk(`<path d="M${x-56} ${y-10} l10 -24 h92 l-10 24z" style="fill:#E8566C"/><ellipse cx="${x+50}" cy="${y-24}" rx="6" ry="12" style="fill:#C9A3E0"/><rect x="${x-70}" y="${y-22}" width="8" height="14" rx="3" style="fill:var(--peri)"/>`,
       `<path d="M${x-56} ${y-10} l10 -24 h92 l-10 24z"/><ellipse cx="${x+50}" cy="${y-24}" rx="6" ry="12"/><rect x="${x-70}" y="${y-22}" width="8" height="14" rx="3"/><path d="M${x-74} ${y-15} h16"/>`);
-    // Marcus and Angellina's: the games corner (TV, console, controllers), her psychology books, her study desk
+    // Tomi and Posy's: Tomi's games corner (TV, console, controllers), Posy's psychology books, her study desk
     case "gamingtv": return furn("tv", x, y) + sk(`<rect x="${x-14}" y="${y-22}" width="28" height="8" rx="2" style="fill:#FFFDF6"/><path d="M${x-30} ${y-58} l6 -6 l6 6 l-6 6z M${x+16} ${y-58} h10 v-6 h-10z" style="fill:#F3C969"/><circle cx="${x-4}" cy="${y-52}" r="3" style="fill:#E8566C"/>`,
       `<rect x="${x-14}" y="${y-22}" width="28" height="8" rx="2"/><circle cx="${x+8}" cy="${y-18}" r="1.4"/>`);
     case "psychshelf": { const cols = ["#C9A3E0", "#8FB3E8", "#F2A0B8", "#9CC27E", "#F3C969", "#B98AD9"]; let b = "";
@@ -331,7 +326,7 @@ export function furn(kind, x, y){
       return sk(`<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3" style="fill:#EADCF0"/>${b}`, `<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3"/><path d="M${x-44} ${y-68} h88 M${x-44} ${y-40} h88 M${x-44} ${y-12} h88"/>`); }
     case "studydesk": return sk(`<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3" style="fill:#FFFDF6"/><rect x="${x-20}" y="${y-50}" width="38" height="22" rx="2" style="fill:#DCE3EE"/><rect x="${x-46}" y="${y-44}" width="20" height="14" rx="1" style="fill:#C9A3E0"/><rect x="${x-44}" y="${y-50}" width="18" height="6" rx="1" style="fill:#8FB3E8"/><rect x="${x+24}" y="${y-38}" width="18" height="8" rx="1" style="fill:#F2A0B8"/><path d="M${x+26} ${y-46} l4 -6 l3 1 l-4 6z" style="fill:#F3D34A"/>`,
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><rect x="${x-20}" y="${y-50}" width="38" height="22" rx="2"/><rect x="${x-46}" y="${y-44}" width="20" height="14" rx="1"/><rect x="${x-44}" y="${y-50}" width="18" height="6" rx="1"/><rect x="${x+24}" y="${y-38}" width="18" height="8" rx="1"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
-    // the big family dining table (seats nine: five along the back, four along the front), with its chairs; the
+    // the big dining table (seats nine: five along the back, four along the front), with its chairs; the
     // table itself is also drawn among the people (diningTable, core.js) so those sitting behind it show waist up
     case "dining": { const back = [0, 1, 2, 3, 4].map(b => x - 120 + b*60), front = [0, 1, 2, 3].map(f => x - 90 + f*60);
       return sk(`${back.map(cx => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4" style="fill:#B98A5A"/>`).join("")}${front.map(cx => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3" style="fill:#B98A5A"/>`).join("")}`,
@@ -339,16 +334,16 @@ export function furn(kind, x, y){
         + diningTable(x, y); }
     // big goals (game/goals.js): the garage's door at the back of the house (boarded up with a sign until it's built),
     // the scooter and car bays in the garage, the cellar door off the wine shop, and the cellar's furniture
-    // the garage door on the living room's east wall, below Evan's
+    // the garage door on the living room's east wall, below the guest room's
     case "garagedoor": return sk(`<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z" style="fill:#8FA3B8"/><path d="M${x+36} ${y-80} l-20 6 v10 l20 -6z" style="fill:#CFE0EE"/>`,
       `<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z"/><circle cx="${x+17}" cy="${y-42}" r="1.8"/><path d="M${x+36} ${y-80} l-20 6 v10 l20 -6z"/>`);
-    // a bedroom door (the family's houses): on the west or east wall depending on where it stands, with a little
+    // a bedroom door (the friends' houses): on the west or east wall depending on where it stands, with a little
     // heart sign; from 11pm to the morning a "shh" sign hangs on it
     case "bedroomdoor": { const left = x < 260, d = left ? `M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z` : `M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z`,
         sx = left ? x - 26 : x + 26, m = (new Date(Date.now() + (globalThis.__mapleOffset || 0) + LOC())).getUTCHours(), night = m >= 23 || m < 6;
       return sk(`<path d="${d}" style="fill:#E8B4C0"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2" style="fill:#FFFDF6"/>` : `<path d="M${sx} ${y - 58} c-4 -6 -10 -2 -6 3 l6 5 l6 -5 c4 -5 -2 -9 -6 -3z" style="fill:#E8566C"/>`}`,
         `<path d="${d}"/><circle cx="${left ? x - 17 : x + 17}" cy="${y - 42}" r="1.8"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2"/><path d="M${sx - 6} ${y - 64} h12" opacity=".6"/>` : ""}`); }
-    // the home office door on the living room's west wall, below Mel's
+    // the home office door on the living room's west wall, below yours
     case "officedoor": return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:#9CC27E"/><path d="M${x-36} ${y-80} l20 6 v12 l-20 -6z" style="fill:#FFFDF6"/>`,
       `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z"/><circle cx="${x-17}" cy="${y-42}" r="1.8"/><path d="M${x-36} ${y-80} l20 6 v12 l-20 -6z"/><path d="M${x-32} ${y-74} h10" opacity=".6"/>`);
     // round 146: the glass doors out to the terrace (bottom of the east wall), and the bookings book on the counter's end
@@ -410,12 +405,12 @@ export function furn(kind, x, y){
       `<rect x="${x-56}" y="${y-40}" width="112" height="40" rx="3"/><path d="M${x-56} ${y-46} h112 v6"/><circle cx="${x-24}" cy="${y-52}" r="9"/><path d="M${x+8} ${y-62} h28 v14 h-28z M${x+36} ${y-58} h6"/><path d="M${x} ${y-40} v40" opacity=".5"/><path class="smoke" d="M${x+20} ${y-66} q-3 -5 0 -9 q3 -4 0 -8" opacity=".6"/>`);
     case "laundry": return sk(`<path d="M${x-30} ${y-34} h60 l-6 34 h-48z" style="fill:#E8D3B0"/><path d="M${x-24} ${y-34} q10 -14 22 -4 q10 -12 26 0z" style="fill:var(--sky)"/><path d="M${x-8} ${y-38} q8 -10 18 -2z" style="fill:var(--rose)"/>`,
       `<path d="M${x-30} ${y-34} h60 l-6 34 h-48z"/><path d="M${x-26} ${y-24} h52 M${x-24} ${y-14} h48" opacity=".5"/><path d="M${x-24} ${y-34} q10 -14 22 -4 q10 -12 26 0"/>`);
-    // Mel's room (and its door in the house)
+    // your room (and its door in the house)
     case "sidedoor": return sk(`<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z" style="fill:var(--blush)"/><path d="M${x-36} ${y-80} l20 6 v14 l-20 -6z" style="fill:#FFFDF6"/>`,
       `<path d="M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z"/><circle cx="${x-17}" cy="${y-42}" r="1.8"/><path d="M${x-36} ${y-80} l20 6 v14 l-20 -6z"/><path d="M${x-27} ${y-70} c-2 -3 -5 -1 -3 2 l3 3 l3 -2 c2 -3 -1 -5 -3 -3" />`);
-    // Evan's room (and its door on the east wall of the house)
+    // the guest room (and its door on the east wall of the house)
     // the town hall's kind-words corkboard, hung on the back wall (x,y = the wall's foot below it)
-    // Mel's routines noticeboard (her room's back wall): pinned lists, one ticked
+    // your routines noticeboard (your room's back wall): pinned lists, one ticked
     case "routineboard": return sk(`<rect x="${x-46}" y="${y-116}" width="92" height="92" rx="4" style="fill:#FFFDF6"/><rect x="${x-38}" y="${y-104}" width="36" height="44" rx="1" transform="rotate(-3 ${x-20} ${y-82})" style="fill:#D6E8F7"/><rect x="${x+2}" y="${y-102}" width="36" height="48" rx="1" transform="rotate(2 ${x+20} ${y-78})" style="fill:#FAD4DC"/><rect x="${x-24}" y="${y-56}" width="48" height="26" rx="1" style="fill:#FFF3B8"/>`,
       `<rect x="${x-46}" y="${y-116}" width="92" height="92" rx="4"/><path d="M${x-32} ${y-92} h22 M${x-32} ${y-84} h18 M${x-32} ${y-76} h22 M${x+8} ${y-90} h22 M${x+8} ${y-82} h18 M${x+8} ${y-74} h22 M${x+8} ${y-66} h14 M${x-16} ${y-46} h30 M${x-16} ${y-38} h22" opacity=".55"/><path d="M${x-36} ${y-93} l2 2 l4 -4"/><circle cx="${x-20}" cy="${y-104}" r="2" style="fill:var(--rose)"/><circle cx="${x+20}" cy="${y-102}" r="2" style="fill:var(--peri2)"/><circle cx="${x}" cy="${y-56}" r="2" style="fill:var(--honey)"/>`);
     // the trophy room: its door in the town hall, the affirmations board, the book on its lectern, pedestals
@@ -620,14 +615,14 @@ export function furn(kind, x, y){
         <path d="M${x-58} ${y+6} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z" style="fill:#E86A5C"/><path d="M${x+20} ${y+8} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z" style="fill:#F7C548"/>`,
       `<path d="M${x-40} ${y-14} v-38 l40 -22 l40 22 v38z"/><path d="M${x-22} ${y-14} v-26 h44 v26z M${x-22} ${y-32} h44 M${x-22} ${y-24} h44"/><path d="M${x-58} ${y+6} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z"/><circle cx="${x-50}" cy="${y+7}" r="3.4"/><circle cx="${x-32}" cy="${y+7}" r="3.4"/>
         <path d="M${x+20} ${y+8} v-8 q0 -3 3 -3 h7 l5 -6 h12 q3 0 4 3 l4 6 q4 0 4 4 v4z"/><circle cx="${x+28}" cy="${y+9}" r="3.4"/><circle cx="${x+46}" cy="${y+9}" r="3.4"/>`);
-    case "bed": { const sl = G.S && G.S().sleep, d = (G.F().decor || {}), pj = d.me_pj ? "#3B4A86" : "var(--tank)", dz = darrenAsleep();
+    case "bed": { const sl = G.S && G.S().sleep, d = (G.F().decor || {}), pj = d.me_pj ? "#3B4A86" : "var(--tank)", dz = false;
       return sk(`<rect x="${x-78}" y="${y-132}" width="156" height="40" rx="10" style="fill:var(--wood)"/><rect x="${x-74}" y="${y-104}" width="148" height="100" rx="6" style="fill:#FFFDF6"/>
         <rect x="${x-66}" y="${y-100}" width="58" height="24" rx="9" style="fill:#F6EEF4"/><rect x="${x+8}" y="${y-100}" width="58" height="24" rx="9" style="fill:#F6EEF4"/>
-        ${dz ? `<circle class="darrenBed" cx="${x+36}" cy="${y-84}" r="11" style="fill:#E6BC98"/><path d="M${x+25} ${y-86} c0 -10 6 -13 11 -13 c6 0 11 3 11 12 c-4 -4 -12 -5 -22 1z" style="fill:#1A1716"/><path d="M${x+22} ${y-76} q14 -6 28 0 v6 h-28z" style="fill:#9A9A9A"/>` : ""}
-        <path d="M${x-74} ${y - (sl || dz ? 74 : 60)} h148 v56 a6 6 0 0 1 -6 6 h-136 a6 6 0 0 1 -6 -6z" style="fill:var(--peri)"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z" style="fill:var(--blush)"/>` : ""}
+        ${("")}
+        <path d="M${x-74} ${y - ((sl) ? 74 : 60)} h148 v56 a6 6 0 0 1 -6 6 h-136 a6 6 0 0 1 -6 -6z" style="fill:var(--peri)"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z" style="fill:var(--blush)"/>` : ""}
         ${sl ? `<circle cx="${x-36}" cy="${y-84}" r="11" style="fill:var(--skin)"/><path d="M${x-48} ${y-84} c0 -12 8 -15 13 -15 c8 0 13 5 11 13 c-3 -4 -8 -5 -12 -4 c-4 1 -8 3 -12 6z" style="fill:var(--hair)"/><path d="M${x-50} ${y-76} q14 -6 28 0 v6 h-28z" style="fill:${pj}"/>` : ""}`,
         `<rect x="${x-78}" y="${y-132}" width="156" height="40" rx="10"/><rect x="${x-74}" y="${y-104}" width="148" height="100" rx="6"/><rect x="${x-66}" y="${y-100}" width="58" height="24" rx="9"/><rect x="${x+8}" y="${y-100}" width="58" height="24" rx="9"/>
-        ${dz ? `<circle cx="${x+36}" cy="${y-84}" r="11"/><path d="M${x+32} ${y-84} q2 1.5 4 0 M${x+38} ${y-84} q2 1.5 4 0" opacity=".7"/>` : ""}<path d="M${x-74} ${y - (sl || dz ? 74 : 60)} h148"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z M${x+28} ${y-58} v52 M${x+40} ${y-58} v52 M${x+52} ${y-58} v52 M${x+64} ${y-58} v52" opacity=".7"/>` : ""}${legs(148, 6)}
+        ${("")}<path d="M${x-74} ${y - ((sl) ? 74 : 60)} h148"/>${d.r_throw ? `<path d="M${x+20} ${y-58} h54 v52 h-54z M${x+28} ${y-58} v52 M${x+40} ${y-58} v52 M${x+52} ${y-58} v52 M${x+64} ${y-58} v52" opacity=".7"/>` : ""}${legs(148, 6)}
         ${sl ? `<path d="M${x-40} ${y-84} q2 1.6 4 0 M${x-33} ${y-84} q2 1.6 4 0"/>` : ""}`) + (sl ? `<text x="${x-14}" y="${y-104}" font-size="11" fill="#3b3530" class="zz" pointer-events="none">z z</text>` : ""); }
     case "curtwindow": { const g = G.F() || {}, night = G.dusk(), shut = g.curtains ? g.curtains === "closed" : (night || !!(G.S && G.S().sleep));
       // each curtain hangs from the rod and sways a little (CSS "sway"), pivoting at the top
@@ -745,11 +740,9 @@ export function roomArt(id){
   });
   if (id === "kidroom") {
     // the door back to the house on the west wall
-    const k = G.kid ? G.kid() : {};
     h += `<g data-exit="1" class="kidexit" aria-label="Back to the house"><ellipse class="hov" cx="34" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
       ${sk(`<path d="M0 346 L28 358 L28 456 L0 466z" style="fill:#F7D35A"/>`, `<path d="M0 346 L28 358 L28 456 L0 466z"/><circle cx="23" cy="410" r="1.8"/>`)}
       ${tapeLabel(50, 488, "To the house", "var(--card)", 11)}</g>`;
-    if (k.sleep) h += `<rect width="520" height="640" fill="#2B2F55" opacity=".34" pointer-events="none"/>`;
     return h;
   }
   if (id === "trophy") {
@@ -764,7 +757,7 @@ export function roomArt(id){
     return h;
   }
   if (id === "room") {
-    // Maple's bed (she sleeps in it while Mel's in here), the door back to the house on the east wall, and night
+    // Maple's bed (she sleeps in it while you're in here), the door back to the house on the east wall, and night
     const sl = G.S && G.S().sleep;
     const cosy = !!(G.F().decor || {}).bed;   // the market's "Maple's cosy bed" upgrades her basket: plush rim, cushion and a heart
     const [mx, my] = MAPLE_BED;

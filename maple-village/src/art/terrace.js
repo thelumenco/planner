@@ -1,4 +1,4 @@
-// The wine shop's alfresco terrace (round 146, Mel: "billowing canvas, swaying curtains, the feel of a long Provence
+// The wine shop's alfresco terrace (round 146: "billowing canvas, swaying curtains, the feel of a long Provence
 // Sunday lunch"). Through the glass doors in the wine shop's corner, or by tapping the little terrace outside: a
 // pergola of weathered beams with cream canvas sails billowing overhead and linen curtains tied to the posts, swaying;
 // a vine and wisteria along the beams; festoon lights; and down the middle one long table under white linen, with
@@ -32,7 +32,7 @@ function occasionDecor(kind, day, hm, F){
       <path d="M260 290 L210 276 M260 290 L310 276" stroke="#FFF6C8" stroke-width="10" opacity=".25"/><rect x="252" y="288" width="16" height="9" rx="2" fill="#3A3430"/><circle cx="260" cy="292" r="2.4" fill="#FFF6C8"/>`)
       + `<g data-tspot="screen" data-x="300" data-y="300" aria-label="Trivia night: join a team"><ellipse class="hov" cx="260" cy="282" rx="72" ry="10" style="fill:var(--butter)"/></g>`;
   }
-  if (kind === "paint" && hm >= 13*60 + 30 && hm < 16*60 + 30) {   // Mel's own easel, waiting, and a tray of paints on the table
+  if (kind === "paint" && hm >= 13*60 + 30 && hm < 16*60 + 30) {   // your own easel, waiting, and a tray of paints on the table
     return g(`<path d="M444 470 l-7 30 M456 470 l7 30 M450 462 v38" stroke="#8A6A52" stroke-width="2"/><rect x="436" y="430" width="28" height="34" fill="#FFFDF6" stroke="#2F2B28" stroke-width="1"/>${F.terraceEv && F.terraceEv.painted === day && F.terraceEv.gallery ? "" : ""}
       <rect x="246" y="440" width="28" height="10" rx="2" fill="#FFFDF6" stroke="#2F2B28" stroke-width=".7"/>${["#E8566C", "#A68FCB", "#F3C969", "#7FA35A"].map((c, i) => `<circle cx="${251 + i*6}" cy="445" r="2" fill="${c}"/>`).join("")}`)
       + `<g data-tspot="easel" data-x="430" data-y="508" aria-label="Your easel: sip and paint"><ellipse class="hov" cx="450" cy="502" rx="22" ry="7" style="fill:var(--butter)"/></g>`;
@@ -45,7 +45,7 @@ function occasionDecor(kind, day, hm, F){
     return g(balloons + fw); }
   return "";
 }
-// round 153 (Mel): light for the evenings. Fairy lights strung across the pergola in three swags, candles in glass jars
+// round 153: light for the evenings. Fairy lights strung across the pergola in three swags, candles in glass jars
 // down the long table and on the wall, and woven rattan pendants hanging from the beams (and a rattan floor lantern by
 // the doors). From six they're lit: the glowing bits are .nglow, so core.js redraws them above the dusk wash.
 function terraceLights(hm){
@@ -112,6 +112,6 @@ export function terraceArt(F = {}){
   const steps = g(sk(`<rect x="0" y="618" width="210" height="22" style="fill:${C.stone2}"/><rect x="310" y="618" width="210" height="22" style="fill:${C.stone2}"/>`, `<path d="M0 618 H210 M310 618 H520"/>`)) + `<g data-exit="vineyard" aria-label="Down the steps to the vineyard"><ellipse class="hov" cx="260" cy="626" rx="44" ry="10" style="fill:var(--butter)"/></g>`;
   const labels = tapeLabel(80, 392, "Bookings", "#E6DDF2", 9) + tapeLabel(352, 596, "The long table", "#FBF0D6", 9) + tapeLabel(300, 168, "The view", "#E6DDF2", 9);
   // round 152: Mother's Day: jugs of pink roses down the table
-  const mum = sunday && mothersDay(day) && hm >= 11*60 ? g([380, 470, 540].map(y => `<rect x="256" y="${y - 10}" width="8" height="10" rx="2" fill="#FFFDF6" stroke="${C.ink}" stroke-width=".8"/>${[-4, 0, 4].map(d => `<circle cx="${260 + d}" cy="${y - 14 - Math.abs(d)/2}" r="3" fill="${roseC[(y + d) % 2]}"/>`).join("")}`).join("")) : "";
-  return view + wall + floor + shop + side + chairs + table + mum + tableSpot + book + view2 + steps + pergola + sails + drapes + terraceLights(hm) + occasionDecor(occ, day, hm, F) + labels;
+  const roses = sunday && mothersDay(day) && hm >= 11*60 ? g([380, 470, 540].map(y => `<rect x="256" y="${y - 10}" width="8" height="10" rx="2" fill="#FFFDF6" stroke="${C.ink}" stroke-width=".8"/>${[-4, 0, 4].map(d => `<circle cx="${260 + d}" cy="${y - 14 - Math.abs(d)/2}" r="3" fill="${roseC[(y + d) % 2]}"/>`).join("")}`).join("")) : "";
+  return view + wall + floor + shop + side + chairs + table + roses + tableSpot + book + view2 + steps + pergola + sails + drapes + terraceLights(hm) + occasionDecor(occ, day, hm, F) + labels;
 }

@@ -35,7 +35,7 @@ export const LV_PEOPLE = [
     "Marco. I'm cycling every village in the hills. Two down. Many to go.", "Marco's out on the road.", {tourist: true}),
 
   /* ---------- Montrose ---------- */
-  // round 186: Lise keeps Mel's paperie (goals.js "paperkeeper") in the lanes
+  // round 186: Lise keeps your paperie (goals.js "paperkeeper") in the lanes
   P("lvlise", "Lise", "Keeps your paperie in Montrose", {skin: "#F2D3BC", hair: "#3A2A22", hairStyle: "bobfringe", top: "#C6D6B2", bottom: "#5A4A3E", extra: "apron"},
     [slot("10:00", "17:00", "bv_hpaper", [110, 488], {dir: 1, dow: [0, 2, 3, 4, 5, 6], needs: "paperkeeper"})],
     ["The seeded paper sells out first. People like a gift that grows.", "A man bought ten sheets of ink blue. For love letters, he said.", "I've hung the new batch. The sage is my favourite.", "Saturday's class is full again!"],
@@ -47,7 +47,7 @@ export const LV_PEOPLE = [
   P("lvroux", "Madame Roux", "Makes nougat in the square", {skin: "#F6D9C4", hair: "#3A3430", hairStyle: "bun", top: "#C8643B", bottom: "#5A4A3E", extra: "apron"},
     [slot("9:00", "18:00", "bv_hnougat", DESK, {dir: -1})],
     ["Honey from Sunflower Hill, almonds from my brother. Nothing else. Well, sugar.", "Calissons are for weddings. And for Tuesdays.", "Stir for an hour. Then stir some more."],
-    "Madame Roux. Nougat, calissons, and a slice for the little one.", "The nougat shop is shut. Madame Roux is stirring."),
+    "Madame Roux. Nougat, calissons, and a little slice to try.", "The nougat shop is shut. Madame Roux is stirring."),
   P("lvpaul", "Paul", "Runs Café de la Place", {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#FFFDF6", bottom: "#2F2B28", extra: "tie"},
     [slot("7:30", "19:00", "bv_hcafe", DESK, {dir: -1})],
     ["Citron pressé, sugar on the side. You sweeten it yourself. That's the rule.", "I watch the pétanque all day. Pagnol has not lost since March.", "Sit outside. Inside is for the rain."],
@@ -124,7 +124,7 @@ export const LV_PEOPLE = [
     "Jean-Marc. I cook at the mill. Sit by the window and watch the wheel.", "The mill's kitchen is closed."),
   P("lvpicnic", "Anouk", "Picnicking by the river", {skin: "#B9825E", hair: "#1E1A18", hairStyle: "bun", top: "#F3E7B0", bottom: "#7FA8C8", hat: "sunhat"},
     [slot("11:00", "15:00", "hb_bank", [[220, 480], [360, 500]]), slot("15:00", "16:30", "bv_hglace", IN)],
-    ["The best lunch is on a rug by the water.", "I've been coming to this meadow since I was Evan's age.", "Lavender ice cream, then a nap in the long grass."],
+    ["The best lunch is on a rug by the water.", "I've been coming to this meadow since I was little.", "Lavender ice cream, then a nap in the long grass."],
     "Anouk. Picnic, book, river, nap. Perfect Saturday.", "Anouk's dozing in the grass.", {tourist: true}),
 
   /* ---------- Chapel Hill ---------- */

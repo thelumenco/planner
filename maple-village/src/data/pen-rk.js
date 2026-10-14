@@ -1,4 +1,4 @@
-// Letter voices for Ronda's and Kyoto's people (round 192): how each one writes back when Mel posts them a gift or a letter.
+// Letter voices for Ronda's and Kyoto's people (round 192): how each one writes back when you post them a gift or a letter.
 // (back: things from their own towns are registered from the towns' goods at runtime, see ronda.js)
 export const PEN_RK = {
   /* ---------- Ronda ---------- */

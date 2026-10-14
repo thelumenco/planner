@@ -3,7 +3,7 @@
 // tree, and flour, cheese and olives from Hana's deli shelf.
 //   Oven: 1 flour bakes 2 loaves in an hour.   Cheese press: 2 milk make a cheese in 3 hours.
 //   Stove: small plates for the tasting room (bread, olives, cheese boards, market treats), and the tapas of the day:
-//   Mel picks one garden dish a day and cooks batches of it. At closing (10pm) any leftover tapas go to the staff for
+//   The player picks one garden dish a day and cooks batches of it. At closing (10pm) any leftover tapas go to the staff for
 //   dinner, and they leave something for the larder by way of thanks.
 // State: F.kitchen = {larder: {id: n}, oven: {start, dur} | null, press: {start, dur} | null}; plates live in F.vine
 // (v.menu for small plates, v.tapas = {day, id, plates} for today's tapas, v.staffNote for the last staff dinner).
@@ -36,7 +36,7 @@ export const GOODS = {
   yuzu: ["yuzu", "yuzu"], miso: ["tub of white miso", "tubs of white miso"], tofu: ["block of tofu", "blocks of tofu"], mochi: ["mochi", "mochi"], matcha: ["tin of matcha", "tins of matcha"],
   // round 128: from Jeju
   tangerine: ["tangerine", "tangerines"], hallabong: ["hallabong", "hallabong"], omija: ["handful of omija berries", "handfuls of omija berries"], blackpork: ["piece of black pork", "pieces of black pork"], abalone: ["abalone", "abalone"],
-  // round 132: from Cinque Terre (and Mel's own loft and garden)
+  // round 132: from Cinque Terre (and the player's own loft and garden)
   pesto: ["jar of pesto", "jars of pesto"], pinenuts: ["bag of pine nuts", "bags of pine nuts"], chickpea: ["handful of chickpeas", "handfuls of chickpeas"], anchovy: ["anchovy", "anchovies"], anchovy_salt: ["jar of salted anchovies", "jars of salted anchovies"],
   // round 142: from Bellbird Valley
   goldensyrup: ["tin of golden syrup", "tins of golden syrup"], wattleseed: ["jar of wattleseed", "jars of wattleseed"], raspberry: ["punnet of raspberries", "punnets of raspberries"],
@@ -94,7 +94,7 @@ export const TAPAS = {
   cangrejos: {n: "Garlic crayfish on toast", need: {crayfish: 4, loaf: 1}, price: 10},
   // round 101: more ways to use eggs, tomatoes, yoghurt, honey, the farm's cheeses, pears and leeks
   huevos: {n: "Huevos rotos", need: {egg: 2, potato: 2}, price: 9},
-  tomatoegg: {n: "Ma Ma's tomato and egg", need: {tomato: 2, egg: 2}, price: 8, seasons: ["summer", "autumn"]},
+  tomatoegg: {n: "Tomato and egg", need: {tomato: 2, egg: 2}, price: 8, seasons: ["summer", "autumn"]},
   yogur: {n: "Yoghurt with honey", need: {yoghurt: 2, honey: 1}, price: 8},
   halloumi: {n: "Grilled halloumi with honey", need: {halloumi: 1, honey: 1}, price: 11},
   azul: {n: "Honeybrook blue with pear", need: {bluecheese: 1, pear: 2}, price: 12},
@@ -105,20 +105,20 @@ export const TAPAS = {
   ajo: {n: "Wild garlic tortilla", need: {wildgarlic: 2, egg: 2, potato: 1}, price: 10, seasons: ["spring"]},
   setas: {n: "Wild mushrooms on toast", need: {mushroom: 2, loaf: 1}, price: 10, seasons: ["autumn", "winter"]},
   castanas: {n: "Roast chestnuts with honey", need: {chestnut: 4, honey: 1}, price: 9, seasons: ["autumn", "winter"]},
-  // round 107: tasted at the tapas bar in Ronda (learn: only once Mel's tried them there, towns.js TASTINGS)
+  // round 107: tasted at the tapas bar in Ronda (learn: only once the player's tried them there, towns.js TASTINGS)
   salmorejo: {n: "Salmorejo", need: {tomato: 2, loaf: 1, oliveoil: 1}, price: 11, seasons: ["summer", "autumn"], learn: true},
   ajoblanco: {n: "Ajo blanco", need: {almond: 2, loaf: 1, oliveoil: 1}, price: 11, learn: true},
   croqjamon: {n: "Jamón croquetas", need: {jamon: 1, milk: 1, flour: 1}, price: 13, learn: true},
   payoyo: {n: "Payoyo with membrillo", need: {payoyo: 1, membrillo: 1}, price: 14, learn: true},
   naranjas: {n: "Orange and olive salad", need: {sevilla: 2, olives: 1, oliveoil: 1}, price: 10, learn: true}};
 // round 109: with herbs from the greenhouse (and shrimp from the sea)
-// round 122: Kyoto dishes (fish from Mel's own catch, tofu and miso from the market, chives from the greenhouse)
+// round 122: Kyoto dishes (fish from the player's own catch, tofu and miso from the market, chives from the greenhouse)
 Object.assign(TAPAS, {misofish: {n: "Miso-glazed fish", need: {fish: 1, miso: 1}, price: 11}, hiyayakko: {n: "Cold tofu with yuzu and chives", need: {tofu: 1, yuzu: 1, chives: 1}, price: 9},
   mochihoney: {n: "Mochi with honey", need: {mochi: 2, honey: 1}, price: 8}});
 // round 128: Jeju dishes (garlic from the greenhouse)
 Object.assign(TAPAS, {heukdwaeji: {n: "Black pork with tangerine glaze", need: {blackpork: 1, tangerine: 1, garlic: 1}, price: 14},
   jeonbok: {n: "Abalone with garlic butter", need: {abalone: 1, garlic: 1, milk: 1}, price: 13}, hallaomija: {n: "Hallabong with omija syrup", need: {hallabong: 1, omija: 1}, price: 9}});
-// round 132: Cinque Terre dishes (rosemary from the greenhouse, olive oil from Mel's mill, anchovies from the sea)
+// round 132: Cinque Terre dishes (rosemary from the greenhouse, olive oil from the player's mill, anchovies from the sea)
 Object.assign(TAPAS, {trofie: {n: "Trofie with pesto", need: {flour: 1, pesto: 1}, price: 12}, focaccia: {n: "Focaccia with rosemary", need: {flour: 1, oliveoil: 1, rosemary: 1}, price: 9},
   farinata: {n: "Farinata", need: {chickpea: 2, oliveoil: 1}, price: 9}, acciughe: {n: "Stuffed fried anchovies", need: {anchovy: 3, loaf: 1, egg: 1}, price: 12},
   crostini: {n: "Anchovy and lemon toasts", need: {anchovy_salt: 1, lemon: 1, loaf: 1}, price: 14}});
@@ -138,8 +138,8 @@ Object.assign(TAPAS, {gambas: {n: "Gambas al ajillo", need: {shrimp: 3, garlic: 
   romero: {n: "Rosemary potatoes", need: {potato: 2, rosemary: 1}, price: 9}, bruschetta: {n: "Tomato and basil bruschetta", need: {loaf: 1, tomato: 2, basil: 1}, price: 10, seasons: ["summer", "autumn"]},
   almejas: {n: "Clams with garlic and lemon", need: {clams: 4, garlic: 1, lemon: 1}, price: 12},
   cebollino: {n: "Chive omelette", need: {egg: 2, chives: 1}, price: 8}, tomillo: {n: "Roast pumpkin with thyme", need: {pumpkin: 1, thyme: 1}, price: 9, seasons: ["autumn", "winter"]}});
-// a tapas Mel can cook: the Ronda ones once she's tasted them there
-export const knows = (F, id) => TAPAS[id].learn ? !!(F.learned && F.learned[id]) : !TAPAS[id].special || beenTo(F, TAPAS[id].special);   // Ronda's: tasted there; the other specials: once Mel's been
+// a tapas the player can cook: the Ronda ones once she's tasted them there
+export const knows = (F, id) => TAPAS[id].learn ? !!(F.learned && F.learned[id]) : !TAPAS[id].special || beenTo(F, TAPAS[id].special);   // Ronda's: tasted there; the other specials: once the player's been
 export const inSeason = (id, season) => !TAPAS[id].seasons || TAPAS[id].seasons.includes(season);
 export const TAPAS_PLATES = 6, TAPAS_MAX = 3;   // round 108: up to three tapas a day
 // The chef's request: each day someone in town has a craving for one of the season's tapas. Make it the tapas of the
@@ -160,9 +160,9 @@ const pool = (k, g) => ALT[g] ? Object.keys(k.larder).filter(ALT[g]).sort((a, b)
 export const larderCount = (k, g) => pool(k, g).reduce((a, id) => a + (k.larder[id] || 0), 0);
 const has = (k, need) => Object.entries(need).every(([id, n]) => larderCount(k, id) >= n);
 const use = (k, need) => Object.entries(need).forEach(([g, n]) => { for (const id of pool(k, g)) { if (n <= 0) break; const m = Math.min(n, k.larder[id] || 0); k.larder[id] -= m; n -= m; if (k.larder[id] <= 0) delete k.larder[id]; } });
-// Round 108: what Pilar may use. Mel keeps some of anything back (k.keep: larder id -> how many), and Pilar never
-// touches those; Mel cooking herself can use everything.
-// Things Mel's just brought in wait FRESH_HOLD before Pilar may use them (k.fresh: id -> {n, until}), so there's
+// Round 108: what Pilar may use. The player keeps some of anything back (k.keep: larder id -> how many), and Pilar never
+// touches those; the player cooking herself can use everything.
+// Things the player's just brought in wait FRESH_HOLD before Pilar may use them (k.fresh: id -> {n, until}), so there's
 // time to set "keep" first.
 export const FRESH_HOLD = 15*60e3;
 const heldNew = (k, id) => { const f = k.fresh && k.fresh[id]; return f && f.until > Date.now() ? f.n : 0; };
@@ -196,7 +196,7 @@ export function takeCheese(F){ const k = kitchenState(F); if (!k.press || left(k
 export const SYRUP_PETALS = 3;
 export function makeSyrup(F){ const k = kitchenState(F); if (!has(k, {petals: SYRUP_PETALS})) return null; use(k, {petals: SYRUP_PETALS}); F.inv = F.inv || {}; F.inv.syrup = (F.inv.syrup || 0) + 2; return "Two bottles of petal syrup, pink and fragrant. Into your backpack."; }
 export function cookDish(F, id, pilar){ const k = kitchenState(F), d = DISHES[id], v = vineState(F); if (!d || !(pilar ? canSpare(k, d.need) : has(k, d.need))) return null; (pilar ? useSpare : use)(k, d.need); v.menu[id] = (v.menu[id] || 0) + d.plates; return `${d.plates} plates of ${d.n.toLowerCase()}, out to the tasting room.`; }
-// Today's tapas (up to TAPAS_MAX). A plan Mel made yesterday for today goes on the chalkboard the first time anyone looks.
+// Today's tapas (up to TAPAS_MAX). A plan the player made yesterday for today goes on the chalkboard the first time anyone looks.
 export function tapasAll(F, today){
   const v = vineState(F), p = v.tapasPlan;
   if (p && p.day === today && !p.done) { p.done = true; (p.ids || []).forEach(id => chooseTapas(F, id, today)); }
@@ -227,10 +227,10 @@ export function staffDinner(F, today, hm){
 export const staffLine = n => `Leftover ${n.dish.toLowerCase()} (${n.plates} plate${n.plates === 1 ? "" : "s"}) went to Marco, Ines and Celeste for dinner. They left ${Object.entries(n.gifts).map(([id, c]) => `${c} ${nm(id, c)}`).join(", ")} in the larder to say thanks.`;
 
 /* ---------- Pilar, the cook ---------- */
-// While she's on shift (and Mel hasn't sent her home in the staff card at the shop counter) Pilar runs the kitchen:
-// takes out finished loaves and cheese, keeps the oven and press going, picks a tapas of the day if Mel hasn't
+// While she's on shift (and the player hasn't sent her home in the staff card at the shop counter) Pilar runs the kitchen:
+// takes out finished loaves and cheese, keeps the oven and press going, picks a tapas of the day if the player hasn't
 // (the dearest one the larder can make), cooks more when the last plates are going, and keeps small plates topped
-// up with whatever's left. She never touches the backpack unless Mel ticks "fetch". -> list of things done
+// up with whatever's left. She never touches the backpack unless the player ticks "fetch". -> list of things done
 export const COOK = "pilar";
 const cookLog = (k, line) => { k.log = [line, ...(k.log || [])].slice(0, 4); };
 export function cookTick(F, today){
@@ -330,7 +330,7 @@ export function wireKitchen(root, F, api){
     api.rerender();
   });
 }
-// Round 136 (Mel): the tapas from her trips are SPECIALS, in their own tab at the stove, and always dearer than any local
+// Round 136: the tapas from her trips are SPECIALS, in their own tab at the stove, and always dearer than any local
 // dish (14-17 a plate, by what the ingredients cost). A town's specials appear once she's been there (Ronda's still
 // need tasting at the tapas bar). Every batch (6 plates) earns well over what its ingredients cost: at least twice
 // for local dishes, buying everything at the cheapest place.
@@ -344,7 +344,7 @@ export const SPECIALS = {salmorejo: ["ronda", 17], ajoblanco: ["ronda", 17], cro
 Object.entries(SPECIALS).forEach(([id, [town, price]]) => Object.assign(TAPAS[id], {special: town, price}));
 export const TOWN_NAME = {ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills"};
 export const beenTo = (F, town) => town === "lavender" ? !!(F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).some(s => /^bv_(lavender|hilltown|perfume|honey|bridge|chapel)$/.test(s))) : town === "tablelands" ? !!(F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).some(s => /^bv_(falls|crater|town|dairy|nuts|gold)$/.test(s))) : town === "coast" ? !!(F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).some(s => /^bv_(breakwater|lighthouse|gully|harbour|sisters|cove)$/.test(s))) : !!((F.towns && F.towns[town]) || F[town]);   // (the Coast Road: once she's stamped a stop there)   // (F.towns from round 132; a town's own state for earlier trips)
-// where each ingredient comes from, shown on the recipe cards (Mel: "where do I get almonds? squid?")
+// where each ingredient comes from, shown on the recipe cards ("where do I get almonds? squid?")
 export const SOURCE = {
   potato: "garden or Clara's stall", tomato: "garden or Clara's stall", pepper: "garden or Clara's stall", corn: "garden or Clara's stall", carrot: "garden or Clara's stall",
   strawberry: "garden or Clara's stall", pea: "garden or Clara's stall", pumpkin: "garden or Clara's stall", leek: "garden or Clara's stall", chickpea: "your garden (or Cinque Terre)",
@@ -352,7 +352,7 @@ export const SOURCE = {
   egg: "the farm gate", milk: "the farm gate", honey: "the farm gate or market", honeycomb: "the market", yoghurt: "the market or farm",
   cheese: "the market deli", flour: "the market deli", olives: "the market deli", loaf: "the oven (1 flour makes 2)",
   farmcheese: "your farm's cheese", halloumi: "your farm's cheese", bluecheese: "your farm's cheese", cheddar: "your farm's cheese",
-  apple: "the orchard", pear: "the orchard", lemon: "Ma Ma's lemon tree or the Friday fish van", fish: "the market or fishing",
+  apple: "the orchard", pear: "the orchard", lemon: "the orchard's lemon tree or the Friday fish van", fish: "the market or fishing",
   sardine: "the sea or bay", mackerel: "the sea or bay, daytime", squid: "the sea, at night", octopus: "the sea, on rainy days", seabream: "the sea or bay",
   trout: "the river, daytime", crayfish: "the lake", shrimp: "the sea, at dawn", anchovy: "the sea or bay", clams: "the Friday fish van at the bay",
   wildgarlic: "the woods in spring", mushroom: "the woods in autumn", chestnut: "the woods in winter",

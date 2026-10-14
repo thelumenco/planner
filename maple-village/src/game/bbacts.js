@@ -1,8 +1,8 @@
-// Bellbird Valley's things to join in with (round 143), each more than a speech bubble, and Evan in on every one:
+// Bellbird Valley's things to join in with (round 143), each more than a speech bubble:
 //   a balloon ride with Gus (dawn, 6 to 9, or the golden hour, 5 to 7): burner and drift to the right height for each
 //     sight as the valley rolls by, and land gently. A flight certificate to keep.
 //   riddling in the barrel cave with Jono: give every bottle on the rack its quarter turn till the chalk marks all
-//     point up. Jono shows Mel how, and a riddling rack goes up in her wine cellar at home (round 144: sparkling left
+//     point up. Jono shows you how, and a riddling rack goes up in your wine cellar at home (round 144: sparkling left
 //     on it longer sells for more).
 //   pick-your-own at the berry farm: the red ones, not the white ones (raspberries and strawberries to take, once a
 //     day), and then dip strawberries in Sophie's chocolate: dark, milk or white, and sprinkles. A box to give.
@@ -68,22 +68,22 @@ export function pickBerry(st, i){ if (st.picked.includes(i) || i < 0 || i >= st.
 export const berriesDone = st => st.ripe.every((r, i) => !r || st.picked.includes(i));
 export function finishBerries(F, st, addInv){ const s = bbState(F); s.picks = (s.picks || 0) + 1; if (s.picked === dayKey()) return null; s.picked = dayKey();
   const rasp = Math.max(1, st.picked.filter(i => st.kind[i] === "rasp").length), straw = Math.max(1, st.picked.length - rasp); addInv("raspberry", Math.min(rasp, 4)); addInv("strawberry", Math.min(straw, 4)); return {rasp: Math.min(rasp, 4), straw: Math.min(straw, 4)}; }
-export function berriesPanel(F, st, evan){
+export function berriesPanel(F, st){
   let h = tape() + `<h2>Pick your own</h2>`;
   if (!st) return h + `<p class="sub">A little basket each, and the rows to yourselves. Red ones only: the white and green ones aren't ready.${bbState(F).picked === dayKey() ? " (You've picked today: what's in the basket now is for eating.)" : ""}</p><div class="actions"><button class="btn primary" data-bba="pick">Grab a basket</button></div>` + shut;
-  h += `<p class="sub">Tap the ripe ones.${("")}</p><div class="bbberries">${st.ripe.map((r, i) => { const got = st.picked.includes(i), straw = st.kind[i] === "straw", col = r ? (straw ? "#E8566C" : "#C2334D") : (straw ? "#F3F0DA" : "#D9E3B0");
+  h += `<p class="sub">Tap the ripe ones.</p><div class="bbberries">${st.ripe.map((r, i) => { const got = st.picked.includes(i), straw = st.kind[i] === "straw", col = r ? (straw ? "#E8566C" : "#C2334D") : (straw ? "#F3F0DA" : "#D9E3B0");
     return `<button class="bbberry${got ? " got" : ""}" data-bba="berry:${i}" ${got ? "disabled" : ""} aria-label="${r ? "ripe" : "not ripe"} ${straw ? "strawberry" : "raspberry"}"><svg viewBox="0 0 30 30" width="30" height="30">${straw ? `<path d="M15 27 C6 20 5 11 9 8 h12 c4 3 3 12 -6 19z" fill="${col}" stroke="#2F2B28" stroke-width="1.2"/><path d="M9 8 l3 -4 l3 3 l3 -3 l3 4z" fill="#7FA35A" stroke="#2F2B28" stroke-width="1"/>` : `${[[11, 12], [17, 12], [14, 17], [10, 18], [18, 18], [14, 23]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4.2" fill="${col}" stroke="#2F2B28" stroke-width=".9"/>`).join("")}<path d="M11 7 l3 -3 l3 3" fill="none" stroke="#7FA35A" stroke-width="1.6"/>`}${got ? `<path d="M6 15 l6 6 l12 -12" fill="none" stroke="#5E8A48" stroke-width="3"/>` : ""}</svg></button>`; }).join("")}</div>`;
   return h + (berriesDone(st) ? `<div class="actions"><button class="btn primary" data-bba="picked">Basket's full</button></div>` : `<p class="muted">${st.picked.length} picked${st.oops ? `, ${st.oops} put back` : ""}.</p>`);
 }
 export const DIP = {price: 4, need: 2, choc: {dark: "Dark", milk: "Milk", white: "White"}, tops: {none: "Nothing", sprinkles: "Hundreds and thousands", nuts: "Crushed nuts", coconut: "Coconut"}};
 export function dipBerries(F, choc, top){ if (!DIP.choc[choc] || !DIP.tops[top] || F.coins < DIP.price || ((F.inv || {}).strawberry || 0) < DIP.need) return null;
   F.coins -= DIP.price; F.inv.strawberry -= DIP.need; if (F.inv.strawberry <= 0) delete F.inv.strawberry; const s = bbState(F); s.dipped = (s.dipped || 0) + 1; return {choc, top}; }
-export function dipPanel(F, st = {}, evan){
+export function dipPanel(F, st = {}){
   const have = (F.inv || {}).strawberry || 0, ok = have >= DIP.need && F.coins >= DIP.price;
   return tape("stripe") + `<h2>Dipping with Sophie</h2><p class="sub">Two strawberries on little forks, into the warm chocolate, a twirl, and something on top while it's wet. ${DIP.price} coins for the chocolate (you bring the berries: you've got ${have}).</p>
     <p class="eyebrow" style="margin:10px 0 6px">Chocolate</p><div class="gchips">${Object.entries(DIP.choc).map(([k, n]) => `<button class="gchip${st.choc === k ? " on" : ""}" data-bba="choc:${k}" aria-pressed="${st.choc === k}">${esc(n)}</button>`).join("")}</div>
     <p class="eyebrow" style="margin:10px 0 6px">On top</p><div class="gchips">${Object.entries(DIP.tops).map(([k, n]) => `<button class="gchip${st.top === k ? " on" : ""}" data-bba="top:${k}" aria-pressed="${st.top === k}">${esc(n)}</button>`).join("")}</div>
-    ${("")}<div class="actions"><button class="btn primary" data-bba="dip" ${ok && st.choc && st.top ? "" : "disabled"}>Dip!</button></div>${have < DIP.need ? `<p class="muted">You'll need strawberries: pick your own in the rows outside.</p>` : ""}` + shut;
+    <div class="actions"><button class="btn primary" data-bba="dip" ${ok && st.choc && st.top ? "" : "disabled"}>Dip!</button></div>${have < DIP.need ? `<p class="muted">You'll need strawberries: pick your own in the rows outside.</p>` : ""}` + shut;
 }
 
 /* ---------- feeding a joey ---------- */
@@ -96,11 +96,11 @@ export function joeyDo(st, i){ if (st.step >= 4) return null;
   st.step++; return "ok"; }
 export const joeyDone = st => st.step >= 4;
 export function finishJoey(F){ const s = bbState(F); if (s.joeyDay === dayKey()) return {again: true, feeds: s.joey || 0}; s.joeyDay = dayKey(); s.joey = (s.joey || 0) + 1; return {feeds: s.joey, release: s.joey === JOEY.RELEASE}; }
-export function joeyPanel(F, st, evan){
+export function joeyPanel(F, st){
   const feeds = bbState(F).joey || 0;
   let h = tape() + `<h2>Feeding Pip</h2>`;
   if (!st) return h + `<p class="sub">Pip's an orphaned eastern grey joey, about the size of a loaf of bread, all ears and legs. Kim's handing you her bottle.${feeds >= JOEY.RELEASE ? " (Pip's gone back to the bush now, with her mob! This is her friend Clover, just in.)" : feeds ? ` You've fed her ${feeds} time${feeds === 1 ? "" : "s"}.` : ""}</p><div class="actions"><button class="btn primary" data-bba="joey">Feed her</button></div>` + shut;
-  h += `<p class="sub">${st.oops ? "Kim gently stops you: \"Not yet, love. One thing at a time.\"" : st.step === 0 ? `Warm the bottle in the jug (${st.warm} of ${JOEY.WARM}).` : st.step === 2 ? `She's sucking! Hold it steady (${st.feed} of ${JOEY.FEED}).` : "Good. What's next?"}${("")}</p>`;
+  h += `<p class="sub">${st.oops ? "Kim gently stops you: \"Not yet, love. One thing at a time.\"" : st.step === 0 ? `Warm the bottle in the jug (${st.warm} of ${JOEY.WARM}).` : st.step === 2 ? `She's sucking! Hold it steady (${st.feed} of ${JOEY.FEED}).` : "Good. What's next?"}</p>`;
   h += `<div class="bbsteps">${JOEY.STEPS.map((n, i) => `<button class="btn ${i < st.step ? "alt" : "primary"} small" data-bba="jstep:${i}" ${i < st.step ? "disabled" : ""}>${i < st.step ? "✓ " : ""}${esc(n)}</button>`).join("")}</div>`;
   return h + (joeyDone(st) ? `<div class="actions"><button class="btn primary" data-bba="fed">Night night, Pip</button></div>` : "");
 }
@@ -111,9 +111,9 @@ export const canoeStart = () => ({strokes: [], wobble: 0, last: null});
 export function paddle(st, side){ if (st.strokes.length >= CANOE.STROKES) return null; const ok = side !== st.last; if (!ok) st.wobble++; st.last = side; st.strokes.push(side); return ok; }
 export const canoeDone = st => st.strokes.length >= CANOE.STROKES;
 export function finishCanoe(F, st){ const s = bbState(F); s.canoe = (s.canoe || 0) + 1; return st.wobble <= 2; }
-export function canoePanel(F, st, evan, paid){
+export function canoePanel(F, st, _unused, paid){   // (the third argument was a flag that's gone; callers still pass it)
   let h = tape("stripe") + `<h2>A canoe down the river</h2>`;
-  if (!st) return h + `<p class="sub">Bodhi pushes you off from the bank. The river's slow and green, with gums leaning over it from both sides.${("")}</p><div class="actions"><button class="btn primary" data-bba="canoe" ${paid || F.coins >= CANOE.price ? "" : "disabled"}>Hire a canoe · ${CANOE.price} ${coin()}</button></div>` + shut;
+  if (!st) return h + `<p class="sub">Bodhi pushes you off from the bank. The river's slow and green, with gums leaning over it from both sides.</p><div class="actions"><button class="btn primary" data-bba="canoe" ${paid || F.coins >= CANOE.price ? "" : "disabled"}>Hire a canoe · ${CANOE.price} ${coin()}</button></div>` + shut;
   const n = st.strokes.length;
   h += `<p class="sub">${n ? (st.last && st.strokes.length > 1 && st.strokes[n - 1] === st.strokes[n - 2] ? "Whoa, you're going round in a circle! Swap sides." : "Gliding. The water drips off the paddle.") : "Paddle on one side, then the other, to go straight."} (${n} of ${CANOE.STROKES})</p><div class="bbriver" aria-hidden="true"><span style="left:${10 + n/CANOE.STROKES*78}%">${CANOE_SVG}</span></div>`;
   return h + (canoeDone(st) ? `<div class="actions"><button class="btn primary" data-bba="canoed">Round the bend</button></div>` : `<div class="actions"><button class="btn primary" data-bba="paddle:L">Left</button><button class="btn primary" data-bba="paddle:R">Right</button></div>`);

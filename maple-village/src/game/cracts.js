@@ -1,16 +1,14 @@
-// The Coast Road's things to join in with (round 150), each with Evan in on it:
+// The Coast Road's things to join in with (round 150):
 //   a surf lesson with Jet at Breakwater: paddle, paddle, and pop up as the wave lifts you (too soon and it rolls past,
-//     too late and it dumps you). Evan's on a foam board in the whitewash with Jet holding the tail. A photo of your
-//     first wave to keep.
+//     too late and it dumps you). A photo of your first wave to keep.
 //   whale watching from the lighthouse balcony at Lighthouse Point (humpbacks May to November, dolphins the rest of the
 //     year): sweep the binoculars across the sea and look for a blow. Win stamps a sighting card the first time.
 //   glow-worms in the grotto at Fern Gully, from 6pm: torches off, wait for your eyes, then count the little lights.
 //   cray pots with Mags at Fisher's Harbour (mornings): haul each pot, measure against the gauge, keep the big ones,
-//     throw back the little ones and the mums carrying eggs. Two crayfish to take home, once a day.
-//   the penguin parade from the hide at The Sisters, 6 to 9pm: stay very still and very quiet, and shush Evan when
-//     he's about to squeal.
-//   Nippers for Evan at Koala Cove with Coach Dimi, mornings: a beach sprint, round the buoy and back, and a dive for
-//     the flags. A medal the first time.
+//     throw back the little ones and the females carrying eggs. Two crayfish to take home, once a day.
+//   the penguin parade from the hide at The Sisters, 6 to 9pm: stay very still and very quiet.
+//   Coach Dimi's grown-ups' surf club morning at Koala Cove, mornings: a beach sprint, round the buoy and back, and a
+//     dive for the flags. A medal the first time.
 //   (and the king parrots at Koala Cove, with a scoop of seed from the park store: core.js townSpot)
 // State: F.bellbird.{surfs, surfPhoto, whales, whaleCard, dolphins, glow (best), pots (day), crays, penguins, nippers, medal}
 import { esc, dayKey } from "../util.js";
@@ -29,7 +27,7 @@ const BOARD_SVG = `<svg viewBox="0 0 40 20" width="40" height="20"><ellipse cx="
 /* ---------- a surf lesson with Jet ---------- */
 // each wave: paddle to build up, and pop up when it peaks (phase 3). Up early: it rolls past. Paddling past the peak: dumped.
 export const SURF = {price: 15, WAVES: 5, PEAK: 3};
-export const surfCost = evan => SURF.price + ((0));
+export const surfCost = _ => SURF.price + ((0));
 export const surfStart = () => ({wave: 0, phase: 0, rides: 0, last: null});
 export function surfDo(st, how){ if (st.wave >= SURF.WAVES) return null;
   if (how === "paddle") { st.phase++; if (st.phase > SURF.PEAK) { st.last = "dumped"; st.wave++; st.phase = 0; } else st.last = "paddle"; return st.last; }
@@ -37,7 +35,7 @@ export function surfDo(st, how){ if (st.wave >= SURF.WAVES) return null;
 export const surfDone = st => st.wave >= SURF.WAVES;
 export function finishSurf(F, st, addInv){ const s = bbState(F); s.surfs = (s.surfs || 0) + 1;
   if (st.rides && !s.surfPhoto && !(F.inv || {}).b_surfphoto) { s.surfPhoto = true; addInv("b_surfphoto", 1); return true; } return false; }
-export function surfPanel(F, st, evan, paid){
+export function surfPanel(F, st, _, paid){
   let h = tape("stripe") + `<h2>A surf lesson with Jet</h2>`;
   if (!st) return h + `<p class="sub">First on the sand: lie on the board, paddle, and pop up onto your feet. Then out into the little waves between the flags.${("")}</p><p class="muted">${surfCost(false)} coins with the board and wetsuit${("")}. ${bbState(F).surfs ? `You've had ${bbState(F).surfs} lesson${bbState(F).surfs === 1 ? "" : "s"}.` : ""}</p><div class="actions"><button class="btn primary" data-bba="surf" ${paid || F.coins >= surfCost(false) ? "" : "disabled"}>Out we go · ${surfCost(false)} ${coin()}</button></div>` + shut;
   if (surfDone(st)) return h + `<p class="sub">${st.rides >= 3 ? "Jet's whooping from the shallows. \"Look at you! You're a surfer!\"" : st.rides ? "You stood up! Wobbly, brief, and absolutely glorious." : "Lots of wipeouts and a mouthful of sea. Jet laughs: \"Everyone's first go. Next time.\""} ${st.rides} of ${SURF.WAVES} waves ridden.${("")}</p><div class="actions"><button class="btn primary" data-bba="surfed">Back to the sand</button></div>`;
@@ -50,7 +48,7 @@ export function surfPanel(F, st, evan, paid){
 export const WHALES = {LOOKS: 6, SECTORS: 8};
 export const whaleSeason = day => { const m = +day.slice(5, 7); return m >= 5 && m <= 11; };   // humpbacks heading north in winter, south with calves in spring
 const W_SIGNS = ["A blow! A puff of spray, then another", "A tail, lifted right out of the water, then gone", "A breach! The whole whale, up and out, and a huge splash", "A mother and her calf, rolling side by side", "A fin slapping the water, over and over"];
-const D_SIGNS = ["Dolphins! A pod of them, arcing through the swell", "A dolphin leaping clean out of a wave", "Dolphins riding the bow wave of a fishing boat", "A baby dolphin, sticking close to its mum"];
+const D_SIGNS = ["Dolphins! A pod of them, arcing through the swell", "A dolphin leaping clean out of a wave", "Dolphins riding the bow wave of a fishing boat", "A baby dolphin, sticking close to its mother"];
 export function whaleStart(day = dayKey(), rng = Math.random){ const n = 3, at = new Set(); while (at.size < n) at.add(Math.floor(rng()*WHALES.SECTORS));
   const signs = (whaleSeason(day) ? W_SIGNS : D_SIGNS).slice().sort(() => rng() - .5); return {at: [...at], signs, looked: [], seen: [], whales: whaleSeason(day)}; }
 export function whaleLook(st, i){ if (st.looked.includes(i) || st.looked.length >= WHALES.LOOKS || i < 0 || i >= WHALES.SECTORS) return null; st.looked.push(i);
@@ -58,10 +56,10 @@ export function whaleLook(st, i){ if (st.looked.includes(i) || st.looked.length 
 export const whaleDone = st => st.looked.length >= WHALES.LOOKS || st.seen.length >= st.at.length;
 export function finishWhales(F, st, addInv){ const s = bbState(F), key = st.whales ? "whales" : "dolphins"; s[key] = (s[key] || 0) + st.seen.length;
   if (st.whales && st.seen.length && !s.whaleCard && !(F.inv || {}).b_whalecard) { s.whaleCard = true; addInv("b_whalecard", 1); return true; } return false; }
-export function whalePanel(F, st, evan){
+export function whalePanel(F, st, _){
   const season = whaleSeason(dayKey());
   let h = tape("stripe") + `<h2>Whale watching</h2>`;
-  if (!st) return h + `<p class="sub">Up all hundred and twenty-eight steps, out onto the balcony round the lamp, and the whole ocean's in front of you. ${season ? "It's whale season: the humpbacks are passing, mums and calves heading south." : "The humpbacks are away (they pass from May to November), but the dolphins are here all year."} Win hands you the big binoculars.${("")}</p><div class="actions"><button class="btn primary" data-bba="whales">Look out to sea</button></div>` + shut;
+  if (!st) return h + `<p class="sub">Up all hundred and twenty-eight steps, out onto the balcony round the lamp, and the whole ocean's in front of you. ${season ? "It's whale season: the humpbacks are passing, mothers and calves heading south." : "The humpbacks are away (they pass from May to November), but the dolphins are here all year."} Win hands you the big binoculars.${("")}</p><div class="actions"><button class="btn primary" data-bba="whales">Look out to sea</button></div>` + shut;
   if (whaleDone(st)) return h + `<p class="sub">${st.seen.length ? `You saw: ${st.seen.map(s => s.split("!")[0].split(",")[0].toLowerCase()).join("; ")}.` : "Just sea, and more sea, and a container ship very far away. They're out there, though. Win says come back in an hour."}</p>${st.seen.length ? `<ul class="hlist">${st.seen.map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}<div class="actions"><button class="btn primary" data-bba="whaled">Back down the steps</button></div>`;
   h += `<p class="sub">Sweep the binoculars across the water: tap a stretch of sea to look there. ${WHALES.LOOKS - st.looked.length} looks left before your arms get tired.</p>`;
   h += `<div class="crsea">${Array.from({length: WHALES.SECTORS}, (_, i) => { const l = st.looked.includes(i), hit = l && st.at.includes(i);
@@ -105,7 +103,7 @@ export function finishPots(F, st, addInv){ const s = bbState(F); s.potRuns = (s.
 export function potsPanel(F, st, o){
   let h = tape("stripe") + `<h2>Cray pots with Mags</h2>`;
   if (!st) { if (!potsOpen(o.hm)) return h + `<p class="sub">Mags goes out at first light and she's back and done by lunch. Come in the morning and she'll take you out to her pots.</p>` + shut;
-    return h + `<p class="sub">Out in the bay in Mags's little boat, the Molly B. Five floats bobbing: five pots on the bottom. She hands you the brass gauge: "Under it, back it goes. And any mum with eggs under her tail goes back too, whatever her size."${("")}${bbState(F).pots === dayKey() ? " (You've had your crays today: this one's for the fun of it.)" : ""}</p><div class="actions"><button class="btn primary" data-bba="pots">Out to the pots</button></div>` + shut; }
+    return h + `<p class="sub">Out in the bay in Mags's little boat, the Molly B. Five floats bobbing: five pots on the bottom. She hands you the brass gauge: "Under it, back it goes. And any mother with eggs under her tail goes back too, whatever her size."${("")}${bbState(F).pots === dayKey() ? " (You've had your crays today: this one's for the fun of it.)" : ""}</p><div class="actions"><button class="btn primary" data-bba="pots">Out to the pots</button></div>` + shut; }
   if (potsDone(st)) return h + `<p class="sub">${st.right === st.pots.length ? "Mags nods slowly. \"You'd make a deckhand.\"" : st.right >= st.pots.length - 1 ? "\"Nearly perfect,\" says Mags. \"Better than Davo his first week.\"" : "\"You'll get the hang of the gauge,\" Mags says, and checks the crays you kept, just in case."} Back to the wharf with the gulls following.</p><div class="actions"><button class="btn primary" data-bba="potted">Tie up at the wharf</button></div>`;
   const p = st.pots[st.i], say = {kept: "Into the tank! A beauty.", back: "Over the side, and off she scoots backwards. Good call.", small: "Mags shakes her head: \"Under the gauge, love. Back he goes.\" Over the side.", berried: "\"See those eggs under her tail? She stays.\" Mags lowers her back in, gently.", big: "\"That one was over the gauge!\" Too late: it's off. Mags laughs. \"Next one.\"", empty: "Empty. Just a bit of weed and a cranky crab, who goes back."}[st.last];
   h += say ? `<p class="muted">${esc(say)}</p>` : "";
@@ -115,10 +113,10 @@ export function potsPanel(F, st, o){
 }
 
 /* ---------- the penguin parade ---------- */
-// rounds as the light goes: mostly just stay still; now and then Evan's about to squeal and needs a shush
+// rounds as the light goes: mostly just stay still (fidget and they're off)
 export const PENG = {from: 18*60, to: 21*60, ROUNDS: 6};
 export const pengOpen = hm => hm >= PENG.from && hm < PENG.to;
-export function pengStart(evan, rng = Math.random){ return {round: 0, here: 0, fright: 0, squeal: Array.from({length: PENG.ROUNDS}, () => false), last: null}; }
+export function pengStart(_, rng = Math.random){ return {round: 0, here: 0, fright: 0, squeal: Array.from({length: PENG.ROUNDS}, () => false), last: null}; }
 export function pengDo(st, how, rng = Math.random){ if (st.round >= PENG.ROUNDS) return null; const need = st.squeal[st.round] ? "shush" : "still";
   const ok = how === need; const n = ok ? 2 + Math.floor(rng()*5) : 0; st.here += n; if (!ok) st.fright++; st.last = ok ? (how === "shush" ? "shushed" : "still") : (need === "shush" ? "squeal" : "fidget"); st.round++; return n; }
 export const pengDone = st => st.round >= PENG.ROUNDS;
@@ -129,13 +127,12 @@ export function pengPanel(F, st, o){
   if (!st) return h + `<p class="sub">Into the hide, onto the long bench, and the window onto the sand. No torches, no cameras, and not a peep: they're shy. The sun's going down behind the Sisters.${("")}</p><div class="actions"><button class="btn primary" data-bba="peng">Settle in</button></div>` + shut;
   if (pengDone(st)) return h + `<p class="sub">${st.here} little penguins waddled home up the beach, flippers out, chattering, and disappeared into their burrows in the dunes.${st.fright ? " A couple of groups scuttled back into the sea first, but they'll try again later." : " Not one of them was frightened."}${("")}</p><div class="actions"><button class="btn primary" data-bba="penged">Tiptoe out</button></div>`;
   const lights = ["The sun's touching the sea.", "Pink sky. Something moves at the edge of the water...", "A little huddle of penguins, standing in the shallows, deciding.", "They're coming! Up the sand, in a line, flippers out.", "More, and more. One falls over and gets straight back up.", "Nearly dark. The last few hurry past right under the window."][st.round];
-  const was = {still: "They pass right by. You hold your breath.", shushed: "A finger to your lips; Evan clamps his hands over his mouth, eyes huge. The penguins keep coming.", squeal: "\"PENGUINS!\" squeaks Evan. The whole group turns and scurries back into the waves.", fidget: "The bench creaks. Three penguins freeze, then hop back into the sea."}[st.last];
-  const evanAbout = st.squeal[st.round];
+  const was = {still: "They pass right by. You hold your breath.", shushed: "A finger to your lips; the man down the bench swallows a sneeze. The penguins keep coming.", squeal: "\"PENGUINS!\" squeaks someone down the bench. The whole group turns and scurries back into the waves.", fidget: "The bench creaks. Three penguins freeze, then hop back into the sea."}[st.last];
   return h + (was ? `<p class="muted">${esc(was)}</p>` : "") + `<p class="sub">${lights}${("")}</p><div class="crpeng" aria-hidden="true">${PENG_SVG.repeat(Math.min(st.here, 24))}</div><div class="actions"><button class="btn primary" data-bba="pstill">Stay very still</button>${("")}</div><p class="muted">${st.here} so far.</p>`;
 }
 
-/* ---------- Nippers for Evan ---------- */
-// legs of the race: cheer him on, and when a wave comes, tell him to duck under it
+/* ---------- Coach Dimi's surf club morning ---------- */
+// legs of the race: push on, and when a wave comes, duck under it
 export const NIP = {from: 9*60, to: 12*60, LEGS: ["The beach sprint", "Wading out to the buoy", "Round the buoy", "Back up the sand", "The dive for the flags"]};
 export const nipOpen = hm => hm >= NIP.from && hm < NIP.to;
 export const nipStart = (rng = Math.random) => ({leg: 0, wave: NIP.LEGS.map((_, i) => (i === 1 || i === 2) && rng() < .6), slips: 0, last: null});
@@ -145,12 +142,11 @@ export const nipPlace = st => Math.min(st.slips + 1, 4);
 export function finishNip(F, st, addInv){ const s = bbState(F); s.nippers = (s.nippers || 0) + 1; const place = nipPlace(st); if (place === 1) s.nipWins = (s.nipWins || 0) + 1;
   if (!s.medal && !(F.inv || {}).b_nipmedal) { s.medal = true; addInv("b_nipmedal", 1); return {place, medal: true}; } return {place, medal: false}; }
 export function nipPanel(F, st, o){
-  let h = tape("stripe") + `<h2>Nippers</h2>`;
-  return h + `<p class="sub">Little lifesavers, five to thirteen, in red and yellow caps, racing to the flags. Coach Dimi says Evan can join in any morning: bring him along.</p>` + shut;
-  if (!nipOpen(o.hm)) return h + `<p class="sub">Nippers is on in the mornings, nine till twelve, at the river mouth beach. Coach Dimi says bring Evan back then.</p>` + shut;
-  if (!st) return h + `<p class="sub">Coach Dimi pulls a red and yellow cap down over Evan's ears and lines him up with the under-sixes. "Run to the water, out round the buoy, back up the sand, and dive for a flag. Parents cheer. Loudly."${(bbState(F).nippers || 0) ? ` (Evan's done Nippers ${bbState(F).nippers} time${bbState(F).nippers === 1 ? "" : "s"}.)` : ""}</p><div class="actions"><button class="btn primary" data-bba="nip">On your marks...</button></div>` + shut;
-  if (nipDone(st)) { const place = nipPlace(st); return h + `<p class="sub">${["Evan's first! He's holding the flag over his head and running in circles.", "Second! He dived for the flag and got a mouthful of sand, and he doesn't care at all.", "Third! He's beaming. Coach Dimi high-fives him.", "He came in last, smiling the whole way, and stopped to show a shell to the girl next to him."][place - 1]}</p><div class="actions"><button class="btn primary" data-bba="nipped">Hot chips at the surf club</button></div>`; }
-  const was = {cheer: "\"GO EVAN!\" He goes faster.", duck: "\"Duck under!\" He does, and pops up the other side, spluttering and grinning.", dunked: "A wave knocks him flat! He comes up, wipes his eyes, keeps going.", dawdle: "He stopped to wave at you. Lots of waving."}[st.last];
+  let h = tape("stripe") + `<h2>Coach Dimi's surf club morning</h2>`;
+  if (!nipOpen(o.hm)) return h + `<p class="sub">Coach Dimi's surf club mornings are nine till twelve on the river mouth beach: beach flags, a swim round the buoy, and hot chips after. Come back then.</p>` + shut;
+  if (!st) return h + `<p class="sub">Coach Dimi pulls a red and yellow cap down over your ears and lines you up with the grown-ups. "Run to the water, out round the buoy, back up the sand, and dive for a flag. Wave coming? Duck under it. Otherwise, go!"${(bbState(F).nippers || 0) ? ` (You've done ${bbState(F).nippers} surf club morning${bbState(F).nippers === 1 ? "" : "s"}.)` : ""}</p><div class="actions"><button class="btn primary" data-bba="nip">On your marks...</button></div>` + shut;
+  if (nipDone(st)) { const place = nipPlace(st); return h + `<p class="sub">${["First! You're holding the flag over your head, sandy to the eyebrows.", "Second! You dived for the flag and got a mouthful of sand. Worth it.", "Third! Coach Dimi high-fives you all the same.", "Last over the line, laughing the whole way. Coach Dimi says that's the spirit."][place - 1]}</p><div class="actions"><button class="btn primary" data-bba="nipped">Hot chips at the surf club</button></div>`; }
+  const was = {cheer: "You dig in and go faster. Coach Dimi whoops.", duck: "You duck under the wave and pop up the other side, spluttering and grinning.", dunked: "A wave knocks you flat! Up you come, wiping your eyes, and keep going.", dawdle: "You stopped to duck a wave that never came. Everyone else kept going."}[st.last];
   const wave = st.wave[st.leg];
-  return h + (was ? `<p class="muted">${esc(was)}</p>` : "") + `<p class="sub">${esc(NIP.LEGS[st.leg])}.${wave ? " A wave's rolling in towards the little ones..." : ""}</p><div class="actions"><button class="btn primary" data-bba="ncheer">Cheer!</button><button class="btn alt" data-bba="nduck">"Duck under!"</button></div>`;
+  return h + (was ? `<p class="muted">${esc(was)}</p>` : "") + `<p class="sub">${esc(NIP.LEGS[st.leg])}.${wave ? " A wave's rolling in towards you..." : ""}</p><div class="actions"><button class="btn primary" data-bba="ncheer">Push on!</button><button class="btn alt" data-bba="nduck">Duck under!</button></div>`;
 }

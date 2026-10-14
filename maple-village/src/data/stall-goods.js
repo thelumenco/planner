@@ -1,14 +1,14 @@
 // More things to buy at the market stalls: each stall keeps a signature item (the first in its tours.js list) and
 // rotates a few more from its pool, so no two market days offer quite the same things (core.js stallItems).
 // Every good is a gift. art: [icon shape, colour, second colour] drawn by icons.js (marketIcon). Nothing with dairy
-// goes to Marcus (lactose intolerant), so dairy things name who they suit instead of "family".
-const NOM = ["bo", "farid", "mei", "hana", "theo", "posy"];   // everyone but Marcus
+// goes to Tomi (lactose intolerant), so dairy things name who they suit instead of "family" (any friend).
+const NOM = ["bo", "farid", "mei", "hana", "theo", "posy"];   // everyone but Tomi
 const G = (n, to, price, tab, say, art, says) => ({n, kind: "gift", to, price, tab, say, art, ...(says ? {says} : {})});
 export const GOODS = {
   // ---- Sunday farmers market ----
   // Elena: cheese and olives
   cheddar: G("Aged cheddar wedge", ["bo", "theo", "mei"], 9, "market", "A wedge of aged cheddar! Crumbly and sharp.", ["wedge", "#F3C969"], {bo: "Cheese and crackers tonight. Sorted."}),
-  olivejar: G("Jar of marinated olives", ["bo", "theo", "hana", "posy", "tomi"], 8, "market", "Marinated olives, with garlic and herbs.", ["jar", "#7D8F45", "#E8D3A6"], {tomi: "Olives! Healthy fats, Zeh. Approved."}),
+  olivejar: G("Jar of marinated olives", ["bo", "theo", "hana", "posy", "tomi"], 8, "market", "Marinated olives, with garlic and herbs.", ["jar", "#7D8F45", "#E8D3A6"], {tomi: "Olives! Healthy fats. Approved."}),
   figjam: G("Fig and walnut jam", "family", 7, "market", "Fig jam! That's going on everything.", ["jar", "#7A4A6E", "#F4EEE3"]),
   crackers: G("Rosemary crackers", "family", 5, "market", "Rosemary crackers, still crisp.", ["box", "#E3C59F", "#9CC27E"]),
   goatcheese: G("Herbed goat's cheese", ["bo", "hana", "posy", "theo"], 9, "market", "Soft goat's cheese rolled in herbs.", ["wheel", "#FFFDF6", "#9CC27E"]),
@@ -16,7 +16,7 @@ export const GOODS = {
   lavhoney: G("Lavender honey", "family", 9, "market", "Lavender honey! It tastes like a garden.", ["jar", "#C9A3E0", "#E8D3A6"]),
   honeysticks: G("Honey sticks", ["posy", "farid", "mei"], 4, "market", "Honey straws! Bite the end and slurp.", ["sticks", "#F3C969"], {}),
   lipbalm: G("Beeswax lip balm", ["hana", "posy", "farid"], 5, "market", "Beeswax lip balm. Smells like honey.", ["tube", "#F3D98A"]),
-  beewraps: G("Beeswax food wraps", ["farid", "hana", "bo"], 8, "market", "Beeswax wraps for the leftovers. No more cling film.", ["cloth", "#F3C969", "#E8566C"], {farid: "Aiyo, so clever! Ma Ma's using these for the kueh."}),
+  beewraps: G("Beeswax food wraps", ["farid", "hana", "bo"], 8, "market", "Beeswax wraps for the leftovers. No more cling film.", ["cloth", "#F3C969", "#E8566C"], {farid: "Oh, clever! I'll wrap the almond cake in these."}),
   honeylemon: G("Honey lemon cordial", "family", 7, "market", "Honey lemon cordial. Add hot water, feel better.", ["bottle", "#F3D34A"]),
   mead: G("Bottle of mead", ["bo", "theo", "mei"], 12, "market", "Honey wine! The oldest drink there is.", ["bottle", "#E3A23A"]),
   // Grace: handmade soap
@@ -26,7 +26,7 @@ export const GOODS = {
   shampoobar: G("Shampoo bar", ["bo", "hana", "posy", "tomi"], 7, "market", "A shampoo bar. No plastic bottle!", ["soap", "#9FD3C2"]),
   handcream: G("Rose hand cream", ["farid", "hana", "posy"], 8, "market", "Rose hand cream, for after the garden.", ["tube", "#F2A0B8"]),
   bathsalts: G("Lavender bath salts", ["hana", "posy", "farid", "bo"], 7, "market", "Bath salts. A long soak tonight.", ["jar", "#C9A3E0", "#FFFDF6"]),
-  soap_dino: G("Dinosaur soap", "evan", 5, "market", "A DINOSAUR SOAP! RAWR in the bath!", ["soap", "#9CC27E"]),
+  soap_dino: G("Dinosaur soap", ["tomi", "posy"], 5, "market", "A dinosaur soap! Rawr, in the bath.", ["soap", "#9CC27E"]),
   loofah: G("Natural loofah", ["bo", "hana", "farid"], 4, "market", "A loofah. Grown, not made!", ["loaf", "#E3D29A"]),
   soycandle: G("Fig soy candle", ["hana", "posy", "farid", "bo"], 9, "market", "A fig-scented candle in a tin.", ["candle", "#7A4A6E"]),
   // Ben: craft beer
@@ -35,7 +35,7 @@ export const GOODS = {
   cider: G("Apple cider", ["bo", "theo", "posy", "tomi"], 8, "market", "Dry apple cider, pressed up the hill.", ["bottle", "#B9D98A"]),
   rootbeer: G("Root beer", ["bo", "tomi"], 4, "market", "Old-fashioned root beer!", ["bottle", "#6B3A2A"], {}),
   // Dev: bakery
-  eggtart: G("Egg tart", NOM, 4, "market", "A warm egg tart! The pastry's so flaky.", ["tart", "#F3C969"], {farid: "Dan tat! Still warm. Ma Ma's favourite."}),
+  eggtart: G("Egg tart", NOM, 4, "market", "A warm egg tart! The pastry's so flaky.", ["tart", "#F3C969"], {farid: "Still warm! The pastry's nearly as good as my uncle's."}),
   croissant: G("Butter croissant", NOM, 4, "market", "A croissant, all buttery layers.", ["crescent", "#E3A85A"]),
   bananabread: G("Banana bread", "family", 6, "market", "A slice of banana bread, still warm.", ["loaf", "#C98A4A"]),
   cinnamonbun: G("Cinnamon bun", NOM, 5, "market", "A sticky cinnamon bun!", ["bun", "#C98A4A", "#FFFDF6"]),
@@ -47,12 +47,12 @@ export const GOODS = {
   candyapple: G("Candy apple", ["posy", "farid", "hana"], 4, "fair", "A candy apple! Shiny and crunchy.", ["apple", "#C2334D"]),
   popcorn: G("Bag of popcorn", "family", 3, "fair", "Popcorn, salty and sweet.", ["bag", "#FFFDF6", "#E8566C"]),
   cottoncandy: G("Cotton candy", ["posy", "farid"], 3, "fair", "Pink cotton candy!", ["cloud", "#F4C7CF"], {}),
-  muahchee: G("Muah chee", "family", 4, "fair", "Muah chee, rolled in peanuts.", ["box", "#FFFDF6", "#C98A4A"], {mei: "Muah chee! Like the pasar malam last time."}),
+  muahchee: G("Muah chee", "family", 4, "fair", "Muah chee, rolled in peanuts.", ["box", "#FFFDF6", "#C98A4A"], {mei: "Muah chee. Like the night market, last time."}),
   minipancakes: G("Mini pancakes", "family", 4, "fair", "A paper boat of mini pancakes!", ["boat", "#E3A85A"]),
 
   // ---- Night market ----
   // Yun: Taiwanese street snacks
-  popcornchicken: G("Popcorn chicken", ["bo", "tomi", "theo", "mei"], 6, "night", "Taiwanese popcorn chicken, with basil!", ["boat", "#D99A4A"], {tomi: "Protein bites! Zeh, you get me."}),
+  popcornchicken: G("Popcorn chicken", ["bo", "tomi", "theo", "mei"], 6, "night", "Taiwanese popcorn chicken, with basil!", ["boat", "#D99A4A"], {tomi: "Protein bites! You get me."}),
   pepperbun: G("Pepper bun", ["bo", "theo", "mei", "tomi"], 5, "night", "Hu jiao bing, straight off the tandoor wall.", ["bun", "#D9A86A", "#4A3226"]),
   guabao: G("Gua bao", ["bo", "theo", "tomi", "posy"], 6, "night", "Braised pork in a fluffy bun.", ["bao", "#FFFDF6", "#A8432E"]),
   taroballs: G("Taro ball dessert", "family", 5, "night", "Chewy taro balls in syrup.", ["bowl", "#C9A3E0"]),
@@ -82,12 +82,12 @@ export const GOODS = {
   cattee: G("Cat tee", ["posy", "hana"], 7, "night", "A tee with a cat on it!", ["tee", "#F4C7CF"]),
   tote: G("Canvas tote bag", ["hana", "posy", "farid"], 6, "night", "A tote bag! For the market.", ["tote", "#F3E7C9", "#E8566C"]),
   sleepmask: G("Silk sleep mask", ["hana", "posy", "bo"], 6, "night", "A silk sleep mask. Proper rest.", ["mask", "#C3CDEE"]),
-  beanie: G("Knit beanie", ["bo", "tomi", "theo", "mei"], 6, "night", "A knit beanie for the aircon.", ["beanie", "#7FA35A"]),
-  dinosocks: G("Dinosaur socks", "evan", 3, "night", "DINOSAUR SOCKS!", ["sock", "#9CC27E", "#F3C969"]),
+  beanie: G("Knit beanie", ["bo", "tomi", "theo", "mei"], 6, "night", "A knit beanie for chilly evenings.", ["beanie", "#7FA35A"]),
+  dinosocks: G("Dinosaur socks", ["tomi", "bo"], 3, "night", "Dinosaur socks! Rawr.", ["sock", "#9CC27E", "#F3C969"]),
   // Lior: lanterns and lamps (the decor stays; these are gifts)
   minilantern: G("Mini paper lantern", ["farid", "mei", "hana"], 5, "night", "A little paper lantern!", ["lantern", "#E8566C"]),
   starlights: G("Jar of fairy lights", ["posy", "hana"], 7, "night", "Fairy lights in a jar! For the bedroom.", ["jar", "#FFF3C4", "#E8D3A6"]),
-  rabbitlamp: G("Rabbit night light", "evan", 8, "night", "A bunny night light! It glows!", ["plush", "#FFFDF6"]),
+  rabbitlamp: G("Rabbit night light", ["posy", "hana"], 8, "night", "A bunny night light! It glows.", ["plush", "#FFFDF6"]),
   incense: G("Sandalwood incense", ["farid", "mei", "theo"], 4, "night", "Sandalwood incense. Very calming.", ["sticks", "#A8754F"]),
   // Wen: sweets
   dragonbeard: G("Dragon's beard candy", "family", 5, "night", "Dragon's beard candy, like silk threads!", ["box", "#FFFDF6", "#F3C969"]),
@@ -101,36 +101,36 @@ export const GOODS = {
   chrystea: G("Chrysanthemum tea", ["farid", "mei", "theo", "hana"], 3, "night", "Chrysanthemum tea. Good for the eyes!", ["cup", "#F3D34A"]),
   coconutshake: G("Coconut shake", "family", 5, "night", "A coconut shake, straight from the coconut.", ["coconut", "#7FA35A"])
 };
-// The Cocoa Room's bars (cocoa.js), to give: dark is dairy-free, so it suits Marcus too
+// The Cocoa Room's bars (cocoa.js), to give: dark is dairy-free, so it suits Tomi too
 Object.assign(GOODS, {
-  bar_milk: {...G("Milk chocolate bar", NOM, 6, "cocoa", "Your own chocolate! Smooth and creamy.", ["bar", "#8A5A3A"]), says: {farid: "You made this? From the bean? Aiyo, so clever."}},
-  bar_dark: {...G("Dark chocolate bar", "family", 6, "cocoa", "Dark chocolate, made from the bean! Rich.", ["bar", "#4A2E22"]), says: {tomi: "Dark choc, no dairy. Antioxidants, Zeh. Approved.", theo: "Dark chocolate with my coffee. Perfect."}},
-  pairbox: G("Wine and chocolate pairing box", ["bo", "theo", "hana", "posy", "farid", "mei"], 40, "cocoa", "Your wine AND your bonbons? In one box? I'm saving this for a special night.", ["box", "#7A1F3D", "#F3C969"], {bo: "Wine and chocolate. You know me so well.", theo: "Ah Gong will share it with your mum. Maybe."}),
-  sp_log: G("Chocolate yule log", "family", 18, "cocoa", "A chocolate log! It's Christmas now, officially.", null, {tomi: "Dark choc log, no dairy. Merry Christmas, Zeh."}),
-  sp_coins: G("Box of gold chocolate coins", NOM, 12, "cocoa", "Gold coins! Huat ah! So much luck in one box.", ["box", "#F3C969", "#D9433A"], {farid: "Gold coins for Ma Ma? Huat ah!"}),
-  sp_spiced: G("Spiced chocolate box", "family", 12, "cocoa", "Cardamom and chocolate? Oh, that's lovely. Happy Deepavali!", ["box", "#4A2E22", "#F6A23A"], {tomi: "Dark and spiced, dairy-free. Happy Deepavali, Zeh."}),
-  sp_mooncake: G("Chocolate mooncake", NOM, 10, "cocoa", "A chocolate mooncake! Let's have it under the lanterns.", null, {farid: "Chocolate mooncake? Ma Ma never try before. So modern!"}),
+  bar_milk: {...G("Milk chocolate bar", NOM, 6, "cocoa", "Your own chocolate! Smooth and creamy.", ["bar", "#8A5A3A"]), says: {farid: "You made this? From the bean? That's proper baking, that is."}},
+  bar_dark: {...G("Dark chocolate bar", "family", 6, "cocoa", "Dark chocolate, made from the bean! Rich.", ["bar", "#4A2E22"]), says: {tomi: "Dark choc, no dairy. Antioxidants. Approved.", theo: "Dark chocolate with my coffee. Perfect."}},
+  pairbox: G("Wine and chocolate pairing box", ["bo", "theo", "hana", "posy", "farid", "mei"], 40, "cocoa", "Your wine AND your bonbons? In one box? I'm saving this for a special night.", ["box", "#7A1F3D", "#F3C969"], {bo: "Wine and chocolate. You know me so well.", theo: "Received with thanks. I shall share it with Hana. Officially."}),
+  sp_log: G("Chocolate yule log", "family", 18, "cocoa", "A chocolate log! It's Christmas now, officially.", null, {tomi: "Dark choc log, no dairy. Merry Christmas!"}),
+  sp_coins: G("Box of gold chocolate coins", NOM, 12, "cocoa", "Gold coins! So much luck in one box.", ["box", "#F3C969", "#D9433A"], {farid: "Gold coins! I'll hang a few in the trees for luck."}),
+  sp_spiced: G("Spiced chocolate box", "family", 12, "cocoa", "Cardamom and chocolate? Oh, that's lovely. Happy Deepavali!", ["box", "#4A2E22", "#F6A23A"], {tomi: "Dark and spiced, dairy-free. Happy Deepavali!"}),
+  sp_mooncake: G("Chocolate mooncake", NOM, 10, "cocoa", "A chocolate mooncake! Let's have it under the lanterns.", null, {farid: "A chocolate mooncake? I've never tried one. How modern!"}),
   box16: G("Grand box of 16 bonbons", NOM, 50, "cocoa", "Sixteen bonbons, in a ribbon box! I'm going to make these last. I'm not.", ["box", "#C2505F", "#F3C969"]),
-  box16d: G("Grand box of 16 dark bonbons", "family", 50, "cocoa", "Sixteen dark bonbons, all dairy-free! This is a treasure chest.", ["box", "#4A2E22", "#C2505F"], {tomi: "Sixteen, dairy-free. You spoil me, Zeh."}),
+  box16d: G("Grand box of 16 dark bonbons", "family", 50, "cocoa", "Sixteen dark bonbons, all dairy-free! This is a treasure chest.", ["box", "#4A2E22", "#C2505F"], {tomi: "Sixteen, dairy-free. You spoil me."}),
   box4: G("Box of 4 bonbons", NOM, 14, "cocoa", "A little box of your bonbons! Too pretty to eat. Almost.", ["box", "#8A5A3A", "#F3E7C9"]),
-  box4d: G("Box of 4 dark bonbons", "family", 14, "cocoa", "Dark chocolate bonbons, all dairy-free!", ["box", "#4A2E22", "#F3C969"], {tomi: "Dairy-free bonbons? You thought of everything, Zeh."}),
-  box9: G("Box of 9 bonbons", NOM, 30, "cocoa", "A whole box of bonbons! Every one different.", ["box", "#8A5A3A", "#E8566C"], {hana: "Nine! I'll share them with Dad. Maybe.", farid: "So beautiful, like jewels. Ma Ma keep for special guests."}),
+  box4d: G("Box of 4 dark bonbons", "family", 14, "cocoa", "Dark chocolate bonbons, all dairy-free!", ["box", "#4A2E22", "#F3C969"], {tomi: "Dairy-free bonbons? You thought of everything."}),
+  box9: G("Box of 9 bonbons", NOM, 30, "cocoa", "A whole box of bonbons! Every one different.", ["box", "#8A5A3A", "#E8566C"], {hana: "Nine! I'll share them with Theo. Maybe.", farid: "Like little jewels. I'll keep these for special guests."}),
   box9d: G("Box of 9 dark bonbons", "family", 30, "cocoa", "Nine dark bonbons, all dairy-free!", ["box", "#4A2E22", "#E8566C"]),
   bar_white: {...G("White chocolate bar", NOM, 6, "cocoa", "White chocolate, sweet and vanilla-y.", ["bar", "#F3E7C9"]), says: {}}
 });
-// Keepsakes: little things to put on a shelf in Mel's buildings (the Scoop Shack, the wine shop, home, her room, the
-// app houses): companions.js places them. Pets: adopted at the market's adoption corner, then given to someone in
-// the family, who looks after it on the screen Mel picks (companions.js).
+// Keepsakes: little things to put on a shelf in your buildings (the Scoop Shack, the wine shop, home, your room, the
+// app houses): companions.js places them. Pets: adopted at the market's adoption corner, then given to one of your
+// friends, who looks after it on the screen you pick (companions.js).
 const K = (n, price, line, art) => ({n, kind: "keepsake", price, line, art});
 const P = (n, price, line, art, pet) => ({n, kind: "pet", price, line, art, pet, say: "A new friend! I promise to look after it, always."});
 // story rewards (game/stories.js): not sold anywhere, given by villagers as their stories unfold
 Object.assign(GOODS, {
   s_recipebook: K("Henri's recipe book", 0, "Henri Marchand's chocolate recipes, in faded ink, 1962 onwards.", ["box", "#8A5A3A"]),
-  s_label: K("The first Marchand label", 0, "Dad's painting of the Marchand & Fille label: a ribbon and a copper pot.", ["star", "#E8C48E"]),
+  s_label: K("The first Marchand label", 0, "Theo's painting of the Marchand & Fille label: a ribbon and a copper pot.", ["star", "#E8C48E"]),
   s_praline: G("Henri's hazelnut pralines", "family", 0, null, "Hazelnut pralines, from Henri's own recipe. Melt-in-the-mouth.", ["box", "#C98A4A"]),
   s_toast: G("Postman's toast", "family", 0, null, "Honey, butter and a pinch of sea salt. Hana's new favourite.", ["loaf", "#E3B04B"]),
   s_spoon: K("Tomás's olive-wood spoon", 0, "An olive-wood spoon Tomás Ruiz carved in 1913 from a branch of the tree by the mill. Worn smooth by four generations of soup.", ["roll", "#C9A27E"]),
-  s_poem: K("A poem from Jason", 0, "In Jason's neat hand, on cream paper: 'The late train came. The harbour lights stayed on. / The pizza cooled; I'd read my book twice through. / Some evenings are not lost, they're only long. / I'd wait again. I'd always wait for you.'", ["roll", "#FFFDF6"]),
+  s_poem: K("A verse from Ornella", 0, "In a neat hand, on cream paper, from the yellow house by the harbour: 'The harbour lights came on, then all at once. / The farinata cooled; the swallows went to bed. / Some evenings are not lost, they're only long. / Stay longer, stay a little, the water said.'", ["roll", "#FFFDF6"]),
   s_nonna: G("Nonna's fior di latte", "family", 0, null, "Just milk and sugar, the way Sofia's nonna made it in Napoli.", ["cone", "#FFF6DC"])
 });
 Object.assign(GOODS, {
@@ -155,24 +155,24 @@ Object.assign(GOODS, {
   pet_tortoise: P("Tortoise", 22, "A slow, wise little tortoise, looking for a home.", ["tortoise", "#7FA35A"], "tortoise"),
   pet_duckling: P("Duckling", 12, "A fluffy yellow duckling, looking for a home.", ["duck", "#F3D34A"], "duckling")
 });
-// round 172: the Christmas market (20 November to Christmas Eve, game/tours.js XMAS). Ma Ma's wreaths, Hana's
+// round 172: the Christmas market (20 November to Christmas Eve, game/tours.js XMAS). Farid's wreaths, Hana's
 // gingerbread and tree ornaments, Hiro's wooden toys. (The chestnuts and hot chocolate are treats, eaten on the spot:
 // game/xmas.js TREATS.) Ornaments and wreaths are keepsakes: a shelf, or the tree at home
 Object.assign(GOODS, {
-  xm_wreath: K("Holly wreath", 12, "A wreath Ma Ma made at her Christmas market stall: holly from the orchard hedge, ivy from the back fence, a red ribbon. She tied the bow twice to get it right.", ["ring", "#4F7A4A", "#C8432F"]),
-  xm_bouquet: G("Winter bouquet", "family", 8, "market", "Winter flowers from Ma Ma! Red and white, with a sprig of pine.", ["bouquet", "#C8432F", "#FFFDF6"], {farid: "Aiyo, you buy Ma Ma's own flowers back? Silly girl. Thank you."}),
-  xm_mistletoe: K("Sprig of mistletoe", 4, "A sprig of mistletoe from Ma Ma's stall, tied with red thread. Darren keeps hanging it in doorways.", ["sprig", "#7FA35A", "#FFFDF6"]),
+  xm_wreath: K("Holly wreath", 12, "A wreath Farid made at his Christmas market stall: holly from the orchard hedge, ivy from the back fence, a red ribbon. He tied the bow twice to get it right.", ["ring", "#4F7A4A", "#C8432F"]),
+  xm_bouquet: G("Winter bouquet", "family", 8, "market", "Winter flowers from Farid's stall! Red and white, with a sprig of pine.", ["bouquet", "#C8432F", "#FFFDF6"], {farid: "You're buying my own flowers back? Silly thing. Thank you, truly."}),
+  xm_mistletoe: K("Sprig of mistletoe", 4, "A sprig of mistletoe from Farid's stall, tied with red thread. Bo keeps hanging it in doorways.", ["sprig", "#7FA35A", "#FFFDF6"]),
   xm_ginger: G("Gingerbread person", ["bo", "farid", "mei", "hana", "theo", "posy", "tomi"], 3, "market", "A gingerbread person, iced by Hana! Which leg first?", ["ginger", "#C98A4A", "#FFFDF6"], {}),
   xm_bauble: K("Glass bauble", 5, "A glass bauble from Hana's Christmas stall, deep red with a gold band. It catches the fairy lights.", ["bauble", "#C8432F", "#F3C969"]),
   xm_star: K("Straw star", 4, "A star woven from straw, the old way, from Hana's Christmas stall. It's for the top of the tree, or a window.", ["star", "#F3D98A"]),
   xm_angel: K("Felt angel", 6, "A little felt angel with a gold halo, sewn by Hana's aunt. Her wings are slightly different sizes. That's the charm.", ["angel", "#FFFDF6", "#F3C969"]),
-  xm_train: G("Wooden train", "evan", 14, "market", "A wooden train! Three carriages and a funnel.", ["train", "#C8432F", "#7FB8E8"], {}),
-  xm_horse: G("Little rocking horse", "evan", 18, "market", "A little rocking horse, painted dapple grey.", ["horse", "#E6DDF2", "#C8432F"], {}),
+  xm_train: G("Wooden train", ["theo", "bo"], 14, "market", "A wooden train! Three carriages and a funnel.", ["train", "#C8432F", "#7FB8E8"], {}),
+  xm_horse: G("Little rocking horse", ["posy", "farid"], 18, "market", "A little rocking horse, painted dapple grey. For the shelf.", ["horse", "#E6DDF2", "#C8432F"], {}),
   xm_yoyo: G("Painted yo-yo", ["tomi", "bo"], 4, "market", "A painted wooden yo-yo!", ["yoyo", "#F3C969", "#E8566C"], {tomi: "Walk the dog. Watch. ...okay, watch again."}),
   // round 174: keepsakes from the grotto and the Christmas Eve lantern walk (not for sale anywhere)
-  xm_santaphoto: K("Evan's photo with Santa", 0, "Evan on Santa's knee in the grotto on the field, holding his present with both hands, very serious. Pip the elf is photobombing in the corner.", ["tile", "#C8432F", "#FFFDF6"]),
+  xm_santaphoto: K("Your photo with Santa", 0, "You, sat beside Santa in the grotto on the field, holding your present with both hands, very serious. Pip the elf is photobombing in the corner.", ["tile", "#C8432F", "#FFFDF6"]),
   xm_lantern: K("A paper lantern from the Christmas Eve walk", 0, "The paper lantern you carried round the field on Christmas Eve, the whole village walking together in the dark, the tree lit up at the end. The candle's burnt down to a stub. You kept it anyway.", ["lantern", "#FFE9A8"]),
-  xm_ark: G("Noah's ark", "evan", 22, "market", "A wooden ark, with animals two by two!", ["ark", "#A8754F", "#9CC27E"], {})
+  xm_ark: G("Noah's ark", ["bo", "farid"], 22, "market", "A wooden ark, with animals two by two!", ["ark", "#A8754F", "#9CC27E"], {})
 });
 // what else each stall keeps in its pool, besides the items in tours.js (keyed by stall keeper)
 export const POOLS = {

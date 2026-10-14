@@ -1,19 +1,19 @@
-// Orchard tours and visits. Weekends: four paid tours a day (10am, 11:30, 2pm, 4pm), each led by Ma Ma, Gong Gong,
-// Farid or Mei, taking a small group of villagers round the orchard and then the flower farm (a different mix every
-// time). Weekdays: Darren leads a tour after work on Tuesdays and Thursdays. Every day a couple of villagers also
+// Orchard tours and visits. Weekends: four paid tours a day (10am, 11:30, 2pm, 4pm), each led by Farid or Mei,
+// taking a small group of villagers round the orchard and then the flower farm (a different mix every
+// time). Weekdays: Bo leads a tour after work on Tuesdays and Thursdays. Every day a couple of villagers also
 // wander over on their own. Tours pay TOUR_FEE a person into the farm shop's tin (orchard.js), once there's something
 // to show (a few things planted). All of it is worked out from the date, so every screen agrees on who's where.
 // tourSlot / visitSlot return routine-style slots that win over a villager's usual routine (npcs.js slotNow).
 import { hash } from "../util.js";
 
 export const TOUR_FEE = 4;
-// Round 107: family away on a day trip (trips.js says who). Tours, Ma Ma's stall, Mum's class and the family dinner
-// all work round them: someone else leads or minds it, the class is off, dinner moves to another house.
+// Round 107: friends away on a day trip (trips.js says who). Tours, Farid's stall, Hana's class and the village supper
+// all work round them: someone else leads or minds it, the class is off, supper moves to another house.
 let awayOf = () => [];
 export const setAway = fn => { awayOf = fn; };
 export const awayToday = day => awayOf(day) || [];
 const WEEKEND = [[10*60, 10*60 + 45], [11*60 + 30, 12*60 + 15], [14*60, 14*60 + 45], [16*60, 16*60 + 45]];
-const DARREN = [17*60 + 45, 18*60 + 30], DARREN_DAYS = [2, 4];
+const BO_TOUR = [17*60 + 45, 18*60 + 30], BO_DAYS = [2, 4];
 const GUIDES = ["farid", "mei"];
 export const VISITORS = ["hana", "okada", "juniper", "bo", "lin", "pip", "opal", "theo"];
 // out-of-towners (data/npcs.js, tourist: true): they only come for tours, tastings and the farm shop
@@ -35,7 +35,7 @@ export function toursOn(day){
   const away = awayToday(day), guides = GUIDES.filter(g => !keepers.includes(g) && !away.includes(g));
   if (d === 0 || d === 6) WEEKEND.forEach(([from, to], i) => { const guide = guides[(hash(day) + i) % guides.length], t = 1 + (hash(day + "t" + i) % 2);
     out.push({i, from, to, guide, group: [...groupFor(day + ":" + i, 3 + (hash(day + "n" + i) % 2) - t), ...groupFor(day + ":t" + i, t, keepers, TOURISTS)]}); });
-  else if (DARREN_DAYS.includes(d)) out.push({i: 0, from: DARREN[0], to: DARREN[1], guide: away.includes("bo") ? "farid" : "bo", group: [...groupFor(day + ":d", 2), ...groupFor(day + ":dt", 1, [], TOURISTS)]});
+  else if (BO_DAYS.includes(d)) out.push({i: 0, from: BO_TOUR[0], to: BO_TOUR[1], guide: away.includes("bo") ? "farid" : "bo", group: [...groupFor(day + ":d", 2), ...groupFor(day + ":dt", 1, [], TOURISTS)]});
   return out;
 }
 // Where the group stands: round the trees first, then over to the flower beds for the second half
@@ -69,7 +69,7 @@ export function visitSlot(id, day, hm){
 export const tourNow = (day, hm) => toursOn(day).find(t => hm >= t.from && hm < t.to) || null;
 
 // The field: picnickers at lunchtime, someone feeding the swans in the early evening, Pip playing football after school
-// (and on weekend mornings), and Ma Ma and Gong Gong strolling round the lake on Friday afternoons and Sunday mornings.
+// (and on weekend mornings), and Farid and Mei strolling round the lake on Friday afternoons and Sunday mornings.
 const PICNIC = [[106, 468], [138, 464]], LAKESIDE = [[196, 384], [236, 388], [272, 380]], PITCH = [[96, 560], [150, 548], [204, 566], [130, 574]], STROLL = [[60, 330], [100, 380], [300, 380], [70, 250]];
 export function fieldVisits(day){
   const d = dow(day), we = d === 0 || d === 6, busy = [...toursOn(day).flatMap(t => [t.guide, ...t.group]), ...visitsOn(day).map(v => v.id)];
@@ -89,7 +89,7 @@ export function fieldSlot(id, day, hm){
 }
 
 // Extra tasting-room regulars at the wine shop (on top of everyone's usual evening seat in npcs.js): afternoon drop-ins,
-// the vineyard and orchard hands after work, Ma Ma and Gong Gong on Saturday afternoons, Darren on Friday nights.
+// the vineyard and orchard hands after work, Farid and Mei on Saturday afternoons, Bo on Friday nights.
 // Seats are the chairs round the tasting room's three tables; nobody shares a chair at the same time.
 const SEAT = {a: [87, 518], b: [173, 518], c: [227, 518], d: [313, 518], e: [367, 512], f: [453, 512]};
 const TASTINGS = [
@@ -154,7 +154,7 @@ export function familySlot(id, day, hm){
 // Events at the field: the Sunday farmers market (8am to 1pm, every week) and the field fair on the last Saturday of
 // each month (10am to 4pm: kites, face painting, lemonade, snacks). The stalls stand in a row along the top of the field,
 // above the path. Out-of-towners run most of them; at the Sunday market the wine shop has a stall (Ines minds it, selling
-// from the shop's own shelves) and so does Ma Ma (fruit and flowers from the orchard's farm shop stock).
+// from the shop's own shelves) and so does Farid (fruit and flowers from the orchard's farm shop stock).
 // at: which of the six stall places along the top it stands in
 // (place 8 isn't on the top row: it's the Scoop Shack's cart on the grass between the path and the river)
 export const STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128], [306, 520], [196, 520]];
@@ -163,7 +163,7 @@ export const MARKET = [{id: "elena", at: 0, short: "Cheese", n: "Cheese and oliv
   {id: "felix", at: 1, short: "Honey", n: "Honey and bee things", items: ["honey", "honeycomb", "beecandle", "toast"], col: "#E3A23A", line: "Wildflower honey, from my own bees. The candles are pure beeswax."},
   {id: "clara", at: 2, short: "Produce", n: "Fresh produce", items: [], produce: true, col: "#9CC27E", line: "Picked yesterday, whatever's in season. Have a look!"},
   {id: "ines", at: 3, kind: "wine", short: "Our wines", n: "Our wine stall", items: [], col: "#8E2C48", line: "Tastings and bottles, straight from the shop's shelves."},
-  {id: "farid", at: 4, kind: "orchard", short: "Ma Ma's", n: "Ma Ma's fruit and flowers", items: [], col: "#E8566C", line: "Fresh from the orchard this morning. Come, take some!"},
+  {id: "farid", at: 4, kind: "orchard", short: "Orchard", n: "Farid's fruit and flowers", items: [], col: "#E8566C", line: "Fresh from the orchard this morning. Do have a taste!"},
   {id: "grace", at: 5, short: "Soap", n: "Handmade soap", items: ["soap_lav", "soap_rose", "soap_duck", "scrub", "crown"], col: "#C9A3E0", line: "All made by hand, in small batches. Gran taught me. Smell the lavender!"},
   {id: "ben", at: 6, short: "Craft beer", n: "Craft beer", items: ["paleale", "stout"], col: "#D9A441", line: "Brewed in my shed. Well, the shed's quite big."},
   {id: "dev", at: 7, short: "Bakery", n: "Bakery", items: ["kaya", "currypuff", "flour"], col: "#C98A4A", line: "Still warm! Kaya buns and curry puffs."},
@@ -188,29 +188,29 @@ export const NIGHT = [{id: "yun", at: 0, short: "Taiwan eats", n: "Taiwanese str
   {id: "lior", at: 5, short: "Lanterns", n: "Lanterns and lamps", items: [], decor: ["n_lanterns", "r_moon"], col: "#F3C969", line: "Paper lanterns for the house, and a moon lamp for your room."},
   {id: "wen", at: 6, short: "Sweets", n: "Sweets", items: ["tanghulu", "eggwaffle"], col: "#C9A3E0", line: "Tanghulu, strawberries in crackly sugar. And egg waffles, still warm."},
   {id: "kai", at: 7, short: "Drinks", n: "Night drinks", items: ["sugarcane", "grassjelly"], col: "#9CC27E", line: "Fresh sugarcane, pressed while you wait. Grass jelly for the old-school ones."},
-  // Mel's own: the Scoop Shack's cart, scooping from the shop's display (scoop.js cartOn). Tomo minds it after his day on the deck
+  // your own: the Scoop Shack's cart, scooping from the shop's display (scoop.js cartOn). Tomo minds it after his day on the deck
   {id: "tomo", at: 8, kind: "scoop", short: "Scoop Shack", n: "The Scoop Shack cart", items: [], col: "#F2A0B8", line: "Gelato from the Scoop Shack! Cup or cone?"}];
-// stalls that only stand once Mel's bought them (needs): core.js tells us what's owned
+// stalls that only stand once you've bought them (needs): core.js tells us what's owned
 let ownedNow = () => ({});
 export const setStallOwned = fn => { ownedNow = fn; };
 const standing = (list, day) => { const o = ownedNow(), away = awayToday(day);
-  return list.filter(s => !s.needs || o[s.needs]).map(s => s.id === "farid" && away.includes("farid") ? {...s, id: "mei", line: "Ma Ma's away for the day, so I'm minding her stall. Same fruit, same prices!"}
-    : s.kind === "mine" && o.millshop ? {...s, id: "hazel", line: "I'm minding Mel's stall. Everything here, she made."} : s); };   // round 173: with the Mill Shop open, Hazel minds Mel's Christmas stall
+  return list.filter(s => !s.needs || o[s.needs]).map(s => s.id === "farid" && away.includes("farid") ? {...s, id: "mei", line: "Farid's away for the day, so I'm minding his stall. Same fruit, same prices."}
+    : s.kind === "mine" && o.millshop ? {...s, id: "hazel", line: "I'm minding your stall. Everything here, you made."} : s); };   // round 173: with the Mill Shop open, Hazel minds your Christmas stall
 export const NIGHT_TOURISTS = ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"];
 export const STAGE = {x: 452, y: 462}, STAGE_WATCH = [[404, 560], [446, 566], [492, 536], [508, 562], [426, 590]];
 function lastSaturday(day){ const dt = new Date(day + "T00:00:00Z"); if (dt.getUTCDay() !== 6) return false; const n = new Date(dt.getTime() + 7*864e5); return n.getUTCMonth() !== dt.getUTCMonth(); }
-// Round 172 (Mel: "let's do Christmas markets and gift hampers"): the Christmas market, every evening 5 to 9 from 20
+// Round 172 ("let's do Christmas markets and gift hampers"): the Christmas market, every evening 5 to 9 from 20
 // November to Christmas Eve. On those days it takes the place of the night market and the fair; the Sunday morning
 // farmers market carries on. Wooden stalls under garlands, the big tree on the football pitch, up all season (lit at half past five;
 // the first night the whole village counts it down), lanterns along the paths.
-// at: 0-7 along the top as ever; Mel's own stall is place 2. kind: "mine" (Mel's: game/xmas.js), "mulled" (cups from
-// her pot, Celeste ladling), "cocoa" (the Cocoa Room's cart, once it's hers), the rest are ordinary stalls (treats:
+// at: 0-7 along the top as ever; your own stall is place 2. kind: "mine" (yours: game/xmas.js), "mulled" (cups from
+// your pot, Celeste ladling), "cocoa" (the Cocoa Room's cart, once it's yours), the rest are ordinary stalls (treats:
 // eaten on the spot, game/xmas.js)
 export const xmasOn = day => { const md = day.slice(5); return md >= "11-20" && md <= "12-24"; };
 export const XMAS_FROM = 17*60, XMAS_TO = 21*60, XMAS_LIT = 17*60 + 30, XMAS_TREE = [184, 600];
-export const XMAS = [{id: "farid", at: 0, short: "Wreaths", n: "Ma Ma's wreaths and winter flowers", items: ["xm_wreath", "xm_bouquet", "xm_mistletoe"], col: "#4F7A4A", line: "Holly from the orchard hedge, ivy from the back fence. Ma Ma makes them all by hand!"},
+export const XMAS = [{id: "farid", at: 0, short: "Wreaths", n: "Farid's wreaths and winter flowers", items: ["xm_wreath", "xm_bouquet", "xm_mistletoe"], col: "#4F7A4A", line: "Holly from the orchard hedge, ivy from the back fence. I make every one by hand!"},
   {id: "hana", at: 1, short: "Gingerbread", n: "Hana's gingerbread and ornaments", items: ["xm_ginger", "xm_bauble", "xm_star", "xm_angel"], col: "#C8432F", line: "Gingerbread people, iced this afternoon. And ornaments for your tree!"},
-  {id: "mel", at: 2, kind: "mine", short: "Mel's stall", n: "Your stall", items: [], col: "#8E2C48", line: ""},
+  {id: "mel", at: 2, kind: "mine", short: "Your stall", n: "Your stall", items: [], col: "#8E2C48", line: ""},
   {id: "celeste", at: 3, kind: "mulled", short: "Mulled wine", n: "Mulled wine", items: [], col: "#7A1F3D", line: "Mind, it's hot! Cinnamon on top?"},
   {id: "hiro", at: 4, short: "Wooden toys", n: "Wooden toys", items: ["xm_train", "xm_horse", "xm_yoyo", "xm_ark"], col: "#7FB8E8", line: "Every one carved and painted in my workshop. No batteries, ever."},
   {id: "dev", at: 5, short: "Chestnuts", n: "Roast chestnuts", items: [], treats: ["xm_chestnut"], col: "#8A5A3A", line: "Hot chestnuts! Mind your fingers, they're straight off the coals."},
@@ -287,13 +287,13 @@ export function eventSlot(id, day, hm){
   if (k >= 0 || id === "pip") return {from: start, to: wave ? e.to : mid, scene: "field", wander: id === "pip" ? FIELD_PLAY : FIELD_WALK};
   return null;
 }
-// Round 104: Mel's family goes to the night market and the fair too (the Sunday market they already do in their routines).
-// Night market: Tuesdays Marcus and Angellina, and Ma Ma and Gong Gong early for a look round; Thursdays Mum and Dad,
-// and Darren for an hour. The fair: everyone, in turns through the day.
+// Round 104: your friends go to the night market and the fair too (the Sunday market they already do in their routines).
+// Night market: Tuesdays Tomi and Posy, and Farid and Mei early for a look round; Thursdays Hana and Theo,
+// and Bo for an hour. The fair: everyone, in turns through the day.
 const FAMILY_EVENTS = {
   night: {2: [["farid", 17*60 + 45, 19*60], ["mei", 17*60 + 45, 19*60], ["tomi", 18*60 + 30, 20*60 + 30], ["posy", 18*60 + 30, 20*60 + 30]],
     4: [["hana", 18*60, 20*60], ["theo", 18*60, 20*60], ["bo", 19*60, 20*60 + 30]]},
-  // round 172: the Christmas market, a few of the family most evenings (not the dinner nights, Wednesday and Sunday,
+  // round 172: the Christmas market, a few of your friends most evenings (not the supper nights, Wednesday and Sunday,
   // when they're round the table by 6:30)
   xmas: {1: [["hana", 17*60 + 15, 18*60 + 45], ["theo", 17*60 + 15, 18*60 + 45]], 2: [["tomi", 18*60, 20*60], ["posy", 18*60, 20*60]],
     3: [["bo", 17*60, 18*60 + 15]], 4: [["farid", 17*60 + 15, 18*60 + 30], ["mei", 17*60 + 15, 18*60 + 30]], 5: [["bo", 18*60 + 30, 20*60 + 30], ["hana", 18*60 + 30, 20*60], ["theo", 18*60 + 30, 20*60]],
@@ -320,13 +320,13 @@ function nightShopper(id, e, day, hm){
   return null;
 }
 
-// Mum's exercise class on the exercise lawn at the field (east of the river), 8 to 9am Monday to Saturday: Pilates on
+// Hana's exercise class on the exercise lawn at the field (east of the river), 8 to 9am Monday to Saturday: Pilates on
 // Mondays and Wednesdays, Zumba on Tuesdays and Thursdays, Piloxing on Fridays and Saturdays. Three villagers join
-// her each morning (Mel can join too: tap the lawn). Not on market Sundays.
+// her each morning (you can join too: tap the lawn). Not on market Sundays.
 export const CLASS_FROM = 8*60, CLASS_TO = 9*60, LAWN = [452, 404];
 const CLASS_KIND = {1: "Pilates", 2: "Zumba", 3: "Pilates", 4: "Zumba", 5: "Piloxing", 6: "Piloxing"};
 const MATS = [[418, 444], [456, 452], [494, 444], [436, 480]];
-const CLASS_POOL = ["lin", "okada", "juniper", "hana", "opal", "bo", "posy", "priya"];
+const CLASS_POOL = ["lin", "okada", "juniper", "opal", "bo", "posy", "priya"];
 export const classOn = day => CLASS_KIND[dow(day)] && !awayToday(day).includes("hana") ? {kind: CLASS_KIND[dow(day)], from: CLASS_FROM, to: CLASS_TO,
   who: groupFor(day + ":class", 3, [], CLASS_POOL)} : null;
 export function classSlot(id, day, hm){
@@ -344,32 +344,32 @@ export function shoreSlot(id, day, hm){
   return groupFor(day + ":sup", we ? 2 : 1, busy, TOURISTS).includes(id) ? {from, to, scene: "shore", wander: SUP_SEA, act: "sup", free: true} : null;
 }
 
-// Family dinners: Wednesdays and Sundays, 6:30 to 8pm, at one of the four family houses in turn (Mel's home, Ma Ma's
-// cottage, Mum and Dad's, Marcus and Angellina's). Everyone sits round the big dining table: five along the back
-// (Ma Ma, Gong Gong, Mum, Dad, Angellina), four along the front (Darren, Marcus, Evan, Mel).
+// The village supper: Wednesdays and Sundays, 6:30 to 8pm, at one of four houses in turn (your place, Farid and Mei's
+// cottage, Hana and Theo's, Tomi and Posy's). Everyone sits round the big dining table: five along the back
+// (Farid, Mei, Hana, Theo, Posy), three along the front (Bo, Tomi, you).
 export const DINNER_FROM = 18*60 + 30, DINNER_TO = 20*60;
 export const DINNER_HOSTS = ["home", "hanatheo", "cottage", "tomiposy"];
 const HOST_FAMILY = {hanatheo: ["hana", "theo"], cottage: ["farid", "mei"], tomiposy: ["tomi", "posy"]};
 // Round 112: Friday evenings. Aperitivo hour at the wine shop (4:30 to 7), the fishmonger's van at the bay (5 to 10)
-// and the bonfire (7 to 10) at the firepit at home, with the family round it.
+// and the bonfire (7 to 10) at the firepit at home, with your friends round it.
 export const APERITIVO = [16*60 + 30, 19*60], VAN = [17*60, 22*60], BONFIRE = [19*60, 22*60];
 const isFri = day => dow(day) === 5;
 export const aperitivoNow = (day, hm) => isFri(day) && hm >= APERITIVO[0] && hm < APERITIVO[1];
 export const vanNow = (day, hm) => isFri(day) && hm >= VAN[0] && hm < VAN[1];
 export const bonfireNow = (day, hm) => isFri(day) && hm >= BONFIRE[0] && hm < BONFIRE[1];
-// the bonfire is the firepit at home (base scene, bottom of the garden): Mel asked for it there
+// the bonfire is the firepit at home (base scene, bottom of the garden)
 export const FIRE = [276, 608];
-// round the fire: along the back and the sides (nobody in front of the flames); Marcus and Angellina on the bench
+// round the fire: along the back and the sides (nobody in front of the flames); Tomi and Posy on the bench
 const LOGS = {theo: [[224, 612], 1], hana: [[242, 584], 1], farid: [[276, 572], 1], mei: [[310, 584], -1], tomi: [[340, 604], -1], posy: [[364, 604], -1]};
 const BONFIRE_FAMILY = {theo: 19*60, hana: 19*60, mei: 19*60, farid: 19*60, tomi: 19*60 + 30, posy: 19*60 + 30};
-// Round 113: movie night on the field, the last Friday of the month, 7:30 to 9:30 (the family's on the blankets
+// Round 113: movie night on the field, the last Friday of the month, 7:30 to 9:30 (everyone's on the blankets
 // instead of round the bonfire that night); and a little Friday market on the field, 4:30 to 7:15 (a quarter of an hour before the film): three stalls with a
 // different mix every week, and Hiro selling kites on the beach.
 export const MOVIE = [19*60 + 30, 21*60 + 30], BAYMKT = [16*60 + 30, 19*60 + 15];   // the market packs up a quarter of an hour before the film
 export const lastFriday = day => { const dt = new Date(day + "T00:00:00Z"); return dt.getUTCDay() === 5 && new Date(dt.getTime() + 7*864e5).getUTCMonth() !== dt.getUTCMonth(); };
 export const movieNow = (day, hm) => lastFriday(day) && !xmasOn(day) && hm >= MOVIE[0] && hm < MOVIE[1];   // (not in the Christmas market's season: its stalls have the top of the field)
 export const SCREEN = [236, 128];   // the screen stands where the Sunday market's stalls go, along the top of the field
-// spread out over the field, not bunched at the screen (Mel): two on the blanket by the screen, two at the picnic
+// spread out over the field, not bunched at the screen: two on the blanket by the screen, two at the picnic
 // spot, and two strolling round the exercise lawn
 const BLANKET = {hana: [222, 210], theo: [252, 212], farid: [92, 502], mei: [178, 504]};
 const LAWN_STROLL = [[410, 470], [450, 505], [480, 465], [430, 530], [470, 525]], STROLLERS = ["tomi", "posy"];
@@ -380,7 +380,7 @@ export function movieSlot(id, day, hm){
   return {from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: id === "mei" ? -1 : 1, movie: true};
 }
 export const bayMarketNow = (day, hm) => dow(day) === 5 && !xmasOn(day) && hm >= BAYMKT[0] && hm < BAYMKT[1];
-// (the "bay market" lives on the field now, where the Sunday market stands: Mel asked for the bay to stay calm)
+// (the "bay market" lives on the field now, where the Sunday market stands, so the bay stays calm)
 export const BAY_STALLS = [[156, 128], [236, 128], [316, 128]], KITE_SELLER = [396, 150];
 export const bayKeepers = day => groupFor(day + ":baymkt", 3, [], NIGHT_TOURISTS);
 export function bayMarketSlot(id, day, hm){
@@ -394,7 +394,7 @@ export function bonfireSlot(id, day, hm){
   const from = BONFIRE_FAMILY[id]; if (from == null || hm < from) return null;
   const [at, dir] = LOGS[id]; return {from, to: BONFIRE[1], scene: "base", at, act: id === "theo" ? "guitar" : "sit", dir, bonfire: true};
 }
-export const HOST_NAME = {home: "your place", hanatheo: "Mum and Dad's", cottage: "Ma Ma and Gong Gong's", tomiposy: "Marcus and Angellina's"};
+export const HOST_NAME = {home: "your place", hanatheo: "Hana and Theo's", cottage: "Farid and Mei's", tomiposy: "Tomi and Posy's"};
 // where each house's dining table stands: cx = centre, fy = the front edge of the table on the floor
 export const DINING = {home: {cx: 260, fy: 452}, hanatheo: {cx: 270, fy: 500}, cottage: {cx: 320, fy: 470}, tomiposy: {cx: 340, fy: 470}};
 const BACK = ["farid", "mei", "hana", "theo", "posy"], FRONT = ["bo", "tomi", "mel"];
@@ -409,7 +409,7 @@ export function dinnerOn(day){
   const d = dow(day); if (d !== 3 && d !== 0) return null;
   const week = Math.floor(Date.parse(day + "T00:00:00Z")/(7*864e5));
   const away = awayToday(day), k = (week*2 + (d === 0 ? 1 : 0)) % 4;
-  // the hosts are off on a trip: dinner moves to the next house along (Mel's place is always there to fall back on)
+  // the hosts are off on a trip: supper moves to the next house along (your place is always there to fall back on)
   const host = [0, 1, 2, 3].map(i => DINNER_HOSTS[(k + i) % 4]).find(h => !(HOST_FAMILY[h] || []).every(id => away.includes(id)) || h === "home");
   return {host, from: DINNER_FROM, to: DINNER_TO};
 }
@@ -420,7 +420,7 @@ export function dinnerSlot(id, day, hm){
   return {from: d.from, to: d.to, scene: d.host, at: dinnerSeat(d.host, id), act: "sit", dir: BACK.includes(id) ? 1 : -1, dinner: true};
 }
 
-// Date night: Marcus and Angellina at the middle table of the tasting room, Tuesdays and Saturdays 7:30 to 9pm
+// Date night: Tomi and Posy at the middle table of the tasting room, Tuesdays and Saturdays 7:30 to 9pm
 // (Mr Okada and Hana, who usually sit there in the evenings, take those nights off)
 export const DATE_DAYS = [2, 6], DATE_FROM = 19*60 + 30, DATE_TO = 21*60;
 export function dateSlot(id, day, hm){
@@ -429,7 +429,7 @@ export function dateSlot(id, day, hm){
 }
 
 // The wine club (once the cellar door is built): the first Friday of every month, 6 to 9pm, eight members gather in
-// the cellar door to taste and buy. They're picked each month from the regulars and the family.
+// the cellar door to taste and buy. They're picked each month from the regulars and your friends.
 export const CLUB_FROM = 18*60, CLUB_TO = 21*60;
 const CLUB_POOL = ["hana", "okada", "juniper", "bo", "lin", "opal", "theo", "tomi", "posy", "farid", "mei", "marco"];
 const CLUB_WALK = [[200, 360], [300, 380], [380, 430], [250, 460], [420, 340], [170, 430], [330, 560], [200, 560]];
@@ -470,14 +470,14 @@ export function letSlot(id, day, hm){
   if (k === 1 && hm >= 14*60 && hm < 15*60 + 30) return {from: 14*60, to: 15*60 + 30, scene: "hwoods", wander: [[200, 318], [330, 420], [440, 510], [300, 300]]};
   return null;
 }
-// Disco night (round 140, Mel): every Saturday once the cellar door is built, 8 to 11:30pm. The disco ball comes out,
-// the lights flash, the music's on, and the floor's packed: most of the village (not Ma Ma, Gong Gong, Mr Okada or Lin,
+// Disco night (round 140): every Saturday once the cellar door is built, 8 to 11:30pm. The disco ball comes out,
+// the lights flash, the music's on, and the floor's packed: most of the village (not Mr Okada or Lin,
 // who'd rather be in bed, nor whoever's working) and a handful of tourists, all dancing. Wine sells much faster.
 export const DISCO_FROM = 20*60, DISCO_TO = 23*60 + 30;
 export const discoOn = day => dow(day) === 6, discoNow = (day, hm) => discoOn(day) && hm >= DISCO_FROM && hm < DISCO_TO;
 const DISCO_POOL = ["hana", "juniper", "bo", "opal", "theo", "marco", "ines", "farid", "mei", "felix", "elena", "amara", "mateo", "lila", "noor", "wren", "sofia", "tomo", "tomi", "posy"];
-// Not a grid (Mel: "they should be mingling"): little knots of two or three round the floor, couples together facing
-// each other (Mum and Dad; Marcus and Angellina once their date night's over at 9), each with their own move. About
+// Not a grid ("they should be mingling"): little knots of two or three round the floor, couples together facing
+// each other (Hana and Theo; Tomi and Posy once their date night's over at 9), each with their own move. About
 // half drift between their knot and the next one now and then; the rest stay put and dance.
 export const DISCO_MOVES = ["dance", "boogie", "armsup", "twirl", "shuffle", "point"];
 const KNOTS = [[215, 350], [345, 340], [455, 395], [190, 435], [315, 425], [420, 470], [265, 505]];

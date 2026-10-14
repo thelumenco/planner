@@ -1,8 +1,8 @@
-// Mulled wine (round 153, Mel): from late November (the 20th) until Boxing Day, a big pot on the stove in the wine
-// shop's kitchen. A bottle of Mel's own red off the shelves, and two or three things to mull it with: spices from Hana's
+// Mulled wine (round 153): from late November (the 20th) until Boxing Day, a big pot on the stove in the wine
+// shop's kitchen. A bottle of your own red off the shelves, and two or three things to mull it with: spices from Hana's
 // market (cinnamon, cloves, star anise, cardamom, ginger) and fruit or honey from the orchard, the garden and the farm
 // (orange, lemon, apple, raspberries, honey). Like the gelato flavours, every new mix is found once and named, then
-// made again whenever she likes. Half an hour mulling, then ten cups in the pot: they sell at the wine shop counter, to
+// made again whenever you like. Half an hour mulling, then ten cups in the pot: they sell at the wine shop counter, to
 // the terrace's occasions (Christmas lunch, New Year's Eve), and the more that's in it, the more a cup costs.
 // State: F.mull = {recipes: [{id, adds, name, col}], pot: {id, start, dur} | null, cups, cupId, price, made}
 import { esc, dayKey } from "../util.js";
@@ -29,7 +29,7 @@ const rackHTML = (F, m) => { const on = Object.keys(m.rack).filter(a => m.rack[a
     + (bag.length ? `<p class="eyebrow" style="margin:10px 0 6px">From your backpack</p><div class="actions">${bag.map(a => `<button class="btn small alt" data-mull="rack:${a}">Put ${F.inv[a]} ${esc(ADDS[a].n.toLowerCase())} on the rack</button>`).join("")}</div>` : ""); };
 const keyOf = adds => [...adds].sort().join("+");
 const SPECIAL = {"orange+sp_cinnamon+sp_clove": "The Classic", "apple+sp_cinnamon+sp_ginger": "Apple Pie", "honey+lemon+sp_ginger": "Hot Toddy Mull", "orange+sp_anise+sp_cardamom": "Spice Market",
-  "raspberry+sp_cinnamon": "Winter Berry", "honey+orange+sp_clove": "Golden Hour", "apple+honey+sp_cinnamon": "Grandma's Kitchen", "lemon+sp_anise": "Starlight"};
+  "raspberry+sp_cinnamon": "Winter Berry", "honey+orange+sp_clove": "Golden Hour", "apple+honey+sp_cinnamon": "Farmhouse Kitchen", "lemon+sp_anise": "Starlight"};
 export function mullName(adds){ const k = keyOf(adds); if (SPECIAL[k]) return SPECIAL[k]; const ns = [...adds].sort((a, b) => (ADDS[b].spice ? 0 : 1) - (ADDS[a].spice ? 0 : 1)).map(a => ADDS[a].n);
   return ns.length === 2 ? `${ns[0]} & ${ns[1]}` : `${ns.slice(0, -1).join(", ")} & ${ns[ns.length - 1]}`; }
 export const cupPrice = adds => 4 + adds.length;
@@ -67,7 +67,7 @@ export function mullPanel(F, v, st = {}, day = dayKey()){
     return `<li><span class="wtxt"><b>${esc(r.name)}</b><small>${swatch(r.adds)} ${r.adds.map(a => esc(ADDS[a].n)).join(", ")} · ${cupPrice(r.adds)} a cup</small></span><button class="btn small ${ok ? "primary" : "alt"}" data-mull="again:${r.id}" ${ok ? "" : "disabled"}>Mull it</button></li>`; }).join("")}</ul>`;
   if (!reds.length) return h + `<p class="muted">You'll need a bottle of red on the shelves for the base: Merlot-ish house red, Tempranillo or Pinot.</p>` + shut;
   h += `<p class="eyebrow" style="margin:10px 0 6px">The wine</p><div class="gchips">${reds.map(s => `<button class="gchip${st.base === s.id ? " on" : ""}" data-mull="base:${s.id}" aria-pressed="${st.base === s.id}">${esc(s.name)} (${s.n})</button>`).join("")}</div>`;
-  h += `<p class="eyebrow" style="margin:10px 0 6px">Mull it with (two or three)</p>${have.length ? `<div class="gchips">${have.map(a => `<button class="gchip${pick.includes(a) ? " on" : ""}" data-mull="add:${a}" aria-pressed="${pick.includes(a)}"><i class="mulldot" style="background:${ADDS[a].col}"></i>${esc(ADDS[a].n)} (${got(F, m, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing to mull with yet: spices from Hana's market; oranges, lemons and apples from Ma Ma's orchard; raspberries; honey from the farm.</p>`}`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">Mull it with (two or three)</p>${have.length ? `<div class="gchips">${have.map(a => `<button class="gchip${pick.includes(a) ? " on" : ""}" data-mull="add:${a}" aria-pressed="${pick.includes(a)}"><i class="mulldot" style="background:${ADDS[a].col}"></i>${esc(ADDS[a].n)} (${got(F, m, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing to mull with yet: spices from Hana's market; oranges, lemons and apples from Farid's orchard; raspberries; honey from the farm.</p>`}`;
   h += rackHTML(F, m);
   const ready = st.base && pick.length >= MULL.min && pick.length <= MULL.max, known = ready && m.recipes.some(r => r.id === keyOf(pick));
   return h + `<div class="actions"><button class="btn primary" data-mull="go" ${ready ? "" : "disabled"}>${ready ? (known ? `Mull ${esc(mullName(pick))} again` : "Into the pot: something new") : "Into the pot"}</button></div>` + shut;

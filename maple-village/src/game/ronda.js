@@ -115,11 +115,11 @@ export function flamencoPanel(F, st, hm){
 }
 
 // Paint your own tile at Lucía's: pick a colour and a pattern, then the four brush strokes in order (Lucía guides
-// your hand if you go wrong); fired in her kiln, it's a keepsake for a shelf at home. Evan does a finger-painted one.
+// your hand if you go wrong); fired in her kiln, it's a keepsake for a shelf at home.
 export const paintId = (c, p) => `ptile_${c}_${p}`;
-export function paintTile(F, c, p, withEvan, addInv){
+export function paintTile(F, c, p, withThumb, addInv){
   if (!PAINT.colours[c] || !PAINT.patterns[p] || F.coins < PAINT.price) return null;
-  F.coins -= PAINT.price; addInv(paintId(c, p), 1); if (withEvan) addInv("etile", 1); const r = rondaState(F); r.painted = (r.painted || 0) + 1; return paintId(c, p);
+  F.coins -= PAINT.price; addInv(paintId(c, p), 1); if (withThumb) addInv("etile", 1); const r = rondaState(F); r.painted = (r.painted || 0) + 1; return paintId(c, p);
 }
 const motif = (p, col, k = 4) => p === "star" ? [`M20 8 L22 17 L31 14 L24 20 L31 26 L22 23 L20 32`, `M20 32 L18 23 L9 26 L16 20 L9 14 L18 17 L20 8`, `M14 20 h12`, `M20 14 v12`].slice(0, k)
   : p === "flower" ? [`M20 20 m-7 0 a7 7 0 1 0 14 0 a7 7 0 1 0 -14 0`, `M20 13 q4 -6 0 -6 q-4 0 0 6`, `M27 20 q6 4 6 0 q0 -4 -6 0 M13 20 q-6 4 -6 0 q0 -4 6 0`, `M20 27 v6 M17 31 h6`].slice(0, k)

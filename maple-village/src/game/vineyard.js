@@ -2,7 +2,7 @@
 // bottle and name the wines, stock the wine shop's shelves. Villagers buy now and then and leave coins in the
 // honesty box; standing behind the counter brings more customers. How busy it gets follows the village's routines
 // (evenings and weekends are busiest; villagers dropping in for a tasting add more). State lives in the game save
-// (F.vine). Times are real time, so things grow and ferment while Mel is away.
+// (F.vine). Times are real time, so things grow and ferment while the player is away.
 import { lunchNow, seatedAt } from "./lunch.js";
 import { esc, plain, H, now, LOC } from "../util.js";
 import { NPCS } from "../data/npcs.js";
@@ -23,7 +23,7 @@ export const STYLES = {red: {n: "Red", grape: "red", dur: 10*H, price: 18, col: 
   tempranillo: {n: "Tempranillo", grape: "tempranillo", dur: 12*H, price: 28, col: "#5A1630"},
   // round 145: from Kel's cuttings in Bellbird Valley. A light, cherry-ish Pinot Noir and a buttery Chardonnay
   pinot: {n: "Pinot Noir", grape: "pinot", dur: 11*H, price: 24, col: "#8A2E3E"}, chardonnay: {n: "Chardonnay", grape: "chardonnay", dur: 9*H, price: 22, col: "#E8C96A"}};
-// the grapes Mel can grow (Tempranillo once she's brought cuttings home from Ronda)
+// the grapes the player can grow (Tempranillo once she's brought cuttings home from Ronda)
 export const grapeKinds = v => ["red", "white", ...(v.tempra ? ["tempranillo"] : []), ...(v.pinot ? ["pinot"] : []), ...(v.chard ? ["chardonnay"] : [])];
 const GRAPE_N = {red: "Red", white: "White", tempranillo: "Tempranillo", pinot: "Pinot Noir", chardonnay: "Chardonnay"};
 const FLAG = {tempranillo: "tempra", pinot: "pinot", chardonnay: "chard"};
@@ -39,11 +39,11 @@ const BUNCHES = 3, PER_BATCH = 3, BOTTLES = 6, GLASSES = 5;
 export const tapasOn = (v, day) => (v.tapasList || []).filter(t => t && t.day === day && TAPAS[t.id]);
 export const platesLeft = v => Object.values(v.menu || {}).reduce((a, n) => a + n, 0) + (v.tapasList || []).reduce((a, t) => a + (t.plates || 0), 0);
 // the olive tree (bought at the stall, planted by the path): ripe every 8 hours, two jars of olives a picking
-export const OLIVE = 6*H;   // (round 154, Mel: "not enough": every six hours now, and more a picking)
+export const OLIVE = 6*H;   // (round 154: "not enough": every six hours now, and more a picking)
 export const oliveRipe = v => !!v.olive && Date.now() - (v.olive.pickedAt || v.olive.planted) >= OLIVE;
 // round 110: the olive grove (four more trees along the top terrace, bought at the stall), ripe on the same 8 hours,
 // eight jars a picking. Marco and Ines pick the tree and the grove on their shifts (with the grapes) into the olive
-// crate (v.oliveCrate), which Mel empties into her backpack at the grove, or the mill takes from directly.
+// crate (v.oliveCrate), which the player empties into her backpack at the grove, or the mill takes from directly.
 export const GROVE_JARS = 12, TREE_JARS = 3;
 export const groveRipe = v => !!v.grove && Date.now() - (v.grove.pickedAt || v.grove.planted) >= OLIVE;
 export function pickGrove(F){ const v = vineState(F); if (!groveRipe(v)) return null; v.grove.pickedAt = Date.now(); F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + GROVE_JARS*(v.grove2 ? 2 : 1); return `${GROVE_JARS} jars of olives from the grove, into your backpack.`; }
@@ -61,11 +61,11 @@ export function vineState(F){
   v.lastTick = v.lastTick || Date.now(); v.today = v.today || {day: "", bottles: 0, glasses: 0, coins: 0};
   return v;
 }
-// Mel can rename both (in the staff card at the shop counter); these are the names everything shows
+// The player can rename both (in the staff card at the shop counter); these are the names everything shows
 export const vineyardName = F => (F.vine && F.vine.names && F.vine.names.vineyard) || "The vineyard";
 export const shopName = F => (F.vine && F.vine.names && F.vine.names.shop) || "The wine shop";
 export function rename(F, which, name){ const v = vineState(F), n = plain(String(name || "")).trim().slice(0, 28); if (n) v.names[which] = n; else delete v.names[which]; }
-// The staff: what each of them takes off Mel's hands (each can be switched off in the staff card)
+// The staff: what each of them takes off the player's hands (each can be switched off in the staff card)
 export const HELP = [["pick", "Marco and Ines pick ripe grapes", "and water the vines again, as before"], ["barrels", "Marco fills empty barrels", "red grapes become red wine, white grapes white; you still name and bottle them"],
   ["stock", "Celeste stocks the shelves", "bottles go from the cellar to the shop when she's on"], ["cook", "Pilar runs the kitchen", "oven, cheese press, the tapas of the day and small plates, from what's in the larder"],
   ["fetch", "Pilar takes kitchen goods from my backpack", "crops, eggs, milk, flour, cheese and olives go straight to the larder (Maple keeps her treats)"]];
@@ -83,7 +83,7 @@ export const barrelLeft = b => b ? Math.max(0, b.start + b.dur - Date.now()) : 0
 export const shelfStock = v => v.shelf.reduce((n, s) => n + s.n, 0);
 
 /* ---------- actions (return a line for Maple, or null) ---------- */
-// round 152 (Mel: "3 is too few"): up to six in the barrel shed (the second 150, then 75 more each: 450 for the sixth),
+// round 152 ("3 is too few"): up to six in the barrel shed (the second 150, then 75 more each: 450 for the sixth),
 // and once the cellar door's open, twelve more on its barrel racks (250 each)
 export const BARRELS = {shed: 6, cellar: 12, cellarPrice: 250};
 export const maxBarrels = F => BARRELS.shed + (F && F.goals && F.goals.cellar ? BARRELS.cellar : 0);
@@ -104,7 +104,7 @@ export function plantVine(F, r, i, kind){
   const v = vineState(F), row = v.rows[r]; if (!row || !row.trellis || row.vines[i] || !(v.cuttings[kind] > 0)) return null;
   v.cuttings[kind]--; row.vines[i] = {v: kind, planted: Date.now(), wateredAt: null}; return `A ${gName(kind)} vine, planted. Give it some water.`;
 }
-// dig a vine up (round 147, Mel): the cutting goes back in the box to plant somewhere else (another kind can go in
+// dig a vine up (round 147): the cutting goes back in the box to plant somewhere else (another kind can go in
 // its place); if it was ripe, its grapes are picked first
 export function uprootVine(F, r, i){
   const v = vineState(F), row = v.rows[r], vn = row && row.vines[i]; if (!vn) return null;
@@ -124,13 +124,13 @@ export function fillBarrel(F, slot, style){
   return `Into the barrel. It'll be ready in about ${Math.round(st.dur/H)} hours. Off you go, it doesn't need you.`;
 }
 export function secondFerment(F, slot){ const v = vineState(F), b = v.barrels[slot]; if (!b || b.style !== "sparkling" || b.stage !== 1 || barrelLeft(b)) return null; b.stage = 2; b.start = Date.now(); b.dur = STYLES.sparkling.dur2; return "Second fermentation for the bubbles. Two more hours."; }
-// suggested names for a barrel (like the ice cream flavours and bonbons): places and moments from the village, the
-// family, and a few in French, matched to the style. Each barrel gets its own list; ones already in the cellar or on
+// suggested names for a barrel (like the ice cream flavours and bonbons): places and moments from the village, its
+// people, and a few in French, matched to the style. Each barrel gets its own list; ones already in the cellar or on
 // the shelves are skipped. k picks the next suggestion.
 const W_PLACE = ["Jetty Sunset", "Dolphin Bay", "Lantern Night", "Low Tide", "Sea Breeze", "Golden Hour", "Swan Lake", "Porch Swing", "First Light", "Rainy Window", "Orchard Hill", "Wildflower", "Night Market", "Paddleboard", "Harvest Moon", "Morning Mist", "Kite Day", "Sunday Picnic", "Firefly", "Boardwalk", "Lighthouse", "Monsoon", "Frangipani", "Hammock"];
-const W_WHO = ["Maple's", "Evan's", "Ma Ma's", "Gong Gong's", "Ah Gong's", "Ah Ma's", "Darren's", "Marco's", "Ines's", "Grandpa's Porch"];
+const W_WHO = ["Maple's", "Farid's", "Mei's", "Hana's", "Bo's", "Pip's", "Marco's", "Ines's", "Harbourmaster's", "Ferryman's"];
 const W_WORD = {pinot: ["Pinot", "Pinot Noir", "Reserve", "Cherry Hill"], chardonnay: ["Chardonnay", "Chardy", "Golden", "Reserve"], tempranillo: ["Tempranillo", "Reserva", "Crianza", "Tinto"], red: ["Red", "Reserve", "Rouge", "Old Vine"], rose: ["Rosé", "Blush", "Pink"], white: ["White", "Blanc", "Crisp"], sparkling: ["Bubbles", "Fizz", "Brut", "Sparkle"]};
-const W_FR = {pinot: ["Bellbird Ridge", "Gum Creek Pinot", "Kel's Row"], chardonnay: ["Wattle Hill", "Balloon Lookout", "Riverside Chardonnay"], tempranillo: ["Puente Nuevo", "Tajo Reserva", "Viña Ronda", "Bodega Maple"], red: ["Château Maple", "Clos de la Baie", "Domaine du Lac", "Grand Cru Evan"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée Maple", "Crémant de la Baie", "Pétillant du Lac"]};
+const W_FR = {pinot: ["Bellbird Ridge", "Gum Creek Pinot", "Kel's Row"], chardonnay: ["Wattle Hill", "Balloon Lookout", "Riverside Chardonnay"], tempranillo: ["Puente Nuevo", "Tajo Reserva", "Viña Ronda", "Bodega Maple"], red: ["Château Maple", "Clos de la Baie", "Domaine du Lac", "Grand Cru du Verger"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée Maple", "Crémant de la Baie", "Pétillant du Lac"]};
 export function wineNames(F, slot){
   const v = vineState(F), b = v.barrels[slot]; if (!b) return [];
   const used = new Set([...v.cellar, ...v.shelf].map(x => x.name.toLowerCase())), st = b.style, seed = Math.floor(b.start || 0) + slot*7919, out = [];
@@ -147,9 +147,9 @@ export function bottle(F, slot, name){
   v.cellar.push({id: "w" + Date.now().toString(36), name: nm, type: b.style, n: BOTTLES}); v.barrels[slot] = null;
   return `${BOTTLES} bottles of ${nm}, into the cellar. Stock them on the shop shelves.`;
 }
-// The riddling rack (round 144, once Jono's shown Mel how in Bellbird Valley's barrel cave): sparkling laid on it in
+// The riddling rack (round 144, once Jono's shown the player how in Bellbird Valley's barrel cave): sparkling laid on it in
 // the cellar is turned a little every day, and comes off clearer and finer: 2 coins more a bottle for every day on
-// the rack, up to five days. (It stays on the rack, not auto-stocked, till Mel stocks it herself.)
+// the rack, up to five days. (It stays on the rack, not auto-stocked, till the player stocks it herself.)
 export const RIDDLE = {day: 2, max: 5};
 export const riddleDays = (c, now = Date.now()) => c && c.rack ? Math.min(RIDDLE.max, Math.floor((now - c.rack)/(24*H))) : 0;
 export const canRiddle = F => !!(F.bellbird && F.bellbird.riddle);
@@ -179,7 +179,7 @@ function whoAt(at){
 // busier in the evening and at weekends, and with villagers about; open 10am to 10pm
 function footfall(hm, weekend, visitors){ return (hm >= 17*60 && hm < 21*60 ? 2 : hm >= 12*60 && hm < 14*60 ? 1.3 : 1) * (weekend ? 1.5 : 1) * (1 + .4*visitors); }
 // Simulates the minutes since the last tick (up to 12 hours): customers buying (into the honesty box, or straight
-// to Mel while she's serving behind the counter), and the vineyard hands watering thirsty vines while on shift.
+// to the player while she's serving behind the counter), and the vineyard hands watering thirsty vines while on shift.
 // -> {bottles, glasses, coins, toBox, watered, mins} or null when nothing happened
 // One plate for a customer: the tapas of the day first (65% of the time, on its own day), else a small plate
 function servePlate(v, gameDay, out){
@@ -188,8 +188,8 @@ function servePlate(v, gameDay, out){
   const live = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]); if (!live.length) return; const id = live[Math.floor(Math.random()*live.length)];
   v.menu[id]--; if (!v.menu[id]) delete v.menu[id]; out.plates++; out.coins += DISHES[id].price; out.dish = id;
 }
-// A villager who sits down in the tasting room while Mel's there orders straight away: a glass of whatever's open (a
-// bottle from the shelf is opened if none is) and, 6 times in 10, a plate. Paid into the honesty box, or to Mel if
+// A villager who sits down in the tasting room while the player's there orders straight away: a glass of whatever's open (a
+// bottle from the shelf is opened if none is) and, 6 times in 10, a plate. Paid into the honesty box, or to the player if
 // she's serving. -> {glasses, plates, coins, wine (type), dish, opened} or null when there's nothing to pour
 export function serveGuest(F, opts = {}){
   const v = vineState(F), s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (!s) return null;
@@ -231,25 +231,25 @@ export function sellTick(F, opts = {}){
       if (stock.length && Math.random() < .012*st) { const b = stock[Math.floor(Math.random()*stock.length)]; if (Math.random() < winePf(b)) { b.n--; out.bottles++; out.coins += b.price; out.market = (out.market || 0) + 1; } }
       if (Math.random() < .008*st) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g && Math.random() < winePf(g)) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.market = (out.market || 0) + 1; } } }
     // the monthly wine club in the cellar door (first Friday, 6 to 9pm): members buy bottles and glasses off the same
-    // shelves; with Mel there hosting they buy half as much again, and pay her
+    // shelves; with the player there hosting they buy half as much again, and pay her
     if (F.goals && F.goals.cellar && wineClubNow(new Date(at + off + LOC()).toISOString().slice(0, 10), hm)) { const hst = opts.club && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
       if (stock.length && Math.random() < .04*hst) { const b = stock[Math.floor(Math.random()*stock.length)]; if (Math.random() < winePf(b)) { b.n--; out.bottles++; out.coins += b.price; out.club = (out.club || 0) + 1; } }
       if (Math.random() < .03*hst) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g && Math.random() < winePf(g)) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.club = (out.club || 0) + 1; } } }
     // Saturday disco night in the cellar (round 140): a packed floor, thirsty dancers, bottles and glasses flying off
-    // the shelves; with Mel there behind the tasting bar, half as much again
+    // the shelves; with the player there behind the tasting bar, half as much again
     if (F.goals && F.goals.cellar && discoNow(new Date(at + off + LOC()).toISOString().slice(0, 10), hm)) { const hst = opts.disco && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
       if (stock.length && Math.random() < .07*hst) { const b = stock[Math.floor(Math.random()*stock.length)]; if (Math.random() < winePf(b)) { b.n--; out.bottles++; out.coins += b.price; out.disco = (out.disco || 0) + 1; } }
       if (Math.random() < .09*hst) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g && Math.random() < winePf(g)) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.disco = (out.disco || 0) + 1; } } }
     // the Sunday long lunch on the terrace (round 146, lunch.js): everyone who's booked and sat down orders whole
     // bottles (a pair gets through about one an hour, and they lean to the dearer bottles) and plates from the
-    // kitchen; with Mel out there hosting, half as much again, they tip, and they pay her
+    // kitchen; with the player out there hosting, half as much again, they tip, and they pay her
     if (v.terrace) { const lday = new Date(at + off + LOC()).toISOString().slice(0, 10), seated = lunchNow(lday, hm) ? seatedAt(lday, hm) : 0;
       if (seated) { const host = opts.lunch && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
         if (stock.length && Math.random() < seated/2/60*host) { const w8 = stock.map(x => Math.pow(x.price, 1.5)), tot = w8.reduce((a, b) => a + b, 0); let r = Math.random()*tot, i = 0; while (r > w8[i] && i < stock.length - 1) { r -= w8[i]; i++; }
           const b = stock[i]; b.n--; out.bottles++; out.coins += b.price; out.lunchB = (out.lunchB || 0) + 1; if (opts.lunch) out.lunchTips = (out.lunchTips || 0) + Math.max(1, Math.round(b.price*.15)); }
         if (Math.random() < seated/60*.8*host) { const p0 = out.plates; servePlate(v, lday, out); if (out.plates > p0) out.lunchP = (out.lunchP || 0) + 1; } }
       // round 152: the terrace's other occasions (game/occasions.js): a wedding (sparkling by the case), trivia night,
-      // sip and paint (glasses), Valentine's, Christmas lunch, New Year's Eve. Mel out there hosting: faster, and tips
+      // sip and paint (glasses), Valentine's, Christmas lunch, New Year's Eve. The player out there hosting: faster, and tips
       const oc = occasionNow(lday, hm);
       if (oc) { const host = opts.lunch && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0), fizz = oc.kind === "wedding" || oc.kind === "nye";
         if (oc.glasses) { if (Math.random() < oc.guests/60*oc.drink*host) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.occB = (out.occB || 0) + 1; } } }
@@ -281,7 +281,7 @@ export function sellTick(F, opts = {}){
     if (Math.random() < .0016*f) { // a glass in the tasting room, poured from an open bottle (a fresh one is opened when needed)
       const s = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (s && Math.random() < winePf(s)) { if (!s.open) { s.n--; s.open = GLASSES; } s.open--; out.glasses++; out.coins += Math.max(1, Math.round(s.price/4)); if (Math.random() < (apero ? .9 : .6)) plate(); } }
     if (Math.random() < (apero ? .005 : .0016)*f) plate();   // someone pops in just for a bite (round 112: a bit more often, and lots more at aperitivo hour)
-    if (crate.length && Math.random() < .0018*f) { const id = crate[Math.floor(Math.random()*crate.length)]; v.fruit[id]--; if (!v.fruit[id]) delete v.fruit[id]; out.fruit = (out.fruit || 0) + 1; out.coins += (ITEMS[id] && ITEMS[id].sell) || 3; }   // fruit from Ma Ma's orchard
+    if (crate.length && Math.random() < .0018*f) { const id = crate[Math.floor(Math.random()*crate.length)]; v.fruit[id]--; if (!v.fruit[id]) delete v.fruit[id]; out.fruit = (out.fruit || 0) + 1; out.coins += (ITEMS[id] && ITEMS[id].sell) || 3; }   // fruit from the orchard
   }
   v.shelf = v.shelf.filter(s => s.n > 0 || s.open > 0);
   if (!out.coins && !out.plates && !out.watered && !out.picked && !out.filled && !out.stocked && !out.olives) return null;
@@ -324,10 +324,10 @@ const grapePic = c => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidd
 export function barrelPanel(F){
   const v = vineState(F);
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles.</p>`;
-  // round 132: the ladder up to the drying loft, once Mel's been to Cinque Terre (game/loft.js)
+  // round 132: the ladder up to the drying loft, once the player's been to Cinque Terre (game/loft.js)
   if (F.towns && F.towns.cinque) h += `<div class="actions"><button class="btn alt small" data-loft="1">Up the ladder to the drying loft</button></div>`;
   // the grape crates: picked grapes wait here. Take some for the Scoop Shack (or put them back); Marco only fills
-  // barrels from what's left over the amount Mel keeps back
+  // barrels from what's left over the amount the player keeps back
   h += `<p class="eyebrow">The grape crates</p><ul class="hlist wlist orflowers grcrates">${grapeKinds(v).map(c => { const back = (F.inv || {})["grape_" + c] || 0;
     return `<li><span class="wpic">${grapePic(c)}</span><span class="wtxt"><b>${v.grapes[c]} ${c} bunch${v.grapes[c] === 1 ? "" : "es"}</b><small>${v.help.barrels ? `Marco keeps ${v.keep[c] || 0} back for you` : "picked and waiting"}</small></span>
       <span class="orbtns"><button class="btn small primary" data-vy="takegr" data-k="${c}" data-n="1" ${v.grapes[c] ? "" : "disabled"}>Take 1</button><button class="btn small alt" data-vy="takegr" data-k="${c}" data-n="99" ${v.grapes[c] ? "" : "disabled"}>All</button>${back ? `<button class="btn small alt" data-vy="putgr" data-k="${c}">Put back ${back}</button>` : ""}</span>
@@ -352,7 +352,7 @@ export function stockFruit(F, id){ const v = vineState(F), n = (F.inv || {})[id]
   delete F.inv[id]; v.fruit[id] = (v.fruit[id] || 0) + n; return `${n} ${ITEMS[id].n.toLowerCase()}${n > 1 && !/s$/.test(ITEMS[id].n) ? "s" : ""} into the fruit crate.`; }
 const fruitCrate = F => { const v = vineState(F), crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0), bag = Object.keys(F.inv || {}).filter(id => F.inv[id] > 0 && ITEMS[id] && ITEMS[id].fruit);
   if (!crate.length && !bag.length) return "";
-  return `<p class="eyebrow">Fruit crate</p>${crate.length ? `<ul class="hlist wlist">${crate.map(id => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${v.fruit[id]} in the crate · ${ITEMS[id].sell || 3} coins each</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty. Fruit from Ma Ma's orchard sells here too.</p>`}
+  return `<p class="eyebrow">Fruit crate</p>${crate.length ? `<ul class="hlist wlist">${crate.map(id => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${v.fruit[id]} in the crate · ${ITEMS[id].sell || 3} coins each</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty. Fruit from the orchard sells here too.</p>`}
     ${bag.length ? `<div class="vbtns">${bag.map(id => `<button class="btn small alt" data-vyfruit="${id}">${icon(id, 18)} Add ${F.inv[id]} ${esc(ITEMS[id].n.toLowerCase())}</button>`).join("")}</div>` : ""}`; };
 export function shelfPanel(F){
   const v = vineState(F);
@@ -404,7 +404,7 @@ export function menuPanel(F, today){
     + sec("Small plates", plates.map(id => row(dishArt(id, 42), DISHES[id].n, `${v.menu[id]} left`, DISHES[id].price)))
     + sec("By the glass", wines.map(s => row(glassArt(s.type, 36), s.name, STYLES[s.type].n, Math.max(1, Math.round(s.price/4)))))
     + sec("By the bottle", v.shelf.filter(s => s.n > 0).map(s => row(bottleArt(s.type, 40), s.name, `${STYLES[s.type].n} · ${s.n} on the shelf`, s.price)))
-    + sec("From Ma Ma's orchard", fruit.map(id => row(icon(id, 34), ITEMS[id].n, `${v.fruit[id]} in the crate`, ITEMS[id].sell || 3)));
+    + sec("From the orchard", fruit.map(id => row(icon(id, 34), ITEMS[id].n, `${v.fruit[id]} in the crate`, ITEMS[id].sell || 3)));
   h += body || `<p class="muted">Nothing on today. Bottle some wine and stock the shelves, or cook something in the kitchen.</p>`;
   return h + `<p class="muted">Prices in coins.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }

@@ -1,4 +1,4 @@
-// The Lavender Hills' things to join in with (round 163), each with Evan in on it when he's come along:
+// The Lavender Hills' things to join in with (round 163), for you to join in with:
 //   the lavender harvest with Émile at Lavender Ridge: cut only the bushes in full flower (deep purple), leave the
 //     pale ones for next week. Then into the still. Two bunches of lavender to take home, once a day.
 //   pétanque with Monsieur Pagnol in the square at Montrose: short, middle or long, to land nearest the jack.
@@ -6,8 +6,8 @@
 //     gets a name, and your first is bottled for you to keep.
 //   the hives with Mathis at Sunflower Hill: a puff of smoke before you lift each frame. A jar of sunflower honey once
 //     a day.
-//   the sunflower maze: left, right or straight at each turn. Evan's certificate when he first finds the middle.
-//   Pooh-sticks off the Old Bridge: pick your stick, drop it, race to the other side. Best of three against Dad.
+//   the sunflower maze: left, right or straight at each turn. A certificate the first time you find the middle.
+//   Pooh-sticks off the Old Bridge: pick your stick, drop it, race to the other side. Best of three against Theo.
 //   the chapel on Chapel Hill: light a candle, and from half past five ring the bell for the sunset, pulling the rope
 //     each time it swings back down. A little brass bell to keep, the first time.
 //   Céline's banon lesson: soften the leaves, wrap, tie, rest. Then it's yours to make at home in Elena's cheese press
@@ -111,13 +111,13 @@ export function lvPanel(F, kind, st, o = {}){
       if (beesDone(t)) return h + `<p class="sub">${t.calm <= 0 ? "The buzzing rises, and Mathis says it's time to close up. \"They're cross today. Not your fault.\"" : `${t.lifted} frames of capped honey, golden and heavy.`} He gives you a jar from yesterday's spin.</p><div class="actions">${btn("beesdone", "Take off the veil")}</div>`;
       return h + `<p class="sub">${t.last === "buzz" ? "Bzzzz! You lifted it without smoke. The bees are cross." : t.last === "frame" ? "Up comes a frame, thick with honeycomb and slow, calm bees." : t.smoked ? "A puff of cool smoke drifts over the frames." : "The lid's off. Thousands of bees, humming."} (frame ${t.frame + 1} of ${BEES.FRAMES})</p><p class="muted">Calm: ${"●".repeat(t.calm)}${"○".repeat(3 - t.calm)}</p><div class="actions">${btn("bee.smoke", "A puff of smoke", false)}${btn("bee.lift", "Lift the frame")}</div>`; }
     case "maze": { let h = tape() + `<h2>The sunflower maze</h2>`;
-      if (!t) return h + `<p class="sub">Paths cut through sunflowers taller than Dad. Somewhere in the middle there's a bench and a little bell.${("")}</p><div class="actions">${btn("mazego", "In you go")}</div>` + shut;
+      if (!t) return h + `<p class="sub">Paths cut through sunflowers taller than you. Somewhere in the middle there's a bench and a little bell.${("")}</p><div class="actions">${btn("mazego", "In you go")}</div>` + shut;
       if (mazeDone(t)) return h + `<p class="sub">The middle! A little clearing, a bench, and a bell on a post. Ring, ring!${("")} ${t.wrong ? `(Only ${t.wrong} dead end${t.wrong > 1 ? "s" : ""}.)` : "Not one wrong turn!"}</p><div class="actions">${btn("mazedone", "Find the way out")}</div>`;
       return h + `<p class="sub">${t.last === "dead" ? "A dead end! Just sunflowers, all staring at you. Back you go." : t.at ? "On you go, the sunflowers closing in overhead..." : "Sunflowers on every side. Which way?"} (turn ${t.at + 1})</p><div class="actions">${btn("turn.left", "Left")}${btn("turn.straight", "Straight on")}${btn("turn.right", "Right")}</div>`; }
     case "sticks": { let h = tape() + `<h2>Pooh-sticks off the Old Bridge</h2>`;
-      if (!t) return h + `<p class="sub">Everyone picks a stick, drops it off the upstream side at the same moment, and runs to the other side to see whose comes out first. Dad says he's never lost. Best of three.</p><div class="actions">${btn("sticksgo", "Find a stick")}</div>` + shut;
-      if (sticksDone(t)) return h + `<p class="sub">${t.mine > t.dads ? "You win! Dad demands a recount. There is no recount in Pooh-sticks." : "Dad wins, and does a little dance on the bridge."} (${t.mine} to ${t.dads})${("")}</p><div class="actions">${btn("sticksdone", "Back over the bridge")}</div>`;
-      return h + `<p class="sub">${t.last === "won" ? "Yours pops out first!" : t.last === "lost" ? "Dad's pops out first. \"Undefeated!\"" : "Pick your stick."} (race ${t.round + 1} of ${STICKS.ROUNDS})</p><div class="actions">${Object.entries(STICK_N).map(([k, n]) => btn(`stick.${k}`, n)).join("")}</div>`; }
+      if (!t) return h + `<p class="sub">Everyone picks a stick, drops it off the upstream side at the same moment, and runs to the other side to see whose comes out first. Theo says he's never lost. Officially. Best of three.</p><div class="actions">${btn("sticksgo", "Find a stick")}</div>` + shut;
+      if (sticksDone(t)) return h + `<p class="sub">${t.mine > t.dads ? "You win! Theo demands a recount. There is no recount in Pooh-sticks." : "Theo wins, and does a small, dignified dance on the bridge."} (${t.mine} to ${t.dads})${("")}</p><div class="actions">${btn("sticksdone", "Back over the bridge")}</div>`;
+      return h + `<p class="sub">${t.last === "won" ? "Yours pops out first!" : t.last === "lost" ? "Theo's pops out first. \"Undefeated. Put it in the register.\"" : "Pick your stick."} (race ${t.round + 1} of ${STICKS.ROUNDS})</p><div class="actions">${Object.entries(STICK_N).map(([k, n]) => btn(`stick.${k}`, n)).join("")}</div>`; }
     case "bell": { let h = tape("stripe") + `<h2>The chapel of Saint Anne</h2>`;
       if (!t) return h + `<p class="sub">Light a candle, for anyone, for no reason at all.${bellOpen(hm) ? " And it's nearly sunset: Père Gaston holds out the bell rope. \"Pull when it swings back down to you. Five strokes.\"" : " From half past five, someone rings the bell for the sunset."}</p><div class="actions">${btn("candle", "Light a candle", false)}${bellOpen(hm) ? btn("bellgo", "Take the bell rope") : ""}</div>` + shut;
       if (bellDone(t)) return h + `<p class="sub">${t.rung >= BELL.STROKES ? "Dong. Dong. Dong. Dong. Dong. Out over the hill, over the goats, over the lavender. Outside, everyone's gone quiet, watching the sun go down." : "The rope runs out of swing. A few good dongs, and the sun goes down anyway, orange and gold."}</p><div class="actions">${btn("belldone", "Go out to watch the sunset")}</div>`;
@@ -133,7 +133,7 @@ export function lvPanel(F, kind, st, o = {}){
   return "";
 }
 
-// what a button does -> {say, sfx, evan, xp, hearts, flash, close}, or null
+// what a button does -> {say, sfx, xp, hearts, flash, close}, or null
 export function lvAct(F, kind, st, verb, arg, o = {}){
   const s = lvState(F), hm = o.hm || 12*60, add = o.addInv || (() => {}), rng = o.rng || Math.random, t = st.t;
   switch (verb) {
@@ -155,8 +155,8 @@ export function lvAct(F, kind, st, verb, arg, o = {}){
     case "beesdone": if (!t || !beesDone(t) || s.hives === dayKey()) return null; s.hives = dayKey(); st.t = null; add("honey_sun", 1); return {close: true, xp: 2, hearts: 2, flash: "A jar of sunflower honey", say: "Mathis gives you a jar of sunflower honey, golden and creamy. \"For your gelato,\" he says. Word gets around."};
     case "mazego": st.t = mazeStart(rng); return {sfx: "paper"};
     case "turn": { if (!t) return null; const r = mazeTurn(t, arg); if (!r) return null; t.last = r; return {sfx: r === "dead" ? "tap" : r === "middle" ? "chime" : "pop"}; }
-    case "mazedone": { if (!t || !mazeDone(t)) return null; s.maze = (s.maze || 0) + 1; const cert = false; if (cert) { s.cert = true; add("b_mazecert", 1); } st.t = null;
-      return {close: true, xp: 1, hearts: 2, flash: cert ? "Evan's sunflower maze certificate" : null, say: cert ? "Odile stamps a little certificate with a sunflower: Evan found the middle of the maze. He wants it framed." : "Out of the sunflowers, blinking, with pollen on everything."}; }
+    case "mazedone": { if (!t || !mazeDone(t)) return null; s.maze = (s.maze || 0) + 1; const cert = !s.cert && !(F.inv || {}).b_mazecert; if (cert) { s.cert = true; add("b_mazecert", 1); } st.t = null;
+      return {close: true, xp: 1, hearts: 2, flash: cert ? "A sunflower maze certificate" : null, say: cert ? "Odile stamps a little certificate with a sunflower: you found the middle of the maze. It's going in a frame." : "Out of the sunflowers, blinking, with pollen on everything."}; }
     case "sticksgo": st.t = sticksStart(); return {sfx: "paper"};
     case "stick": { if (!t) return null; const r = sticksDrop(t, arg, rng); if (!r) return null; return {sfx: r === "won" ? "chime" : "tap"}; }
     case "sticksdone": { if (!t || !sticksDone(t)) return null; s.sticks = (s.sticks || 0) + 1; if (t.mine > t.dads) s.beatDad = (s.beatDad || 0) + 1; st.t = null; return {close: true, xp: 1, hearts: 2}; }

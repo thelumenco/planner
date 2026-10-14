@@ -1,4 +1,4 @@
-// Bellbird Valley's Lavender Hills (round 161, Mel): the fourth and last region, inspired by Provence. Past Riverside
+// Bellbird Valley's Lavender Hills (round 161): the fourth and last region, inspired by Provence. Past Riverside
 // Camp the road climbs into soft limestone hills: rows of lavender in long purple stripes, a hilltop village with a
 // fountain and plane trees, a perfumery in a rose garden, sunflower fields humming with bees, a river with an old
 // stone bridge, and a goat farm under a little chapel where everyone goes for the sunset. Warm stone, blue shutters,
@@ -21,8 +21,6 @@ export const LV_TOWNS = {
   bv_lavender: {...VAN, n: "Lavender Ridge", region: "lavender", screens: ["hv_rows", "hv_still"], arrive: ["hv_rows", [150, 560]], station: "bvvan_lavender", music: "bb_lavender",
     blurb: "Rows and rows of lavender over a soft hill, bees in every one, an old copper still that turns the flowers into oil, a farm shop, and a tea room with lavender scones.",
     arriveLine: "Over the crest and there it is: the whole hillside in purple stripes, the smell coming in through the van windows before you've even stopped, and the hum of a thousand bees.",
-    evanArrive: ["it's ALL purple!", "bees! so many bees!", "it smells like Ma Ma's soap!"],
-    evanScreen: {hv_rows: ["the bees are on every flower!", "purple, purple, purple!"], hv_still: ["a big copper pot!", "steam! it's cooking flowers!"]},
     hints: {hv_rows: "Lavender Ridge: the lavender rows and the van. Down the lane: the still, the farm shop and the tea room.", hv_still: "The farmyard: the copper still, the farm shop, the tea room. Up the lane: back to the rows."},
     spots: famSpots({hv_rows: [[250, 420], [330, 450], [220, 500], [380, 400], [180, 430], [300, 520]], hv_still: [[220, 360], [300, 380], [260, 460], [200, 520], [330, 540], [260, 300]]}),
     acts: {hana: {hv_rows: {act: "armful", at: [240, 440], dir: 1}}, bo: {hv_rows: {act: "bee", at: [340, 480], dir: -1}}}, rooms: {
@@ -31,10 +29,10 @@ export const LV_TOWNS = {
       bv_htea: room("bvhtea", "The Lavender Ridge tea room", "The tea room: lace curtains, a view down the rows, lavender scones, and lavender lemonade in tall glasses.")},
     lines: {hana: ["I could lie down in these rows and never get up.", "Smell it! You can taste it in the air."],
       theo: ["Every row's planted on the curve of the hill. Clever.", "That still must be a hundred years old. Look at the copper."],
-      farid: ["Ma Ma's soap smells like this. Now Ma Ma knows why.", "Lavender scones? Ma Ma will judge them."],
-      mei: ["Gong Gong likes the bees. Busy, busy. Like Ma Ma.", "Very peaceful. Gong Gong could stay all day."],
+      farid: ["Lavender scones? I'll be the judge of those. I trained in a bakery, you know.", "Lavender in my almond cake. Why have I never tried that?"],
+      mei: ["Listen to the bees. Busy, busy. I could hum along with them.", "Very peaceful. I could doze here all afternoon."],
       bo: ["There's a bee on me. There's a bee ON me. It's fine. It's fine.", "Lavender lemonade. Sounds weird. Tastes amazing."],
-      tomi: ["Zeh, this is going straight on the fridge as a photo.", "Purple as far as you can see."],
+      tomi: ["This is going straight on the fridge as a photo.", "Purple as far as you can see. Like the last level of a game."],
       posy: ["Lavender in everything! The soap, the honey, the scones!", "I'm taking a whole armful home."]},
     say: {bvhrows: "The lavender rows: long purple stripes over the hill, humming with bees, each bush a round soft cushion.",
       bvhbench: "A bench at the top of the rows, looking down over all that purple to the hills.",
@@ -44,22 +42,20 @@ export const LV_TOWNS = {
   bv_hilltown: {...VAN, n: "Montrose", region: "lavender", screens: ["hm_square", "hm_lanes"], arrive: ["hm_square", [130, 560]], station: "bvvan_hilltown", music: "bb_hilltown",
     blurb: "A hilltop village of honey-coloured stone: a square with a fountain and plane trees, a boulangerie, a nougat shop, a café, old men playing pétanque, and lanes that climb to the ramparts.",
     arriveLine: "Up the last switchback into Montrose: a square of warm stone, the fountain splashing, plane trees making dappled shade, and the click of pétanque balls.",
-    evanArrive: ["a FOUNTAIN!", "the houses are made of rocks!", "I smell bread!"],
-    evanScreen: {hm_square: ["the men are throwing balls!", "a fountain with a fish!"], hm_lanes: ["steps! so many steps!", "a tiny door!"]},
     hints: {hm_square: "Montrose: the square, the fountain, the pétanque piste, the boulangerie, the nougat shop, the café and the van. East: the lanes.", hm_lanes: "The lanes: the old washhouse, the steps up to the ramparts. West: back to the square."},
     spots: famSpots({hm_square: [[220, 400], [320, 420], [260, 520], [180, 460], [360, 560], [300, 300]], hm_lanes: [[200, 380], [300, 420], [380, 380], [260, 500], [160, 520], [420, 520]]}),
     acts: {mei: {hm_square: {act: "baguette", at: [200, 440], dir: 1}}, tomi: {hm_square: {act: "accordion", at: [330, 320], dir: -1}}}, rooms: {
       bv_hboul: room("bvhboul", "La Boulangerie", "The boulangerie: baskets of baguettes standing up like umbrellas, fougasse shaped like leaves, tarts in the window, and a bell on the door."),
       bv_hnougat: room("bvhnougat", "The nougat shop", "The nougat shop: great slabs of white nougat studded with almonds, little calissons in rows, and Madame cutting slices with a big knife."),
       bv_hcafe: room("bvhcafe", "Café de la Place", "The café: little round tables, wicker chairs, a zinc bar, citron pressé, and everyone watching the pétanque through the window."),
-      // round 183: Mel's paperie (goals.js "paperie"), up in the lanes: empty and for sale until she buys it
+      // round 183: your paperie (goals.js "paperie"), up in the lanes: empty and for sale until you buy it
       bv_hpaper: room("bvhpaper", "The paperie", "The paperie: stone walls, a long drying line, a vat by the back wall, and paper in every colour on the shelves.")},
     lines: {hana: ["Everything's the colour of honey here.", "Those blue shutters! I want blue shutters."],
       theo: ["These walls are seven hundred years old. Seven hundred.", "From the ramparts you can see the lavender, the sunflowers and the river."],
-      farid: ["A baguette. Ma Ma will carry it. Ma Ma will eat the end.", "Nougat! Ma Ma's teeth say no. Ma Ma says yes."],
-      mei: ["Gong Gong wants to play with the old men. Gong Gong will win.", "Very old village. Gong Gong feels young here."],
-      bo: ["Fresh baguette, still warm. I'm not sharing the crust.", "The steps up to the ramparts. Let's count them. Darren counts."],
-      tomi: ["Zeh, this square. This is the life.", "Someone's playing an accordion somewhere. Of course they are."],
+      farid: ["A baguette. I'll carry it. I'll also eat the end.", "Nougat! My teeth say no. I say yes."],
+      mei: ["The old men are playing pétanque. I think I could beat them.", "Very old village. Very quiet. I feel young here."],
+      bo: ["Fresh baguette, still warm. I'm not sharing the crust.", "The steps up to the ramparts. I'll count them. Then I'll count them again."],
+      tomi: ["This square. This is the life.", "Someone's playing an accordion somewhere. Of course they are."],
       posy: ["The little doors! Every one a different colour.", "A café in a square under the trees. I've dreamt of this."]},
     say: {bvhfountain: "The fountain: an old stone fish spouting water into a mossy basin, and pigeons taking turns to drink.",
       bvhpiste: "The pétanque piste: a gravel strip under the plane trees, old men in caps, and the click of steel balls.",
@@ -71,8 +67,6 @@ export const LV_TOWNS = {
   bv_perfume: {...VAN, n: "Rosehill", region: "lavender", screens: ["hp_garden", "hp_street"], arrive: ["hp_street", [130, 560]], station: "bvvan_perfume", music: "bb_perfume",
     blurb: "A little perfume town: a walled garden of roses, jasmine and tuberose, the old perfumery where you can blend your own scent, a soap maker, and a glassblower who makes the bottles.",
     arriveLine: "Into Rosehill, and the air is sweet before you're even out of the van: roses climbing every wall, and a perfumery with its doors open and its windows full of tiny bottles.",
-    evanArrive: ["it smells like FLOWERS!", "tiny bottles!", "a man is blowing glass!"],
-    evanScreen: {hp_street: ["the glass is ON FIRE", "soap that looks like cake!"], hp_garden: ["roses bigger than my face!", "a bee in the rose!"]},
     hints: {hp_street: "Rosehill: the perfumery, the soap maker, the glassblower and the van. Up the steps: the flower garden.", hp_garden: "The perfumer's garden: the roses, the jasmine and the tuberose. Down the steps: back to the street."},
     spots: famSpots({hp_street: [[220, 360], [300, 380], [260, 460], [200, 520], [330, 540], [260, 300]], hp_garden: [[200, 450], [320, 470], [260, 540], [420, 520], [140, 520], [380, 300]]}),
     acts: {posy: {hp_garden: {act: "sniff", at: [200, 460], dir: 1}}, farid: {hp_street: {act: "spritz", at: [220, 330], dir: 1}}}, rooms: {
@@ -81,10 +75,10 @@ export const LV_TOWNS = {
       bv_hglass: room("bvhglass", "The glassblower", "The glassblower's: the furnace roaring orange, Luc turning a glowing blob on a long pipe, and shelves of little coloured bottles catching the light.")},
     lines: {hana: ["I'm making a perfume. Mine. Nobody else will smell like me.", "The roses! Smell this one. And this one."],
       theo: ["Watch him blow the glass. That's a skill you can't rush.", "A thousand roses for one tiny bottle. Imagine."],
-      farid: ["Ma Ma's soap. From here. Now Ma Ma knows.", "Very nice smell. Ma Ma will wear it to mahjong."],
-      mei: ["Gong Gong will sit in the garden with the roses.", "The glassblower is very patient. Gong Gong respects him."],
-      bo: ["I'm going to make a perfume called Darren. It'll smell like chips.", "That furnace is HOT. I'm standing over here."],
-      tomi: ["Zeh, I'm making one for Angie. Don't tell her.", "The soap looks like slices of cake. Don't eat it, Evan."],
+      farid: ["Lavender soap for the cottage. Mei will pretend it's hers.", "Very nice smell. I'll wear it to the Sunday market."],
+      mei: ["I'll sit in the garden with the roses, and sing to them a little.", "The glassblower is very patient. I respect that."],
+      bo: ["I'm going to make a perfume called Sawdust. It'll smell like the workshop.", "That furnace is HOT. I'm standing over here."],
+      tomi: ["I'm making one for Posy. Don't tell her.", "The soap looks like slices of cake. I'm not going to eat it. Probably."],
       posy: ["I could spend all day in that perfume shop. Smelling everything.", "Jasmine at night must be amazing here."]},
     say: {bvhroses: "The rose beds: old roses, pink and cream and deep red, so heavy with flowers they lean on each other.",
       bvhjasmine: "The jasmine walk: a tunnel of white stars, strongest at dusk.",
@@ -92,10 +86,8 @@ export const LV_TOWNS = {
       bvhsavon: "The soap maker's: a little shop with soap stacked in the window like bricks.",
       bvhglass: "The glassblower's: a workshop with its doors wide open and the glow of the furnace inside."}},
   bv_honey: {...VAN, n: "Sunflower Hill", region: "lavender", screens: ["hs_fields", "hs_hives"], arrive: ["hs_hives", [390, 560]], station: "bvvan_honey", music: "bb_honey",
-    blurb: "A honey farm among fields of sunflowers taller than Dad: rows of painted hives, a honey house, a beeswax candle shop, a farmhouse kitchen, and a sunflower maze.",
+    blurb: "A honey farm among fields of sunflowers taller than you: rows of painted hives, a honey house, a beeswax candle shop, a farmhouse kitchen, and a sunflower maze.",
     arriveLine: "Down a lane between walls of sunflowers, every face turned to the sun, and at the end, a row of hives painted every colour, and the deep, slow hum of bees.",
-    evanArrive: ["the flowers are TALLER than Daddy!", "the boxes are for bees!", "a maze! a sunflower maze!"],
-    evanScreen: {hs_hives: ["the bees live in the boxes!", "honey! honey!"], hs_fields: ["I'm lost in the sunflowers!", "they're all looking at the sun!"]},
     hints: {hs_hives: "Sunflower Hill: the hives, the honey house, the candle shop and the van. West: the sunflower fields.", hs_fields: "The sunflower fields: the maze, and the farmhouse kitchen. East: back to the hives."},
     spots: famSpots({hs_hives: [[220, 360], [300, 400], [160, 420], [420, 380], [260, 480], [120, 520]], hs_fields: [[200, 420], [320, 420], [260, 500], [420, 500], [140, 460], [360, 580]]}),
     acts: {theo: {hs_hives: {act: "beesuit", at: [320, 440], dir: -1}}, tomi: {hs_fields: {act: "sunflower", at: [380, 560], dir: -1}}}, rooms: {
@@ -104,10 +96,10 @@ export const LV_TOWNS = {
       bv_hkitchen: room("bvhkitchen", "The farmhouse kitchen", "The farmhouse kitchen: a long scrubbed table, a stove, bunches of herbs, honey cake under a cloth, and Odile's lunch for whoever's there.")},
     lines: {hana: ["Every sunflower's facing the same way. Following the sun.", "Honey still warm from the hive. On bread. Heaven."],
       theo: ["Bees fly two kilometres for one load. Those little legs.", "The sunflowers turn east every night to wait for the sun."],
-      farid: ["Lavender honey from here. Ma Ma buys three. No, four.", "A farmhouse lunch. Ma Ma approves."],
-      mei: ["Gong Gong will watch the bees. Good workers.", "Sunflowers like little suns. Very cheerful."],
-      bo: ["I'm going into the maze. If I'm not back in an hour, send honey.", "Bees. Lots of bees. Calm. Stay calm, Darren."],
-      tomi: ["Zeh, these sunflowers are like two metres.", "Beekeeping. I want to try it. In the suit. The whole suit."],
+      farid: ["Lavender honey from here. I'll buy three. No, four. For baking.", "A farmhouse lunch. Very good bread. I approve."],
+      mei: ["I'll watch the bees for a while. Good workers.", "Sunflowers like little suns. Very cheerful."],
+      bo: ["I'm going into the maze. If I'm not back in an hour, send honey.", "Bees. Lots of bees. Calm. Stay calm, Bo."],
+      tomi: ["These sunflowers are like two metres tall.", "Beekeeping. I want to try it. In the suit. The whole suit."],
       posy: ["Beeswax candles! They smell like honey when they burn.", "The hives are painted like little houses!"]},
     say: {bvhhives: "The hives: a row of wooden boxes painted blue, yellow, green and pink, bees streaming in and out.",
       bvhmaze: "The sunflower maze: paths cut through sunflowers taller than you, with a little bench in the middle.",
@@ -117,8 +109,6 @@ export const LV_TOWNS = {
   bv_bridge: {...VAN, n: "The Old Bridge", region: "lavender", screens: ["hb_bridge", "hb_bank"], arrive: ["hb_bridge", [130, 560]], station: "bvvan_bridge", music: "bb_bridge",
     blurb: "A green river under a humpbacked stone bridge, willows trailing in the water, a meadow for picnics, an old water mill that's a restaurant now, an épicerie and an ice-cream shop.",
     arriveLine: "Down to the river: a humpbacked bridge of old stone, willows trailing their hair in the green water, dragonflies, and the slow turn of a mill wheel.",
-    evanArrive: ["a BRIDGE! a round bridge!", "can we throw sticks?", "a water wheel!"],
-    evanScreen: {hb_bridge: ["sticks! I need sticks!", "a duck under the bridge!"], hb_bank: ["ice cream! ICE CREAM!", "the wheel goes round and round"]},
     hints: {hb_bridge: "The Old Bridge: the bridge over the river, the willow and its swing, and the van. East: the riverbank.", hb_bank: "The riverbank: the meadow, the old mill restaurant, the épicerie and the ice-cream shop. West: back to the bridge."},
     spots: famSpots({hb_bridge: [[220, 400], [320, 420], [260, 520], [400, 500], [180, 460], [360, 560]], hb_bank: [[200, 420], [320, 440], [260, 520], [420, 480], [140, 500], [380, 560]]}),
     acts: {bo: {hb_bank: {act: "float", at: [180, 612], dir: 1}}, mei: {hb_bank: {act: "picnic", at: [380, 480], dir: -1}}}, rooms: {
@@ -127,10 +117,10 @@ export const LV_TOWNS = {
       bv_hmill: room("bvhmill", "Le Vieux Moulin", "The old mill, now a restaurant: the great wheel turning outside the window, stone walls, white tablecloths, and the sound of water under the floor.")},
     lines: {hana: ["A picnic by the river under the willows. Perfect.", "Listen: the water, the wheel, the birds. That's all."],
       theo: ["That bridge was built without a single drop of mortar. Just stones.", "Pooh-sticks. I'm the champion. Ask anyone."],
-      farid: ["A picnic. Ma Ma brought the good containers.", "Apricot ice cream. Ma Ma says yes."],
-      mei: ["Gong Gong will sit under the willow and rest.", "Old bridge, old mill, old man. Good company."],
+      farid: ["A picnic. I brought the good containers. And a cake. Two cakes.", "Apricot ice cream. Yes, please."],
+      mei: ["I'll sit under the willow and rest. Wake me if a fish jumps.", "Old bridge, old mill, slow river. Good company."],
       bo: ["I'm going in the river. On a rubber ring. Watch me float.", "Lavender ice cream? Fine. Two scoops."],
-      tomi: ["Zeh, dinner at the mill. With the wheel turning. Romantic.", "Dragonflies! Blue ones!"],
+      tomi: ["Dinner at the mill. With the wheel turning. Romantic, right, Posy?", "Dragonflies! Blue ones!"],
       posy: ["The willow swing! I'm having a go.", "I want to live in a house by this river."]},
     say: {bvhbridge: "The old bridge: a humpback of grey stone over the green river, worn smooth by centuries of feet. Perfect for Pooh-sticks.",
       bvhwillow: "The willow: its branches trailing in the water, and a rope swing hanging from the big bough.",
@@ -141,8 +131,6 @@ export const LV_TOWNS = {
   bv_chapel: {...VAN, n: "Chapel Hill", region: "lavender", screens: ["hc_goats", "hc_chapel"], arrive: ["hc_goats", [130, 560]], station: "bvvan_chapel", music: "bb_chapel",
     blurb: "A goat farm on a hillside of wild thyme, with a fromagerie and a farm bistro, and at the top of the hill a tiny stone chapel among the cypresses, where everyone comes to watch the sunset.",
     arriveLine: "Up a white gravel track through wild thyme, past goats with bells clanking, to a farm on the hillside, and above it all, a tiny chapel and three dark cypress trees against the sky.",
-    evanArrive: ["GOATS! with BELLS!", "a tiny church!", "the goat is eating my shoe!"],
-    evanScreen: {hc_goats: ["the baby goat jumped!", "ding ding ding, the goats!"], hc_chapel: ["we're on top of the world!", "the sun is going down!"]},
     hints: {hc_goats: "Chapel Hill: the goats, the fromagerie, the farm bistro and the van. East: up to the chapel.", hc_chapel: "The hilltop: the little chapel, the cypresses, and the sunset bench. West: back down to the goats."},
     spots: famSpots({hc_goats: [[220, 460], [320, 480], [260, 540], [400, 520], [160, 500], [360, 580]], hc_chapel: [[180, 380], [340, 380], [260, 460], [420, 460], [140, 500], [380, 540]]}),
     acts: {theo: {hc_goats: {act: "goat", at: [350, 450], dir: 1}}, farid: {hc_chapel: {act: "candle", at: [200, 300], dir: 1}}, hana: {hc_chapel: {act: "heart", at: [330, 330], dir: 1}}}, rooms: {
@@ -151,10 +139,10 @@ export const LV_TOWNS = {
       bv_hchapel: room("bvhchapel", "The chapel of Saint Anne", "The chapel: cool and dim, whitewashed walls, a few wooden benches, candles flickering, a little painted ceiling of stars, and the bell rope hanging by the door.")},
     lines: {hana: ["The sunset from up here. I'm not leaving till it's dark.", "Goat's cheese with honey. Try it. Trust me."],
       theo: ["That chapel's nine hundred years old. Still standing.", "The cypresses are like exclamation marks on the hill."],
-      farid: ["The goats are very naughty. Ma Ma likes them.", "Ma Ma will light a candle in the little church."],
-      mei: ["Gong Gong will sit on the bench and watch the sun go.", "Wild thyme everywhere. Smell it when you walk."],
+      farid: ["The goats are very naughty. I like them.", "I'll light a candle in the little church."],
+      mei: ["I'll sit on the bench and watch the sun go.", "Wild thyme everywhere. Smell it when you walk."],
       bo: ["A goat ate my map. Fine. I didn't need it.", "Warm goat's cheese on toast. Life is good."],
-      tomi: ["Zeh, the best sunset of the whole trip. Bet you.", "The little church bell. I want to ring it."],
+      tomi: ["Best sunset of the whole trip. Bet you.", "The little church bell. I want to ring it."],
       posy: ["Cheese wrapped in leaves and tied with string! Like a present!", "The stars on the chapel ceiling. Someone painted every one."]},
     say: {bvhgoats: "The goats: brown and white, bells clanking, kids leaping off rocks, and one very bold one eyeing your bag.",
       bvhsunset: "The sunset bench: an old stone bench by the cypresses, facing west over the whole valley.",
@@ -239,7 +227,7 @@ export const LV_NAMES = {hv_rows: "Lavender Ridge", hv_still: "Lavender Ridge: t
   hb_bridge: "The Old Bridge", hb_bank: "The Old Bridge: the riverbank", hc_goats: "Chapel Hill", hc_chapel: "Chapel Hill: the chapel"};
 // Round 162: what the Lavender Hills' rooms sell (TOWN_GOODS, by room; merged in data/bellbird.js). Sunflower honey
 // goes in the gelato and the bonbons; the lavender itself you pick at Lavender Ridge (game/lvacts.js: bunches, for the
-// mill and the gelato). Your own perfume, Evan's maze certificate and the chapel's little medal are keepsakes you earn.
+// mill and the gelato). Your own perfume, the sunflower maze certificate and the chapel's little medal are keepsakes you earn.
 export const LV_GOODS = {
   b_lavoil: {n: "Lavender oil in a blue bottle", kind: "gift", to: ["hana", "farid", "posy"], price: 9, shop: "bv_hshop", art: ["bottle", "#3E6B8C", "#9A7CC8"], say: "Lavender oil from the still! One drop on the pillow and I'll sleep like a baby."},
   b_lavbags: {n: "Little lavender bags", kind: "gift", to: "family", price: 4, shop: "bv_hshop", art: ["bag", "#E6DCF3", "#9A7CC8"], say: "Lavender bags for the drawers! Everything's going to smell like Provence."},
@@ -248,7 +236,7 @@ export const LV_GOODS = {
   b_nougat: {n: "A slab of nougat", kind: "gift", to: ["farid", "bo", "mei"], price: 6, shop: "bv_hnougat", art: ["box", "#FFFDF6", "#D9A05A"], say: "White nougat with almonds and lavender honey! Chewy. Gooey. Gone."},
   b_calissons: {n: "A box of calissons", kind: "gift", to: ["hana", "posy", "theo"], price: 8, shop: "bv_hnougat", art: ["box", "#F3E7B0", "#C8643B"], say: "Calissons! Little diamond sweets of almond and melon, iced white. So pretty I almost can't eat them. Almost."},
   b_savon: {n: "A block of Provence soap", kind: "gift", to: "family", price: 5, shop: "bv_hsavon", art: ["soap", "#E6DCF3"], say: "Real olive oil soap from Rosehill, with lavender! It's stamped and everything."},
-  b_soapstamp: {n: "A wooden soap stamp", kind: "keepsake", price: 9, shop: "bv_hsavon", art: ["sticks", "#B98A5E"], line: "An old wooden soap stamp from the soap maker at Rosehill, carved with a little sprig of lavender. Mel stamps her own soaps with it now."},
+  b_soapstamp: {n: "A wooden soap stamp", kind: "keepsake", price: 9, shop: "bv_hsavon", art: ["sticks", "#B98A5E"], line: "An old wooden soap stamp from the soap maker at Rosehill, carved with a little sprig of lavender. You stamp your own soaps with it now."},
   b_glassbird: {n: "A blown-glass bird", kind: "keepsake", price: 14, shop: "bv_hglass", art: ["bird", "#9FD3C2"], line: "A little blue-green bird blown from glass by Luc at Rosehill. It catches the morning light on the windowsill."},
   b_scentbottle: {n: "A tiny glass scent bottle", kind: "gift", to: ["posy", "hana", "farid"], price: 10, shop: "bv_hglass", art: ["bottle", "#B79BDC", "#F3C969"], say: "A tiny glass bottle, hand-blown, with a glass stopper like a flower! For perfume. Or just for looking at."},
   honey_sun: {n: "Sunflower honey", kind: "ingredient", price: 7, sell: 4, shop: "bv_hhoney", art: ["jar", "#E3B04B", "#F3C93A"], what: "golden and creamy, from Sunflower Hill: for gelato and bonbons"},
@@ -259,7 +247,7 @@ export const LV_GOODS = {
   b_picnic: {n: "A little picnic basket", kind: "keepsake", price: 15, shop: "bv_hepicerie", art: ["tote", "#C9A06A"], line: "A wicker picnic basket from the épicerie by the Old Bridge, with a gingham lining. For every picnic from now on."},
   b_chevre: {n: "A goat's cheese in a chestnut leaf", kind: "gift", to: ["theo", "farid", "mei", "bo", "posy"], price: 7, shop: "bv_hfromage", art: ["wheel", "#FFF8EC", "#7A5A3A"], say: "A little goat's cheese wrapped in a chestnut leaf and tied with raffia! Like a present. It is a present."},
   b_myperfume: {n: "Your own perfume", kind: "keepsake", price: 0, art: ["bottle", "#E8A0B4", "#F3C969"], line: "A little bottle of the perfume you blended yourself at the perfumery in Rosehill, with your own name for it on the label in the perfumer's handwriting."},
-  b_mazecert: {n: "Evan's sunflower maze certificate", kind: "keepsake", price: 0, art: ["tile", "#F3C93A", "#5E8A3A"], line: "A certificate from Sunflower Hill: Evan found the middle of the sunflower maze, with a sunflower stamp and Odile's signature."},
+  b_mazecert: {n: "A sunflower maze certificate", kind: "keepsake", price: 0, art: ["tile", "#F3C93A", "#5E8A3A"], line: "A certificate from Sunflower Hill: you found the middle of the sunflower maze, with a sunflower stamp and Odile's signature."},
   b_bellmedal: {n: "A little chapel bell", kind: "keepsake", price: 0, art: ["bell", "#C9A24A"], line: "A tiny brass bell from the chapel of Saint Anne on Chapel Hill, for ringing the bell at sunset. It tinkles when the door opens."}
 };
 export const LV_KEEP = {};

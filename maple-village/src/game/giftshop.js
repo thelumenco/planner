@@ -1,11 +1,11 @@
-// The gift shop behind the wine shop (round 178, Mel: "a gift shop... a display case of bonbons, shelves of whatever was
-// produced in the mill... it sells from the same stock lah"). Inspired by a Yarra Valley cellar door with tea, cheese,
+// The gift shop behind the wine shop (round 178: "a gift shop... a display case of bonbons, shelves of whatever was
+// produced in the mill... it sells from the same stock"). Inspired by a Yarra Valley cellar door with tea, cheese,
 // chocolates and a gift corner. A goal (800 coins), through a new door in the wine shop's bottom-left corner. Posy keeps
 // it, 10 to 6, every day but Monday. Everything on its shelves is shared stock: the Cocoa Room's display case and bar
 // wall, the mill's shelves, the wine shop's bottles. A sale here is one fewer there.
 // State: F.giftshop = {sold: {day: {n, coins, bonbon, bar, mill, wine, pair}}, pairs: [price, ...]}
 // Round 189: they can also be packed in the wine corner itself ("Pair it" on a bottle), straight onto the display.
-// Pairing boxes (round 179, Mel: "yes please"): Mel packs them herself at the bonbon table (a bottle and 4 bonbons), then
+// Pairing boxes (round 179: "yes please"): The player packs them herself at the bonbon table (a bottle and 4 bonbons), then
 // puts them out in the wine corner. Each one sells for what went into it, no more: the bottle's price plus 4 bonbons.
 // They go now and then, more often in the weeks before Valentine's, Mother's Day and Christmas.
 import { esc } from "../util.js";
@@ -15,8 +15,8 @@ import { forSale, sellPainting, sellMade, makersState, MAKER_ITEMS, galleryPanel
 
 export const GIFT_HOURS = {from: 10*60, to: 18*60, closed: [1]};
 export const giftState = F => { F.giftshop = F.giftshop || {}; F.giftshop.sold = F.giftshop.sold || {}; F.giftshop.pairs = F.giftshop.pairs || []; F.giftshop.wrapped = F.giftshop.wrapped || []; return F.giftshop; };
-// round 185: a gift Mel wrapped, out on the wrapping table to sell (at its own price: the gift plus the paper, ribbon and tag)
-// round 202 (Mel: "shouldn't there be a table next to it for gifts?"): the gift basket beside the wrapping table holds them; one can come back out
+// round 185: a gift the player wrapped, out on the wrapping table to sell (at its own price: the gift plus the paper, ribbon and tag)
+// round 202 ("shouldn't there be a table next to it for gifts?"): the gift basket beside the wrapping table holds them; one can come back out
 export function takeWrapped(F, i){ const w = giftState(F).wrapped, id = w[i]; if (!id) return null; w.splice(i, 1); F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; return id; }
 export function putWrapped(F, id){ const inv = F.inv || {}; if (!(inv[id] > 0) || !ITEMS[id] || !ITEMS[id].wrapped) return false; inv[id]--; if (inv[id] <= 0) delete inv[id]; giftState(F).wrapped.push(id); return true; }   // (F.gift is the welcome seeds)
 const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
@@ -43,7 +43,7 @@ export function takeBackPair(F, c){
   if (c) { const have = (F.inv || {}).pairbox || 0; c.pairVals = [...(have ? (c.pairVals || []).slice(-have) : []), val]; }
   F.inv.pairbox = (F.inv.pairbox || 0) + 1; return 1;
 }
-// round 188 (Mel: "I can click the bonbon case and the wine shelves but I cannot take one"): Mel takes things off the
+// round 188 ("I can click the bonbon case and the wine shelves but I cannot take one"): The player takes things off the
 // gift shop's displays, from the same shared stock. A bottle becomes a gift of its own (registered from F.giftshop.bottles).
 export function takeBottle(F, v, shelfId){
   const b = ((v || {}).shelf || []).find(x => x.id === shelfId && x.n > 0); if (!b) return null;
@@ -52,20 +52,20 @@ export function takeBottle(F, v, shelfId){
 }
 export function registerBottles(F){ for (const [id, b] of Object.entries((F.giftshop || {}).bottles || {})) ITEMS[id] = {n: `A bottle of ${b.name}`, kind: "gift", to: ["hana", "theo", "bo", "tomi", "posy", "mei"], price: b.price,
   ico: "wine_" + (["red", "rose", "white", "sparkling"].includes(b.type) ? b.type : "red"), say: `Your own ${b.name}! We'll open it this weekend.`, wine: true}; }
-// one minute of trade: mode "mel" (she's at the till), "keeper" (Posy's in), else shut -> coins
+// one minute of trade: mode "mel" (the player at the till), "keeper" (Posy's in), else shut -> coins
 export function giftSellMinute(F, day, hm, mode, o){
   if (!mode) return 0; const p = mode === "mel" ? .08 : .05; if (Math.random() >= p) return 0;
   const g = giftState(F);
   if (g.wrapped.length && Math.random() < (pairSeason(day) ? .3 : .12)) {   // a wrapped gift off the table
     const id = g.wrapped.shift(), coins = (ITEMS[id] || {price: 6}).price, t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.wrap = (t.wrap || 0) + 1; return coins;
   }
-  // round 196: now and then a painting off the gallery wall (Mel keeps a token; the painter gets the rest and writes),
-  // and the makers' shelf (Mel keeps about a fifth)
+  // round 196: now and then a painting off the gallery wall (The player keeps a token; the painter gets the rest and writes),
+  // and the makers' shelf (The player keeps about a fifth)
   if (forSale(F).length && Math.random() < .05) {
     const fr = galleryState(F).frames, idx = fr.map((f, i) => f && f.by ? i : -1).filter(i => i >= 0), i = idx[Math.floor(Math.random()*idx.length)], at = o.at || Date.now(),
       coins = sellPainting(F, i, at), t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.art = (t.art || 0) + 1; return coins;
   }
-  { const tr = F.giftshop.travel || {}, ts = Object.keys(tr).filter(id => tr[id] > 0 && ITEMS[id]); if (ts.length && Math.random() < .12) {   // round 198: from our travels (Mel paid for the box, so it's all hers)
+  { const tr = F.giftshop.travel || {}, ts = Object.keys(tr).filter(id => tr[id] > 0 && ITEMS[id]); if (ts.length && Math.random() < .12) {   // round 198: from our travels (The player paid for the box, so it's all hers)
     const id = ts[Math.floor(Math.random()*ts.length)], coins = ITEMS[id].price; tr[id]--; const t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.travel = (t.travel || 0) + 1; return coins; } }
   { const mk = MAKER_ITEMS.filter(id => (makersState(F).stock[id] || 0) > 0); if (mk.length && Math.random() < .18) {
     const coins = sellMade(F, mk[Math.floor(Math.random()*mk.length)]), t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.made = (t.made || 0) + 1; return coins; } }

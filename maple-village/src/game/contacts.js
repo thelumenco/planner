@@ -1,7 +1,7 @@
-// The address book (round 190, Mel: "People I meet on travels, can I add them to a contact list in the game if I want,
-// so I can mail them gifts and letters. They then come back with a thank you note in line with their character").
-// Anyone Mel's met on a trip (F.met), but not the day-trippers (tourist: true), can go in the book if she wants; the
-// campervan neighbours too. From the gift chooser she posts a gift ("By post"): parcels cost postage by how far
+// The address book (round 190): people you meet on your travels can go in a contact list, so you can post them gifts
+// and letters. They write back a thank-you note in their own voice.
+// Anyone you've met on a trip (F.met), but not the day-trippers (tourist: true), can go in the book if you like; the
+// campervan neighbours too. From the gift chooser you post a gift ("By post"): parcels cost postage by how far
 // (POSTAGE), letters are free. A reply comes back in a day or three, in that person's own voice (data/pen-*.js), and now
 // and then with a little something from their stop tucked in. Someone with no voice written yet writes a plain thank-you
 // with a P.S. from their own lines.
@@ -27,7 +27,7 @@ export const REGIONS = {bellbird: "Bellbird Valley", coast: "the Coast Road", ta
 // what a parcel costs to post, and how many days the reply takes (a letter's free)
 export const POSTAGE = {bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8};
 const DAYS = {2: 1, 4: 2, 8: 3};
-const HELD = [];   // (round 192: Jason and Luca are in, with Mel's blessing)
+const HELD = [];   // anyone held back from the book (nobody, now)
 const REGION = {};
 [[BB_PEOPLE, "bellbird"], [CR_PEOPLE, "coast"], [TL_PEOPLE, "tablelands"], [LV_PEOPLE, "lavender"]].forEach(([list, r]) => list.forEach(p => { REGION[p.id] = r; }));
 NPCS.forEach(p => { if (["ronda", "kyoto", "jeju", "cinque"].includes(p.local)) REGION[p.id] = p.local; });
@@ -46,13 +46,13 @@ export const addable = F => Object.keys(F.met || {}).filter(id => canAdd(F, id) 
 export const postage = id => POSTAGE[REGION[id]] || 4;
 export const postable = it => !!it && (it.kind === "gift" || it.kind === "bouquet" || (it.kind === "keepsake" && !!it.to));
 
-// the ready-made openings for a letter (Mel can add her own lines below)
+// the ready-made openings for a letter (you can add your own lines below)
 export const OPENINGS = ["Thinking of you", "Thank you for the day", "I keep thinking about your", "Guess what happened at home", "Just saying hello"];
 const OPEN_TXT = {"Thinking of you": "I was thinking of you today, and wanted to say hello.", "Thank you for the day": "Thank you for such a lovely day when I visited.",
   "I keep thinking about your": "I keep thinking about your little corner of the world.", "Guess what happened at home": "I've got news from home to tell you.", "Just saying hello": "Just a little note to say hello."};
 export const openingText = o => OPEN_TXT[o] || "";
 
-// post a gift (item) or a letter (item null, with an opening and/or her own words). Returns the entry, or a reason.
+// post a gift (item) or a letter (item null, with an opening and/or your own words). Returns the entry, or a reason.
 export function postTo(F, to, {item = null, open = "", text = ""} = {}, at = now()){
   if (!inBook(F, to)) return {err: "Not in your address book."};
   const it = item && ITEMS[item];
@@ -86,17 +86,17 @@ export function replyBody(e){
   const d = DEF[e.to], p = PEN[e.to], h = hash(e.id), first = (d.name || "").split(" ")[0];
   const fill = s => String(s || "").replace(/\{it\}/g, e.item ? nm(e.item) : "letter");
   let body;
-  if (p && p.own) {   // round 192: Jason writes long letters: an opening, his own lines, two bits of news, a P.S.
+  if (p && p.own) {   // round 192: Ornella writes long letters: an opening, her own lines, two bits of news, a P.S.
     const two = [p.news[h % p.news.length], p.news[(h + 1 + (h >> 3) % (p.news.length - 1)) % p.news.length]];
-    body = `${p.dear || "Dear Mel,"}\n\n${p.open[h % p.open.length]}\n\n${fill(e.item ? (p[giftKind(e.item)] || p.other) : p.letter)}\n\n${two.join("\n\n")}`;
+    body = `${p.dear || "Dear friend,"}\n\n${p.open[h % p.open.length]}\n\n${fill(e.item ? (p[giftKind(e.item)] || p.other) : p.letter)}\n\n${two.join("\n\n")}`;
     if (e.back && ITEMS[e.back]) body += `\n\n${p.backNote}`;
     if (e.offer && ITEMS[e.offer]) body += `\n\n${offerLine(e.to, e.offer)}`;
     return `${body}\n\n${p.sign}\n\n${p.ps[(h >> 2) % p.ps.length]}`;
   }
   if (e.item) {
     const k = giftKind(e.item), line = p ? fill(p[k] || p.other) : "";
-    body = `Dear Mel,\n\nThank you for the ${nm(e.item)}! ${line || "It made my whole week, truly."}`;
-  } else body = `Dear Mel,\n\n${p ? fill(p.letter) : "Your letter came this morning, and I read it twice."}`;
+    body = `Dear friend,\n\nThank you for the ${nm(e.item)}! ${line || "It made my whole week, truly."}`;
+  } else body = `Dear friend,\n\n${p ? fill(p.letter) : "Your letter came this morning, and I read it twice."}`;
   if (p && p.news && p.news.length) body += `\n\n${p.news[h % p.news.length]}`;
   else if (d.lines && d.lines.length) body += `\n\nP.S. ${d.lines[h % d.lines.length]}`;
   if (e.back && ITEMS[e.back]) body += `\n\n${p.backNote || `I've tucked in a little ${nm(e.back)}.`}`;
@@ -112,14 +112,14 @@ export function collectBack(F, t = now()){
 }
 export const onTheWay = (F, t = now()) => bookState(F).sent.filter(e => e.at > t).length;
 /* ---------- from our travels (round 198) ---------- */
-// A friend whose own goods would sit on a shop shelf (their PEN `back`, a gift) offers, after Mel's third post, to send
-// a few each week. Mel says yes or no in the address book. Each week's box costs her TRADE of the price (she pays on
+// A friend whose own goods would sit on a shop shelf (their PEN `back`, a gift) offers, after your third post, to send
+// a few each week. You say yes or no in the address book. Each week's box costs you TRADE of the price (you pay on
 // arrival; no coins, no box that week), and it sells at their own price in the gift shop: a small margin, never more.
 // State: F.book.offers {id: {item, at}}, F.book.lines {id: {item, next}}, F.giftshop.travel {item: n}
 export const BOX = 4, TRADE = .8, MAX_LINES = 5;
 export const importable = id => { const p = PEN[id], it = p && p.back && ITEMS[p.back]; return it && it.kind === "gift" && it.price > 0 ? p.back : null; };
 export const tradeOf = item => Math.max(1, Math.round((ITEMS[item] || {price: 0}).price*TRADE));
-const offerLine = (to, item) => `P.S. ${DEF[to] && DEF[to].name === "Jason" ? "Forgive my presumption, but I hear you keep a gift shop now. Should you ever want some of my own for the shelves" : "I hear you've a gift shop now. If you ever wanted some of mine for the shelves"}, I could send ${BOX} a week (${nm(item)}), for a little under what I charge here. Just say the word.`;
+const offerLine = (to, item) => `P.S. ${DEF[to] && DEF[to].name === "Ornella" ? "I hear you keep a gift shop now. Should you ever want a little cargo of mine for the shelves" : "I hear you've a gift shop now. If you ever wanted some of mine for the shelves"}, I could send ${BOX} a week (${nm(item)}), for a little under what I charge here. Just say the word.`;
 export const offersOpen = (F, t = now()) => Object.entries(bookState(F).offers || {}).filter(([id, o]) => o.at <= t && !o.no && !(bookState(F).lines || {})[id] && DEF[id]).map(([id, o]) => ({id, item: o.item}));
 export const lines = F => Object.entries(bookState(F).lines || {}).filter(([id]) => DEF[id]).map(([id, l]) => ({id, ...l}));
 export function acceptOffer(F, id, t = now()){ const b = bookState(F), o = (b.offers || {})[id]; if (!o || o.no || lines(F).length >= MAX_LINES) return false;

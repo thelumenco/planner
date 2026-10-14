@@ -1,5 +1,5 @@
-// Villager sprite builder. Same rig as Mel/Evan (.flip > .bob > .legL/.legR/.armL/.armR) so the walk CSS animates it.
-// Origin is at the feet. `look`: {skin, hair, hairStyle, top, bottom, extra}; kid=true draws Evan-sized.
+// Villager sprite builder. Same rig as the player (.flip > .bob > .legL/.legR/.armL/.armR) so the walk CSS animates it.
+// Origin is at the feet. `look`: {skin, hair, hairStyle, top, bottom, extra}; kid=true draws child-sized.
 
 const S = (c) => `style="fill:${c}"`;
 
@@ -8,7 +8,7 @@ function hair(style, c, k){
   const y = -46*k, r = 10.6*k;
   switch (style){
     case "bun": return `<circle cx="0" cy="${y - r - 3*k}" r="${5*k}" ${S(c)}/>` + cap(c, y, r);
-    // a bob with a straight-cut fringe (Mel's mum): the bob behind, the fringe drawn over the forehead (see fringe)
+    // a bob with a straight-cut fringe (Hana): the bob behind, the fringe drawn over the forehead (see fringe)
     case "bobfringe":
     case "bob": return `<path d="M${-r-1.2} ${y+1} c-1 -12 5 -16 ${r+1} -16 c7 0 ${r+2} 4 ${r+1.6} 16 l0 ${7*k} l${-4*k} 0 l0 ${-8*k} c-4 -1 -12 -1 -16 -3 l0 ${11*k} l${-4*k} 0z" ${S(c)}/>`;
     case "long": return `<path d="M${-r-1} ${y} c-1 -12 5 -16 ${r+1} -16 c7 0 ${r+2} 4 ${r+1} 16 l1 ${18*k} l${-5*k} 0 l-1 ${-16*k} c-4 -2 -11 -2 -15 -5 l-1 ${21*k} l${-5*k} 0z" ${S(c)}/>`;
@@ -20,7 +20,7 @@ function hair(style, c, k){
 }
 const fringe = (c, y, r, k) => `<path d="M${-r-.4} ${y-2.6*k} h${2*r+.8} c0 -7 -4 -11.4 ${-r} -11.4 c-6.4 0 ${-r} 4.4 ${-r} 11.4z" ${S(c)}/>`;
 // a paddleboard (stand-up paddling): the board under the feet and a paddle in the right hand
-// round 134, Cinque Terre: Mum's beach towel, drawn upright under her so it lies flat when she does (act-sunbathe)
+// round 134, Cinque Terre: Hana's beach towel, drawn upright under her so it lies flat when she does (act-sunbathe)
 const towel = k => `<rect x="${-11*k}" y="${-64*k}" width="${22*k}" height="${68*k}" rx="2" style="fill:#3E9BC7"/>${[0, 1, 2, 3].map(i => `<path d="M${-11*k} ${(-54 + i*16)*k} h${22*k}" fill="none" stroke-width="${3*k}" style="stroke:#FFFDF6"/>`).join("")}`;
 const board = k => `<ellipse cx="0" cy="${-1*k}" rx="${22*k}" ry="${3.6*k}" style="fill:#F3C969"/><path d="M${-18*k} ${-1*k} h${36*k}" fill="none" stroke-width=".8" style="stroke:#E8566C"/>`;
 const paddle = k => `<path d="M${12*k} ${-30*k} l${5*k} ${32*k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16*k} ${-2*k} l${2*k} ${8*k} l${3*k} ${-1*k} l${-2*k} ${-8*k}z" ${S("#7FB8E8")}/>`;
@@ -30,7 +30,7 @@ function extra(kind, look, k){
   const y = -46*k, r = 10.6*k;
   switch (kind){
     case "apron": return `<path d="M${-6*k} ${-30*k} h${12*k} l${1.5*k} ${15*k} h${-15*k}z" ${S("#FFFDF6")}/><path d="M${-5*k} ${-31*k} l${-2*k} ${-5*k} M${5*k} ${-31*k} l${2*k} ${-5*k}" fill="none"/>`;
-    case "specs": return `<g style="stroke:#1E1A18"><rect x="${-6.6*k}" y="${y}" width="${5.4*k}" height="${3.8*k}" rx="1" fill="none" stroke-width="1.3"/><rect x="${1.2*k}" y="${y}" width="${5.4*k}" height="${3.8*k}" rx="1" fill="none" stroke-width="1.3"/><path d="M${-1.2*k} ${y + 1.4*k} h${2.4*k}" fill="none" stroke-width="1.1"/></g>`;   // Jason's black frames (round 135), whatever's in his hands
+    case "specs": return `<g style="stroke:#1E1A18"><rect x="${-6.6*k}" y="${y}" width="${5.4*k}" height="${3.8*k}" rx="1" fill="none" stroke-width="1.3"/><rect x="${1.2*k}" y="${y}" width="${5.4*k}" height="${3.8*k}" rx="1" fill="none" stroke-width="1.3"/><path d="M${-1.2*k} ${y + 1.4*k} h${2.4*k}" fill="none" stroke-width="1.1"/></g>`;   // a local's black frames (round 135), whatever's in his hands
     case "glasses": return `<circle cx="${-3.8*k}" cy="${y+2}" r="${2.6*k}" fill="none" stroke-width=".9"/><circle cx="${3.8*k}" cy="${y+2}" r="${2.6*k}" fill="none" stroke-width=".9"/><path d="M${-1.2*k} ${y+2} h${2.4*k}" fill="none" stroke-width=".9"/>`;
     case "cap": return `<path d="M${-r} ${y-3} c0 -8 ${r*2} -8 ${r*2} 0z" ${S(look.top)}/><path d="M${r-2} ${y-3} h${7*k}" stroke-width="2.2" style="stroke:${look.top}"/>`;
     case "sunhat": return `<ellipse cx="0" cy="${y-6*k}" rx="${16*k}" ry="${3.6*k}" ${S("#F3DFA6")}/><path d="M${-8*k} ${y-6*k} c0 -10 ${16*k} -10 ${16*k} 0z" ${S("#F3DFA6")}/><path d="M${-8*k} ${y-7.5*k} h${16*k}" style="stroke:var(--rose)" stroke-width="1.6"/>`;
@@ -44,14 +44,14 @@ function extra(kind, look, k){
     case "cone": return `<path d="M${9.5*k} ${-23*k} l${3*k} ${10*k} l${3*k} ${-10*k}z" ${S("#E8C48E")}/><circle cx="${12.5*k}" cy="${-25*k}" r="${3.6*k}" ${S(["#F4C7CF", "#C3E8B8", "#F3E27A", "#FFF6DC"][Math.round(k*7 + (look.top || "").length) % 4])}/>`;
     case "hoe": return `<g class="tool"><path d="M${16*k} ${-48*k} l${-4*k} ${46*k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12*k} ${-2*k} h${-8*k} l${1*k} ${3*k} h${7*k}z" ${S("var(--stone)")}/></g>`;
     case "rod": return `<path d="M${9*k} ${-22*k} L${34*k} ${-56*k}" fill="none" stroke-width="${1.8*k}" style="stroke:#8A5A3A"/><circle cx="${13*k}" cy="${-27*k}" r="${2.2*k}" ${S("#F3C969")}/><path d="M${34*k} ${-56*k} Q${39*k} ${-30*k} ${42*k} ${-4*k}" fill="none" stroke-width=".6"/><circle cx="${42*k}" cy="${-4*k}" r="${2.2*k}" ${S("#E8566C")}/>`;
-    // round 107, for Ronda: Manolo's guitar, Dad's (and Lucía's) sketchbook, Marcus's camera, Angellina's notebook, Gong Gong's paper
+    // round 107, for Ronda: Manolo's guitar, Theo's (and Lucía's) sketchbook, Tomi's camera, Posy's notebook, Mei's paper
     case "guitar": return `<g class="tool"><ellipse cx="${2*k}" cy="${-22*k}" rx="${7*k}" ry="${5.5*k}" transform="rotate(-20 ${2*k} ${-22*k})" ${S("#C98A4A")}/><circle cx="${2*k}" cy="${-22*k}" r="${1.8*k}" ${S("#3A2E28")}/><path d="M${7*k} ${-25*k} L${20*k} ${-34*k}" stroke-width="${2.4*k}" style="stroke:#7A4A30"/></g>`;
     case "sketchbook": return `<rect x="${4*k}" y="${-30*k}" width="${11*k}" height="${9*k}" rx="1" ${S("#FFFDF6")}/><path d="M${6*k} ${-27*k} q${3*k} ${-2*k} ${7*k} 0 M${6*k} ${-24*k} h${5*k}" fill="none" stroke-width=".7"/><g class="tool"><path d="M${14*k} ${-22*k} l${4*k} ${-6*k}" fill="none" stroke-width="1.4" style="stroke:#E3A23A"/></g>`;
     case "camera": return `<rect x="${7*k}" y="${-31*k}" width="${10*k}" height="${7*k}" rx="1.5" ${S("#3A3430")}/><circle cx="${12*k}" cy="${-27.5*k}" r="${2.2*k}" ${S("#9FD3E8")}/><rect x="${8*k}" y="${-33*k}" width="${3*k}" height="${2*k}" ${S("#3A3430")}/>`;
     case "notebook": return `<rect x="${7*k}" y="${-29*k}" width="${8*k}" height="${10*k}" rx="1" ${S("#E8566C")}/><path d="M${9*k} ${-26*k} h${4*k} M${9*k} ${-23*k} h${4*k}" fill="none" stroke-width=".7"/>`;
     case "newspaper": return `<rect x="${-10*k}" y="${-34*k}" width="${20*k}" height="${13*k}" rx="1" ${S("#F3ECDD")}/><path d="M${-8*k} ${-31*k} h${7*k} M${-8*k} ${-28*k} h${16*k} M${-8*k} ${-25*k} h${16*k} M${1*k} ${-31*k} h${7*k}" fill="none" stroke-width=".7"/>`;
-    // round 122, for Kyoto (never what they did in Ronda): Mum's red paper parasol, Dad's clay cup on the wheel, Ma Ma's
-    // paper cranes, Gong Gong's Go board, Darren's skewers, Marcus's calligraphy brush, Angellina's fortune slip
+    // round 122, for Kyoto (never what they did in Ronda): Hana's red paper parasol, Theo's clay cup on the wheel, Farid's
+    // paper cranes, Mei's Go board, Bo's skewers, Tomi's calligraphy brush, Posy's fortune slip
     case "parasol": return `<g class="tool"><path d="M${10*k} ${-20*k} L${10*k} ${-62*k}" fill="none" stroke-width="1.4" style="stroke:#5A4636"/><path d="M${-8*k} ${-56*k} Q${10*k} ${-76*k} ${28*k} ${-56*k}z" ${S("#C8432F")}/>${[0, 1, 2, 3].map(i => `<path d="M${10*k} ${-68*k} L${(-4 + i*9)*k} ${-57*k}" fill="none" stroke-width=".6" style="stroke:#F3C969"/>`).join("")}</g>`;
     case "claycup": return `<ellipse cx="${10*k}" cy="${-10*k}" rx="${11*k}" ry="${3*k}" ${S("#8A6A52")}/><path d="M${4*k} ${-11*k} q${-1*k} ${-10*k} ${3*k} ${-11*k} h${6*k} q${4*k} ${1*k} ${2*k} ${11*k}z" ${S("#C9A27E")}/><g class="tool"><path d="M${10*k} ${-14*k} h${2*k}" fill="none" stroke-width=".8"/></g>`;
     case "crane": return `<g class="tool"><path d="M${8*k} ${-28*k} l${6*k} ${-6*k} l${6*k} ${6*k} l${-6*k} ${2*k}z" ${S("#F2A0B8")}/><path d="M${14*k} ${-34*k} l${4*k} ${-4*k}" fill="none" stroke-width=".8"/></g><path d="M${-12*k} ${-6*k} l${4*k} ${-4*k} l${4*k} ${4*k}z M${-4*k} ${-4*k} l${4*k} ${-4*k} l${4*k} ${4*k}z" ${S("#BFE0F2")}/>`;
@@ -59,24 +59,24 @@ function extra(kind, look, k){
     case "skewer": return `<g class="tool"><path d="M${10*k} ${-20*k} L${14*k} ${-40*k}" fill="none" stroke-width="1" style="stroke:#C9A27E"/>${[0, 1, 2].map(i => `<circle cx="${(13.2 - i*.8)*k}" cy="${(-36 + i*5)*k}" r="${2.4*k}" ${S(["#FBEFF2", "#9CC27E", "#F6C7D6"][i])}/>`).join("")}</g>`;
     case "brush": return `<rect x="${-14*k}" y="${-8*k}" width="${16*k}" height="${8*k}" ${S("#FFFDF6")}/><path d="M${-11*k} ${-6*k} q${3*k} ${2*k} ${6*k} 0 M${-8*k} ${-3*k} v${2*k}" fill="none" stroke-width="1.4" style="stroke:#2F2B28"/><g class="tool"><path d="M${10*k} ${-20*k} L${16*k} ${-34*k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${9*k} ${-18*k} l${2*k} ${-3*k} l${2*k} ${2*k}z" style="fill:#2F2B28"/></g>`;
     case "fortune": return `<g class="tool"><rect x="${8*k}" y="${-32*k}" width="${6*k}" height="${14*k}" rx="1" ${S("#FFFDF6")}/><path d="M${10*k} ${-29*k} v${8*k} M${12*k} ${-29*k} v${5*k}" fill="none" stroke-width=".6" style="stroke:#C8432F"/></g>`;
-    // round 129, for Jeju (never what they did in Ronda or Kyoto): Mum's kite, Ma Ma's tangerine basket, Gong Gong's
-    // net and needle, Darren's wish-tower stone (Dad's pat on the stone grandfather's nose is an arm, npcs.css)
+    // round 129, for Jeju (never what they did in Ronda or Kyoto): Hana's kite, Farid's tangerine basket, Mei's
+    // net and needle, Bo's wish-tower stone (Theo's pat on the stone grandfather's nose is an arm, npcs.css)
     case "kite": return `<g class="kitefly"><path d="M${10*k} ${-22*k} Q${26*k} ${-60*k} ${34*k} ${-96*k}" fill="none" stroke-width=".7"/><path d="M${34*k} ${-110*k} l${8*k} ${10*k} l${-8*k} ${12*k} l${-8*k} ${-12*k}z" ${S("#F08A2E")}/><path d="M${26*k} ${-100*k} h${16*k} M${34*k} ${-110*k} v${22*k}" fill="none" stroke-width=".6"/><path d="M${34*k} ${-88*k} q${-4*k} ${8*k} ${2*k} ${14*k} q${4*k} ${6*k} ${-2*k} ${12*k}" fill="none" stroke-width="1" style="stroke:#3E7CC0"/></g>`;
     case "tbasket": return `<path d="M${6*k} ${-24*k} h${14*k} l${-2*k} ${9*k} h${-10*k}z" ${S("#C9A27E")}/><path d="M${7*k} ${-24*k} q${6*k} ${-9*k} ${12*k} 0" fill="none" stroke-width=".9"/>${[0, 1, 2].map(i => `<circle cx="${(9 + i*4)*k}" cy="${-25*k}" r="${2.4*k}" ${S("#F29A2E")}/>`).join("")}<g class="tool"><circle cx="${14*k}" cy="${-36*k}" r="${2.6*k}" ${S("#F29A2E")}/></g>`;
     case "net": return `<path d="M${-14*k} ${-12*k} q${14*k} ${-6*k} ${30*k} 0 l${-4*k} ${12*k} h${-22*k}z" ${S("#C9B27A")}/><path d="M${-10*k} ${-10*k} l${6*k} ${10*k} M${-2*k} ${-12*k} l${6*k} ${12*k} M${6*k} ${-12*k} l${6*k} ${12*k} M${12*k} ${-11*k} l${-6*k} ${11*k} M${4*k} ${-12*k} l${-6*k} ${12*k}" fill="none" stroke-width=".5"/><g class="tool"><path d="M${10*k} ${-20*k} l${4*k} ${-6*k}" fill="none" stroke-width="1.2" style="stroke:#8A6A52"/></g>`;
     case "stone": return `<g class="tool"><ellipse cx="${13*k}" cy="${-26*k}" rx="${4*k}" ry="${2.4*k}" ${S("#5F5E64")}/></g>${[0, 1, 2].map(i => `<ellipse cx="${20*k}" cy="${(-2 - i*4)*k}" rx="${(6 - i*1.4)*k}" ry="${2.2*k}" ${S(i % 2 ? "#7A7980" : "#4A494E")}/>`).join("")}`;
-    // round 134, for Cinque Terre (never what they did in Ronda, Kyoto or Jeju): Ma Ma's knitting, Gong Gong's bocce
-    // balls, Darren's hiking poles, Marcus's little rowing boat and oar, Angellina's book (Mum's towel is look.towel)
+    // round 134, for Cinque Terre (never what they did in Ronda, Kyoto or Jeju): Farid's knitting, Mei's bocce
+    // balls, Bo's hiking poles, Tomi's little rowing boat and oar, Posy's book (Hana's towel is look.towel)
     case "knit": return `<circle cx="${-2*k}" cy="${-4*k}" r="${4*k}" ${S("#E8566C")}/><path d="M${-4*k} ${-6*k} q${2*k} ${3*k} ${5*k} ${1*k}" fill="none" stroke-width=".6"/><path d="M${2*k} ${-24*k} h${10*k} v${6*k} h${-10*k}z" ${S("#F2A0B8")}/><g class="tool"><path d="M${0*k} ${-28*k} L${14*k} ${-20*k} M${14*k} ${-28*k} L${0*k} ${-20*k}" fill="none" stroke-width="1" style="stroke:#C9A27E"/></g><path d="M${-1*k} ${-7*k} Q${2*k} ${-16*k} ${4*k} ${-20*k}" fill="none" stroke-width=".6" style="stroke:#E8566C"/>`;
     case "bocce": return `<g class="tool"><circle cx="${12*k}" cy="${-20*k}" r="${3.4*k}" ${S("#C9483A")}/></g><circle cx="${30*k}" cy="${-2*k}" r="${3.2*k}" ${S("#3E6BAE")}/><circle cx="${40*k}" cy="${-4*k}" r="${3.2*k}" ${S("#C9483A")}/><circle cx="${48*k}" cy="${0*k}" r="${1.6*k}" ${S("#FFFDF6")}/>`;
     case "poles": return `<path d="M${-10*k} ${-22*k} L${-16*k} ${0*k}" fill="none" stroke-width="1.4" style="stroke:#5F5E64"/><g class="tool"><path d="M${10*k} ${-22*k} L${17*k} ${0*k}" fill="none" stroke-width="1.4" style="stroke:#5F5E64"/></g><path d="M${-6*k} ${-37*k} h${12*k} l${2*k} ${14*k} h${-16*k}z" ${S("#2E7A5A")}/>`;
     case "oar": return `<path d="M${-26*k} ${-15*k} h${52*k} q${-4*k} ${15*k} ${-20*k} ${15*k} h${-14*k} q${-14*k} 0 ${-18*k} ${-15*k}z" ${S("#3E6BAE")}/><path d="M${-24*k} ${-11*k} h${48*k}" fill="none" stroke-width="${2*k}" style="stroke:#F3D98A"/><g class="tool"><path d="M${10*k} ${-22*k} L${34*k} ${2*k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><ellipse cx="${36*k}" cy="${4*k}" rx="${2.4*k}" ry="${5*k}" transform="rotate(-45 ${36*k} ${4*k})" ${S("#C9A27E")}/></g>`;
     case "book": return `<path d="M${-2*k} ${-30*k} q${7*k} ${-3*k} ${14*k} 0 v${10*k} q${-7*k} ${-3*k} ${-14*k} 0z" ${S("#FFFDF6")}/><path d="M${5*k} ${-31*k} v${10*k}" fill="none" stroke-width=".7"/><path d="M${-2*k} ${-20*k} q${7*k} ${-3*k} ${14*k} 0" fill="none" stroke-width="1.4" style="stroke:#2E7A5A"/>`;
-    // round 144, for Bellbird Valley (never what they did in Ronda, Kyoto, Jeju or Cinque Terre): Ma Ma's op-shop
-    // cardigan on a hanger, Gong Gong's binoculars, Angellina's wattle crown, Darren's drone, Dad's takeaway coffee,
-    // Marcus's footy, Mum's glass of Pinot, Dad's juggled strawberries, Ma Ma's paper fan, Darren's berry flats, Mum's
-    // bag of roo pellets, Dad's barbecue tongs (and the grill), Gong Gong's skimming stone, Ma Ma's cards, Darren's
-    // marshmallow on a stick (Mum's wave, Gong Gong's tai chi, Marcus at the wombat hole, Angellina looking up at the
+    // round 144, for Bellbird Valley (never what they did in Ronda, Kyoto, Jeju or Cinque Terre): Farid's op-shop
+    // cardigan on a hanger, Mei's binoculars, Posy's wattle crown, Bo's drone, Theo's takeaway coffee,
+    // Tomi's footy, Hana's glass of Pinot, Theo's juggled strawberries, Farid's paper fan, Bo's berry flats, Hana's
+    // bag of roo pellets, Theo's barbecue tongs (and the grill), Mei's skimming stone, Farid's cards, Bo's
+    // marshmallow on a stick (Hana's wave, Mei's tai chi, Tomi at the wombat hole, Posy looking up at the
     // koalas: arms and poses only, npcs.css)
     case "hanger": return `<g class="tool"><path d="M${10*k} ${-22*k} v${-16*k}" fill="none" stroke-width="1.2" style="stroke:#8A8478"/><path d="M${10*k} ${-40*k} q${2*k} ${-3*k} ${-1*k} ${-4*k}" fill="none" stroke-width="1.1"/><path d="M${2*k} ${-36*k} l${8*k} ${-4*k} l${8*k} ${4*k} v${14*k} h${-16*k}z" ${S("#C98A9A")}/><path d="M${10*k} ${-36*k} v${14*k}" fill="none" stroke-width=".7"/></g>`;
     case "binocs": return `<g class="tool"><rect x="${2*k}" y="${y - 1*k}" width="${5*k}" height="${7*k}" rx="${1.6*k}" ${S("#3A3430")}/><rect x="${8*k}" y="${y - 1*k}" width="${5*k}" height="${7*k}" rx="${1.6*k}" ${S("#3A3430")}/><path d="M${7*k} ${y + 2*k} h${1*k}" stroke-width="1.4"/></g>`;
@@ -94,9 +94,9 @@ function extra(kind, look, k){
     case "cards": return `<g class="tool">${[-12, 0, 12].map((r, i) => `<rect x="${8*k}" y="${-30*k}" width="${5*k}" height="${7*k}" rx=".8" transform="rotate(${r} ${10*k} ${-22*k})" fill="${i === 1 ? "#FFFDF6" : "#F6F1E8"}" stroke="#2F2B28" stroke-width=".5"/>`).join("")}</g><rect x="${-18*k}" y="${-2*k}" width="${8*k}" height="${3*k}" rx=".6" fill="#C9483A" stroke="#2F2B28" stroke-width=".5"/>`;
     case "mallow": return `<g class="tool"><path d="M${10*k} ${-22*k} L${36*k} ${-34*k}" fill="none" stroke-width="1.2" style="stroke:#8A6A3A"/><rect x="${35*k}" y="${-38*k}" width="${5*k}" height="${4.4*k}" rx="${1.4*k}" fill="#F3D9A0" stroke="#2F2B28" stroke-width=".6"/></g>`;
     // round 150, for the Coast Road (never what they did in Ronda, Kyoto, Jeju, Cinque Terre or Bellbird Valley):
-    // Marcus's bodyboard, Mum's yoga mat, Gong Gong's coin telescope, Angellina's easel, Dad's macro lens (and the
-    // fungi), Darren's tally counter, Darren's box of chips (and the gull), Ma Ma's bag of prawns, Ma Ma's shell
-    // bucket, Dad's driftwood shelter, Mum's king parrot, Gong Gong's quoits, Angellina's postcard
+    // Tomi's bodyboard, Hana's yoga mat, Mei's coin telescope, Posy's easel, Theo's macro lens (and the
+    // fungi), Bo's tally counter, Bo's box of chips (and the gull), Farid's bag of prawns, Farid's shell
+    // bucket, Theo's driftwood shelter, Hana's king parrot, Mei's quoits, Posy's postcard
     case "bodyboard": return `<g class="tool"><rect x="${9*k}" y="${-36*k}" width="${8*k}" height="${30*k}" rx="${3.4*k}" ${S("#3E9CC8")}/><path d="M${10*k} ${-30*k} h${6*k} M${10*k} ${-12*k} h${6*k}" stroke-width="${1.4*k}" style="stroke:#F3C969"/></g>`;
     case "yogamat": return `<rect x="${-18*k}" y="${-1.4*k}" width="${36*k}" height="${3*k}" rx="${1.4*k}" ${S("#B48ED8")}/>`;
     case "telescope": return `<path d="M${22*k} ${-30*k} v${30*k} M${17*k} 0 h${10*k}" fill="none" stroke-width="${2.4*k}" style="stroke:#5F6E64"/><g transform="rotate(-8 ${22*k} ${-34*k})"><rect x="${6*k}" y="${-48*k}" width="${26*k}" height="${7*k}" rx="${2.4*k}" ${S("#7A8C78")}/><rect x="${28*k}" y="${-49.5*k}" width="${6*k}" height="${10*k}" rx="${1.6*k}" ${S("#5F6E64")}/></g><rect x="${18*k}" y="${-34*k}" width="${8*k}" height="${6*k}" rx="1" ${S("#5F6E64")}/>`;
@@ -110,10 +110,10 @@ function extra(kind, look, k){
     case "parrot": return `<g class="perch"><ellipse cx="${22*k}" cy="${-41*k}" rx="${3.4*k}" ry="${5*k}" ${S("#4E9A4A")}/><circle cx="${22.6*k}" cy="${-47*k}" r="${3*k}" ${S("#D8432F")}/><path d="M${25.4*k} ${-47*k} q${1.6*k} ${1*k} ${0} ${2.4*k}" fill="#3A3430" stroke="none"/><path d="M${21*k} ${-37*k} l${-2*k} ${8*k} l${3*k} ${-1*k}z" fill="#2E6A8E" stroke="#2F2B28" stroke-width=".5"/><ellipse cx="${22.6*k}" cy="${-39*k}" rx="${2*k}" ry="${2.6*k}" fill="#D8432F" stroke="none"/></g>`;
     case "quoit": return `<g class="tool"><circle cx="${13*k}" cy="${-22*k}" r="${3.4*k}" fill="none" stroke-width="${1.6*k}" style="stroke:#3E6BAE"/></g><path d="M${42*k} 0 v${-10*k}" stroke-width="${1.4*k}" style="stroke:#8A6A3A"/><ellipse cx="${42*k}" cy="${-1*k}" rx="${4*k}" ry="${1.4*k}" fill="none" stroke-width="${1.4*k}" style="stroke:#C8432F"/><ellipse cx="${42*k}" cy="${-4*k}" rx="${4*k}" ry="${1.4*k}" fill="none" stroke-width="${1.4*k}" style="stroke:#3E6BAE"/>`;
     case "postcard": return `<rect x="${-6*k}" y="${-24*k}" width="${14*k}" height="${9*k}" rx=".8" ${S("#FFFDF6")}/><path d="M${1*k} ${-23*k} v${7*k}" stroke-width=".5"/><rect x="${4*k}" y="${-23*k}" width="${3*k}" height="${3*k}" fill="#E8913A" stroke="none"/><g class="tool"><path d="M${8*k} ${-20*k} l${4*k} ${-6*k}" fill="none" stroke-width="${1.2*k}" style="stroke:#3E6BAE"/></g>`;
-    // round 160, for the Tablelands (never what anyone did anywhere before): Gong Gong's thermos of tea, Marcus wading
-    // under the falls, Angellina feeding the ducks, Darren's frisbee, Ma Ma's bag of lollies, Dad's milk pail, Gong Gong
-    // leaning on the calf-pen rail, Marcus's macadamia branch, Ma Ma's nut-cracking stone, Darren's gold pan, Dad's
-    // guard's flag, Angellina's sarsaparilla (and Mum's "shh" at the platypus platform is a pose)
+    // round 160, for the Tablelands (never what anyone did anywhere before): Mei's thermos of tea, Tomi wading
+    // under the falls, Posy feeding the ducks, Bo's frisbee, Farid's bag of lollies, Theo's milk pail, Mei
+    // leaning on the calf-pen rail, Tomi's macadamia branch, Farid's nut-cracking stone, Bo's gold pan, Theo's
+    // guard's flag, Posy's sarsaparilla (and Hana's "shh" at the platypus platform is a pose)
     case "thermos": return `<g class="tool"><rect x="${8*k}" y="${-31*k}" width="${5*k}" height="${12*k}" rx="${1.4*k}" ${S("#C8432F")}/><rect x="${7.6*k}" y="${-33*k}" width="${5.8*k}" height="${3*k}" rx=".6" ${S("#3A3430")}/></g><path d="M${-14*k} ${-24*k} q${-2*k} ${-4*k} 0 ${-8*k}" fill="none" stroke-width=".8" style="stroke:#D9D2C8" opacity=".8"/><rect x="${-17*k}" y="${-22*k}" width="${5*k}" height="${5*k}" rx="1" ${S("#FFFDF6")}/>`;
     case "wadewater": return `<ellipse cx="0" cy="${-2*k}" rx="${20*k}" ry="${5*k}" style="fill:#7FB8C8" opacity=".75" stroke="none"/><path d="M${-24*k} ${-1*k} q${4*k} ${-2*k} ${8*k} 0 M${16*k} ${-1*k} q${4*k} ${-2*k} ${8*k} 0" fill="none" stroke-width=".9" style="stroke:#FFFFFF"/>`;
     case "ducks": return `<g class="tool"><circle cx="${12*k}" cy="${-22*k}" r="${1.6*k}" ${S("#E8D3A8")}/></g>${[[24, -3, 1], [34, -1, 1]].map(([x, y, d]) => `<ellipse cx="${x*k}" cy="${y*k}" rx="${5*k}" ry="${3.2*k}" ${S("#9A8E70")}/><circle cx="${(x - 4*d)*k}" cy="${(y - 3)*k}" r="${2.2*k}" ${S("#3E6A4E")}/><path d="M${(x - 6.4*d)*k} ${(y - 3)*k} l${-2*d*k} ${.6*k}" stroke-width="${1.2*k}" style="stroke:#E8A83A"/>`).join("")}${[18, 21, 28].map(x => `<circle cx="${x*k}" cy="${-1*k}" r="${.8*k}" ${S("#E8D3A8")} stroke="none"/>`).join("")}`;
@@ -128,9 +128,9 @@ function extra(kind, look, k){
     case "goldpan": return `<g class="tool"><ellipse cx="${10*k}" cy="${-18*k}" rx="${10*k}" ry="${3.4*k}" ${S("#8A7A6A")}/><ellipse cx="${10*k}" cy="${-18.6*k}" rx="${6*k}" ry="${1.8*k}" ${S("#5A5048")}/><circle cx="${12*k}" cy="${-18.6*k}" r="${.8*k}" ${S("#F3C969")} stroke="none"/></g>`;
     case "guardflag": return `<g class="tool"><path d="M${12*k} ${-30*k} v${-26*k}" fill="none" stroke-width="${1.4*k}" style="stroke:#6B5444"/><path d="M${12*k} ${-56*k} h${12*k} v${8*k} h${-12*k}z" ${S("#3E8A4E")}/></g>`;
     case "sarsbottle": return `<g class="tool"><rect x="${8*k}" y="${-33*k}" width="${4.4*k}" height="${10*k}" rx="${1.4*k}" ${S("#5A3A2A")}/><path d="M${10*k} ${-33*k} l${2*k} ${-7*k}" fill="none" stroke-width="${.9*k}" style="stroke:#E8566C"/></g>`;
-    // round 164, for the Lavender Hills (never done anywhere before): Mum's armful of lavender, a bee after Darren, Gong
-    // Gong's baguette, Marcus's accordion, Angellina's perfume strip, Ma Ma's scent spray, Dad's beekeeper's veil, Marcus's
-    // giant sunflower, Darren's rubber ring, Gong Gong's picnic rug, Ma Ma's candle, Dad's goat kid (Mum's hand on her
+    // round 164, for the Lavender Hills (never done anywhere before): Hana's armful of lavender, a bee after Bo, Mei's
+    // baguette, Tomi's accordion, Posy's perfume strip, Farid's scent spray, Theo's beekeeper's veil, Tomi's
+    // giant sunflower, Bo's rubber ring, Mei's picnic rug, Farid's candle, Theo's goat kid (Hana's hand on her
     // heart at the sunset is a pose)
     case "armful": return `<g class="tool">${[-4, 0, 4, 8].map((dx, i) => `<path d="M${(6 + dx)*k} ${-22*k} l${(2 - i)*k} ${-16*k}" fill="none" stroke-width="${.9*k}" style="stroke:#5E7A4E"/><ellipse cx="${(6 + dx + 2 - i)*k}" cy="${-40*k}" rx="${1.6*k}" ry="${4*k}" ${S(i % 2 ? "#9A7CC8" : "#B79BDC")}/>`).join("")}</g>`;
     case "beebuzz": return `<g class="perch"><ellipse cx="${18*k}" cy="${-56*k}" rx="${2.6*k}" ry="${1.8*k}" ${S("#F3C93A")}/><path d="M${17*k} ${-56*k} v${1*k} M${19*k} ${-56*k} v${1*k}" stroke-width=".6"/><ellipse cx="${17.4*k}" cy="${-58.4*k}" rx="${1.6*k}" ry="${1*k}" style="fill:#FFFFFF" opacity=".8"/></g>`;
@@ -152,7 +152,7 @@ function extra(kind, look, k){
   return "";
 }
 
-// Jason's shirt (round 135): white, printed with little coconut trees (a curved trunk, a fan of fronds, two coconuts)
+// a local's shirt (round 135): white, printed with little coconut trees (a curved trunk, a fan of fronds, two coconuts)
 function palms(k){
   const tree = (x, y, d = 1) => `<path d="M${x*k} ${y*k} q${1.2*d*k} ${-2.6*k} ${.6*d*k} ${-5.4*k}" fill="none" stroke-width="${.9*k}" style="stroke:#9A6A44"/>`
     + [[-3, .4], [-2.4, -1.6], [0, -2.6], [2.4, -1.6], [3, .4]].map(([dx, dy]) => `<path d="M${(x + .6*d)*k} ${(y - 5.4)*k} q${dx*.5*k} ${(dy - 1)*k} ${dx*k} ${(dy + .6)*k}" fill="none" stroke-width="${.8*k}" style="stroke:#3E8A4A"/>`).join("")
@@ -160,7 +160,7 @@ function palms(k){
   return `<g pointer-events="none">${tree(-4.5, -26)}${tree(3.5, -30, -1)}${tree(4, -17)}${tree(-3, -15.5, -1)}</g>`;
 }
 // Batik: a little repeating motif (flowers of dots, tiny leaves) over the top and trousers. col: the motif colour.
-function batik(col, k, shirt){   // shirt: just the shirt (Jason's print shirt, round 135), not the trousers
+function batik(col, k, shirt){   // shirt: just the shirt (a local's print shirt, round 135), not the trousers
   const flower = (x, y) => `<circle cx="${x*k}" cy="${y*k}" r="${1.5*k}" style="fill:${col}" stroke="none"/>` + [[0, -2.6], [2.5, 0], [0, 2.6], [-2.5, 0]].map(([dx, dy]) => `<circle cx="${(x + dx)*k}" cy="${(y + dy)*k}" r="${.8*k}" style="fill:${col}" stroke="none"/>`).join("");
   const leaf = (x, y) => `<path d="M${x*k} ${y*k} q${1.6*k} ${-1.6*k} ${3.2*k} 0 q${-1.6*k} ${1.6*k} ${-3.2*k} 0z" style="fill:${col}" stroke="none"/>`;
   return `<g opacity=".85" pointer-events="none">${flower(-4, -31)}${flower(4.5, -25)}${flower(-3.5, -19)}${leaf(1, -33)}${leaf(-7, -25)}${leaf(4, -18)}
