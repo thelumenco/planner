@@ -3254,9 +3254,9 @@ try {
   await page.goto(url + "?reset=1&seed=1&time=15:00&date=2026-10-13"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=15:00&date=2026-10-13&stg=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(1500);
-  await page.locator('#world [data-spot="fridge"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftab="stored"]', { timeout: 20000 });
-  check(await page.locator('#ctx [data-hfr="shop"]').count() === 1, "the fridge keeps its pantry and shopping list, with a Stored tab beside them");
-  await page.click('#ctx [data-ftab="stored"]'); await page.waitForSelector('#ctx [data-st="putall"]', { timeout: 20000 }); await page.click('#ctx [data-st="putall"]'); await page.waitForTimeout(300);
+  await page.locator('#world [data-spot="fridge"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-st="putall"]', { timeout: 20000 });
+  check(await page.locator('#ctx [data-hfr="shop"]').count() === 0, "the fridge opens straight onto what's stored (no pantry or shopping list)");
+  await page.click('#ctx [data-st="putall"]'); await page.waitForTimeout(300);
   await page.click('#ctx [data-st="send"][data-id="raspberry"][data-to="scoop"]'); await page.waitForTimeout(300);
   check(await fox().then(f => !f.inv.raspberry && f.inv.balloon === 1 && f.scoop.fridge.raspberry === 5 && !f.storage.fridge.raspberry), "in the browser: raspberries into the fridge, then off to the Scoop Shack");
   await page.evaluate(() => window.__mapleScene("garage")); await page.waitForTimeout(1500);
