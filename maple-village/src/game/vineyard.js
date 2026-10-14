@@ -68,7 +68,7 @@ export function rename(F, which, name){ const v = vineState(F), n = plain(String
 // The staff: what each of them takes off the player's hands (each can be switched off in the staff card)
 export const HELP = [["pick", "Marco and Ines pick ripe grapes", "and water the vines again, as before"], ["barrels", "Marco fills empty barrels", "red grapes become red wine, white grapes white; you still name and bottle them"],
   ["stock", "Celeste stocks the shelves", "bottles go from the cellar to the shop when she's on"], ["cook", "Pilar runs the kitchen", "oven, cheese press, the tapas of the day and small plates, from what's in the larder"],
-  ["fetch", "Pilar takes kitchen goods from my backpack", "crops, eggs, milk, flour, cheese and olives go straight to the larder (Maple keeps her treats)"]];
+  ["fetch", "Pilar takes kitchen goods from my backpack", "crops, eggs, milk, flour, cheese and olives go straight to the larder (your pet keeps their treats)"]];
 // Finishing a quest moves the vineyard and kitchen on too: ripening vines, fermenting barrels, the oven and the
 // cheese press each jump ahead by `ms` (the garden gets the same boost in core).
 export function questBoost(F, ms){
@@ -128,9 +128,9 @@ export function secondFerment(F, slot){ const v = vineState(F), b = v.barrels[sl
 // people, and a few in French, matched to the style. Each barrel gets its own list; ones already in the cellar or on
 // the shelves are skipped. k picks the next suggestion.
 const W_PLACE = ["Jetty Sunset", "Dolphin Bay", "Lantern Night", "Low Tide", "Sea Breeze", "Golden Hour", "Swan Lake", "Porch Swing", "First Light", "Rainy Window", "Orchard Hill", "Wildflower", "Night Market", "Paddleboard", "Harvest Moon", "Morning Mist", "Kite Day", "Sunday Picnic", "Firefly", "Boardwalk", "Lighthouse", "Monsoon", "Frangipani", "Hammock"];
-const W_WHO = ["Maple's", "Farid's", "Mei's", "Hana's", "Bo's", "Pip's", "Marco's", "Ines's", "Harbourmaster's", "Ferryman's"];
+const W_WHO = ["Meadow", "Farid's", "Mei's", "Hana's", "Bo's", "Pip's", "Marco's", "Ines's", "Harbourmaster's", "Ferryman's"];
 const W_WORD = {pinot: ["Pinot", "Pinot Noir", "Reserve", "Cherry Hill"], chardonnay: ["Chardonnay", "Chardy", "Golden", "Reserve"], tempranillo: ["Tempranillo", "Reserva", "Crianza", "Tinto"], red: ["Red", "Reserve", "Rouge", "Old Vine"], rose: ["Rosé", "Blush", "Pink"], white: ["White", "Blanc", "Crisp"], sparkling: ["Bubbles", "Fizz", "Brut", "Sparkle"]};
-const W_FR = {pinot: ["Bellbird Ridge", "Gum Creek Pinot", "Kel's Row"], chardonnay: ["Wattle Hill", "Balloon Lookout", "Riverside Chardonnay"], tempranillo: ["Puente Nuevo", "Tajo Reserva", "Viña Ronda", "Bodega Maple"], red: ["Château Maple", "Clos de la Baie", "Domaine du Lac", "Grand Cru du Verger"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée Maple", "Crémant de la Baie", "Pétillant du Lac"]};
+const W_FR = {pinot: ["Bellbird Ridge", "Gum Creek Pinot", "Kel's Row"], chardonnay: ["Wattle Hill", "Balloon Lookout", "Riverside Chardonnay"], tempranillo: ["Puente Nuevo", "Tajo Reserva", "Viña Ronda", "Bodega del Pozo"], red: ["Château du Verger", "Clos de la Baie", "Domaine du Lac", "Grand Cru du Verger"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée du Pré", "Crémant de la Baie", "Pétillant du Lac"]};
 export function wineNames(F, slot){
   const v = vineState(F), b = v.barrels[slot]; if (!b) return [];
   const used = new Set([...v.cellar, ...v.shelf].map(x => x.name.toLowerCase())), st = b.style, seed = Math.floor(b.start || 0) + slot*7919, out = [];
@@ -143,7 +143,7 @@ export function wineNames(F, slot){
 }
 export function bottle(F, slot, name){
   const v = vineState(F), b = v.barrels[slot]; if (!b || barrelLeft(b) || (b.style === "sparkling" && b.stage !== 2)) return null;
-  const nm = plain(String(name || "")).trim().slice(0, 30) || wineNames(F, slot)[0] || `Maple's ${STYLES[b.style].n}`;
+  const nm = plain(String(name || "")).trim().slice(0, 30) || wineNames(F, slot)[0] || `Honeybrook ${STYLES[b.style].n}`;
   v.cellar.push({id: "w" + Date.now().toString(36), name: nm, type: b.style, n: BOTTLES}); v.barrels[slot] = null;
   return `${BOTTLES} bottles of ${nm}, into the cellar. Stock them on the shop shelves.`;
 }

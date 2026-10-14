@@ -11,7 +11,7 @@ import { icon } from "../art/icons.js";
 
 export const GOALS = {
   scooter: {n: "Scooter", price: 800, where: "garage", line: "A little electric scooter. Zips you from screen to screen about half again as fast as walking."},
-  car: {n: "Cream convertible", price: 3500, where: "garage", line: "A cream convertible, roof down. Room for you and Maple, and more than twice as fast as walking."},
+  car: {n: "Cream convertible", price: 3500, where: "garage", line: "A cream convertible, roof down. Room for you and your pet, and more than twice as fast as walking."},
   boat: {n: "Dolphin cruise boat", price: 4500, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take your friends out to see the dolphins up close."},
   cocoa: {n: "The Cocoa Room", price: 1000, where: "bay", line: "The boarded-up shopfront on the bay, turned into your own chocolate shop: a shop front with a wall of bars, and a kitchen where you make chocolate from the bean. Amara will run the counter."},
   van: {n: "Campervan", price: 3800, where: "hlane", line: "A cream-and-mint vintage campervan with a pop-top roof, parked at its spot on the cottage lane. A little home from home: do it up inside, sleep under the stars, and one day, road trips."},
@@ -34,7 +34,7 @@ export function buyGoal(F, k){
   F.coins -= g.price; F.goals = {...(F.goals || {}), [k]: Date.now()};
   if (k === "scooter" || k === "car") F.ride = k;
   return {scooter: "A shiny new scooter, parked in the garage. You'll zip about on it outdoors from now on.",
-    car: "A cream convertible! Roof down, Maple in the back, ears flapping, and you waving at everyone. You'll drive between screens from now on.",
+    car: "A cream convertible! Roof down, your pet in the back, ears flapping, and you waving at everyone. You'll drive between screens from now on.",
     boat: "Your dolphin cruise boat is moored at the end of the jetty. Take everyone out!",
     cellar: "The cellar door is open! Through the new door on the wine shop's west wall.",
     paperkeeper: "Lise starts tomorrow! She's already rearranged the ribbon rack by colour.",
@@ -68,7 +68,7 @@ export function garagePanel(F){
 // The paddleboard jetties: at the foreshore, a paddle about with the dolphins or paddle up the river home; at home,
 // paddle down the river and out to the foreshore (Maple comes too)
 export function jettyPanel(where, _unused){
-  const fam = ("Maple hops on the front of your board.");
+  const fam = "Your pet hops on the front of your board.";
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${where === "shore" ? "The paddleboards" : "Your little jetty"}</h2>`;
   h += where === "shore"
     ? `<p class="sub">A paddle about with the dolphins, or up the stream, across the lake and down the river home?</p><div class="actions"><button class="btn primary" data-sup="play">Paddle about</button><button class="btn alt" data-sup="base">Paddle home</button></div>`

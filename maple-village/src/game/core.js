@@ -26,6 +26,9 @@ import { reached, award, onPedestals, nextUp, pedestalPanel, bookPanel, wireTrop
 import { attachRoutines, routinesPanel, wireRoutines, rv, todaysSteps, checklistLeft } from "./routines.js";
 import { myName, dearMe } from "./me.js";
 import * as GU from "./guests.js";
+import { lookOf, applyLook } from "./look.js";
+import { openSetup, setupOpen } from "./setup.js";
+import { SPECIES, speciesOf, petArt, petify } from "../art/pets.js";
 import { sendOptions, takeSend, sendMorePanel } from "./bikesend.js";
 import { rideBy, initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, whereAt, npcSay, npcPos, daySchedule, clearSlots } from "./npcs.js";
 import { dishArt, glassArt } from "../art/wine.js";
@@ -113,7 +116,7 @@ import { discoNow, discoOn, DISCO_FROM, aperitivoNow, bonfireNow, vanNow, FIRE, 
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), berries:0, earned:0, steps:0, stepMs:0, water:0, crown:false, npcSaid:{}, harvested:0, updatedAt:0});
-const freshFox = () => ({name:"Maple", xp:0, days:0, streak:0, lastActive:null, coins:null, inv:null, plots:null, cool:{}, met:{}, gifts:{}, mailRead:{}, updatedAt:0});
+const freshFox = () => ({name:"", xp:0, days:0, streak:0, lastActive:null, coins:null, inv:null, plots:null, cool:{}, met:{}, gifts:{}, mailRead:{}, updatedAt:0});
 const load = (k, f) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ? Object.assign(f(), v) : f(); } catch { return f(); } };
 let S = load("fox.today", freshToday), F = load("fox.fox", freshFox);
 function migrate(){
@@ -183,6 +186,24 @@ function adopt(which, remote){
   migrate();
   try { localStorage.setItem("fox."+which, JSON.stringify(which === "today" ? S : F)); } catch {}
   render(true);
+}
+// Your pet (art/pets.js): its colours on :root, and its drawings in the backpack portrait, the follower on the map,
+// and the heads in the bike basket and the car. Redrawn only when the species changes (a new game).
+function dressPet(){
+  const k = speciesOf(F), a = petArt(k), [c1, c2, c3] = SPECIES[k].cols, r = document.documentElement.style;
+  r.setProperty("--pet1", c1); r.setProperty("--pet2", c2); r.setProperty("--pet3", c3);
+  if (document.body.dataset.petkind === k) return; document.body.dataset.petkind = k;
+  $("fTail").innerHTML = a.tail; $("fBody").innerHTML = a.body; $("fHeadArt").innerHTML = a.head; $("napBody").innerHTML = a.nap;
+  const mm = $("mmaple"); mm.querySelector(".bob.stand").innerHTML = a.stand; mm.querySelector(".curl").innerHTML = a.curl;
+  document.querySelectorAll(".petPeek").forEach(g => { g.innerHTML = a.peek; });
+}
+// A new game starts with the setup card (setup.js): your name, pronouns and look, then your pet. Dev builds skip it
+// (with a plain look and a fox) unless the page asks for it with ?setup=1, so test pages start straight in the village.
+function needSetup(){
+  if (F.me && F.pet) return;
+  if (window.__mapleDevStub && !/[?&]setup=1/.test(location.search)) { F.me = F.me || {name: "", pron: {they: "they", them: "them", their: "their"}, look: lookOf(F)}; if (!F.pet) { F.pet = "fox"; F.name = F.name || SPECIES.fox.names[0]; } return; }
+  setTimeout(() => { if ((F.me && F.pet) || setupOpen()) return;
+    openSetup(F, {done: () => { dressPet(); applyWear(); save(true); speak(`Welcome to Honeybrook, ${myName(F)}. ${F.name} has already found the best spot in the house.`, 6000); }}); }, 900);
 }
 // A small per-day record for the Friday paper (last 21 days).
 function noteHistory(){
@@ -346,7 +367,7 @@ document.addEventListener("click", e => {
 }, true);
 $("undoBtn").onclick = () => { const f = undoFn; undoFn = null; clearTimeout(undoT); $("undoBar").hidden = true; if (f) { f(); sfx("paper", true); } };
 let earnT;
-function flash(msg){ lastFlash = msg; const e = $("earn"); e.textContent = plain(msg); clearTimeout(earnT); earnT = setTimeout(() => e.textContent = "", 4000); }
+function flash(msg){ msg = petify(msg, F); lastFlash = msg; const e = $("earn"); e.textContent = plain(msg); clearTimeout(earnT); earnT = setTimeout(() => e.textContent = "", 4000); }
 function earn(n, why){ if (!/task|request/.test(why)) sfx("coin"); F.coins += n; S.earned += n; markActive(); flash(`+${n} coins: ${why}`); mprop("coin", mel.x, mel.y - 60, 1800); }
 function gainXp(n){
   const before = level(); F.xp += n;
@@ -374,6 +395,7 @@ let speechAt = 0;
 const unprompted = () => Date.now() - lastInput > 1500;
 const quietNow = () => hushed() && unprompted();
 function speak(text, ms, force){
+  text = petify(text, F);
   const el = $("speech");
   if (!force && quietNow()) { if (!el.hidden) el.textContent = plain(text); return; }
   el.hidden = false; speechAt = Date.now(); el.textContent = plain(text); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
@@ -417,7 +439,7 @@ function act(kind, item){
   if (kind === "ball") { prop("ball", "p-ball", null, null, 1800); setTimeout(() => hearts(2), 1500); }
   if (kind === "yarn") prop("yarn", "p-yarn", null, null, 3300);
   if (kind === "hide") { d = 4300; prop("eyes", "p-peek", 65, 84, 4300); setTimeout(() => hearts(3), 3900); }
-  if (kind === "nap") { d = 7000; portrait.dataset.nap = "1"; mapleNap = Date.now() + 7000; [0, 800, 1600, 2400].forEach(t => setTimeout(() => prop("z", "p-z", 52, 56, 4800), t)); }
+  if (kind === "nap") { d = Math.round(7000*SPECIES[speciesOf(F)].sleepy); portrait.dataset.nap = "1"; mapleNap = Date.now() + d;   /* a capybara naps longest */ [0, 800, 1600, 2400].forEach(t => setTimeout(() => prop("z", "p-z", 52, 56, 4800), t)); }
   if (kind === "crown") { S.crown = true; hearts(3); }
   if (kind === "fort") { d = 5000; prop("fort", "p-fort", 65, 70, 5000); setTimeout(() => hearts(4), 3000); }
   if (kind === "cheer") hearts(3);
@@ -850,7 +872,7 @@ function giveGift(id, chosen){
   gainXp(1); save();
 }
 function playFree(kind){
-  const lines = {pet:["*leans into the pat*", "Happy fox noises!", "More pats please."], hide:["You found me!"], nap:["Mmm… cosy…"]};
+  const lines = {pet:["*leans into the pat*", "Happy {kind} noises!", "More pats please."], hide:["You found me!"], nap:["Mmm… cosy…"]};
   if (kind === "pet") { sfx("purr"); hearts(2); speak(pick(lines.pet), 3000); return; }
   act(kind); speak(pick(lines[kind]), 4500);
   if (!F.cool[kind] || Date.now() - F.cool[kind] > 30*M) { F.cool[kind] = Date.now(); gainXp(1); save(); }
@@ -958,6 +980,7 @@ const fridgeHead = () => { const n = SL.shopLeft(F); return `<span class="tape s
 const slDraft = {text: "", focus: false, showText: false};
 function wireStorage(c){
   c.querySelectorAll("[data-ftab]").forEach(b => b.onclick = ev => { ev.stopPropagation(); homeView = b.dataset.ftab; slDraft.showText = false; sfx("tap"); ctx(); });
+  c.querySelectorAll("[data-relook]").forEach(b => b.onclick = ev => { ev.stopPropagation(); sfx("paper", true); openSetup(F, {lookOnly: true, done: () => { applyWear(); save(true); speak("A new look. Very you.", 3500); }}); });
   c.querySelectorAll("[data-guest]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const [a, id] = b.dataset.guest.split(":");
     if (a === "ask" && GU.invite(F, id)) { sfx("paper", true); flash(`${GU.nameOf(id)} is coming to stay`); speak(`A letter's on its way to ${GU.nameOf(id)}. They'll be on the 10:30 train tomorrow, for three days.`, 5000); save(); }
     else if (a === "cancel" && GU.cancel(F)) { sfx("tap"); speak("Another time. The bed stays made.", 3500); save(); }
@@ -1121,7 +1144,7 @@ function ctx(){
   { const hn = scView === "fridge" && SCOOP_IN.includes(scene) ? "scoop" : ccView === "pantry" && COCOA_IN.includes(scene) ? "cocoa" : kView === "larder" && scene === "kitchen" ? "kitchen" : kView === "mull" && scene === "kitchen" ? "rack" : null, note = hn ? homeNote(F, hn) : "";
     if (note) { const i = h.lastIndexOf('<div class="actions">'); h = i < 0 ? h + note : h.slice(0, i) + note + h.slice(i); } }
   c.innerHTML = h;
-  if ((homeView && (scene === "home" || scene === "garage")) || (guestView && scene === "kidroom")) wireStorage(c);
+  if ((homeView && (scene === "home" || scene === "garage")) || (guestView && scene === "kidroom") || (wardOpen && scene === "room")) wireStorage(c);
   if (ppView && scene === "bv_hpaper") wirePaper(c);
   if ((ppView && scene === "bv_hpaper") || (fieldView === "gwrap" && scene === "giftshop")) wireWrap(c);
   if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gs]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const [a, v] = b.dataset.gs.split(/:(.*)/s), cc = owns(F, "cocoa") ? cocoaState(F) : null;   // round 188: take from the displays
@@ -1480,7 +1503,7 @@ function bag(){
   const order = ["gift","food","ingredient","feed","flower","use","tool","seed"];
   ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
   $("bag").innerHTML = ids.map(id => { const it = ITEMS[id];
-    const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
+    const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed your pet" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
     // kitchen ingredients can go to the wine shop's larder instead (food can still be fed to Maple)
     const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
     return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");
@@ -1592,27 +1615,19 @@ function drawTableware(){
 // Today's outfit from the wardrobe (F.wear, kept for the day): colours come from the item names (garments.js colourOf).
 // The top and bottom recolour Mel's own; a dress, layer, shoes, bag, earrings, sunglasses (outdoors only) and hair worn
 // down are drawn over her. Pyjamas in her room win.
-const wearToday = () => F.wear && F.wear.day === dayKey() ? F.wear : null;
 function applyWear(pj){
-  const m = $("mel"); if (!m) return; const yk = !pj && townOf(scene) === "kyoto" && yukataOn(F), w = yk ? {dress: `${YUKATA.cols[yk][1]} maxi`, shoes: "tan"} : pj ? null : wearToday(), c = (f, fb) => colourOf(w[f], fb);
+  // your look (look.js) is the base; in Kyoto, in a yukata from the yukata shop, the dress goes over it
+  const m = $("mel"); if (!m) return; const look = lookOf(F); applyLook(m, look);
+  const yk = !pj && townOf(scene) === "kyoto" && yukataOn(F), w = yk ? {dress: `${YUKATA.cols[yk][1]} maxi`, shoes: "tan"} : null, c = (f, fb) => colourOf(w[f], fb);
   const fill = (el, col) => { el.style.display = col ? "" : "none"; if (col) el.style.fill = col; };
-  if (w && w.top && !w.dress) m.style.setProperty("--tank", c("top", "#FFFDF6")); else m.style.removeProperty("--tank");
-  if (w && w.bottom && !w.dress) m.style.setProperty("--denim", c("bottom", "#2F2B28")); else m.style.removeProperty("--denim");
   fill($("oDress"), w && w.dress ? c("dress", "#2E3A70") : null);
-  fill($("oLayer"), w && w.layer ? c("layer", "#6B6B72") : null);
-  m.querySelectorAll(".osleeve").forEach(e => fill(e, w && w.layer ? c("layer", "#6B6B72") : null));
+  fill($("oLayer"), null); m.querySelectorAll(".osleeve").forEach(e => fill(e, null));
   m.querySelectorAll(".oshoe").forEach(e => fill(e, w && w.shoes ? c("shoes", "#2F2B28") : null));
-  // trousers go all the way down to the shoes; shorts and skirts stay short
-  const long = !!(w && w.bottom && !w.dress && !/short|skirt|skort|mini/i.test(w.bottom));
-  m.querySelectorAll(".otrouser").forEach(e => fill(e, long ? c("bottom", "#2F2B28") : null));
+  m.classList.toggle("dressed", !!(w && w.dress));
   // trousers: the hips run straight on into the legs (no shorts hem drawn across them)
+  const long = look.legs === "trousers" && !(w && w.dress);
   { const hips = $("oHips"), sides = $("oHipSides"); if (hips) { hips.setAttribute("d", long ? "M-8.6 -23 h17.2 l-0.4 8.6 h-16.4z" : "M-8.6 -23 h17.2 l1 9.5 h-8 l-1.6 -3 l-1.6 3 h-8z"); hips.style.stroke = long ? "none" : ""; } if (sides) sides.style.display = long ? "" : "none"; }
-  const bag = $("oBag"); bag.style.display = w && w.bag ? "" : "none"; if (w && w.bag) bag.querySelector("rect").style.fill = c("bag", "#2F2B28");
-  const ear = $("oEar"); ear.style.display = w && w.jewellery ? "" : "none";
-  if (w && w.jewellery) ear.querySelectorAll("circle").forEach(e => e.style.fill = /silver|platinum|white gold/i.test(w.jewellery) ? "#BFC3CA" : /pearl/i.test(w.jewellery) ? "#F6F1E8" : "#D9A93A");
-  $("oShades").style.display = w && w.sunglasses && outside() ? "" : "none";
-  const down = !!(w && w.hair && /down/i.test(w.hair)); $("oHairDown").style.display = down ? "" : "none"; m.classList.toggle("hairdown", down);
-  m.classList.toggle("restyled", !!(w && (w.hair || w.dress || w.top))); // the blue hair tie and sprigs belong to the usual look only
+  $("oBag").style.display = "none"; $("oEar").style.display = "none"; $("oShades").style.display = "none";
 }
 // The river taxi (transport.js): pay, a few seconds on the launch (an overlay), then step off at the other stop
 function rideTaxi(to){
@@ -1745,7 +1760,7 @@ function terraceSpot(id){
   if (id === "screen") { occView = "trivia"; trvSt = null; sfx("paper", true); render(); return; }
   if (id === "easel") { occView = "paint"; pntSt = null; sfx("paper", true); render(); return; }
   if (id === "arch") { const w = weddingOn(dayKey()), hm = sgHM(); if (!w) return;
-    speak(hm < WED.ceremony[0] ? `The arch is ready: roses, lavender and olive leaves. ${w.couple} are getting married here at two.` : hm < WED.ceremony[1] ? `${w.couple} say their vows under the arch. Someone's grandmother is crying already. So is Maple, a bit.` : hm < WED.first[0] ? `The wedding breakfast. ${w.couple}, ${w.from}, and the whole terrace raising a glass.` : hm < WED.dancing[0] ? `Their first dance, under the festoon lights. Everyone's gone quiet.` : `Everyone's up dancing. The arch is losing petals, and nobody minds.`, 5500); render(); return; }
+    speak(hm < WED.ceremony[0] ? `The arch is ready: roses, lavender and olive leaves. ${w.couple} are getting married here at two.` : hm < WED.ceremony[1] ? `${w.couple} say their vows under the arch. Someone's grandmother is crying already. So is {pet}, a bit.` : hm < WED.first[0] ? `The wedding breakfast. ${w.couple}, ${w.from}, and the whole terrace raising a glass.` : hm < WED.dancing[0] ? `Their first dance, under the festoon lights. Everyone's gone quiet.` : `Everyone's up dancing. The arch is losing petals, and nobody minds.`, 5500); render(); return; }
   if (id === "book") { lunchView = "book"; sfx("paper", true); render(); return; }
   if (id === "table") { if (lunchNow(dayKey(), sgHM())) { lunchView = "table"; sfx("paper", true); render(); return; }
     speak(new Date(dayKey() + "T00:00:00Z").getUTCDay() === 0 && sgHM() < LUNCH.from ? "Pilar's laying the long table: white linen, jugs of lavender, the good glasses. Lunch is at twelve." : pick(["The long table, under the canvas. On Sundays it seats twelve, and nobody leaves before three.", "Linen folded, a jug of lavender in the middle. It's waiting for Sunday.", "You straighten a chair. The canvas lifts and settles overhead, like the terrace is breathing."]), 5500); render(); return; }
@@ -2090,7 +2105,7 @@ function arriveSpot(id){
   if (scene === "van" && id === "vmap") { bvView = "map"; tripPick = []; sfx("paper", true); render(); return; }   // round 141: Bellbird Valley
   if (scene === "van" && id === "vboard") { vanView = "board"; sfx("paper", true); render(); return; }
   if (scene === "van" && id === "vtable") { vanView = "crate"; sfx("paper", true); render(); return; }   // round 153: pack the pop-up crate
-  if (scene === "van" && id === "vbed") { speak(pick(["You stretch out under the pop-top. Stars through the roof window. Bliss.", "A little lie-down. Maple curls up at your feet.", "The quietest bed in Honeybrook."]), 4500); ; render(); return; }
+  if (scene === "van" && id === "vbed") { speak(pick(["You stretch out under the pop-top. Stars through the roof window. Bliss.", "A little lie-down. {pet} curls up at your feet.", "The quietest bed in Honeybrook."]), 4500); ; render(); return; }
   if (scene === "barn" && (id === "extractor" || id === "crock" || id === "press" || id === "cave")) { hfView = id; hfState(F); sfx("paper", true);
     if (id === "cave" && isHere("elena")) npcSay("elena", pick(["Turn them every morning. They like the attention.", "Smell that? That's a cheese thinking."]));
     else if (id === "press" && isHere("elena")) npcSay("elena", "Name it something nice. A wheel with a good name ages better. Everyone knows that.");
@@ -2314,7 +2329,7 @@ function marketStallPanel(st){
     if (st.id === "elena" && owns(F, "millshop")) h += `<p class="muted">"Your oils are the talk of the market. I send people up the lane to the mill."</p>`;
     if (st.kind === "wine" && (sold.market || Object.keys(craftState(F).store).length)) h += `<p class="muted">A crate from the mill at the end of the stall: oils, soaps and lotions. ${sold.market ? `${sold.market} sold so far.` : ""}</p>`; }
   const items = stallItems(st);
-  if (items.length) h += `<div class="items shop">${items.map(id => itemBtn(id, `<b>${stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < stallPrice(id), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.${st.produce ? " Handy when the garden's between harvests: it all goes to the kitchen or to Maple." : ""}</p>`;
+  if (items.length) h += `<div class="items shop">${items.map(id => itemBtn(id, `<b>${stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < stallPrice(id), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.${st.produce ? " Handy when the garden's between harvests: it all goes to the kitchen or to your pet." : ""}</p>`;
   if (st.decor) h += `<div class="items shop">${st.decor.map(id => { const d = DECOR[id], own = F.decorOwned[id], on = own && F.decor[d.slot] === d.val;
     return `<button class="item" data-decor="${id}" ${!own && F.coins < d.price ? "disabled" : ""}><span class="e">${icon(d.ico, 34)}</span><span class="n">${esc(d.n)}</span><span class="c">${on ? (d.where === "room" ? "in your room" : "in your home") : own ? "tap to use" : `<b>${d.price}</b> ${icon("coin", 13)}`}</span></button>`; }).join("")}</div><p class="muted">Bought once, kept forever. You have ${F.coins} coins.</p>`;
   h += treatsHTML(st, F.coins);   // round 172: the Christmas market's chestnuts and hot chocolate
@@ -2634,7 +2649,7 @@ function tipBand(){
   if (F.coins < 2) { speak("Not even two coins! Next time.", 3000); render(); return; }
   F.coins -= 2; S.tips = (S.tips || 0) + 1; sfx("coin"); flash("-2 coins in the hat");
   [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", STAGE.x - 20 + k*20, STAGE.y - 70, 1800), d));
-  speak(pick(["Clink! The bass player tips his hat back at you.", "Two coins in the hat. The keys player plays a little flourish just for you.", "\"Thank you! This next one's for the lady with the fox.\"", "Clink. The duo grin and slide into something slower."]), 4500);
+  speak(pick(["Clink! The bass player tips his hat back at you.", "Two coins in the hat. The keys player plays a little flourish just for you.", "\"Thank you! This next one's for you and the {kind}.\"", "Clink. The duo grin and slide into something slower."]), 4500);
   if (S.tips === 1) gainXp(1); save(); render();
 }
 // A family paddle off the foreshore: Mel (and Evan, if he's here) take boards out from the rack by the jetty for a
@@ -2647,13 +2662,13 @@ const SUP_BOARD = k => `<g class="supboard"><ellipse cx="0" cy="${-1*k}" rx="${2
   // a hire bike (transport.js): a child seat on the back for Evan, a basket on the front for Maple
   b.insertAdjacentHTML("beforebegin", `<g class="rideBike" transform="translate(0 7)">${bikeArt("#5E8A5A")}</g>`);
   b.insertAdjacentHTML("afterend", `<g class="rideBike" transform="translate(0 7)" style="stroke:var(--line)" stroke-width="1"><g class="bikeEvan"><path d="M-22 -18 h10 v8 h-10z" style="fill:#3E6B8C"/><path d="M-22 -18 v-8" stroke-width="1.6"/><circle cx="-17" cy="-26" r="4.6" style="fill:var(--skin)"/><path d="M-21.6 -27 q4.6 -7 9.2 0" style="fill:var(--hair)"/><path d="M-22.6 -27.6 q5.6 -9 11.2 0z" style="fill:#F3C969"/><circle cx="-18.4" cy="-25.6" r=".7" style="fill:#2F2B28" stroke="none"/><path d="M-13 -14 l5 -1" stroke-width="1.6"/></g>
-    <path d="M14 -24 h12 l-2 9 h-8z" style="fill:#C9A27E"/><path d="M15 -21 h10 M16 -18 h8" opacity=".5"/><g class="bikeMaple"><path d="M17 -27 l1 -6 l3 3z M25 -27 l-1 -6 l-3 3z" style="fill:var(--fox)"/><ellipse cx="21" cy="-26" rx="5" ry="4" style="fill:var(--fox)"/><path d="M17.5 -25 q3.5 3 7 0" style="fill:var(--cream)" stroke="none"/><circle cx="19.4" cy="-27" r=".7" style="fill:#2F2B28" stroke="none"/><circle cx="22.6" cy="-27" r=".7" style="fill:#2F2B28" stroke="none"/></g></g>`);
+    <path d="M14 -24 h12 l-2 9 h-8z" style="fill:#C9A27E"/><path d="M15 -21 h10 M16 -18 h8" opacity=".5"/><g class="bikeMaple petPeek" transform="translate(21 -26) scale(.72)"></g></g>`);
   // the ice cream trolley (round 137): a little pink push-cart in front of her, like the night market's but no parasol
   b.insertAdjacentHTML("afterend", `<g class="rideTrolley" style="stroke:var(--line)" stroke-width="1"><path d="M10 -22 l6 3" stroke-width="1.6" fill="none"/><rect x="15" y="-24" width="26" height="17" rx="2" style="fill:#F4C7CF"/><rect x="15" y="-24" width="26" height="4" rx="1.5" style="fill:#FFFDF6"/><path d="M15 -15 h26" stroke-width="2.2" style="stroke:#FFFDF6"/><path d="M24 -12 l2 5 l2 -5z" style="fill:#E8C48E"/><circle cx="26" cy="-13" r="2" style="fill:#F8D59A"/><path d="M32 -12 l2 5 l2 -5z" style="fill:#E8C48E"/><circle cx="34" cy="-13" r="2" style="fill:#C3E8B8"/><circle cx="19" cy="-3" r="3" style="fill:#2F2B28"/><circle cx="37" cy="-3" r="3" style="fill:#2F2B28"/></g>`);
   b.insertAdjacentHTML("beforebegin", `<g class="rideScoot" style="stroke:var(--line)" stroke-width="1"><rect x="-15" y="-3" width="30" height="3.4" rx="1.6" style="fill:#7FB8E8"/><circle cx="-12" cy="1" r="2.6" style="fill:#2F2B28"/><circle cx="12" cy="1" r="2.6" style="fill:#2F2B28"/><path d="M12 -3 l3 -26 M10 -29 h9" fill="none" stroke-width="2"/></g>`);
   // the cream convertible, roof down: Mel at the wheel, Maple in the back, Evan beside her when he's along (and awake)
   b.insertAdjacentHTML("afterend", `<g class="rideCar" style="stroke:var(--line)" stroke-width="1.1"><g class="carEvan"><circle cx="-21" cy="-26" r="5" style="fill:var(--skin)"/><path d="M-26 -27 q5 -8 10 -1" style="fill:#2A211D"/><circle cx="-22.5" cy="-25.5" r=".7" style="fill:#2F2B28" stroke="none"/></g>
-    <path d="M-38 -22 l3 -8 l4 5z M-32 -23 l3 -7 l3 6z" style="fill:var(--fox)"/><ellipse cx="-32" cy="-19" rx="6" ry="4.6" style="fill:var(--fox)"/><path d="M-37 -17.5 q5 3 10 0" style="fill:#FFFDF6"/><circle cx="-34" cy="-20" r=".7" style="fill:#2F2B28" stroke="none"/>
+    <g class="petPeek" transform="translate(-32 -20) scale(.85)"></g>
     <path d="M-40 -4 v-12 q0 -4 4 -5 h56 l8 4 q4 2 4 6 v7z" style="fill:#F3E7C9"/><path d="M-38 -14 h58" opacity=".5"/><path d="M14 -21 l4 -9" style="stroke:#9CC3E0" stroke-width="2.2"/>
     <circle cx="-26" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="16" cy="-3" r="5" style="fill:#2F2B28"/><circle cx="-26" cy="-3" r="2" style="fill:#CFC8BE"/><circle cx="16" cy="-3" r="2" style="fill:#CFC8BE"/><circle cx="29" cy="-11" r="1.6" style="fill:#F3C969"/></g>`); } }
 function familyPaddle(){
@@ -2663,7 +2678,7 @@ function familyPaddle(){
   sup = {from: m, until: Date.now() + 60000, out: false};
   route = []; atSpot = null; mel.path = []; mel.tx = 104; mel.ty = 372; mel.sitting = false; nodes.mel.classList.remove("sit"); nodes.mel.classList.add("sup"); sfx("paper", true);
   const fam = ["hana", "theo", "tomi", "posy"].filter(isHere);
-  speak(fam.length ? `Boards out! ${fam.map(n => NPCS.find(d => d.id === n).name).join(" and ").replace(/ and (?=.* and )/g, ", ")} ${fam.length > 1 ? "are" : "is"} paddling out with you.` : "Boards out! Off the jetty and onto the water. Maple's minding the towels.", 4500);
+  speak(fam.length ? `Boards out! ${fam.map(n => NPCS.find(d => d.id === n).name).join(" and ").replace(/ and (?=.* and )/g, ", ")} ${fam.length > 1 ? "are" : "is"} paddling out with you.` : "Boards out! Off the jetty and onto the water. {pet}'s minding the towels.", 4500);
   setTimeout(() => { if (sup && scene === "shore") { speak("Dolphins! Right next to the boards. Don't fall in. Okay, maybe a little.", 4500); [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("heart", 80 + k*24, 330, 1800), d)); if (fam.length) npcSay(fam[0], "Dolphin! Over there, look!"); } }, 20000);
   render();
 }
@@ -2690,7 +2705,7 @@ function startCruise(){
   const m = sgHM(); if (m >= 19*60 || m < 6*60) { speak("Too dark for a cruise. The dolphins are tucked up for the night.", 3500); render(); return; }
   S.cruise = {until: Date.now() + 45000}; route = []; mel.path = []; atSpot = null;
   [nodes.mel, nodes.maple].forEach(n => n.style.visibility = "hidden"); sfx("chime"); drawScene();
-  speak(("All aboard! Maple's on your lap. Off up the coast."), 5000);
+  speak("All aboard! {pet}'s on your lap. Off up the coast.", 5000);
   setTimeout(() => { if (S.cruise && scene === "shore") { speak("Dolphins! A whole pod, right alongside the boat. One jumps clean out of the water.", 5500); [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("heart", 90 + k*20, 260, 1800), d)); } }, 16000);
   render();
 }
@@ -2771,7 +2786,7 @@ function fieldSpot(id){
   }
   if (id === "picnic") {
     mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = 1; sfx("paper", true);
-    if (F.inv.picnic > 0) { addInv("picnic", -1); gainXp(4); act("cheer"); speak("Picnic time! Sandwiches, fruit, and Maple guarding the basket.", 5000);
+    if (F.inv.picnic > 0) { addInv("picnic", -1); gainXp(4); act("cheer"); speak("Picnic time! Sandwiches, fruit, and {pet} guarding the basket.", 5000);
       ; }
     else speak(pick(["A rest on the picnic blanket. Clouds, a breeze, nothing to do for a minute.", "Sit, breathe, look at the lake. That counts as a break."]), 4500);
     save(); render(); return;
@@ -2836,7 +2851,7 @@ $("bedYes").onclick = () => { bedAsk(false); F.bedSkip = nightKey(); save(); bed
 // Backup: every part of the game this browser holds (the save, journal, jars, kind words, routines, letters, home) in one file
 $("setBackup").onclick = async () => {
   const data = {}; Object.keys(localStorage).filter(k => k.startsWith("fox.")).forEach(k => { try { data[k] = JSON.parse(localStorage.getItem(k)); } catch { data[k] = localStorage.getItem(k); } });
-  const file = JSON.stringify({game: "Maple's village", exportedAt: new Date().toISOString(), data}, null, 1), name = `maples-village-backup-${dayKey()}.json`;
+  const file = JSON.stringify({game: "Honeybrook", exportedAt: new Date().toISOString(), data}, null, 1), name = `honeybrook-backup-${dayKey()}.json`;
   let dl = null; try { dl = await claude.use("downloads"); } catch {}
   if (!dl) { $("setBackupNote").textContent = "Downloads aren't available in this view. Try the Claude app or claude.ai in a browser."; return; }
   try { await dl.save({filename: name, data: file}); $("setBackupNote").textContent = `Saved ${name}. Keep it somewhere safe, like your Google Drive.`; F.backupAt = Date.now(); save(); }
@@ -2871,7 +2886,7 @@ svg.addEventListener("click", ev => {
   const kp = ev.target.closest("[data-keep]");
   if (kp) { keepSpot = kp.dataset.keep; sfx("paper", true); render(); return; }
   const ent = ev.target.closest("[data-ent]");
-  if (ent && ent.dataset.ent === "maple") { sfx("purr"); if (Math.random() < .35) { hearts(2); speak("Purr… treats and toys are in your backpack. Tap the bag up top!", 4000); return; } hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please."]), 3000); return; }
+  if (ent && ent.dataset.ent === "maple") { sfx("purr"); if (Math.random() < .35) { hearts(2); speak("A happy wriggle. Treats and toys are in your backpack: tap the bag up top!", 4000); return; } hearts(2); speak(pick(["*leans into the pat*", "Happy {kind} noises!", "More pats please."]), 3000); return; }
   // the orchard's tree spots and the flower farm's beds and bushes: walk over, then the spot's card
   const ot = ev.target.closest("[data-tree], [data-bed], [data-bush]");
   if (ot && (scene === "orchard" || scene === "flowers")) { const where = ot.dataset.tree != null ? "tree" : ot.dataset.bed != null ? "bed" : "bush", i = +(ot.dataset.tree ?? ot.dataset.bed ?? ot.dataset.bush);
@@ -3038,7 +3053,7 @@ function frame(now){
   nodes.maple.classList.toggle("sleep", sleeping);
   if (inRoom) {}
   else if (sup && scene === "shore") { maple.tx = 196; maple.ty = 486; stepTo(maple, 120, dt); }
-  else if (!sleeping) { maple.tx = mel.x - mel.dir*24; maple.ty = mel.y + 3; const d = Math.hypot(maple.tx - maple.x, maple.ty - maple.y); stepTo(maple, Math.max(120, d*3.2), dt); if (!maple.moving) maple.dir = mel.dir; }
+  else if (!sleeping) { maple.tx = mel.x - mel.dir*24; maple.ty = mel.y + 3; const d = Math.hypot(maple.tx - maple.x, maple.ty - maple.y); stepTo(maple, Math.max(120, d*3.2)*SPECIES[speciesOf(F)].pace, dt); if (!maple.moving) maple.dir = mel.dir; }   // (pace: a tortoise ambles, a rabbit bounds)
   else maple.moving = false;
   tickNpcs(dt); updateCam(dt); drawTableware();
   placeNode(nodes.mel, mel); placeNode(nodes.maple, maple);
@@ -3057,8 +3072,10 @@ function frame(now){
 document.querySelectorAll("[data-track]").forEach(b => b.onclick = () => openTracker(b.dataset.track));
 $("paperSave").onclick = () => { const v = $("paperNameIn").value.trim(); F.paperName = v; $("paperNameIn").value = ""; $("paperNameIn").placeholder = paperName(); sfx("paper"); speak(v ? `Hot off the press: ${v}!` : "Back to The Morning Crier.", 4000); save(); };
 $("paperNameIn").placeholder = paperName();
-$("nameSave").onclick = () => { const v = $("nameIn").value.trim(); if (v) { F.name = v; $("nameIn").value = ""; act("cheer"); speak(`Hi! I'm ${v} now 🦊`, 4000); save(); } };
-$("pet").onclick = () => { sfx("purr"); hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please.", "You're my favourite human."]), 3000); };
+$("nameSave").onclick = () => { const v = $("nameIn").value.trim(); if (v) { F.name = v.slice(0, 20); $("nameIn").value = ""; act("cheer"); speak(`Hi! I'm ${F.name} now.`, 4000); save(); } };
+$("meSave").onclick = () => { const v = $("meIn").value.trim(); if (v) { F.me = {...(F.me || {}), name: v.slice(0, 24)}; $("meIn").value = ""; sfx("chime"); speak(`Nice to meet you, ${F.me.name}.`, 4000); save(); } };
+$("meLook").onclick = () => { sfx("paper", true); openSetup(F, {lookOnly: true, done: () => { applyWear(); save(true); speak("A new look. Very you.", 3500); }}); };
+$("pet").onclick = () => { sfx("purr"); hearts(2); speak(pick(["*leans into the pat*", "Happy {kind} noises!", "More pats please.", "You're my favourite human."]), 3000); };
 
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
@@ -3090,6 +3107,7 @@ setGhTools(() => F.tools || {});
 // wakes up at home as usual). F.where is kept by save().
 { const w = !globalThis.__mapleNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F));
   if (ok) { scene = w.scene; mel.x = mel.tx = w.x; mel.y = mel.ty = w.y; mel.path = []; maple.x = maple.tx = w.x - 22; maple.y = maple.ty = w.y + 2; } }
+dressPet(); needSetup();
 render(true);
 if (F.gift) setTimeout(() => speak("A welcome gift! Seeds are in your backpack 🌷", 5000), 1200);
 requestAnimationFrame(frame);

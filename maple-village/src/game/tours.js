@@ -32,10 +32,10 @@ export function toursOn(day){
   const d = dow(day), out = [];
   // groups are a mix: a couple of villagers and one or two out-of-towners
   const keepers = keepersOn(day);
-  const away = awayToday(day), guides = GUIDES.filter(g => !keepers.includes(g) && !away.includes(g));
-  if (d === 0 || d === 6) WEEKEND.forEach(([from, to], i) => { const guide = guides[(hash(day) + i) % guides.length], t = 1 + (hash(day + "t" + i) % 2);
+  const away = awayToday(day), guides = GUIDES.filter(g => !keepers.includes(g) && !away.includes(g)), evening = ["bo", ...GUIDES].find(g => !away.includes(g));
+  if ((d === 0 || d === 6) && guides.length) WEEKEND.forEach(([from, to], i) => { const guide = guides[(hash(day) + i) % guides.length], t = 1 + (hash(day + "t" + i) % 2);
     out.push({i, from, to, guide, group: [...groupFor(day + ":" + i, 3 + (hash(day + "n" + i) % 2) - t), ...groupFor(day + ":t" + i, t, keepers, TOURISTS)]}); });
-  else if (BO_DAYS.includes(d)) out.push({i: 0, from: BO_TOUR[0], to: BO_TOUR[1], guide: away.includes("bo") ? "farid" : "bo", group: [...groupFor(day + ":d", 2), ...groupFor(day + ":dt", 1, [], TOURISTS)]});
+  else if (BO_DAYS.includes(d) && evening) out.push({i: 0, from: BO_TOUR[0], to: BO_TOUR[1], guide: evening, group: [...groupFor(day + ":d", 2), ...groupFor(day + ":dt", 1, [], TOURISTS)]});
   return out;
 }
 // Where the group stands: round the trees first, then over to the flower beds for the second half

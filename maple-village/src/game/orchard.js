@@ -178,7 +178,7 @@ export function shopPanel(F, today, tab, market){
     const have = fruit.filter(id => o.stock[id] > 0);
     h += have.length ? `<ul class="hlist wlist">${have.map(id => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(fruitName(id, 2)[0].toUpperCase() + fruitName(id, 2).slice(1))}</b><small>${o.stock[id]} on the shelf</small></span><button class="btn small primary" data-or="take" data-k="${id}">Take one</button>${o.stock[id] > 1 ? `<button class="btn small alt" data-or="takeall" data-k="${id}">All</button>` : ""}</li>`).join("")}</ul>`
       : `<p class="muted">${o.trees.some(Boolean) ? "Nothing picked yet. Farid picks the fruit as soon as it's ripe." : "No fruit yet. Plant some trees (the Plant tab) and Farid will pick the fruit once it's ripe."}</p>`;
-    h += `<p class="muted">Fruit can go to the wine shop's fruit crate, or to Maple.</p>`;
+    h += `<p class="muted">Fruit can go to the wine shop's fruit crate, or to your pet.</p>`;
   } else {
     const ids = Object.keys(FLOWERS).filter(id => stemsOf(o, id) > 0);
     h += ids.length ? `<ul class="hlist wlist orflowers">${ids.map(id => { const s = stemsOf(o, id);

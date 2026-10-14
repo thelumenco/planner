@@ -797,8 +797,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 /* big goals: how much is saved towards one */
 .goalbar{height:12px;border-radius:999px;background:rgba(60,40,30,.12);overflow:hidden;margin:10px 0 4px;border:1.2px solid var(--line)}
 .goalbar span{display:block;height:100%;background:var(--honey);border-radius:999px}
-#mel.hairdown .pony{display:none}
-#mel.restyled .usual{display:none}
+
+
 
 /* the wardrobe: ticking off what to wear */
 .wearpick ul li label{display:flex;align-items:center;gap:8px;width:100%;cursor:pointer}
@@ -980,3 +980,30 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ppbatch{display:flex;justify-content:center;margin:2px 0 6px}
 .qlist.nbrs .hearts{margin:0;gap:2px}
 .sltext{width:100%;font:inherit;font-size:.85rem;padding:8px;border:1.4px solid #E4DDD2;border-radius:6px;background:#FFFDF7;margin:6px 0 4px}
+/* phase 4: your look (game/look.js applyLook): hair styles, body, legs, switched by classes on #mel (and the setup preview) */
+.me .hLong,.me .hBob,.me .hBun,.me .hCurl,.me .torsoM,.me .tee,.me .skirt,.me .otrouser{display:none}
+.me:not(.hs-pony) .pony,.me:not(.hs-pony) .usual{display:none}
+.me.hs-long .hLong,.me.hs-bob .hBob,.me.hs-bun .hBun,.me.hs-curly .hCurl{display:inline}
+.me.b-man .torsoW{display:none}.me.b-man .torsoM{display:inline}
+.me.b-man .straps,.me.b-neither .straps{display:none}.me.b-man .tee,.me.b-neither .tee{display:inline}
+.me.l-skirt .skirt,.me.l-trousers .otrouser{display:inline}
+.me.dressed .skirt,.me.dressed .otrouser{display:none}
+/* phase 4: the setup card (game/setup.js) */
+.setup{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));background:rgba(58,46,40,.45)}
+.setup[hidden]{display:none}
+.sucard{width:min(560px,100%);max-height:100%;overflow:auto;background:var(--card,#FFFDF6);border-radius:18px;padding:22px 20px;box-shadow:0 10px 40px rgba(40,30,20,.25)}
+.sucard h2{margin:.1em 0 .4em}
+.sulabel{display:block;margin:14px 0 6px;font-weight:700;font-size:.9rem}
+.suinput{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid rgba(120,104,84,.3);font:inherit;background:#FFFDF6;color:#2F2B28}
+.suown{gap:8px}.suown .suinput{flex:1;min-width:0}
+.swatches{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid rgba(58,46,40,.25);cursor:pointer;padding:0}
+.sw.on{outline:3px solid #5E9A86;outline-offset:2px}
+.sulook{display:flex;gap:14px;align-items:flex-start}
+.suprev{flex:none;background:var(--grass,#E4ECD6);border-radius:14px}
+.suopts{flex:1;min-width:0}
+@media (max-width:480px){.sulook{flex-direction:column;align-items:center}.suprev{width:96px;height:160px}}
+.supets{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.supet{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;border-radius:14px;border:1.5px solid rgba(120,104,84,.25);background:#FFFDF6;font:inherit;cursor:pointer;flex:1 1 84px}
+.supet.on{background:#E3F2EC;border-color:#5E9A86;font-weight:700}
+:root[data-theme="dark"] .sucard{background:#2E2A33;color:#F1EBE0}

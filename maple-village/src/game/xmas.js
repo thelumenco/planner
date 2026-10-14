@@ -170,7 +170,7 @@ export function lanternWalk(F, day){ const x = xmasState(F); x.walk = x.walk || 
 
 // Santa's grotto: weekend evenings 5 to 8, by the picnic spot. You whisper a wish, get a little present, and the
 // first visit each Christmas, a photo with Santa to keep (nobody's too old for Santa)
-export const WISHES = ["snow. Just a little snow, please, for the lantern walk.", "a whole week with nothing to do but read.", "that the orchard has its best year yet.", "a really good cheese. You'll know it when you taste it.", "that Maple stops stealing socks. Or doesn't. You've grown fond of it.", "that everyone in the village gets a present too."];
+export const WISHES = ["snow. Just a little snow, please, for the lantern walk.", "a whole week with nothing to do but read.", "that the orchard has its best year yet.", "a really good cheese. You'll know it when you taste it.", "that {pet} stops stealing socks. Or doesn't. You've grown fond of it.", "that everyone in the village gets a present too."];
 export const GIFTS = [["xm_ginger", "a gingerbread person"], ["xm_yoyo", "a painted yo-yo"], ["xm_star", "a little straw star"]];
 export function grottoPanel(F, day, hm, o = {}){
   const x = xmasState(F); let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Santa's grotto</h2>`;

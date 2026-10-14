@@ -75,7 +75,7 @@ export function buyCcUp(F, k){
     grinder2: "A second stone grinder, rumbling away beside the first.", wrap: "The wrapping station's set up: ribbons, tissue, boxes in every size.",
     tree: "A cacao tree in the orchard! Farid says he'll talk to it every morning.", fountain: "The chocolate fountain's flowing. Tomi is going to lose his mind.",
     supply: "Done: the Scoop Shack gets 10 pieces of your dark chocolate every morning, when there's enough spare.", workshop: "Weekend workshops are on: Saturdays, 2 to 4, at the tables.",
-    assistant: "Lila starts Monday! The shop's open seven days now.", vending: "The vending machine's plugged in by the door: rows of your bars behind the glass, a little light on top. Maple has already sniffed every button.", cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."}[k] || `${u.n}, on the shelf by the bonbon table. Pick them when you make a tray.`;
+    assistant: "Lila starts Monday! The shop's open seven days now.", vending: "The vending machine's plugged in by the door: rows of your bars behind the glass, a little light on top. Your pet has already sniffed every button.", cart: "The chocolate cart's ready for Sunday's farmers market. Mateo's thrilled."}[k] || `${u.n}, on the shelf by the bonbon table. Pick them when you make a tray.`;
 }
 // the vending machine's coins, into the player's pocket -> how many
 export function emptyVending(F){ const c = cocoaState(F), n = c.vend || 0; c.vend = 0; F.coins += n; return n; }
@@ -129,7 +129,7 @@ export const isFilling = id => (id in INGR && !NOT_FILLING.includes(id)) || id i
 export const fillName = id => FL(id)[0];
 // (round 176: "Heart" is a mould now. Round 194: this comment used to sit mid-line and hid POETIC, so a third of
 // two-filling bonbons crashed the bonbon table when they were named)
-const STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Cream"], POETIC = ["Jetty Sunset", "Lantern Night", "Village Green", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Maple's Secret", "Night Market"];
+const STYLE = ["Truffle", "Bonbon", "Praline", "Ganache", "Cream"], POETIC = ["Jetty Sunset", "Lantern Night", "Village Green", "Sea Breeze", "First Light", "Golden Hour", "Low Tide", "Porch Swing", "Pocket Secret", "Night Market"];
 const keyOf = (shell, fills) => [shell, ...[...new Set(fills)].sort()].join("+");
 export function bonbonName(shell, fills){
   const f = [...new Set(fills)].sort(), h = hash(keyOf(shell, f)), style = STYLE[h % STYLE.length], sh = shell[0].toUpperCase() + shell.slice(1);

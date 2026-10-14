@@ -182,7 +182,7 @@ export const PEN_RK = {
     flower: "I tied them to the front of the rickshaw. I'm in even more photos now.",
     other: "It rides in the rickshaw with me now, up and down the lane all day. It's seen everything.",
     letter: "Your letter came all the way across the sea. I read it at the top of the lane, getting my breath back.",
-    news: ["Maple season is here. Everyone wants a photo, and I'm in most of them, as usual.", "I found a new story about the pagoda this month. Sachiko-san told it to me over tea."],
+    news: ["Autumn leaf season is here. Everyone wants a photo, and I'm in most of them, as usual.", "I found a new story about the pagoda this month. Sachiko-san told it to me over tea."],
     back: null, backNote: ""},
   haru: {sign: "Haru, from the gravel garden",
     food: "I ate it under the eaves, with a cup of tea, looking at the waves I raked this morning.",

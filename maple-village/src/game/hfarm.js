@@ -37,7 +37,7 @@ export const LEVELS = [{n: "Helper", at: 0, gives: ""}, {n: "Trusted hand", at: 
   {n: "Partner", at: 200, gives: "a shelf of your own at the farm stand, and three more shelves in the cave"}];
 export const levelOf = h => LEVELS.reduce((l, x, i) => h.trust >= x.at ? i : l, 0);
 // trust for a bit of help -> the new level's index if this tipped the player into it (the unlocks come with it)
-export function gainTrust(F, n){ const h = hfState(F), before = levelOf(h); h.trust += n; const after = levelOf(h); if (after > before) { if (after >= 1 && !h.myHive) h.myHive = {t: clock(), name: "Maple's Meadow"}; return after; } return null; }
+export function gainTrust(F, n){ const h = hfState(F), before = levelOf(h); h.trust += n; const after = levelOf(h); if (after > before) { if (after >= 1 && !h.myHive) h.myHive = {t: clock(), name: "Honey Meadow"}; return after; } return null; }
 export const STAND = {milk: 3, goatmilk: 4, honey: 6, egg: 3};
 const clock = () => Date.now() + (globalThis.__mapleOffset || 0);
 const yesterday = day => new Date(Date.parse(day + "T00:00:00Z") - 864e5).toISOString().slice(0, 10);

@@ -36,7 +36,7 @@ export const NPCS = [
     look: {skin: "#F3D2B8", hair: "#5A3A2A", hairStyle: "bun", top: "#EFA3A6", bottom: "#7A6A8C", extra: "apron"},
     routine: [slot("7:00", "7:45", "hfarm", [[130, 600], [190, 590]], {dow: [1, 4]}), slot("19:30", "21:00", "wineshop", [227, 518], {act: "sit", dow: [0]}), slot("8:00", "12:00", "market", [260, 352]), slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
       slot("13:00", "15:00", "market", [260, 352]), slot("15:00", "15:40", "village", [[362, 372], [392, 360], [340, 380]]), slot("15:40", "19:00", "market", [260, 352])],
-    lines: ["Fresh dumplings today. Don't tell Maple, she'll want three.", "You look like a honey toast kind of person today.", "Lunch rush is wild. Everyone wants toast at once!",
+    lines: ["Fresh dumplings today. Don't tell {pet}, they'll want three.", "You look like a honey toast kind of person today.", "Lunch rush is wild. Everyone wants toast at once!",
       "Remember to eat something proper, not just snacks.", "The strawberries sell out first. Every time."],
     away: "Hana's popped out. The shop still works: honesty box on the counter.",
     react: {harvest: "Ooh, homegrown! I'll buy anything you grow, you know.", quests3: "Three quests done already? Have a dumpling, you've earned it.", lunch: "Have you had lunch? Proper lunch?"}
@@ -88,7 +88,7 @@ export const NPCS = [
     intro: "I'm Pip! I'm seven and I'm the FASTEST. Watch!", kid: true,
     look: {skin: "#D6A27C", hair: "#1F1A17", hairStyle: "spiky", top: "#F28C6A", bottom: "#4C7BB0", extra: "helmet"},
     routine: [slot("16:30", "17:30", "vineyard", [[110, 604], [262, 600], [410, 608], [200, 586], [330, 590]]), slot("15:00", "18:30", "base", [[230, 350], [300, 380], [200, 420], [360, 516], [160, 560], [300, 600]])],
-    lines: ["Race you to the pond!", "Nobody is as fast as me. Nobody.", "Did you know foxes can't ride bikes? I asked Maple.", "I found a snail! His name is Gary."],
+    lines: ["Race you to the pond!", "Nobody is as fast as me. Nobody.", "Did you know a {kind} can't ride a bike? I asked {pet}.", "I found a snail! His name is Gary."],
     react: {}
   },
   {
@@ -107,7 +107,7 @@ export const NPCS = [
     look: {skin: "#F0D0B4", hair: "#6B4A2E", hairStyle: "short", top: "#C3CDEE", bottom: "#3A3A48", extra: "tie"},
     routine: [slot("9:00", "12:00", "hwoods", WOODS_WALK, {dow: [6]}), slot("15:00", "17:00", "bay", [[180, 420], [240, 430]], {dow: [0], act: "sit"}), slot("17:30", "19:00", "wineshop", [313, 518], {act: "sit"}), slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "trophy", [228, 590], {act: "sit"}), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
     lines: ["Records say you've been busy. I'm very proud. Officially.", "This stamp is from 1962. Look at the little bird!", "Everything filed, everything stamped. Bliss.",
-      "The quest board is the most important document in town.", "I've started a register of Maple's naps. It's long."],
+      "The quest board is the most important document in town.", "I've started a register of {pet}'s naps. It's long."],
     react: {quests3: "I've stamped three completed quests in the register. Gold stamp!", planning: "A planning quest! My favourite kind of paperwork."}
   },
   // The vineyard's workers: while they're on shift they water, pick ripe grapes and fill empty barrels (each can be
@@ -507,7 +507,7 @@ export const NPCS = [
     intro: "Ren! Rickshaw, best legs in Kyoto. I know every story on this lane. Ask me anything.",
     look: {skin: "#C99470", hair: "#1E1A18", hairStyle: "spiky", top: "#2F2B28", bottom: "#2F2B28", extra: "satchel"},
     routine: [slot("9:00", "18:00", "kt_lane", [[262, 430], [300, 420]], {dir: -1})],
-    lines: ["That pagoda's been rebuilt after fires, after storms. It always comes back.", "The tea house? Sachiko-san's. Best tea on the lane. Don't tell the others I said.", "Up this hill a thousand times a day. My calves have calves.", "Maple season! Everyone wants a photo. I'm in most of them."],
+    lines: ["That pagoda's been rebuilt after fires, after storms. It always comes back.", "The tea house? Sachiko-san's. Best tea on the lane. Don't tell the others I said.", "Up this hill a thousand times a day. My calves have calves.", "Autumn leaf season! Everyone wants a photo. I'm in most of them."],
     away: "Ren's rickshaw is parked. He's off for noodles."
   },
   {

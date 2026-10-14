@@ -68,7 +68,7 @@ export function cantinaPanel(F){
 
 /* ---------- painting a boat with the fishermen (Manarola) ---------- */
 export const BOAT = {hulls: {blue: ["Sea blue", "#3E6BAE"], red: ["Harbour red", "#C9483A"], green: ["Fisherman's green", "#2E7A5A"], yellow: ["Lemon yellow", "#F3D34A"]},
-  stripes: {white: ["White", "#FFFDF6"], yellow: ["Yellow", "#F3D98A"], red: ["Red", "#C9483A"], blue: ["Pale blue", "#9FC3D9"]}, names: ["Maple", "Stella", "Nonna", "Honeybrook"]};
+  stripes: {white: ["White", "#FFFDF6"], yellow: ["Yellow", "#F3D98A"], red: ["Red", "#C9483A"], blue: ["Pale blue", "#9FC3D9"]}, names: ["Ember", "Stella", "Nonna", "Honeybrook"]};
 export function paintBoat(F, hull, stripe, name, addInv){ if (!BOAT.hulls[hull] || !BOAT.stripes[stripe] || !BOAT.names.includes(name)) return null; const c = cinqueState(F); c.boat = {hull, stripe, name}; c.boats = (c.boats || 0) + 1; if (!F.inv.c_boat) addInv("c_boat", 1); return c.boat; }
 export const boatCols = F => { const b = (F.cinque || {}).boat; return b ? [BOAT.hulls[b.hull][1], BOAT.stripes[b.stripe][1], b.name] : ["#3E6BAE", "#F3D98A", ""]; };
 export function boatPanel(F, st = {}, _x){

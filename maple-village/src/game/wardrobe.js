@@ -14,5 +14,5 @@ function accessories(F){
 
 export function wardrobePanel(F){
   const acc = accessories(F);
-  return `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2>` + (acc || `<p class="sub">Nothing hanging up yet. Hana sells bows, scarves, hats and pyjamas in the market's "Me &amp; my room" tab.</p>`);
+  return `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2><div class="actions"><button class="btn small alt" data-relook="1">Change my look</button></div>` + (acc || `<p class="sub">Nothing hanging up yet. Hana sells bows, scarves, hats and pyjamas in the market's "Me &amp; my room" tab.</p>`);
 }

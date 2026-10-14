@@ -155,7 +155,7 @@ export function catchLine(r){
   if (r.id === "koi") return "Too beautiful to keep. You carry it home and let it go in the pond. It'll live there now.";
   if (r.id === "boot") return "Somebody's old wellington. Into the bin it goes.";
   if (r.id === "seaglass") return "A piece of sea glass, smoothed by the waves. It goes on the windowsill.";
-  return f.item === "fish" ? "In the backpack: grill it at the kitchen, or give it to Maple." : `In the backpack: ${ING[f.item][2]}.`;
+  return f.item === "fish" ? "In the backpack: grill it at the kitchen, or give it to your pet." : `In the backpack: ${ING[f.item][2]}.`;
 }
 function journalHtml(F){
   const s = fishState(F);

@@ -35,7 +35,7 @@ export const FLOWERS = {
   sweetpea:   {n: "Sweet peas", one: "sweet pea", seasons: ["spring"], price: 6, col: "#C9A3E0"},
   sunflower:  {n: "Sunflowers", one: "sunflower", seasons: ["summer"], price: 7, col: "#F3C33A"},
   cosmos:     {n: "Cosmos", one: "cosmos", seasons: ["summer"], price: 6, col: "#F2A0B8"},
-  hana:        {n: "Chrysanthemums", one: "chrysanthemum", seasons: ["autumn"], price: 7, col: "#E9B640"},
+  mum:        {n: "Chrysanthemums", one: "chrysanthemum", seasons: ["autumn"], price: 7, col: "#E9B640"},
   dahlia:     {n: "Dahlias", one: "dahlia", seasons: ["autumn"], price: 8, col: "#C2334D"},
   pansy:      {n: "Pansies", one: "pansy", seasons: ["winter"], price: 6, col: "#8C7AD9"},
   amaryllis:  {n: "Amaryllis", one: "amaryllis", seasons: ["winter"], price: 8, col: "#D9433A"},

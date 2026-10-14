@@ -51,7 +51,7 @@ export const ITEMS = {
   apple:{e:"🍎", n:"Apple", kind:"food", price:2, tab:"treats", say:"Crunchy! Thank you 🍎"},
   dumpling:{e:"🥟", n:"Dumpling", kind:"food", price:4, tab:"treats", say:"A dumpling?! Best boss ever."},
   fish:{e:"🐟", n:"Fish", kind:"food", price:6, tab:"treats", say:"Fishy feast. Mmm."},
-  toast:{e:"🍯", n:"Honey toast", kind:"food", price:8, tab:"treats", say:"Sticky paws, happy fox."},
+  toast:{e:"🍯", n:"Honey toast", kind:"food", price:8, tab:"treats", say:"Sticky paws, happy {kind}."},
   picnic:{e:"🧺", n:"Picnic", kind:"food", price:20, need:25, xp:4, tab:"treats", say:"A whole picnic! You earned this."},
   brush:{e:"🪮", n:"Brush", kind:"tool", act:"brush", price:10, tab:"care", say:"Ooh, so fluffy now ✨"},
   ball:{e:"⚽", n:"Ball", kind:"tool", act:"ball", price:12, tab:"care", say:"Fetch! Again, again!"},
@@ -157,7 +157,7 @@ export const ITEMS = {
     says:{bo:"Ooh, a local pale ale. That's my Sunday arvo sorted.", mei:"Beer! A cold one later, down by the lake."}},
   stout:{n:"Craft stout", kind:"gift", to:["bo", "mei", "theo", "tomi"], price:9, tab:"market", say:"A dark craft stout, small batch.",
     says:{bo:"A stout! Rich and dark. I'm saving this for the weekend.", mei:"A dark beer. Very good. I'll save it for fishing."}},
-  sandpit:{n:"Digging sandpit", kind:"keep", price:150, tab:"family", say:"A sandpit in the garden, all for your fox! The first hole's already dug."},
+  sandpit:{n:"Digging sandpit", kind:"keep", price:150, tab:"family", say:"A sandpit in the garden, all for your pet! The first hole's already dug."},
   truck:{n:"Vintage tin truck", kind:"keep", price:80, tab:"family", say:"A little red tin truck for the windowsill at home. Wind it up and it trundles."},
   headphones:{n:"Headphones", kind:"keep", to:"bo", price:120, tab:"family", say:"Noise-cancelling headphones for Bo! Now he can hum over the saw in peace."},
   treehouse:{n:"Your treehouse", kind:"keep", price:800, tab:"family", say:"A treehouse in the swing tree! A reading nook with a view, and a ladder up."},
@@ -229,7 +229,7 @@ export const DECOR = {
   lamp:        {ico:"lamp",      n:"Reading lamp",     slot:"lamp", val:"on",     price:15},
   big_plant:   {ico:"pot",       n:"Big plant",        slot:"plant",val:"on",     price:10},
   painting:    {ico:"painting",  n:"Painting",         slot:"art",  val:"on",     price:20},
-  fox_bed:     {ico:"bed",       n:"Maple's cosy bed", slot:"bed",  val:"on",     price:25, tab:"me", where:"room"},   // upgrades her basket in your room
+  fox_bed:     {ico:"bed",       n:"A cosy pet bed", slot:"bed",  val:"on",     price:25, tab:"me", where:"room"},   // upgrades her basket in your room
   // "Me & my room" tab: things for your own room, and things you wear (shown on you in the village)
   r_lights:    {ico:"lantern",   n:"Fairy lights",     slot:"r_lights", val:"on", price:20, tab:"me", where:"room"},
   r_plant:     {ico:"pot",       n:"Monstera",         slot:"r_plant",  val:"on", price:15, tab:"me", where:"room"},
@@ -259,17 +259,17 @@ export const QUEST_BOOST = 30*M;
 export const LEVELS = [
   {xp:0, name:"new friend"}, {xp:10, name:"snack buddy", gift:"a rose scarf"},
   {xp:25, name:"cushion pal", gift:"a little plant"}, {xp:45, name:"den mate", gift:"fairy lights"},
-  {xp:70, name:"cosy companion", gift:"bunting"}, {xp:100, name:"best fox friend"},
-  {xp:140, name:"fox soulmate"}, {xp:190, name:"forever den"}
+  {xp:70, name:"cosy companion", gift:"bunting"}, {xp:100, name:"best friends"},
+  {xp:140, name:"soulmates"}, {xp:190, name:"forever den"}
 ];
 export const PEP = ["You don't have to feel ready. You just have to open it.", "Small and steady still counts. This is how the week moves.",
   "You've done harder things than this before lunch.", "Start messy. Tidy later. That's allowed.", "I'll be right here. Go on."];
-export const YAY = ["Quest complete! ✨", "Look at you go!", "Done! Happy fox wiggle.", "Quest done. Proud of you, properly."];
+export const YAY = ["Quest complete! ✨", "Look at you go!", "Done! Happy {kind} wiggle.", "Quest done. Proud of you, properly."];
 
 // From the orchard and flower farm: fruit (food Maple can eat, or stock for the wine shop's fruit crate), bouquets
 // (give one to anybody in the village) and potted flowers (set one in a pot spot: home, the wine shop, your room).
 const capi = s => s[0].toUpperCase() + s.slice(1);
-const FRUIT_SAY = {cherry: "Cherries! I'll save you the stones.", lemon: "A lemon? *sniff* *sneeze* Fresh!", peach: "Fuzzy and sweet. Farid grew this!", mango: "Mango! Sticky chin, happy fox.",
+const FRUIT_SAY = {cherry: "Cherries! I'll save you the stones.", lemon: "A lemon? *sniff* *sneeze* Fresh!", peach: "Fuzzy and sweet. Farid grew this!", mango: "Mango! Sticky chin, happy {kind}.",
   apple: "Crunchy! Thank you", pear: "A juicy pear. Drip, drip.", fig: "A fig! Fancy.", orange: "Peel it for me? Please?", persimmon: "Persimmon! Like eating a little sunset.", tangerine: "A tangerine! Easy to peel. Here, half for you."};
 Object.values(TREES).forEach(t => { const it = ITEMS[t.fruit] = ITEMS[t.fruit] || {n: capi(t.fn[0]), kind: "food", say: FRUIT_SAY[t.fruit] || "Fruit from Farid's orchard!"}; it.fruit = true; it.sell = it.sell || t.sell; });
 Object.keys(FLOWERS).forEach(id => { const f = FLOWERS[id];

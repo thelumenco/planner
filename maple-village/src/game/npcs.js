@@ -1,6 +1,7 @@
 // NPC engine: places villagers by their daily routine (local time), walks them about, handles taps and daily reactions,
 // and runs agent messengers who carry unread mail to the player. Core owns the frame loop and calls tickNpcs / tapNpc.
 import { NPCS, AGENTS } from "../data/npcs.js";
+import { petify } from "../art/pets.js";
 import { personArt, letterArt, rainGearFor } from "../art/people.js";
 import { rainyOn } from "../art/village-extras.js";
 import { OUTDOOR } from "../data/world.js";
@@ -215,6 +216,7 @@ export function courierDelivered(itemId){
 
 /* ---------- talking ---------- */
 function say(e, text, ms = 3800){
+  text = petify(text, api.F());
   if (api.quiet && api.quiet()) return;   // quiet evening: neighbours only talk when tapped
   const el = $("npcSay"); sayer = e;
   const who = e.kind === "agent" ? e.ag.name.split(/[ ,]/)[0] : e.def.name;

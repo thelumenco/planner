@@ -759,7 +759,7 @@ export function roomArt(id){
   if (id === "room") {
     // Maple's bed (she sleeps in it while you're in here), the door back to the house on the east wall, and night
     const sl = G.S && G.S().sleep;
-    const cosy = !!(G.F().decor || {}).bed;   // the market's "Maple's cosy bed" upgrades her basket: plush rim, cushion and a heart
+    const cosy = !!(G.F().decor || {}).bed;   // the market's "cosy bed" upgrades the pet basket: plush rim, cushion and a heart
     const [mx, my] = MAPLE_BED;
     h += cosy ? sk(`<ellipse cx="${mx}" cy="${my}" rx="36" ry="16" style="fill:var(--rose)"/><ellipse cx="${mx}" cy="${my + -3}" rx="25" ry="10" style="fill:#FFFDF6"/><ellipse cx="${mx - 12}" cy="${my + -6}" rx="9" ry="5" style="fill:var(--peri)"/><path d="M${mx + 20} ${my - 18} c-3 -4 -8 0 -5 3 l5 4 l5 -4 c3 -3 -2 -7 -5 -3z" style="fill:var(--rose)"/>`, `<ellipse cx="${mx}" cy="${my}" rx="36" ry="16"/><ellipse cx="${mx}" cy="${my + -3}" rx="25" ry="10"/><ellipse cx="${mx - 12}" cy="${my + -6}" rx="9" ry="5"/>`)
       : sk(`<ellipse cx="${mx}" cy="${my}" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="${mx}" cy="${my + -2}" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="${mx}" cy="${my}" rx="30" ry="13"/><ellipse cx="${mx}" cy="${my + -2}" rx="20" ry="8"/>`);

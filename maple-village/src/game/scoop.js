@@ -161,7 +161,7 @@ const NOTES = ["Best pandan ever. Sorry, only had coins for one! x", "For the li
 
 /* ---------- discovering flavours ---------- */
 const GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"], SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
-const POETIC = ["Dolphin Bay", "Jetty Sunset", "Village Green", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Harbour Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
+const POETIC = ["Dolphin Bay", "Jetty Sunset", "Village Green", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Harbour Dream", "Secret Garden", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
 export function nameFor(ings){
   const dairy = isDairy(ings), flav = ings.filter(i => i !== "milk"), h = hash(ings.join("+"));
   if (!flav.length) return "Fior di Latte";
