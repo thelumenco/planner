@@ -264,7 +264,7 @@ export const ROOMS = {
     ["officedoor","Home office","O","officedoor",null,"The home office: your desk, a spare desk and the treadmill.",0],
     ["gdoor","Garage","Q","garagedoor",null,"Through to the garage.",0],
     ["fridge","Fridge","H","fridge",null,"The fridge: what we have, and the shopping list."],
-    ["dine","Dining table","X","dining",null,"The big table. Room for everyone, and then some.",44]]},
+    ["dine","Dining table","X","dining:home",null,"The round table. Squeeze in: there's always room for one more.",44]]},
   // the home office, through the lower door on the living room's west wall: Mel's desk, Darren's desk, the treadmill
   office: {name:"Home office", wall:"#EEF1E6", trim:"var(--sage)", noBoard:true, pos:{A:[140,262], K:[300,261], G:[420,330], F:[120,540]}, stations:[
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
@@ -331,7 +331,7 @@ export const ROOMS = {
     ["tv","TV","T","tv",null,"Her dramas. Nobody touches the remote.",30],
     ["kitchenette","Kitchenette","K","kitchenette",null,"The kettle's always warm in here.",30],
     ["tea","Tea table","C","teatable",null,"Tea and cake with Farid, at three.",34],
-    ["dine","Dining table","X","dining",null,"Farid's big table. He cooks for twenty, every time.",44]]},
+    ["dine","Dining table","X","dining:cottage",null,"Farid's farmhouse table. He cooks for twenty, every time.",44]]},
   // Mum and Dad's house on the foreshore: Dad's piano, double bass and easel, Mum's exercise mat, the kitchen table
   hanatheo: {name:"Hana and Theo's", wall:"#EAF2F5", trim:"#3E6B8C", noBoard:true, pos:{P:[112,250], B:[232,262], E:[376,290], Y:[110,392], X:[270,500], R:[480,330]}, stations:[
     ["bedroom","Bedroom","R","bedroomdoor",null,"Hana and Theo's room.",0],
@@ -339,7 +339,7 @@ export const ROOMS = {
     ["bass","Double bass","B","doublebass",null,"Theo's double bass. Taller than Hana. Much taller.",38],
     ["easel","Easel","E","easel",null,"Theo's sketches: the jetty, the dolphins, and Hana (twice).",34],
     ["mat","Hana's mat","Y","yogamat",null,"Hana's mat. Pilates, Zumba, Piloxing: she does them all.",26],
-    ["dine","Dining table","X","dining",null,"The supper table. There's always food on it. Take some home.",44]]},
+    ["dine","Dining table","X","dining:hanatheo",null,"The glass table, with cushions on every chair. There's always food on it. Take some home.",44]]},
   // Marcus and Angellina's: the games corner, Angellina's study desk and psychology books, the sofa
   // Auntie Lin and Juniper share the little green cottage by the flower-farm gate (Ada and Idris have their old houses
   // on Makers' Lane for the shops): seed trays and a telescope, one sofa, two cushions, one teapot
@@ -356,7 +356,7 @@ export const ROOMS = {
     ["books","Bookshelf","K","psychshelf",null,"Posy's psychology books, read for fun, all with sticky notes.",36],
     ["study","Posy's desk","D","studydesk",null,"Posy's desk. Postcards, a sketchbook and highlighters in every colour.",36],
     ["msofa","Sofa","S","sofa",null,"The comfiest sofa on the foreshore.",30],
-    ["dine","Dining table","X","dining",null,"Their dining table. Wedding magazines at one end, bank papers at the other.",44]]},
+    ["dine","Dining table","X","dining:tomiposy",null,"Their glass dining table. Wedding magazines at one end, bank papers at the other.",44]]},
   // The Scoop Shack on the bay: the gelato counter (the display is drawn over the people, so Sofia stands behind it),
   // the chalkboard menu, tables, and the kitchen door on the west wall
   scoopshop: {name:"The Scoop Shack", wall:"#E3F2EC", trim:"#F2A0B8", noBoard:true, pos:{C:[300,330], M:[465,128], Z:[40,400], T:[340,520], U:[96,262], D:[480,400]}, stations:[

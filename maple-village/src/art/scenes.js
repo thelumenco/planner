@@ -8,6 +8,7 @@ import { VILLAGE, ROOMS, stationsOf, MAPLE_BED } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
 import { iconAt } from "./icons.js";
+import { TABLES, SEATS, halfW } from "../data/dining.js";
 import { runArt } from "../game/pets.js";
 import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDefs } from "./village-extras.js";
 import { trophySVG } from "../game/trophies.js";
@@ -264,16 +265,49 @@ export function notesArt(x, y, n){
 }
 
 /* ---------- furniture (x,y = centre of the front edge) ---------- */
-// the big dining table's top, apron, legs and place settings (x = centre, y = front edge on the floor)
-export const diningTable = (x, y) => sk(`<rect x="${x - 150}" y="${y - 40}" width="300" height="28" rx="4" style="fill:#D9B48A"/><rect x="${x - 150}" y="${y - 14}" width="300" height="8" rx="2" style="fill:#B98A5A"/>
-    <path d="M${x - 40} ${y - 36} h80 l-4 20 h-72z" style="fill:#FFFDF6" opacity=".85"/>
-    ${[0, 1, 2, 3, 4].map(b => `<ellipse cx="${x - 120 + b*60}" cy="${y - 33}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}${[0, 1, 2, 3].map(f => `<ellipse cx="${x - 90 + f*60}" cy="${y - 19}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("")}
-    <ellipse cx="${x}" cy="${y - 27}" rx="16" ry="6" style="fill:#F3C969"/><circle cx="${x - 8}" cy="${y - 29}" r="3" style="fill:#E8566C"/><circle cx="${x + 6}" cy="${y - 28}" r="3" style="fill:#9CC27E"/><rect x="${x + 44}" y="${y - 36}" width="6" height="12" rx="2" style="fill:#8FB3E8"/><rect x="${x - 52}" y="${y - 34}" width="6" height="10" rx="2" style="fill:#F2A0B8"/>`,
-  `<rect x="${x - 150}" y="${y - 40}" width="300" height="28" rx="4"/><rect x="${x - 150}" y="${y - 14}" width="300" height="8" rx="2"/><path d="M${x - 140} ${y - 6} v6 M${x + 140} ${y - 6} v6"/>
-    ${[0, 1, 2, 3, 4].map(b => `<ellipse cx="${x - 120 + b*60}" cy="${y - 33}" rx="9" ry="3.6"/>`).join("")}${[0, 1, 2, 3].map(f => `<ellipse cx="${x - 90 + f*60}" cy="${y - 19}" rx="9" ry="3.6"/>`).join("")}<ellipse cx="${x}" cy="${y - 27}" rx="16" ry="6"/>`);
+// a house's dining table (data/dining.js: round or short, wood or glass): top, legs and place settings
+// (x = centre, y = front edge on the floor)
+export function diningTable(x, y, host = "home"){
+  const t = TABLES[host] || TABLES.home, w = halfW(t), S = SEATS(t);
+  const top = t.glass ? "#D6ECF2" : "#D9B48A", edge = t.glass ? "#A9CFDA" : "#B98A5A";
+  const plates = [...S.back.map(([dx]) => [x + dx, y - 33]), ...S.front.map(([dx]) => [x + dx, y - 19]), [x - w + 14, y - 26], [x + w - 14, y - 26]];
+  const plateF = plates.map(([px, py]) => `<ellipse cx="${px}" cy="${py}" rx="9" ry="3.6" style="fill:#FFFDF6"/>`).join("");
+  const plateL = plates.map(([px, py]) => `<ellipse cx="${px}" cy="${py}" rx="9" ry="3.6"/>`).join("");
+  const dish = `<ellipse cx="${x}" cy="${y - 27}" rx="15" ry="5.5" style="fill:#F3C969"/><circle cx="${x - 7}" cy="${y - 29}" r="3" style="fill:#E8566C"/><circle cx="${x + 6}" cy="${y - 28}" r="3" style="fill:#9CC27E"/><rect x="${x + 24}" y="${y - 37}" width="6" height="12" rx="2" style="fill:#8FB3E8"/><rect x="${x - 30}" y="${y - 35}" width="6" height="10" rx="2" style="fill:#F2A0B8"/>`;
+  const shine = t.glass ? `<path d="M${x - w + 22} ${y - 34} l18 -3 M${x + w - 50} ${y - 20} l22 -3" style="stroke:#FFFFFF;stroke-width:2.2;fill:none" opacity=".8"/>` : "";
+  if (t.shape === "round"){
+    const legF = t.glass ? `<path d="M${x - 4} ${y - 12} h8 v10 h-8z M${x - 22} ${y} q22 -6 44 0" style="fill:#6F7378"/>` : `<path d="M${x - 8} ${y - 12} h16 l3 10 h-22z M${x - 24} ${y} q24 -7 48 0" style="fill:#B98A5A"/>`;
+    return sk(`${legF}<ellipse cx="${x}" cy="${y - 22}" rx="${w}" ry="18" style="fill:${edge}"/><ellipse cx="${x}" cy="${y - 26}" rx="${w}" ry="17" style="fill:${top}"${t.glass ? ' opacity=".9"' : ""}/>${shine}${plateF}${dish}`,
+      `<path d="M${x - 24} ${y} q24 -7 48 0"/><path d="M${x - w} ${y - 26} v4 a${w} 18 0 0 0 ${2*w} 0 v-4"/><ellipse cx="${x}" cy="${y - 26}" rx="${w}" ry="17"/>${plateL}<ellipse cx="${x}" cy="${y - 27}" rx="15" ry="5.5"/>`);
+  }
+  const legs = t.glass ? `<path d="M${x - w + 8} ${y - 8} v8 M${x + w - 8} ${y - 8} v8" style="stroke:#4A4E54;stroke-width:3"/>` : "";
+  return sk(`<rect x="${x - w}" y="${y - 40}" width="${2*w}" height="28" rx="4" style="fill:${top}"${t.glass ? ' opacity=".9"' : ""}/><rect x="${x - w}" y="${y - 14}" width="${2*w}" height="${t.glass ? 4 : 8}" rx="2" style="fill:${edge}"/>${shine}${plateF}${dish}`,
+    `<rect x="${x - w}" y="${y - 40}" width="${2*w}" height="28" rx="4"/><rect x="${x - w}" y="${y - 14}" width="${2*w}" height="${t.glass ? 4 : 8}" rx="2"/>${t.glass ? "" : `<path d="M${x - w + 10} ${y - 6} v6 M${x + w - 10} ${y - 6} v6"/>`}${legs}${plateL}<ellipse cx="${x}" cy="${y - 27}" rx="15" ry="5.5"/>`);
+}
+// the chairs round it, each house its own kind: [colour, back shape, leg colour]
+const CHAIRS = {ladder: ["#C99A63", "ladder", null], cushion: ["#F3EDE4", "round", "#B98A5A"], painted: ["#9CC27E", "spindle", null], modern: ["#F3C969", "shell", "#3E4248"]};
+function diningChairs(x, y, host){
+  const t = TABLES[host] || TABLES.home, S = SEATS(t), [col, shape, legC] = CHAIRS[t.chair] || CHAIRS.ladder;
+  let f = "", l = "";
+  // along the back: the chair back shows above the table, behind whoever sits there
+  for (const [dx] of S.back){ const cx = x + dx, ty = y - 68;
+    if (shape === "round") { f += `<path d="M${cx - 11} ${ty + 28} v-18 a11 10 0 0 1 22 0 v18z" style="fill:${col}"/>`; l += `<path d="M${cx - 11} ${ty + 28} v-18 a11 10 0 0 1 22 0 v18z"/><path d="M${cx - 6} ${ty + 10} q6 -4 12 0" opacity=".45"/>`; }
+    else if (shape === "shell") { f += `<rect x="${cx - 12}" y="${ty + 4}" width="24" height="22" rx="9" style="fill:${col}"/>`; l += `<rect x="${cx - 12}" y="${ty + 4}" width="24" height="22" rx="9"/>`; }
+    else { f += `<rect x="${cx - 10}" y="${ty}" width="20" height="28" rx="3" style="fill:${col}"/>`; l += `<rect x="${cx - 10}" y="${ty}" width="20" height="28" rx="3"/>` + (shape === "ladder" ? `<path d="M${cx - 10} ${ty + 9} h20 M${cx - 10} ${ty + 17} h20"/>` : `<path d="M${cx - 4} ${ty + 4} v20 M${cx + 4} ${ty + 4} v20"/>`); } }
+  // at the ends: a side-on chair, its back on the outside
+  for (const [dx, dy, dir] of S.ends){ const cx = x + dx, sy = y + dy, bx = cx - dir*12;
+    f += `<rect x="${cx - 11}" y="${sy - 14}" width="22" height="8" rx="3" style="fill:${col}"/><rect x="${bx - 3}" y="${sy - 44}" width="6" height="34" rx="3" style="fill:${col}"/>`;
+    l += `<rect x="${cx - 11}" y="${sy - 14}" width="22" height="8" rx="3"/><rect x="${bx - 3}" y="${sy - 44}" width="6" height="34" rx="3"/><path d="M${cx - 8} ${sy - 6} v10 M${cx + 8} ${sy - 6} v10"${legC ? ` style="stroke:${legC}"` : ""}/>`; }
+  // along the front: just the seats (their backs face us, low)
+  for (const [dx] of S.front){ const cx = x + dx;
+    f += `<rect x="${cx - 11}" y="${y + 4}" width="22" height="12" rx="${shape === "shell" ? 6 : 3}" style="fill:${col}"/>`;
+    l += `<rect x="${cx - 11}" y="${y + 4}" width="22" height="12" rx="${shape === "shell" ? 6 : 3}"/><path d="M${cx - 8} ${y + 16} v8 M${cx + 8} ${y + 16} v8"${legC ? ` style="stroke:${legC}"` : ""}/>`; }
+  return sk(f, l);
+}
 export function furn(kind, x, y){
   const W2 = "var(--wood)";
   const legs = (w, h) => `<path d="M${x-w/2+6} ${y} v${h} M${x+w/2-6} ${y} v${h}"/>`;
+  if (kind.startsWith("dining:")) { const host = kind.slice(7); return diningChairs(x, y, host) + diningTable(x, y, host); }
   switch (kind){
     case "desk": return sk(`<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3" style="fill:${W2}"/><rect x="${x-18}" y="${y-50}" width="36" height="20" rx="2" style="fill:#DCE3EE"/><rect x="${x+22}" y="${y-38}" width="16" height="10" rx="1" style="fill:var(--card)"/><circle cx="${x-34}" cy="${y-36}" r="5" style="fill:var(--sky)"/>`,
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><rect x="${x-18}" y="${y-50}" width="36" height="20" rx="2"/><path d="M${x-22} ${y-30} h44"/><rect x="${x+22}" y="${y-38}" width="16" height="10" rx="1"/><circle cx="${x-34}" cy="${y-36}" r="5"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
@@ -326,12 +360,8 @@ export function furn(kind, x, y){
       return sk(`<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3" style="fill:#EADCF0"/>${b}`, `<rect x="${x-44}" y="${y-96}" width="88" height="96" rx="3"/><path d="M${x-44} ${y-68} h88 M${x-44} ${y-40} h88 M${x-44} ${y-12} h88"/>`); }
     case "studydesk": return sk(`<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3" style="fill:#FFFDF6"/><rect x="${x-20}" y="${y-50}" width="38" height="22" rx="2" style="fill:#DCE3EE"/><rect x="${x-46}" y="${y-44}" width="20" height="14" rx="1" style="fill:#C9A3E0"/><rect x="${x-44}" y="${y-50}" width="18" height="6" rx="1" style="fill:#8FB3E8"/><rect x="${x+24}" y="${y-38}" width="18" height="8" rx="1" style="fill:#F2A0B8"/><path d="M${x+26} ${y-46} l4 -6 l3 1 l-4 6z" style="fill:#F3D34A"/>`,
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><rect x="${x-20}" y="${y-50}" width="38" height="22" rx="2"/><rect x="${x-46}" y="${y-44}" width="20" height="14" rx="1"/><rect x="${x-44}" y="${y-50}" width="18" height="6" rx="1"/><rect x="${x+24}" y="${y-38}" width="18" height="8" rx="1"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
-    // the big dining table (seats nine: five along the back, four along the front), with its chairs; the
-    // table itself is also drawn among the people (diningTable, core.js) so those sitting behind it show waist up
-    case "dining": { const back = [0, 1, 2, 3, 4].map(b => x - 120 + b*60), front = [0, 1, 2, 3].map(f => x - 90 + f*60);
-      return sk(`${back.map(cx => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4" style="fill:#B98A5A"/>`).join("")}${front.map(cx => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3" style="fill:#B98A5A"/>`).join("")}`,
-        `${back.map(cx => `<rect x="${cx - 10}" y="${y - 66}" width="20" height="26" rx="4"/><path d="M${cx - 6} ${y - 58} h12" opacity=".5"/>`).join("")}${front.map(cx => `<rect x="${cx - 10}" y="${y + 4}" width="20" height="12" rx="3"/><path d="M${cx - 8} ${y + 16} v8 M${cx + 8} ${y + 16} v8"/>`).join("")}`)
-        + diningTable(x, y); }
+    // a house's dining table with its chairs (kind "dining:<house>"); the table itself is also drawn among the
+    // people (diningTable, core.js) so those sitting behind it show waist up
     // big goals (game/goals.js): the garage's door at the back of the house (boarded up with a sign until it's built),
     // the scooter and car bays in the garage, the cellar door off the wine shop, and the cellar's furniture
     // the garage door on the living room's east wall, below the guest room's

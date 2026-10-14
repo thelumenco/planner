@@ -1651,7 +1651,7 @@ function stallFronts(){
   const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null, dine = DINING[scene], key = ev ? dayKey() + ev.kind : dine ? "dine:" + scene : "";
   if (key !== frontKey) { fronts.forEach(([n]) => n.remove()); fronts = []; frontKey = key;
     // a house's dining table: drawn among the people too, so the family along the back sit behind it
-    if (dine) { const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "sfront"); g.setAttribute("pointer-events", "none"); g.innerHTML = diningTable(dine.cx, dine.fy); fronts = [[g, {y: dine.fy - 1}]]; }
+    if (dine) { const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "sfront"); g.setAttribute("pointer-events", "none"); g.innerHTML = diningTable(dine.cx, dine.fy, scene); fronts = [[g, {y: dine.fy - 1}]]; }
     if (ev) fronts = ev.stalls.map(st => { const [x, y] = STALL_SPOTS[st.at], g = document.createElementNS("http://www.w3.org/2000/svg", "g");
       g.setAttribute("class", "sfront"); g.setAttribute("pointer-events", "none"); g.innerHTML = stallFront(st.at, x, y, st); return [g, {y: y - 1}]; }); }
   return fronts;

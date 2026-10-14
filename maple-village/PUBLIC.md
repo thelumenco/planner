@@ -134,11 +134,21 @@ unless the page has ?setup=1. The leak check now finds nothing but window.claude
   you've met, the last at five hearts. Every chapter re-introduces what it's about, and the Stories tab keeps the
   whole story per villager. Ada and Idris have stories of their own (Ada's button jar, Idris's grandfather's suit).
 
-## Planned: Elena sells her cottages (Mel, 2026-10-14)
+## Planned: Elena sells her cottages, and a little landlord business (Mel, 2026-10-14)
 Bluebell and Fig Tree, the two holiday lets on the cottage lane by the station, are Elena's. They stay holiday lets
 (guests for the week, out on the porch mornings and evenings) until you reach five hearts with her. Then Elena decides
-to sell them to you: a letter or a chat (she'd rather sell to a friend than a stranger off the train), with the
-prices from the personal edition's plan (about 3,000 for Bluebell and 2,000 for Fig Tree). Once bought, you do them up
-(the six styles the campervan uses) and let them to guests yourself. Still to design: what the guests pay, how often
-they come, and whether doing them up changes who books. Nothing is built yet; her hearts already count from requests
-and gifts.
+to sell them to you: she'd rather sell to a friend than a stranger off the train (about 3,000 for Bluebell and 2,000
+for Fig Tree, from the personal edition's plan).
+
+Then they're yours to furnish and let, a mini landlord business:
+- A furniture catalogue with a wide range: beds and bed linen (covers, quilts, pillows), dining tables and chairs,
+  armchairs and sofas, bookshelves and shelves, lamps, potted plants, rugs, curtains, pictures and little accessories
+  for each room. Pieces come in quality tiers, from simple to very fine, priced to match.
+- Nothing is instant: you order from the catalogue and it arrives on the train the next day, to unpack and place.
+- The game sets the rent, not the player: each cottage's nightly rate comes from how nice its furniture is and how
+  complete the set is (a bed, somewhere to sit, a table, light, something on the walls, and so on), up to a cap for
+  the cottage. Nicer and more complete means better guests and a higher rate; a half-furnished cottage still lets,
+  just for less. The cap keeps money from getting too easy.
+- Still to design: the tiers and prices, the completeness checklist, how often guests come and stay, and how the
+  rent is paid (weekly into your coins, with a little note from the guests).
+Nothing is built yet; hearts with Elena already count from requests and gifts.

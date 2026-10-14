@@ -30,7 +30,7 @@ export const GUEST_DAYS = {
     at("13:30", "15:30", "shore", [[214, 300], [212, 372], [240, 300]], "Out on the foreshore, looking for dolphins"),
     at("15:30", "17:30", "vineyard", [[262, 440], [262, 390], [300, 260]], "Through the vineyard rows"),
     at("17:30", "19:00", "bay", [[150, 440], [180, 420]], "An ice cream at the bay"),
-    at("19:00", "22:30", "home", [[200, 330], [300, 460]], "Cards at the big table", {act: "sit"}),
+    at("19:00", "22:30", "home", [[200, 330], [300, 460]], "Cards at the round table", {act: "sit"}),
     ...NIGHT],
   // the whole day, gently: the market, the flowers, a book, the wine shop
   slow: [

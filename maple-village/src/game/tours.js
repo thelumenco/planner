@@ -5,6 +5,7 @@
 // to show (a few things planted). All of it is worked out from the date, so every screen agrees on who's where.
 // tourSlot / visitSlot return routine-style slots that win over a villager's usual routine (npcs.js slotNow).
 import { hash } from "../util.js";
+import { TABLES, SEATS } from "../data/dining.js";
 
 export const TOUR_FEE = 4;
 // Round 107: friends away on a day trip (trips.js says who). Tours, Farid's stall, Hana's class and the village supper
@@ -345,8 +346,8 @@ export function shoreSlot(id, day, hm){
 }
 
 // The village supper: Wednesdays and Sundays, 6:30 to 8pm, at one of four houses in turn (your place, Farid and Mei's
-// cottage, Hana and Theo's, Tomi and Posy's). Everyone sits round the big dining table: five along the back
-// (Farid, Mei, Hana, Theo, Posy), three along the front (Bo, Tomi, you).
+// cottage, Hana and Theo's, Tomi and Posy's). Everyone sits round the house's dining table (data/dining.js):
+// three along the back, one at each end, three along the front.
 export const DINNER_FROM = 18*60 + 30, DINNER_TO = 20*60;
 export const DINNER_HOSTS = ["home", "hanatheo", "cottage", "tomiposy"];
 const HOST_FAMILY = {hanatheo: ["hana", "theo"], cottage: ["farid", "mei"], tomiposy: ["tomi", "posy"]};
@@ -397,13 +398,15 @@ export function bonfireSlot(id, day, hm){
 export const HOST_NAME = {home: "your place", hanatheo: "Hana and Theo's", cottage: "Farid and Mei's", tomiposy: "Tomi and Posy's"};
 // where each house's dining table stands: cx = centre, fy = the front edge of the table on the floor
 export const DINING = {home: {cx: 260, fy: 452}, hanatheo: {cx: 270, fy: 500}, cottage: {cx: 320, fy: 470}, tomiposy: {cx: 340, fy: 470}};
-const BACK = ["farid", "mei", "hana", "theo", "posy"], FRONT = ["bo", "tomi", "mel"];
-export function dinnerSeat(host, who){
-  const t = DINING[host]; if (!t) return null;
-  const b = BACK.indexOf(who), f = FRONT.indexOf(who);
-  if (b >= 0) return [t.cx - 120 + b*60, t.fy - 24];
-  if (f >= 0) return [t.cx - 90 + f*60, t.fy + 18];
+// who sits where: Hana, Theo and Mei along the back, Farid and Posy at the ends, Bo, you and Tomi along the front
+const BACK = ["mei", "hana", "theo"], ENDS = ["farid", "posy"], FRONT = ["bo", "mel", "tomi"];
+const seatOf = (host, who) => {
+  const t = TABLES[host]; if (!t) return null; const S = SEATS(t);
+  for (const [row, ids] of [["back", BACK], ["ends", ENDS], ["front", FRONT]]) { const i = ids.indexOf(who); if (i >= 0) return S[row][i].concat(row === "back" ? [1] : row === "front" ? [-1] : []); }
   return null;
+};
+export function dinnerSeat(host, who){
+  const t = DINING[host], s = t && seatOf(host, who); return s ? [t.cx + s[0], t.fy + s[1]] : null;
 }
 export function dinnerOn(day){
   const d = dow(day); if (d !== 3 && d !== 0) return null;
@@ -415,9 +418,9 @@ export function dinnerOn(day){
 }
 export const dinnerNow = (day, hm) => { const d = dinnerOn(day); return d && hm >= d.from && hm < d.to ? d : null; };
 export function dinnerSlot(id, day, hm){
-  if (!BACK.includes(id) && !FRONT.includes(id)) return null;
+  if (![...BACK, ...ENDS, ...FRONT].includes(id)) return null;
   const d = dinnerNow(day, hm); if (!d) return null;
-  return {from: d.from, to: d.to, scene: d.host, at: dinnerSeat(d.host, id), act: "sit", dir: BACK.includes(id) ? 1 : -1, dinner: true};
+  return {from: d.from, to: d.to, scene: d.host, at: dinnerSeat(d.host, id), act: "sit", dir: seatOf(d.host, id)[2], dinner: true};
 }
 
 // Date night: Tomi and Posy at the middle table of the tasting room, Tuesdays and Saturdays 7:30 to 9pm
