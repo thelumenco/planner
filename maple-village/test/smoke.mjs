@@ -4289,6 +4289,38 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 
+// Round 206: Saltwick Harbour, the first boat town: four screens in a horseshoe round the river mouth
+{
+  console.log("\nSaltwick Harbour by boat (round 206)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`saltwick pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/swpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 500; f.goals = {...(f.goals || {}), boat: 1};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=09:00&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=09:00&date=2026-10-16&swpatch=1"); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="timetable"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
+  await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-ttown="kyoto"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-ttown="saltwick"]').count() === 0, "Saltwick isn't on the train: there's no ticket for it at the station");
+  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
+  await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-btown="saltwick"]', { timeout: 15000 });
+  await page.click('#ctx [data-btown="saltwick"]'); await page.waitForTimeout(400);
+  check(/Fuel 10/.test(await page.locator("#ctx").innerText()), "your boat sails to Saltwick Harbour (fuel 10)");
+  await page.click('#ctx [data-tpick="dad"]'); await page.waitForTimeout(150);
+  await page.click('#ctx [data-trip="saltwick"]'); await page.waitForTimeout(8500);
+  check(await page.locator('#world [data-place="swboat"]').count() === 1 && await page.locator('#world [data-place="swmarket"]').count() === 1, "you tie up at the pontoon on the quay, by the fish market");
+  const name = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
+  const hop = async g => { await page.locator(`#world [data-place="${g}"]`).first().dispatchEvent("click"); await page.waitForTimeout(8500); return name(); };
+  check(/East Side/.test(await hop("swToEast")) && await page.locator('#world [data-place="swjet"]').count() === 1, "over the swing bridge to the East Side: the jet workshop, the pub, the chandlery");
+  check(/abbey/.test(await hop("swToAbbey")) && await page.locator('#world [data-place="swabbey"]').count() === 1, "up the steps to the abbey on the headland");
+  await hop("swToEastS"); await hop("swToQuay");
+  check(/West Cliff/.test(await hop("swToWest")) && await page.locator('#world [data-place="swarch"]').count() === 1, "and up the slope to the West Cliff: the whalebone arch and the bandstand");
+  await hop("swToQuayS");
+  await page.locator('#world [data-place="swboat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="boat"]', { timeout: 15000 });
+  check(/Sail home from Saltwick Harbour/.test(await page.locator("#ctx").innerText()), "tapping your boat on the quay: sail home");
+  await page.close();
+}
+
 {
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));

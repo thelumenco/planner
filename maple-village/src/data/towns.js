@@ -13,6 +13,7 @@
 //   rd_old     | rd_bridge
 
 import { BB_TOWNS, BB_PLACES, BB_BRIDGES, BB_ARRIVE, BB_BOUNDS, BB_OBST, BB_GOODS, BB_KEEP } from "./bellbird.js";
+import { SW_TOWNS, SW_PLACES, SW_BRIDGES, SW_ARRIVE, SW_BOUNDS, SW_OBST } from "./saltwick.js";
 import { PAINTINGS } from "./terrace-people.js";
 export const TOWNS = {
   ronda: {
@@ -319,7 +320,7 @@ export const TOWNS = {
     }
   }
 };
-Object.assign(TOWNS, BB_TOWNS);   // Bellbird Valley's stops (round 141): campervan "towns" of two screens each
+Object.assign(TOWNS, BB_TOWNS, SW_TOWNS);   // Bellbird Valley's stops (round 141): campervan "towns" of two screens each
 export const TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t]) => [...t.screens, ...Object.keys(t.rooms || {})].map(s => [s, id])));
 // an interior of a town (round 116) -> its room entry, or null
 export const townRoom = scene => { const t = TOWNS[TOWN_SCENES[scene]]; return (t && t.rooms && t.rooms[scene]) || null; };
@@ -505,7 +506,8 @@ export const TOWN_OBST = {
 };
 // round 146: the wine shop's terrace isn't a town, but it walks like one of their rooms (bounds, the long table)
 TOWN_BOUNDS.terrace = [52, 226, 470, 612]; TOWN_OBST.terrace = [[236, 300, 284, 580], [400, 280, 472, 340], [424, 520, 472, 592], [62, 330, 92, 372], [196, 320, 226, 578], [294, 320, 324, 578]];
-Object.assign(TOWN_PLACES, BB_PLACES); Object.assign(TOWN_BRIDGES, BB_BRIDGES); Object.assign(TOWN_ARRIVE, BB_ARRIVE); Object.assign(TOWN_BOUNDS, BB_BOUNDS); Object.assign(TOWN_OBST, BB_OBST);   // Bellbird Valley
+Object.assign(TOWN_PLACES, BB_PLACES); Object.assign(TOWN_BRIDGES, BB_BRIDGES); Object.assign(TOWN_ARRIVE, BB_ARRIVE); Object.assign(TOWN_BOUNDS, BB_BOUNDS); Object.assign(TOWN_OBST, BB_OBST);
+Object.assign(TOWN_PLACES, SW_PLACES); Object.assign(TOWN_BRIDGES, SW_BRIDGES); Object.assign(TOWN_ARRIVE, SW_ARRIVE); Object.assign(TOWN_BOUNDS, SW_BOUNDS); Object.assign(TOWN_OBST, SW_OBST);   // round 206: Saltwick Harbour (boat towns)   // Bellbird Valley
 
 // Ronda's goods (round 107, round 3): things you can't get in Honeybrook. kind ingredient: they go to the kitchen
 // (tapas), the Scoop Shack (gelato) and the Cocoa Room (bonbon fillings) like any other; kind gift: give them to the

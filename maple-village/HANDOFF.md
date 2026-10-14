@@ -2502,3 +2502,11 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - **core.js:** tapping the owned boat opens `railOpen = "boat"` (the cruise is a button there now). `boatRide` uses `ownBoatRideArt(home, sight)` (town-jeju.js) with `BOAT_SIGHTS[town.boat.sight]` on the way out. In a town, tapping `T.boat.pier` on a boat trip opens the boat's home panel; home lands at `VILLAGE.boat.door`.
 - **Jeju by boat:** `TOWNS.jeju.boat` (fuel 20, ties up at the ferry pier, sight "jeju": the red and white horse lighthouses).
 - **Tests:** block "your own boat sails to towns (round 205)"; "big goals" now opens the boat's panel and taps the cruise.
+
+## Round 206: Saltwick Harbour round 1 (the four screens)
+- **Data:** `src/data/saltwick.js` (`SW_TOWNS`, `SW_PLACES`, `SW_BRIDGES`, `SW_ARRIVE`, `SW_BOUNDS`, `SW_OBST`, `SW_NAMES`, `SW_EVAN`), merged in towns.js and core.js like Bellbird's. `by: "boat"` (the station ticket chips now only list `by: "train"` towns). `boat: {fuel: 10, pier: "swboat", arrive: sw_quay [300, 560], sight: "saltwick"}`. Lines, hints, family wander spots; `acts` and `rooms` empty until rounds 207 to 209.
+- **Screens** (horseshoe, no ring: the river mouth splits the town): `sw_quay` (arrive, bottom left: pontoon and your boat, fish market shed, Copper Kettle, lobster pots, the pier with its green light, swing bridge east, slope north) | `sw_east` (lane, jet workshop, Fisherman's Arms, chandlery, steps north) / `sw_west` (whalebone arch, bandstand, clifftop lawn, beach huts below the cliff) | `sw_abbey` (ruins, church and gravestones, pond, view).
+- **Art:** `src/art/town-saltwick.js` (`saltwickArt`, `SALTWICK_SIGHT` for the crossing). Pantile cottages (`cottage`), swing bridge with December lights, kittiwakes on the pier in summer, a sea fret some autumn and winter mornings (`fretOn`).
+- **Music:** audio.js `saltwick` "Sunday on the bandstand".
+- **core.js:** the boat pier check now runs before the station check in `townSpot` (the town's `station` is the pier).
+- **Tests:** block "Saltwick Harbour by boat (round 206)".

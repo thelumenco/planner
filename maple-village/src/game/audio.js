@@ -91,6 +91,10 @@ export const TRACKS = {
   // a lilting 6/8 like a Ligurian folk song
   cinque: {name: "Mandolin on the harbour", live: true, bpm: 96, steps: 6, tone: "guitar", arp: [1, 3, 5, 3, 4, 2], arpVel: .05, mel: .7, up: 12,
     bars: [[38, 50, 57, 62, 66, 69], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 69, 73], [38, 50, 57, 62, 66, 69], [47, 59, 62, 66, 71, 74], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 67, 69], [38, 50, 57, 62, 66, 74]]},
+  // round 206: Saltwick Harbour, a slow, warm march like the brass band on the bandstand, with a sea-shanty lilt
+  saltwick: {name: "Sunday on the bandstand", live: true, bpm: 84, steps: 6, tone: "rhodes", strum: [0, 3], arp: [1, 3, 5, 3, 4, 3], arpVel: .045, mel: .62,
+    bars: [[43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [50, 57, 62, 66, 69], [43, 55, 59, 62, 67], [40, 52, 55, 59, 64], [48, 55, 60, 64, 67], [50, 54, 57, 62, 66], [43, 55, 59, 62, 71]],
+    lines: [[[0, 71], [2, 74], [4, 71]], [[0, 72], [3, 76]], [[0, 74], [2, 72], [4, 69]], [[0, 71], [3, 67]], [[0, 67], [2, 71], [4, 72]], [[0, 76], [3, 74]], [[0, 72], [2, 69], [4, 66]], [[0, 67]]]},
   // Round 149: the Coast Road, every stop and every room its own
   bb_breakwater: {name: "Out past the break", live: true, bpm: 104, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .05, mel: .75,
     bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [52, 56, 59, 64, 68], [45, 57, 61, 64, 73], [42, 54, 57, 61, 66], [50, 57, 62, 66, 69], [52, 56, 59, 64, 71], [45, 57, 61, 64, 69]],
