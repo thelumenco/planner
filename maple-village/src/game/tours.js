@@ -458,7 +458,8 @@ export function trainSlot(id, day, hm){
   return null;
 }
 const weekOf = day => { const t = Date.parse(day + "T00:00:00Z"); return new Date(t - ((dow(day) + 6) % 7)*864e5).toISOString().slice(0, 10); };
-export const letGuests = day => { const g = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS); return [g.slice(0, 2), g.slice(2, 4)]; };
+// (phase 4: Bluebell and Fig Tree are Auntie Lin's and Juniper's homes now, so no holiday guests stay there)
+export const letGuests = day => [[], []];
 const LET_SEATS = [[[300, 292], [376, 292]], [[300, 466], [376, 466]]];
 export function letSlot(id, day, hm){
   const lets = letGuests(day), c = lets.findIndex(g => g.includes(id)); if (c < 0) return null;

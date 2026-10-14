@@ -2,6 +2,7 @@
 // The player figure is the #mel drawing in index.html; applyLook() sets its colours (CSS variables) and switches its
 // parts on and off with classes, so the same call dresses the figure on the map and the preview on the setup screen.
 // State: F.me.look = {body, skin, hair, style, top, bottom, legs}
+import { clothesArt } from "../art/clothes.js";
 export const BODIES = [["woman", "Woman"], ["man", "Man"], ["neither", "Neither"]];
 export const SKINS = ["#FBE3D3", "#F3D2B8", "#EBC4A0", "#D9A57E", "#C08A62", "#A26E4B", "#7E5136", "#5C3A26"];
 export const HAIRS = ["#2A211D", "#4A3226", "#6B4A2E", "#A9713E", "#D9A35A", "#E9D6A6", "#B5562E", "#D9D4CC", "#8FA7C8", "#C98AA8"];
@@ -24,12 +25,18 @@ export function lookOf(F){
     top: ok(L.top, TOPS) ? L.top : base.top, bottom: ok(L.bottom, BOTTOMS) ? L.bottom : base.bottom, legs: ok(L.legs, LEGS) ? L.legs : base.legs};
 }
 
-// dress a #mel-shaped figure: colours, hair style, body, legs (trousers run down to the shoes; a skirt flares)
-export function applyLook(el, look){
+// dress a #mel-shaped figure: colours (CSS variables), hair style and body classes, then the clothes themselves from
+// art/clothes.js: your everyday top and bottoms from the look, or anything tailor-made you're wearing (worn: {top,
+// bottom}, from tailor.js wornSpec; a dress is a top that brings its own skirt)
+export function applyLook(el, look, worn = {}){
   if (!el) return;
   el.style.setProperty("--skin", look.skin); el.style.setProperty("--hair", look.hair);
   el.style.setProperty("--tank", look.top); el.style.setProperty("--denim", look.bottom);
   for (const [k] of STYLES) el.classList.toggle("hs-" + k, look.style === k);
   for (const [k] of BODIES) el.classList.toggle("b-" + k, look.body === k);
-  for (const [k] of LEGS) el.classList.toggle("l-" + k, look.legs === k);
+  const top = worn.top || {kind: look.body === "woman" ? "tank" : "tee"};
+  const bottom = top.kind === "dress" ? null : worn.bottom || {kind: look.legs, length: look.legs === "skirt" ? "short" : undefined};
+  const art = clothesArt({top, bottom, body: look.body});
+  const put = (cls, html) => { const g = el.querySelector("." + cls); if (g) g.innerHTML = html || ""; };
+  put("clDefs", art.defs); put("clL", art.legL); put("clR", art.legR); put("clHips", art.hips); put("clArmL", art.armL); put("clArmR", art.armR); put("clTorso", art.torso);
 }

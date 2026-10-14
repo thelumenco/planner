@@ -1,6 +1,7 @@
 // The wardrobe at home: the accessories bought at Hana's "Me & my room" tab. Owned (F.decorOwned.me_*) and worn while
 // F.decor.me_* is set (the same switch as tapping it in the shop). The hat only shows outdoors, the pyjamas only in your room.
 import { esc } from "../util.js";
+import { clothesHTML } from "./tailor.js";
 import { icon } from "../art/icons.js";
 
 export const ACCESSORIES = [["me_bow", "bow", "Velvet hair bow", ""], ["me_scarf", "scarf", "Silk neck scarf", ""], ["me_hat", "sunhat", "Straw sun hat", "outdoors"], ["me_pj", "pyjamas", "Silk pyjamas", "in your room"]];
@@ -14,5 +15,5 @@ function accessories(F){
 
 export function wardrobePanel(F){
   const acc = accessories(F);
-  return `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2><div class="actions"><button class="btn small alt" data-relook="1">Change my look</button></div>` + (acc || `<p class="sub">Nothing hanging up yet. Hana sells bows, scarves, hats and pyjamas in the market's "Me &amp; my room" tab.</p>`);
+  return `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2><div class="actions"><button class="btn small alt" data-relook="1">Change my look</button></div>` + clothesHTML(F) + (acc || `<p class="sub">Nothing hanging up yet. Hana sells bows, scarves, hats and pyjamas in the market's "Me &amp; my room" tab.</p>`);
 }

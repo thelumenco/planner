@@ -77,7 +77,9 @@ export const ASKERS = {
   marco:   {likes: ["egg", "loaf", "tomato", "potato", "corn"], why: ["for the vineyard crew", "for a picnic in the rows", "we've a long day of pruning"]},
   felix:   {likes: ["sunflower", "tulip", "wildflower", "blueberry", "raspberry"], why: ["for the farm stand", "the bees would approve", "for the hives' garden"]},
   elena:   {likes: ["carrot", "pumpkin", "pea", "corn", "apple"], why: ["for the dairy", "a treat for the goats", "for the farm kitchen"]},
-  noor:    {likes: ["carrot", "pea", "pumpkin", "egg", "corn"], why: ["for the rescue animals", "for the shelter", "the rabbits deserve a treat"]}
+  noor:    {likes: ["carrot", "pea", "pumpkin", "egg", "corn"], why: ["for the rescue animals", "for the shelter", "the rabbits deserve a treat"]},
+  ada:     {likes: ["tulip", "sunflower", "wildflower", "strawberry", "raspberry"], why: ["for the shop window", "to press for a pattern", "the counter wants cheering up"]},
+  idris:   {likes: ["apple", "pear", "egg", "loaf", "fig"], why: ["for my lunch at the bench", "I forget to eat when I'm hemming", "a long day of buttonholes"]}
 };
 const KINDS = ["food", "ingredient", "flower"];
 // in-season garden crops (their seeds are always at Hana's) count as things you can grow, even before your first harvest

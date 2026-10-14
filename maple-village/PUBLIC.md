@@ -114,3 +114,20 @@ the accessories and animations fit all five. Suggested names (Ember, Clover, Peb
 the personal edition's. A tortoise ambles behind you, a rabbit bounds; a capybara (and a tortoise) naps longer. Lines
 can say {pet} and {kind}; speak(), flash() and the villagers' bubbles fill them in. Dev builds skip the setup card
 unless the page has ?setup=1. The leak check now finds nothing but window.claude (the save hookup, phase 6).
+
+## After phase 4: tailoring, gifts and stories (Mel, 2026-10-14)
+- Makers' Lane: Ada's haberdashery (what was Lin's cottage) and Idris the tailor's (what was Juniper's observatory, now
+  a thimble roof and a big button sign). Auntie Lin lives at Bluebell and Juniper at Fig Tree on the cottage lane now
+  (no more holiday guests there). Both shops open 9:30 to 5:30, every day but Sunday.
+- Ada sells fabric by the piece (cotton 6, linen 8, denim 9, wool 12, silk 18; gingham, stripe and polka dot +2,
+  floral +3; twelve colours) and buttons by the card (wood, shell, brass, pearl, 3 to 8), and buys unused fabric back
+  at half price. Idris makes a T-shirt, blouse, shirt, jumper, shorts, trousers, skirt or dress (2 to 4 pieces of one
+  fabric; a long one takes a piece more): sleeves, neckline, length, buttons and pockets, with a live preview on you.
+  His fee (14 to 32, plus 3 for puff sleeves or a collar, 2 for pockets, 4 for a long hem) is paid when you finalise;
+  it's ready the next morning from 9; collect it and it's in your wardrobe (data/sewing.js, game/tailor.js, F.sew).
+- One clothes generator (art/clothes.js) draws everything you wear, everyday look included, so the preview, the
+  setup card and the map always match.
+- Gifts: any villager, one present a day each (in person, or sent round). A favourite (something they'd ask for, or a
+  present that suits them) is a heart; anything else half a heart. Hearts open up stories: the first chapter once
+  you've met, the last at five hearts. Every chapter re-introduces what it's about, and the Stories tab keeps the
+  whole story per villager. Ada and Idris have stories of their own (Ada's button jar, Idris's grandfather's suit).

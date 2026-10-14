@@ -980,14 +980,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ppbatch{display:flex;justify-content:center;margin:2px 0 6px}
 .qlist.nbrs .hearts{margin:0;gap:2px}
 .sltext{width:100%;font:inherit;font-size:.85rem;padding:8px;border:1.4px solid #E4DDD2;border-radius:6px;background:#FFFDF7;margin:6px 0 4px}
-/* phase 4: your look (game/look.js applyLook): hair styles, body, legs, switched by classes on #mel (and the setup preview) */
-.me .thips,.me .hLong,.me .hBob,.me .hBun,.me .hCurl,.me .torsoM,.me .tee,.me .skirt,.me .otrouser{display:none}
+/* phase 4: your look (game/look.js applyLook): hair styles switched by classes on #mel (and the previews); the clothes
+   themselves are drawn by art/clothes.js into the .cl* groups */
+.me .hLong,.me .hBob,.me .hBun,.me .hCurl{display:none}
 .me:not(.hs-pony) .pony,.me:not(.hs-pony) .usual{display:none}
 .me.hs-long .hLong,.me.hs-bob .hBob,.me.hs-bun .hBun,.me.hs-curly .hCurl{display:inline}
-.me.b-man .torsoW{display:none}.me.b-man .torsoM{display:inline}
-.me.b-man .straps,.me.b-neither .straps{display:none}.me.b-man .tee,.me.b-neither .tee{display:inline}
-.me.l-skirt .skirt,.me.l-trousers .otrouser,.me.l-trousers .thips{display:inline}.me.l-trousers .shorts,.me.dressed .thips{display:none}
-.me.dressed .skirt,.me.dressed .otrouser{display:none}
 /* phase 4: the setup card (game/setup.js) */
 .setup{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));background:rgba(58,46,40,.45)}
 .setup[hidden]{display:none}

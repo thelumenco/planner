@@ -880,6 +880,30 @@ export const NPCS = [
     actLines: {cone: ["Two cones for the deck, coming through!", "Mind the drips!", "Anyone for a waffle?", "Enjoy! Don't let the gulls see."]},
     away: "Tomo's off for the day."
   },
+  // Phase 4: the haberdasher and the tailor, in what were Lin's cottage and Juniper's house on Makers' Lane (tailor.js).
+  // Both open nine thirty to half past five, every day but Sunday, and live upstairs.
+  {
+    id: "ada", pitch: 1.1, name: "Ada", job: "Runs the haberdashery on Makers' Lane",
+    intro: "Ada. Haberdasher. Fabric by the piece, buttons by the card, and advice for nothing. Gingham's half the reason I get up in the morning.",
+    look: {skin: "#F2D3BC", hair: "#D9D4CC", hairStyle: "bun", top: "#C98AA8", bottom: "#4F5A6A", extra: "glasses"},
+    routine: [slot("9:30", "17:30", "chico", [[400, 500], [260, 420], [420, 300]], {dow: [1, 2, 3, 4, 5, 6]}), slot("7:30", "9:00", "village", [[362, 372], [340, 380]], {dow: [1, 2, 3, 4, 5, 6]}),
+      slot("10:00", "12:00", "market", [[200, 470], [320, 480]], {dow: [0]}), slot("14:00", "16:00", "flowers", [[160, 300], [260, 380]], {dow: [0]}),
+      slot("17:30", "19:00", "lane", [[262, 400], [200, 380], [330, 390]]), slot("19:00", "22:00", "chico", [130, 500], {act: "sit"})],
+    lines: ["Linen creases. That's how you know it's linen.", "Every button in that jar has a story. Most of them are about coats.", "Gingham never goes out of fashion. It never came in, either. It just stayed.",
+      "Measure twice. Then ask me, and I'll measure a third time.", "Idris next door makes the clothes. I make the decisions about the fabric."],
+    away: "Ada's shut the haberdashery for the day. The window display's still lit."
+  },
+  {
+    id: "idris", pitch: 0.8, name: "Idris", job: "The tailor on Makers' Lane",
+    intro: "Idris. Tailor. I make things that fit. Bring me fabric from Ada next door, tell me what you'd like, and come back tomorrow.",
+    look: {skin: "#8D5B3E", hair: "#1E1A18", hairStyle: "short", top: "#3E4A5C", bottom: "#2F2B28", extra: "tie"},
+    routine: [slot("9:30", "17:30", "luna", [[400, 500], [130, 500], [260, 430]], {dow: [1, 2, 3, 4, 5, 6]}), slot("7:00", "8:30", "hwoods", [[100, 330], [200, 318], [300, 300]], {dow: [1, 2, 3, 4, 5, 6]}),
+      slot("11:00", "13:00", "bay", [[180, 420], [240, 430]], {dow: [0]}), slot("15:00", "17:00", "village", [[362, 372], [226, 420]], {dow: [0]}),
+      slot("17:30", "18:30", "village", [[362, 372], [330, 380]]), slot("18:30", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [5, 6]}), slot("19:00", "22:00", "luna", [130, 500], {act: "sit"})],
+    lines: ["A good hem is invisible. That's the whole point of it.", "I don't hurry. Clothes can tell.", "Stand up straight. No, that's very good. I was talking to the mannequin.",
+      "Buttons first, then the buttonholes. Never the other way round.", "Ada chooses the fabric. I just do what it tells me."],
+    away: "Idris has put the needle down for the day. Back at half past nine."
+  },
   ...BB_PEOPLE,   // round 143: Bellbird Valley (data/bb-people.js)
   ...CR_PEOPLE,   // round 150: the Coast Road (data/cr-people.js)
   ...TL_PEOPLE,   // round 159: the Tablelands (data/tl-people.js)
@@ -887,9 +911,12 @@ export const NPCS = [
   ...WEDDING_PEOPLE,   // round 152: the wedding parties on the terrace (data/terrace-people.js)
   ...MILL_PEOPLE   // round 154: the mill's own day-trippers (data/mill-people.js)
 ];
-// Four villagers live on Makers' Lane (in the buildings that were app houses in the personal edition): you'll find them
-// at home in the evening, and Mr Okada before his early walk too.
-const HOMES = {bo: [["chord", 1200, 1290]], lin: [["chico", 1140, 1260]], juniper: [["luna", 1200, 1290]], okada: [["ohayo", 360, 435], ["ohayo", 1260, 1320]]};
+// Bo and Mr Okada live on Makers' Lane: you'll find them at home in the evening, and Mr Okada before his early walk too.
+const HOMES = {bo: [["chord", 1200, 1290]], okada: [["ohayo", 360, 435], ["ohayo", 1260, 1320]]};
+// Auntie Lin and Juniper moved to the cottage lane by the station (Bluebell and Fig Tree) when Ada and Idris took their
+// houses on Makers' Lane for the shops: an evening on the bench by the door
+{ const n = NPCS.find(x => x.id === "lin"); if (n) n.routine.push(slot("19:00", "21:00", "hlane", [300, 292], {act: "sit", dir: 1})); }
+{ const n = NPCS.find(x => x.id === "juniper"); if (n) n.routine.push(slot("20:00", "21:30", "hlane", [376, 466], {act: "sit", dir: -1})); }
 for (const [id, slots] of Object.entries(HOMES)) { const n = NPCS.find(x => x.id === id); if (n) slots.forEach(([scene, from, to]) => n.routine.push({from, to, scene, wander: [[200, 340], [320, 350], [260, 430]]})); }
 // Three houses for six friends: Hana and Theo on the foreshore, Tomi and Posy next door, Farid and Mei in the orchard
 // cottage. Their working days stay as they were; these are the mornings and evenings at home (a slot that matches

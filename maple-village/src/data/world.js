@@ -13,8 +13,8 @@ export const VILLAGE = {
   // Makers' Lane: Bo's workshop (he lives upstairs) and three villagers' homes (the ids are the old building names)
   chord:  {scene:"lane", name:"Bo's workshop", short:"Bo's workshop", door:[145,272], mark:[145,150]},
   fresh:  {scene:"village", name:"Library", short:"the library", door:[85,368], mark:[95,256]},
-  chico:  {scene:"lane", name:"Auntie Lin's cottage", short:"Auntie Lin's cottage", door:[380,282], mark:[380,170]},
-  luna:   {scene:"lane", name:"Juniper's house", short:"Juniper's house", door:[160,520], mark:[160,380]},
+  chico:  {scene:"lane", name:"Ada's haberdashery", short:"the haberdashery", door:[380,282], mark:[380,170]},
+  luna:   {scene:"lane", name:"Idris the tailor's", short:"the tailor's", door:[160,520], mark:[160,380]},
   ohayo:  {scene:"lane", name:"Mr Okada's house", short:"Mr Okada's house", door:[362,520], mark:[362,380]},
   post:   {scene:"village", name:"Post office", short:"the post office", door:[435,502], mark:[435,386]},
   market: {scene:"village", name:"Market", short:"the market", door:[362,350], mark:[362,290]},
@@ -126,8 +126,8 @@ export const VILLAGE = {
   timetable:{scene:"hlane", name:"Timetable board", door:[400,170], spot:true, mark:[420,40], line:"The timetable board."},
   honeysuckle:{scene:"hlane", name:"Honeysuckle", short:"Honeysuckle cottage", door:[110,264], mark:[110,150]},
   clover: {scene:"hlane", name:"Clover", short:"Clover cottage", door:[110,434], mark:[110,320]},
-  bluebell:{scene:"hlane", name:"Bluebell", door:[338,262], spot:true, mark:[338,150], line:"Bluebell: a holiday cottage with blue shutters. Guests come and go on the train."},
-  figtree:{scene:"hlane", name:"Fig Tree", door:[338,436], spot:true, mark:[338,320], line:"Fig Tree: a holiday cottage with a fig tree by the door. Guests come and go on the train."},
+  bluebell:{scene:"hlane", name:"Bluebell", door:[338,262], spot:true, mark:[338,150], line:"Bluebell: Auntie Lin's cottage now, blue shutters and a vegetable patch that puts everyone else's to shame."},
+  figtree:{scene:"hlane", name:"Fig Tree", door:[338,436], spot:true, mark:[338,320], line:"Fig Tree: Juniper's cottage now. A telescope in the upstairs window, and poems she won't show anyone."},
   windmill:{scene:"hlane", name:"The windmill", door:[440,356], spot:true, mark:[458,180], line:"The windmill, turning slowly on the slope. It's been here longer than anyone can remember."},
   vanspot:{scene:"hlane", name:"Campervan spot", door:[420,600], spot:true, mark:[420,500], line:"A gravel spot just big enough for a campervan. One day..."},
   van:    {scene:"hlane", name:"The campervan", short:"the campervan", door:[420,600], mark:[420,500]},
@@ -227,16 +227,18 @@ export const ROOMS = {
     ["typewriter","Typewriter","B","typewriter",null,"Clack clack. Words incoming."],
     ["nook","Reading nook","C","nook",null,"Comfy chair, good lamp."],
     ["digest","Bookcase","E","bookcase",null,"Juniper's favourites, shelved by feeling, not alphabet."]]},
-  chico: {name:"Auntie Lin's cottage", wall:"#F7E3E6", trim:"var(--blush)", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320]}, stations:[
-    ["laptop","Seed table","A","writedesk",null,"Seed packets, sorted by opinion."],
-    ["shelf","Potting shelf","B","craft",null,"Pots, twine and a lot of very strong views on compost."],
-    ["sofa","Cosy sofa","C","sofa",null,"Lin's sofa. The cushions are embroidered with vegetables."],
-    ["kitchen","Kitchen table","D","table",null,"Where Lin writes her planting calendar."]]},
-  luna: {name:"Juniper's house", wall:"#EEE9F8", trim:"#B9A6E8", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320]}, stations:[
-    ["laptop","Writing desk","A","writedesk",null,"Where Juniper writes her secret poems."],
-    ["shelf","Bookshelf","B","shelf",null,"Star charts and notebooks."],
-    ["sofa","Cosy sofa","C","sofa",null,"For reading by lamplight."],
-    ["table","Star table","D","table",null,"Juniper's star charts, held down with teacups."]]},
+  // Ada's haberdashery (sewing.js, tailor.js): bolts of fabric, the button jar, and the cutting counter where you buy
+  chico: {name:"Ada's haberdashery", wall:"#F7E3E6", trim:"var(--blush)", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320]}, stations:[
+    ["habcounter","Counter","A","counter",null,"Ada's counter: a brass ruler set into the wood, and the till."],
+    ["bolts","Fabric bolts","B","shelf",null,"Bolts of cotton, linen, denim, wool and silk, every colour of the lane."],
+    ["buttonjar","Button jar","C","craft",null,"A jar of buttons the size of a goldfish bowl. Ada knows every one."],
+    ["habtable","Cutting table","D","table",null,"Where Ada cuts your pieces, with scissors older than the lane."]]},
+  // Idris the tailor's: his cutting table, the rail of finished pieces, a sewing machine and a mirror
+  luna: {name:"Idris the tailor's", wall:"#EEE9F8", trim:"#B9A6E8", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320]}, stations:[
+    ["tailtable","Cutting table","A","table",null,"Pattern paper, pins and tailor's chalk. Tell Idris what you'd like."],
+    ["rail","Clothes rail","B","wardrobe",null,"Finished pieces in tissue paper, waiting to be collected."],
+    ["sewing","Sewing machine","C","craft",null,"An old black sewing machine with gold lettering. It purrs."],
+    ["mirror","Long mirror","D","shelf",null,"A long mirror in a wooden frame. You look very well, says Idris."]]},
   ohayo: {name:"Mr Okada's house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], R:[110,262]}, stations:[
     ["laptop","Sorting desk","A","writedesk",null,"Pebbles, sorted by colour. Then by size. Then by colour again."],
     ["shelf","Plant shelf","B","craft",null,"A lot of plants, all watered at six sharp."],

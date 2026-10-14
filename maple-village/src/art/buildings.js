@@ -69,7 +69,8 @@ export function library(){
   return wrap("fresh", "Library", "var(--peach)", 435, 260, 58, art, lines);
 }
 
-// Auntie Lin's cottage: rounded thatch roof, round door, round windows with flower boxes, heart on the roof.
+// Ada's haberdashery (Auntie Lin's cottage, once): rounded thatch roof, round door, round windows with flower boxes,
+// and a cotton reel on the roof where the heart was.
 export function chicoCottage(){
   const art = `<rect x="104" y="414" width="10" height="20" rx="3" style="fill:var(--stone)"/>
     <rect x="38" y="452" width="94" height="48" rx="6" style="fill:#FBEFEA"/>
@@ -79,31 +80,34 @@ export function chicoCottage(){
     <rect x="42" y="484" width="20" height="6" rx="2" style="fill:var(--wood)"/><rect x="108" y="484" width="20" height="6" rx="2" style="fill:var(--wood)"/>
     <circle cx="46" cy="483" r="2" style="fill:var(--butter)"/><circle cx="52" cy="482" r="2" style="fill:var(--rose)"/><circle cx="58" cy="483" r="2" style="fill:var(--butter)"/>
     <circle cx="112" cy="483" r="2" style="fill:var(--peri)"/><circle cx="118" cy="482" r="2" style="fill:var(--butter)"/><circle cx="124" cy="483" r="2" style="fill:var(--peri)"/>
-    <path d="M85 426 c-3 -4 -8 -1 -4 3 l4 4 l4 -4 c4 -4 -1 -7 -4 -3z" style="fill:#FFFDF6"/>`;
+    <rect x="79" y="420" width="12" height="3" rx="1" style="fill:var(--wood)"/><rect x="80" y="423" width="10" height="9" style="fill:var(--rose)"/><rect x="79" y="432" width="12" height="3" rx="1" style="fill:var(--wood)"/>`;
   const lines = `<rect x="104" y="414" width="10" height="20" rx="3"/>${smoke(109, 410)}
     <rect x="38" y="452" width="94" height="48" rx="6"/>
     <path d="M26 458 Q28 410 85 404 Q142 410 144 458 Q85 446 26 458Z"/><path d="M40 446 q8 4 16 0 q8 4 16 0 q8 4 16 0 q8 4 16 0 q8 4 16 0 q8 4 10 0 M52 428 q8 4 16 0 q8 4 16 0 q8 4 16 0 q8 4 16 0" opacity=".45"/>
     <path d="M71 500 v-16 a14 14 0 0 1 28 0 v16"/><circle cx="92" cy="490" r="1.4"/><path d="M85 470 v30" opacity=".35"/>
     <circle cx="52" cy="474" r="8"/><path d="M44 474 h16 M52 466 v16" opacity=".6"/><circle cx="118" cy="474" r="8"/><path d="M110 474 h16 M118 466 v16" opacity=".6"/>
-    <rect x="42" y="484" width="20" height="6" rx="2"/><rect x="108" y="484" width="20" height="6" rx="2"/>`;
-  return wrap("chico", "Lin's cottage", "var(--blush)", 85, 500, 58, art, lines);
+    <rect x="42" y="484" width="20" height="6" rx="2"/><rect x="108" y="484" width="20" height="6" rx="2"/>
+    <rect x="79" y="420" width="12" height="3" rx="1"/><rect x="80" y="423" width="10" height="9"/><rect x="79" y="432" width="12" height="3" rx="1"/><path d="M80 426 l10 -2 M80 429 l10 -2" opacity=".5"/>`;
+  return wrap("chico", "Haberdashery", "var(--blush)", 85, 500, 58, art, lines);
 }
 
-// Juniper's house: a little observatory (she writes poems about the stars). Lavender walls, a domed roof with a telescope slot, a
-// crescent moon on the dome, an arched door and a star-shaped window.
+// Idris the tailor's (Juniper's little observatory, once): lavender walls, the domed roof now a thimble with dimples, a
+// needle where the telescope slot was, a big four-hole button over the door, and round windows.
 export function lunaHouse(){
   const art = `<rect x="108" y="456" width="104" height="64" rx="4" style="fill:#EEE9F8"/>
     <path d="M100 460 Q100 398 160 396 Q220 398 220 460Z" style="fill:#B9A6E8"/>
-    <path d="M154 398 h12 l-2 40 h-8z" style="fill:#7E6CB8"/>
-    <path d="M180 418 a10 10 0 1 0 6 16 a8 8 0 1 1 -6 -16z" style="fill:#FFF3C4"/>
+    <path d="M158 372 l4 0 l-1 30 h-2z" style="fill:#D9D4CC"/>
+    <circle cx="186" cy="426" r="10" style="fill:#FFF3C4"/>
     <path d="M148 520 v-22 a12 12 0 0 1 24 0 v22z" style="fill:#7E6CB8"/>
-    <path d="M128 476 l3 6 l7 1 l-5 5 l1 7 l-6 -3 l-6 3 l1 -7 l-5 -5 l7 -1z" style="fill:var(--sky)"/>
+    <circle cx="128" cy="484" r="9" style="fill:var(--sky)"/>
     <circle cx="194" cy="484" r="9" style="fill:var(--sky)"/>`;
   const lines = `<rect x="108" y="456" width="104" height="64" rx="4"/><path d="M100 460 Q100 398 160 396 Q220 398 220 460Z"/><path d="M112 440 q48 -12 96 0" opacity=".4"/>
-    <path d="M154 398 h12 l-2 40 h-8z"/><path d="M180 418 a10 10 0 1 0 6 16 a8 8 0 1 1 -6 -16z"/>
+    <path d="M158 372 l4 0 l-1 30 h-2z"/><ellipse cx="160" cy="377" rx=".9" ry="2.4"/><path d="M161 372 q14 -6 12 10" opacity=".55"/>
+    ${[[128, 418], [146, 410], [174, 410], [192, 418], [137, 430], [183, 430]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" opacity=".45"/>`).join("")}
+    <circle cx="186" cy="426" r="10"/><circle cx="183" cy="423" r="1.4"/><circle cx="189" cy="423" r="1.4"/><circle cx="183" cy="429" r="1.4"/><circle cx="189" cy="429" r="1.4"/>
     <path d="M148 520 v-22 a12 12 0 0 1 24 0 v22"/><circle cx="166" cy="510" r="1.4"/>
-    <path d="M128 476 l3 6 l7 1 l-5 5 l1 7 l-6 -3 l-6 3 l1 -7 l-5 -5 l7 -1z"/><circle cx="194" cy="484" r="9"/><path d="M185 484 h18 M194 475 v18" opacity=".6"/>`;
-  return wrap("luna", "Juniper's", "var(--peri)", 160, 520, 60, art, lines);
+    <circle cx="128" cy="484" r="9"/><path d="M119 484 h18 M128 475 v18" opacity=".6"/><circle cx="194" cy="484" r="9"/><path d="M185 484 h18 M194 475 v18" opacity=".6"/>`;
+  return wrap("luna", "The tailor's", "var(--peri)", 160, 520, 60, art, lines);
 }
 
 // Mr Okada's house: a morning house (he's up with the sun). Warm cream walls under a peach tiled roof with upturned eaves, a big rising sun on

@@ -189,5 +189,19 @@ export const STORIES = {
     {lines: ["I trained in my uncle's bakery. Up at four, flour in my eyebrows."]},
     {lines: ["After all those four o'clock starts in my uncle's bakery, I came here for one summer of fruit picking.", "That was six summers ago."]},
     {lines: ["My uncle's pastries, from the bakery where I trained? I made them for Pilar, with Felix's honey and the orchard's pistachios.", "She's putting them on the tapas menu!"], reward: "pastry"}
+  ],
+  // Phase 4: Ada the haberdasher and Idris the tailor, Makers' Lane. Ada's jar of buttons; Idris's first suit.
+  ada: [
+    {lines: ["See the button jar on my counter? Every button in it came off something somebody loved.", "My mother started it. She ran a haberdashery by the sea, with a bell over the door."]},
+    {lines: ["The button jar I told you about, my mother's: the oldest one is a brass button off a sea captain's coat.", "She swapped him a whole bolt of serge for it. She said it was the best bargain of her life."]},
+    {lines: ["My mother's shop by the sea, the one with the bell? It closed the winter I turned twenty.", "I kept the bell, the scissors and the jar. That's this shop, really. Just further from the sea."]},
+    {lines: ["That brass button, the sea captain's, from the bottom of the jar: I want it to go on something you wear.", "Don't argue. Buttons should be worn, not kept. Take it to Idris."], reward: "seabutton"}
+  ],
+  idris: [
+    {lines: ["The first thing I ever made was a suit for my grandfather. I was fourteen. The sleeves were different lengths."]},
+    {lines: ["My grandfather's suit, the one with the odd sleeves: he wore it to every wedding for thirty years.", "He said the short arm was for shaking hands and the long one was for dancing."]},
+    {lines: ["After that suit for my grandfather, I went to a tailor in the city to learn properly. Five years of buttonholes.", "Then the lane had an empty house and a door with a step that suited me."]},
+    {lines: ["When my grandfather died, that suit with the odd sleeves came back to me. It hangs at the end of my rail.", "I've never taken the sleeves up. Some mistakes should be kept exactly as they are."]}
   ]
+
 };
