@@ -3255,7 +3255,15 @@ try {
   await page.goto(url + "?seed=1&time=15:00&date=2026-10-13&stg=1"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(1500);
   await page.locator('#world [data-spot="fridge"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-st="putall"]', { timeout: 20000 });
-  check(await page.locator('#ctx [data-hfr="shop"]').count() === 0, "the fridge opens straight onto what's stored (no pantry or shopping list)");
+  check(await page.locator('#ctx [data-ftab="stored"][aria-selected="true"]').count() === 1, "the fridge opens on what's stored");
+  await page.click('#ctx [data-ftab="shoplist"]'); await page.waitForTimeout(200);
+  check(await page.locator("#ctx .shoplist li").count() === 6 && /Milk/.test(await page.locator("#ctx .shoplist").first().textContent()), "and its door has a shopping list with sample items");
+  await page.fill("#slIn", "Oat milk"); await page.click("#slForm button"); await page.waitForTimeout(200);
+  await page.locator('#ctx [data-sl="tick"]').first().click(); await page.waitForTimeout(200);
+  check(await page.locator("#ctx .shoplist li").count() === 7 && await page.locator("#ctx .shoplist li.done").count() === 1, "things can be added and ticked into the basket");
+  await page.click('#ctx [data-sl="clear"]'); await page.waitForTimeout(200);
+  check(await page.locator("#ctx .shoplist li").count() === 6, "and the basket cleared");
+  await page.click('#ctx [data-ftab="stored"]'); await page.waitForTimeout(200);
   await page.click('#ctx [data-st="putall"]'); await page.waitForTimeout(300);
   await page.click('#ctx [data-st="send"][data-id="raspberry"][data-to="scoop"]'); await page.waitForTimeout(300);
   check(await fox().then(f => !f.inv.raspberry && f.inv.balloon === 1 && f.scoop.fridge.raspberry === 5 && !f.storage.fridge.raspberry), "in the browser: raspberries into the fridge, then off to the Scoop Shack");

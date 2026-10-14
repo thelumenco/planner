@@ -18,6 +18,7 @@ import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, scatterTreat, roo
 import { wardrobePanel, wearing, ACCESSORIES } from "./wardrobe.js";
 import { goodNewsHTML } from "./gazette.js";
 import * as QB from "./quests.js";
+import * as SL from "./shopping.js";
 import { colourOf } from "../art/garments.js";
 import { journalCount } from "./myroom.js";
 import { attachMyDocs, journalPanel, wireJournal } from "./myroom.js";
@@ -1014,8 +1015,20 @@ function closePanel(){
   boardOpen = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 /* ---------- storage at home (round 166, game/storage.js): the fridge's "Stored" tab, and the garage shelf ---------- */
-const fridgeHead = () => `<span class="tape stripe" aria-hidden="true"></span><h2>The fridge</h2>`;
+// the fridge: what's stored for the shops (storage.js), and the shopping list on the door (shopping.js)
+const fridgeHead = () => { const n = SL.shopLeft(F); return `<span class="tape stripe" aria-hidden="true"></span><h2>The fridge</h2><div class="tabs" role="tablist"><button role="tab" data-ftab="stored" aria-selected="${homeView === "stored"}">Stored</button><button role="tab" data-ftab="shoplist" aria-selected="${homeView === "shoplist"}">Shopping list${n ? ` (${n})` : ""}</button></div>`; };
+const slDraft = {text: "", focus: false};
 function wireStorage(c){
+  c.querySelectorAll("[data-ftab]").forEach(b => b.onclick = ev => { ev.stopPropagation(); homeView = b.dataset.ftab; sfx("tap"); ctx(); });
+  c.querySelectorAll("[data-sl]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const a = b.dataset.sl, id = b.dataset.id;
+    if (a === "tick") { SL.toggleItem(F, id); sfx("tap"); }
+    else if (a === "del") { const r = SL.removeItem(F, id); if (r) undoable(`Took “${r.it.name}” off the list`, () => { SL.restoreItem(F, r); save(); ctx(); }); sfx("paper", true); }
+    else if (a === "clear") { const gone = SL.clearGot(F); if (gone.length) undoable(`Cleared ${gone.length} from the basket`, () => { SL.shopList(F).items.push(...gone); save(); ctx(); }); sfx("paper", true); }
+    save(); ctx(); });
+  // a half-typed item survives the game redrawing round it
+  const sf = c.querySelector("#slForm"), si = c.querySelector("#slIn");
+  if (si) { si.value = slDraft.text; si.oninput = () => { slDraft.text = si.value; }; si.onfocus = () => { slDraft.focus = true; }; si.onblur = () => { slDraft.focus = false; }; if (slDraft.focus) si.focus(); }
+  if (sf) sf.onsubmit = ev => { ev.preventDefault(); if (SL.addItem(F, si.value)) { slDraft.text = ""; sfx("paper", true); save(); ctx(); } };
   const where = homeView === "shelf" ? "shelf" : "fridge";
   c.querySelectorAll("[data-st]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const a = b.dataset.st, id = b.dataset.id, n = +b.dataset.n || 99; let line = "";
     if (a === "put") { const k = putAway(F, where, id, n); if (k) line = `${k} ${ITEMS[id].n.toLowerCase()}, put away.`; }
@@ -1034,7 +1047,7 @@ function ctx(){
   if (kid.open && scene === "kidroom" && c.dataset.kid === kid.open && !$("panel").hidden && !openView) return;
   c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
   if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
-  else if (homeView && (scene === "home" || scene === "garage")) h = homeView === "shelf" ? storePanel(F, "shelf", {owns: k => owns(F, k)}) : fridgeHead() + storePanel(F, "fridge", {owns: k => owns(F, k)});
+  else if (homeView && (scene === "home" || scene === "garage")) h = homeView === "shelf" ? storePanel(F, "shelf", {owns: k => owns(F, k)}) : fridgeHead() + (homeView === "shoplist" ? SL.shopPanelHTML(F) : storePanel(F, "fridge", {owns: k => owns(F, k)}));
   else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "trolley" ? trolleyPanel(F, {sel: scSt.tsel || []}) : scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverMore(deliverPanel(F, {pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo()}))
     : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, {pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt}) : scView === "counter" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), server: isHere("sofia")}) : scView === "menu" ? scMenuPanel(F)
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});
@@ -1472,7 +1485,7 @@ function ctx(){
   if (vyView && (scene === "vineyard" || scene === "wineshop")) wireVine(c, F, {harvest: (festivalOn(dayKey()) || {}).id === "harvest", save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, r: vyAt && vyAt.r, i: vyAt && vyAt.i});
   if (routOpen && scene === "room") wireRoutines(c, {rerender: () => ctx(), undoable, done: routineCoins});
   if (trophyView && scene === "trophy") { wireTrophies(c, F, {save: () => save(true), undoable, rerender: () => { ctx(); drawScene(); }, close: () => { trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); drawScene(); }}); }
-  showPanel(!!h, (homeView === "fridge" || homeView === "stored") && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
+  showPanel(!!h, (homeView === "shoplist" || homeView === "stored") && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
   c.querySelectorAll("[data-shop]").forEach(b => b.onclick = () => { shopTab = b.dataset.shop; ctx(); });
   c.querySelectorAll("[data-decor]").forEach(b => b.onclick = () => decorClick(b.dataset.decor));
   c.querySelectorAll(".item[data-id]").forEach(b => b.onclick = () => {
@@ -2163,7 +2176,7 @@ function arriveSpot(id){
   if (id === "stall") { shopClosed = false; render(); return; }
   if (id === "board" && outside()) { openView = "quests"; speak("The quest board: your tasks, and the village's requests.", 3500); render(); return; }
   if (scene === "post" && id === "hampers") { if (!hamperSeason(dayKey())) { speak("Penny's hamper table comes out three times a year: Valentine's (from the 1st of February), Mother's Day (from the 1st of May) and Christmas (from the 20th of November).", 5000); render(); return; } fieldView = "hampers"; sfx("paper", true); render(); return; }
-  if (scene === "home" && id === "fridge") { homeView = "stored"; sfx("tap"); render(); return; }   // what's put away for later (storage.js)
+  if (scene === "home" && id === "fridge") { homeView = "stored"; sfx("tap"); render(); return; }   // what's put away for later (storage.js), and the shopping list
   if (scene === "garage" && id === "cupboard") { speak(pick(["Mops, a bucket and a lot of cloths.", "The cleaning cupboard. Tidy, for once."]), 3000); return; }
   if (scene === "garage" && id === "gshelf") { homeView = "shelf"; sfx("paper", true); render(); return; }
   if (scene === "office" && id === "desk") { speak(pick(["A tidy desk, a lamp and a cup of pens.", "Your desk. A good spot for writing lists."]), 3000); return; }

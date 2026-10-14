@@ -23271,6 +23271,56 @@ ${r.name}` })
     return n >= PAID_PER_DAY ? `You've had today's ${PAID_PER_DAY} paid ticks. Keep ticking for the joy of it.` : `Each task you tick pays ${TASK_PAY} coins (${PAID_PER_DAY - n} more paid ticks today).`;
   };
 
+  // src/game/shopping.js
+  var SAMPLE = ["Milk", "Bread", "Eggs", "Bananas", "Tea bags", "Washing-up liquid"];
+  var newId = () => "s" + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
+  function shopList(F2) {
+    const L = F2.shopList = F2.shopList || {};
+    if (!Array.isArray(L.items)) L.items = [];
+    if (!L.seeded) {
+      L.seeded = true;
+      L.items = SAMPLE.map((name, i) => ({ id: "sample" + i, name, got: false }));
+    }
+    return L;
+  }
+  var shopLeft = (F2) => shopList(F2).items.filter((i) => !i.got).length;
+  function addItem(F2, name) {
+    name = String(name || "").replace(/\s+/g, " ").trim().slice(0, 60);
+    if (!name) return null;
+    const it = { id: newId(), name, got: false };
+    shopList(F2).items.push(it);
+    return it;
+  }
+  function toggleItem(F2, id) {
+    const it = shopList(F2).items.find((i) => i.id === id);
+    if (it) it.got = !it.got;
+    return it;
+  }
+  function removeItem(F2, id) {
+    const L = shopList(F2), i = L.items.findIndex((x) => x.id === id);
+    if (i < 0) return null;
+    const [it] = L.items.splice(i, 1);
+    return { it, i };
+  }
+  function restoreItem(F2, r) {
+    const L = shopList(F2);
+    if (r && !L.items.some((x) => x.id === r.it.id)) L.items.splice(Math.min(r.i, L.items.length), 0, r.it);
+  }
+  function clearGot(F2) {
+    const L = shopList(F2), gone = L.items.filter((i) => i.got);
+    L.items = L.items.filter((i) => !i.got);
+    return gone;
+  }
+  function shopPanelHTML(F2) {
+    const L = shopList(F2), todo = L.items.filter((i) => !i.got), got3 = L.items.filter((i) => i.got);
+    const row6 = (i) => `<li class="${i.got ? "done" : ""}"><label><input type="checkbox" data-sl="tick" data-id="${esc(i.id)}" ${i.got ? "checked" : ""}> <span>${esc(i.name)}</span></label><button class="hx" data-sl="del" data-id="${esc(i.id)}" aria-label="Remove ${esc(i.name)}">✕</button></li>`;
+    let h3 = `<p class="sub">${todo.length ? `${todo.length} thing${todo.length === 1 ? "" : "s"} to buy. Tick them off as they go in the basket.` : "Nothing to buy. Add something when it runs out."}</p>`;
+    if (todo.length) h3 += `<ul class="hlist shoplist">${todo.map(row6).join("")}</ul>`;
+    if (got3.length) h3 += `<p class="eyebrow" style="margin:12px 0 4px">In the basket</p><ul class="hlist shoplist">${got3.map(row6).join("")}</ul><div class="actions"><button class="btn small alt" data-sl="clear">Clear what's in the basket</button></div>`;
+    h3 += `<form class="row hadd" id="slForm"><label class="sr" for="slIn">Add to the shopping list</label><input id="slIn" maxlength="60" placeholder="add to the shopping list"><button class="btn small alt">Add</button></form>`;
+    return h3;
+  }
+
   // src/art/garments.js
   var COLOURS = [
     [/black|jet/, "#2F2B28"],
@@ -35945,8 +35995,67 @@ ${SIGNOFF[t.who] || ""}`;
     if (scene === "market") shopClosed = true;
     ctx();
   }
-  var fridgeHead = () => `<span class="tape stripe" aria-hidden="true"></span><h2>The fridge</h2>`;
+  var fridgeHead = () => {
+    const n = shopLeft(F);
+    return `<span class="tape stripe" aria-hidden="true"></span><h2>The fridge</h2><div class="tabs" role="tablist"><button role="tab" data-ftab="stored" aria-selected="${homeView === "stored"}">Stored</button><button role="tab" data-ftab="shoplist" aria-selected="${homeView === "shoplist"}">Shopping list${n ? ` (${n})` : ""}</button></div>`;
+  };
+  var slDraft = { text: "", focus: false };
   function wireStorage(c) {
+    c.querySelectorAll("[data-ftab]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      homeView = b.dataset.ftab;
+      sfx("tap");
+      ctx();
+    });
+    c.querySelectorAll("[data-sl]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      const a = b.dataset.sl, id = b.dataset.id;
+      if (a === "tick") {
+        toggleItem(F, id);
+        sfx("tap");
+      } else if (a === "del") {
+        const r = removeItem(F, id);
+        if (r) undoable(`Took “${r.it.name}” off the list`, () => {
+          restoreItem(F, r);
+          save();
+          ctx();
+        });
+        sfx("paper", true);
+      } else if (a === "clear") {
+        const gone = clearGot(F);
+        if (gone.length) undoable(`Cleared ${gone.length} from the basket`, () => {
+          shopList(F).items.push(...gone);
+          save();
+          ctx();
+        });
+        sfx("paper", true);
+      }
+      save();
+      ctx();
+    });
+    const sf = c.querySelector("#slForm"), si = c.querySelector("#slIn");
+    if (si) {
+      si.value = slDraft.text;
+      si.oninput = () => {
+        slDraft.text = si.value;
+      };
+      si.onfocus = () => {
+        slDraft.focus = true;
+      };
+      si.onblur = () => {
+        slDraft.focus = false;
+      };
+      if (slDraft.focus) si.focus();
+    }
+    if (sf) sf.onsubmit = (ev) => {
+      ev.preventDefault();
+      if (addItem(F, si.value)) {
+        slDraft.text = "";
+        sfx("paper", true);
+        save();
+        ctx();
+      }
+    };
     const where = homeView === "shelf" ? "shelf" : "fridge";
     c.querySelectorAll("[data-st]").forEach((b) => b.onclick = (ev) => {
       ev.stopPropagation();
@@ -35983,7 +36092,7 @@ ${SIGNOFF[t.who] || ""}`;
     if (kid.open && scene === "kidroom" && c.dataset.kid === kid.open && !$("panel").hidden && !openView) return;
     c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
     if (kid.open && scene === "kidroom") h3 = kidPanel(kid.open);
-    else if (homeView && (scene === "home" || scene === "garage")) h3 = homeView === "shelf" ? storePanel(F, "shelf", { owns: (k) => owns2(F, k) }) : fridgeHead() + storePanel(F, "fridge", { owns: (k) => owns2(F, k) });
+    else if (homeView && (scene === "home" || scene === "garage")) h3 = homeView === "shelf" ? storePanel(F, "shelf", { owns: (k) => owns2(F, k) }) : fridgeHead() + (homeView === "shoplist" ? shopPanelHTML(F) : storePanel(F, "fridge", { owns: (k) => owns2(F, k) }));
     else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h3 = scView === "trolley" ? trolleyPanel(F, { sel: scSt.tsel || [] }) : scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverMore(deliverPanel(F, { pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo() })) : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, { pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt }) : scView === "counter" ? counterPanel(F, { pick: scSt.pick, evan: evanHere(), server: isHere("sofia") }) : scView === "menu" ? menuPanel(F) : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, { swap: scSt.swap });
     else if (goalView) h3 = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
     else if (fieldView === "xtree" && scene === "field") h3 = treePanel(F, dayKey(), sgHM());
@@ -37561,7 +37670,7 @@ ${SIGNOFF[t.who] || ""}`;
         drawScene();
       } });
     }
-    showPanel(!!h3, (homeView === "fridge" || homeView === "stored") && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
+    showPanel(!!h3, (homeView === "shoplist" || homeView === "stored") && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
     c.querySelectorAll("[data-shop]").forEach((b) => b.onclick = () => {
       shopTab = b.dataset.shop;
       ctx();

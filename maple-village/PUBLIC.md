@@ -56,6 +56,9 @@ The quest board (game/quests.js, state in `F.board`):
   The friendship panel has a Neighbours tab with everyone's hearts. New trophies: village requests (5 to 100) and best
   friends (villagers with five hearts).
 
+The fridge (Mel, 2026-10-14): a Shopping list tab beside Stored (game/shopping.js, `F.shopList`). A new game starts
+with six made-up sample items; add, tick into the basket, clear. No coins.
+
 Makers' Lane: the app houses are homes now (ids kept: chord, chico, luna, ohayo). Bo's workshop (he lives upstairs),
 Auntie Lin's cottage, Juniper's house (the little observatory) and Mr Okada's house. Each is home in the evening (and
 Mr Okada early in the morning too): data/npcs.js `HOMES`. The Fresh Pages library is just the library.
