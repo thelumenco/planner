@@ -39201,6 +39201,8 @@ ${SIGNOFF[t.who] || ""}`;
           setTimeout(() => speak(ev.kind === "market" ? "It's the Sunday farmers market! Stalls all along the top, our wine stall with Ines, and Ma Ma's fruit and flowers." : ev.kind === "night" ? "The night market! Fairy lights, street food all along the top, and a jazz duo on the little stage." : "It's the field fair! Kites, face painting, lemonade. Evan's going to love this.", 6e3), 1200);
         }
       }
+      F.where = { scene, x: Math.round(mel.x), y: Math.round(mel.y), day: dayKey() };
+      persist("fox");
       if (id === "market") speak(isHere("hana") ? "Welcome to the market! Hana's in. Have a browse." : NPCS.find((n) => n.id === "hana").away, 4500);
     }, 220);
   }
