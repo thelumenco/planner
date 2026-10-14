@@ -149,6 +149,11 @@ Then they're yours to furnish and let, a mini landlord business:
   complete the set is (a bed, somewhere to sit, a table, light, something on the walls, and so on), up to a cap for
   the cottage. Nicer and more complete means better guests and a higher rate; a half-furnished cottage still lets,
   just for less. The cap keeps money from getting too easy.
-- Still to design: the tiers and prices, the completeness checklist, how often guests come and stay, and how the
-  rent is paid (weekly into your coins, with a little note from the guests).
+- It works like a little Airbnb. Guests book short stays (a night to a week), arrive on the train with their
+  suitcases, stay in the cottage and wander the village like the holiday guests do now, then leave a star rating
+  and a short review in a guest book. The rating comes from the same things as the rate (how nice, how complete),
+  plus whether the place is clean and ready between guests (a quick tidy-up after each stay). Good reviews bring
+  bookings more often; the nightly rate itself stays the game's to set, up to the cottage's cap.
+- Still to design: the tiers and prices, the completeness checklist, how often bookings come, and how payment
+  works (paid when a stay ends, into your coins, with the review).
 Nothing is built yet; hearts with Elena already count from requests and gifts.
