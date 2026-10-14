@@ -12,7 +12,7 @@ import { icon } from "../art/icons.js";
 export const GOALS = {
   scooter: {n: "Scooter", price: 800, where: "garage", line: "A little electric scooter. Zips you from screen to screen about half again as fast as walking."},
   car: {n: "Cream convertible", price: 3500, where: "garage", line: "A cream convertible, roof down. Room for you, Maple and Evan, and more than twice as fast as walking."},
-  boat: {n: "Dolphin cruise boat", price: 4500, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take the family out to see the dolphins up close."},
+  boat: {n: "Dolphin cruise boat", price: 4500, where: "shore", line: "A little cruise boat moored at the end of the jetty. Take the family out to see the dolphins up close, or sail off along the coast to other towns for the day (up to eight aboard, fuel only)."},
   cocoa: {n: "The Cocoa Room", price: 1000, where: "bay", line: "The boarded-up shopfront on the bay, turned into your own chocolate shop: a shop front with a wall of bars, and a kitchen where you make chocolate from the bean. Amara will run the counter."},
   van: {n: "Campervan", price: 3800, where: "hlane", line: "A cream-and-mint vintage campervan with a pop-top roof, parked at its spot on the cottage lane. A little home from home: do it up inside, sleep under the stars, and one day, road trips."},
   greenhouse: {n: "Greenhouse", price: 400, where: "farm", line: "The old shed at the back of the garden, rebuilt in glass. Grow herbs all year (garlic, basil, mint, rosemary, chives, thyme), and anything out of season from Hana's greenhouse seed packets."},
@@ -35,7 +35,7 @@ export function buyGoal(F, k){
   if (k === "scooter" || k === "car") F.ride = k;
   return {scooter: "A shiny new scooter, parked in the garage. You'll zip about on it outdoors from now on.",
     car: "A cream convertible! Roof down, Maple in the back, Evan waving at everyone. You'll drive between screens from now on.",
-    boat: "Your dolphin cruise boat is moored at the end of the jetty. Take everyone out!",
+    boat: "Your boat is moored at the end of the jetty. Take everyone out for the dolphins, or sail off for the day!",
     cellar: "The cellar door is open! Through the new door on the wine shop's west wall.",
     paperkeeper: "Lise starts tomorrow! She's already rearranged the ribbon rack by colour.",
     paperie: "The paperie's yours! The À VENDRE board's down and PAPETERIE is up over the green door. Start with the scrap bin.",

@@ -171,6 +171,8 @@ export const TOWNS = {
     n: "Jeju", by: "train", fare: 70, free: ["evan"], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
     screens: ["jj_shore", "jj_farms", "jj_harbour", "jj_village"], arrive: ["jj_village", [396, 584]], station: "jjtrain", music: "jeju",
     // the ferry: tickets at the foreshore jetty (world.js "ferry"), into the harbour; same hours as the train
+    // round 205: your own boat ties up at the ferry pier too
+    boat: {fuel: 20, pier: "jjpier", arrive: ["jj_harbour", [214, 436]], sight: "jeju", blurb: "Across the sea to the volcanic island: black stone walls, tangerine orchards and the haenyeo divers. The longest sail, so set off early.", arriveLine: "Jeju! You bring your own boat in past the two horse-shaped lighthouses, one red, one white, and tie up at the ferry pier."},
     ferry: {fare: 50, pier: "jjpier", arrive: ["jj_harbour", [214, 436]], arriveLine: "Jeju! The ferry noses in past two little horse-shaped lighthouses, one red, one white. Gulls, salt, and black rocks everywhere."},
     blurb: "A volcanic island: black stone walls, tangerine orchards, thatched stone houses, a green crater by the sea and the women divers bobbing out past the rocks. By train over the sea bridge, or by ferry from the foreshore jetty (50).",
     arriveLine: "Jeju! The train rolls off the sea bridge into a little stone station. Black stone walls, orange tangerines, and the wind smells of the sea.",

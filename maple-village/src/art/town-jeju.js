@@ -232,5 +232,21 @@ export function ferryRideArt(home){
     <rect x="96" y="2" width="10" height="12" fill="${C.orange}"/><circle cx="58" cy="21" r="4" fill="#F2D3BC"/><circle cx="74" cy="21" r="4" fill="#C99A78"/></g></svg></div>`;
   return bank + boat;
 }
+// Mel's own boat on a crossing (round 205): her white boat with the blue stripe and red flag, heads aboard; each
+// route adds its own sight on the far shore (`sight`, drawn in the bank's 600x90 viewBox) on the way out
+export function ownBoatRideArt(home, sight = ""){
+  const bank = `<svg class="taxibank" viewBox="0 0 600 90" preserveAspectRatio="none" aria-hidden="true"><g style="stroke:#3b3530" stroke-width="1.1">
+    ${home ? `<path d="M0 56 Q75 34 150 50 T300 50 V60 H0z" fill="#9CC27E"/>` : sight}
+    <path d="M0 56 H600 V90 H0z" fill="${C.sea}"/>${[40, 140, 260, 380, 500].map(x => `<path d="M${x} 72 q6 -5 12 0 q6 5 12 0" fill="none" stroke="#EAF5FA" stroke-width="1.4"/>`).join("")}
+    <g><path d="M300 66 q14 -16 28 0" fill="#7A8C9C"/><animateTransform attributeName="transform" type="translate" values="0 6;0 -2;0 6" dur="1.4s" repeatCount="indefinite"/></g></g></svg>`;
+  const boat = `<div class="taxiboat"><svg viewBox="0 0 120 70" width="170" height="99" aria-hidden="true"><g filter="url(#wob)" style="stroke:#3b3530" stroke-width="1.4" stroke-linejoin="round">
+    <path d="M70 34 v-30 l20 12z" fill="#E8566C"/><path d="M6 44 H114 L102 64 H18z" fill="#FFFDF6"/><path d="M10 53 H110" stroke="#3E6B8C" stroke-width="3.4"/>
+    <rect x="34" y="24" width="40" height="20" rx="3" fill="#CFE0EE"/><path d="M32 24 h44" stroke="#3E6B8C" stroke-width="2"/>
+    <circle cx="46" cy="33" r="4.6" fill="#F8DECD"/><path d="M41.6 31 q4.6 -8 9.6 -1" fill="#2A211D"/><circle cx="60" cy="35" r="3.4" fill="#F8DECD"/><path d="M57 33 q3 -5 6 0" fill="#2A211D"/>
+    <path d="M86 40 l4 -6 l3 6z" fill="#E8935A"/></g></svg></div>`;
+  return bank + boat;
+}
+// Jeju's sight on the way in: the two horse-shaped lighthouses, one red, one white, and the island beyond
+export const JEJU_SIGHT = `<path d="M400 56 Q440 26 490 28 Q530 32 550 56z" fill="#8FB46A"/><rect x="344" y="34" width="8" height="22" fill="#E2574C"/><path d="M342 34 h12 l-2 -6 h-8z" fill="#E2574C"/><rect x="376" y="34" width="8" height="22" fill="#FFFDF6"/><path d="M374 34 h12 l-2 -6 h-8z" fill="#FFFDF6"/>`;
 // The wish-tower in Honeybrook Woods, by the river (Mel, round 127): it grows a stone for each wish (up to nine)
 export const wishTower = (x, y, n) => `<g data-place="wishtower" aria-label="The wish-tower">${`<ellipse class="hov" cx="${x}" cy="${y + 4}" rx="18" ry="6" style="fill:var(--butter)"/>`}${cairn(x, y, Math.max(3, Math.min(9, n)), 1.25)}</g>`;

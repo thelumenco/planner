@@ -1631,7 +1631,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(800);
   await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="boat"]', { timeout: 15000 });
   await page.click('#ctx [data-goal="boat"]'); await page.waitForTimeout(400);
-  await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForTimeout(4000);
+  await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-cruise]', { timeout: 15000 });   // round 205: the boat's panel first
+  await page.click('#ctx [data-cruise]'); await page.waitForTimeout(4000);
   check(await page.locator("#world .cruising").count() === 1 && await page.evaluate(() => getComputedStyle(document.getElementById("mel")).visibility === "hidden"), "the dolphin cruise boat: everyone aboard and off up the coast");
   // the monthly wine club in the cellar door: the first Friday of the month, 6 to 9pm
   await page.addInitScript(() => { if (!/clubpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
@@ -4260,6 +4261,34 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(gs.takeWrapped(F, 0) === id && F.inv[id] === 1 && !gs.giftState(F).wrapped.length, "and it can come back out");
   check(!/Put out:/.test(wr.wrapPanel(F, {}, {where: "giftshop", table: []})), "the wrapping table just points to the basket now");
 }
+// Round 205: your own boat sails to towns (Jeju for now): fuel only, up to 8 aboard, 8am to 2pm out, home by 7pm, not on downpour days
+{
+  console.log("\nyour own boat sails to towns (round 205)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`boat towns pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/boatpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 500; f.goals = {...(f.goals || {}), boat: 1};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const open = async (t, d) => { await page.goto(url + `?seed=1&time=${t}&date=${d}&boatpatch=1`); await page.waitForTimeout(1500); await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
+    await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector("#ctx [data-cruise]", { timeout: 15000 }); return page.locator("#ctx").innerText(); };
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-01"); await page.waitForTimeout(800);
+  check(/Too rough to sail today/.test(await open("10:00", "2026-11-01")) && await page.locator('#ctx [data-trip]').count() === 0, "no sailing on a downpour day");
+  check(/Too early to set off/.test(await open("07:00", "2026-10-14")), "and not before 8am");
+  check(/Too late to set off/.test(await open("15:00", "2026-10-14")), "or after 2pm (you'd not be home before dark)");
+  const txt = await open("09:00", "2026-10-14");
+  check(/Jeju/.test(txt) && /Fuel 20/.test(txt) && /up to 8 aboard/.test(txt), "the boat's panel: a dolphin cruise, or sail to Jeju for fuel only, up to 8 aboard");
+  for (const id of ["mum", "dad", "mama", "gonggong", "darren", "evan", "marcus", "angelina"]) { const btn = page.locator(`#ctx [data-tpick="${id}"]`); if (await btn.isEnabled()) await btn.click(); await page.waitForTimeout(120); }
+  check(await page.locator("#ctx .tpick.on").count() === 7 && await page.locator("#ctx .tpick[disabled]").count() === 1, "seven of the family can come (eight aboard with Mel); the eighth seat's taken");
+  await page.click('#ctx [data-trip="jeju"]'); await page.waitForTimeout(8500);
+  let f = await gf();
+  check(f.coins === 480 && f.trip && f.trip.by === "boat" && f.trip.party.length === 7 && await page.locator('#world [data-place="jjpier"]').count() === 1, "casting off costs the fuel and lands everyone at Jeju's harbour");
+  await page.locator('#world [data-place="jjpier"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="boat"]', { timeout: 15000 });
+  await page.click('#ctx [data-triphome="boat"]'); await page.waitForTimeout(8500);
+  f = await gf();
+  check(f.trip.done && await page.locator('#world [data-place="boat"]').count() === 1, "and you sail home to your own mooring at the jetty");
+  await page.close();
+}
+
 {
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
