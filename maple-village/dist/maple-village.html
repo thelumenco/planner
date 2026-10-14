@@ -1734,6 +1734,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ppstep.now{background:#F3D9A0;color:#5A3E1A;font-weight:600}
 .ppbatch{display:flex;justify-content:center;margin:2px 0 6px}
 .qlist.nbrs .hearts{margin:0;gap:2px}
+.sltext{width:100%;font:inherit;font-size:.85rem;padding:8px;border:1.4px solid #E4DDD2;border-radius:6px;background:#FFFDF7;margin:6px 0 4px}
 </style>
 </head>
 <body>
@@ -23306,17 +23307,19 @@ ${r.name}` })
     const L = shopList(F2);
     if (r && !L.items.some((x) => x.id === r.it.id)) L.items.splice(Math.min(r.i, L.items.length), 0, r.it);
   }
+  var listText = (F2) => "Shopping list\n" + shopList(F2).items.filter((i) => !i.got).map((i) => "- " + i.name).join("\n");
   function clearGot(F2) {
     const L = shopList(F2), gone = L.items.filter((i) => i.got);
     L.items = L.items.filter((i) => !i.got);
     return gone;
   }
-  function shopPanelHTML(F2) {
+  function shopPanelHTML(F2, showText) {
     const L = shopList(F2), todo = L.items.filter((i) => !i.got), got3 = L.items.filter((i) => i.got);
     const row6 = (i) => `<li class="${i.got ? "done" : ""}"><label><input type="checkbox" data-sl="tick" data-id="${esc(i.id)}" ${i.got ? "checked" : ""}> <span>${esc(i.name)}</span></label><button class="hx" data-sl="del" data-id="${esc(i.id)}" aria-label="Remove ${esc(i.name)}">✕</button></li>`;
     let h3 = `<p class="sub">${todo.length ? `${todo.length} thing${todo.length === 1 ? "" : "s"} to buy. Tick them off as they go in the basket.` : "Nothing to buy. Add something when it runs out."}</p>`;
-    if (todo.length) h3 += `<ul class="hlist shoplist">${todo.map(row6).join("")}</ul>`;
+    if (todo.length) h3 += `<div class="actions"><button class="btn small alt" data-sl="copy">Copy list</button></div><ul class="hlist shoplist">${todo.map(row6).join("")}</ul>`;
     if (got3.length) h3 += `<p class="eyebrow" style="margin:12px 0 4px">In the basket</p><ul class="hlist shoplist">${got3.map(row6).join("")}</ul><div class="actions"><button class="btn small alt" data-sl="clear">Clear what's in the basket</button></div>`;
+    if (showText) h3 += `<label class="sr" for="slText">The list as text</label><textarea id="slText" class="sltext" rows="${Math.min(10, todo.length + 2)}" readonly>${esc(listText(F2))}</textarea>`;
     h3 += `<form class="row hadd" id="slForm"><label class="sr" for="slIn">Add to the shopping list</label><input id="slIn" maxlength="60" placeholder="add to the shopping list"><button class="btn small alt">Add</button></form>`;
     return h3;
   }
@@ -35999,17 +36002,40 @@ ${SIGNOFF[t.who] || ""}`;
     const n = shopLeft(F);
     return `<span class="tape stripe" aria-hidden="true"></span><h2>The fridge</h2><div class="tabs" role="tablist"><button role="tab" data-ftab="stored" aria-selected="${homeView === "stored"}">Stored</button><button role="tab" data-ftab="shoplist" aria-selected="${homeView === "shoplist"}">Shopping list${n ? ` (${n})` : ""}</button></div>`;
   };
-  var slDraft = { text: "", focus: false };
+  var slDraft = { text: "", focus: false, showText: false };
   function wireStorage(c) {
     c.querySelectorAll("[data-ftab]").forEach((b) => b.onclick = (ev) => {
       ev.stopPropagation();
       homeView = b.dataset.ftab;
+      slDraft.showText = false;
       sfx("tap");
       ctx();
     });
     c.querySelectorAll("[data-sl]").forEach((b) => b.onclick = (ev) => {
       ev.stopPropagation();
       const a = b.dataset.sl, id = b.dataset.id;
+      if (a === "copy") {
+        const text = listText(F), fallback = () => {
+          slDraft.showText = true;
+          ctx();
+          const t = $("slText");
+          if (t) {
+            t.focus();
+            t.select();
+          }
+          flash("Copying's blocked here: the list is selected, ready to copy");
+        };
+        try {
+          navigator.clipboard.writeText(text).then(() => {
+            slDraft.showText = false;
+            sfx("paper", true);
+            flash("Shopping list copied");
+          }, fallback);
+        } catch {
+          fallback();
+        }
+        return;
+      }
       if (a === "tick") {
         toggleItem(F, id);
         sfx("tap");
@@ -36092,7 +36118,7 @@ ${SIGNOFF[t.who] || ""}`;
     if (kid.open && scene === "kidroom" && c.dataset.kid === kid.open && !$("panel").hidden && !openView) return;
     c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
     if (kid.open && scene === "kidroom") h3 = kidPanel(kid.open);
-    else if (homeView && (scene === "home" || scene === "garage")) h3 = homeView === "shelf" ? storePanel(F, "shelf", { owns: (k) => owns2(F, k) }) : fridgeHead() + (homeView === "shoplist" ? shopPanelHTML(F) : storePanel(F, "fridge", { owns: (k) => owns2(F, k) }));
+    else if (homeView && (scene === "home" || scene === "garage")) h3 = homeView === "shelf" ? storePanel(F, "shelf", { owns: (k) => owns2(F, k) }) : fridgeHead() + (homeView === "shoplist" ? shopPanelHTML(F, slDraft.showText) : storePanel(F, "fridge", { owns: (k) => owns2(F, k) }));
     else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h3 = scView === "trolley" ? trolleyPanel(F, { sel: scSt.tsel || [] }) : scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverMore(deliverPanel(F, { pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo() })) : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, { pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt }) : scView === "counter" ? counterPanel(F, { pick: scSt.pick, evan: evanHere(), server: isHere("sofia") }) : scView === "menu" ? menuPanel(F) : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, { swap: scSt.swap });
     else if (goalView) h3 = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
     else if (fieldView === "xtree" && scene === "field") h3 = treePanel(F, dayKey(), sgHM());

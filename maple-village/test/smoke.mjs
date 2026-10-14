@@ -3258,6 +3258,8 @@ try {
   check(await page.locator('#ctx [data-ftab="stored"][aria-selected="true"]').count() === 1, "the fridge opens on what's stored");
   await page.click('#ctx [data-ftab="shoplist"]'); await page.waitForTimeout(200);
   check(await page.locator("#ctx .shoplist li").count() === 6 && /Milk/.test(await page.locator("#ctx .shoplist").first().textContent()), "and its door has a shopping list with sample items");
+  await page.click('#ctx [data-sl="copy"]'); await page.waitForTimeout(400);
+  check(/Shopping list copied/.test(await page.locator("#earn").textContent()) || /- Milk/.test(await page.locator("#slText").inputValue().catch(() => "")), "Copy list copies it (or shows it ready to select where copying's blocked)");
   await page.fill("#slIn", "Oat milk"); await page.click("#slForm button"); await page.waitForTimeout(200);
   await page.locator('#ctx [data-sl="tick"]').first().click(); await page.waitForTimeout(200);
   check(await page.locator("#ctx .shoplist li").count() === 7 && await page.locator("#ctx .shoplist li.done").count() === 1, "things can be added and ticked into the basket");

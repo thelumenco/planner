@@ -1017,10 +1017,12 @@ function closePanel(){
 /* ---------- storage at home (round 166, game/storage.js): the fridge's "Stored" tab, and the garage shelf ---------- */
 // the fridge: what's stored for the shops (storage.js), and the shopping list on the door (shopping.js)
 const fridgeHead = () => { const n = SL.shopLeft(F); return `<span class="tape stripe" aria-hidden="true"></span><h2>The fridge</h2><div class="tabs" role="tablist"><button role="tab" data-ftab="stored" aria-selected="${homeView === "stored"}">Stored</button><button role="tab" data-ftab="shoplist" aria-selected="${homeView === "shoplist"}">Shopping list${n ? ` (${n})` : ""}</button></div>`; };
-const slDraft = {text: "", focus: false};
+const slDraft = {text: "", focus: false, showText: false};
 function wireStorage(c){
-  c.querySelectorAll("[data-ftab]").forEach(b => b.onclick = ev => { ev.stopPropagation(); homeView = b.dataset.ftab; sfx("tap"); ctx(); });
+  c.querySelectorAll("[data-ftab]").forEach(b => b.onclick = ev => { ev.stopPropagation(); homeView = b.dataset.ftab; slDraft.showText = false; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-sl]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const a = b.dataset.sl, id = b.dataset.id;
+    if (a === "copy") { const text = SL.listText(F), fallback = () => { slDraft.showText = true; ctx(); const t = $("slText"); if (t) { t.focus(); t.select(); } flash("Copying's blocked here: the list is selected, ready to copy"); };
+      try { navigator.clipboard.writeText(text).then(() => { slDraft.showText = false; sfx("paper", true); flash("Shopping list copied"); }, fallback); } catch { fallback(); } return; }
     if (a === "tick") { SL.toggleItem(F, id); sfx("tap"); }
     else if (a === "del") { const r = SL.removeItem(F, id); if (r) undoable(`Took “${r.it.name}” off the list`, () => { SL.restoreItem(F, r); save(); ctx(); }); sfx("paper", true); }
     else if (a === "clear") { const gone = SL.clearGot(F); if (gone.length) undoable(`Cleared ${gone.length} from the basket`, () => { SL.shopList(F).items.push(...gone); save(); ctx(); }); sfx("paper", true); }
@@ -1047,7 +1049,7 @@ function ctx(){
   if (kid.open && scene === "kidroom" && c.dataset.kid === kid.open && !$("panel").hidden && !openView) return;
   c.dataset.kid = kid.open && scene === "kidroom" ? kid.open : "";
   if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
-  else if (homeView && (scene === "home" || scene === "garage")) h = homeView === "shelf" ? storePanel(F, "shelf", {owns: k => owns(F, k)}) : fridgeHead() + (homeView === "shoplist" ? SL.shopPanelHTML(F) : storePanel(F, "fridge", {owns: k => owns(F, k)}));
+  else if (homeView && (scene === "home" || scene === "garage")) h = homeView === "shelf" ? storePanel(F, "shelf", {owns: k => owns(F, k)}) : fridgeHead() + (homeView === "shoplist" ? SL.shopPanelHTML(F, slDraft.showText) : storePanel(F, "fridge", {owns: k => owns(F, k)}));
   else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "trolley" ? trolleyPanel(F, {sel: scSt.tsel || []}) : scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverMore(deliverPanel(F, {pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo()}))
     : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, {pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt}) : scView === "counter" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), server: isHere("sofia")}) : scView === "menu" ? scMenuPanel(F)
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});

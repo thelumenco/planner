@@ -57,7 +57,8 @@ The quest board (game/quests.js, state in `F.board`):
   friends (villagers with five hearts).
 
 The fridge (Mel, 2026-10-14): a Shopping list tab beside Stored (game/shopping.js, `F.shopList`). A new game starts
-with six made-up sample items; add, tick into the basket, clear. No coins.
+with six made-up sample items; add, tick into the basket, clear, and Copy list (what's still to buy, as text; where the
+browser blocks copying, the text shows selected instead). No coins.
 
 Makers' Lane: the app houses are homes now (ids kept: chord, chico, luna, ohayo). Bo's workshop (he lives upstairs),
 Auntie Lin's cottage, Juniper's house (the little observatory) and Mr Okada's house. Each is home in the evening (and

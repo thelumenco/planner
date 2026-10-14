@@ -19,15 +19,19 @@ export function addItem(F, name){
 export function toggleItem(F, id){ const it = shopList(F).items.find(i => i.id === id); if (it) it.got = !it.got; return it; }
 export function removeItem(F, id){ const L = shopList(F), i = L.items.findIndex(x => x.id === id); if (i < 0) return null; const [it] = L.items.splice(i, 1); return {it, i}; }
 export function restoreItem(F, r){ const L = shopList(F); if (r && !L.items.some(x => x.id === r.it.id)) L.items.splice(Math.min(r.i, L.items.length), 0, r.it); }
+// the list as plain text, for pasting into a message or a notes app (only what's still to buy)
+export const listText = F => "Shopping list\n" + shopList(F).items.filter(i => !i.got).map(i => "- " + i.name).join("\n");
 // -> the items taken off (for undo)
 export function clearGot(F){ const L = shopList(F), gone = L.items.filter(i => i.got); L.items = L.items.filter(i => !i.got); return gone; }
 
-export function shopPanelHTML(F){
+export function shopPanelHTML(F, showText){
   const L = shopList(F), todo = L.items.filter(i => !i.got), got = L.items.filter(i => i.got);
   const row = i => `<li class="${i.got ? "done" : ""}"><label><input type="checkbox" data-sl="tick" data-id="${esc(i.id)}" ${i.got ? "checked" : ""}> <span>${esc(i.name)}</span></label><button class="hx" data-sl="del" data-id="${esc(i.id)}" aria-label="Remove ${esc(i.name)}">✕</button></li>`;
   let h = `<p class="sub">${todo.length ? `${todo.length} thing${todo.length === 1 ? "" : "s"} to buy. Tick them off as they go in the basket.` : "Nothing to buy. Add something when it runs out."}</p>`;
-  if (todo.length) h += `<ul class="hlist shoplist">${todo.map(row).join("")}</ul>`;
+  if (todo.length) h += `<div class="actions"><button class="btn small alt" data-sl="copy">Copy list</button></div><ul class="hlist shoplist">${todo.map(row).join("")}</ul>`;
   if (got.length) h += `<p class="eyebrow" style="margin:12px 0 4px">In the basket</p><ul class="hlist shoplist">${got.map(row).join("")}</ul><div class="actions"><button class="btn small alt" data-sl="clear">Clear what's in the basket</button></div>`;
+  // when the browser won't copy (some embedded views block the clipboard), the text is shown ready to select
+  if (showText) h += `<label class="sr" for="slText">The list as text</label><textarea id="slText" class="sltext" rows="${Math.min(10, todo.length + 2)}" readonly>${esc(listText(F))}</textarea>`;
   h += `<form class="row hadd" id="slForm"><label class="sr" for="slIn">Add to the shopping list</label><input id="slIn" maxlength="60" placeholder="add to the shopping list"><button class="btn small alt">Add</button></form>`;
   return h;
 }

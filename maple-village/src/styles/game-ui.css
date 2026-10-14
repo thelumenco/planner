@@ -979,3 +979,4 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ppstep.now{background:#F3D9A0;color:#5A3E1A;font-weight:600}
 .ppbatch{display:flex;justify-content:center;margin:2px 0 6px}
 .qlist.nbrs .hearts{margin:0;gap:2px}
+.sltext{width:100%;font:inherit;font-size:.85rem;padding:8px;border:1.4px solid #E4DDD2;border-radius:6px;background:#FFFDF7;margin:6px 0 4px}
