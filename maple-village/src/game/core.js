@@ -663,7 +663,7 @@ function stalePapers(){
   const newest = {}; allMail().forEach(m => { if (m && m.id && m.from === "crier") { const k = paperKind(m); if (!newest[k] || (m.at || 0) > (newest[k].at || 0)) newest[k] = m; } });
   return new Set(allMail().filter(m => m && m.id && m.from === "crier" && newest[paperKind(m)] !== m).map(m => m.id));
 }
-const unreadMail = () => { const stale = stalePapers(); return allMail().filter(m => m && m.id && !F.mailRead[m.id] && !stale.has(m.id) && (!m.at || Date.now() - m.at < 36*H)).sort((a, b) => (a.at || 0) - (b.at || 0)); };
+const unreadMail = () => { const stale = stalePapers(); return allMail().filter(m => m && m.id && !F.mailRead[m.id] && !stale.has(m.id) && (!m.at || now() - m.at < (m.from === "crier" ? 72 : 36)*H)).sort((a, b) => (a.at || 0) - (b.at || 0)); };
 // The village paper's name: Mel can rename it in Settings (kept with the fox doc, so it follows her across devices).
 const paperName = () => (F.paperName || "").trim() || "The Morning Crier";
 const paperWaiting = () => unreadMail().find(m => m.from === "crier");
@@ -2924,7 +2924,7 @@ setTimeout(vineTick, 3000);
 if (window.__mapleDevStub) window.__mapleScene = id => setScene(id, OUTDOOR.includes(id) ? [260, 330] : INNER[id] ? INNER[id].arrive : [260, 596]);
 if (window.__mapleDevStub) window.__mapleOrder = (shop = "The Scoop Shack") => { S.orderAt = 0; scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0); orderNote([{shop: "scoop", coins: 6, what: "a cone of mango"}], shop, false); };   // tests: an order note, and Tomo riding past
 // dev builds only: test scripts read and nudge the save (the quest board tests give the backpack what a request needs)
-if (window.__mapleDevStub) window.__mapleGame = {F: () => F, S: () => S, give: (id, n) => { addInv(id, n); save(true); }, render: () => render(true), handOver: who => offerHandOver(who)};
+if (window.__mapleDevStub) window.__mapleGame = {F: () => F, S: () => S, give: (id, n) => { addInv(id, n); save(true); }, render: () => render(true), handOver: who => offerHandOver(who), mail: () => ({paper: paperWaiting(), unread: unreadMail().map(m => m.id), atSpot})};
 /* ---------- Routine bonuses: 1 coin a checklist step, 5 for finishing a routine (a weekly one's step counts as
    finishing it). Each pays once a day: unticking and re-ticking earns nothing more. ---------- */
 const ROUTINE_STEP = 1, ROUTINE_DONE = 8;

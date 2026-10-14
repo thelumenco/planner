@@ -35125,7 +35125,7 @@ ${r.name}` })
   }
   var unreadMail = () => {
     const stale = stalePapers();
-    return allMail().filter((m) => m && m.id && !F.mailRead[m.id] && !stale.has(m.id) && (!m.at || Date.now() - m.at < 36 * H)).sort((a, b) => (a.at || 0) - (b.at || 0));
+    return allMail().filter((m) => m && m.id && !F.mailRead[m.id] && !stale.has(m.id) && (!m.at || now() - m.at < (m.from === "crier" ? 72 : 36) * H)).sort((a, b) => (a.at || 0) - (b.at || 0));
   };
   var paperName = () => (F.paperName || "").trim() || "The Morning Crier";
   var paperWaiting = () => unreadMail().find((m) => m.from === "crier");
@@ -41984,7 +41984,7 @@ ${SIGNOFF[t.who] || ""}`;
   if (window.__mapleDevStub) window.__mapleGame = { F: () => F, S: () => S2, give: (id, n) => {
     addInv(id, n);
     save(true);
-  }, render: () => render(true), handOver: (who) => offerHandOver(who) };
+  }, render: () => render(true), handOver: (who) => offerHandOver(who), mail: () => ({ paper: paperWaiting(), unread: unreadMail().map((m) => m.id), atSpot }) };
   var ROUTINE_STEP = 1;
   var ROUTINE_DONE = 8;
   function routineCoins(r) {
