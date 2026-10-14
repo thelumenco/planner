@@ -59,6 +59,7 @@ export const INGR = {
   wattleseed: ["Wattleseed", "Wattleseed", "#8A5A3A"], raspberry: ["Raspberries", "Raspberry", "#D9435A"], goldensyrup: ["Golden syrup", "Golden Syrup", "#E8A83A"], honey_heath: ["Coastal heath honey", "Heath Honey", "#E3B04B"], honey_cream: ["Creamed honey", "Creamed Honey", "#F3E1A0"], honeycomb: ["Honeycomb", "Honeycomb", "#E8B04A"], euchoney: ["Eucalyptus honey", "Eucalyptus Honey", "#C98A2E"], macadamia: ["Macadamias", "Macadamia", "#E8D9B8"], fingerlime: ["Finger limes", "Finger Lime", "#9CC45A"], honey_sun: ["Sunflower honey", "Sunflower Honey", "#E3B04B"],   // from the Tablelands (round 158)
     // from Bellbird Valley (round 142)
   seasalt: ["Saltwick sea salt", "Sea Salt", "#E8ECEE"], dulse: ["Dulse seaweed", "Seaweed", "#8A3A4A"],   // from Saltwick Harbour (round 207)
+  chestnutflour: ["Chestnut flour", "Chestnut", "#A8754F"], capers: ["Salted capers", "Caper", "#7A8A4A"], fennelseed: ["Wild fennel seeds", "Fennel", "#A8B86A"],   // from Portovenere (round 211)
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
   yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)

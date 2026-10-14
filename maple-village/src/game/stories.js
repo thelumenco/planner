@@ -36,7 +36,7 @@ function eligible(F, id, day){
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 // Ronda's locals tell theirs on a day trip, quest or no quest (Mel's on holiday); the two-a-day limit still holds
-const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet"];   // Ronda's, Kyoto's and Saltwick's, and Jason in Cinque Terre
+const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "rosa", "ilario", "bianca"];   // Ronda's, Kyoto's, Saltwick's and Portovenere's, and Jason in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
   if (id === "jason") return eligible(F, id, day);   // Jason (Mel's friend) tells his whenever she visits, a chapter a day, outside the two-a-day limit
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;
@@ -66,7 +66,12 @@ const REWARDS = {
   // Saltwick Harbour's locals
   storrhat: (F, addInv) => { addInv("sw_hat", 1); return "Jack Storr's old oilskin hat, from Nan"; },
   kittiwake: (F, addInv) => { addInv("sw_ship", 1); return "the Kittiwake in a bottle, made by Tom (a keepsake)"; },
-  jetear: (F, addInv) => { addInv("sw_jetear", 1); return "a pair of Priya's jet earrings"; }
+  jetear: (F, addInv) => { addInv("sw_jetear", 1); return "a pair of Priya's jet earrings"; },
+  // Portovenere's locals
+  pvshellbox: (F, addInv) => { addInv("pv_shellbox", 1); return "one of Lia's shell-covered boxes, from Rosa (a keepsake, to keep your luck in)"; },
+  pvpandolce: (F, addInv) => { addInv("pv_pandolce", 1); return "a pandolce from Rosa's harvest party on the quay"; },
+  pvcoaster: (F, addInv) => { addInv("pv_coaster", 1); return "a portoro marble coaster, cut from Ilario's swift (a keepsake)"; },
+  pvpoems: (F, addInv) => { addInv("pv_poems", 1); return "a little book of the Gulf's poets, from Signora Bianca"; }
 };
 // flags that change the game: the koi tip, Farid's pastries on the menu
 export function applyFlags(F){

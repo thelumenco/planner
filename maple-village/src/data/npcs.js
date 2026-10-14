@@ -8,6 +8,7 @@
 import { BB_PEOPLE } from "./bb-people.js";
 import { CR_PEOPLE } from "./cr-people.js";
 import { SW_PEOPLE } from "./sw-people.js";
+import { PV_PEOPLE } from "./pv-people.js";
 import { TL_PEOPLE } from "./tl-people.js";
 import { LV_PEOPLE } from "./lv-people.js";
 import { WEDDING_PEOPLE } from "./terrace-people.js";
@@ -817,7 +818,9 @@ export const NPCS = [
     id: "jason", local: "cinque", pitch: 0.92, name: "Jason", job: "Lives in Vernazza now. Writes poetry, walks, watches the sunset",
     intro: "Mel. Well, well, well. I trust you came by train, and not by strike? I live here now, you know: the second floor of the yellow house by the harbour, geraniums on the balcony. Come up whenever you like. There are far fewer stairs than Corniglia.",
     look: {skin: "#F6DCC6", hair: "#1E1A18", hairStyle: "short", top: "#FFFDF6", palms: true, sleeves: "#FFFDF6", bottom: "#2E3A5A", tall: true, specs: true},
-    routine: [slot("8:00", "10:30", "ct_vernazza", [332, 296], {act: "poem", dir: -1}), slot("10:30", "12:30", "ct_corniglia", [[372, 420], [300, 460], [400, 380]]),
+    // round 212 (Mel): on Tuesdays and Saturdays Jason and Luca take the little ferry round to Portovenere for lunch
+    routine: [slot("11:00", "13:00", "pv_bar", [[220, 500], [300, 520]], {dow: [2, 6]}), slot("13:00", "16:00", "pv_books", [[200, 500], [320, 520]], {dow: [2, 6]}),
+      slot("8:00", "10:30", "ct_vernazza", [332, 296], {act: "poem", dir: -1}), slot("10:30", "12:30", "ct_corniglia", [[372, 420], [300, 460], [400, 380]]),
       slot("12:30", "14:00", "ct_focacceria", [[200, 520], [330, 540]]), slot("14:00", "16:30", "ct_monterosso", [[200, 480], [340, 470], [260, 420]]),
       slot("16:30", "18:00", "ct_gelato", [[200, 500], [330, 520]]), slot("18:00", "21:45", "ct_vernazza", [222, 418], {act: "sit", dir: -1})],
     hellos: ["Mel! Sit, sit. I've ordered for you already. I know your tastes.", "Ah, there you are. The day has improved considerably.", "Mel! Come and admire the view with me. I've been admiring it alone, and it's wasted on one."],
@@ -842,7 +845,8 @@ export const NPCS = [
     id: "luca", local: "cinque", pitch: 0.8, name: "Luca", job: "Mends the fishing boats' engines in Vernazza. Jason's partner",
     intro: "Ciao! Luca. I fix the engines on the boats. Jason fixes my grammar. It is a fair trade. You're Mel? He talks about you all the time. The train, the pizza, the steps. Every story, the steps get more.",
     look: {skin: "#D8A47E", hair: "#3A2A20", hairStyle: "short", top: "#F3E7C8", bottom: "#3E5E7A"},
-    routine: [slot("8:00", "13:00", "ct_vernazza", [[200, 440], [180, 470], [230, 450]]), slot("15:00", "18:00", "ct_vernazza", [[200, 440], [230, 450]]), slot("18:00", "21:45", "ct_vernazza", [246, 420], {act: "sit", dir: -1})],
+    routine: [slot("11:00", "13:00", "pv_bar", [[260, 520], [340, 500]], {dow: [2, 6]}), slot("13:00", "16:00", "pv_point", [[260, 440], [300, 470]], {dow: [2, 6]}),
+      slot("8:00", "13:00", "ct_vernazza", [[200, 440], [180, 470], [230, 450]]), slot("15:00", "18:00", "ct_vernazza", [[200, 440], [230, 450]]), slot("18:00", "21:45", "ct_vernazza", [246, 420], {act: "sit", dir: -1})],
     lines: ["He writes poems about the sea. I tell him the sea is mostly diesel. He doesn't listen. Good.", "I met him when the ferry broke down outside the harbour. I came out with my toolbox. He came out with a book. He's still here.",
       "He made me read Shakespeare. I made him eat raw anchovies. We are both braver now.", "Every evening, the harbour wall, the sunset. Ten years I lived here and never sat still. Now I sit."],
     away: "Luca's out in a boat, fixing somebody's engine."
@@ -1063,6 +1067,7 @@ export const NPCS = [
   ...BB_PEOPLE,   // round 143: Bellbird Valley (data/bb-people.js)
   ...CR_PEOPLE,   // round 150: the Coast Road (data/cr-people.js)
   ...SW_PEOPLE,   // round 208: Saltwick Harbour (data/sw-people.js)
+  ...PV_PEOPLE,   // round 212: Portovenere (data/pv-people.js)
   ...TL_PEOPLE,   // round 159: the Tablelands (data/tl-people.js)
   ...LV_PEOPLE,   // round 163: the Lavender Hills (data/lv-people.js)
   ...WEDDING_PEOPLE,   // round 152: the wedding parties on the terrace (data/terrace-people.js)

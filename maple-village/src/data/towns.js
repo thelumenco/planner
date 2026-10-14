@@ -14,6 +14,8 @@
 
 import { BB_TOWNS, BB_PLACES, BB_BRIDGES, BB_ARRIVE, BB_BOUNDS, BB_OBST, BB_GOODS, BB_KEEP } from "./bellbird.js";
 import { SW_TOWNS, SW_PLACES, SW_BRIDGES, SW_ARRIVE, SW_BOUNDS, SW_OBST, SW_GOODS } from "./saltwick.js";
+import { PV_TOWNS, PV_PLACES, PV_BRIDGES, PV_ARRIVE, PV_BOUNDS, PV_OBST } from "./porto.js";
+import { PV_GOODS } from "./porto-goods.js";
 import { PAINTINGS } from "./terrace-people.js";
 export const TOWNS = {
   ronda: {
@@ -320,7 +322,7 @@ export const TOWNS = {
     }
   }
 };
-Object.assign(TOWNS, BB_TOWNS, SW_TOWNS);   // Bellbird Valley's stops (round 141): campervan "towns" of two screens each
+Object.assign(TOWNS, BB_TOWNS, SW_TOWNS, PV_TOWNS);   // Bellbird Valley's stops (round 141): campervan "towns" of two screens each
 export const TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t]) => [...t.screens, ...Object.keys(t.rooms || {})].map(s => [s, id])));
 // an interior of a town (round 116) -> its room entry, or null
 export const townRoom = scene => { const t = TOWNS[TOWN_SCENES[scene]]; return (t && t.rooms && t.rooms[scene]) || null; };
@@ -507,7 +509,7 @@ export const TOWN_OBST = {
 // round 146: the wine shop's terrace isn't a town, but it walks like one of their rooms (bounds, the long table)
 TOWN_BOUNDS.terrace = [52, 226, 470, 612]; TOWN_OBST.terrace = [[236, 300, 284, 580], [400, 280, 472, 340], [424, 520, 472, 592], [62, 330, 92, 372], [196, 320, 226, 578], [294, 320, 324, 578]];
 Object.assign(TOWN_PLACES, BB_PLACES); Object.assign(TOWN_BRIDGES, BB_BRIDGES); Object.assign(TOWN_ARRIVE, BB_ARRIVE); Object.assign(TOWN_BOUNDS, BB_BOUNDS); Object.assign(TOWN_OBST, BB_OBST);
-Object.assign(TOWN_PLACES, SW_PLACES); Object.assign(TOWN_BRIDGES, SW_BRIDGES); Object.assign(TOWN_ARRIVE, SW_ARRIVE); Object.assign(TOWN_BOUNDS, SW_BOUNDS); Object.assign(TOWN_OBST, SW_OBST);   // round 206: Saltwick Harbour (boat towns)   // Bellbird Valley
+Object.assign(TOWN_PLACES, SW_PLACES, PV_PLACES); Object.assign(TOWN_BRIDGES, SW_BRIDGES, PV_BRIDGES); Object.assign(TOWN_ARRIVE, SW_ARRIVE, PV_ARRIVE); Object.assign(TOWN_BOUNDS, SW_BOUNDS, PV_BOUNDS); Object.assign(TOWN_OBST, SW_OBST, PV_OBST);   // round 206: Saltwick Harbour (boat towns)   // Bellbird Valley
 
 // Ronda's goods (round 107, round 3): things you can't get in Honeybrook. kind ingredient: they go to the kitchen
 // (tapas), the Scoop Shack (gelato) and the Cocoa Room (bonbon fillings) like any other; kind gift: give them to the
@@ -643,7 +645,7 @@ Object.assign(KEEP_LINES, {c_magnet: "A tiny stack of coloured houses over a blu
 ["c_magnet", "c_linen"].forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
 TOWN_GOODS.c_magnet.magnet = true;
 // Bellbird Valley's goods (round 142: data/bellbird.js)
-Object.assign(TOWN_GOODS, BB_GOODS, PAINTINGS, SW_GOODS); Object.assign(KEEP_LINES, BB_KEEP);   // (and round 152: the terrace keepsakes)
+Object.assign(TOWN_GOODS, BB_GOODS, PAINTINGS, SW_GOODS, PV_GOODS); Object.assign(KEEP_LINES, BB_KEEP);   // (and round 152: the terrace keepsakes)
 Object.keys(BB_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
 TOWN_GOODS.b_magnet.magnet = true; TOWN_GOODS.b_crmagnet.magnet = true;
 Object.keys(PAINT.colours).forEach(c => Object.keys(PAINT.patterns).forEach(p => { TOWN_GOODS[`ptile_${c}_${p}`] = {n: "Your painted tile", kind: "keepsake", price: 0, tile: [c, p], art: ["tile", PAINT.colours[c][1], "#FFFDF6"], line: `A tile you painted yourself at Lucía's in Ronda: ${PAINT.patterns[p]}, in ${PAINT.colours[c][0]}.`}; }));

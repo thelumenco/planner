@@ -3084,8 +3084,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
-    check(sp.length === 31 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
-      "the 31 dishes from the trips (round 207: and Saltwick's three) are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(sp.length === 34 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 34 dishes from the trips (rounds 207 and 211: and Saltwick's and Portovenere's three each) are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "jason"), L = np.NPCS.find(n => n.id === "luca");
@@ -4375,6 +4375,71 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   f = await gf();
   check(f.saltwick.shanty === 1 && f.inv.sw_song === 1, "the shanty by the fire with Billy and Alf: sing and HEAVE, and the words to keep");
   check(await page.locator('#world [data-npc="shantybilly"]').count() === 1 && await page.locator('#world [data-npc="ged"]').count() === 1, "Billy's singing and Ged's behind the bar");
+  await page.close();
+}
+
+// Rounds 210 to 213: Portovenere by boat: the four screens, six rooms (Signora Lia's shells too), stuffing mussels, a line in the
+// poets' book, the choir, the poet's notebook, Jason and Luca popping over on Tuesdays and Saturdays, the family
+{
+  console.log("\nPortovenere by boat (rounds 210 to 213)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`portovenere pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/pvpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 600; f.goals = {...(f.goals || {}), boat: 1};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const go = async sc => { await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(1500); };
+  const spot = async id => { await page.locator(`#world [data-rdspot="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(2500); };
+  const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(7000); };
+  const name = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
+  // 2026-10-17 is a Saturday: Jason and Luca are over for lunch
+  await page.goto(url + "?reset=1&seed=1&time=10:45&date=2026-10-17"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:45&date=2026-10-17&pvpatch=1"); await page.waitForTimeout(1500);
+  await go("shore"); await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-btown="porto"]', { timeout: 15000 });
+  await page.click('#ctx [data-btown="porto"]'); await page.waitForTimeout(300);
+  check(/Fuel 24/.test(await page.locator("#ctx").innerText()), "your boat sails to Portovenere (fuel 24)");
+  await page.click('#ctx [data-tpick="evan"]'); await page.waitForTimeout(100); await page.click('#ctx [data-trip="porto"]'); await page.waitForTimeout(9000);
+  check(await page.locator('#world [data-place="pvboat"]').count() === 1 && /harbour/i.test(await name()), "you tie up in the harbour under the wall of tall painted houses");
+  check(/Borgo/i.test(await (async () => { await place("pvToBorgo"); return name(); })()) && await page.locator('#world [data-place="pvshells"]').count() === 1, "west to the Borgo: the town gate, the bookshop, the marble bottega, the shell shop");
+  check(/castle/i.test(await (async () => { await place("pvToCastle"); return name(); })()), "up the steps to Castle Doria");
+  check(/point|Pietro/i.test(await (async () => { await place("pvToPointW"); return name(); })()) && await page.locator('#world [data-place="pvchurch"]').count() === 1, "along the walls to San Pietro on its rock");
+  check(/harbour/i.test(await (async () => { await place("pvToHarbourS"); return name(); })()), "and back round the rocks to the harbour");
+  // the harbour cats, for Evan
+  await place("pvcats"); check(((await gf()).porto || {}).cats === 1, "the harbour cats on the warm step (one climbs into Evan's lap)");
+  // Signora Lia's shells: an ornament to take home
+  await go("pv_shells"); await spot("pv_shells");
+  check(/Seashell mobile/.test(await page.locator("#ctx").innerText()) && /Shell mirror/.test(await page.locator("#ctx").innerText()), "Signora Lia's shell shop: mobiles, boxes, mirrors, wreaths, boats, frames, garlands");
+  await page.click('#ctx [data-rbuy="pv_shellbox"]'); await page.waitForTimeout(800);
+  check((await gf()).inv.pv_shellbox === 1, "a shell-covered box to take home (a keepsake)");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  // stuffing mussels with Rosa
+  await go("pv_mussels"); await spot("pvstuff"); await page.click('#ctx [data-pv="stuff"]'); await page.waitForTimeout(300);
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-pv="open"]'); await page.waitForTimeout(120); }
+  await page.click('#ctx [data-pv="fill:Chocolate"]'); await page.waitForTimeout(200);
+  const oops = /Never/.test(await page.locator("#ctx").innerText());
+  for (const f of ["Bread soaked in milk", "Mortadella", "An egg", "Parsley"]) { await page.click(`#ctx [data-pv="fill:${f}"]`); await page.waitForTimeout(150); }
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-pv="tie"]'); await page.waitForTimeout(120); }
+  await page.click('#ctx [data-pv="stuffdone"]'); await page.waitForTimeout(800);
+  check(oops && (await gf()).porto.muscoli, "stuffing mussels with Rosa: open, fill (never chocolate), tie, and her recipe");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // a line in the poets' book
+  await go("pv_books"); await spot("pvverse");
+  for (const k of ["a:0", "b:0", "c:1"]) { await page.click(`#ctx [data-pv="${k}"]`); await page.waitForTimeout(150); }
+  await page.click('#ctx [data-pv="write"]'); await page.waitForTimeout(800);
+  let f = await gf();
+  check(f.porto.verses.length === 1 && f.inv.pv_verse === 1, "a line in the poets' visitors' book, framed for you to keep");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await go("pv_bar"); await page.waitForTimeout(2500);
+  check(await page.locator('#world [data-npc="jason"]').count() === 1 && await page.locator('#world [data-npc="luca"]').count() === 1, "on a Saturday, Jason and Luca are over from Cinque Terre, having lunch at the bar on the quay");
+  // the choir at San Pietro (11 to 12)
+  await go("pv_church"); await page.waitForTimeout(2000); await spot("pvchoir"); await page.click('#ctx [data-pv="choir"]'); await page.waitForTimeout(300);
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-pv="listen"]'); await page.waitForTimeout(150); }
+  await page.click('#ctx [data-pv="lastnote"]'); await page.waitForTimeout(800);
+  f = await gf();
+  check(f.porto.choir === 1 && f.porto.lines.church, "the choir at San Pietro: listen, then sing the last note (a line for the notebook)");
+  // the other five lines: the castle, the swifts, the grotto, the ropes, the strait: the poet's notebook
+  await go("pv_castle"); await place("pvcastle"); await place("pvfigs"); await go("pv_point"); await place("pvgrotto"); await go("pv_harbour"); await place("pvpalmaria"); await go("pv_mussels"); await spot("pvropes");
+  f = await gf();
+  check(Object.keys(f.porto.lines).length === 6 && f.inv.pv_notebook === 1, "six lines from six corners of town: the poet's notebook");
   await page.close();
 }
 
