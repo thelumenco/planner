@@ -44,7 +44,7 @@ export const contacts = F => Object.keys(bookState(F).ids).filter(id => DEF[id])
 // people met on trips who could be added (for the book's "met on your travels" list)
 export const addable = F => Object.keys(F.met || {}).filter(id => canAdd(F, id) && !inBook(F, id));
 export const postage = id => POSTAGE[REGION[id]] || 4;
-export const postable = it => !!it && (it.kind === "gift" || it.kind === "bouquet");
+export const postable = it => !!it && (it.kind === "gift" || it.kind === "bouquet" || (it.kind === "keepsake" && !!it.to));
 
 // the ready-made openings for a letter (Mel can add her own lines below)
 export const OPENINGS = ["Thinking of you", "Thank you for the day", "I keep thinking about your", "Guess what happened at home", "Just saying hello"];

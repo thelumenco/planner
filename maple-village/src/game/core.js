@@ -1286,6 +1286,7 @@ function useItem(id){
   if (it.kind === "gift") { giftPick = giftPick === id ? null : id; postPick = false; bag(); return; }
   if (it.kind === "bouquet") { giftPick = giftPick === id ? null : id; postPick = false; bag(); return; }   // choose who it's for, like a gift
   if (it.kind === "pot") { potItem = id; orView = "pot"; openView = null; render(); return; }
+  if (it.kind === "keepsake" && it.to) { giftPick = giftPick === id ? null : id; postPick = false; bag(); return; }   // round 197: a painting of hers, to give or to keep
   if (it.kind === "keepsake") { keepItem = id; openView = null; render(); return; }
   if (it.kind === "pet") { adoptItem = id; adoptSt = {}; openView = null; render(); return; }
   if (it.kind === "ingredient") { toKitchen(id); return; }

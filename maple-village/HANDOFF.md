@@ -2460,3 +2460,7 @@ excited about selling my painting"; makers' cut about a fifth, fine.
 - world.js: gift shop `G:[262,150]` (wall, label above via scenes.js) and `H:[446,594]`; scenes.js art `gallerywall`, `makershelf`
   (`G.galleryStock` stocks before drawing). core.js: `data-gg` (hang, down, buy); the wall redraws when something sells while Mel's there.
 - Next (round 197): imports from trip friends in the address book.
+
+## Round 197: every painting its own picture; give your own paintings
+Mel: "The paintings all look the same". `gallery.js` `paintSVG` draws each work's motif (`works[i][4]`: dusk, vines, jetty, rows, orchard, rain, wisteria, cat, window, well, herons, pine, bridge, jar, dahlia, cosmos, rose; Mel's own: rows, cypress, still), on the wall (scenes.js) and in the panel. `framesNow` gives older frames their motif by title.
+Mel: "When I take down the painting, can I gift it?" PAINTINGS (terrace-people.js) gain `to: "family"` and lines; a keepsake with `to` opens the gift chooser (still with Keep it), and `postable` lets it go by post.

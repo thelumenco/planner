@@ -4036,9 +4036,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     person("wd_sam2", "Sammy", "Kate's brother", "suit", "spiky")
   ];
   var PAINTINGS = {
-    p_view: { n: "Your painting: the lavender view", kind: "keepsake", price: 0, art: ["tile", "#A68FCB", "#F3DDB0"], line: "Your own painting of the view from the terrace, from Dad's sip and paint. Lavender rows running off to blue hills. Wobbly, and wonderful." },
-    p_cypress: { n: "Your painting: cypresses at dusk", kind: "keepsake", price: 0, art: ["tile", "#4E6A4A", "#E9C9A8"], line: "Three cypresses against a peachy sky, painted at Dad's sip and paint on the terrace. He fixed the horizon with one stroke." },
-    p_still: { n: "Your painting: a bottle and a glass", kind: "keepsake", price: 0, art: ["tile", "#7A1F3D", "#F3E7C8"], line: "A still life: a bottle of your own wine, a glass and some fruit, from Dad's sip and paint. It's going on the wall." },
+    p_view: { to: "family", say: "Your own painting! It's going straight on the wall, where everyone can see it.", says: { dad: "You painted this at my class! Look at that horizon. I'm framing it properly.", evan: "Mama painted this! I'm putting it next to my drawings." }, n: "Your painting: the lavender view", kind: "keepsake", price: 0, art: ["tile", "#A68FCB", "#F3DDB0"], line: "Your own painting of the view from the terrace, from Dad's sip and paint. Lavender rows running off to blue hills. Wobbly, and wonderful." },
+    p_cypress: { to: "family", say: "Your own painting! It's going straight on the wall, where everyone can see it.", says: { dad: "You painted this at my class! Look at that horizon. I'm framing it properly.", evan: "Mama painted this! I'm putting it next to my drawings." }, n: "Your painting: cypresses at dusk", kind: "keepsake", price: 0, art: ["tile", "#4E6A4A", "#E9C9A8"], line: "Three cypresses against a peachy sky, painted at Dad's sip and paint on the terrace. He fixed the horizon with one stroke." },
+    p_still: { to: "family", say: "Your own painting! It's going straight on the wall, where everyone can see it.", says: { dad: "You painted this at my class! Look at that horizon. I'm framing it properly.", evan: "Mama painted this! I'm putting it next to my drawings." }, n: "Your painting: a bottle and a glass", kind: "keepsake", price: 0, art: ["tile", "#7A1F3D", "#F3E7C8"], line: "A still life: a bottle of your own wine, a glass and some fruit, from Dad's sip and paint. It's going on the wall." },
     t_bouquet: { n: "A wedding bouquet", kind: "keepsake", price: 0, art: ["tile", "#F4C7CF", "#7FA35A"], line: "The bouquet from a wedding on the terrace: it sailed over everyone's heads and straight into your arms. Roses, lavender and olive leaves, drying now." }
   };
 
@@ -6967,6 +6967,233 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     CROPS[id].ico = id;
   });
 
+  // src/game/gallery.js
+  var TOKEN = 10;
+  var CUT = 0.2;
+  var FRAMES = 4;
+  var D = 864e5;
+  var PAINTERS = {
+    dad: {
+      name: "Dad",
+      what: "Sip-and-paint landscapes",
+      sign: "Love, Dad",
+      works: [["The terrace at dusk", 48, "#E9A87A", "#5A6B8C", "dusk"], ["Vines in October", 44, "#C98A3A", "#7A8C4A", "vines"], ["The jetty, early", 40, "#9FC3D9", "#E8D3A6", "jetty"], ["Lavender rows", 46, "#A68FCB", "#F3DDB0", "rows"], ["Ma Ma's orchard", 42, "#7FA35A", "#F3C969", "orchard"]],
+      note: ["Mel! Somebody bought my painting. A real person, with real money. I've told everyone at the class. Twice.", "Posy rang to say '{t}' sold. I had to sit down. Your mother says I'm insufferable now. She's right.", "'{t}' has gone to a good home, Posy says. I hope they hang it where the light's kind. I've already started the next one."]
+    },
+    juniper: {
+      name: "Juniper",
+      what: "Watercolours from the library garden",
+      sign: "With love, Juniper (from behind the returns desk)",
+      works: [["Rain on the reading room", 32, "#BFD6E6", "#8A8279", "rain"], ["Wisteria by the steps", 36, "#C3A9E0", "#9EBE8C", "wisteria"], ["The library cat, asleep", 28, "#E8C49A", "#5A4A3E", "cat"], ["Autumn, through the window", 34, "#D98A4A", "#F3E7C8", "window"]],
+      note: ["I've been grinning at the date stamp all morning. '{t}' sold! I may frame the receipt.", "Thank you for giving my little watercolours a wall. '{t}' found a home, and I found I can't stop telling the regulars.", "Someone bought '{t}'. I keep imagining it on their wall, getting rained on in a painted sort of way."]
+    },
+    okada: {
+      name: "Mr Okada",
+      what: "Ink-brush landscapes",
+      sign: "With thanks, K. Okada",
+      works: [["The well, in mist", 52, "#E6E2DA", "#2F2B28", "well"], ["Two herons", 56, "#F3EFE6", "#3A4A5A", "herons"], ["Pine on the headland", 50, "#E9E4D6", "#2E3A2E", "pine"], ["Bridge in snow", 54, "#F6F3EE", "#4A4A4A", "bridge"]],
+      note: ["I am told '{t}' has been sold. Forty years of sorting other people's letters, and now one of my brushes has travelled further than I ever did. Thank you.", "Ink is patient. So, it seems, was the person who bought '{t}'. I am very quietly delighted.", "A small note to say thank you. '{t}' sold, and I have bought myself a new brush to celebrate. A modest one."]
+    },
+    mei: {
+      name: "Mei",
+      what: "Botanical paintings from the flower farm",
+      sign: "Mei, from the flower farm",
+      works: [["Sweet peas, in a jar", 30, "#F4C7CF", "#7FA35A", "jar"], ["Dahlia study", 34, "#D9534F", "#5E8A3A", "dahlia"], ["Cosmos in the wind", 28, "#F3B6D0", "#9EBE8C", "cosmos"], ["The first rose", 32, "#E8566C", "#6A8A4A", "rose"]],
+      note: ["'{t}' sold! I've been telling the dahlias. They're very proud.", "I painted '{t}' between waterings and never thought anyone would want it. Thank you for hanging it up.", "Posy says '{t}' went to a lady who smelled it first. That's the nicest thing anyone's ever done to one of my paintings."]
+    }
+  };
+  var MAKERS = {
+    lin: { name: "Auntie Lin", item: "mk_cards" },
+    bo: { name: "Bo", item: "mk_spoon" },
+    noor: { name: "Noor", item: "mk_pettoy" },
+    wren: { name: "Wren", item: "mk_bird" },
+    hana: { name: "Hana", item: "mk_honeybutter" },
+    felix: { name: "Felix", item: "mk_wraps" }
+  };
+  Object.assign(ITEMS, {
+    mk_cards: { n: "Pressed-flower cards", kind: "gift", to: "family", price: 6, art: ["tile", "#FFFDF6", "#F4C7CF"], maker: "lin", say: "Auntie Lin's pressed-flower cards! Too pretty to write in. I'll write in one anyway." },
+    mk_spoon: { n: "A carved wooden spoon", kind: "gift", to: ["mum", "mama", "dad", "darren"], price: 9, art: ["disc", "#C9A27E", "#8A5A3A"], maker: "bo", say: "A wooden spoon Bo carved by hand! It's too nice for porridge. It's getting porridge." },
+    mk_pettoy: { n: "A knitted mouse for a pet", kind: "gift", to: ["evan", "angelina"], price: 5, art: ["tile", "#C3CDEE", "#F4C7CF"], maker: "noor", say: "A little knitted mouse from Noor's rescue! Every cat in the street will want it." },
+    mk_bird: { n: "A whittled wren", kind: "gift", to: ["dad", "gonggong", "evan"], price: 8, art: ["bird", "#C9A27E"], maker: "wren", say: "A little wooden wren, whittled by the ranger! It's sitting on the windowsill, looking out." },
+    mk_honeybutter: { n: "Hana's honey butter", kind: "gift", to: "family", price: 6, art: ["jar", "#F3D98A", "#FFFDF6"], maker: "hana", say: "Hana's honey butter, the one from her toast! On everything. On everything." },
+    mk_wraps: { n: "Beeswax food wraps", kind: "gift", to: ["mum", "mama", "angelina"], price: 7, art: ["cloth", "#F6E3A1", "#9EBE8C"], maker: "felix", say: "Beeswax wraps from Felix's bees! No more cling film. The kitchen smells like honey." }
+  });
+  var MAKER_ITEMS = Object.values(MAKERS).map((m) => m.item);
+  var STOCK = 3;
+  var galleryState = (F2) => {
+    F2.giftshop = F2.giftshop || {};
+    const g10 = F2.giftshop.gallery = F2.giftshop.gallery || {};
+    g10.frames = g10.frames || Array(FRAMES).fill(null);
+    g10.sold = g10.sold || [];
+    return g10;
+  };
+  var makersState = (F2) => {
+    F2.giftshop = F2.giftshop || {};
+    const m = F2.giftshop.makers = F2.giftshop.makers || {};
+    m.stock = m.stock || {};
+    m.week = m.week || {};
+    return m;
+  };
+  var dow = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+  var hashS = (s) => {
+    let h3 = 0;
+    for (const c of String(s)) h3 = h3 * 31 + c.charCodeAt(0) | 0;
+    return Math.abs(h3);
+  };
+  function stockUp(F2, day) {
+    const g10 = galleryState(F2), m = makersState(F2);
+    let n = 0;
+    if (!g10.filled || dow(day) === 1 && g10.filled !== day) {
+      g10.filled = day;
+      const hung = new Set(g10.frames.filter((f5) => f5 && f5.by).map((f5) => f5.by));
+      const queue = Object.keys(PAINTERS).filter((p) => !hung.has(p)).sort((a, b) => hashS(day + a) - hashS(day + b));
+      const mine = ownPaintings(F2).length || g10.frames.some((f5) => f5 && f5.own);
+      let room4 = (mine ? FRAMES - 1 : FRAMES) - g10.frames.filter((f5) => f5 && f5.by).length;
+      g10.frames = g10.frames.map((f5) => {
+        if (f5 || !queue.length || room4 <= 0) return f5;
+        room4--;
+        const by = queue.shift(), done = new Set(g10.sold.filter((s) => s.by === by).map((s) => s.t)), w = PAINTERS[by].works, pick5 = w.find((x) => !done.has(x[0])) || w[hashS(day + by) % w.length];
+        n++;
+        return { by, t: pick5[0], price: pick5[1], c1: pick5[2], c2: pick5[3], m: pick5[4] };
+      });
+    }
+    if (!m.filled || dow(day) === 1 && m.filled !== day) {
+      m.filled = day;
+      m.week = {};
+      MAKER_ITEMS.forEach((id) => {
+        if ((m.stock[id] || 0) < STOCK) {
+          m.stock[id] = STOCK;
+          n++;
+        }
+      });
+    }
+    return n;
+  }
+  var motifOf = (f5) => {
+    if (f5.m || !f5.by) return f5.m || OWN_MOTIF[f5.own];
+    const w = (PAINTERS[f5.by] || { works: [] }).works.find((x) => x[0] === f5.t);
+    return w && w[4];
+  };
+  var framesNow = (F2) => galleryState(F2).frames.map((f5) => f5 && !f5.m ? { ...f5, m: motifOf(f5) } : f5);
+  var forSale = (F2) => galleryState(F2).frames.filter((f5) => f5 && f5.by);
+  function sellPainting(F2, i, at2) {
+    const g10 = galleryState(F2), f5 = g10.frames[i];
+    if (!f5 || !f5.by) return 0;
+    g10.frames[i] = null;
+    g10.sold = [...g10.sold, { by: f5.by, t: f5.t, price: f5.price, at: at2 + 7 * D, id: `gal-${f5.by}-${at2}` }].slice(-40);
+    return Math.min(TOKEN, f5.price);
+  }
+  function sellMade(F2, id) {
+    const m = makersState(F2);
+    if (!(m.stock[id] > 0)) return 0;
+    m.stock[id]--;
+    const it = ITEMS[id];
+    m.week[it.maker] = (m.week[it.maker] || 0) + it.price;
+    return Math.max(1, Math.round(it.price * CUT));
+  }
+  function buyMade(F2, id) {
+    const it = ITEMS[id];
+    if (!it || !(makersState(F2).stock[id] > 0) || (F2.coins || 0) < it.price) return false;
+    F2.coins -= it.price;
+    sellMade(F2, id);
+    F2.inv = F2.inv || {};
+    F2.inv[id] = (F2.inv[id] || 0) + 1;
+    return true;
+  }
+  var ownPaintings = (F2) => Object.keys(F2.inv || {}).filter((id) => /^p_/.test(id) && F2.inv[id] > 0 && ITEMS[id]);
+  function hangOwn(F2, id) {
+    const g10 = galleryState(F2), i = g10.frames.indexOf(null);
+    if (i < 0 || !(F2.inv[id] > 0)) return false;
+    F2.inv[id]--;
+    if (!F2.inv[id]) delete F2.inv[id];
+    const a = (PAINTINGS[id] || {}).art || [0, "#A68FCB", "#F3DDB0"];
+    g10.frames[i] = { own: id, c1: a[1], c2: a[2], m: OWN_MOTIF[id] || "rows" };
+    return true;
+  }
+  var OWN_MOTIF = { p_view: "rows", p_cypress: "cypress", p_still: "still" };
+  function takeDown(F2, i) {
+    const g10 = galleryState(F2), f5 = g10.frames[i];
+    if (!f5 || !f5.own) return false;
+    g10.frames[i] = null;
+    F2.inv[f5.own] = (F2.inv[f5.own] || 0) + 1;
+    return true;
+  }
+  var galleryMail = (F2, t2) => galleryState(F2).sold.filter((s) => s.at <= t2 && PAINTERS[s.by]).map((s) => {
+    const p = PAINTERS[s.by], line = p.note[hashS(s.id) % p.note.length].replace(/\{t\}/g, s.t);
+    return { id: s.id, from: "postie", at: s.at, title: `${p.name}'s painting sold`, body: `${s.by === "dad" ? "Hello love" : "Dear Mel"},
+
+${line}
+
+${p.sign}` };
+  });
+  var INK = "#2F2B28";
+  function paintSVG(x, y, w, h3, f5) {
+    const c1 = f5.c1 || "#A68FCB", c22 = f5.c2 || "#F3DDB0", X = (v) => (x + v * w).toFixed(1), Y = (v) => (y + v * h3).toFixed(1), R2 = (v) => (v * w).toFixed(1);
+    const bg = (c) => `<rect x="${x}" y="${y}" width="${w}" height="${h3}" fill="${c}"/>`;
+    switch (f5.m) {
+      case "dusk":
+        return bg(c1) + `<circle cx="${X(0.65)}" cy="${Y(0.45)}" r="${R2(0.16)}" fill="#F6E3A1"/><rect x="${x}" y="${Y(0.62)}" width="${w}" height="${(h3 * 0.38).toFixed(1)}" fill="${c22}"/>${[0.15, 0.35, 0.55, 0.75, 0.95].map((v) => `<rect x="${X(v - 0.03)}" y="${Y(0.52)}" width="${R2(0.05)}" height="${(h3 * 0.12).toFixed(1)}" fill="${INK}"/>`).join("")}<rect x="${x}" y="${Y(0.52)}" width="${w}" height="${(h3 * 0.03).toFixed(1)}" fill="${INK}"/>`;
+      case "vines":
+        return bg("#F3DDB0") + [0.2, 0.45, 0.7, 0.95].map((v, i) => `<path d="M${x} ${Y(v)} Q${X(0.5)} ${Y(v - 0.12)} ${X(1)} ${Y(v)}" stroke="${i % 2 ? c1 : c22}" stroke-width="${(h3 * 0.07).toFixed(1)}" fill="none"/>`).join("");
+      case "jetty":
+        return bg(c1) + `<rect x="${x}" y="${Y(0.55)}" width="${w}" height="${(h3 * 0.45).toFixed(1)}" fill="#7FA8C8"/><path d="M${X(0.2)} ${Y(1)} L${X(0.42)} ${Y(0.5)} L${X(0.52)} ${Y(0.5)} L${X(0.5)} ${Y(1)}z" fill="${c22}"/><circle cx="${X(0.8)}" cy="${Y(0.25)}" r="${R2(0.1)}" fill="#FFFDF6"/>`;
+      case "rows":
+        return bg("#BFD6E6") + `<rect x="${x}" y="${Y(0.4)}" width="${w}" height="${(h3 * 0.6).toFixed(1)}" fill="${c22}"/>${[-0.4, -0.1, 0.2, 0.5, 0.8, 1.1, 1.4].map((v) => `<path d="M${X(0.5)} ${Y(0.4)} L${X(v)} ${Y(1)}" stroke="${c1}" stroke-width="${(w * 0.08).toFixed(1)}"/>`).join("")}`;
+      case "orchard":
+        return bg("#DDEBF2") + `<rect x="${x}" y="${Y(0.7)}" width="${w}" height="${(h3 * 0.3).toFixed(1)}" fill="${c1}"/>${[0.25, 0.72].map((v) => `<rect x="${X(v - 0.03)}" y="${Y(0.5)}" width="${R2(0.06)}" height="${(h3 * 0.25).toFixed(1)}" fill="#8A5A3A"/><circle cx="${X(v)}" cy="${Y(0.42)}" r="${R2(0.2)}" fill="${c1}"/><circle cx="${X(v - 0.06)}" cy="${Y(0.38)}" r="${R2(0.04)}" fill="${c22}"/><circle cx="${X(v + 0.07)}" cy="${Y(0.47)}" r="${R2(0.04)}" fill="${c22}"/>`).join("")}`;
+      case "rain":
+        return bg(c1) + `<rect x="${X(0.15)}" y="${Y(0.1)}" width="${R2(0.7)}" height="${(h3 * 0.7).toFixed(1)}" fill="#E6EEF3" stroke="${c22}" stroke-width="1.5"/><path d="M${X(0.5)} ${Y(0.1)} V${Y(0.8)} M${X(0.15)} ${Y(0.45)} H${X(0.85)}" stroke="${c22}" stroke-width="1.2"/>${[0.25, 0.4, 0.62, 0.75].map((v, i) => `<path d="M${X(v)} ${Y(0.18 + i * 0.05)} l-1 4" stroke="#7FA8C8" stroke-width="1"/>`).join("")}<rect x="${x}" y="${Y(0.85)}" width="${w}" height="${(h3 * 0.15).toFixed(1)}" fill="${c22}"/>`;
+      case "wisteria":
+        return bg("#F6F1E8") + `<path d="M${x} ${Y(0.12)} H${X(1)}" stroke="#8A5A3A" stroke-width="2"/>${[0.15, 0.38, 0.62, 0.85].map((v, i) => `<ellipse cx="${X(v)}" cy="${Y(0.38 + i % 2 * 0.1)}" rx="${R2(0.08)}" ry="${(h3 * 0.2).toFixed(1)}" fill="${c1}"/>`).join("")}<rect x="${x}" y="${Y(0.8)}" width="${w}" height="${(h3 * 0.2).toFixed(1)}" fill="${c22}"/>`;
+      case "cat":
+        return bg(c1) + `<rect x="${x}" y="${Y(0.72)}" width="${w}" height="${(h3 * 0.28).toFixed(1)}" fill="#C9A27E"/><ellipse cx="${X(0.5)}" cy="${Y(0.66)}" rx="${R2(0.3)}" ry="${(h3 * 0.12).toFixed(1)}" fill="${c22}"/><circle cx="${X(0.72)}" cy="${Y(0.58)}" r="${R2(0.1)}" fill="${c22}"/><path d="M${X(0.66)} ${Y(0.51)} l2 -4 l2 4 M${X(0.74)} ${Y(0.51)} l2 -4 l2 4" fill="${c22}" stroke="${c22}"/><path d="M${X(0.22)} ${Y(0.7)} q-4 -6 2 -9" stroke="${c22}" stroke-width="2" fill="none"/>`;
+      case "window":
+        return bg(c22) + `<rect x="${X(0.12)}" y="${Y(0.1)}" width="${R2(0.76)}" height="${(h3 * 0.8).toFixed(1)}" fill="#F3E7C8" stroke="#8A5A3A" stroke-width="1.5"/><circle cx="${X(0.5)}" cy="${Y(0.45)}" r="${R2(0.22)}" fill="${c1}"/><rect x="${X(0.48)}" y="${Y(0.55)}" width="${R2(0.04)}" height="${(h3 * 0.3).toFixed(1)}" fill="#8A5A3A"/>${[[0.3, 0.7], [0.7, 0.3], [0.62, 0.72]].map(([a, b]) => `<ellipse cx="${X(a)}" cy="${Y(b)}" rx="2" ry="1.3" fill="${c1}"/>`).join("")}`;
+      case "well":
+        return bg(c1) + `<rect x="${X(0.3)}" y="${Y(0.55)}" width="${R2(0.4)}" height="${(h3 * 0.3).toFixed(1)}" fill="none" stroke="${c22}" stroke-width="1.5"/><path d="M${X(0.25)} ${Y(0.35)} L${X(0.5)} ${Y(0.22)} L${X(0.75)} ${Y(0.35)} M${X(0.32)} ${Y(0.35)} V${Y(0.55)} M${X(0.68)} ${Y(0.35)} V${Y(0.55)}" stroke="${c22}" stroke-width="1.5" fill="none"/><path d="M${x} ${Y(0.9)} H${X(1)}" stroke="${c22}" stroke-width="1" opacity=".5"/>`;
+      case "herons":
+        return bg(c1) + [0.33, 0.68].map((v, i) => `<path d="M${X(v)} ${Y(0.82)} V${Y(0.5)} q0 -10 ${i ? 5 : -5} -12 M${X(v)} ${Y(0.55)} q${i ? -8 : 8} -2 ${i ? -10 : 10} 6" stroke="${c22}" stroke-width="1.6" fill="none"/>`).join("") + `<path d="M${x} ${Y(0.85)} H${X(1)}" stroke="${c22}" stroke-width="1" opacity=".5"/>`;
+      case "pine":
+        return bg(c1) + `<path d="M${x} ${Y(1)} L${X(0.6)} ${Y(0.62)} L${X(1)} ${Y(0.75)} V${Y(1)}z" fill="${c22}" opacity=".5"/><path d="M${X(0.45)} ${Y(0.72)} V${Y(0.25)} M${X(0.45)} ${Y(0.3)} q-10 4 -12 10 M${X(0.45)} ${Y(0.42)} q12 2 14 8 M${X(0.45)} ${Y(0.55)} q-8 2 -10 7" stroke="${c22}" stroke-width="2" fill="none"/>`;
+      case "bridge":
+        return bg(c1) + `<path d="M${x} ${Y(0.75)} Q${X(0.5)} ${Y(0.3)} ${X(1)} ${Y(0.75)}" stroke="${c22}" stroke-width="2.4" fill="none"/>${[0.2, 0.35, 0.5, 0.65, 0.8].map((v) => `<path d="M${X(v)} ${Y(0.75 - Math.sin(v * Math.PI) * 0.42)} v-5" stroke="${c22}" stroke-width="1"/>`).join("")}${[[0.15, 0.2], [0.8, 0.15], [0.45, 0.1], [0.6, 0.9]].map(([a, b]) => `<circle cx="${X(a)}" cy="${Y(b)}" r="1" fill="#C9C3BA"/>`).join("")}`;
+      case "jar":
+        return bg("#F6F1E8") + `<rect x="${X(0.32)}" y="${Y(0.6)}" width="${R2(0.36)}" height="${(h3 * 0.32).toFixed(1)}" rx="3" fill="#CFE3EA" stroke="#9FB8C2"/>${[[0.3, 0.3], [0.5, 0.2], [0.7, 0.32], [0.42, 0.42], [0.6, 0.45]].map(([a, b]) => `<path d="M${X(0.5)} ${Y(0.62)} L${X(a)} ${Y(b)}" stroke="${c22}" stroke-width="1"/><circle cx="${X(a)}" cy="${Y(b)}" r="${R2(0.07)}" fill="${c1}"/>`).join("")}`;
+      case "dahlia":
+        return bg("#F6F1E8") + `<path d="M${X(0.5)} ${Y(1)} V${Y(0.55)}" stroke="${c22}" stroke-width="2"/>${Array.from({ length: 10 }, (_, i) => `<ellipse cx="${X(0.5)}" cy="${Y(0.32)}" rx="${R2(0.07)}" ry="${R2(0.22)}" fill="${c1}" transform="rotate(${i * 36} ${X(0.5)} ${Y(0.4)})"/>`).join("")}<circle cx="${X(0.5)}" cy="${Y(0.4)}" r="${R2(0.08)}" fill="#F3C969"/>`;
+      case "cosmos":
+        return bg("#E8F0E2") + [[0.25, 0.35], [0.55, 0.2], [0.75, 0.45], [0.4, 0.55]].map(([a, b]) => `<path d="M${X(a)} ${Y(b)} Q${X(a + 0.05)} ${Y(0.75)} ${X(0.5)} ${Y(1)}" stroke="${c22}" stroke-width="1" fill="none"/><circle cx="${X(a)}" cy="${Y(b)}" r="${R2(0.09)}" fill="${c1}"/><circle cx="${X(a)}" cy="${Y(b)}" r="${R2(0.03)}" fill="#F3C969"/>`).join("");
+      case "rose":
+        return bg("#F6F1E8") + `<path d="M${X(0.5)} ${Y(1)} V${Y(0.45)}" stroke="${c22}" stroke-width="2"/><ellipse cx="${X(0.62)}" cy="${Y(0.65)}" rx="${R2(0.12)}" ry="${R2(0.06)}" fill="${c22}"/><circle cx="${X(0.5)}" cy="${Y(0.36)}" r="${R2(0.17)}" fill="${c1}"/><path d="M${X(0.42)} ${Y(0.36)} q4 -6 8 0 q-4 5 -8 0" stroke="#FFFDF6" stroke-width=".8" fill="none"/>`;
+      case "cypress":
+        return bg(c22) + `<rect x="${x}" y="${Y(0.8)}" width="${w}" height="${(h3 * 0.2).toFixed(1)}" fill="#9EBE8C"/>${[0.3, 0.5, 0.7].map((v, i) => `<ellipse cx="${X(v)}" cy="${Y(0.55 - i % 2 * 0.06)}" rx="${R2(0.07)}" ry="${(h3 * 0.28).toFixed(1)}" fill="${c1}"/>`).join("")}`;
+      case "still":
+        return bg(c22) + `<rect x="${x}" y="${Y(0.78)}" width="${w}" height="${(h3 * 0.22).toFixed(1)}" fill="#C9A27E"/><rect x="${X(0.25)}" y="${Y(0.35)}" width="${R2(0.16)}" height="${(h3 * 0.45).toFixed(1)}" rx="2" fill="${c1}"/><rect x="${X(0.29)}" y="${Y(0.2)}" width="${R2(0.08)}" height="${(h3 * 0.16).toFixed(1)}" fill="${c1}"/><path d="M${X(0.58)} ${Y(0.5)} h${R2(0.16)} l-2 6 h${(-(w * 0.16) + 4).toFixed(1)}z M${X(0.66)} ${Y(0.62)} v${(h3 * 0.15).toFixed(1)}" stroke="${INK}" stroke-width=".8" fill="#F3E7C8"/><circle cx="${X(0.84)}" cy="${Y(0.72)}" r="${R2(0.06)}" fill="#E8566C"/>`;
+      default:
+        return bg(c1) + `<path d="M${x} ${Y(0.65)} Q${X(0.35)} ${Y(0.45)} ${X(0.6)} ${Y(0.6)} T${X(1)} ${Y(0.55)} V${Y(1)} H${x}z" fill="${c22}"/>`;
+    }
+  }
+  var swatch = (f5) => `<span class="wpic"><svg width="30" height="30" viewBox="0 0 30 30"><rect x="2" y="3" width="26" height="24" rx="2" fill="#8A5A3A"/><svg x="5" y="6" width="20" height="18" overflow="hidden">${paintSVG(0, 0, 20, 18, f5)}</svg></svg></span>`;
+  function galleryPanel(F2) {
+    const g10 = galleryState(F2), own = ownPaintings(F2), free = g10.frames.filter((f5) => !f5).length;
+    let h3 = `<h2>The gallery wall</h2><p class="sub">Four frames between the windows. Local painters hang their work here; when one sells you keep ${TOKEN} coins and the rest goes to the painter. They bring new ones on Mondays.</p><ul class="hlist wlist">`;
+    h3 += framesNow(F2).map((f5, i) => !f5 ? `<li><span class="wtxt"><b>An empty frame</b><small>${own.length ? "Hang one of yours, or a painter will fill it on Monday" : "A painter will fill it on Monday"}</small></span></li>` : f5.own ? `<li>${swatch(f5)}<span class="wtxt"><b>${esc(ITEMS[f5.own].n.replace(/^Your painting: /, "").replace(/^./, (c) => c.toUpperCase()))}</b><small>Yours · not for sale</small></span><span class="orbtns"><button class="btn small alt" data-gg="down:${i}">Take it down</button></span></li>` : `<li>${swatch(f5)}<span class="wtxt"><b>${esc(f5.t)}</b><small>${esc(PAINTERS[f5.by].name)} · ${esc(PAINTERS[f5.by].what.toLowerCase())} · ${f5.price} coins</small></span></li>`).join("") + `</ul>`;
+    if (own.length && free) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Hang one of yours</p><div class="actions">${own.map((id) => `<button class="btn small alt" data-gg="hang:${id}">${esc(ITEMS[id].n.replace(/^Your painting: /, ""))}</button>`).join("")}</div>`;
+    const recent2 = g10.sold.slice(-3).reverse();
+    if (recent2.length) h3 += `<p class="muted">Sold lately: ${recent2.map((s) => `"${esc(s.t)}" by ${esc(PAINTERS[s.by].name)}`).join(", ")}.</p>`;
+    return h3;
+  }
+  function makersPanel(F2) {
+    const m = makersState(F2), wk = Object.entries(m.week).filter(([, c]) => c > 0);
+    let h3 = `<h2>The makers' shelf</h2><p class="sub">Little handmade things from around Honeybrook, on consignment: when one sells, the maker gets the money and you keep about a fifth. They top it up on Mondays.</p><ul class="hlist wlist">`;
+    h3 += Object.entries(MAKERS).map(([k, mk]) => {
+      const it = ITEMS[mk.item], n = m.stock[mk.item] || 0;
+      return `<li><span class="wpic">${icon(mk.item, 28)}</span><span class="wtxt"><b>${esc(it.n)}</b><small>${esc(mk.name)} · ${it.price} coins · ${n ? `${n} on the shelf` : "sold out till Monday"}</small></span><span class="orbtns"><button class="btn small alt" data-gg="buy:${mk.item}" ${n && (F2.coins || 0) >= it.price ? "" : "disabled"}>Buy one</button></span></li>`;
+    }).join("") + `</ul>`;
+    if (wk.length) h3 += `<p class="muted">This week the makers have taken home ${wk.map(([k, c]) => `${esc(MAKERS[k].name)} ${c}`).join(", ")} coins.</p>`;
+    return h3;
+  }
+
   // src/art/moulds.js
   var f4 = (n) => +n.toFixed(2);
   function mouldPath(shape2, x, y, r) {
@@ -7564,18 +7791,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     }).join("");
     return `<g data-place="run" aria-label="Animal run"><ellipse class="hov" cx="${(x0 + x1) / 2}" cy="${y1}" rx="${(x1 - x0) / 2 + 8}" ry="10" style="fill:var(--butter)"/>${fence2}${meadow}${crate5}${coop}${bowl}${animals}${tapeLabel(big ? 204 : 137, big ? 500 : 508, "Animal run", "var(--peach)", 11)}</g>`;
   }
-  var INK = `style="stroke:var(--line)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"`;
+  var INK2 = `style="stroke:var(--line)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"`;
   function animalArt(a, sad) {
     const g10 = isGrown(a);
-    if (a.kind === "chick") return g10 ? `<g ${INK}><path d="M-9 0 q-4 -9 2 -12" fill="#FFFDF6"/><ellipse cx="0" cy="-5" rx="9" ry="7" fill="#FFFDF6"/><circle cx="7" cy="-12" r="4.5" fill="#FFFDF6"/><path d="M5 -17 q1 -3 3 -1 q1 -3 3 0" fill="var(--rose)"/><path d="M11 -12 l3 1 l-3 1.5z" fill="var(--honey)"/><path d="M-2 2 v4 M3 2 v4" style="stroke:var(--honey)"/><circle cx="8" cy="-13" r=".9" fill="var(--line)" stroke="none"/></g>` : `<g ${INK}><circle cx="0" cy="-5" r="5.5" fill="var(--butter)"/><circle cx="4" cy="-10" r="3.6" fill="var(--butter)"/><path d="M7.4 -10 l2.4 .8 l-2.4 1.2z" fill="var(--honey)"/><path d="M-1 0 v3 M2 0 v3" style="stroke:var(--honey)"/><circle cx="4.8" cy="-10.8" r=".8" fill="var(--line)" stroke="none"/>${sad ? `<path d="M-6 -16 q2 -2 4 0" opacity=".6"/>` : ""}</g>`;
+    if (a.kind === "chick") return g10 ? `<g ${INK2}><path d="M-9 0 q-4 -9 2 -12" fill="#FFFDF6"/><ellipse cx="0" cy="-5" rx="9" ry="7" fill="#FFFDF6"/><circle cx="7" cy="-12" r="4.5" fill="#FFFDF6"/><path d="M5 -17 q1 -3 3 -1 q1 -3 3 0" fill="var(--rose)"/><path d="M11 -12 l3 1 l-3 1.5z" fill="var(--honey)"/><path d="M-2 2 v4 M3 2 v4" style="stroke:var(--honey)"/><circle cx="8" cy="-13" r=".9" fill="var(--line)" stroke="none"/></g>` : `<g ${INK2}><circle cx="0" cy="-5" r="5.5" fill="var(--butter)"/><circle cx="4" cy="-10" r="3.6" fill="var(--butter)"/><path d="M7.4 -10 l2.4 .8 l-2.4 1.2z" fill="var(--honey)"/><path d="M-1 0 v3 M2 0 v3" style="stroke:var(--honey)"/><circle cx="4.8" cy="-10.8" r=".8" fill="var(--line)" stroke="none"/>${sad ? `<path d="M-6 -16 q2 -2 4 0" opacity=".6"/>` : ""}</g>`;
     if (a.kind === "goat") {
       const s2 = g10 ? 1.05 : 0.75;
-      return `<g transform="scale(${s2})" ${INK}><ellipse cx="0" cy="-9" rx="12" ry="7" fill="#F4EEE3"/><path d="M-8 -4 v8 M-3 -3 v7 M4 -3 v7 M9 -4 v8" fill="none"/><path d="M-12 -11 q-4 -3 -3 -7" fill="none"/>
+      return `<g transform="scale(${s2})" ${INK2}><ellipse cx="0" cy="-9" rx="12" ry="7" fill="#F4EEE3"/><path d="M-8 -4 v8 M-3 -3 v7 M4 -3 v7 M9 -4 v8" fill="none"/><path d="M-12 -11 q-4 -3 -3 -7" fill="none"/>
       <path d="M8 -12 q2 -9 9 -8 q4 1 3 6 q-2 5 -8 5z" fill="#F4EEE3"/><path d="M12 -19 q-2 -6 -6 -6 M16 -19 q2 -6 6 -7" fill="none" stroke-width="1.6"/><path d="M8 -15 q-5 0 -5 3 q3 1 6 -1" fill="#C9B79C"/>
       <circle cx="16" cy="-14" r="1" fill="var(--line)" stroke="none"/><path d="M19 -9 q1 4 -2 6" fill="none"/>${sad ? `<path d="M22 -24 q1 -3 3 -1" fill="none"/>` : ""}</g>`;
     }
     const c = BUNNY_COLS[a.col || 0], s = g10 ? 1 : 0.72;
-    return `<g transform="scale(${s})" ${INK}><ellipse cx="0" cy="-6" rx="10" ry="7" fill="${c}"/><circle cx="-10" cy="-8" r="2.6" fill="#FFFDF6"/><circle cx="8" cy="-11" r="5.2" fill="${c}"/><ellipse cx="6" cy="-20" rx="1.8" ry="5.5" fill="${c}" transform="rotate(${sad ? -40 : -10} 6 -16)"/><ellipse cx="10" cy="-20" rx="1.8" ry="5.5" fill="${c}" transform="rotate(${sad ? 30 : 12} 10 -16)"/><circle cx="10" cy="-12" r=".9" fill="var(--line)" stroke="none"/><circle cx="13" cy="-10" r=".9" fill="var(--rose)" stroke="none"/></g>`;
+    return `<g transform="scale(${s})" ${INK2}><ellipse cx="0" cy="-6" rx="10" ry="7" fill="${c}"/><circle cx="-10" cy="-8" r="2.6" fill="#FFFDF6"/><circle cx="8" cy="-11" r="5.2" fill="${c}"/><ellipse cx="6" cy="-20" rx="1.8" ry="5.5" fill="${c}" transform="rotate(${sad ? -40 : -10} 6 -16)"/><ellipse cx="10" cy="-20" rx="1.8" ry="5.5" fill="${c}" transform="rotate(${sad ? 30 : 12} 10 -16)"/><circle cx="10" cy="-12" r=".9" fill="var(--line)" stroke="none"/><circle cx="13" cy="-10" r=".9" fill="var(--rose)" stroke="none"/></g>`;
   }
 
   // src/game/jars.js
@@ -7603,14 +7830,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       return { jars: [], custom: [], updatedAt: 0 };
     }
   };
-  var D = load();
+  var D2 = load();
   var ref = null;
   var chain = Promise.resolve();
   var onChange = () => {
   };
   var keep = () => {
     try {
-      localStorage.setItem(KEY, JSON.stringify(D));
+      localStorage.setItem(KEY, JSON.stringify(D2));
     } catch {
     }
   };
@@ -7631,10 +7858,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ref = col.doc("jars");
     ref.onSnapshot((snap) => {
       if (!snap.exists) {
-        if (D.jars.length || D.custom.length) push();
+        if (D2.jars.length || D2.custom.length) push();
         return;
       }
-      D = merge(D, JSON.parse(JSON.stringify(snap.data() || {})));
+      D2 = merge(D2, JSON.parse(JSON.stringify(snap.data() || {})));
       keep();
       onChange();
     }, () => {
@@ -7645,34 +7872,34 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     chain = chain.then(async () => {
       try {
         const cur2 = await ref.get();
-        if (cur2.exists) D = merge(D, JSON.parse(JSON.stringify(cur2.data() || {})));
-        await ref.set(JSON.parse(JSON.stringify(D)));
+        if (cur2.exists) D2 = merge(D2, JSON.parse(JSON.stringify(cur2.data() || {})));
+        await ref.set(JSON.parse(JSON.stringify(D2)));
       } catch {
       }
     });
   }
   var commit = () => {
-    D.updatedAt = Date.now();
+    D2.updatedAt = Date.now();
     keep();
     push();
     onChange();
   };
-  var palette = () => [...EMOTIONS, ...D.custom.filter((c) => !c.deleted).map((c) => ({ id: c.id, name: c.name, color: c.color, mark: "dot", custom: true }))];
+  var palette = () => [...EMOTIONS, ...D2.custom.filter((c) => !c.deleted).map((c) => ({ id: c.id, name: c.name, color: c.color, mark: "dot", custom: true }))];
   var emo = (id) => palette().find((e) => e.id === id) || { id, name: "Feeling", color: "#B9B0A4", mark: "dot" };
   var shelf = () => {
     const s = Array(SLOTS2).fill(null);
-    D.jars.filter((j) => !j.deleted && j.slot != null).forEach((j) => {
+    D2.jars.filter((j) => !j.deleted && j.slot != null).forEach((j) => {
       if (j.slot >= 0 && j.slot < SLOTS2 && !s[j.slot]) s[j.slot] = j;
     });
     return s;
   };
-  var jarById = (id) => D.jars.find((j) => j.id === id && !j.deleted) || null;
+  var jarById = (id) => D2.jars.find((j) => j.id === id && !j.deleted) || null;
   var freeSlot = () => shelf().findIndex((x) => !x);
   function addCustom(name, color) {
     name = plain(String(name || "")).trim().slice(0, 20);
     if (!name) return null;
     const c = { id: "c" + Date.now().toString(36), name: name[0].toUpperCase() + name.slice(1), color: CUSTOM_COLOURS.includes(color) ? color : CUSTOM_COLOURS[0], at: Date.now() };
-    D.custom.push(c);
+    D2.custom.push(c);
     commit();
     return c;
   }
@@ -7690,14 +7917,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         return [id, { name: e.name, color: e.color, mark: e.mark }];
       }))
     };
-    D.jars.push(j);
+    D2.jars.push(j);
     commit();
     return j;
   }
   function emptyJar(id) {
     const j = jarById(id);
     if (!j) return null;
-    D.jars = D.jars.map((x) => x.id === id ? { id, at: Date.now(), deleted: true } : x);
+    D2.jars = D2.jars.map((x) => x.id === id ? { id, at: Date.now(), deleted: true } : x);
     commit();
     return () => {
       if (shelf()[j.slot]) {
@@ -7705,7 +7932,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         if (s < 0) return;
         j.slot = s;
       }
-      D.jars = D.jars.map((x) => x.id === id ? Object.assign({}, j, { at: Date.now() }) : x);
+      D2.jars = D2.jars.map((x) => x.id === id ? Object.assign({}, j, { at: Date.now() }) : x);
       commit();
     };
   }
@@ -8046,8 +8273,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (c.revenue && c.revenue.target > 0 && c.revenue.total < c.revenue.target) row7(`This month's revenue goal`, Math.round(c.revenue.total), Math.round(c.revenue.target));
     return rows2.slice(0, 6);
   }
-  var INK2 = "#3A2E28";
-  var sw = `stroke="${INK2}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"`;
+  var INK3 = "#3A2E28";
+  var sw = `stroke="${INK3}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"`;
   function emblem(kind, x, y) {
     switch (kind) {
       case "star":
@@ -8055,13 +8282,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       case "note":
         return `<path d="M${x - 2} ${y + 5} v-11 l7 -2 v10" fill="none" ${sw}/><circle cx="${x - 4}" cy="${y + 5}" r="2.6" fill="#FFFDF6" ${sw}/><circle cx="${x + 3}" cy="${y + 3}" r="2.6" fill="#FFFDF6" ${sw}/>`;
       case "chick":
-        return `<circle cx="${x}" cy="${y + 1}" r="6" fill="#FFE38A" ${sw}/><circle cx="${x + 1.5}" cy="${y - 1}" r=".9" fill="${INK2}"/><path d="M${x + 5} ${y + 1} l3 1 -3 1z" fill="#F2A65A" ${sw}/>`;
+        return `<circle cx="${x}" cy="${y + 1}" r="6" fill="#FFE38A" ${sw}/><circle cx="${x + 1.5}" cy="${y - 1}" r=".9" fill="${INK3}"/><path d="M${x + 5} ${y + 1} l3 1 -3 1z" fill="#F2A65A" ${sw}/>`;
       case "sun":
         return `<circle cx="${x}" cy="${y}" r="4.5" fill="#FFE38A" ${sw}/><path d="M${x} ${y - 9} v2 M${x} ${y + 7} v2 M${x - 9} ${y} h2 M${x + 7} ${y} h2" ${sw}/>`;
       case "moon":
         return `<path d="M${x + 3} ${y - 7} a7 7 0 1 0 4 11 a6 6 0 0 1 -4 -11z" fill="#FFF6D6" ${sw}/>`;
       case "coin":
-        return `<circle cx="${x}" cy="${y}" r="6.5" fill="#FFE38A" ${sw}/><path d="M${x} ${y - 3.5} v7 M${x + 2.4} ${y - 2.2} q-2.4 -1.6 -4.4 0 q-1 2 2 2.4 q3 .6 2 2.6 q-2 1.5 -4.6 0" fill="none" stroke="${INK2}" stroke-width="1.2"/>`;
+        return `<circle cx="${x}" cy="${y}" r="6.5" fill="#FFE38A" ${sw}/><path d="M${x} ${y - 3.5} v7 M${x + 2.4} ${y - 2.2} q-2.4 -1.6 -4.4 0 q-1 2 2 2.4 q3 .6 2 2.6 q-2 1.5 -4.6 0" fill="none" stroke="${INK3}" stroke-width="1.2"/>`;
       case "check":
         return `<path d="M${x - 5} ${y} l3.5 3.5 l7 -7" fill="none" stroke="#FFFDF6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
       case "flag":
@@ -8071,7 +8298,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       case "shoe":
         return `<path d="M${x - 7} ${y + 3} v-6 h5 l2 3 q6 0 7 3 z" fill="#FFFDF6" ${sw}/>`;
       case "fox":
-        return `<path d="M${x - 6} ${y - 5} l3 3 h6 l3 -3 v6 q-6 7 -12 0z" fill="#FFFDF6" ${sw}/><circle cx="${x - 2.4}" cy="${y}" r=".8" fill="${INK2}"/><circle cx="${x + 2.4}" cy="${y}" r=".8" fill="${INK2}"/>`;
+        return `<path d="M${x - 6} ${y - 5} l3 3 h6 l3 -3 v6 q-6 7 -12 0z" fill="#FFFDF6" ${sw}/><circle cx="${x - 2.4}" cy="${y}" r=".8" fill="${INK3}"/><circle cx="${x + 2.4}" cy="${y}" r=".8" fill="${INK3}"/>`;
       case "heart":
         return `<path d="M${x} ${y + 5} c-8 -5 -6 -12 0 -8 c6 -4 8 3 0 8z" fill="#FFFDF6" ${sw}/>`;
       case "sprout":
@@ -8086,7 +8313,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     let top = "";
     if (L2.shape === "cup") top = `<path d="M16 10 h32 v6 q0 20 -16 22 q-16 -2 -16 -22z" fill="${c}" ${sw}/><path d="M16 14 q-9 0 -8 8 q1 7 10 7 M48 14 q9 0 8 8 q-1 7 -10 7" fill="none" ${sw}/><rect x="28" y="38" width="8" height="8" fill="${c}" ${sw}/><path d="M20 12 q2 14 8 20" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".55"/>${emblem(L2.emblem, 32, 22)}`;
     else if (L2.shape === "star") top = `<path d="M32 4 l7 14 15 2 -11 10 3 15 -14 -8 -14 8 3 -15 -11 -10 15 -2z" fill="${c}" ${sw}/><rect x="29" y="40" width="6" height="6" fill="${c}" ${sw}/>${emblem(L2.emblem, 32, 24)}`;
-    else if (L2.shape === "medal") top = `<path d="M22 4 l8 18 M42 4 l-8 18" stroke="${c}" stroke-width="7" stroke-linecap="round"/><path d="M22 4 l8 18 M42 4 l-8 18" fill="none" stroke="${INK2}" stroke-width="1" opacity=".5"/><circle cx="32" cy="32" r="13" fill="${c}" ${sw}/><circle cx="32" cy="32" r="9.5" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".6"/>${emblem(L2.emblem, 32, 32)}`;
+    else if (L2.shape === "medal") top = `<path d="M22 4 l8 18 M42 4 l-8 18" stroke="${c}" stroke-width="7" stroke-linecap="round"/><path d="M22 4 l8 18 M42 4 l-8 18" fill="none" stroke="${INK3}" stroke-width="1" opacity=".5"/><circle cx="32" cy="32" r="13" fill="${c}" ${sw}/><circle cx="32" cy="32" r="9.5" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".6"/>${emblem(L2.emblem, 32, 32)}`;
     else if (L2.shape === "rosette") top = `<path d="M26 34 l-6 14 5 -2 3 5 4 -14 M38 34 l6 14 -5 -2 -3 5 -4 -14" fill="${c}" ${sw}/>${Array.from({ length: 12 }, (_, i) => {
       const a = i * Math.PI / 6;
       return `<circle cx="${(32 + Math.cos(a) * 12).toFixed(1)}" cy="${(24 + Math.sin(a) * 12).toFixed(1)}" r="5" fill="${c}" ${sw}/>`;
@@ -8094,7 +8321,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     else if (L2.shape === "plaque") top = `<path d="M14 8 h36 v18 q0 16 -18 20 q-18 -4 -18 -20z" fill="${c}" ${sw}/><path d="M18 12 h28 v14 q0 12 -14 15 q-14 -3 -14 -15z" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".6"/>${emblem(L2.emblem, 32, 24)}`;
     else top = `<ellipse cx="32" cy="42" rx="16" ry="4" fill="${c}" ${sw}/><rect x="16" y="30" width="32" height="12" fill="${c}" ${sw}/><ellipse cx="32" cy="30" rx="16" ry="4" fill="${c}" ${sw}/><rect x="20" y="18" width="24" height="12" fill="${c}" ${sw}/><ellipse cx="32" cy="18" rx="12" ry="3.5" fill="${c}" ${sw}/><path d="M22 12 l4 -7 6 6 6 -6 4 7z" fill="${c}" ${sw}/>${emblem(L2.emblem, 32, 25)}`;
     const label2 = esc(String(t2.short || t2.n || "")).slice(0, 6);
-    return `<svg viewBox="0 0 64 72" width="${size}" height="${size * 72 / 64}" aria-hidden="true">${top}<path d="M18 46 h28 l3 10 h-34z" fill="#8B5E3C" ${sw}/><rect x="12" y="56" width="40" height="12" rx="2" fill="#6B4630" ${sw}/><rect x="20" y="58.5" width="24" height="7" rx="1" fill="#E8D3A8"/><text x="32" y="64.2" text-anchor="middle" font-family="Mulish, sans-serif" font-weight="800" font-size="${label2.length > 4 ? 4.6 : 5.6}" fill="${INK2}">${label2}</text></svg>`;
+    return `<svg viewBox="0 0 64 72" width="${size}" height="${size * 72 / 64}" aria-hidden="true">${top}<path d="M18 46 h28 l3 10 h-34z" fill="#8B5E3C" ${sw}/><rect x="12" y="56" width="40" height="12" rx="2" fill="#6B4630" ${sw}/><rect x="20" y="58.5" width="24" height="7" rx="1" fill="#E8D3A8"/><text x="32" y="64.2" text-anchor="middle" font-family="Mulish, sans-serif" font-weight="800" font-size="${label2.length > 4 ? 4.6 : 5.6}" fill="${INK3}">${label2}</text></svg>`;
   }
   var when2 = (ms) => new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Singapore" });
   function pedestalPanel(t2, nexts, canBook) {
@@ -8343,7 +8570,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var GUIDES = ["mama", "gonggong", "farid", "mei"];
   var VISITORS = ["hana", "okada", "juniper", "bo", "lin", "pip", "opal", "theo"];
   var TOURISTS = ["aiko", "ben", "clara", "dev", "rosa", "bastien", "grace", "hiro"];
-  var dow = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+  var dow2 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
   var fmtTime = (m) => `${Math.floor(m / 60) > 12 ? Math.floor(m / 60) - 12 : Math.floor(m / 60)}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m >= 12 * 60 ? "pm" : "am"}`;
   function groupFor(seed2, n, skip = [], from = VISITORS) {
     const pool2 = from.filter((v) => !skip.includes(v)), out = [];
@@ -8354,7 +8581,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return out;
   }
   function toursOn(day) {
-    const d = dow(day), out = [];
+    const d = dow2(day), out = [];
     const keepers = keepersOn(day);
     const away = awayToday(day), guides = GUIDES.filter((g10) => !keepers.includes(g10) && !away.includes(g10));
     if (d === 0 || d === 6) WEEKEND.forEach(([from, to], i) => {
@@ -8374,7 +8601,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return null;
   }
   function visitsOn(day) {
-    const d = dow(day), busy2 = toursOn(day).flatMap((t4) => [t4.guide, ...t4.group]), pick5 = (seed2) => groupFor(day + seed2, 1, busy2)[0];
+    const d = dow2(day), busy2 = toursOn(day).flatMap((t4) => [t4.guide, ...t4.group]), pick5 = (seed2) => groupFor(day + seed2, 1, busy2)[0];
     const tbusy = toursOn(day).flatMap((t4) => t4.group), [t1, t2, t3] = groupFor(day + "tv", 3, tbusy, TOURISTS);
     const tourists = [
       { id: t1, scene: "orchard", from: 10 * 60 + 30, to: 11 * 60 + 30, wander: SHOPSIDE },
@@ -8395,7 +8622,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var PITCH = [[96, 560], [150, 548], [204, 566], [130, 574]];
   var STROLL = [[60, 330], [100, 380], [300, 380], [70, 250]];
   function fieldVisits(day) {
-    const d = dow(day), we = d === 0 || d === 6, busy2 = [...toursOn(day).flatMap((t2) => [t2.guide, ...t2.group]), ...visitsOn(day).map((v) => v.id)];
+    const d = dow2(day), we = d === 0 || d === 6, busy2 = [...toursOn(day).flatMap((t2) => [t2.guide, ...t2.group]), ...visitsOn(day).map((v) => v.id)];
     const pool2 = (seed2) => groupFor(day + seed2, 2, [...busy2, "pip"]);
     const [p1, p2] = pool2("pic"), [s1] = groupFor(day + "swan", 1, [...busy2, "pip", p1, p2]);
     const out = [
@@ -8446,13 +8673,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var WEEKEND_SEATS = [[11 * 60, 12 * 60, [SEAT.d, SEAT.e]], [16 * 60 + 30, 17 * 60 + 30, [SEAT.d, SEAT.e]]];
   var BROWSE_SEATS = [[10 * 60, 11 * 60 + 15, [[106, 300], [164, 312]], "browse"], [11 * 60 + 15, 12 * 60, [[126, 306], [76, 316]], "browse"]];
   function touristTastings(day) {
-    const d = dow(day), busy2 = toursOn(day).flatMap((t2) => t2.group), out = [];
+    const d = dow2(day), busy2 = toursOn(day).flatMap((t2) => t2.group), out = [];
     const stallKeepers = keepersOn(day);
     [...TOURIST_SEATS, ...d === 0 || d === 6 ? WEEKEND_SEATS : [], ...BROWSE_SEATS].forEach(([from, to, seats, act2], k) => groupFor(day + "tt" + k, 2, [...busy2, ...stallKeepers], act2 ? [...TOURISTS, ...NIGHT_TOURISTS] : TOURISTS).forEach((id, j) => out.push({ id, from, to, at: seats[j], act: act2 })));
     return out;
   }
   function tastingSlot(id, day, hm6) {
-    const d = dow(day), we = d === 0 || d === 6;
+    const d = dow2(day), we = d === 0 || d === 6;
     const v = [...TASTINGS2, ...touristTastings(day)].find((x) => x.id === id && hm6 >= x.from && hm6 < x.to && (!x.days || x.days === "we" === we) && (!x.dow || x.dow.includes(d)));
     return v ? { from: v.from, to: v.to, scene: "wineshop", at: v.at, act: v.act === "browse" ? null : "sit" } : null;
   }
@@ -8460,7 +8687,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var PLAY = [[110, 604], [262, 600], [410, 608], [188, 584], [330, 590], [470, 590], [150, 600]];
   var WATCH = [[180, 556], [346, 560], [60, 560], [420, 548]];
   function familyVisits(day) {
-    const d = dow(day), we = d === 0 || d === 6, h3 = hash(day), fam2 = (k) => FAMILIES[(h3 + k) % FAMILIES.length], out = [];
+    const d = dow2(day), we = d === 0 || d === 6, h3 = hash(day), fam2 = (k) => FAMILIES[(h3 + k) % FAMILIES.length], out = [];
     const add2 = (f5, from, to, scene2 = "vineyard") => {
       out.push({ id: f5.parent, from, to, scene: scene2, wander: scene2 === "vineyard" ? WATCH : FIELD_WALK });
       f5.kids.forEach((k) => out.push({ id: k, from, to, scene: scene2, wander: scene2 === "vineyard" ? PLAY : FIELD_PLAY }));
@@ -8558,9 +8785,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   ].map((st6) => ({ ...st6, xmas: true }));
   function eventsOn(day) {
     const out = [], x = xmasOn(day);
-    if (dow(day) === 0) out.push({ kind: "market", name: "Sunday farmers market", from: 8 * 60, to: 13 * 60, stalls: standing(MARKET, day), wine: true });
+    if (dow2(day) === 0) out.push({ kind: "market", name: "Sunday farmers market", from: 8 * 60, to: 13 * 60, stalls: standing(MARKET, day), wine: true });
     if (!x && lastSaturday(day)) out.push({ kind: "fair", name: "Field fair", from: 10 * 60, to: 16 * 60, stalls: FAIR, wine: false });
-    if (!x && (dow(day) === 2 || dow(day) === 4)) out.push({ kind: "night", name: "Night market", from: 17 * 60 + 30, to: 22 * 60, stalls: NIGHT, wine: false });
+    if (!x && (dow2(day) === 2 || dow2(day) === 4)) out.push({ kind: "night", name: "Night market", from: 17 * 60 + 30, to: 22 * 60, stalls: NIGHT, wine: false });
     if (x) out.push({ kind: "xmas", name: "Christmas market", from: XMAS_FROM, to: XMAS_TO, stalls: standing(XMAS, day), wine: false });
     return out;
   }
@@ -8607,8 +8834,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var GROTTO = [17 * 60, 20 * 60];
   var GROTTO_AT = [64, 548];
   var LANTERN_WALK = [20 * 60 + 15, 21 * 60];
-  var carolsNow = (day, hm6) => xmasOn(day) && dow(day) === 5 && hm6 >= CAROLS[0] && hm6 < CAROLS[1];
-  var grottoOn = (day) => xmasOn(day) && (dow(day) === 0 || dow(day) === 6);
+  var carolsNow = (day, hm6) => xmasOn(day) && dow2(day) === 5 && hm6 >= CAROLS[0] && hm6 < CAROLS[1];
+  var grottoOn = (day) => xmasOn(day) && (dow2(day) === 0 || dow2(day) === 6);
   var grottoNow = (day, hm6) => grottoOn(day) && hm6 >= GROTTO[0] && hm6 < GROTTO[1];
   var lanternWalkNow = (day, hm6) => day.slice(5) === "12-24" && hm6 >= LANTERN_WALK[0] && hm6 < LANTERN_WALK[1];
   var WALK_ROUTE = [[278, 600], [242, 540], [278, 470], [242, 414], [176, 404], [104, 380], [62, 340], [112, 206], [180, 202], [302, 202], [440, 202]];
@@ -8666,7 +8893,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     fair: [["mum", 10 * 60, 12 * 60], ["dad", 10 * 60, 12 * 60], ["mama", 11 * 60, 13 * 60], ["gonggong", 11 * 60, 13 * 60], ["darren", 13 * 60, 15 * 60], ["marcus", 13 * 60, 15 * 60 + 30], ["angelina", 13 * 60, 15 * 60 + 30]]
   };
   function familyAtEvent(id, e, day, hm6) {
-    const list5 = e.kind === "night" || e.kind === "xmas" ? FAMILY_EVENTS[e.kind][dow(day)] || [] : e.kind === "fair" ? FAMILY_EVENTS.fair : [];
+    const list5 = e.kind === "night" || e.kind === "xmas" ? FAMILY_EVENTS[e.kind][dow2(day)] || [] : e.kind === "fair" ? FAMILY_EVENTS.fair : [];
     const f5 = list5.find(([who3, from, to]) => who3 === id && hm6 >= from && hm6 < to);
     if (!f5) return null;
     return { from: f5[1], to: f5[2], scene: "field", wander: FIELD_WALK };
@@ -8688,8 +8915,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var CLASS_KIND = { 1: "Pilates", 2: "Zumba", 3: "Pilates", 4: "Zumba", 5: "Piloxing", 6: "Piloxing" };
   var MATS = [[418, 444], [456, 452], [494, 444], [436, 480]];
   var CLASS_POOL = ["lin", "okada", "juniper", "hana", "opal", "bo", "angelina", "priya"];
-  var classOn = (day) => CLASS_KIND[dow(day)] && !awayToday(day).includes("mum") ? {
-    kind: CLASS_KIND[dow(day)],
+  var classOn = (day) => CLASS_KIND[dow2(day)] && !awayToday(day).includes("mum") ? {
+    kind: CLASS_KIND[dow2(day)],
     from: CLASS_FROM,
     to: CLASS_TO,
     who: groupFor(day + ":class", 3, [], CLASS_POOL)
@@ -8704,7 +8931,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var SUP_SEA = [[60, 190], [104, 250], [70, 330], [112, 400], [64, 560], [118, 610]];
   function shoreSlot(id, day, hm6) {
     if (!TOURISTS.includes(id)) return null;
-    const we = [0, 6].includes(dow(day)), from = we ? 9 * 60 : 7 * 60, to = we ? 12 * 60 : 8 * 60 + 30;
+    const we = [0, 6].includes(dow2(day)), from = we ? 9 * 60 : 7 * 60, to = we ? 12 * 60 : 8 * 60 + 30;
     if (hm6 < from || hm6 >= to) return null;
     const busy2 = [...keepersOn(day), ...toursOn(day).flatMap((t2) => t2.group)];
     return groupFor(day + ":sup", we ? 2 : 1, busy2, TOURISTS).includes(id) ? { from, to, scene: "shore", wander: SUP_SEA, act: "sup", free: true } : null;
@@ -8716,7 +8943,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var APERITIVO = [16 * 60 + 30, 19 * 60];
   var VAN5 = [17 * 60, 22 * 60];
   var BONFIRE = [19 * 60, 22 * 60];
-  var isFri = (day) => dow(day) === 5;
+  var isFri = (day) => dow2(day) === 5;
   var aperitivoNow = (day, hm6) => isFri(day) && hm6 >= APERITIVO[0] && hm6 < APERITIVO[1];
   var vanNow = (day, hm6) => isFri(day) && hm6 >= VAN5[0] && hm6 < VAN5[1];
   var bonfireNow = (day, hm6) => isFri(day) && hm6 >= BONFIRE[0] && hm6 < BONFIRE[1];
@@ -8740,7 +8967,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (!BLANKET[id]) return null;
     return { from: MOVIE[0], to: MOVIE[1], scene: "field", at: BLANKET[id], act: "sit", dir: id === "gonggong" ? -1 : 1, movie: true };
   }
-  var bayMarketNow = (day, hm6) => dow(day) === 5 && !xmasOn(day) && hm6 >= BAYMKT[0] && hm6 < BAYMKT[1];
+  var bayMarketNow = (day, hm6) => dow2(day) === 5 && !xmasOn(day) && hm6 >= BAYMKT[0] && hm6 < BAYMKT[1];
   var BAY_STALLS = [[156, 128], [236, 128], [316, 128]];
   var KITE_SELLER = [396, 150];
   var bayKeepers = (day) => groupFor(day + ":baymkt", 3, [], NIGHT_TOURISTS);
@@ -8772,7 +8999,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return null;
   }
   function dinnerOn(day) {
-    const d = dow(day);
+    const d = dow2(day);
     if (d !== 3 && d !== 0) return null;
     const week = Math.floor(Date.parse(day + "T00:00:00Z") / (7 * 864e5));
     const away = awayToday(day), k = (week * 2 + (d === 0 ? 1 : 0)) % 4;
@@ -8793,7 +9020,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var DATE_FROM = 19 * 60 + 30;
   var DATE_TO = 21 * 60;
   function dateSlot(id, day, hm6) {
-    if (id !== "marcus" && id !== "angelina" || !DATE_DAYS.includes(dow(day)) || hm6 < DATE_FROM || hm6 >= DATE_TO) return null;
+    if (id !== "marcus" && id !== "angelina" || !DATE_DAYS.includes(dow2(day)) || hm6 < DATE_FROM || hm6 >= DATE_TO) return null;
     return { from: DATE_FROM, to: DATE_TO, scene: "wineshop", at: id === "marcus" ? SEAT.c : SEAT.d, act: "sit", dir: id === "marcus" ? 1 : -1, date: true };
   }
   var CLUB_FROM = 18 * 60;
@@ -8818,7 +9045,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
   var LANE_WALK = [[330, 176], [236, 300], [232, 440], [236, 540], [280, 600]];
   var PLATFORM_WAIT = [[300, 178], [350, 180], [380, 184], [270, 186], [400, 182]];
-  var nightDay = (day) => [2, 4].includes(dow(day));
+  var nightDay = (day) => [2, 4].includes(dow2(day));
   function trainSlot(id, day, hm6) {
     if (hm6 >= 9 * 60 + 15 && hm6 < 9 * 60 + 27 && toursOn(day).flatMap((t2) => t2.group).filter((g10) => TOURISTS.includes(g10)).includes(id)) return { from: 9 * 60 + 15, to: 9 * 60 + 27, scene: "hlane", wander: LANE_WALK };
     if (nightDay(day) && NIGHT_TOURISTS.includes(id)) {
@@ -8830,7 +9057,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
   var weekOf = (day) => {
     const t2 = Date.parse(day + "T00:00:00Z");
-    return new Date(t2 - (dow(day) + 6) % 7 * 864e5).toISOString().slice(0, 10);
+    return new Date(t2 - (dow2(day) + 6) % 7 * 864e5).toISOString().slice(0, 10);
   };
   var letGuests = (day) => {
     const g10 = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS);
@@ -8849,7 +9076,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   }
   var DISCO_FROM = 20 * 60;
   var DISCO_TO = 23 * 60 + 30;
-  var discoOn = (day) => dow(day) === 6;
+  var discoOn = (day) => dow2(day) === 6;
   var discoNow = (day, hm6) => discoOn(day) && hm6 >= DISCO_FROM && hm6 < DISCO_TO;
   var DISCO_POOL = ["hana", "juniper", "bo", "opal", "theo", "marco", "ines", "farid", "mei", "felix", "elena", "amara", "mateo", "lila", "noor", "wren", "sofia", "tomo", "mum", "dad", "marcus", "angelina"];
   var DISCO_MOVES = ["dance", "boogie", "armsup", "twirl", "shuffle", "point"];
@@ -8906,7 +9133,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var scoopCache = {};
   function scoopVisits(day) {
     if (scoopCache[day]) return scoopCache[day];
-    const d = dow(day), we = d === 0 || d === 6, out = [];
+    const d = dow2(day), we = d === 0 || d === 6, out = [];
     for (let h3 = 10; h3 < 20; h3++) {
       const n = (we ? 3 : 2) + (h3 >= 14 && h3 < 17 ? 1 : 0), who3 = groupFor(day + ":ice" + h3, n, [], SCOOP_POOL);
       who3.forEach((id, k) => {
@@ -13396,11 +13623,11 @@ ${r.n}`;
 
   // src/game/lunch.js
   var LUNCH = { from: 12 * 60, to: 15 * 60, seats: 12 };
-  var dow2 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+  var dow3 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
   var addDays = (day, n) => new Date(Date.parse(day + "T00:00:00Z") + n * 864e5).toISOString().slice(0, 10);
-  var lunchOn = (day) => dow2(day) === 0;
+  var lunchOn = (day) => dow3(day) === 0;
   var lunchNow = (day, hm6) => lunchOn(day) && hm6 >= LUNCH.from && hm6 < LUNCH.to;
-  var nextSunday = (day = dayKey()) => addDays(day, (7 - dow2(day)) % 7);
+  var nextSunday = (day = dayKey()) => addDays(day, (7 - dow3(day)) % 7);
   var PARTIES = [
     { ids: ["hana", "pip"] },
     { ids: ["okada", "lin"] },
@@ -13442,7 +13669,7 @@ ${r.n}`;
     return cache[sunday] = out;
   }
   function bookOpen(day = dayKey()) {
-    const sun2 = nextSunday(day), all = bookingsFor(sun2), d = dow2(day);
+    const sun2 = nextSunday(day), all = bookingsFor(sun2), d = dow3(day);
     const n = d === 0 || d === 6 ? all.length : Math.max(1, Math.ceil(all.length * d / 6));
     return { sunday: sun2, list: all.slice(0, n), all: all.length };
   }
@@ -13480,9 +13707,9 @@ ${r.n}`;
   }
 
   // src/art/wine.js
-  var INK3 = `stroke="#3b3530" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"`;
+  var INK4 = `stroke="#3b3530" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"`;
   var ripeCol = (kind) => kind === "red" ? "#6B2A55" : kind === "tempranillo" ? "#3A2050" : kind === "pinot" ? "#4A2A4E" : kind === "chardonnay" ? "#D9D27A" : "#C9D66A";
-  var leaf = (x, y, s, rot, fill2) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><path d="M0 7 C-2 4 -9 7 -11 1 C-12 -3 -8 -5 -6 -4 C-9 -8 -5 -12 -2 -9 C-1 -13 1 -13 2 -9 C5 -12 9 -8 6 -4 C8 -5 12 -3 11 1 C9 7 2 4 0 7Z" fill="${fill2}" ${INK3} stroke-width="${(1.3 / s).toFixed(2)}"/><path d="M0 6 V-8 M0 0 L-7 -4 M0 0 L7 -4" fill="none" stroke="#3b3530" stroke-width="${(0.8 / s).toFixed(2)}" opacity=".55"/></g>`;
+  var leaf = (x, y, s, rot, fill2) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><path d="M0 7 C-2 4 -9 7 -11 1 C-12 -3 -8 -5 -6 -4 C-9 -8 -5 -12 -2 -9 C-1 -13 1 -13 2 -9 C5 -12 9 -8 6 -4 C8 -5 12 -3 11 1 C9 7 2 4 0 7Z" fill="${fill2}" ${INK4} stroke-width="${(1.3 / s).toFixed(2)}"/><path d="M0 6 V-8 M0 0 L-7 -4 M0 0 L7 -4" fill="none" stroke="#3b3530" stroke-width="${(0.8 / s).toFixed(2)}" opacity=".55"/></g>`;
   function bunch(x, y, col, r, n = 13) {
     const rows2 = [4, 3, 3, 2, 1];
     let out = "", k = 0;
@@ -13501,7 +13728,7 @@ ${r.n}`;
     if (!trellis) return svg(h3 + `<g filter="url(#wob)"><path d="M40 118 v-26 M130 118 v-26" stroke="#8B5E3C" stroke-width="4" stroke-linecap="round"/><path d="M40 98 H130" fill="none" stroke="#3b3530" stroke-dasharray="5 6" opacity=".55"/></g>
     <text x="85" y="78" text-anchor="middle" font-family="Klee One,serif" font-size="12" fill="#8A8279">needs a trellis</text>`);
     h3 += `<g filter="url(#wob)"><path d="M18 118 V30 M152 118 V30" stroke="#8B5E3C" stroke-width="5" stroke-linecap="round"/><path d="M18 42 H152 M18 66 H152" fill="none" stroke="#6B5E52" stroke-width="1.2"/></g>`;
-    if (!vn) return svg(h3 + `<ellipse cx="85" cy="116" rx="22" ry="6" fill="#9C7A5C" ${INK3}/><path d="M85 112 v-14" stroke="#5E7A4E" stroke-width="1.6" stroke-dasharray="3 3"/>
+    if (!vn) return svg(h3 + `<ellipse cx="85" cy="116" rx="22" ry="6" fill="#9C7A5C" ${INK4}/><path d="M85 112 v-14" stroke="#5E7A4E" stroke-width="1.6" stroke-dasharray="3 3"/>
     <text x="85" y="88" text-anchor="middle" font-family="Klee One,serif" font-size="12" fill="#8A8279">ready for a vine</text>`);
     const lf = thirsty ? "#B7C58E" : "#86B26A", lf2 = thirsty ? "#C8D3A0" : "#9CC27E", droop = thirsty ? 18 : 0;
     h3 += `<g filter="url(#wob)"><path d="M85 118 C82 100 90 88 85 70 C83 60 86 50 85 44" fill="none" stroke="#7A5638" stroke-width="7" stroke-linecap="round"/>
@@ -13512,27 +13739,27 @@ ${r.n}`;
     if (vn.wateredAt) {
       const ripe = g10 >= 1, col = ripe ? ripeCol(vn.v) : g10 > 0.6 ? vn.v === "red" || vn.v === "tempranillo" || vn.v === "pinot" ? "#9A6A86" : "#B9CF7A" : "#A9C98A", r = 3.4 + Math.min(1, g10) * 1.4, n = 6 + Math.round(Math.min(1, g10) * 7);
       if (g10 > 0.15) h3 += bunch(66, 74, col, r, n) + bunch(106, 76, col, r, n);
-      else h3 += `<circle cx="66" cy="78" r="2.6" fill="#E9F0C8" ${INK3}/><circle cx="70" cy="81" r="2.6" fill="#E9F0C8" ${INK3}/><circle cx="106" cy="80" r="2.6" fill="#E9F0C8" ${INK3}/>`;
-      if (ripe) h3 += `<g class="twinkle"><path d="M140 84 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" ${INK3} stroke-width="1"/></g>`;
-    } else h3 += `<g><path d="M140 70 q-7 10 0 14 q7 -4 0 -14z" fill="#9CC3E0" ${INK3}/><path d="M128 92 q-5 7 0 10 q5 -3 0 -10z" fill="#BFD6E6" ${INK3}/></g>`;
+      else h3 += `<circle cx="66" cy="78" r="2.6" fill="#E9F0C8" ${INK4}/><circle cx="70" cy="81" r="2.6" fill="#E9F0C8" ${INK4}/><circle cx="106" cy="80" r="2.6" fill="#E9F0C8" ${INK4}/>`;
+      if (ripe) h3 += `<g class="twinkle"><path d="M140 84 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" ${INK4} stroke-width="1"/></g>`;
+    } else h3 += `<g><path d="M140 70 q-7 10 0 14 q7 -4 0 -14z" fill="#9CC3E0" ${INK4}/><path d="M128 92 q-5 7 0 10 q5 -3 0 -10z" fill="#BFD6E6" ${INK4}/></g>`;
     return svg(h3);
   }
   var svg = (inner, w = 170, hgt = 140, cls = "vypic") => `<svg class="${cls}" viewBox="0 0 ${w} ${hgt}" width="${w}" height="${hgt}" aria-hidden="true">${inner}</svg>`;
   function barrelPic(phase2, col, label2) {
     let h3 = `<rect x="2" y="2" width="136" height="116" rx="14" fill="#F3EADF"/><path d="M2 100 H138 V104 a14 14 0 0 1 -14 14 H16 a14 14 0 0 1 -14 -14z" fill="#E2D2BC"/>`;
     h3 += `<g filter="url(#wob)"><path d="M26 102 l10 -14 M114 102 l-10 -14 M22 102 H118" stroke="#6B4A33" stroke-width="4" stroke-linecap="round" fill="none"/>
-    <path d="M22 60 C22 34 38 24 70 24 C102 24 118 34 118 60 C118 86 102 96 70 96 C38 96 22 86 22 60Z" fill="#B07B52" ${INK3}/>
+    <path d="M22 60 C22 34 38 24 70 24 C102 24 118 34 118 60 C118 86 102 96 70 96 C38 96 22 86 22 60Z" fill="#B07B52" ${INK4}/>
     <path d="M38 27 C32 45 32 75 38 93 M102 27 C108 45 108 75 102 93" fill="none" stroke="#4A3A30" stroke-width="3.2"/>
     <path d="M55 25 C53 45 53 75 55 95 M70 24 V96 M85 25 C87 45 87 75 85 95" fill="none" stroke="#8A5A3A" stroke-width="1" opacity=".7"/></g>`;
-    if (label2) h3 += `<rect x="50" y="48" width="40" height="22" rx="3" fill="#3E4A43" ${INK3}/><text x="70" y="63" text-anchor="middle" font-family="Klee One,serif" font-size="10" fill="#F6EFE3">${label2}</text>`;
-    if (phase2 === "empty") h3 += `<ellipse cx="70" cy="22" rx="16" ry="5" fill="#C9A27E" ${INK3} transform="rotate(-18 70 22)"/><text x="70" y="64" text-anchor="middle" font-family="Klee One,serif" font-size="11" fill="#FFF3DD">empty</text>`;
+    if (label2) h3 += `<rect x="50" y="48" width="40" height="22" rx="3" fill="#3E4A43" ${INK4}/><text x="70" y="63" text-anchor="middle" font-family="Klee One,serif" font-size="10" fill="#F6EFE3">${label2}</text>`;
+    if (phase2 === "empty") h3 += `<ellipse cx="70" cy="22" rx="16" ry="5" fill="#C9A27E" ${INK4} transform="rotate(-18 70 22)"/><text x="70" y="64" text-anchor="middle" font-family="Klee One,serif" font-size="11" fill="#FFF3DD">empty</text>`;
     else {
-      h3 += `<circle cx="70" cy="80" r="5" fill="${col}" ${INK3} stroke-width="1"/><rect x="65" y="16" width="10" height="9" rx="2" fill="#8B5E3C" ${INK3}/>`;
+      h3 += `<circle cx="70" cy="80" r="5" fill="${col}" ${INK4} stroke-width="1"/><rect x="65" y="16" width="10" height="9" rx="2" fill="#8B5E3C" ${INK4}/>`;
       if (phase2 === "ferment" || phase2 === "bubbles") {
-        h3 += `<path d="M70 16 V6 h6 v6" fill="none" ${INK3}/><g class="vybub"><circle cx="76" cy="2" r="2.2" fill="#FFFDF6" ${INK3} stroke-width=".9"/><circle cx="82" cy="-4" r="1.6" fill="#FFFDF6" ${INK3} stroke-width=".9"/><circle cx="74" cy="-9" r="1.2" fill="#FFFDF6" ${INK3} stroke-width=".9"/></g>`;
+        h3 += `<path d="M70 16 V6 h6 v6" fill="none" ${INK4}/><g class="vybub"><circle cx="76" cy="2" r="2.2" fill="#FFFDF6" ${INK4} stroke-width=".9"/><circle cx="82" cy="-4" r="1.6" fill="#FFFDF6" ${INK4} stroke-width=".9"/><circle cx="74" cy="-9" r="1.2" fill="#FFFDF6" ${INK4} stroke-width=".9"/></g>`;
         if (phase2 === "bubbles") h3 += `<g transform="translate(112 38)">${bottleArt("sparkling", 30, -24)}</g>`;
       } else if (phase2 === "await2") h3 += `<path d="M118 40 l6 -6 M120 48 h8 M118 56 l6 6" stroke="#C9A227" stroke-width="2" stroke-linecap="round"/>`;
-      else if (phase2 === "ready") h3 += `<g class="twinkle"><path d="M116 26 l3 -7 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3z" fill="#FFE38A" ${INK3} stroke-width="1"/></g>`;
+      else if (phase2 === "ready") h3 += `<g class="twinkle"><path d="M116 26 l3 -7 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3z" fill="#FFE38A" ${INK4} stroke-width="1"/></g>`;
     }
     return svg(h3, 140, 120, "vypic barrelpic");
   }
@@ -13546,24 +13773,24 @@ ${r.n}`;
     const wine = { red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0", tempranillo: "#5A1630", pinot: "#8A2E3E", chardonnay: "#E8C96A" }[type] || "#7A1F3D";
     const body2 = type === "white" ? "M12 2 h6 v18 q6 8 6 18 v34 a3 3 0 0 1 -3 3 h-12 a3 3 0 0 1 -3 -3 v-34 q0 -10 6 -18z" : "M12 2 h6 v14 q8 4 8 12 v44 a3 3 0 0 1 -3 3 h-16 a3 3 0 0 1 -3 -3 v-44 q0 -8 8 -12z";
     const clear2 = type === "rose" || type === "white";
-    const inner = `<path d="${body2}" fill="${glass}" ${INK3}/>${clear2 ? `<path d="M7 40 h16 v31 a2 2 0 0 1 -2 2 h-12 a2 2 0 0 1 -2 -2z" fill="${wine}" opacity=".9"/>` : ""}
-    <rect x="7" y="44" width="16" height="18" rx="1.5" fill="#FFFDF6" ${INK3} stroke-width="1"/><rect x="9" y="49" width="12" height="4" fill="${wine}"/><path d="M10 57 h10" stroke="#8A8279" stroke-width="1"/>
-    ${type === "sparkling" ? `<path d="M11 1 h8 v13 h-8z" fill="#C9A227" ${INK3} stroke-width="1"/><path d="M11 9 h8" stroke="#8B6B12" stroke-width="1"/>` : `<rect x="12" y="1" width="6" height="5" rx="1" fill="${type === "red" ? "#8E2C48" : "#C9A227"}" ${INK3} stroke-width="1"/>`}
+    const inner = `<path d="${body2}" fill="${glass}" ${INK4}/>${clear2 ? `<path d="M7 40 h16 v31 a2 2 0 0 1 -2 2 h-12 a2 2 0 0 1 -2 -2z" fill="${wine}" opacity=".9"/>` : ""}
+    <rect x="7" y="44" width="16" height="18" rx="1.5" fill="#FFFDF6" ${INK4} stroke-width="1"/><rect x="9" y="49" width="12" height="4" fill="${wine}"/><path d="M10 57 h10" stroke="#8A8279" stroke-width="1"/>
+    ${type === "sparkling" ? `<path d="M11 1 h8 v13 h-8z" fill="#C9A227" ${INK4} stroke-width="1"/><path d="M11 9 h8" stroke="#8B6B12" stroke-width="1"/>` : `<rect x="12" y="1" width="6" height="5" rx="1" fill="${type === "red" ? "#8E2C48" : "#C9A227"}" ${INK4} stroke-width="1"/>`}
     <path d="M9 24 q-1 10 0 18" fill="none" stroke="#FFFFFF" stroke-width="1.6" opacity=".5" stroke-linecap="round"/>`;
     if (tilt2 != null) return `<g transform="scale(${(h3 / 76).toFixed(3)}) rotate(${tilt2} 15 40)">${inner}</g>`;
     return `<svg class="vybottle" viewBox="0 0 30 76" width="${Math.round(h3 * 30 / 76)}" height="${h3}" aria-hidden="true">${inner}</svg>`;
   }
   var glassArt = (type, h3 = 34) => {
     const wine = { red: "#7A1F3D", rose: "#E98AA0", white: "#E8D57A", sparkling: "#F3E7B0", tempranillo: "#5A1630", pinot: "#8A2E3E", chardonnay: "#E8C96A" }[type] || "#7A1F3D";
-    return `<svg class="vybottle" viewBox="0 0 24 40" width="${Math.round(h3 * 0.6)}" height="${h3}" aria-hidden="true"><path d="M5 4 h14 q1 14 -7 17 q-8 -3 -7 -17z" fill="#F4F8FA" ${INK3}/><path d="M5.6 10 h12.8 q-.6 10 -6.4 11 q-5.8 -1 -6.4 -11z" fill="${wine}"/>${type === "sparkling" ? `<circle cx="10" cy="15" r=".9" fill="#FFFDF6"/><circle cx="13" cy="13" r=".7" fill="#FFFDF6"/>` : ""}<path d="M12 21 v13 M6 36 h12" fill="none" ${INK3}/></svg>`;
+    return `<svg class="vybottle" viewBox="0 0 24 40" width="${Math.round(h3 * 0.6)}" height="${h3}" aria-hidden="true"><path d="M5 4 h14 q1 14 -7 17 q-8 -3 -7 -17z" fill="#F4F8FA" ${INK4}/><path d="M5.6 10 h12.8 q-.6 10 -6.4 11 q-5.8 -1 -6.4 -11z" fill="${wine}"/>${type === "sparkling" ? `<circle cx="10" cy="15" r=".9" fill="#FFFDF6"/><circle cx="13" cy="13" r=".7" fill="#FFFDF6"/>` : ""}<path d="M12 21 v13 M6 36 h12" fill="none" ${INK4}/></svg>`;
   };
   function oliveTree(x, y, sc, state) {
-    const leaves = [[-22, -50], [-8, -62], [10, -60], [24, -48], [-14, -38], [14, -36], [0, -48]].map(([dx, dy], i) => `<ellipse cx="${x + dx * sc}" cy="${y + dy * sc}" rx="${14 * sc}" ry="${9 * sc}" fill="${i % 2 ? "#A7B89A" : "#8FA47E"}" ${INK3}/>`).join("");
+    const leaves = [[-22, -50], [-8, -62], [10, -60], [24, -48], [-14, -38], [14, -36], [0, -48]].map(([dx, dy], i) => `<ellipse cx="${x + dx * sc}" cy="${y + dy * sc}" rx="${14 * sc}" ry="${9 * sc}" fill="${i % 2 ? "#A7B89A" : "#8FA47E"}" ${INK4}/>`).join("");
     const fruit = state === "ripe" ? [[-16, -44], [-4, -54], [8, -46], [18, -40], [-8, -34], [4, -38], [14, -54]].map(([dx, dy]) => `<ellipse cx="${x + dx * sc}" cy="${y + dy * sc}" rx="${2.6 * sc}" ry="${2 * sc}" fill="#3B3045" stroke="#3b3530" stroke-width=".8"/>`).join("") : state === "growing" ? [[-12, -44], [6, -50], [16, -42]].map(([dx, dy]) => `<ellipse cx="${x + dx * sc}" cy="${y + dy * sc}" rx="${2 * sc}" ry="${1.6 * sc}" fill="#9CB86A" stroke="#3b3530" stroke-width=".7"/>`).join("") : "";
     return `<path d="M${x - 3 * sc} ${y} C${x - 6 * sc} ${y - 14 * sc} ${x + 4 * sc} ${y - 20 * sc} ${x} ${y - 32 * sc} M${x + 3 * sc} ${y} C${x + 8 * sc} ${y - 12 * sc} ${x - 2 * sc} ${y - 22 * sc} ${x + 6 * sc} ${y - 34 * sc}" fill="none" stroke="#7A5638" stroke-width="${4 * sc}" stroke-linecap="round"/>${leaves}${fruit}`;
   }
   function oliveArt(state, w = 150) {
-    const inner = `<rect x="2" y="2" width="146" height="126" rx="14" fill="#EEF4E6"/><path d="M2 108 Q60 100 148 108 V114 a14 14 0 0 1 -14 14 H16 a14 14 0 0 1 -14 -14z" fill="#B08A6A"/>` + (state === "none" ? `<ellipse cx="75" cy="108" rx="22" ry="6" fill="#9C7A5C" ${INK3}/><text x="75" y="70" text-anchor="middle" font-family="Klee One,serif" font-size="12" fill="#8A8279">a spot for an olive tree</text>` : oliveTree(75, 110, 1.35, state)) + (state === "ripe" ? `<g class="twinkle"><path d="M122 30 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" ${INK3} stroke-width="1"/></g>` : "");
+    const inner = `<rect x="2" y="2" width="146" height="126" rx="14" fill="#EEF4E6"/><path d="M2 108 Q60 100 148 108 V114 a14 14 0 0 1 -14 14 H16 a14 14 0 0 1 -14 -14z" fill="#B08A6A"/>` + (state === "none" ? `<ellipse cx="75" cy="108" rx="22" ry="6" fill="#9C7A5C" ${INK4}/><text x="75" y="70" text-anchor="middle" font-family="Klee One,serif" font-size="12" fill="#8A8279">a spot for an olive tree</text>` : oliveTree(75, 110, 1.35, state)) + (state === "ripe" ? `<g class="twinkle"><path d="M122 30 l2.5 -6 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5z" fill="#FFE38A" ${INK4} stroke-width="1"/></g>` : "");
     return `<svg class="vypic" viewBox="0 0 150 130" width="${w}" height="${Math.round(w * 130 / 150)}" aria-hidden="true">${inner}</svg>`;
   }
   function stallIcon(id, off) {
@@ -13574,9 +13801,9 @@ ${r.n}`;
     }
     if (id === "olive") return w(oliveTree(24, 46, 0.62, "ripe"));
     if (id === "grove" || id === "grove2") return w(oliveTree(14, 44, 0.4, "ripe") + oliveTree(34, 44, 0.4, "ripe") + oliveTree(24, 34, 0.36, "ripe"));
-    if (id === "terrace") return w(`<path d="M6 16 h36 l-3 -8 h-30z" fill="#9CC27E" ${INK3}/><path d="M9 16 v26 M39 16 v26" stroke="#8B5E3C" stroke-width="2.4"/><ellipse cx="24" cy="32" rx="9" ry="3.5" fill="#FFFDF6" ${INK3}/><path d="M24 35 v8 M19 43 h10" ${INK3}/><circle cx="14" cy="12" r="2" fill="#6B2A55"/><circle cx="32" cy="12" r="2" fill="#6B2A55"/>`);
+    if (id === "terrace") return w(`<path d="M6 16 h36 l-3 -8 h-30z" fill="#9CC27E" ${INK4}/><path d="M9 16 v26 M39 16 v26" stroke="#8B5E3C" stroke-width="2.4"/><ellipse cx="24" cy="32" rx="9" ry="3.5" fill="#FFFDF6" ${INK4}/><path d="M24 35 v8 M19 43 h10" ${INK4}/><circle cx="14" cy="12" r="2" fill="#6B2A55"/><circle cx="32" cy="12" r="2" fill="#6B2A55"/>`);
     if (id === "trellis") return w(`<path d="M8 44 V8 M40 44 V8" stroke="#8B5E3C" stroke-width="3.4" stroke-linecap="round"/><path d="M8 16 H40 M8 28 H40" fill="none" stroke="#3b3530" stroke-width="1.2"/>${leaf(20, 20, 0.7, -15, "#86B26A")}${leaf(30, 30, 0.6, 20, "#9CC27E")}`);
-    return w(`<path d="M8 24 C8 12 14 8 24 8 C34 8 40 12 40 24 C40 36 34 40 24 40 C14 40 8 36 8 24Z" fill="#B07B52" ${INK3}/><path d="M14 9 C11 18 11 30 14 39 M34 9 C37 18 37 30 34 39" fill="none" stroke="#4A3A30" stroke-width="2.2"/><path d="M24 8 V40" stroke="#8A5A3A" stroke-width="1" opacity=".7"/>`);
+    return w(`<path d="M8 24 C8 12 14 8 24 8 C34 8 40 12 40 24 C40 36 34 40 24 40 C14 40 8 36 8 24Z" fill="#B07B52" ${INK4}/><path d="M14 9 C11 18 11 30 14 39 M34 9 C37 18 37 30 34 39" fill="none" stroke="#4A3A30" stroke-width="2.2"/><path d="M24 8 V40" stroke="#8A5A3A" stroke-width="1" opacity=".7"/>`);
   }
   var TAPAS_COL = {
     almejas: ["#F3E7C8", "#9DB08A"],
@@ -13631,28 +13858,28 @@ ${r.n}`;
   function dishArt(id, s = 44, off) {
     if (String(id).startsWith("tapas:")) {
       const [a, b] = TAPAS_COL[id.slice(6)] || ["#E86A5C", "#F3C969"];
-      return `<svg class="vybottle" viewBox="0 0 48 44" width="${s}" height="${Math.round(s * 44 / 48)}" aria-hidden="true"><g${off ? ' opacity=".4"' : ""}><ellipse cx="24" cy="27" rx="20" ry="10" fill="#C46A4A" ${INK3}/><ellipse cx="24" cy="24" rx="16" ry="7" fill="${a}" ${INK3} stroke-width="1"/>
-      ${[[17, 23], [24, 21], [31, 23], [21, 26], [28, 26]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${b}" stroke="#3b3530" stroke-width=".8"/>`).join("")}<path d="M4 25 q-2 -3 1 -4 M44 25 q2 -3 -1 -4" fill="none" ${INK3}/><path d="M30 14 l6 -7" stroke="#8B5E3C" stroke-width="1.6" stroke-linecap="round"/></g></svg>`;
+      return `<svg class="vybottle" viewBox="0 0 48 44" width="${s}" height="${Math.round(s * 44 / 48)}" aria-hidden="true"><g${off ? ' opacity=".4"' : ""}><ellipse cx="24" cy="27" rx="20" ry="10" fill="#C46A4A" ${INK4}/><ellipse cx="24" cy="24" rx="16" ry="7" fill="${a}" ${INK4} stroke-width="1"/>
+      ${[[17, 23], [24, 21], [31, 23], [21, 26], [28, 26]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${b}" stroke="#3b3530" stroke-width=".8"/>`).join("")}<path d="M4 25 q-2 -3 1 -4 M44 25 q2 -3 -1 -4" fill="none" ${INK4}/><path d="M30 14 l6 -7" stroke="#8B5E3C" stroke-width="1.6" stroke-linecap="round"/></g></svg>`;
     }
-    const plate = `<ellipse cx="24" cy="30" rx="21" ry="11" fill="#FFFDF6" ${INK3}/><ellipse cx="24" cy="29" rx="14" ry="6.5" fill="none" stroke="#E4DDD2" stroke-width="1.2"/>`;
+    const plate = `<ellipse cx="24" cy="30" rx="21" ry="11" fill="#FFFDF6" ${INK4}/><ellipse cx="24" cy="29" rx="14" ry="6.5" fill="none" stroke="#E4DDD2" stroke-width="1.2"/>`;
     const F2 = {
-      cheese: plate + `<path d="M12 28 l14 -10 l3 9z" fill="#F3C969" ${INK3}/><circle cx="20" cy="25" r="1.4" fill="#E3B04B"/><rect x="30" y="22" width="6" height="6" rx="1" fill="#F6E3A1" ${INK3} stroke-width="1"/><rect x="33" y="27" width="6" height="5" rx="1" fill="#FFF3C4" ${INK3} stroke-width="1"/><circle cx="16" cy="32" r="2.4" fill="#6B2A55" ${INK3} stroke-width=".8"/><circle cx="19.5" cy="33" r="2.4" fill="#6B2A55" ${INK3} stroke-width=".8"/>`,
-      farmboard: plate + `<path d="M11 29 l12 -9 l3 8z" fill="#F6E3A1" ${INK3}/><path d="M24 30 l9 -9 l5 6z" fill="#DCE3E8" ${INK3}/><circle cx="31" cy="25" r="1" fill="#6B8CA8"/><rect x="14" y="31" width="7" height="3.5" rx="1" fill="#D9944A" ${INK3} stroke-width="1"/><path d="M34 31 q3 -3 6 0 q-3 2 -6 0z" fill="#F3B23A" ${INK3} stroke-width=".8"/>`,
-      honeycake: plate + `<path d="M13 30 l11 -10 l12 7 v5 l-12 3z" fill="#E3B04B" ${INK3}/><path d="M13 30 l11 -10 l12 7 l-12 4z" fill="#F3C969" ${INK3}/><path d="M18 26 q4 2 8 0 q3 -1 6 1" fill="none" stroke="#C9853E" stroke-width="1.4"/>`,
-      shortbread: plate + [[15, 27], [24, 25], [33, 27]].map(([x, y]) => `<rect x="${x - 4}" y="${y - 3}" width="8" height="6" rx="1.2" fill="#F3DFA6" ${INK3} stroke-width="1"/><circle cx="${x}" cy="${y}" r="1.4" fill="#E86A7C"/>`).join(""),
-      bluetart: plate + `<ellipse cx="24" cy="26" rx="14" ry="7" fill="#E3B47A" ${INK3}/><ellipse cx="24" cy="25" rx="10.5" ry="4.8" fill="#5E6EB8"/>` + [[19, 24], [24, 23], [29, 25], [22, 27], [27, 27]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#3F4F9A" stroke="#3b3530" stroke-width=".6"/>`).join(""),
-      posset: plate + [[16, 26], [30, 26]].map(([x, y]) => `<path d="M${x - 6} ${y - 4} h12 l-1.5 8 h-9z" fill="#FFF6DC" ${INK3} stroke-width="1"/><ellipse cx="${x}" cy="${y - 4}" rx="6" ry="1.6" fill="#F4B8C8" ${INK3} stroke-width=".8"/>`).join(""),
-      almendras: plate + [[14, 27], [19, 24], [24, 27], [29, 24], [34, 27], [21, 30], [27, 30]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3" ry="1.8" fill="#D9B07A" ${INK3} stroke-width=".8"/>`).join(""),
-      panaceite: plate + `<rect x="11" y="23" width="18" height="9" rx="3" fill="#E3B47A" ${INK3}/><path d="M13 26 q4 2 12 0" fill="none" stroke="#C9C25A" stroke-width="2"/><path d="M32 18 h4 v4 l2 3 v8 h-8 v-8 l2 -3z" fill="#B9B04A" ${INK3} stroke-width="1"/>`,
-      crumble: plate + `<ellipse cx="24" cy="26" rx="13" ry="6.5" fill="#4A3550" ${INK3}/><path d="M12 25 q4 -6 8 -2 q4 -5 8 -1 q4 -4 8 2" fill="#E3B47A" ${INK3} stroke-width="1"/>`,
-      bread: plate + `<path d="M11 28 q0 -9 13 -9 q13 0 13 9 v2 h-26z" fill="#D9A066" ${INK3}/><path d="M17 22 l2 5 M23 20 l1 6 M29 21 l-1 5" stroke="#9C6B3E" stroke-width="1.2"/><rect x="31" y="29" width="7" height="4" rx="1" fill="#FFF3C4" ${INK3} stroke-width="1"/>`,
-      olives: `<path d="M7 24 h34 q-2 13 -17 13 q-15 0 -17 -13z" fill="#E7EFF2" ${INK3}/>` + [[16, 22], [22, 20], [28, 22], [19, 26], [26, 26], [32, 25]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.2" ry="2.4" fill="#7FA35A" ${INK3} stroke-width=".9"/>`).join("") + `<path d="M36 18 l6 -8" stroke="#8B5E3C" stroke-width="1.6" stroke-linecap="round"/>`,
-      carrotcake: plate + `<path d="M13 30 l12 -12 l11 8 v5 l-12 3z" fill="#E3A36A" ${INK3}/><path d="M13 30 l12 -12 l11 8 l-12 4z" fill="#FFF3E6" ${INK3}/><path d="M22 21 l-2 -4 M24 20 l1 -4" stroke="#7FA35A" stroke-width="1.4" stroke-linecap="round"/><path d="M21 22 l5 0 l-2.5 4z" fill="#F08A3C" stroke="#3b3530" stroke-width=".8"/>`,
-      corn: plate + `<path d="M10 30 q14 -14 28 -6 q-4 9 -28 6z" fill="#F3C969" ${INK3}/><path d="M16 26 l2 4 M22 24 l2 5 M28 23 l1.5 5 M33 24 l1 4" stroke="#B5813A" stroke-width="1.2"/><path d="M36 22 q6 -2 7 4" fill="none" stroke="#7FA35A" stroke-width="1.6"/>`,
-      berrytart: plate + `<ellipse cx="24" cy="26" rx="14" ry="7" fill="#E3B47A" ${INK3}/><ellipse cx="24" cy="25" rx="10.5" ry="4.8" fill="#F6E3C6"/>` + [[18, 24, "#D9485F"], [22, 23, "#3F6FD1"], [26, 24, "#D9485F"], [30, 25, "#3F6FD1"], [21, 27, "#3F6FD1"], [27, 27, "#D9485F"]].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="2" fill="${c}" stroke="#3b3530" stroke-width=".7"/>`).join(""),
-      dumplings: plate + [[15, 27], [24, 24], [33, 27]].map(([x, y]) => `<path d="M${x - 6} ${y + 2} q6 -9 12 0 q-6 3 -12 0z" fill="#F4EEE3" ${INK3}/><path d="M${x - 3} ${y - 1} l1 2 M${x} ${y - 2} v2 M${x + 3} ${y - 1} l-1 2" stroke="#8A8279" stroke-width=".9"/>`).join(""),
-      honeytoast: plate + [[14, 21], [22, 19], [30, 21]].map(([x, y]) => `<rect x="${x}" y="${y}" width="6" height="12" rx="1.5" fill="#D9A066" ${INK3} stroke-width="1"/><rect x="${x + 1}" y="${y + 1}" width="4" height="4" rx="1" fill="#F3C969"/>`).join("") + `<path d="M36 22 q4 1 3 6" fill="none" stroke="#E3A33A" stroke-width="2"/>`,
-      fish: plate + `<path d="M11 27 q9 -9 20 0 q-11 9 -20 0z" fill="#B9C6CF" ${INK3}/><path d="M31 27 l6 -5 v10z" fill="#B9C6CF" ${INK3}/><circle cx="15" cy="26" r="1" fill="#3b3530"/><path d="M19 23 l3 8 M24 23 l3 8" stroke="#6B5E52" stroke-width="1.1"/><path d="M35 33 q3 -2 5 0" fill="none" stroke="#7FA35A" stroke-width="1.4"/>`,
+      cheese: plate + `<path d="M12 28 l14 -10 l3 9z" fill="#F3C969" ${INK4}/><circle cx="20" cy="25" r="1.4" fill="#E3B04B"/><rect x="30" y="22" width="6" height="6" rx="1" fill="#F6E3A1" ${INK4} stroke-width="1"/><rect x="33" y="27" width="6" height="5" rx="1" fill="#FFF3C4" ${INK4} stroke-width="1"/><circle cx="16" cy="32" r="2.4" fill="#6B2A55" ${INK4} stroke-width=".8"/><circle cx="19.5" cy="33" r="2.4" fill="#6B2A55" ${INK4} stroke-width=".8"/>`,
+      farmboard: plate + `<path d="M11 29 l12 -9 l3 8z" fill="#F6E3A1" ${INK4}/><path d="M24 30 l9 -9 l5 6z" fill="#DCE3E8" ${INK4}/><circle cx="31" cy="25" r="1" fill="#6B8CA8"/><rect x="14" y="31" width="7" height="3.5" rx="1" fill="#D9944A" ${INK4} stroke-width="1"/><path d="M34 31 q3 -3 6 0 q-3 2 -6 0z" fill="#F3B23A" ${INK4} stroke-width=".8"/>`,
+      honeycake: plate + `<path d="M13 30 l11 -10 l12 7 v5 l-12 3z" fill="#E3B04B" ${INK4}/><path d="M13 30 l11 -10 l12 7 l-12 4z" fill="#F3C969" ${INK4}/><path d="M18 26 q4 2 8 0 q3 -1 6 1" fill="none" stroke="#C9853E" stroke-width="1.4"/>`,
+      shortbread: plate + [[15, 27], [24, 25], [33, 27]].map(([x, y]) => `<rect x="${x - 4}" y="${y - 3}" width="8" height="6" rx="1.2" fill="#F3DFA6" ${INK4} stroke-width="1"/><circle cx="${x}" cy="${y}" r="1.4" fill="#E86A7C"/>`).join(""),
+      bluetart: plate + `<ellipse cx="24" cy="26" rx="14" ry="7" fill="#E3B47A" ${INK4}/><ellipse cx="24" cy="25" rx="10.5" ry="4.8" fill="#5E6EB8"/>` + [[19, 24], [24, 23], [29, 25], [22, 27], [27, 27]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#3F4F9A" stroke="#3b3530" stroke-width=".6"/>`).join(""),
+      posset: plate + [[16, 26], [30, 26]].map(([x, y]) => `<path d="M${x - 6} ${y - 4} h12 l-1.5 8 h-9z" fill="#FFF6DC" ${INK4} stroke-width="1"/><ellipse cx="${x}" cy="${y - 4}" rx="6" ry="1.6" fill="#F4B8C8" ${INK4} stroke-width=".8"/>`).join(""),
+      almendras: plate + [[14, 27], [19, 24], [24, 27], [29, 24], [34, 27], [21, 30], [27, 30]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3" ry="1.8" fill="#D9B07A" ${INK4} stroke-width=".8"/>`).join(""),
+      panaceite: plate + `<rect x="11" y="23" width="18" height="9" rx="3" fill="#E3B47A" ${INK4}/><path d="M13 26 q4 2 12 0" fill="none" stroke="#C9C25A" stroke-width="2"/><path d="M32 18 h4 v4 l2 3 v8 h-8 v-8 l2 -3z" fill="#B9B04A" ${INK4} stroke-width="1"/>`,
+      crumble: plate + `<ellipse cx="24" cy="26" rx="13" ry="6.5" fill="#4A3550" ${INK4}/><path d="M12 25 q4 -6 8 -2 q4 -5 8 -1 q4 -4 8 2" fill="#E3B47A" ${INK4} stroke-width="1"/>`,
+      bread: plate + `<path d="M11 28 q0 -9 13 -9 q13 0 13 9 v2 h-26z" fill="#D9A066" ${INK4}/><path d="M17 22 l2 5 M23 20 l1 6 M29 21 l-1 5" stroke="#9C6B3E" stroke-width="1.2"/><rect x="31" y="29" width="7" height="4" rx="1" fill="#FFF3C4" ${INK4} stroke-width="1"/>`,
+      olives: `<path d="M7 24 h34 q-2 13 -17 13 q-15 0 -17 -13z" fill="#E7EFF2" ${INK4}/>` + [[16, 22], [22, 20], [28, 22], [19, 26], [26, 26], [32, 25]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.2" ry="2.4" fill="#7FA35A" ${INK4} stroke-width=".9"/>`).join("") + `<path d="M36 18 l6 -8" stroke="#8B5E3C" stroke-width="1.6" stroke-linecap="round"/>`,
+      carrotcake: plate + `<path d="M13 30 l12 -12 l11 8 v5 l-12 3z" fill="#E3A36A" ${INK4}/><path d="M13 30 l12 -12 l11 8 l-12 4z" fill="#FFF3E6" ${INK4}/><path d="M22 21 l-2 -4 M24 20 l1 -4" stroke="#7FA35A" stroke-width="1.4" stroke-linecap="round"/><path d="M21 22 l5 0 l-2.5 4z" fill="#F08A3C" stroke="#3b3530" stroke-width=".8"/>`,
+      corn: plate + `<path d="M10 30 q14 -14 28 -6 q-4 9 -28 6z" fill="#F3C969" ${INK4}/><path d="M16 26 l2 4 M22 24 l2 5 M28 23 l1.5 5 M33 24 l1 4" stroke="#B5813A" stroke-width="1.2"/><path d="M36 22 q6 -2 7 4" fill="none" stroke="#7FA35A" stroke-width="1.6"/>`,
+      berrytart: plate + `<ellipse cx="24" cy="26" rx="14" ry="7" fill="#E3B47A" ${INK4}/><ellipse cx="24" cy="25" rx="10.5" ry="4.8" fill="#F6E3C6"/>` + [[18, 24, "#D9485F"], [22, 23, "#3F6FD1"], [26, 24, "#D9485F"], [30, 25, "#3F6FD1"], [21, 27, "#3F6FD1"], [27, 27, "#D9485F"]].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="2" fill="${c}" stroke="#3b3530" stroke-width=".7"/>`).join(""),
+      dumplings: plate + [[15, 27], [24, 24], [33, 27]].map(([x, y]) => `<path d="M${x - 6} ${y + 2} q6 -9 12 0 q-6 3 -12 0z" fill="#F4EEE3" ${INK4}/><path d="M${x - 3} ${y - 1} l1 2 M${x} ${y - 2} v2 M${x + 3} ${y - 1} l-1 2" stroke="#8A8279" stroke-width=".9"/>`).join(""),
+      honeytoast: plate + [[14, 21], [22, 19], [30, 21]].map(([x, y]) => `<rect x="${x}" y="${y}" width="6" height="12" rx="1.5" fill="#D9A066" ${INK4} stroke-width="1"/><rect x="${x + 1}" y="${y + 1}" width="4" height="4" rx="1" fill="#F3C969"/>`).join("") + `<path d="M36 22 q4 1 3 6" fill="none" stroke="#E3A33A" stroke-width="2"/>`,
+      fish: plate + `<path d="M11 27 q9 -9 20 0 q-11 9 -20 0z" fill="#B9C6CF" ${INK4}/><path d="M31 27 l6 -5 v10z" fill="#B9C6CF" ${INK4}/><circle cx="15" cy="26" r="1" fill="#3b3530"/><path d="M19 23 l3 8 M24 23 l3 8" stroke="#6B5E52" stroke-width="1.1"/><path d="M35 33 q3 -2 5 0" fill="none" stroke="#7FA35A" stroke-width="1.4"/>`,
       apples: plate + [[15, 27, "#D9485F"], [22, 25, "#9CC27E"], [29, 27, "#D9485F"], [35, 26, "#9CC27E"]].map(([x, y, c]) => `<path d="M${x - 4} ${y} q4 -7 8 0 q-4 3 -8 0z" fill="#FFF3DD" stroke="${c}" stroke-width="2"/>`).join("")
     };
     return `<svg class="vybottle" viewBox="0 0 48 44" width="${s}" height="${Math.round(s * 44 / 48)}" aria-hidden="true"><g${off ? ' opacity=".4"' : ""}>${F2[id] || plate}</g></svg>`;
@@ -15517,7 +15744,7 @@ ${r.n}`;
     return m.price || 5;
   }
   var shut6 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
-  var swatch = (adds) => `<span class="mullsw">${adds.map((a) => `<i style="background:${ADDS[a].col}"></i>`).join("")}</span>`;
+  var swatch2 = (adds) => `<span class="mullsw">${adds.map((a) => `<i style="background:${ADDS[a].col}"></i>`).join("")}</span>`;
   function mullPanel(F2, v, st6 = {}, day = dayKey()) {
     const m = mullState(F2);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The mulling pot</h2>`;
@@ -15534,7 +15761,7 @@ ${r.n}`;
     h3 += `<p class="sub">A bottle of your red, and two or three things to mull it with. Half an hour on a low heat, then ten cups.</p>`;
     if (m.recipes.length) h3 += `<p class="eyebrow" style="margin:10px 0 6px">Make one you know</p><ul class="hlist wlist">${m.recipes.map((r) => {
       const ok = r.adds.every((a) => got(F2, m, a) > 0) && reds.length;
-      return `<li><span class="wtxt"><b>${esc(r.name)}</b><small>${swatch(r.adds)} ${r.adds.map((a) => esc(ADDS[a].n)).join(", ")} · ${cupPrice(r.adds)} a cup</small></span><button class="btn small ${ok ? "primary" : "alt"}" data-mull="again:${r.id}" ${ok ? "" : "disabled"}>Mull it</button></li>`;
+      return `<li><span class="wtxt"><b>${esc(r.name)}</b><small>${swatch2(r.adds)} ${r.adds.map((a) => esc(ADDS[a].n)).join(", ")} · ${cupPrice(r.adds)} a cup</small></span><button class="btn small ${ok ? "primary" : "alt"}" data-mull="again:${r.id}" ${ok ? "" : "disabled"}>Mull it</button></li>`;
     }).join("")}</ul>`;
     if (!reds.length) return h3 + `<p class="muted">You'll need a bottle of red on the shelves for the base: Merlot-ish house red, Tempranillo or Pinot.</p>` + shut6;
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">The wine</p><div class="gchips">${reds.map((s) => `<button class="gchip${st6.base === s.id ? " on" : ""}" data-mull="base:${s.id}" aria-pressed="${st6.base === s.id}">${esc(s.name)} (${s.n})</button>`).join("")}</div>`;
@@ -16823,8 +17050,8 @@ ${r.n}`;
     { id: "late", t: 22 * 60 + 30, dir: "w", n: "The late train", to: "to the city", line: "Night market evenings only: everyone home, sleepy and full.", dow: [2, 4] }
   ];
   var STOP_X = 190;
-  var dow3 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
-  var trainsOn = (day) => TRAINS.filter((t2) => !t2.dow || t2.dow.includes(dow3(day)));
+  var dow4 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+  var trainsOn = (day) => TRAINS.filter((t2) => !t2.dow || t2.dow.includes(dow4(day)));
   var WINDOWS = {
     hlane: { e: [[-1, "arrive"], [0, "dwell"], [1, "dwell"], [2, "depart"]], w: [[-1, "arrive"], [0, "dwell"], [1, "dwell"], [2, "depart"]] },
     hfarm: { e: [[-2, "pass"]], w: [[3, "pass"]] },
@@ -17822,11 +18049,11 @@ ${r.n}`;
       }
       case "gallerywall": {
         G2.galleryStock && G2.galleryStock();
-        const fr = (((G2.F && G2.F() || {}).giftshop || {}).gallery || {}).frames || [null, null, null, null];
+        const fr = G2.F && G2.F().giftshop && G2.F().giftshop.gallery ? framesNow(G2.F()) : [null, null, null, null];
         return sk(
           fr.map((f5, i) => {
-            const fx = x - 108 + i * 56, c1 = f5 ? f5.c1 || "#A68FCB" : "#EFE8DC", c22 = f5 ? f5.c2 || "#F3DDB0" : "#EFE8DC";
-            return `<rect x="${fx}" y="${y - 92}" width="48" height="58" rx="2" style="fill:${f5 ? "#8A5A3A" : "#D9CBB6"}"/><rect x="${fx + 5}" y="${y - 87}" width="38" height="48" style="fill:${c1}"/>${f5 ? `<path d="M${fx + 5} ${y - 56} Q${fx + 18} ${y - 68} ${fx + 28} ${y - 58} T${fx + 43} ${y - 62} V${y - 39} H${fx + 5}z" style="fill:${c22}"/>` : ""}${f5 && f5.by ? `<rect x="${fx + 16}" y="${y - 30}" width="16" height="6" rx="1" style="fill:#FFFDF6"/>` : ""}`;
+            const fx = x - 108 + i * 56;
+            return `<rect x="${fx}" y="${y - 92}" width="48" height="58" rx="2" style="fill:${f5 ? "#8A5A3A" : "#D9CBB6"}"/>${f5 ? `<svg x="${fx + 5}" y="${y - 87}" width="38" height="48" overflow="hidden">${paintSVG(0, 0, 38, 48, f5)}</svg>` : `<rect x="${fx + 5}" y="${y - 87}" width="38" height="48" style="fill:#EFE8DC"/>`}${f5 && f5.by ? `<rect x="${fx + 16}" y="${y - 30}" width="16" height="6" rx="1" style="fill:#FFFDF6"/>` : ""}`;
           }).join(""),
           fr.map((f5, i) => `<rect x="${x - 108 + i * 56}" y="${y - 92}" width="48" height="58" rx="2"/>`).join("")
         );
@@ -21926,7 +22153,7 @@ Quests finished today: ${S3.doneIds.length}`;
   var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
   var DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-hellos", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
   var KEY4 = "fox.feeds";
-  var D2 = (() => {
+  var D3 = (() => {
     try {
       return JSON.parse(localStorage.getItem(KEY4)) || {};
     } catch {
@@ -21938,9 +22165,9 @@ Quests finished today: ${S3.doneIds.length}`;
   function attachFeeds(col, changed) {
     onChange3 = changed;
     DOCS.forEach((id) => col.doc(id).onSnapshot((snap) => {
-      D2[id] = snap.exists ? snap.data() || null : null;
+      D3[id] = snap.exists ? snap.data() || null : null;
       try {
-        localStorage.setItem(KEY4, JSON.stringify(D2));
+        localStorage.setItem(KEY4, JSON.stringify(D3));
       } catch {
       }
       onChange3(id);
@@ -21949,7 +22176,7 @@ Quests finished today: ${S3.doneIds.length}`;
   }
   var STATE = (s) => /fail|red|error|down/i.test(s || "") ? "red" : /warn|amber|flaky|slow|skip/i.test(s || "") ? "amber" : /pass|ok|green|up|healthy/i.test(s || "") ? "green" : "grey";
   function health(app) {
-    const d = D2["health-" + app];
+    const d = D3["health-" + app];
     if (!d || !d.at) return null;
     const checks = (Array.isArray(d.checks) ? d.checks : []).slice(0, 12).map((c) => ({ name: plain(String(c.name || "")).slice(0, 60), state: STATE(c.state), detail: plain(String(c.detail || "")).slice(0, 120) }));
     const worst = checks.some((c) => c.state === "red") ? "red" : checks.some((c) => c.state === "amber") ? "amber" : "green";
@@ -21974,7 +22201,7 @@ Quests finished today: ${S3.doneIds.length}`;
   }
   var n0 = (v) => Math.max(0, Math.round(+v || 0));
   function ohayoHellos() {
-    const d = D2["ohayo-hellos"];
+    const d = D3["ohayo-hellos"];
     if (!d || !d.at) return null;
     const reactions = (Array.isArray(d.reactions) ? d.reactions : []).slice(0, 12).map((r) => ({
       name: plain(String(r.name || "Someone")).slice(0, 30),
@@ -22023,7 +22250,7 @@ Quests finished today: ${S3.doneIds.length}`;
   function contentItems() {
     const out = [];
     Object.keys(BRANDS).forEach((b) => {
-      const d = D2["content-" + b];
+      const d = D3["content-" + b];
       (d && d.items || []).forEach((it) => {
         if (!it || !/^\d{4}-\d{2}-\d{2}$/.test(it.date || "")) return;
         out.push({
@@ -22039,7 +22266,7 @@ Quests finished today: ${S3.doneIds.length}`;
     });
     return out.sort((x, y) => (x.date + x.time).localeCompare(y.date + y.time));
   }
-  var contentUpdated = () => Object.keys(BRANDS).map((b) => D2["content-" + b] && D2["content-" + b].at).filter(Boolean);
+  var contentUpdated = () => Object.keys(BRANDS).map((b) => D3["content-" + b] && D3["content-" + b].at).filter(Boolean);
   var brandFilter = "all";
   function contentHTML() {
     const today2 = dayKey(), end = new Date(Date.parse(today2 + "T00:00:00Z") + 14 * 864e5).toISOString().slice(0, 10);
@@ -22062,11 +22289,11 @@ Quests finished today: ${S3.doneIds.length}`;
     });
   }
   var outfitDoc = () => {
-    const d = D2.outfit;
+    const d = D3.outfit;
     return d && d.at ? d : null;
   };
   function goodNews() {
-    const d = D2.goodnews;
+    const d = D3.goodnews;
     return d && d.at ? d : null;
   }
   function goodNewsHTML(localWins, cal, tab = "wins") {
@@ -22258,10 +22485,10 @@ Quests finished today: ${S3.doneIds.length}`;
     }, 500);
   }
   var today = () => dayKey();
-  var dow4 = () => (/* @__PURE__ */ new Date(today() + "T00:00:00Z")).getUTCDay();
+  var dow5 = () => (/* @__PURE__ */ new Date(today() + "T00:00:00Z")).getUTCDay();
   var shift = (k, d) => new Date(Date.parse(k + "T00:00:00Z") + d * 864e5).toISOString().slice(0, 10);
-  var weekKey = () => shift(today(), -dow4());
-  var mondayKey = () => shift(today(), -((dow4() + 6) % 7));
+  var weekKey = () => shift(today(), -dow5());
+  var mondayKey = () => shift(today(), -((dow5() + 6) % 7));
   function tidy() {
     if (!Array.isArray(H2.zones) || !H2.zones.length) H2.zones = DEFAULT_ZONES;
     if (!H2.pantryCategories || !H2.pantryCategories.length) H2.pantryCategories = DEFAULT_CATS;
@@ -22285,7 +22512,7 @@ Quests finished today: ${S3.doneIds.length}`;
   function hestiaCounts() {
     tidy();
     const daily = (H2.dailyTasks || []).filter((t2) => !dayDone(t2.id)).length;
-    const weeklyToday = (H2.weeklyTasks || []).filter((t2) => t2.weekday === dow4() && !weekDone(t2.id)).length;
+    const weeklyToday = (H2.weeklyTasks || []).filter((t2) => t2.weekday === dow5() && !weekDone(t2.id)).length;
     const shop = (H2.shoppingList || []).filter((s) => !s.purchased).length;
     return { chores: daily + weeklyToday, shop, zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).length };
   }
@@ -22392,8 +22619,8 @@ Quests finished today: ${S3.doneIds.length}`;
       const order2 = (t2) => (dayDone(t2.id) ? 10 : 0) + (t2.timeOfDay === "morning" ? 0 : t2.timeOfDay === "evening" ? 2 : 1);
       h3 += [...H2.dailyTasks || []].sort((a, b) => order2(a) - order2(b)).map((t2) => row("daily", t2.id, t2, dayDone(t2.id), t2.timeOfDay ? `<span class="hbadge">${t2.timeOfDay}</span>` : "")).join("");
     } else if (view.tab === "weekly") {
-      const order2 = (t2) => (weekDone(t2.id) ? 10 : 0) + (t2.weekday === dow4() ? 0 : 1);
-      h3 += [...H2.weeklyTasks || []].sort((a, b) => order2(a) - order2(b)).map((t2) => row("weekly", t2.id, t2, weekDone(t2.id), t2.weekday != null ? `<span class="hbadge${t2.weekday === dow4() ? " now" : ""}">${t2.weekday === dow4() ? "today" : DAYS[t2.weekday]}</span>` : "")).join("");
+      const order2 = (t2) => (weekDone(t2.id) ? 10 : 0) + (t2.weekday === dow5() ? 0 : 1);
+      h3 += [...H2.weeklyTasks || []].sort((a, b) => order2(a) - order2(b)).map((t2) => row("weekly", t2.id, t2, weekDone(t2.id), t2.weekday != null ? `<span class="hbadge${t2.weekday === dow5() ? " now" : ""}">${t2.weekday === dow5() ? "today" : DAYS[t2.weekday]}</span>` : "")).join("");
     } else if (view.tab === "last") {
       const items = [...H2.lastDone || []].sort((a, b) => (dueIn(a) ?? 9999) - (dueIn(b) ?? 9999));
       h3 += items.map((it) => {
@@ -22765,7 +22992,7 @@ Quests finished today: ${S3.doneIds.length}`;
     tidy();
     const shop = (H2.shoppingList || []).map((s) => (H2.pantryItems.find((i) => i.id === s.id) || {}).name).filter(Boolean);
     return {
-      choresDueToday: [...(H2.dailyTasks || []).filter((t2) => !dayDone(t2.id)).map((t2) => t2.text), ...(H2.weeklyTasks || []).filter((t2) => t2.weekday === dow4() && !weekDone(t2.id)).map((t2) => t2.text)],
+      choresDueToday: [...(H2.dailyTasks || []).filter((t2) => !dayDone(t2.id)).map((t2) => t2.text), ...(H2.weeklyTasks || []).filter((t2) => t2.weekday === dow5() && !weekDone(t2.id)).map((t2) => t2.text)],
       weeklyLeft: (H2.weeklyTasks || []).filter((t2) => !weekDone(t2.id)).map((t2) => t2.text),
       zone: zone().name,
       zoneLeft: (zone().tasks || []).filter((_, i) => !zoneDone(i)).map((t2) => t2.text),
@@ -24827,8 +25054,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
 
   // src/game/kid.js
   var kid = { sleep: false, pending: null, open: null };
-  var INK4 = "#3A2E28";
-  var sw2 = `stroke="${INK4}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"`;
+  var INK5 = "#3A2E28";
+  var sw2 = `stroke="${INK5}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"`;
   var pick2 = (a) => a[Math.floor(Math.random() * a.length)];
   var SNACKS = {
     milk: {
@@ -24847,25 +25074,25 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       n: "Apple chips",
       say: ["crunch crunch!", "apple!", "crunchy!"],
       fx: "crunch",
-      svg: `<path d="M8 38 h48 q-2 22 -24 22 q-22 0 -24 -22z" fill="#F4C7CF" ${sw2}/>${[[20, 32], [32, 28], [44, 32], [26, 36], [38, 36]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="#FFF3D6" ${sw2}/><circle cx="${x}" cy="${y}" r="1.6" fill="${INK4}"/>`).join("")}`
+      svg: `<path d="M8 38 h48 q-2 22 -24 22 q-22 0 -24 -22z" fill="#F4C7CF" ${sw2}/>${[[20, 32], [32, 28], [44, 32], [26, 36], [38, 36]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="#FFF3D6" ${sw2}/><circle cx="${x}" cy="${y}" r="1.6" fill="${INK5}"/>`).join("")}`
     },
     melon: {
       n: "Watermelon",
       say: ["melon!", "juicy!", "nom nom"],
       fx: "crunch",
-      svg: `<path d="M8 24 h48 a24 24 0 0 1 -48 0z" fill="#7BB37A" ${sw2}/><path d="M13 24 h38 a19 19 0 0 1 -38 0z" fill="#F26D6D"/>${[[22, 32], [32, 36], [42, 32], [28, 28], [37, 28]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1.6" ry="2.6" fill="${INK4}"/>`).join("")}<path d="M8 24 h48" ${sw2}/>`
+      svg: `<path d="M8 24 h48 a24 24 0 0 1 -48 0z" fill="#7BB37A" ${sw2}/><path d="M13 24 h38 a19 19 0 0 1 -38 0z" fill="#F26D6D"/>${[[22, 32], [32, 36], [42, 32], [28, 28], [37, 28]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1.6" ry="2.6" fill="${INK5}"/>`).join("")}<path d="M8 24 h48" ${sw2}/>`
     },
     fish: {
       n: "Goldfish crackers",
       say: ["fishies!", "crunch!", "more fish!"],
       fx: "crunch",
-      svg: `<path d="M8 40 h48 q-2 20 -24 20 q-22 0 -24 -20z" fill="#BFD6E6" ${sw2}/>${[[20, 32, -10], [36, 28, 8], [30, 37, 0], [46, 35, -6]].map(([x, y, r]) => `<g transform="translate(${x} ${y}) rotate(${r})"><ellipse cx="0" cy="0" rx="8" ry="5" fill="#F3A13A" ${sw2}/><path d="M7 0 l6 -5 v10z" fill="#F3A13A" ${sw2}/><circle cx="-4" cy="-1" r="1.2" fill="${INK4}"/></g>`).join("")}`
+      svg: `<path d="M8 40 h48 q-2 20 -24 20 q-22 0 -24 -20z" fill="#BFD6E6" ${sw2}/>${[[20, 32, -10], [36, 28, 8], [30, 37, 0], [46, 35, -6]].map(([x, y, r]) => `<g transform="translate(${x} ${y}) rotate(${r})"><ellipse cx="0" cy="0" rx="8" ry="5" fill="#F3A13A" ${sw2}/><path d="M7 0 l6 -5 v10z" fill="#F3A13A" ${sw2}/><circle cx="-4" cy="-1" r="1.2" fill="${INK5}"/></g>`).join("")}`
     }
   };
   var pic2 = (inner, size = 64) => `<svg viewBox="0 0 64 64" width="${size}" height="${size}" aria-hidden="true">${inner}</svg>`;
   var snackPic = (id, size) => pic2(SNACKS[id].svg, size);
   var DINO_COLS = ["#7BB37A", "#7FB8E8", "#F2A65A", "#C9A3E8", "#F4A0B5"];
-  var babyDino = (c) => `<path d="M14 54 q-4 -20 12 -26 q4 -14 16 -12 q10 2 8 12 q-2 6 -10 6 q4 8 2 20z" fill="${c}" ${sw2}/><circle cx="44" cy="22" r="2" fill="${INK4}"/><path d="M47 28 q-3 2 -6 1" fill="none" ${sw2}/><path d="M26 30 l-3 -5 l5 1 l1 -5 l4 3" fill="#FFFDF6" ${sw2}/>`;
+  var babyDino = (c) => `<path d="M14 54 q-4 -20 12 -26 q4 -14 16 -12 q10 2 8 12 q-2 6 -10 6 q4 8 2 20z" fill="${c}" ${sw2}/><circle cx="44" cy="22" r="2" fill="${INK5}"/><path d="M47 28 q-3 2 -6 1" fill="none" ${sw2}/><path d="M26 30 l-3 -5 l5 1 l1 -5 l4 3" fill="#FFFDF6" ${sw2}/>`;
   var egg = (stage3) => `<ellipse cx="32" cy="38" rx="20" ry="25" fill="#FFF6E2" ${sw2}/><circle cx="24" cy="30" r="3.4" fill="#A8CF8E"/><circle cx="38" cy="44" r="4" fill="#F2A65A"/><circle cx="36" cy="26" r="2.6" fill="#7FB8E8"/>${stage3 >= 1 ? `<path d="M14 36 l6 -5 l5 6 l6 -7 l6 7 l6 -6 l5 5" fill="none" ${sw2}/>` : ""}`;
   var hatched = (c) => `${babyDino(c)}<path d="M12 44 l6 -5 l5 6 l6 -7 l6 7 l6 -6 l6 5 v6 a20 14 0 0 1 -41 0z" fill="#FFF6E2" ${sw2}/>`;
   var CAR_COLS = ["#E86A5C", "#5B8FD6", "#F3C14A"];
@@ -24873,7 +25100,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var engine = `<svg viewBox="0 0 80 64" width="110" height="88" aria-hidden="true"><path d="M8 50 v-24 h24 v-12 h16 v12 h16 q8 0 8 8 v16z" fill="#E86A5C" ${sw2}/><rect x="12" y="30" width="16" height="12" rx="2" fill="#DCEBF6" ${sw2}/><path d="M52 26 v-12 h8 v12" fill="#3B3B44" ${sw2}/><circle cx="22" cy="54" r="8" fill="#3B3B44" ${sw2}/><circle cx="54" cy="54" r="8" fill="#3B3B44" ${sw2}/><circle cx="72" cy="40" r="3" fill="#FFE38A"/><g class="puff"><circle cx="58" cy="8" r="5" fill="#FFFFFF" ${sw2}/></g></svg>`;
   var wagon = (c) => `<svg viewBox="0 0 64 64" width="80" height="80" aria-hidden="true"><rect x="6" y="24" width="52" height="26" rx="4" fill="${c}" ${sw2}/><circle cx="18" cy="54" r="7" fill="#3B3B44" ${sw2}/><circle cx="46" cy="54" r="7" fill="#3B3B44" ${sw2}/><path d="M0 40 h6" ${sw2}/></svg>`;
   var BAL_COLS = ["#F26D6D", "#F7C548", "#7FB8E8", "#7BB37A", "#C9A3E8", "#F4A0B5"];
-  var balloon = (c) => `<svg viewBox="0 0 64 96" width="74" height="111" aria-hidden="true"><ellipse cx="32" cy="32" rx="24" ry="29" fill="${c}" ${sw2}/><path d="M28 61 l4 6 l4 -6z" fill="${c}" ${sw2}/><path d="M32 67 q-6 12 2 26" fill="none" stroke="${INK4}" stroke-width="1.6"/><ellipse cx="23" cy="21" rx="5" ry="8" fill="#FFFFFF" opacity=".55"/></svg>`;
+  var balloon = (c) => `<svg viewBox="0 0 64 96" width="74" height="111" aria-hidden="true"><ellipse cx="32" cy="32" rx="24" ry="29" fill="${c}" ${sw2}/><path d="M28 61 l4 6 l4 -6z" fill="${c}" ${sw2}/><path d="M32 67 q-6 12 2 26" fill="none" stroke="${INK5}" stroke-width="1.6"/><ellipse cx="23" cy="21" rx="5" ry="8" fill="#FFFFFF" opacity=".55"/></svg>`;
   var star = `<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M12 2 l3 6.5 7 .8 -5.2 4.8 1.4 7 -6.2 -3.5 -6.2 3.5 1.4 -7 L1 9.3 l7 -.8z" fill="#F7C548" ${sw2.replace("2.2", "1.4")}/></svg>`;
   var home = `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M3 11 L12 3 l9 8 M5 10 v10 h14 v-10" fill="none" ${sw2}/><rect x="10" y="14" width="4" height="6" fill="#F7C548"/></svg>`;
   var st5 = { eggs: [], wagons: 1, trainBusy: false, popped: 0, spawn: null, timers: [] };
@@ -25929,179 +26156,6 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!o.stock) return { ...base, from: v.from + 10, to: v.from + VISIT, at: sh.door };
     if (m < 13) return { ...base, from: v.from + 10, to: v.from + 13, at: sh.till[j % sh.till.length], dir: -1 };
     return { ...base, from: v.from + 13, to: v.from + VISIT, at: sh.door, act: "shopbag" };
-  }
-
-  // src/game/gallery.js
-  var TOKEN = 10;
-  var CUT = 0.2;
-  var FRAMES = 4;
-  var D3 = 864e5;
-  var PAINTERS = {
-    dad: {
-      name: "Dad",
-      what: "Sip-and-paint landscapes",
-      sign: "Love, Dad",
-      works: [["The terrace at dusk", 48, "#E9A87A", "#5A6B8C"], ["Vines in October", 44, "#C98A3A", "#7A8C4A"], ["The jetty, early", 40, "#9FC3D9", "#E8D3A6"], ["Lavender rows", 46, "#A68FCB", "#F3DDB0"], ["Ma Ma's orchard", 42, "#7FA35A", "#F3C969"]],
-      note: ["Mel! Somebody bought my painting. A real person, with real money. I've told everyone at the class. Twice.", "Posy rang to say '{t}' sold. I had to sit down. Your mother says I'm insufferable now. She's right.", "'{t}' has gone to a good home, Posy says. I hope they hang it where the light's kind. I've already started the next one."]
-    },
-    juniper: {
-      name: "Juniper",
-      what: "Watercolours from the library garden",
-      sign: "With love, Juniper (from behind the returns desk)",
-      works: [["Rain on the reading room", 32, "#BFD6E6", "#8A8279"], ["Wisteria by the steps", 36, "#C3A9E0", "#9EBE8C"], ["The library cat, asleep", 28, "#E8C49A", "#5A4A3E"], ["Autumn, through the window", 34, "#D98A4A", "#F3E7C8"]],
-      note: ["I've been grinning at the date stamp all morning. '{t}' sold! I may frame the receipt.", "Thank you for giving my little watercolours a wall. '{t}' found a home, and I found I can't stop telling the regulars.", "Someone bought '{t}'. I keep imagining it on their wall, getting rained on in a painted sort of way."]
-    },
-    okada: {
-      name: "Mr Okada",
-      what: "Ink-brush landscapes",
-      sign: "With thanks, K. Okada",
-      works: [["The well, in mist", 52, "#E6E2DA", "#2F2B28"], ["Two herons", 56, "#F3EFE6", "#3A4A5A"], ["Pine on the headland", 50, "#E9E4D6", "#2E3A2E"], ["Bridge in snow", 54, "#F6F3EE", "#4A4A4A"]],
-      note: ["I am told '{t}' has been sold. Forty years of sorting other people's letters, and now one of my brushes has travelled further than I ever did. Thank you.", "Ink is patient. So, it seems, was the person who bought '{t}'. I am very quietly delighted.", "A small note to say thank you. '{t}' sold, and I have bought myself a new brush to celebrate. A modest one."]
-    },
-    mei: {
-      name: "Mei",
-      what: "Botanical paintings from the flower farm",
-      sign: "Mei, from the flower farm",
-      works: [["Sweet peas, in a jar", 30, "#F4C7CF", "#7FA35A"], ["Dahlia study", 34, "#D9534F", "#5E8A3A"], ["Cosmos in the wind", 28, "#F3B6D0", "#9EBE8C"], ["The first rose", 32, "#E8566C", "#6A8A4A"]],
-      note: ["'{t}' sold! I've been telling the dahlias. They're very proud.", "I painted '{t}' between waterings and never thought anyone would want it. Thank you for hanging it up.", "Posy says '{t}' went to a lady who smelled it first. That's the nicest thing anyone's ever done to one of my paintings."]
-    }
-  };
-  var MAKERS = {
-    lin: { name: "Auntie Lin", item: "mk_cards" },
-    bo: { name: "Bo", item: "mk_spoon" },
-    noor: { name: "Noor", item: "mk_pettoy" },
-    wren: { name: "Wren", item: "mk_bird" },
-    hana: { name: "Hana", item: "mk_honeybutter" },
-    felix: { name: "Felix", item: "mk_wraps" }
-  };
-  Object.assign(ITEMS, {
-    mk_cards: { n: "Pressed-flower cards", kind: "gift", to: "family", price: 6, art: ["tile", "#FFFDF6", "#F4C7CF"], maker: "lin", say: "Auntie Lin's pressed-flower cards! Too pretty to write in. I'll write in one anyway." },
-    mk_spoon: { n: "A carved wooden spoon", kind: "gift", to: ["mum", "mama", "dad", "darren"], price: 9, art: ["disc", "#C9A27E", "#8A5A3A"], maker: "bo", say: "A wooden spoon Bo carved by hand! It's too nice for porridge. It's getting porridge." },
-    mk_pettoy: { n: "A knitted mouse for a pet", kind: "gift", to: ["evan", "angelina"], price: 5, art: ["tile", "#C3CDEE", "#F4C7CF"], maker: "noor", say: "A little knitted mouse from Noor's rescue! Every cat in the street will want it." },
-    mk_bird: { n: "A whittled wren", kind: "gift", to: ["dad", "gonggong", "evan"], price: 8, art: ["bird", "#C9A27E"], maker: "wren", say: "A little wooden wren, whittled by the ranger! It's sitting on the windowsill, looking out." },
-    mk_honeybutter: { n: "Hana's honey butter", kind: "gift", to: "family", price: 6, art: ["jar", "#F3D98A", "#FFFDF6"], maker: "hana", say: "Hana's honey butter, the one from her toast! On everything. On everything." },
-    mk_wraps: { n: "Beeswax food wraps", kind: "gift", to: ["mum", "mama", "angelina"], price: 7, art: ["cloth", "#F6E3A1", "#9EBE8C"], maker: "felix", say: "Beeswax wraps from Felix's bees! No more cling film. The kitchen smells like honey." }
-  });
-  var MAKER_ITEMS = Object.values(MAKERS).map((m) => m.item);
-  var STOCK = 3;
-  var galleryState = (F2) => {
-    F2.giftshop = F2.giftshop || {};
-    const g10 = F2.giftshop.gallery = F2.giftshop.gallery || {};
-    g10.frames = g10.frames || Array(FRAMES).fill(null);
-    g10.sold = g10.sold || [];
-    return g10;
-  };
-  var makersState = (F2) => {
-    F2.giftshop = F2.giftshop || {};
-    const m = F2.giftshop.makers = F2.giftshop.makers || {};
-    m.stock = m.stock || {};
-    m.week = m.week || {};
-    return m;
-  };
-  var dow5 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
-  var hashS = (s) => {
-    let h3 = 0;
-    for (const c of String(s)) h3 = h3 * 31 + c.charCodeAt(0) | 0;
-    return Math.abs(h3);
-  };
-  function stockUp(F2, day) {
-    const g10 = galleryState(F2), m = makersState(F2);
-    let n = 0;
-    if (!g10.filled || dow5(day) === 1 && g10.filled !== day) {
-      g10.filled = day;
-      const hung = new Set(g10.frames.filter((f5) => f5 && f5.by).map((f5) => f5.by));
-      const queue = Object.keys(PAINTERS).filter((p) => !hung.has(p)).sort((a, b) => hashS(day + a) - hashS(day + b));
-      const mine = ownPaintings(F2).length || g10.frames.some((f5) => f5 && f5.own);
-      let room4 = (mine ? FRAMES - 1 : FRAMES) - g10.frames.filter((f5) => f5 && f5.by).length;
-      g10.frames = g10.frames.map((f5) => {
-        if (f5 || !queue.length || room4 <= 0) return f5;
-        room4--;
-        const by = queue.shift(), done = new Set(g10.sold.filter((s) => s.by === by).map((s) => s.t)), w = PAINTERS[by].works, pick5 = w.find((x) => !done.has(x[0])) || w[hashS(day + by) % w.length];
-        n++;
-        return { by, t: pick5[0], price: pick5[1], c1: pick5[2], c2: pick5[3] };
-      });
-    }
-    if (!m.filled || dow5(day) === 1 && m.filled !== day) {
-      m.filled = day;
-      m.week = {};
-      MAKER_ITEMS.forEach((id) => {
-        if ((m.stock[id] || 0) < STOCK) {
-          m.stock[id] = STOCK;
-          n++;
-        }
-      });
-    }
-    return n;
-  }
-  var forSale = (F2) => galleryState(F2).frames.filter((f5) => f5 && f5.by);
-  function sellPainting(F2, i, at2) {
-    const g10 = galleryState(F2), f5 = g10.frames[i];
-    if (!f5 || !f5.by) return 0;
-    g10.frames[i] = null;
-    g10.sold = [...g10.sold, { by: f5.by, t: f5.t, price: f5.price, at: at2 + 7 * D3, id: `gal-${f5.by}-${at2}` }].slice(-40);
-    return Math.min(TOKEN, f5.price);
-  }
-  function sellMade(F2, id) {
-    const m = makersState(F2);
-    if (!(m.stock[id] > 0)) return 0;
-    m.stock[id]--;
-    const it = ITEMS[id];
-    m.week[it.maker] = (m.week[it.maker] || 0) + it.price;
-    return Math.max(1, Math.round(it.price * CUT));
-  }
-  function buyMade(F2, id) {
-    const it = ITEMS[id];
-    if (!it || !(makersState(F2).stock[id] > 0) || (F2.coins || 0) < it.price) return false;
-    F2.coins -= it.price;
-    sellMade(F2, id);
-    F2.inv = F2.inv || {};
-    F2.inv[id] = (F2.inv[id] || 0) + 1;
-    return true;
-  }
-  var ownPaintings = (F2) => Object.keys(F2.inv || {}).filter((id) => /^p_/.test(id) && F2.inv[id] > 0 && ITEMS[id]);
-  function hangOwn(F2, id) {
-    const g10 = galleryState(F2), i = g10.frames.indexOf(null);
-    if (i < 0 || !(F2.inv[id] > 0)) return false;
-    F2.inv[id]--;
-    if (!F2.inv[id]) delete F2.inv[id];
-    const a = (PAINTINGS[id] || {}).art || [0, "#A68FCB", "#F3DDB0"];
-    g10.frames[i] = { own: id, c1: a[1], c2: a[2] };
-    return true;
-  }
-  function takeDown(F2, i) {
-    const g10 = galleryState(F2), f5 = g10.frames[i];
-    if (!f5 || !f5.own) return false;
-    g10.frames[i] = null;
-    F2.inv[f5.own] = (F2.inv[f5.own] || 0) + 1;
-    return true;
-  }
-  var galleryMail = (F2, t2) => galleryState(F2).sold.filter((s) => s.at <= t2 && PAINTERS[s.by]).map((s) => {
-    const p = PAINTERS[s.by], line = p.note[hashS(s.id) % p.note.length].replace(/\{t\}/g, s.t);
-    return { id: s.id, from: "postie", at: s.at, title: `${p.name}'s painting sold`, body: `${s.by === "dad" ? "Hello love" : "Dear Mel"},
-
-${line}
-
-${p.sign}` };
-  });
-  var swatch2 = (c1, c22) => `<span class="wpic"><svg width="30" height="30" viewBox="0 0 30 30"><rect x="2" y="3" width="26" height="24" rx="2" fill="#8A5A3A"/><rect x="5" y="6" width="20" height="18" fill="${c1}"/><path d="M5 18 Q12 12 18 17 T25 15 V24 H5z" fill="${c22}"/></svg></span>`;
-  function galleryPanel(F2) {
-    const g10 = galleryState(F2), own = ownPaintings(F2), free = g10.frames.filter((f5) => !f5).length;
-    let h3 = `<h2>The gallery wall</h2><p class="sub">Four frames between the windows. Local painters hang their work here; when one sells you keep ${TOKEN} coins and the rest goes to the painter. They bring new ones on Mondays.</p><ul class="hlist wlist">`;
-    h3 += g10.frames.map((f5, i) => !f5 ? `<li><span class="wtxt"><b>An empty frame</b><small>${own.length ? "Hang one of yours, or a painter will fill it on Monday" : "A painter will fill it on Monday"}</small></span></li>` : f5.own ? `<li>${swatch2(f5.c1 || "#A68FCB", f5.c2 || "#F3DDB0")}<span class="wtxt"><b>${esc(ITEMS[f5.own].n.replace(/^Your painting: /, "").replace(/^./, (c) => c.toUpperCase()))}</b><small>Yours · not for sale</small></span><span class="orbtns"><button class="btn small alt" data-gg="down:${i}">Take it down</button></span></li>` : `<li>${swatch2(f5.c1, f5.c2)}<span class="wtxt"><b>${esc(f5.t)}</b><small>${esc(PAINTERS[f5.by].name)} · ${esc(PAINTERS[f5.by].what.toLowerCase())} · ${f5.price} coins</small></span></li>`).join("") + `</ul>`;
-    if (own.length && free) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Hang one of yours</p><div class="actions">${own.map((id) => `<button class="btn small alt" data-gg="hang:${id}">${esc(ITEMS[id].n.replace(/^Your painting: /, ""))}</button>`).join("")}</div>`;
-    const recent2 = g10.sold.slice(-3).reverse();
-    if (recent2.length) h3 += `<p class="muted">Sold lately: ${recent2.map((s) => `"${esc(s.t)}" by ${esc(PAINTERS[s.by].name)}`).join(", ")}.</p>`;
-    return h3;
-  }
-  function makersPanel(F2) {
-    const m = makersState(F2), wk = Object.entries(m.week).filter(([, c]) => c > 0);
-    let h3 = `<h2>The makers' shelf</h2><p class="sub">Little handmade things from around Honeybrook, on consignment: when one sells, the maker gets the money and you keep about a fifth. They top it up on Mondays.</p><ul class="hlist wlist">`;
-    h3 += Object.entries(MAKERS).map(([k, mk]) => {
-      const it = ITEMS[mk.item], n = m.stock[mk.item] || 0;
-      return `<li><span class="wpic">${icon(mk.item, 28)}</span><span class="wtxt"><b>${esc(it.n)}</b><small>${esc(mk.name)} · ${it.price} coins · ${n ? `${n} on the shelf` : "sold out till Monday"}</small></span><span class="orbtns"><button class="btn small alt" data-gg="buy:${mk.item}" ${n && (F2.coins || 0) >= it.price ? "" : "disabled"}>Buy one</button></span></li>`;
-    }).join("") + `</ul>`;
-    if (wk.length) h3 += `<p class="muted">This week the makers have taken home ${wk.map(([k, c]) => `${esc(MAKERS[k].name)} ${c}`).join(", ")} coins.</p>`;
-    return h3;
   }
 
   // src/game/giftshop.js
@@ -35434,7 +35488,7 @@ ${p.sign}` };
   var contacts = (F2) => Object.keys(bookState(F2).ids).filter((id) => DEF[id]).sort((a, b) => Object.keys(REGIONS2).indexOf(REGION[a]) - Object.keys(REGIONS2).indexOf(REGION[b]) || DEF[a].name.localeCompare(DEF[b].name));
   var addable = (F2) => Object.keys(F2.met || {}).filter((id) => canAdd(F2, id) && !inBook2(F2, id));
   var postage = (id) => POSTAGE[REGION[id]] || 4;
-  var postable = (it) => !!it && (it.kind === "gift" || it.kind === "bouquet");
+  var postable = (it) => !!it && (it.kind === "gift" || it.kind === "bouquet" || it.kind === "keepsake" && !!it.to);
   var OPENINGS = ["Thinking of you", "Thank you for the day", "I keep thinking about your", "Guess what happened at home", "Just saying hello"];
   function postTo(F2, to, { item = null, open: open2 = "", text = "" } = {}, at2 = now()) {
     if (!inBook2(F2, to)) return { err: "Not in your address book." };
@@ -39943,6 +39997,12 @@ Then tell chat "wind down" whenever you're ready.`
       orView = "pot";
       openView = null;
       render();
+      return;
+    }
+    if (it.kind === "keepsake" && it.to) {
+      giftPick = giftPick === id ? null : id;
+      postPick = false;
+      bag();
       return;
     }
     if (it.kind === "keepsake") {

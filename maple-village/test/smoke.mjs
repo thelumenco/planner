@@ -4213,6 +4213,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(gal.stockUp(F, "2026-10-20") === 0 && gal.stockUp(F, "2026-10-26") > 0 && gal.forSale(F).length === 3, "the painters and makers come back the next Monday");
   let sold = 0; for (let k = 0; k < 4000; k++) { const g2 = {coins: 0, inv: {}, goals: {giftshop: 1}}; gal.stockUp(g2, mon); if (gs.giftSellMinute(g2, mon, 600, "mel", {store: {}, v: {shelf: []}, cocoa: null, onDisplay: () => []}) === gal.TOKEN) sold++; }
   check(sold > 0 && sold < 400, "shoppers buy a painting now and then, not often (" + sold + " in 4000 busy minutes)");
+  const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), ms = new Set(Object.values(gal.PAINTERS).flatMap(p => p.works.map(w => w[4])));
+  check(ms.size === Object.values(gal.PAINTERS).reduce((a, p) => a + p.works.length, 0) && [...ms].every(m => gal.paintSVG(0, 0, 38, 48, {m, c1: "#000", c2: "#fff"}).length > 80), "round 197: every painting has its own picture (" + ms.size + ")");
+  check(it.ITEMS.p_view.to === "family" && it.ITEMS.p_view.kind === "keepsake" && bk.postable(it.ITEMS.p_view), "and Mel's own paintings can be given, or posted to a friend");
 }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }

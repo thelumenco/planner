@@ -1,3 +1,4 @@
+import { paintSVG, framesNow } from "../game/gallery.js";   // round 197: each painting its own little picture
 // SVG scene builders: village, interiors, garden. Generated strings, hand-drawn look via #wob / #marker / #wash.
 // Scene builders read live game state through the `G` context set by core (setArtContext).
 import { mouldPath } from "./moulds.js";
@@ -389,9 +390,9 @@ export function furn(kind, x, y){
         ${Array.from({length: Math.min(6, m.oil)}, (_, i) => `<rect x="${x-40 + i*14}" y="${y-84}" width="8" height="24" rx="3" style="fill:${["#B9B04A", "#8FA34A", "#C9B84A"][i % 3]}"/><rect x="${x-38 + i*14}" y="${y-90}" width="4" height="6" style="fill:#5A3A2A"/>`).join("")}
         ${Array.from({length: Math.min(6, m.soap)}, (_, i) => `<rect x="${x-40 + i*14}" y="${y-44}" width="12" height="9" rx="2" style="fill:${["#E8C9D8", "#F3E1A0", "#C9DDB0"][i % 3]}"/>`).join("")}${Array.from({length: Math.min(6, m.lotion)}, (_, i) => `<ellipse cx="${x-34 + i*14}" cy="${y-38}" rx="0" ry="0"/>`).join("")}`,
         `<rect x="${x-46}" y="${y-92}" width="92" height="92" rx="3"/>`); }
-    case "gallerywall": { G.galleryStock && G.galleryStock(); const fr = ((((G.F && G.F()) || {}).giftshop || {}).gallery || {}).frames || [null, null, null, null];   // round 196: four frames between the windows
-      return sk(fr.map((f, i) => { const fx = x - 108 + i*56, c1 = f ? f.c1 || "#A68FCB" : "#EFE8DC", c2 = f ? f.c2 || "#F3DDB0" : "#EFE8DC";
-        return `<rect x="${fx}" y="${y-92}" width="48" height="58" rx="2" style="fill:${f ? "#8A5A3A" : "#D9CBB6"}"/><rect x="${fx+5}" y="${y-87}" width="38" height="48" style="fill:${c1}"/>${f ? `<path d="M${fx+5} ${y-56} Q${fx+18} ${y-68} ${fx+28} ${y-58} T${fx+43} ${y-62} V${y-39} H${fx+5}z" style="fill:${c2}"/>` : ""}${f && f.by ? `<rect x="${fx+16}" y="${y-30}" width="16" height="6" rx="1" style="fill:#FFFDF6"/>` : ""}`; }).join(""),
+    case "gallerywall": { G.galleryStock && G.galleryStock(); const fr = (G.F && G.F().giftshop && G.F().giftshop.gallery) ? framesNow(G.F()) : [null, null, null, null];   // round 196: four frames between the windows
+      return sk(fr.map((f, i) => { const fx = x - 108 + i*56;
+        return `<rect x="${fx}" y="${y-92}" width="48" height="58" rx="2" style="fill:${f ? "#8A5A3A" : "#D9CBB6"}"/>${f ? `<svg x="${fx+5}" y="${y-87}" width="38" height="48" overflow="hidden">${paintSVG(0, 0, 38, 48, f)}</svg>` : `<rect x="${fx+5}" y="${y-87}" width="38" height="48" style="fill:#EFE8DC"/>`}${f && f.by ? `<rect x="${fx+16}" y="${y-30}" width="16" height="6" rx="1" style="fill:#FFFDF6"/>` : ""}`; }).join(""),
         fr.map((f, i) => `<rect x="${x - 108 + i*56}" y="${y-92}" width="48" height="58" rx="2"/>`).join("")); }
     case "makershelf": { const st = (((((G.F && G.F()) || {}).giftshop || {}).makers || {}).stock) || {}, cols = [["mk_cards", "#F4C7CF"], ["mk_spoon", "#C9A27E"], ["mk_pettoy", "#C3CDEE"], ["mk_bird", "#B08A62"], ["mk_honeybutter", "#F3D98A"], ["mk_wraps", "#9EBE8C"]];
       return sk(`<rect x="${x-40}" y="${y-34}" width="80" height="34" rx="3" style="fill:#B08A62"/><rect x="${x-44}" y="${y-40}" width="88" height="8" rx="2" style="fill:#E3D5C0"/><rect x="${x-40}" y="${y-74}" width="80" height="6" rx="2" style="fill:#E3D5C0"/><rect x="${x-38}" y="${y-74}" width="4" height="36" style="fill:#B08A62"/><rect x="${x+34}" y="${y-74}" width="4" height="36" style="fill:#B08A62"/>
