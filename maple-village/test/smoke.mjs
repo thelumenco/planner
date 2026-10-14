@@ -4249,6 +4249,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const G2 = {coins: 0, met: {}, goals: {}}; G2.met[who] = true; bk.addContact(G2, who, "d"); [0, 1, 2].forEach(k => bk.postTo(G2, who, {open: "Hi"}, T + k));
   check(!bk.offersOpen(G2, T + 9*D).length, "no offers before there's a gift shop to send to");
 }
+{
+  console.log("\nThe gift basket beside the wrapping table (round 202)");
+  const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), wr = await import(new URL("../src/game/wrap.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
+  const F = {coins: 20, inv: {box4: 2, gw_red: 1}, goals: {giftshop: 1}}, id = wr.wrapIt(F, {item: "box4", paper: "gw_red"});
+  const p0 = gs.giftPanel(F, "gbasket", {F, day: "2026-10-14"});
+  check(id && /The gift basket/.test(p0) && /data-gs="wput:/.test(p0) && /Empty/.test(p0), "the basket offers the wrapped gift from the backpack");
+  check(gs.putWrapped(F, id) && !F.inv[id] && /data-gs="wback:0"/.test(gs.giftPanel(F, "gbasket", {F, day: "2026-10-14"})), "in it goes, and it's listed in the basket");
+  check(gs.takeWrapped(F, 0) === id && F.inv[id] === 1 && !gs.giftState(F).wrapped.length, "and it can come back out");
+  check(!/Put out:/.test(wr.wrapPanel(F, {}, {where: "giftshop", table: []})), "the wrapping table just points to the basket now");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

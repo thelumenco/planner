@@ -2482,3 +2482,6 @@ Mel: "I dont want Tomi to do anything upstairs... take the olives from the crate
 
 ## Round 201: beeswax in the basket
 Mel: "I need to be able to put beeswax in the basket". `basketable` already allowed it, but the basket tab only listed herbs, goat's milk and olive oil, so there was no button. Added.
+
+## Round 202: the gift basket
+Mel: "How do I see what's on the table that I've put out... shouldn't there be a table next to it for gifts?" A new gift shop station `gbasket` (world.js `I:[176,600]`, scenes.js art `giftbasket`: up to six little parcels in each wrap's own paper colour, from `F.paperie.wraps` + paper-icons `COL`). Its panel (giftshop.js `PANEL.gbasket`) lists what's in it (Take it back: `takeWrapped`) and the wrapped gifts in the backpack (Put it in: `putWrapped`), via `data-gs` `wput`/`wback`. The wrapping table now just points to the basket. Test block "round 202".

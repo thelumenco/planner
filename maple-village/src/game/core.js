@@ -84,7 +84,7 @@ import { craftState, craft as millCraft, renderWax, craftDone, registerCraft, be
 import { hamperSeason, xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
 import * as BK from "./contacts.js";
 import * as GAL from "./gallery.js";
-import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair, putWrapped, giftState, takeBottle, registerBottles } from "./giftshop.js";
+import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair, putWrapped, takeWrapped, giftState, takeBottle, registerBottles } from "./giftshop.js";
 import * as PP from "./paperie.js";
 import * as WR from "./wrap.js";
 import { setPaperArtF } from "../art/paperie-room.js";
@@ -1854,12 +1854,14 @@ function ctx(){
     else if (a === "bar" && cc) { if (takeBar(F, v, true)) { sfx("chime"); flash(`${CC_KINDS[v].n} bar in your backpack`); } }
     else if (a === "mill") { if (takeFromStore(F, v, 1)) { sfx("paper", true); flash(`${ITEMS[v].n} in your backpack`); } }
     else if (a === "wine") { const id = takeBottle(F, vineState(F), v); if (id) { sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); } }
+    else if (a === "wput") { if (putWrapped(F, v)) { sfx("paper", true); flash("In the gift basket"); } }   // round 202: the gift basket
+    else if (a === "wback") { const id = takeWrapped(F, +v); if (id) { sfx("paper", true); flash(`${ITEMS[id].n}, back in your backpack`); } }
     else if (a === "pair" && cc) { gsPk = {kind: "pair", k: v, size: 4, sel: {}}; sfx("paper", true); }   // round 189: pack a pairing box here
     else if ((a === "padd" || a === "psub") && gsPk) pickAdd(F, gsPk, v, a === "padd" ? 1 : -1);
     else if (a === "pfill" && gsPk) pickFill(F, gsPk);
     else if (a === "pcancel") gsPk = null;
     else if (a === "pgo" && gsPk && cc) { const w = packPairing(F, gsPk.k, gsPk.sel); if (w) { putOutPairs(F, cc, 1); gsPk = null; sfx("paper", true); flash(`A pairing box with ${w}, out in the wine corner`); } }
-    save(); ctx(); });
+    save(true); ctx(); });
   if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gg]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const [a, v] = b.dataset.gg.split(/:(.*)/s);   // round 196: the gallery and the makers' shelf
     if (a === "hang") { if (GAL.hangOwn(F, v)) { sfx("paper", true); flash("Up on the gallery wall"); } }
     else if (a === "down") { if (GAL.takeDown(F, +v)) { sfx("paper", true); flash("Back in your backpack"); } }
@@ -2891,7 +2893,7 @@ function arriveSpot(id){
   if (id === "gdoor") { setScene("garage", INNER.garage.arrive); return; }
   if (id === "officedoor") { setScene("office", INNER.office.arrive); return; }
   if (id === "giftdoor") { if (owns(F, "giftshop")) setScene("giftshop", INNER.giftshop.arrive); else { goalView = "giftshop"; sfx("paper", true); render(); } return; }   // round 178
-  if (scene === "giftshop" && ["gcase", "gbars", "gmill", "gwine", "gtill", "gwrap", "ggallery", "gmakers"].includes(id)) { if (id === "gwrap") wrSt = {}; fieldView = id; sfx("paper", true); if (id === "gtill" && isHere("posy")) npcSay("posy", pick(["Morning! The bonbons are walking out the door.", "I'll mind it. Go have a wander.", "Somebody asked if we do gift wrap. I said yes. Do we?"])); render(); return; }
+  if (scene === "giftshop" && ["gcase", "gbars", "gmill", "gwine", "gtill", "gwrap", "ggallery", "gmakers", "gbasket"].includes(id)) { if (id === "gwrap") wrSt = {}; fieldView = id; sfx("paper", true); if (id === "gtill" && isHere("posy")) npcSay("posy", pick(["Morning! The bonbons are walking out the door.", "I'll mind it. Go have a wander.", "Somebody asked if we do gift wrap. I said yes. Do we?"])); render(); return; }
   if (id === "cdoor") { if (owns(F, "cellar")) setScene("cellar", INNER.cellar.arrive); else { goalView = "cellar"; sfx("paper", true); render(); } return; }
   if (scene === "garage" && (id === "scooter" || id === "car")) { goalView = owns(F, id) ? "garagepick" : id; sfx("paper", true); render(); return; }
   if (scene === "cellar" && id === "flight" && owns(F, "cellar") && wineClubNow(dayKey(), sgHM())) {   // hosting the wine club
@@ -3310,7 +3312,7 @@ function wireWrap(c){
     else if (["item", "paper", "stamp", "ribbon", "tag"].includes(a)) { wrSt[a] = v && wrSt[a] !== v ? v : null; sfx("tap"); }
     else if (a === "go") { const id = WR.wrapIt(F, wrSt); if (id) { sfx("chime"); gainXp(1); act("cheer"); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 18 : -18), mel.y - 60, 1400), t));
       say = `Folded, creased, ${wrSt.stamp ? "stamped, " : ""}${wrSt.ribbon ? "tied with a bow, " : ""}${wrSt.tag ? "tagged, " : ""}done. It's in your backpack: tap it there to choose who it's for.`; wrSt = {}; } }
-    else if (a === "put") { if (putWrapped(F, v)) { sfx("paper", true); flash("Out on the wrapping table"); } }
+    else if (a === "put") { if (putWrapped(F, v)) { sfx("paper", true); flash("In the gift basket"); } }
     else if (a === "paperbuy") { if (WR.buyPaper(F, v)) { sfx("coin"); flash(`A sheet of ${WR.STORE_PAPER[v].n.toLowerCase()} wrapping paper`); } }   // round 188
     else if (a === "tagbuy") { if (WR.buyTags(F)) { sfx("coin"); flash(`${WR.TAG_PACK.n} gift tags`); } }
     if (say) speak(say, 5000); save(); ctx(); drawScene(); });

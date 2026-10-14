@@ -6316,7 +6316,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // the cellar door (a big goal): Mel's wine wall, the tasting bar, barrel racks, a high table
     // round 178: the gift shop, through the wine shop's bottom-left door (game/giftshop.js): shared stock from the other shops
-    giftshop: { name: "The gift shop", wall: "#F6EEE6", trim: "#C9A3E0", noBoard: true, pos: { A: [110, 262], B: [262, 262], C: [414, 262], D: [110, 500], E: [300, 470], F: [320, 592], G: [262, 150], H: [446, 594] }, stations: [
+    giftshop: { name: "The gift shop", wall: "#F6EEE6", trim: "#C9A3E0", noBoard: true, pos: { A: [110, 262], B: [262, 262], C: [414, 262], D: [110, 500], E: [300, 470], F: [320, 592], G: [262, 150], H: [446, 594], I: [176, 600] }, stations: [
       ["gcase", "Bonbon case", "A", "bonboncase", null, "A little case of bonbons, from the Cocoa Room's trays.", 36],
       ["gbars", "Chocolate shelf", "B", "giftbars", null, "Bars from the Cocoa Room's wall.", 34],
       ["gmill", "From the mill", "C", "giftmill", null, "Oils, soaps and lotions from the mill.", 34],
@@ -6326,8 +6326,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       // round 185
       ["ggallery", "Gallery wall", "G", "gallerywall", null, "Local painters' work, between the windows. And yours, if you like.", 146],
       // round 196
-      ["gmakers", "Makers' shelf", "H", "makershelf", null, "Handmade things from around Honeybrook, on consignment.", -4]
+      ["gmakers", "Makers' shelf", "H", "makershelf", null, "Handmade things from around Honeybrook, on consignment.", -4],
+      ["gbasket", "Gift basket", "I", "giftbasket", null, "Your wrapped gifts, out for sale beside the wrapping table.", -4]
     ] },
+    // round 202
     cellar: { name: "The cellar door", wall: "#E9DCCB", trim: "#6B3A2A", noBoard: true, pos: { W: [130, 262], B: [340, 262], R: [140, 500], T: [360, 500] }, stations: [
       ["winewall", "Wine wall", "W", "winewall", null, "A bottle of every wine you've made. It's getting full.", 36],
       ["flight", "Tasting bar", "B", "tastebar", null, "The tasting bar. Pour yourself a flight (and on the first Friday of the month, host the wine club).", 34],
@@ -20184,6 +20186,17 @@ ${r.n}`;
           fr.map((f5, i) => `<rect x="${x - 108 + i * 56}" y="${y - 92}" width="48" height="58" rx="2"/>`).join("")
         );
       }
+      case "giftbasket": {
+        const w = ((G2.F && G2.F() || {}).giftshop || {}).wrapped || [], wraps = ((G2.F && G2.F() || {}).paperie || {}).wraps || [], col = (id) => {
+          const r = wraps.find((x2) => x2.id === id) || {};
+          return COL[r.col] || "#E8B4BC";
+        };
+        return sk(
+          `${w.slice(0, 6).map((id, i) => `<rect x="${x - 30 + i % 3 * 20}" y="${y - 44 - Math.floor(i / 3) * 12}" width="16" height="13" rx="2" style="fill:${col(id)}"/><rect x="${x - 23 + i % 3 * 20}" y="${y - 44 - Math.floor(i / 3) * 12}" width="2" height="13" style="fill:#FFFDF6"/>`).join("")}
+        <path d="M${x - 38} ${y - 34} h76 l-8 34 h-60z" style="fill:#C9A27E"/><path d="M${x - 30} ${y - 34} q30 -40 60 0" style="fill:none;stroke:#A8754F;stroke-width:3"/>${[-26, -13, 0, 13, 26].map((dx) => `<path d="M${x + dx} ${y - 32} v30" style="stroke:#A8754F;stroke-width:1.2"/>`).join("")}`,
+          `<path d="M${x - 38} ${y - 34} h76 l-8 34 h-60z"/><path d="M${x - 30} ${y - 34} q30 -40 60 0"/>`
+        );
+      }
       case "makershelf": {
         const st6 = (((G2.F && G2.F() || {}).giftshop || {}).makers || {}).stock || {}, cols = [["mk_cards", "#F4C7CF"], ["mk_spoon", "#C9A27E"], ["mk_pettoy", "#C3CDEE"], ["mk_bird", "#B08A62"], ["mk_honeybutter", "#F3D98A"], ["mk_wraps", "#9EBE8C"]];
         return sk(
@@ -28293,6 +28306,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     F2.giftshop.wrapped = F2.giftshop.wrapped || [];
     return F2.giftshop;
   };
+  function takeWrapped(F2, i) {
+    const w = giftState(F2).wrapped, id = w[i];
+    if (!id) return null;
+    w.splice(i, 1);
+    F2.inv = F2.inv || {};
+    F2.inv[id] = (F2.inv[id] || 0) + 1;
+    return id;
+  }
   function putWrapped(F2, id) {
     const inv = F2.inv || {};
     if (!(inv[id] > 0) || !ITEMS[id] || !ITEMS[id].wrapped) return false;
@@ -28459,6 +28480,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return `<p class="eyebrow" style="margin:12px 0 6px">Pairing boxes</p><ul class="hlist wlist"><li><span class="wpic">${icon("pairbox", 30)}</span><span class="wtxt"><b>Wine and chocolate pairing box</b><small>${g10.pairs.length ? `${g10.pairs.length} out · ${price}` : "None out yet"}${have2 ? ` · ${have2} in your backpack` : ""}</small></span><span class="orbtns">` + (have2 ? `<button class="btn small primary" data-gp="put" data-n="1">Put out 1</button>${have2 > 1 ? `<button class="btn small alt" data-gp="put" data-n="99">All</button>` : ""}` : "") + (g10.pairs.length ? `<button class="btn small alt" data-gp="take">Take 1 back</button>` : "") + `</span></li></ul>` + (pairSeason(o.day) ? `<p class="muted">People are buying these for someone special this time of year.</p>` : "");
   }
   var PANEL = {
+    gbasket: (o) => {
+      const out = giftState(o.F).wrapped, mine = Object.keys(o.F.inv || {}).filter((id) => o.F.inv[id] > 0 && ITEMS[id] && ITEMS[id].wrapped);
+      return `<h2>The gift basket</h2><p class="sub">A wicker basket beside the wrapping table. Wrapped gifts wait here for someone to fall in love with them: more in the weeks before Valentine's, Mother's Day and Christmas.</p>
+      <p class="eyebrow" style="margin:10px 0 6px">In the basket${out.length ? ` (${out.length})` : ""}</p>${out.length ? `<ul class="hlist wlist">${out.map((id, i) => ITEMS[id] ? `<li><span class="wpic">${icon(ITEMS[id].ico, 28)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${ITEMS[id].price} coins</small></span><span class="orbtns"><button class="btn small alt" data-gs="wback:${i}">Take it back</button></span></li>` : "").join("")}</ul>` : `<p class="muted">Empty. Wrap something at the table, then put it in here.</p>`}
+      <p class="eyebrow" style="margin:12px 0 6px">From your backpack</p>${mine.length ? `<ul class="hlist wlist">${mine.map((id) => `<li><span class="wpic">${icon(ITEMS[id].ico, 28)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${o.F.inv[id]} with you · sells for ${ITEMS[id].price}</small></span><span class="orbtns"><button class="btn small primary" data-gs="wput:${esc(id)}">Put it in</button></span></li>`).join("")}</ul>` : `<p class="muted">No wrapped gifts with you.</p>`}`;
+    },
     ggallery: (o) => galleryPanel(o.F),
     // round 196
     gmakers: (o) => makersPanel(o.F),
@@ -35841,9 +35868,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (o.where === "giftshop" || o.where === "paperie") h3 += `<p class="eyebrow" style="margin:12px 0 6px">Wrapping supplies</p><ul class="hlist wlist">${Object.entries(STORE_PAPER).map(([k, sp]) => `<li><span class="wpic">${icon("gw_" + k, 26)}</span><span class="wtxt"><b>${sp.n} wrapping paper</b><small>${sp.price} ${coin15()} a sheet${(F2.inv || {})["gw_" + k] ? ` · ${F2.inv["gw_" + k]} with you` : ""}</small></span><span class="orbtns"><button class="btn small alt" data-wr="paperbuy:${k}" ${F2.coins >= sp.price ? "" : "disabled"}>Buy a sheet</button></span></li>`).join("")}
     ${o.where === "giftshop" ? Object.entries(RIBBONS).map(([k, r]) => `<li><span class="wpic">${icon("rb_" + k, 26)}</span><span class="wtxt"><b>${esc(r.n)}</b><small>A reel: ${REEL2} bows · ${r.price} ${coin15()}</small></span><span class="orbtns"><button class="btn small alt" data-wr="reel:${k}" ${F2.coins >= r.price ? "" : "disabled"}>Buy a reel</button></span></li>`).join("") + `<li><span class="wpic">${icon("tag_plain", 26)}</span><span class="wtxt"><b>Gift tags</b><small>A pack of ${TAG_PACK.n} · ${TAG_PACK.price} ${coin15()}</small></span><span class="orbtns"><button class="btn small alt" data-wr="tagbuy" ${F2.coins >= TAG_PACK.price ? "" : "disabled"}>Buy a pack</button></span></li>` : ""}</ul>`;
     if (o.where === "giftshop") {
-      const mine = bagOf(F2, (id) => ITEMS[id].wrapped), out = o.table || [];
-      h3 += `<p class="eyebrow" style="margin:12px 0 6px">On the table to sell${out.length ? ` (${out.length})` : ""}</p>${out.length ? `<div class="gchips">${out.map((id) => ITEMS[id] ? `<span class="gchip">${icon(ITEMS[id].ico, 20)}<span>${esc(ITEMS[id].n)} · ${ITEMS[id].price}</span></span>` : "").join("")}</div>` : `<p class="muted">Nothing out yet.</p>`}
-      ${mine.length ? `<div class="gchips">${mine.map((id) => chip2(false, "put:" + id, ITEMS[id].ico, `Put out: ${ITEMS[id].n}`)).join("")}</div>` : ""}`;
+      const out = o.table || [];
+      h3 += `<p class="muted" style="margin-top:12px">Wrapped gifts to sell go in the gift basket, just beside this table${out.length ? ` (${out.length} in it now)` : ""}.</p>`;
     }
     return h3 + shut22;
   }
@@ -41181,6 +41207,17 @@ ${SIGNOFF[t2.who] || ""}`;
           sfx("paper", true);
           flash(`${ITEMS[id].n} in your backpack`);
         }
+      } else if (a === "wput") {
+        if (putWrapped(F, v)) {
+          sfx("paper", true);
+          flash("In the gift basket");
+        }
+      } else if (a === "wback") {
+        const id = takeWrapped(F, +v);
+        if (id) {
+          sfx("paper", true);
+          flash(`${ITEMS[id].n}, back in your backpack`);
+        }
       } else if (a === "pair" && cc) {
         gsPk = { kind: "pair", k: v, size: 4, sel: {} };
         sfx("paper", true);
@@ -41196,7 +41233,7 @@ ${SIGNOFF[t2.who] || ""}`;
           flash(`A pairing box with ${w}, out in the wine corner`);
         }
       }
-      save2();
+      save2(true);
       ctx();
     });
     if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gg]").forEach((b) => b.onclick = (ev) => {
@@ -44682,7 +44719,7 @@ ${SIGNOFF[t2.who] || ""}`;
       }
       return;
     }
-    if (scene === "giftshop" && ["gcase", "gbars", "gmill", "gwine", "gtill", "gwrap", "ggallery", "gmakers"].includes(id)) {
+    if (scene === "giftshop" && ["gcase", "gbars", "gmill", "gwine", "gtill", "gwrap", "ggallery", "gmakers", "gbasket"].includes(id)) {
       if (id === "gwrap") wrSt = {};
       fieldView = id;
       sfx("paper", true);
@@ -46162,7 +46199,7 @@ ${SIGNOFF[t2.who] || ""}`;
       } else if (a === "put") {
         if (putWrapped(F, v)) {
           sfx("paper", true);
-          flash("Out on the wrapping table");
+          flash("In the gift basket");
         }
       } else if (a === "paperbuy") {
         if (buyPaper(F, v)) {

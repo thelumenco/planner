@@ -1,3 +1,4 @@
+import { COL as PAPER_COL } from "./paper-icons.js";   // round 202: the gift basket shows each wrap in its own paper
 import { paintSVG, framesNow } from "../game/gallery.js";   // round 197: each painting its own little picture
 // SVG scene builders: village, interiors, garden. Generated strings, hand-drawn look via #wob / #marker / #wash.
 // Scene builders read live game state through the `G` context set by core (setArtContext).
@@ -394,6 +395,10 @@ export function furn(kind, x, y){
       return sk(fr.map((f, i) => { const fx = x - 108 + i*56;
         return `<rect x="${fx}" y="${y-92}" width="48" height="58" rx="2" style="fill:${f ? "#8A5A3A" : "#D9CBB6"}"/>${f ? `<svg x="${fx+5}" y="${y-87}" width="38" height="48" overflow="hidden">${paintSVG(0, 0, 38, 48, f)}</svg>` : `<rect x="${fx+5}" y="${y-87}" width="38" height="48" style="fill:#EFE8DC"/>`}${f && f.by ? `<rect x="${fx+16}" y="${y-30}" width="16" height="6" rx="1" style="fill:#FFFDF6"/>` : ""}`; }).join(""),
         fr.map((f, i) => `<rect x="${x - 108 + i*56}" y="${y-92}" width="48" height="58" rx="2"/>`).join("")); }
+    case "giftbasket": { const w = (((G.F && G.F()) || {}).giftshop || {}).wrapped || [], wraps = ((((G.F && G.F()) || {}).paperie || {}).wraps) || [], col = id => { const r = wraps.find(x => x.id === id) || {}; return PAPER_COL[r.col] || "#E8B4BC"; };   // round 202: wrapped gifts, out for sale
+      return sk(`${w.slice(0, 6).map((id, i) => `<rect x="${x - 30 + (i % 3)*20}" y="${y - 44 - Math.floor(i/3)*12}" width="16" height="13" rx="2" style="fill:${col(id)}"/><rect x="${x - 23 + (i % 3)*20}" y="${y - 44 - Math.floor(i/3)*12}" width="2" height="13" style="fill:#FFFDF6"/>`).join("")}
+        <path d="M${x-38} ${y-34} h76 l-8 34 h-60z" style="fill:#C9A27E"/><path d="M${x-30} ${y-34} q30 -40 60 0" style="fill:none;stroke:#A8754F;stroke-width:3"/>${[-26, -13, 0, 13, 26].map(dx => `<path d="M${x + dx} ${y-32} v30" style="stroke:#A8754F;stroke-width:1.2"/>`).join("")}`,
+        `<path d="M${x-38} ${y-34} h76 l-8 34 h-60z"/><path d="M${x-30} ${y-34} q30 -40 60 0"/>`); }
     case "makershelf": { const st = (((((G.F && G.F()) || {}).giftshop || {}).makers || {}).stock) || {}, cols = [["mk_cards", "#F4C7CF"], ["mk_spoon", "#C9A27E"], ["mk_pettoy", "#C3CDEE"], ["mk_bird", "#B08A62"], ["mk_honeybutter", "#F3D98A"], ["mk_wraps", "#9EBE8C"]];
       return sk(`<rect x="${x-40}" y="${y-34}" width="80" height="34" rx="3" style="fill:#B08A62"/><rect x="${x-44}" y="${y-40}" width="88" height="8" rx="2" style="fill:#E3D5C0"/><rect x="${x-40}" y="${y-74}" width="80" height="6" rx="2" style="fill:#E3D5C0"/><rect x="${x-38}" y="${y-74}" width="4" height="36" style="fill:#B08A62"/><rect x="${x+34}" y="${y-74}" width="4" height="36" style="fill:#B08A62"/>
         ${cols.map(([id, c], i) => (st[id] || 0) > 0 ? `<rect x="${x-32 + (i % 3)*24}" y="${y - (i < 3 ? 88 : 52)}" width="16" height="12" rx="2" style="fill:${c}"/>` : "").join("")}`,

@@ -16,6 +16,8 @@ import { forSale, sellPainting, sellMade, makersState, MAKER_ITEMS, galleryPanel
 export const GIFT_HOURS = {from: 10*60, to: 18*60, closed: [1]};
 export const giftState = F => { F.giftshop = F.giftshop || {}; F.giftshop.sold = F.giftshop.sold || {}; F.giftshop.pairs = F.giftshop.pairs || []; F.giftshop.wrapped = F.giftshop.wrapped || []; return F.giftshop; };
 // round 185: a gift Mel wrapped, out on the wrapping table to sell (at its own price: the gift plus the paper, ribbon and tag)
+// round 202 (Mel: "shouldn't there be a table next to it for gifts?"): the gift basket beside the wrapping table holds them; one can come back out
+export function takeWrapped(F, i){ const w = giftState(F).wrapped, id = w[i]; if (!id) return null; w.splice(i, 1); F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; return id; }
 export function putWrapped(F, id){ const inv = F.inv || {}; if (!(inv[id] > 0) || !ITEMS[id] || !ITEMS[id].wrapped) return false; inv[id]--; if (inv[id] <= 0) delete inv[id]; giftState(F).wrapped.push(id); return true; }   // (F.gift is the welcome seeds)
 const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
 export const keeperOn = (day, hm) => hm >= GIFT_HOURS.from && hm < GIFT_HOURS.to && !GIFT_HOURS.closed.includes(dowOf(day));
@@ -100,6 +102,10 @@ function pairsHTML(o){
     + (pairSeason(o.day) ? `<p class="muted">People are buying these for someone special this time of year.</p>` : "");
 }
 const PANEL = {
+  gbasket: o => { const out = giftState(o.F).wrapped, mine = Object.keys(o.F.inv || {}).filter(id => o.F.inv[id] > 0 && ITEMS[id] && ITEMS[id].wrapped);   // round 202
+    return `<h2>The gift basket</h2><p class="sub">A wicker basket beside the wrapping table. Wrapped gifts wait here for someone to fall in love with them: more in the weeks before Valentine's, Mother's Day and Christmas.</p>
+      <p class="eyebrow" style="margin:10px 0 6px">In the basket${out.length ? ` (${out.length})` : ""}</p>${out.length ? `<ul class="hlist wlist">${out.map((id, i) => ITEMS[id] ? `<li><span class="wpic">${icon(ITEMS[id].ico, 28)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${ITEMS[id].price} coins</small></span><span class="orbtns"><button class="btn small alt" data-gs="wback:${i}">Take it back</button></span></li>` : "").join("")}</ul>` : `<p class="muted">Empty. Wrap something at the table, then put it in here.</p>`}
+      <p class="eyebrow" style="margin:12px 0 6px">From your backpack</p>${mine.length ? `<ul class="hlist wlist">${mine.map(id => `<li><span class="wpic">${icon(ITEMS[id].ico, 28)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${o.F.inv[id]} with you · sells for ${ITEMS[id].price}</small></span><span class="orbtns"><button class="btn small primary" data-gs="wput:${esc(id)}">Put it in</button></span></li>`).join("")}</ul>` : `<p class="muted">No wrapped gifts with you.</p>`}`; },
   ggallery: o => galleryPanel(o.F),   // round 196
   gmakers: o => makersPanel(o.F),
   gcase: o => { const s = stockOf(o); return `<h2>The bonbon case</h2><p class="sub">A little glass case on the counter end, filled from the Cocoa Room's own display: the same trays, so what sells here is gone there too.${o.cocoa ? ` ${o.cocoa.prices.bonbon} coins a bonbon.` : ""}</p>`
