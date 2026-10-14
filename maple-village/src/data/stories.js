@@ -53,7 +53,16 @@ export const STORIES = {
     {lines: ["About those Gazette poems signed 'J.'. Still a secret, yes?", "I write them here at the library, before it opens. The building's quietest then. Just me and the radiators."]},
     {needs: ["theo:2"], lines: ["My secret Gazette poems: I think someone's found me out.", "Someone's been leaving pressed flowers in the poetry section. Right where the next poem goes."]},
     {lines: ["The pressed flowers in the poetry section, the ones left where my next poem goes? I know who it is.", "It's Theo. Of course it's Theo. He has a rubber stamp that says 'pressed'."]},
-    {lines: ["So Theo knows I'm 'J.' now, and I've gone and agreed to something.", "We're doing a reading at the night market. Lior's making the lanterns. I'm terrified. You'll come?"]}
+    {lines: ["So Theo knows I'm 'J.' now, and I've gone and agreed to something.", "We're doing a reading at the night market. Lior's making the lanterns. I'm terrified. You'll come?"]},
+    {needs: ["lin:3"], lines: ["You know Lin and I share the green cottage by the flower-farm gate? She's the reason I read at the night market.", "She sat in the front row with a flask of tea and a sign that said 'LOUDER'. I've never been so embarrassed or so happy."]}
+  ],
+  // Auntie Lin and Juniper: how a gardener and a librarian became the best of friends, and housemates
+  lin: [
+    {lines: ["Juniper and I live together now, in the green cottage by the flower-farm gate. People ask how. It started with a library fine.", "Forty years of seed catalogues, never returned. She came round to collect them herself."]},
+    {lines: ["That library fine, the one for my forty years of seed catalogues? Juniper didn't take the catalogues back.", "She sat down at my kitchen table and read them all. Then she asked why the tomato pages had poems in the margins."]},
+    {lines: ["The poems in the margins of my seed catalogues, the ones Juniper found? I'd written them. Badly. For forty years.", "She didn't laugh. She brought me a notebook. Now I write them there, and she tells me which ones are good. None, mostly."]},
+    {lines: ["When the shops came to Makers' Lane and we both needed somewhere new, Juniper said: one cottage, two armchairs, one teapot.", "I said she'd never cope with my seed trays. She said I'd never cope with her telescope. We were both wrong."]},
+    {lines: ["Juniper and I have our evenings in the green cottage: she reads me her poems, I tell her what to plant.", "Here, a packet of my tomato seeds. There's a poem on the back. Don't tell her I wrote it."], reward: "linseeds"}
   ],
   theo: [
     {lines: ["I keep the village records. Births, weddings, who owns which hedge.", "And the Gazette's poems, the ones signed 'J.', in my album."]},

@@ -49,6 +49,15 @@ const SHELLS = {
     ${skirting}${plant(470, 420, .9)}`,
 
   // Auntie Lin's cottage: soft floor, polka-dot wallpaper, round windows, braided rug, plants.
+  // Lin and Juniper's: a soft green cottage room, a rag rug, one wall of stars (Juniper's) and one of seed packets (Lin's)
+  linjun: () => `<rect width="520" height="640" style="fill:#E9EEDC"/>
+    <g opacity=".4" style="stroke:#D6DEC4" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>
+    <g filter="url(#wob)"><ellipse cx="260" cy="430" rx="120" ry="56" style="fill:#F3E1A0" opacity=".6"/>${[100, 74, 48].map((rx, i) => `<ellipse cx="260" cy="430" rx="${rx}" ry="${rx/2}" fill="none" style="stroke:${["#9CC27E", "#C9A3E0", "#F2A290"][i]}" stroke-width="5" opacity=".7"/>`).join("")}</g>
+    ${wallBase("#F2F5EA", "#5E8A48")}
+    <g style="fill:#FFF3C4" opacity=".8">${rows(6, r => rows(8, i => `<path transform="translate(${i*30 + (r % 2)*15 + 8} ${r*22 + 12})" d="M0 -3 l1 2 l2 1 l-2 1 l-1 2 l-1 -2 l-2 -1 l2 -1z"/>`))}</g>
+    <g opacity=".7">${rows(6, r => rows(8, i => `<rect x="${280 + i*28 + (r % 2)*14}" y="${r*22 + 6}" width="12" height="15" rx="1" style="fill:${["#F4C7CF", "#DCE8C8", "#F3E1A0"][(r + i) % 3]}"/>`))}</g>
+    ${skirting}${plant(52, 430, 1)}${plant(478, 430, .9)}`,
+
   chico: () => `<rect width="520" height="640" style="fill:#F2E2D8"/>
     <g opacity=".4" style="stroke:#E2C9BB" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>
     <g filter="url(#wob)"><ellipse cx="260" cy="420" rx="120" ry="60" style="fill:var(--butter)" opacity=".7"/>${[100, 80, 60, 40].map((rx, i) => `<ellipse cx="260" cy="420" rx="${rx}" ry="${rx/2}" fill="none" style="stroke:${["var(--rose)", "var(--sage)", "var(--peri)", "var(--rose)"][i]}" stroke-width="5" opacity=".7"/>`).join("")}<ellipse cx="260" cy="420" rx="120" ry="60" fill="none" style="stroke:var(--line)" stroke-width="1.2"/></g>

@@ -91,6 +91,7 @@ export const VILLAGE = {
   toFieldS:{scene:"shore", name:"Gate to the field", door:[498,300], spot:true, bridge:"field", mark:[490,246], line:"East through the gate to the field and the lake."},
   toFlowersS:{scene:"shore", name:"Gate to the flower farm", door:[250,622], spot:true, bridge:"flowers", mark:[290,560], line:"Down the boardwalk to the flower farm."},
   hanatheo: {scene:"shore", name:"Hana and Theo's", short:"Hana and Theo's house", door:[360,226], mark:[360,110]},
+  linjun: {scene:"shore", name:"Lin and Juniper's", short:"Lin and Juniper's cottage", door:[438,578], mark:[438,470]},
   tomiposy: {scene:"shore", name:"Tomi and Posy's", short:"Tomi and Posy's house", door:[400,470], mark:[400,354]},
   suprack:{scene:"shore", name:"Paddleboards", door:[216,488], spot:true, line:"The paddleboard rack by the jetty. Fancy a paddle?"},
   ferry:  {scene:"shore", name:"Ferry to Jeju", door:[86,466], spot:true, mark:[78,400], line:"The ferry stop at the end of the jetty: boats to Jeju."},
@@ -126,8 +127,8 @@ export const VILLAGE = {
   timetable:{scene:"hlane", name:"Timetable board", door:[400,170], spot:true, mark:[420,40], line:"The timetable board."},
   honeysuckle:{scene:"hlane", name:"Honeysuckle", short:"Honeysuckle cottage", door:[110,264], mark:[110,150]},
   clover: {scene:"hlane", name:"Clover", short:"Clover cottage", door:[110,434], mark:[110,320]},
-  bluebell:{scene:"hlane", name:"Bluebell", door:[338,262], spot:true, mark:[338,150], line:"Bluebell: Auntie Lin's cottage now, blue shutters and a vegetable patch that puts everyone else's to shame."},
-  figtree:{scene:"hlane", name:"Fig Tree", door:[338,436], spot:true, mark:[338,320], line:"Fig Tree: Juniper's cottage now. A telescope in the upstairs window, and poems she won't show anyone."},
+  bluebell:{scene:"hlane", name:"Bluebell", door:[338,262], spot:true, mark:[338,150], line:"Bluebell: a holiday cottage with blue shutters. Guests come and go on the train."},
+  figtree:{scene:"hlane", name:"Fig Tree", door:[338,436], spot:true, mark:[338,320], line:"Fig Tree: a holiday cottage with a fig tree by the door. Guests come and go on the train."},
   windmill:{scene:"hlane", name:"The windmill", door:[440,356], spot:true, mark:[458,180], line:"The windmill, turning slowly on the slope. It's been here longer than anyone can remember."},
   vanspot:{scene:"hlane", name:"Campervan spot", door:[420,600], spot:true, mark:[420,500], line:"A gravel spot just big enough for a campervan. One day..."},
   van:    {scene:"hlane", name:"The campervan", short:"the campervan", door:[420,600], mark:[420,500]},
@@ -340,6 +341,15 @@ export const ROOMS = {
     ["mat","Hana's mat","Y","yogamat",null,"Hana's mat. Pilates, Zumba, Piloxing: she does them all.",26],
     ["dine","Dining table","X","dining",null,"The supper table. There's always food on it. Take some home.",44]]},
   // Marcus and Angellina's: the games corner, Angellina's study desk and psychology books, the sofa
+  // Auntie Lin and Juniper share the little green cottage by the flower-farm gate (Ada and Idris have their old houses
+  // on Makers' Lane for the shops): seed trays and star charts, two armchairs, one teapot
+  linjun: {name:"Lin and Juniper's", wall:"#F2F5EA", trim:"#5E8A48", noBoard:true, pos:{S:[120,262], T:[420,262], B:[270,262], P:[130,520], X:[360,470], R:[480,340]}, stations:[
+    ["bedroom","Bedroom","R","bedroomdoor",null,"Two bedrooms off the landing. Lin's is up with the sun; Juniper's light is on till late.",0],
+    ["seeds","Seed trays","S","plantable",null,"Lin's seed trays on the sill, each labelled in capitals: TOMATOES. DO NOT TOUCH.",30],
+    ["scope","Telescope","T","curtwindow",null,"Juniper's telescope at the window, pointed at whatever's brightest tonight.",30],
+    ["books","Bookshelf","B","bookcase",null,"Poetry and seed catalogues, mixed up on purpose. Lin says it keeps them both honest.",30],
+    ["chairs","Two armchairs","P","sofa",null,"Two armchairs pulled close, a pot of tea between them. They've been arguing about compost for an hour.",34],
+    ["dine","Kitchen table","X","dining",null,"A small table with two mismatched chairs and a jar of whatever's flowering.",44]]},
   tomiposy: {name:"Tomi and Posy's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[110,262], K:[432,261], D:[284,262], S:[110,420], X:[340,470], R:[480,340]}, stations:[
     ["bedroom","Bedroom","R","bedroomdoor",null,"Tomi and Posy's room.",0],
     ["games","Games corner","G","gamingtv",null,"Tomi's games. He says he's 'nearly finished' this one. He's been nearly finished for a month.",36],

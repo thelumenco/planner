@@ -72,6 +72,7 @@ const REWARDS = {
   chashaku: () => "Okada's grandmother's bamboo tea scoop, to take home to him",
   spoon: (F, addInv) => { addInv("s_spoon", 1); return "Tomás's olive-wood spoon (a keepsake)"; },
   poem: (F, addInv) => { addInv("s_poem", 1); return "a verse from Ornella, in her big sloping hand (a keepsake)"; },
+  linseeds: (F, addInv) => { addInv("tomato_seed", 3); return "three packets of Lin's tomato seeds (with a poem on the back)"; },
   seabutton: (F, addInv) => { const b = (F.sew = F.sew || {}).buttons = (F.sew.buttons || {}); b.brass = (b.brass || 0) + 1; return "the sea captain's brass button, in your sewing basket"; },
   oilcake: F => { storyState(F).flags.oilcake = true; applyFlags(F); return "Ines's abuela's olive oil cake, on the tapas menu"; }
 };

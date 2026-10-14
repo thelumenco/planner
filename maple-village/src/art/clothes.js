@@ -2,7 +2,7 @@
 // clothesArt({top, bottom, body}) returns SVG markup for each part of the #mel figure (index.html):
 //   defs (patterns), legL/legR (trouser legs), hips (shorts/trousers seat, a skirt, or a dress's skirt),
 //   armL/armR (sleeves), torso (top or dress bodice, neckline, collar, buttons, pockets).
-// Units are the figure's: feet at y 0, hips y -23..-14, arms y -34..-20.5, torso y -34.2..-22.4, neck y -40..-34.
+// Units are the figure's: feet at y 0, hips y -23..-14, arms y -34..-20.5, torso y -36..-22.4 (up to the chin).
 // A missing colour falls back to the look's CSS variables (--tank for the top, --denim for the bottom).
 
 const KINDS = ["tank", "tee", "blouse", "shirt", "jumper", "dress"];
@@ -71,8 +71,8 @@ const mirror = s => s ? `<g transform="scale(-1 1)">${s}</g>` : "";
 
 // ---- the torso outline for each body: shoulder S, neck edge N (where the neckline starts), bottom B
 const BODY = {
-  woman: {S: [8.2, -34.2], N: [5.6, -34.6], B: [9, -22.4], sh: "q1.2 -.4 2.6 -.4", round: "q2.8 2.6 5.6 2.6 q2.8 0 5.6 -2.6", shR: "q1.4 0 2.6 .4"},
-  man: {S: [8.8, -33.8], N: [5.8, -34.6], B: [9.4, -22.4], sh: "q1.2 -.8 3 -.8", round: "q2.9 2.2 5.8 2.2 q2.9 0 5.8 -2.2", shR: "q1.8 0 3 .8"}
+  woman: {S: [8.2, -36], N: [5.6, -36.4], B: [9, -22.4], sh: "q1.2 -.4 2.6 -.4", round: "q2.8 2.6 5.6 2.6 q2.8 0 5.6 -2.6", shR: "q1.4 0 2.6 .4"},
+  man: {S: [8.8, -35.6], N: [5.8, -36.4], B: [9.4, -22.4], sh: "q1.2 -.8 3 -.8", round: "q2.9 2.2 5.8 2.2 q2.9 0 5.8 -2.2", shR: "q1.8 0 3 .8"}
 };
 BODY.neither = BODY.woman;
 
@@ -90,7 +90,8 @@ function torsoArt(t, b, F, plain){
   const {kind, sleeves, neck, buttons, pockets} = t, [sx, sy] = b.S, [nx, ny] = b.N;
   const jumper = kind === "jumper", bx = b.B[0] + (jumper ? 0.3 : 0), by = b.B[1] + (jumper ? 1 : 0);
   const depth = neckDepth(neck, b);
-  let s = `<path d="M${-nx} ${ny} h${n(2*nx)} V${n(depth + 0.6)} H${-nx}z" style="fill:var(--skin)" stroke="none"/>`;
+  // a round neck meets the chin (no neck showing); a V, square or collar dips below it, with skin inside its outline
+  let s = neck === "round" ? "" : `<path d="M${-nx} ${ny} h${n(2*nx)} V${n(depth + 0.6)} H${-nx}z" style="fill:var(--skin)" stroke="none"/>`;
   s += `<path d="M${-sx} ${sy} ${b.sh} ${neckline(neck, b, kind)} ${b.shR} L${bx} ${by} H${-bx}z" ${F}/>`;
   if (sleeves === "none") s += `<path d="M${n(-nx + 0.2)} ${ny + 0.2} l.6 -3.2 M${n(nx - 0.2)} ${ny + 0.2} l-.6 -3.2" fill="none"/>`;
   if (jumper) {

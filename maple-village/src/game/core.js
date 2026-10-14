@@ -2118,7 +2118,7 @@ function arriveSpot(id){
   if (scene === "luna" && ["tailtable", "rail", "sewing", "mirror"].includes(id)) { tailView = true; sfx("paper", true); if (isHere("idris") && sewOpen() && !TL.orderState(F)) npcSay("idris", pick(["Right. What shall we make?", "Stand there. Arms out. Lovely.", "Show me what Ada sold you."])); render(); return; }
   if (id === "gbook") { guestView = true; sfx("paper", true); render(); return; }
   if (id === "gbed") { const g = GU.guestHere(F); speak(g && isHere(g) && (sgHM() >= 22*60 + 30 || sgHM() < 7*60) ? `Shh. ${GU.nameOf(g)}'s fast asleep under the quilt.` : g ? `${GU.nameOf(g)}'s bed, made with hospital corners. Their book's on the pillow.` : "Clean sheets, a patchwork quilt and a sprig of lavender on the pillow. All ready for a guest.", 4500); render(); return; }
-  if (id === "bedroom") { const m = sgHM(), who = {cottage: "Farid and Mei", hanatheo: "Hana and Theo", tomiposy: "Tomi and Posy"}[scene] || "They";
+  if (id === "bedroom") { const m = sgHM(), who = {cottage: "Farid and Mei", hanatheo: "Hana and Theo", tomiposy: "Tomi and Posy", linjun: "Lin and Juniper"}[scene] || "They";
     speak(m >= 23*60 || m < 6*60 + 30 ? `Shh. ${who} are fast asleep. See them in the morning.` : `${who === "They" ? "Their" : who + "'s"} bedroom. Private! The door stays shut.`, 4000); render(); return; }
   if (id === "gdoor") { setScene("garage", INNER.garage.arrive); return; }
   if (id === "officedoor") { setScene("office", INNER.office.arrive); return; }

@@ -913,10 +913,9 @@ export const NPCS = [
 ];
 // Bo and Mr Okada live on Makers' Lane: you'll find them at home in the evening, and Mr Okada before his early walk too.
 const HOMES = {bo: [["chord", 1200, 1290]], okada: [["ohayo", 360, 435], ["ohayo", 1260, 1320]]};
-// Auntie Lin and Juniper moved to the cottage lane by the station (Bluebell and Fig Tree) when Ada and Idris took their
-// houses on Makers' Lane for the shops: an evening on the bench by the door
-{ const n = NPCS.find(x => x.id === "lin"); if (n) n.routine.push(slot("19:00", "21:00", "hlane", [300, 292], {act: "sit", dir: 1})); }
-{ const n = NPCS.find(x => x.id === "juniper"); if (n) n.routine.push(slot("20:00", "21:30", "hlane", [376, 466], {act: "sit", dir: -1})); }
+// Auntie Lin and Juniper share the green cottage by the flower-farm gate on the foreshore: evenings at home
+{ const n = NPCS.find(x => x.id === "lin"); if (n) n.routine.push(slot("19:00", "22:50", "linjun", [130, 520], {act: "sit"}), slot("22:50", "23:00", "linjun", [470, 352])); }
+{ const n = NPCS.find(x => x.id === "juniper"); if (n) n.routine.push(slot("20:00", "22:50", "linjun", [420, 300], {act: "sit"}), slot("22:50", "23:00", "linjun", [470, 360])); }
 for (const [id, slots] of Object.entries(HOMES)) { const n = NPCS.find(x => x.id === id); if (n) slots.forEach(([scene, from, to]) => n.routine.push({from, to, scene, wander: [[200, 340], [320, 350], [260, 430]]})); }
 // Three houses for six friends: Hana and Theo on the foreshore, Tomi and Posy next door, Farid and Mei in the orchard
 // cottage. Their working days stay as they were; these are the mornings and evenings at home (a slot that matches

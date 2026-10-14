@@ -49,7 +49,7 @@ export function shoreArt(){
     <g filter="url(#wob)"><path d="M250 0 V640 M250 300 H520 M360 300 V222 M400 300 V466" fill="none" style="stroke:#D9BE94" stroke-width="20" stroke-linecap="round"/>
       <path d="M250 0 V640 M250 300 H520" fill="none" style="stroke:#C9A87A" stroke-width="20" stroke-dasharray="1.4 9" opacity=".7"/></g>
     <g pointer-events="none">${sk(`<rect x="236" y="48" width="28" height="34" rx="2" style="fill:var(--wood)"/>`, `<rect x="236" y="48" width="28" height="34" rx="2"/><path d="M236 56 h28 M236 64 h28 M236 72 h28 M232 46 v38 M268 46 v38"/>`)}</g>
-    ${pine(286, 150, 1.1)}${pine(470, 210, 1)}${pine(420, 632, .8)}${pine(500, 612, .95)}
+    ${pine(286, 150, 1.1)}${pine(470, 210, 1)}${pine(506, 520, .75)}
     ${flowers([[440, 250, "#EFA3A6"], [462, 268, "#F3C969"], [288, 360, "#C3CDEE"], [470, 400, "#EFA3A6"], [300, 560, "#F3C969"]])}`;
   const sea = dolphin(80, 200, 11, 1, false) + dolphin(64, 238, 11, 2.2, false) + dolphin(96, 470, 14, 6, true) + farPaddler(40, 330, 140, 70);
   const jetty = `<g pointer-events="none">${sk(`<rect x="34" y="454" width="176" height="18" rx="2" style="fill:#C9A27E"/>`, `<rect x="34" y="454" width="176" height="18" rx="2"/>${Array.from({length: 11}, (_, i) => `<path d="M${50 + i*15} 454 v18"/>`).join("")}${[44, 88, 132, 176].map(x => `<path d="M${x} 472 v10"/>`).join("")}`)}</g>`;
@@ -68,6 +68,10 @@ export function shoreArt(){
     {art: `<path d="M318 168 l4 -10 l4 10z M330 164 v-8 l6 -2 v8" style="fill:#2F2B28"/><rect x="300" y="210" width="120" height="6" style="fill:#3E6B8C"/>`, lines: `<circle cx="333" cy="164" r="2"/><circle cx="339" cy="162" r="2"/>`});
   const tomiposy = house("tomiposy", 340, 384, 120, 76, "#FFF3E6", "#8E5B9A", "Tomi and Posy's", "var(--blush)",
     {art: `<path d="M452 396 h-10 v10" style="fill:none"/><circle cx="356" cy="452" r="5" style="fill:#7FA35A"/><circle cx="444" cy="452" r="5" style="fill:#7FA35A"/>`, lines: `<path d="M352 456 h8 l-1 4 h-6z M440 456 h8 l-1 4 h-6z"/>`});
+  // Auntie Lin and Juniper's cottage, by the flower-farm gate: a vegetable patch for Lin, a telescope for Juniper
+  const linjun = house("linjun", 392, 524, 92, 50, "#F2F5EA", "#5E8A48", "Lin and Juniper's", "var(--sage)",
+    {art: `<rect x="398" y="566" width="20" height="6" rx="2" style="fill:#8A6A52"/>${[402, 408, 414].map(x => `<path d="M${x} 566 q-2 -6 0 -9 q2 3 0 9z" style="fill:#7FA35A"/>`).join("")}<path d="M466 530 l12 -8 l2 3 l-12 8z" style="fill:#7E6CB8"/>`,
+     lines: `<rect x="398" y="566" width="20" height="6" rx="2"/><path d="M466 530 l12 -8 l2 3 l-12 8z M470 532 l-3 8"/>`});
   // the dolphin cruise boat (a big goal) at the end of the jetty; out on a cruise it sails up the coast and back with
   // friends aboard and dolphins alongside. Before it's bought: a mooring post with a "your boat here" sign
   const G = artCtx(), F = G.F(), S = G.S ? G.S() : {}, boatOwned = !!((F.goals || {}).boat), cruising = !!(S.cruise && Date.now() < S.cruise.until);
@@ -81,7 +85,7 @@ export function shoreArt(){
     : `<g data-place="boat" aria-label="The mooring: save up for a dolphin cruise boat"><ellipse class="hov" cx="206" cy="552" rx="26" ry="8" style="fill:var(--butter)"/>
       ${sk(`<rect x="200" y="512" width="8" height="34" style="fill:var(--wood)"/><rect x="178" y="512" width="52" height="18" rx="2" style="fill:#FFFDF6"/>`, `<rect x="200" y="512" width="8" height="34"/><rect x="178" y="512" width="52" height="18" rx="2"/><path d="M186 521 h36" opacity=".55"/>`)}
       ${tapeLabel(168, 588, "Boat mooring", "var(--peri)", 10)}</g>`;
-  return lampDefs + ground + sea + jetty + ferry + boat + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + hanatheo + tomiposy
+  return lampDefs + ground + sea + jetty + ferry + boat + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + hanatheo + tomiposy + linjun
     + archGate("toFieldS", 500, 292, "The field", 446, 320, "var(--peri)", "Gate to the field")
     + archGate("toBay", 250, 30, "The bay", 312, 26, "var(--blush)", "Up the boardwalk to the bay and the Scoop Shack")
     + archGate("toFlowersS", 250, 616, "Flower farm", 326, 606, "var(--blush)", "Gate to the flower farm");

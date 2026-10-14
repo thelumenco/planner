@@ -117,8 +117,10 @@ unless the page has ?setup=1. The leak check now finds nothing but window.claude
 
 ## After phase 4: tailoring, gifts and stories (Mel, 2026-10-14)
 - Makers' Lane: Ada's haberdashery (what was Lin's cottage) and Idris the tailor's (what was Juniper's observatory, now
-  a thimble roof and a big button sign). Auntie Lin lives at Bluebell and Juniper at Fig Tree on the cottage lane now
-  (no more holiday guests there). Both shops open 9:30 to 5:30, every day but Sunday.
+  a thimble roof and a big button sign). Auntie Lin and Juniper share a new green cottage on the foreshore by the
+  flower-farm gate (scene linjun), and Lin has a story now: how a gardener and a librarian became the best of friends.
+  Bluebell and Fig Tree stay holiday lets with their guests (to be bought later). Both shops open 9:30 to 5:30,
+  every day but Sunday. Tops run up to the chin again (no neck showing); V, square and collar necklines show skin.
 - Ada sells fabric by the piece (cotton 6, linen 8, denim 9, wool 12, silk 18; gingham, stripe and polka dot +2,
   floral +3; twelve colours) and buttons by the card (wood, shell, brass, pearl, 3 to 8), and buys unused fabric back
   at half price. Idris makes a T-shirt, blouse, shirt, jumper, shorts, trousers, skirt or dress (2 to 4 pieces of one
