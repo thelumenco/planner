@@ -17,6 +17,10 @@ export const KEEP_SPOTS = {
   wine1: {scene: "wineshop", at: [96, 128], n: "the wine shop, left wall"}, wine2: {scene: "wineshop", at: [182, 128], n: "the wine shop, by the shelves"},
   home1: {scene: "home", at: [172, 128], n: "home, by the quest board"}, home2: {scene: "home", at: [352, 128], n: "home, by the kitchen window"},
   room1: {scene: "room", at: [62, 128], n: "your room, by the window"}, room2: {scene: "room", at: [482, 128], n: "your room, by your routines"},
+  // round 204 (Mel: more places for keepsakes): two more at home, two more in her room, two in the home office
+  home3: {scene: "home", at: [95, 128], n: "home, under the left window"}, home4: {scene: "home", at: [425, 128], n: "home, under the right window"},
+  room3: {scene: "room", at: [112, 128], n: "your room, by the curtains"}, room4: {scene: "room", at: [158, 128], n: "your room, beside the window"},
+  office1: {scene: "office", at: [60, 128], n: "the home office, left wall"}, office2: {scene: "office", at: [140, 128], n: "the home office, by the window"},
   chord1: {scene: "chord", at: [186, 128], n: "the Chord workshop, by the pegboard"}, chord2: {scene: "chord", at: [318, 128], n: "the Chord workshop, by the window"},
   chico1: {scene: "chico", at: [336, 128], n: "Chico cottage, by the round window"}, chico2: {scene: "chico", at: [482, 128], n: "Chico cottage, far wall"},
   luna1: {scene: "luna", at: [96, 128], n: "the Luna house, left wall"}, luna2: {scene: "luna", at: [334, 128], n: "the Luna house, by the moon"},
@@ -33,7 +37,7 @@ export const KEEP_SPOTS = {
 // what can go where: keepsakes, and souvenirs marked keep (towns.js), on shelves; fridge magnets only on the fridge
 export const canKeep = it => !!it && (it.kind === "keepsake" || !!it.keep);
 const fits = (it, sp) => canKeep(it) && (sp.only ? !!it[sp.only] : !it.magnet);
-const BUILDING = {scoopshop: "The Scoop Shack", wineshop: "The wine shop", home: "Home", room: "Your room", cocoa: "The Cocoa Room", greenhouse: "The greenhouse", mill: "The old mill", chord: "Chord workshop", chico: "Chico cottage", luna: "Luna house", ohayo: "Ohayo house"};
+const BUILDING = {scoopshop: "The Scoop Shack", wineshop: "The wine shop", home: "Home", room: "Your room", office: "The home office", cocoa: "The Cocoa Room", greenhouse: "The greenhouse", mill: "The old mill", chord: "Chord workshop", chico: "Chico cottage", luna: "Luna house", ohayo: "Ohayo house"};
 const onWhat = sp => sp.only ? `on the fridge at ${sp.n.replace(/, .*/, "")}` : `on the shelf in ${sp.n}`;
 export const keeps = F => (F.keeps = F.keeps || {});
 // put a keepsake from the backpack on a shelf -> a line to say, or null
