@@ -119,8 +119,30 @@
 .panel.cork li small{display:block;color:#6F675F;font-size:.75rem;margin-top:2px}
 .panel.cork li .next,.panel.cork li button{margin-top:6px}
 .panel.cork .qlist li.cur b::after{content:""}
-.panel.cork .row,.panel.cork #sunsamaLine{background:#FFFDF7;padding:8px 10px;border-radius:3px;margin:8px 0 0;box-shadow:0 6px 10px -8px rgba(0,0,0,.5)}
-.panel.cork #sunsamaLine{font-size:.8rem;line-height:1.45;color:#5E5650}
+.panel.cork .row{background:#FFFDF7;padding:8px 10px;border-radius:3px;margin:8px 0 0;box-shadow:0 6px 10px -8px rgba(0,0,0,.5)}
+/* the quest board (quests.js): your tasks as pinned notes with a tick box, the village's requests below */
+.panel.cork .ph3{display:table;background:#FFFDF7;padding:2px 10px;margin:14px 0 8px;transform:rotate(.8deg);box-shadow:0 4px 8px -6px rgba(0,0,0,.4)}
+.panel.cork #qPay{margin:0 0 8px;font-size:.8rem}
+.panel.cork .qlist.board li.empty{grid-column:1/-1;transform:none}
+.panel.cork .qlist.board li.task{padding-left:40px;min-height:56px}
+.qlist.board .tick,.qnote .tick{width:24px;height:24px;border:1.6px solid var(--navy);border-radius:6px;background:#FFFDF7;padding:0;cursor:pointer;flex:none}
+.qlist.board .tick{position:absolute;left:9px;top:16px;margin:0}
+.qlist.board li.done .tick,.qnote .tick[aria-pressed="true"]{background:#8FB07B;border-color:#8FB07B}
+.qlist.board li.done .tick::after{content:"";position:absolute;left:7px;top:2px;width:6px;height:12px;border:solid #FFFDF7;border-width:0 2.4px 2.4px 0;transform:rotate(45deg)}
+.qlist.board .drop{display:block;border:0;background:none;padding:0;font:inherit;font-size:.72rem;color:#6F675F;text-decoration:underline dotted;cursor:pointer}
+.qlist.board li.done .drop{text-decoration:underline dotted}
+.panel.cork .qlist.reqs{grid-template-columns:1fr}
+.panel.cork .qlist.reqs li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.panel.cork .qlist.reqs li .next{margin:0}
+.qlist.reqs .hearts{display:flex;gap:3px;margin:6px 0 0;font-size:0}
+.qlist.reqs .hearts i{width:10px;height:10px;border-radius:50%;border:1.4px solid var(--rose);background:transparent}
+.qlist.reqs .hearts i.on{background:var(--rose)}
+.addtask select{font:inherit;font-size:.85rem;padding:6px 8px;border:1.4px solid var(--line);border-radius:6px;background:#FFFDF7;color:var(--ink)}
+/* the quest note: tick today's tasks straight from the map */
+.qnote .bujo.qtasks li{padding-left:0;display:flex;align-items:center;gap:8px}
+.qnote .bujo.qtasks li::before,.qnote .bujo.reqs li::before{content:none}
+.qnote .bujo.qtasks li.more{color:var(--soft);font-size:.85rem;padding-left:32px}
+.qnote .bujo.reqs li{padding-left:0;display:flex;align-items:center;gap:6px;font-size:.88rem}
 .panel.cork .actions{margin-top:8px}
 .panel.cork .muted{color:#3F352C}
 /* letters */
@@ -469,7 +491,7 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .pphoto{background:linear-gradient(#EAF1F6,#F6EEF4);width:110px;height:118px;display:grid;place-items:center}
 .pcap{margin:4px 0 0;font-family:"Klee One",serif;font-weight:600;font-size:.86rem;text-align:center;color:#4A443E}
 @media (prefers-reduced-motion:reduce){.blobdrop{animation:none}}
-/* planning cards never widen the panel; Notion tables wrap */
+/* cards never widen the panel; tables wrap */
 .pcards{grid-template-columns:minmax(0,1fr)}
 .pcard{min-width:0;overflow-wrap:anywhere}
 .ptable{overflow-x:auto;margin:6px 0}
@@ -956,3 +978,4 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ppstep.done{background:#DCE7D2;color:#4E6A3E}
 .ppstep.now{background:#F3D9A0;color:#5A3E1A;font-weight:600}
 .ppbatch{display:flex;justify-content:center;margin:2px 0 6px}
+.qlist.nbrs .hearts{margin:0;gap:2px}

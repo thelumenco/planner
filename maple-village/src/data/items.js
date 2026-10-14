@@ -242,7 +242,7 @@ export const DECOR = {
 };
 
 export const PLOTS = Array.from({length:12}, (_, i) => ({x:70 + (i%3)*140, y:172 + Math.floor(i/3)*104, w:100, h:66}));
-// Storybook seasons by the real (Singapore) calendar: spring Mar-May, summer Jun-Aug, autumn Sep-Nov, winter Dec-Feb.
+// Storybook seasons by the real calendar: spring Mar-May, summer Jun-Aug, autumn Sep-Nov, winter Dec-Feb.
 // Hana's seeds rotate with them (anything already bought or planted carries on), and so do the tapas of the day.
 export const SEASONS = {spring: {n: "Spring", line: "Blossom and fresh greens"}, summer: {n: "Summer", line: "Sun-ripe and juicy"},
   autumn: {n: "Autumn", line: "Harvest time"}, winter: {n: "Winter", line: "Cosy roots and soups"}};

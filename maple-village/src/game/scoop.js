@@ -14,7 +14,7 @@
 //                a neon cone sign (busier evenings), a delivery bike (Tomo pedals ice creams round to the family
 //                from anywhere), and the chocolate dip station: a little room off the shop with dips and toppings,
 //                each bought separately, for dipped cones and waffles
-import { esc, dayKey, sgHM, hash } from "../util.js";
+import { esc, dayKey, sgHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
 import { TREES, FLOWERS } from "../data/orchard.js";
@@ -257,7 +257,7 @@ export function scoopTick(F, opts = {}){
   if (s.batch) { s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB; s.batch = null; }   // a batch Tomo had on the go (from when he still cooked)
   const out = {coins: 0, n: 0, mins: 0, box: 0, churned: finishChurn(s, now)};
   for (let at = from + 60000; at <= now; at += 60000) {
-    const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
+    const sg = new Date(at + LOC()), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     const sale = saleMinute(s, day, hm, opts); if (sale && sale.box) out.box += sale.coins; else if (sale) { out.coins += sale.coins; out.n++; }
     const cs = cartMinute(s, day, hm, opts); if (cs) { out.coins += cs.coins; out.n++; out.cart = (out.cart || 0) + cs.coins; }
     const dv = deliverMinute(s, day, hm); if (dv) { out.coins += dv.coins; (out.orders = out.orders || []).push(dv); s.bikeOut = at; }

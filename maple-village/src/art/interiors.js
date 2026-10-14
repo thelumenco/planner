@@ -22,7 +22,7 @@ const SHELLS = {
       <path d="M140 20 h26 v54 l-13 -10 l-13 10z M134 20 h38 M354 20 h26 v54 l-13 -10 l-13 10z M348 20 h38"/><circle cx="153" cy="40" r="5"/><circle cx="367" cy="40" r="5"/>`)}
     ${skirting}${plant(70, 600, 1.1)}${plant(474, 610, .9)}`,
 
-  // Chord workshop: wide planks with sawdust, a pegboard of tools, a factory window, crates.
+  // Bo's workshop: wide planks with sawdust, a pegboard of tools, a factory window, crates.
   chord: () => `<rect width="520" height="640" style="fill:#E2CDAA"/>
     <g opacity=".5" style="stroke:#C9AE86" stroke-width="1.2">${rows(9, i => `<path d="M${i*60 + 20} 150 V640"/>`)}${rows(18, i => `<path d="M${(i*67) % 520 + 20} ${170 + (i % 9)*52} h-18"/>`)}</g>
     <g opacity=".5" style="fill:#F3E2C2">${rows(14, i => `<circle cx="${(i*83 + 37) % 480 + 20}" cy="${(i*131) % 420 + 190}" r="${2 + (i % 3)}"/>`)}</g>
@@ -36,7 +36,7 @@ const SHELLS = {
     ${sk(`<rect x="446" y="394" width="40" height="34" style="fill:#C9A27E"/><rect x="454" y="366" width="30" height="28" style="fill:#D9B893"/>`,
       `<rect x="446" y="394" width="40" height="34"/><path d="M446 394 l40 34 M486 394 l-40 34" opacity=".5"/><rect x="454" y="366" width="30" height="28"/><path d="M454 380 h30" opacity=".5"/>`)}`,
 
-  // Fresh Pages library: herringbone floor, built-in bookcases on the back wall, a round rug.
+  // The library: herringbone floor, built-in bookcases on the back wall, a round rug.
   fresh: () => `<rect width="520" height="640" style="fill:#E7CFAC"/>
     <g opacity=".45" style="stroke:#CDAE84" stroke-width="1.1">${rows(13, r => rows(14, c => `<path d="M${c*40 + (r % 2)*20} ${160 + r*38} l20 19 ${c % 2 ? "" : "m0 0 l20 -19"}"/>`))}</g>
     <g filter="url(#wob)" opacity=".8"><ellipse cx="260" cy="420" rx="150" ry="62" style="fill:var(--peach)" opacity=".55"/><ellipse cx="260" cy="420" rx="150" ry="62" fill="none" style="stroke:var(--line)" stroke-width="1.3"/><ellipse cx="260" cy="420" rx="132" ry="50" fill="none" style="stroke:var(--line)" stroke-width="1" stroke-dasharray="4 6"/></g>
@@ -48,7 +48,7 @@ const SHELLS = {
       <path d="M190 16 l-14 118 M184 60 h-11 M181 90 h-11" opacity=".8"/>`)}
     ${skirting}${plant(470, 420, .9)}`,
 
-  // Chico cottage: soft floor, polka-dot wallpaper, round windows, braided rug, plants.
+  // Auntie Lin's cottage: soft floor, polka-dot wallpaper, round windows, braided rug, plants.
   chico: () => `<rect width="520" height="640" style="fill:#F2E2D8"/>
     <g opacity=".4" style="stroke:#E2C9BB" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>
     <g filter="url(#wob)"><ellipse cx="260" cy="420" rx="120" ry="60" style="fill:var(--butter)" opacity=".7"/>${[100, 80, 60, 40].map((rx, i) => `<ellipse cx="260" cy="420" rx="${rx}" ry="${rx/2}" fill="none" style="stroke:${["var(--rose)", "var(--sage)", "var(--peri)", "var(--rose)"][i]}" stroke-width="5" opacity=".7"/>`).join("")}<ellipse cx="260" cy="420" rx="120" ry="60" fill="none" style="stroke:var(--line)" stroke-width="1.2"/></g>
@@ -58,7 +58,7 @@ const SHELLS = {
       `<circle cx="96" cy="66" r="34"/><path d="M62 66 h68 M96 32 v68"/><circle cx="424" cy="66" r="34"/><path d="M390 66 h68 M424 32 v68"/><path d="M168 0 v46 M156 52 l-6 14 M180 52 l6 14"/>`)}
     ${skirting}${plant(52, 430, 1)}${plant(478, 430, .85)}`,
 
-  // Luna house: a dusky lavender room, a starry ceiling band, a round window with the moon in it, a rug
+  // Juniper's house: a dusky lavender room, a starry ceiling band, a round window with the moon in it, a rug
   luna: () => `<rect width="520" height="640" style="fill:#E6E0F2"/>
     <g opacity=".4" style="stroke:#D2C8E6" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>
     <g filter="url(#wob)"><ellipse cx="260" cy="430" rx="120" ry="58" style="fill:#C3CDEE" opacity=".7"/></g>
@@ -67,7 +67,7 @@ const SHELLS = {
     ${sk(`<circle cx="420" cy="86" r="34" style="fill:#4B4A7A"/><path d="M428 66 a18 18 0 1 0 8 32 a14 14 0 1 1 -8 -32z" style="fill:#FFF3C4"/>`, `<circle cx="420" cy="86" r="34"/>`)}
     ${skirting}${plant(52, 430, 1)}${plant(478, 430, .85)}`,
 
-  // Ohayo house: morning light. Pale wood floor, a peach wall with a sunrise window, a low shelf of plants
+  // Mr Okada's house: morning light. Pale wood floor, a peach wall with a sunrise window, a low shelf of plants
   ohayo: () => `<rect width="520" height="640" style="fill:#F3E6D2"/>
     <g opacity=".45" style="stroke:#E2CCAE" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>
     <g filter="url(#wob)"><rect x="160" y="380" width="200" height="90" rx="8" style="fill:#FBE3C8" opacity=".8"/></g>

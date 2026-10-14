@@ -2,7 +2,7 @@
 // through the bay and Wildflower Farm to Honeybrook station on the cottage lane, and on east into the hill (and back).
 // The timetable is only on the platform board (not the village calendar). Each train stops at Honeybrook for two
 // minutes at its time; on the way it passes the farm a minute or two either side, and the bay a minute further out.
-import { dayKey, sgHM } from "../util.js";
+import { dayKey, sgHM, LOC } from "../util.js";
 
 export const TRAINS = [
   {id: "milk", t: 7*60 + 40, dir: "w", n: "The milk train", to: "to the city", line: "Churns of milk and crates of honey from the farm, off to the city."},
@@ -21,7 +21,7 @@ const WINDOWS = {
   bay: {e: [[-3, "pass"]], w: [[4, "pass"]]},
   hwoods: {e: [[3, "pass"]], w: [[-2, "pass"]]}   // round 103: on east into the tunnel under the hill (and back out)
 };
-const secs = () => { const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8*3600e3); return d.getUTCSeconds() + d.getUTCMilliseconds()/1000; };
+const secs = () => { const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + LOC()); return d.getUTCSeconds() + d.getUTCMilliseconds()/1000; };
 // the train on a screen right now: {id, dir, mode, elapsed (seconds into its minute; dwell counts both minutes)} or null
 export function trainHere(scene, day = dayKey(), hm = sgHM()){
   const w = WINDOWS[scene]; if (!w) return null;

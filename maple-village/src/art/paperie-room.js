@@ -3,6 +3,7 @@
 // the tub, the vat's pulp in its colour (flecked with the add-in), the stack in the press, sheets pegged on the line
 // (darker while damp), and the shelves stacked in the colours she's made. Before it's hers: an empty shop, dust
 // sheets, and an À VENDRE board to tap.
+import { LOC } from "../util.js";
 import { sk } from "./scenes.js";
 import { iconAt } from "./icons.js";
 import { COL, WET } from "./paper-icons.js";
@@ -67,7 +68,7 @@ export function paperRoomArt(){
     + g(["#C8432F", "#7A1F3D", "#C9A27E", "#E8566C"].map((c, i) => `<circle cx="${418 + i*20}" cy="512" r="7" fill="${c}" ${O}/><circle cx="${418 + i*20}" cy="512" r="2.4" fill="#FFFDF6"/>`).join("") + `<rect x="412" y="530" width="34" height="14" rx="2" fill="#C9A27E" ${O}/>${[0, 1, 2, 3].map(i => `<rect x="${415 + i*8}" y="526" width="5" height="6" rx="1" fill="#8A6A42"/>`).join("")}${[0, 1, 2].map(i => `<path d="M${458 + i*9} 528 l3 -3 h4 v12 h-7z" fill="${i === 1 ? "#C6D6B2" : "#EFE6D2"}" ${O}/>`).join("")}`)
     + lab(446, 580, "Ribbons & tags", "#F4C7CF"));
   // round 186: on Saturday afternoons the big table comes out for the card class, cards and scissors all over it
-  const sg = new Date(t + 8*3600e3), cls = classOn(sg.toISOString().slice(0, 10), sg.getUTCHours()*60 + sg.getUTCMinutes()) ? g(sk(`<rect x="210" y="420" width="100" height="44" rx="4" style="fill:#E8D3BC"/>`, `<rect x="210" y="420" width="100" height="44" rx="4"/>`)
+  const sg = new Date(t + LOC()), cls = classOn(sg.toISOString().slice(0, 10), sg.getUTCHours()*60 + sg.getUTCMinutes()) ? g(sk(`<rect x="210" y="420" width="100" height="44" rx="4" style="fill:#E8D3BC"/>`, `<rect x="210" y="420" width="100" height="44" rx="4"/>`)
     + ["#F2C4C4", "#C6D6B2", "#9DB4D0", "#EFE6D2"].map((c, i) => `<rect x="${222 + i*20}" y="${428 + (i % 2)*10}" width="14" height="18" rx="1" fill="${c}" ${O}/>`).join("") + lab(260, 478, "Card class", "#F4C7CF")) : "";
   return floor(200, "#C9A27E") + stoneWall() + sign(260, 32, "PAPETERIE", "#FFFDF6", "#5E7A4E", 11) + shelf + line + vat + scrap + tub + adds + press + till + rack + cls + exit("#5E7A4E");
 }

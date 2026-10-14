@@ -8,8 +8,8 @@ import { hash } from "../util.js";
 export const UPGRADES = [
   {at: 3,   id: "bunting",  name: "bunting over the market"},
   {at: 8,   id: "lanterns", name: "lanterns along the main path"},
-  {at: 15,  id: "flag",     name: "a flag on the Chord workshop"},
-  {at: 25,  id: "arch",     name: "a flower arch over Chico's door"},
+  {at: 15,  id: "flag",     name: "a flag on Bo's workshop"},
+  {at: 25,  id: "arch",     name: "a flower arch over Auntie Lin's door"},
   {at: 40,  id: "bench",    name: "a reading bench outside the library"},
   {at: 60,  id: "lights",   name: "string lights around the square"},
   {at: 85,  id: "fountain", name: "a little fountain"},
@@ -36,7 +36,7 @@ export const streetLamp = (x, y) => lampGlow(x, y - 30, 34) + sk(`<rect x="${x -
   `<path d="M${x} ${y} v-24 M${x - 4} ${y} h8"/><rect x="${x - 5}" y="${y - 36}" width="10" height="12" rx="2"/><path d="M${x - 7} ${y - 36} l7 -5 l7 5z"/>`);
 const lamp = (x, y) => lampGlow(x, y - 18, 22) + sk(`<rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2" style="fill:#F6C26B"/>`, `<path d="M${x} ${y} v-13"/><rect x="${x - 4}" y="${y - 22}" width="8" height="9" rx="2"/><path d="M${x - 5} ${y} h10"/>`);
 
-// Upgrades live in the town square, except the blossom trees (by the pond at home) and the Chord flag and Chico arch (Makers' Lane).
+// Upgrades live in the town square, except the blossom trees (by the pond at home) and the workshop flag and the cottage arch (Makers' Lane).
 export function upgradesArt(n, where){
   const has = id => unlocked(n).some(u => u.id === id);
   let h = "";
@@ -45,7 +45,7 @@ export function upgradesArt(n, where){
     return h;
   }
   if (where === "lane") {
-    // the Chord flag and Chico's flower arch live with their buildings on Makers' Lane
+    // the workshop flag and the cottage's flower arch live with their buildings on Makers' Lane
     if (has("flag")) h += `<g transform="translate(60 0)">${sk(`<path d="M85 140 l18 6 l-18 6z" style="fill:var(--peach)"/>`, `<path d="M85 160 v-22 M85 140 l18 6 l-18 6"/>`)}</g>`;
     if (has("arch")) h += `<g transform="translate(295 -230)">${sk(`${[0, 1, 2, 3, 4, 5, 6].map(i => { const a = Math.PI*(1 - i/6), x = 85 + Math.cos(a)*19, y = 486 - Math.sin(a)*19; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" style="fill:${["var(--rose)", "#FFFDF6", "var(--butter)"][i % 3]}"/>`; }).join("")}`,
       `<path d="M66 500 v-14 a19 19 0 0 1 38 0 v14"/>`)}</g>`;

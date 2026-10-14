@@ -4,7 +4,7 @@
 // (evenings and weekends are busiest; villagers dropping in for a tasting add more). State lives in the game save
 // (F.vine). Times are real time, so things grow and ferment while Mel is away.
 import { lunchNow, seatedAt } from "./lunch.js";
-import { esc, plain, H, now } from "../util.js";
+import { esc, plain, H, now, LOC } from "../util.js";
 import { NPCS } from "../data/npcs.js";
 import { ITEMS } from "../data/items.js";
 import { eventNow, wineClubNow, aperitivoNow, discoNow } from "./tours.js";
@@ -168,7 +168,7 @@ export function collect(F){ const v = vineState(F), n = v.box; if (!n) return 0;
 // tasting, the vineyard hands at work.
 const WORKERS = ["marco", "ines"], STAFF = "celeste";
 function whoAt(at){
-  const d = new Date(at + 8*H), hm = d.getUTCHours()*60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay()), dw = d.getUTCDay();
+  const d = new Date(at + LOC()), hm = d.getUTCHours()*60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay()), dw = d.getUTCDay();
   const out = {staff: false, visitors: 0, workers: false};
   for (const n of NPCS) { const s = n.routine.find(x => hm >= x.from && hm < x.to && (!x.days || (x.days === "we") === we) && (!x.dow || x.dow.includes(dw))); if (!s) continue;
     if (n.id === STAFF) out.staff = out.staff || s.scene === "wineshop";
@@ -202,7 +202,7 @@ export function serveGuest(F, opts = {}){
   v.shelf = v.shelf.filter(x => x.n > 0 || x.open > 0);
   if (opts.serving || opts.stall || opts.club) F.coins += out.coins; else v.box += out.coins;
   v.glasses++; v.plates += out.plates;
-  const day = new Date(Date.now() + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
+  const day = new Date(Date.now() + LOC()).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
   v.today.glasses++; v.today.plates = (v.today.plates || 0) + out.plates; v.today.coins += out.coins; v.today.bottles += out.bottles || 0;
   return out;
 }
@@ -213,7 +213,7 @@ export function sellTick(F, opts = {}){
   const out = {bottles: 0, glasses: 0, plates: 0, coins: 0, toBox: !opts.serving, watered: 0, picked: 0, filled: 0, stocked: 0, mins};
   let w = null; const off = now() - t;   // the game clock (equal to real time outside tests)
   for (let k = mins; k > 0; k--) {
-    const at = t - k*60000, d = new Date(at + off + 8*H), hm = d.getUTCHours()*60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay());
+    const at = t - k*60000, d = new Date(at + off + LOC()), hm = d.getUTCHours()*60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay());
     if (!w || k % 10 === 0 || k === 1) w = whoAt(at + off);
     if (w.workers) {
       if (v.help.pick) v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && vn.wateredAt && at - vn.wateredAt >= GROW) { const n = BUNCHES + (opts.harvest ? 1 : 0); v.grapes[vn.v] += n; vn.wateredAt = null; out.picked += n; } }));
@@ -226,24 +226,24 @@ export function sellTick(F, opts = {}){
     if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.reduce((n, c) => n + c.n, 0); v.cellar.filter(c => !c.rack).forEach(c => stock(F, c.id)); }
     // the Sunday farmers market: the wine shop's stall at the field sells from these same shelves (Ines minds it;
     // standing at the stall yourself brings more people over, and they pay you)
-    const ev = eventNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm);
+    const ev = eventNow(new Date(at + off + LOC()).toISOString().slice(0, 10), hm);
     if (ev && ev.wine) { const st = opts.stall && k === 1 ? 3 : 1, stock = v.shelf.filter(x => x.n > 0);
       if (stock.length && Math.random() < .012*st) { const b = stock[Math.floor(Math.random()*stock.length)]; if (Math.random() < winePf(b)) { b.n--; out.bottles++; out.coins += b.price; out.market = (out.market || 0) + 1; } }
       if (Math.random() < .008*st) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g && Math.random() < winePf(g)) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.market = (out.market || 0) + 1; } } }
     // the monthly wine club in the cellar door (first Friday, 6 to 9pm): members buy bottles and glasses off the same
     // shelves; with Mel there hosting they buy half as much again, and pay her
-    if (F.goals && F.goals.cellar && wineClubNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm)) { const hst = opts.club && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
+    if (F.goals && F.goals.cellar && wineClubNow(new Date(at + off + LOC()).toISOString().slice(0, 10), hm)) { const hst = opts.club && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
       if (stock.length && Math.random() < .04*hst) { const b = stock[Math.floor(Math.random()*stock.length)]; if (Math.random() < winePf(b)) { b.n--; out.bottles++; out.coins += b.price; out.club = (out.club || 0) + 1; } }
       if (Math.random() < .03*hst) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g && Math.random() < winePf(g)) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.club = (out.club || 0) + 1; } } }
     // Saturday disco night in the cellar (round 140): a packed floor, thirsty dancers, bottles and glasses flying off
     // the shelves; with Mel there behind the tasting bar, half as much again
-    if (F.goals && F.goals.cellar && discoNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm)) { const hst = opts.disco && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
+    if (F.goals && F.goals.cellar && discoNow(new Date(at + off + LOC()).toISOString().slice(0, 10), hm)) { const hst = opts.disco && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
       if (stock.length && Math.random() < .07*hst) { const b = stock[Math.floor(Math.random()*stock.length)]; if (Math.random() < winePf(b)) { b.n--; out.bottles++; out.coins += b.price; out.disco = (out.disco || 0) + 1; } }
       if (Math.random() < .09*hst) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g && Math.random() < winePf(g)) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.disco = (out.disco || 0) + 1; } } }
     // the Sunday long lunch on the terrace (round 146, lunch.js): everyone who's booked and sat down orders whole
     // bottles (a pair gets through about one an hour, and they lean to the dearer bottles) and plates from the
     // kitchen; with Mel out there hosting, half as much again, they tip, and they pay her
-    if (v.terrace) { const lday = new Date(at + off + 6*H).toISOString().slice(0, 10), seated = lunchNow(lday, hm) ? seatedAt(lday, hm) : 0;
+    if (v.terrace) { const lday = new Date(at + off + LOC()).toISOString().slice(0, 10), seated = lunchNow(lday, hm) ? seatedAt(lday, hm) : 0;
       if (seated) { const host = opts.lunch && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0);
         if (stock.length && Math.random() < seated/2/60*host) { const w8 = stock.map(x => Math.pow(x.price, 1.5)), tot = w8.reduce((a, b) => a + b, 0); let r = Math.random()*tot, i = 0; while (r > w8[i] && i < stock.length - 1) { r -= w8[i]; i++; }
           const b = stock[i]; b.n--; out.bottles++; out.coins += b.price; out.lunchB = (out.lunchB || 0) + 1; if (opts.lunch) out.lunchTips = (out.lunchTips || 0) + Math.max(1, Math.round(b.price*.15)); }
@@ -261,9 +261,9 @@ export function sellTick(F, opts = {}){
     if (hm < 10*60 || hm >= 22*60) continue;
     const onShelf = v.shelf.filter(s => s.n > 0), open = v.shelf.find(s => s.open > 0); const crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0);
     if (!onShelf.length && !open && !platesLeft(v) && !crate.length) continue;
-    const food = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), tap = tapasOn(v, new Date(at + off + 6*H).toISOString().slice(0, 10)).some(t => t.plates > 0);
-    const f = (aperitivoNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm) ? 1.6 : 1) * footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1) * (F.goals && F.goals.cellar ? 1.15 : 1);   // the cellar door (a big goal) draws a few more visitors
-    const gameDay = new Date(at + off + 6*H).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
+    const food = Object.keys(v.menu).filter(id => v.menu[id] > 0 && DISHES[id]), tap = tapasOn(v, new Date(at + off + LOC()).toISOString().slice(0, 10)).some(t => t.plates > 0);
+    const f = (aperitivoNow(new Date(at + off + LOC()).toISOString().slice(0, 10), hm) ? 1.6 : 1) * footfall(hm, we, w.visitors) * (opts.serving && k === 1 ? 3 : w.staff ? 2 : 1) * (tap ? 1.4 : food.length ? 1.25 : 1) * (v.terrace ? 1.3 : 1) * (F.goals && F.goals.cellar ? 1.15 : 1);   // the cellar door (a big goal) draws a few more visitors
+    const gameDay = new Date(at + off + LOC()).toISOString().slice(0, 10);   // the game's day (it turns over at 2am)
     const apero = aperitivoNow(gameDay, hm); if (apero) out.apero = true;   // Friday aperitivo hour: busier, and everyone wants a plate
     const plate = () => servePlate(v, gameDay, out);
     // round 153: mulled wine by the cup, late November to Boxing Day, while there's some in the pot
@@ -290,7 +290,7 @@ export function sellTick(F, opts = {}){
   if (out.lunchTips) { out.tips = (out.tips || 0) + out.lunchTips; out.coins += out.lunchTips; }   // hosting the Sunday lunch: the tables tip
   if (opts.serving || opts.lunch) F.coins += out.coins; else v.box += out.coins;
   v.sold += out.bottles; v.glasses += out.glasses;
-  const day = new Date(t + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
+  const day = new Date(t + LOC()).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
   ["picked", "filled", "stocked"].forEach(x => { v.today[x] = (v.today[x] || 0) + out[x]; });
   v.today.plates = (v.today.plates || 0) + out.plates; v.today.deliv = (v.today.deliv || 0) + (out.deliv || 0); v.today.lunchB = (v.today.lunchB || 0) + (out.lunchB || 0); v.today.occB = (v.today.occB || 0) + (out.occB || 0); v.today.mulled = (v.today.mulled || 0) + (out.mulled || 0); v.today.occP = (v.today.occP || 0) + (out.occP || 0); if (out.occ) v.today.occ = out.occ; v.today.lunchP = (v.today.lunchP || 0) + (out.lunchP || 0); v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
   return out;

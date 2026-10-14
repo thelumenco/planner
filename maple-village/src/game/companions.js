@@ -1,6 +1,6 @@
 // Keepsakes and pets from the market stalls (data/stall-goods.js).
-//   keepsakes  little things Mel puts on a wall shelf in one of her buildings: two shelves each in the Scoop Shack,
-//              the wine shop, home, her room, the Cocoa Room and the four app houses, one in the greenhouse and the
+//   keepsakes  little things you put on a wall shelf in one of your buildings: two shelves each in the Scoop Shack,
+//              the wine shop, home, your room and the Cocoa Room, one in the greenhouse and the
 //              mill, and the home fridge for magnets. Town souvenirs marked keep can go up too. F.keeps = {spot: item id}; putting one where
 //              another stands sends the old one back to the backpack, and a placed one can be taken back down.
 //   pets       adopted at the market's adoption corner (Noor), then given to someone in the family, who looks after
@@ -17,10 +17,6 @@ export const KEEP_SPOTS = {
   wine1: {scene: "wineshop", at: [96, 128], n: "the wine shop, left wall"}, wine2: {scene: "wineshop", at: [182, 128], n: "the wine shop, by the shelves"},
   home1: {scene: "home", at: [172, 128], n: "home, by the quest board"}, home2: {scene: "home", at: [352, 128], n: "home, by the kitchen window"},
   room1: {scene: "room", at: [62, 128], n: "your room, by the window"}, room2: {scene: "room", at: [482, 128], n: "your room, by your routines"},
-  chord1: {scene: "chord", at: [186, 128], n: "the Chord workshop, by the pegboard"}, chord2: {scene: "chord", at: [318, 128], n: "the Chord workshop, by the window"},
-  chico1: {scene: "chico", at: [336, 128], n: "Chico cottage, by the round window"}, chico2: {scene: "chico", at: [482, 128], n: "Chico cottage, far wall"},
-  luna1: {scene: "luna", at: [96, 128], n: "the Luna house, left wall"}, luna2: {scene: "luna", at: [334, 128], n: "the Luna house, by the moon"},
-  ohayo1: {scene: "ohayo", at: [60, 128], n: "the Ohayo house, left wall"}, ohayo2: {scene: "ohayo", at: [322, 128], n: "the Ohayo house, by the sunrise"},
   cocoa1: {scene: "cocoa", at: [100, 128], n: "the Cocoa Room, above the bar wall"}, cocoa2: {scene: "cocoa", at: [356, 128], n: "the Cocoa Room, by the chalkboard"},
   green1: {scene: "greenhouse", at: [64, 140], n: "the greenhouse, on the glass"},
   mill1: {scene: "mill", at: [64, 128], n: "the old mill, by the photograph"},
@@ -33,7 +29,7 @@ export const KEEP_SPOTS = {
 // what can go where: keepsakes, and souvenirs marked keep (towns.js), on shelves; fridge magnets only on the fridge
 export const canKeep = it => !!it && (it.kind === "keepsake" || !!it.keep);
 const fits = (it, sp) => canKeep(it) && (sp.only ? !!it[sp.only] : !it.magnet);
-const BUILDING = {scoopshop: "The Scoop Shack", wineshop: "The wine shop", home: "Home", room: "Your room", cocoa: "The Cocoa Room", greenhouse: "The greenhouse", mill: "The old mill", chord: "Chord workshop", chico: "Chico cottage", luna: "Luna house", ohayo: "Ohayo house"};
+const BUILDING = {scoopshop: "The Scoop Shack", wineshop: "The wine shop", home: "Home", room: "Your room", cocoa: "The Cocoa Room", greenhouse: "The greenhouse", mill: "The old mill"};
 const onWhat = sp => sp.only ? `on the fridge at ${sp.n.replace(/, .*/, "")}` : `on the shelf in ${sp.n}`;
 export const keeps = F => (F.keeps = F.keeps || {});
 // put a keepsake from the backpack on a shelf -> a line to say, or null
@@ -84,9 +80,7 @@ export const PET_HOMES = {
   room: {n: "Your room", spots: [[300, 560], [200, 300]], indoor: true}, garage: {n: "The garage", spots: [[220, 380], [330, 560]], indoor: true},
   cottage: {n: "Ma Ma and Gong Gong's cottage", spots: [[180, 470], [360, 470]], indoor: true}, mumdad: {n: "Mum and Dad's", spots: [[200, 470], [380, 500]], indoor: true},
   marcus: {n: "Marcus and Angellina's", spots: [[200, 420], [380, 560]], indoor: true}, scoopshop: {n: "The Scoop Shack", spots: [[140, 450], [420, 440]], indoor: true},
-  wineshop: {n: "The wine shop", spots: [[160, 470], [420, 470]], indoor: true}, chord: {n: "The Chord workshop", spots: [[170, 470], [420, 440]], indoor: true},
-  chico: {n: "Chico cottage", spots: [[180, 420], [380, 470]], indoor: true}, luna: {n: "The Luna house", spots: [[180, 420], [380, 470]], indoor: true},
-  ohayo: {n: "The Ohayo house", spots: [[260, 470], [420, 470]], indoor: true},
+  wineshop: {n: "The wine shop", spots: [[160, 470], [420, 470]], indoor: true}, 
   base: {n: "Home base (the garden)", spots: [[200, 400], [330, 430], [420, 360]]}, orchard: {n: "Ma Ma's orchard", spots: [[260, 470], [150, 330]]},
   vineyard: {n: "The vineyard", spots: [[200, 560], [330, 570]]}, field: {n: "The field", spots: [[140, 520], [300, 440]]}, shore: {n: "The foreshore", spots: [[250, 470], [210, 300]]},
   bay: {n: "The bay (by the deck)", spots: [[260, 420], [300, 560]]}

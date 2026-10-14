@@ -1,7 +1,7 @@
 // Village NPCs (light-touch neighbours) and agent NPCs (Mel's automations as messengers). All original characters.
 //
 // Town folk live in the town square ("village"); Darren stays at home base ("base", "home", "farm").
-// Routine slots use Singapore minutes-since-midnight: {from, to, scene, at:[x,y]} stands still,
+// Routine slots use local minutes-since-midnight: {from, to, scene, at:[x,y]} stands still,
 // {..., wander:[[x,y],...]} strolls between points. Outside every slot the NPC is off-screen (home, asleep).
 // `react` lines fire once a day when their condition is true (see npcs.js REACTIONS).
 
@@ -19,7 +19,7 @@ const OUT = {top: "#DCE7F2", bottom: "#4A4F5C", shorts: false};
 const SHORE_WALK = [[226, 180], [240, 300], [300, 312], [430, 300], [236, 420], [226, 560], [300, 580]];
 export const SEA = [[60, 190], [104, 250], [70, 330], [112, 400], [64, 560], [118, 610]];
 const BANKER = {top: "#DCE7F2", bottom: "#2F3A4A", extra: "tie"};
-// a wander along Makers' Lane (between Chord, Chico and the empty plots), and round the Sunday market at the field
+// a wander along Makers' Lane (between the workshop and the cottages), and round the Sunday market at the field
 const LANE = [[262, 320], [200, 390], [320, 400], [262, 470], [110, 360], [420, 380]];
 const MARKET_WALK = [[120, 200], [220, 196], [320, 200], [420, 200], [130, 470]];
 const VINE_WALK = [[262, 390], [340, 440], [300, 300], [200, 560], [418, 490]];
@@ -52,7 +52,7 @@ export const NPCS = [
     react: {inbox: "An email quest! Just like the old days. Stamp it and send it.", water: "Good, drink up. Forty years of walking taught me that.", quests3: "Steady work. That's the postmaster's way."}
   },
   {
-    id: "juniper", pitch: 1.05, name: "Juniper", job: "Librarian at the Fresh Pages library",
+    id: "juniper", pitch: 1.05, name: "Juniper", job: "Librarian at the library",
     intro: "Welcome to the library! I'm Juniper. I love a good semicolon; I also write poetry, but that's a secret. One book recommendation a week, guaranteed.",
     look: {skin: "#C99A78", hair: "#2B2320", hairStyle: "bob", top: "#B9D2A6", bottom: "#3F4A6B", extra: "glasses"},
     routine: [slot("7:20", "7:42", "hlane", [250, 150], {dow: [2], dir: 1}), slot("7:00", "8:00", "hwoods", WOODS_RIDE, {dow: [1, 3, 5], look: BIKE}), slot("9:00", "11:00", "hwoods", WOODS_RIDE, {dow: [6], look: BIKE}), slot("15:30", "16:30", "lane", LANE, {dow: [1, 2, 3, 4, 5]}),
@@ -63,7 +63,7 @@ export const NPCS = [
     react: {writing: "Ooh, a writing quest. Messy first, lovely later.", quests3: "Three chapters done today. Metaphorically."}
   },
   {
-    id: "bo", pitch: 0.8, name: "Bo", job: "Carpenter at the Chord workshop",
+    id: "bo", pitch: 0.8, name: "Bo", job: "Carpenter, with a workshop on Makers' Lane",
     intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
     look: {skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap"},
     routine: [slot("12:30", "13:30", "bay", [[180, 420], [240, 430], [300, 420]], {dow: [3, 5]}), slot("8:00", "10:00", "hwoods", WOODS_RIDE, {dow: [6], look: BIKE}), slot("12:30", "13:30", "lane", LANE, {dow: [2, 4]}),
@@ -93,13 +93,13 @@ export const NPCS = [
   },
   {
     id: "opal", pitch: 1.0, name: "Opal", job: "The banker",
-    intro: "Welcome to the bank! I'm Opal. Five vaults, all yours. Every little deposit is a jewel in the jar, and yes, I polish them.",
+    intro: "Welcome to the bank! I'm Opal. The vaults are polished, the pens all work and the mints are free.",
     look: {skin: "#E8C3A2", hair: "#2E2622", hairStyle: "bun", top: "#7FA88A", bottom: "#3F4A3A", extra: "glasses"},
     routine: [slot("10:00", "11:30", "hfarm", [[140, 600], [200, 560], [260, 600]], {dow: [6]}), slot("9:00", "11:00", "hwoods", WOODS_WALK, {dow: [0]}), slot("18:00", "19:30", "wineshop", [367, 512], {act: "sit"}), slot("9:00", "12:30", "bank", [260, 500]), slot("12:30", "13:30", "village", [[300, 214], [262, 230]]), slot("13:30", "17:30", "bank", [260, 500])],
     lines: ["Every jewel counts. Even the little ones. Especially the little ones.", "Pay yourself first, then the rest. That's the banker's secret.", "I polished the sapphires this morning. Don't tell the rubies.",
       "Slow and steady fills a jar. Promise.", "A full jar is the prettiest thing in this town."],
-    away: "Opal's on her lunch break. The vaults are always open to you.",
-    react: {quests3: "Three quests done! That's a jewel's worth of effort."}
+    away: "Opal's on her lunch break. Back soon.",
+    react: {quests3: "Three tasks done! That's a good day's work."}
   },
   {
     id: "theo", pitch: 0.9, name: "Theo", job: "Town hall clerk",
@@ -1066,6 +1066,10 @@ export const NPCS = [
   ...WEDDING_PEOPLE,   // round 152: the wedding parties on the terrace (data/terrace-people.js)
   ...MILL_PEOPLE   // round 154: the mill's own day-trippers (data/mill-people.js)
 ];
+// Four villagers live on Makers' Lane (in the buildings that were app houses in the personal edition): you'll find them
+// at home in the evening, and Mr Okada before his early walk too.
+const HOMES = {bo: [["chord", 1200, 1290]], lin: [["chico", 1140, 1260]], juniper: [["luna", 1200, 1290]], okada: [["ohayo", 360, 435], ["ohayo", 1260, 1320]]};
+for (const [id, slots] of Object.entries(HOMES)) { const n = NPCS.find(x => x.id === id); if (n) slots.forEach(([scene, from, to]) => n.routine.push({from, to, scene, wander: [[200, 340], [320, 350], [260, 430]]})); }
 
 // Agent NPCs: one per automation. `from` on a mail item picks the messenger (unknown -> postie).
 // round 154: Grace, staying the season with her gran Hazel, has a week too (her Sunday stall comes from tours.js)
@@ -1073,13 +1077,7 @@ export const NPCS = [
   slot("11:00", "12:00", "hlane", [[250, 300], [300, 320]], {dow: [1, 2, 3, 4, 5, 6]}),
   slot("14:00", "16:00", "shore", [[214, 300], [200, 380], [220, 520]], {dow: [1, 3, 5]}), slot("14:00", "16:00", "cocoa", [[200, 450], [320, 470]], {dow: [2, 4, 6]})]; }
 export const AGENTS = {
-  crier:    {name: "Rosa the town crier", skill: "morning-briefing", look: {skin: "#EDC6A6", hair: "#8A3B2A", hairStyle: "bun", top: "#C2505F", bottom: "#3A2E28", extra: "bell"}, hello: "Hear ye! Your morning briefing!", helloTown: "Hear ye! Your paper's still in your letterbox, so I've brought the news to town!"},
-  runner:   {name: "Kip, the library runner", skill: "book-digest", look: {skin: "#D8A882", hair: "#2A211D", hairStyle: "spiky", top: "#7C9F6C", bottom: "#5E5A55", extra: "satchel"}, hello: "Today's book digest, hot off the shelf!"},
-  postie:   {name: "Penny the postie", skill: "inbox-triage", look: {skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#6E9FD6", bottom: "#2F3B73", extra: "cap"}, hello: "Post! Your inbox, sorted."},
-  chord:    {name: "Cora from Chord", skill: "Chord agent", look: {skin: "#E6BC98", hair: "#3B2A1E", hairStyle: "bun", top: "#B9D2A6", bottom: "#4F6B8A", extra: "satchel"}, hello: "News from the Chord workshop!"},
-  chico:    {name: "Coco from Chico", skill: "Chico agent", look: {skin: "#C99A78", hair: "#1F1A17", hairStyle: "bob", top: "#F4C7CF", bottom: "#7A6A8C", extra: "satchel"}, hello: "Chico update, fresh from the cottage!"},
-  planner:  {name: "Wren the content planner", skill: "content planning", look: {skin: "#F0D0B4", hair: "#C9A27E", hairStyle: "long", top: "#F5C3A4", bottom: "#3F4A6B", extra: "satchel"}, hello: "Content plan's ready for your eyes!"},
-  scout:    {name: "Fennel the tender scout", skill: "gebiz-opportunity-scout", look: {skin: "#E2B590", hair: "#5A3A2A", hairStyle: "short", top: "#BFD6E6", bottom: "#5E5A55", extra: "cap"}, hello: "Scouted some tenders for you!"},
-  courier:  {name: "Basil the garden courier", skill: "sunsama-tidy / client-health-check", look: {skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#9EBE8C", bottom: "#8A6A52", extra: "satchel"}, hello: "A little tidy-up report!"},
-  winddown: {name: "Luna the evening messenger", skill: "evening-wind-down", look: {skin: "#EDC6A6", hair: "#2B2320", hairStyle: "long", top: "#9AA9DD", bottom: "#2F3B73", extra: "lantern"}, hello: "Time to close the day. A note for you."}
+  crier:    {name: "Rosa the town crier", look: {skin: "#EDC6A6", hair: "#8A3B2A", hairStyle: "bun", top: "#C2505F", bottom: "#3A2E28", extra: "bell"}, hello: "Hear ye! The weekend paper!", helloTown: "Hear ye! Your paper's still in your letterbox, so I've brought the news to town!"},
+  postie:   {name: "Penny the postie", look: {skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#6E9FD6", bottom: "#2F3B73", extra: "cap"}, hello: "Post! A letter for you."},
+  winddown: {name: "Lark the evening messenger", look: {skin: "#EDC6A6", hair: "#2B2320", hairStyle: "long", top: "#9AA9DD", bottom: "#2F3B73", extra: "lantern"}, hello: "Time to close the day. A note for you."}
 };

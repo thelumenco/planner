@@ -31,7 +31,7 @@
 // at stall place 9 on the field: tours.js MARKET, shown once it's bought).
 // The shop is open 11am to 8pm, Tuesday to Sunday. Amara serves at the counter; customers buy bars off the wall (more
 // often while Mel's serving too). Takings go straight to Mel. Mel can have a bar or take one to give.
-import { esc, dayKey, sgHM, hash } from "../util.js";
+import { esc, dayKey, sgHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
 import { mouldPath, shellRibs } from "../art/moulds.js";
 import { INGR, farmShelf, scoopState, hasUp, takeBack, bikeOwned, DELIVERY, deliveryHours } from "./scoop.js";
@@ -268,7 +268,7 @@ function handStep(F, c, t, out){
 export function cocoaTick(F, opts = {}){
   const c = cocoaState(F), t = now(), from = Math.max(c.at || t, t - 864e5), out = {coins: 0, n: 0, mins: 0, done: null, hand: {pots: 0, bars: 0, sacks: 0, spent: 0, res: 0}};
   for (let at = from + 60000; at <= t; at += 60000) {
-    const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
+    const sg = new Date(at + LOC()), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     out.mins++; out.done = finish(c, at) || out.done;
     if (c.plan.on && opts.hand !== false && handOn(day, hm)) handStep(F, c, at, out);
     if (ccUp(c, "tree") && at - (c.treeAt || at) >= TREE_EVERY) { c.treeAt = at; c.beans++; out.tree = (out.tree || 0) + 1; }

@@ -6,7 +6,7 @@
 // the spot is replanted. See data/orchard.js for the catalogue and timings.
 // State: F.orch = {trees[12], beds[12], bushes[4]: {k, at, next} | null, stock: {fruit|stem id: n}, tin, lastTick,
 // today: {day, sold, coins}, tea}; potted flowers placed around the village live in F.pots {spot: flower id}.
-import { esc, H, now, hash } from "../util.js";
+import { esc, H, now, hash, LOC } from "../util.js";
 import { ITEMS, seasonOf, SEASONS } from "../data/items.js";
 import { TREES, treeOpen, FLOWERS, TREE_GROW, TREE_FIRST, TREE_AGAIN, BED_GROW, BED_AGAIN, BUSH_GROW, BUSH_AGAIN, BED_YIELD, BUSH_YIELD,
   BOUQUET_STEMS, POT_STEMS, STEM_PRICE, BOUQUET_PRICE, POT_PRICE, POT_SPOTS } from "../data/orchard.js";
@@ -54,7 +54,7 @@ export function plant(F, where, i, id, today){
 // Ma Ma's day in the orchard: she picks anything ripe (7am to 7pm), and villagers buy from the farm shop (9am to 6pm)
 // for the minutes since the last tick (up to 12 hours back). Takings go in her tin. -> {picked: {id: n}, sold, coins} or null
 export function orchTick(F, today){
-  const o = orchState(F), t = Date.now(), off = now() - t, hm = (ms) => { const d = new Date(ms + off + 8*H); return d.getUTCHours()*60 + d.getUTCMinutes(); };
+  const o = orchState(F), t = Date.now(), off = now() - t, hm = (ms) => { const d = new Date(ms + off + LOC()); return d.getUTCHours()*60 + d.getUTCMinutes(); };
   const out = {picked: {}, sold: 0, coins: 0}; let any = false;
   if (hm(t) >= 7*60 && hm(t) < 19*60) for (const where of ["tree", "bed", "bush"]) o[SPOTS[where]].forEach(p => {
     if (stateOf(where, p, today).stage !== "ripe") return;
@@ -66,7 +66,7 @@ export function orchTick(F, today){
     if (t - o.lastTick > 1440*60000) o.lastTick = t - 1440*60000;
     o.lastTick += mins*60000;
     for (let k = mins; k > 0; k--) {
-      const at = t - k*60000, m = hm(at), d = new Date(at + off + 8*H), we = [0, 6].includes(d.getUTCDay());
+      const at = t - k*60000, m = hm(at), d = new Date(at + off + LOC()), we = [0, 6].includes(d.getUTCDay());
       // Sunday market mornings Ma Ma sells from her stall at the field instead (busier, from the same shelves)
       const mkt = eventNow(d.toISOString().slice(0, 10), m); if (!(mkt && mkt.kind === "market") && (m < 9*60 || m >= 18*60)) continue;
       const ids = Object.keys(o.stock).filter(x => o.stock[x] > 0); if (!ids.length) break;

@@ -1,20 +1,18 @@
 // Local stand-in for the claude.ai artifact runtime (window.claude.use), dev builds only.
 window.__mapleDevStub = true;   // dev only: lets test scripts jump between scenes
-// db: documents in localStorage under "stub:<path>", live onSnapshot. user: id "me". sample: canned replies.
+// db: documents in localStorage under "stub:<path>", live onSnapshot. user: id "me". downloads: remembers the last save.
 // URL options:
 //   ?dblag=ms     delay the first database snapshot (like a slow phone connection)
-//   ?seed=1         write a demo plan, mail and stats for today
-//   ?time=15:30     pretend it's this time in Singapore (NPC routines, nudges)
+//   ?seed=1         pin three demo tasks to the quest board (a fresh save only)
+//   ?time=15:30     pretend it's this local time (NPC routines, nudges)
 //   ?date=2026-11-07  pretend it's this date (festivals, rain, Friday paper); combine with ?time
-//   ?nosample=1     behave as if the sample capability isn't granted
 //   ?reset=1        clear all local game + stub data first
-//   ?sunsama=1      fake Sunsama connector for the page's own Sunsama pull
 (() => {
   const q = new URLSearchParams(location.search);
   if (q.get("reset")) Object.keys(localStorage).filter(k => k.startsWith("stub:") || k.startsWith("fox.")).forEach(k => localStorage.removeItem(k));
   if (q.get("time") || q.get("date")) {
     const [h, m] = (q.get("time") || "10:00").split(":").map(Number);
-    const sg = new Date(Date.now() + 8 * 3600e3);
+    const sg = new Date(Date.now() - new Date().getTimezoneOffset() * 60e3);
     const [Y, Mo, D] = q.get("date") ? q.get("date").split("-").map(Number) : [sg.getUTCFullYear(), sg.getUTCMonth() + 1, sg.getUTCDate()];
     const want = Date.UTC(Y, Mo - 1, D, h, m || 0);
     window.__mapleOffset = want - sg.getTime();
@@ -39,140 +37,16 @@ window.__mapleDevStub = true;   // dev only: lets test scripts jump between scen
   const db = { doc, collection };
   window.devDb = { get: k => read("data/users/me/" + k), set: (k, v) => write("data/users/me/" + k, v) };
 
-  const sample = async (input, opts = {}) => {
-    const reply = "I'm the dev stub, so no real Claude here. In the published page this answers properly. Try: open the doc, write one rough sentence, then tell me how it went.";
-    let text = "";
-    for (const w of reply.split(" ")) { await new Promise(r => setTimeout(r, 40)); text += (text ? " " : "") + w; opts.onText && opts.onText({ text, delta: w }); }
-    return { text, truncated: false, modelTierApplied: opts.modelTier || "default" };
-  };
-  // Maple's chat: a tiny fake that turns a few phrases into actions, so the action plumbing can be tested offline
-  sample.json = async (prompt) => {
-    window.__lastPrompt = String(prompt);
-    if (/Write Mel's weekly visualisation back to her/.test(String(prompt))) return {summary: "Spacious. The week opens in front of you like a held breath let go. You send the Voice Pass email without overthinking it.", theme: "Room to breathe", word: "Spacious", actions: [{title: "Send the Voice Pass email", why: "I sent the Voice Pass email"}]};
-    if (/You are Mel's personal stylist/.test(String(prompt))) return {label: "Emerald easy day", dress: "Emerald wrap midi dress", shoes: "Black ballet flats", bag: "Black crossbody", jewellery: "Silver hoops", hair: "up, low bun", why: "Soft, fitted and cool-toned for a relaxed day."};
-    const m = /\nMel: ([^\n]*)\nReturn JSON only/.exec(String(prompt)); if (!m) return {};
-    const t = m[1].toLowerCase(), acts = [];
-    const shop = /add (.+) to (?:the |my )?shopping list/.exec(t); if (shop) acts.push({type: "shopping_add", items: shop[1].split(/,| and /).map(x => ({name: x.trim()})).filter(x => x.name)});
-    if (/break/.test(t)) acts.push({type: "break", minutes: 10});
-    const did = /i did (?:the )?(.+)/.exec(t); if (did) acts.push({type: "chore_done", text: did[1]});
-    if (/water/.test(t)) acts.push({type: "water", ml: 250});
-    const rem = /remind me to (.+) in (\d+) (minute|hour)s?/.exec(t); if (rem) acts.push({type: "remind", text: rem[1], minutes: +rem[2]*(rem[3] === "hour" ? 60 : 1)});
-    return {reply: acts.length ? "Done! One less thing to hold in your head." : "One thing at a time. What's the smallest next step?", actions: acts};
-  };
-  sample.limits = async () => ({ maxPromptBytes: 100000 });
-
-  // ?sunsama=1: a fake Sunsama connector (same response shape as sunsama://tasks/<day>, invented tasks)
-  let stubDay = null;
-  const mcp = {
-    callTool: async (server, tool, input) => {
-      await new Promise(r => setTimeout(r, 300));
-      if (server === "Gmail" && tool === "search_threads") {
-        const t = (id, sender, subject, snippet, h) => ({ id, messageCount: 1, viewUrl: "https://mail.google.com/mail/#all/" + id,
-          messages: [{ id, sender, subject, snippet, date: new Date(Date.now() - h*3600e3).toISOString(), labelIds: ["UNREAD", "INBOX"] }] });
-        return { content: [], payload: { resultCountEstimate: "2", threads: [t("g1", "Farzana Ali <farzana@example.com>", "MUSE audit: next steps", "Lovely to hear from you, here's what I'm thinking", 2), t("g2", "studio@example.com", "Invoice question", "Quick one about the October invoice", 20)] } };
-      }
-      if (server === "Notion" && tool === "notion-create-pages") { window.__visSaved = input; return { content: [], payload: { pages: [{ id: "vis1" }] } }; }
-      if (server === "Sunsama MCP" && tool === "create_weekly_objective") { (window.__weeklyObj = window.__weeklyObj || []).push(input); return { content: [], payload: { _id: "o" + window.__weeklyObj.length } }; }
-      if (server === "Sunsama MCP" && /^mark_subtask_as_/.test(tool)) { (window.__subTicks = window.__subTicks || []).push({tool, input}); return { content: [], payload: { success: true } }; }
-      if (server === "Sunsama MCP" && tool === "mark_task_as_completed") { (window.__sunsamaDone = window.__sunsamaDone || []).push(input); return { content: [], payload: { success: true } }; }
-      if (server === "Sunsama MCP" && tool === "create_task") { (window.__sunsamaTasks = window.__sunsamaTasks || []).push(input); return { content: [], payload: { _id: "t" + window.__sunsamaTasks.length } }; }
-      if (server === "Zapier" && tool === "execute_zapier_read_action") {
-        window.__zapier = input;
-        return { content: [], payload: { results: [{ id: "z1", from: { name: "Aunty May", email: "may@example.com" }, subject: "Dinner on Sunday?", raw: { snippet: "Bring Evan, I made kueh" }, date: new Date(Date.now() - 2*3600e3).toISOString(), message_url: "https://mail.google.com/mail/u/0/#inbox/z1" }] } };
-      }
-      if (server === "Google Calendar" && (tool === "create_event" || tool === "delete_event")) {
-        (window.__calWrites = window.__calWrites || []).push({tool, input});
-        return tool === "create_event" ? { content: [], payload: { id: "ev" + window.__calWrites.length, summary: input.summary, start: { dateTime: input.startTime } } } : { content: [], payload: {} };
-      }
-      if (server === "Google Calendar" && tool === "list_events") {
-        if (input.calendarId !== "primary") return { content: [], payload: { events: [] } };
-        const d = input.startTime.slice(0, 10), at = (h, m) => `${d}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00+08:00`;
-        const events = [
-          { id: "e1", summary: "School drop-off", start: { dateTime: at(9, 0) }, end: { dateTime: at(9, 30) }, status: "confirmed" },
-          { id: "e2", summary: "Call with a client", start: { dateTime: at(15, 0) }, end: { dateTime: at(15, 45) }, location: "Zoom", status: "confirmed", htmlLink: "https://calendar.google.com" },
-          { id: "e3", summary: "Pick up groceries", start: { date: d }, end: { date: d }, status: "confirmed" }
-        ];
-        return { content: [], payload: { events } };
-      }
-      if (server === "Chord") {
-        const P = { studio_overview: { studio: "Test Studio", currency: "$", projects_active: 2, tasks_overdue: 1, tasks_waiting_on_clients: 2, client_comments_open: 1, proposals_awaiting_reply: 1, leads_open: 2, retainers_running: 3, retainer_income_per_month: 450, next_bookings: [{ meeting: "Coffee Chat", with: "A. Client", starts: "Wed, 21 Oct 2026, 14:30" }] },
-          list_projects: { count: 2, projects: [{ id: "p1", name: "Website copy", client: "Sample Co", category: "Copy", due: "2026-10-16", tasks_done: 3, tasks_total: 8 }, { id: "p2", name: "Claude Setup", client: "Test Client", key_date: "2026-10-07", key_date_label: "Key date", tasks_done: 0, tasks_total: 6 }] },
-          needs_attention: { count: 1, items: [{ title: "New enquiry from a florist", action: "Reply and book a call" }] },
-          get_project: { id: "p1", stages: [] }, list_upcoming: { items: [] }, list_clients: { clients: [] },
-          list_retainers: { month: "2026-10", currency: "$", count: 2, monthly_total: 600, retainers: [{ name: "Lead gen", client: "Sample Farm", monthly_amount: 500, running: true }, { name: "MUSE", client: "Test Studio", monthly_amount: 100, running: true }] } };
-        if (tool === "list_invoices") {
-          const paid = [["2026-08-04", 1680, "Sample Co"], ["2026-08-03", 2140, "Internal"], ["2026-09-12", 900, "Popcorn Test"], ["2026-10-02", 1350, "Sample Co"]].map(([d, t, c], i) => ({ id: "i" + i, number: "INV-" + i, client: c, status: "paid", total: t, issued: d, paid: d }));
-          return { content: [], payload: input.status === "paid" ? { status: "paid", currency: "$", invoices: paid } : { status: "unpaid", currency: "$", invoices: [{ id: "u1", number: "INV-9", client: "Late Co", status: "sent", overdue: true, total: 1800, due: "2026-10-01" }] } };
-        }
-        if (!P[tool]) throw { code: "not_in_manifest", message: "not declared" };
-        return { content: [], payload: P[tool] };
-      }
-      if (server === "Notion" && tool === "notion-search") {
-        const q = String(input.query || "");
-        return { content: [], payload: { results: [{ id: "plan-" + q.replace(/\W+/g, "-"), title: q, url: "https://app.notion.com/p/x", type: "page" }], type: "ai_search" } };
-      }
-      if (server === "Notion" && tool === "notion-fetch") {
-        const t = String(input.id || "").replace(/^plan-/, "").replace(/-/g, " ");
-        return { content: [], payload: { title: t, text: `<page><properties>{"Name":"${t}","Theme":"Stub theme for ${t}"}</properties><content>\n## Objectives\n- **Primary:** (stub plan for ${t}) fill the Visibility Fix\n## Day by day\n**Monday (sales)**\n- Message 12 warm leads (30 min)\n**Tuesday (client)**\n- Write features 1 and 2 (90 min)\n## Waiting on others\nPopcorn, Radhika.\n## Life reflection\n<table header-row="true">\n<tr>\n<td>Area</td>\n<td>Score</td>\n</tr>\n<tr>\n<td>Family</td>\n<td>4</td>\n</tr>\n</table>\n</content></page>` } };
-      }
-      if (server !== "Sunsama MCP" || tool !== "read_resource") throw { code: "not_in_manifest", message: "not declared" };
-      if (/objectives/.test(String(input.uri || ""))) return { content: [], payload: { objectives: [{ _id: "o1", title: "Chord traction: work the plan daily", completed: true }, { _id: "o2", title: "Introduce myself as a founder", completed: true }] } };
-      // the first day asked for is "today"; any later day gets tomorrow's (different) tasks
-      const day = String(input.uri || "").slice(-10); stubDay = stubDay || day;
-      if (day !== stubDay) {
-        const tasks = [{ _id: "n1", title: "Plan the Chord newsletter", channel: "Chord", timeEstimate: "30 minutes", sortOrder: 1, completed: false, notes: "", subtasks: [] },
-          { _id: "n2", title: "Book Evan's swim class", channel: "Personal", isPersonal: true, timeEstimate: "10 minutes", sortOrder: 2, completed: false, notes: "", subtasks: [] }];
-        return { content: [{ type: "text", text: JSON.stringify({ tasks }) }], payload: { tasks } };
-      }
-      const tasks = [
-        { _id: "s1", title: "Comms catchup", timeEstimate: "15 minutes", sortOrder: 1, isWork: true, completed: false,
-          notes: '<ul data-type="taskList"><li data-type="taskItem"><label><input type="checkbox"></label><div><p>Check GHL</p></div></li><li data-type="taskItem"><label><input type="checkbox"></label><div><p>Check emails</p></div></li></ul>', subtasks: [] },
-        { _id: "s2", title: "Draft the Visibility Fix email", channel: "Ambidextrous", timeEstimate: "45 minutes", sortOrder: 2, completed: false,
-          notes: "<p>From the October plan: email the list &amp;amp; post in one community.</p>", subtasks: [] },
-        { _id: "s3", title: "🚶 Treadmill batch", channel: "Ambidextrous", timeEstimate: "50 minutes", sortOrder: 3, completed: false,
-          notes: "<p>Walk-friendly tasks. Tick off subtasks as you go.</p><p><strong>Post on LinkedIn</strong></p><ul><li><p>One of your Rule of 3 for next week.</p></li></ul><hr><p><strong>Message 12 warm leads</strong> (by Fri)</p><ul><li><p>Message them one by one, not as a broadcast.</p></li><li><p>Planner: https://example.com/planner</p></li></ul><hr><p><strong>Also on this walk:</strong> Comms catchup, right after this one.</p>",
-          subtasks: [{ _id: "x", title: "Post on LinkedIn", completed: false, timeEstimate: "10 minutes" }, { _id: "y", title: "Message 12 warm leads", completed: true, timeEstimate: "30 minutes" }] },
-        { _id: "s4", title: "Submit to F6S", channel: "Chord", timeEstimate: "1 hour 30 minutes", sortOrder: 4, completed: false, notes: "", subtasks: [] },
-        { _id: "s5", title: "Listen to affirmations", channel: "Personal", isPersonal: true, timeEstimate: "5 minutes", sortOrder: 5, completed: true, notes: "<p></p>", subtasks: [] }
-      ];
-      // ?ahead=1: a later day's task Mel worked on (and ticked off) early shows up in today's list, as Sunsama does
-      if (q.get("ahead")) tasks.push({ _id: "a1", title: "🚶 Treadmill batch", channel: "Ambidextrous", timeEstimate: "30 minutes", sortOrder: 6, completed: true, scheduledDate: "2099-12-31", notes: "", subtasks: [{ _id: "ax", title: "Send the invoice", completed: true }] });
-      return { content: [{ type: "text", text: JSON.stringify({ tasks }) }], payload: { tasks } };
-    }
-  };
-
   const downloads = { save: async ({ filename, data }) => { window.__download = { filename, size: String(data).length }; return { status: "saved" }; } };
-  const caps = { downloads, db, mcp: q.get("sunsama") || q.get("notion") || q.get("chord") ? mcp : null, user: { id: async () => "me", isOwner: () => true, canEdit: () => true }, sample: q.get("nosample") ? null : sample };
+  const caps = { downloads, db, user: { id: async () => "me", isOwner: () => true, canEdit: () => true } };
   window.claude = { use: name => new Promise(r => setTimeout(() => r(caps[name] ?? null), 250)) };
 
-  if (q.get("seed")) {
-    const sg = new Date(Date.now() + 6 * 3600e3 + (window.__mapleOffset || 0)).toISOString().slice(0, 10);
-    write("data/users/me/plan", { day: sg, tasks: [
-      { id: "t1", title: "Fix Chord onboarding flow", firstStep: "Open the onboarding screen in the browser", minutes: 25, pep: "This is the bit new creatives see first. Make it lovely.", place: "chord", spot: "bench",
-        notes: "From Sunsama:\n- Step 2 skips the brand colour picker on mobile\n- Copy on the welcome screen still says 'studio' instead of 'workspace'\n- Check it on a 375px screen\nLinked doc: https://example.com/onboarding-spec" },
-      { id: "t2", title: "Reply to Farzana about the MUSE audit", firstStep: "Open her email", minutes: 15, place: "post", spot: "counter",
-        email: { who: "Farzana", subject: "MUSE audit next steps", draft: "Hi Farzana, lovely to hear from you! Here's what happens next…", link: "https://mail.google.com/mail/u/0/#inbox" },
-        notes: "She asked when the audit report lands and whether the call can move to Thursday." },
-      { id: "t3", title: "Review the Chico beta feedback doc", firstStep: "Open the feedback doc", minutes: 25, treadmill: true, place: "chico", spot: "sofa", notes: "Read-only skim. Star the three loudest themes." },
-      { id: "t4", title: "Call with Ambidextrous accountant", minutes: 30, meeting: true, at: "3:00 pm", place: "hall", spot: "phone" },
-      { id: "t5", title: "Send October invoices", firstStep: "Open Stripe invoices", minutes: 20, place: "post", spot: "scales" }
-    ] });
-    write("data/users/me/mail", { items: [
-      { id: "m1", from: "crier", title: "A charging-week Monday, one call at three", at: Date.now() - 3600e3,
-        body: "Good morning, Mel. Five quests on the board, one meeting, and the week's theme is Chico charging.",
-        sections: [
-          { heading: "Today", lines: ["3:00 pm Call with the accountant (Zoom)", "5:30 pm Evan pickup"] },
-          { heading: "The one that matters", lines: ["Fix the Chord onboarding flow: new creatives see it first"] },
-          { heading: "Inbox", lines: ["2 possible leads (one MUSE, one website copy)", "Farzana is waiting on a reply"] },
-          { heading: "This week", lines: ["Theme: Chico charging", "Revenue action: send 3 MUSE follow-ups"] },
-          { heading: "Little things", lines: ["Water bottle by the desk", "Treadmill-able: the Chico feedback review"] }
-        ] },
-      { id: "m2", from: "postie", title: "Inbox triage", body: "2 new leads, 1 draft waiting for your OK (Farzana).\nNothing urgent from clients.", link: "https://mail.google.com/mail/u/0/#inbox", at: Date.now() - 600e3 }
-    ] });
-    write("data/users/me/library", { items: [
-      { id: "d1", title: "Show Your Work!", author: "Austin Kleon", added: 1, body: "- Share something small every day\n- Think process, not product\n- Teach what you know\n- Be open, but don't turn into human spam", try: "Post one behind-the-scenes photo of today's work." },
-      { id: "d2", title: "Company of One", author: "Paul Jarvis", added: 2, body: "- Question growth by default\n- Stay small and resilient\n- Build systems before hiring", try: "List one thing to stop doing this month." }
-    ] });
-    write("data/users/me/stats", { chord: { users: 142, at: Date.now() }, chico: { users: 58, at: Date.now() } });
+  if (q.get("seed") && !read("data/users/me/fox")) {   // only into a fresh save: later loads keep what the game wrote
+    const at = Date.now();
+    write("data/users/me/fox", { updatedAt: 1, board: { tasks: [
+      { id: "tseed1", title: "Water the houseplants", daily: true, at },
+      { id: "tseed2", title: "Book a dentist appointment", daily: false, at },
+      { id: "tseed3", title: "Ten minutes of stretching", daily: true, at }
+    ] } });
   }
 })();

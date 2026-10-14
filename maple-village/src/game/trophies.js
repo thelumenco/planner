@@ -1,46 +1,34 @@
-// Trophies: milestones Mel reaches, kept in the trophy room off the town hall. Each family of milestone has its own
+// Trophies: milestones you reach, kept in the trophy room off the town hall. Each family of milestone has its own
 // trophy (same look, a new number on the plinth each time). The newest six stand on pedestals; the rest live in the
 // trophy book (a journal-like page each: what it was for, when, and a polaroid of the trophy). When the pedestals
-// are full, the oldest moves to the book on its own. Stored in the game save (F.trophies), so it follows Mel.
+// are full, the oldest moves to the book on its own. Stored in the game save (F.trophies), so it follows you.
 import { esc, dayKey } from "../util.js";
 
 export const PEDESTALS = 6;
-const APPS = {chord: {n: "Chord", unit: "studios", col: "#7BB37A", emblem: "note"}, chico: {n: "Chico", unit: "families", col: "#F4A0B5", emblem: "chick"},
-  ohayo: {n: "Ohayo", unit: "users", col: "#F2A65A", emblem: "sun"}, luna: {n: "Luna", unit: "users", col: "#B9A6E8", emblem: "moon"}};
 const fmt = n => Number(n).toLocaleString("en-GB");
-const monthName = ym => new Date(ym + "-01T00:00:00Z").toLocaleDateString("en-GB", {month: "long", year: "numeric", timeZone: "UTC"});
 // families: id prefix -> {shape, col, emblem}
 export const LOOKS = {
-  quests: {shape: "cup", col: "#E8B84A", emblem: "star"}, revenue: {shape: "coins", col: "#E8B84A", emblem: "coin"},
-  objweek: {shape: "rosette", col: "#5B8FD6", emblem: "check"}, objcount: {shape: "medal", col: "#5B8FD6", emblem: "flag"},
+  quests: {shape: "cup", col: "#E8B84A", emblem: "star"}, favours: {shape: "rosette", col: "#5B8FD6", emblem: "check"},
   water: {shape: "medal", col: "#7FB8E8", emblem: "drop"}, steps: {shape: "medal", col: "#F2A65A", emblem: "shoe"},
-  maple: {shape: "plaque", col: "#EE8B3A", emblem: "fox"}, kind: {shape: "plaque", col: "#F4A0B5", emblem: "heart"},
-  harvest: {shape: "cup", col: "#7BB37A", emblem: "sprout"}, vault: {shape: "coins", col: "#C9A227", emblem: "star"}, journal: {shape: "star", col: "#C9A3E8", emblem: "book"},
-  ...Object.fromEntries(Object.entries(APPS).map(([k, a]) => [k, {shape: "cup", col: a.col, emblem: a.emblem}]))
+  maple: {shape: "plaque", col: "#EE8B3A", emblem: "fox"}, friends: {shape: "plaque", col: "#F4A0B5", emblem: "heart"},
+  harvest: {shape: "cup", col: "#7BB37A", emblem: "sprout"}, journal: {shape: "star", col: "#C9A3E8", emblem: "book"}
 };
-const TH = {quests: [10, 25, 50, 100, 250, 500, 1000, 2500], app: [20, 50, 100, 250, 500, 1000, 2500, 5000, 10000], objcount: [5, 10, 25, 50, 100],
-  kind: [10, 25, 50, 100], harvest: [10, 50, 100, 250, 500], journal: [10, 50, 100, 250], streak: [7, 14]};
+const TH = {quests: [10, 25, 50, 100, 250, 500, 1000, 2500], favours: [5, 10, 25, 50, 100], friends: [1, 3, 5, 10], harvest: [10, 50, 100, 250, 500], journal: [10, 50, 100, 250], streak: [7, 14]};
 
-// ctx: {F, ST, levels, levelIndex, kudos, journal, revenue:{month, total, target}|null, objectives:{week, list:[{_id, title, completed}]}|null}
+// ctx: {F, levels, levelIndex, journal}
 // -> every milestone reached so far, as {id, fam, n, label, note, short}
 export function reached(c){
   const out = [], add = (fam, id, n, label, note, short) => out.push({id, fam, n, label, note, short});
-  TH.quests.filter(t => (c.F.totalQuests || 0) >= t).forEach(t => add("quests", "quests-" + t, t, `${fmt(t)} quests done`, `${fmt(t)} quests finished, one tiny first step at a time.`, fmt(t)));
-  Object.entries(APPS).forEach(([k, a]) => { const s = c.ST && c.ST[k]; if (!s || !(s.users > 0)) return; const unit = s.label || a.unit;
-    TH.app.filter(t => s.users >= t).forEach(t => add(k, `${k}-${t}`, t, `${fmt(t)} ${unit} on ${a.n}`, `${a.n} reached ${fmt(t)} ${unit}.`, fmt(t))); });
-  if (c.revenue && c.revenue.target > 0 && c.revenue.total >= c.revenue.target)
-    add("revenue", "rev-" + c.revenue.month, c.revenue.target, `Revenue goal · ${monthName(c.revenue.month)}`, `Hit the monthly target of ${c.revenue.cur || "$"}${fmt(Math.round(c.revenue.target))} in ${monthName(c.revenue.month)}.`, monthName(c.revenue.month).split(" ")[0].slice(0, 3));
-  const objs = c.F.objDone || {}, done = Object.keys(objs).length;
-  TH.objcount.filter(t => done >= t).forEach(t => add("objcount", "objc-" + t, t, `${t} weekly objectives done`, `${t} Sunsama weekly objectives ticked off.`, String(t)));
-  Object.entries(c.F.objWeeks || {}).forEach(([wk, w]) => add("objweek", "objw-" + wk, w.n, `Every objective · week of ${new Date(wk + "T00:00:00Z").toLocaleDateString("en-GB", {day: "numeric", month: "short", timeZone: "UTC"})}`, `Every weekly objective done: ${w.titles.join("; ")}.`, "All"));
+  TH.quests.filter(t => (c.F.totalQuests || 0) >= t).forEach(t => add("quests", "quests-" + t, t, `${fmt(t)} quests done`, `${fmt(t)} tasks and favours done, one at a time.`, fmt(t)));
+  const board = c.F.board || {}, favours = board.done || 0, best = Object.values(board.hearts || {}).filter(n => n >= 5).length;
+  TH.favours.filter(t => favours >= t).forEach(t => add("favours", "favours-" + t, t, `${t} village requests`, `${t} villagers' requests, handed over in person.`, String(t)));
+  TH.friends.filter(t => best >= t).forEach(t => add("friends", "friends-" + t, t, `${t} best friend${t > 1 ? "s" : ""} in the village`, `${t} villager${t > 1 ? "s" : ""} with all five hearts.`, String(t)));
   const hist = c.F.history || {}, days = Object.keys(hist).sort(), streak = key => { let n = 0, best = 0, prev = null;
     days.forEach(d => { const ok = !!key(hist[d]), next = prev && Date.parse(d) - Date.parse(prev) === 864e5; n = ok ? (next && n > 0 ? n + 1 : 1) : 0; best = Math.max(best, n); prev = d; }); return best; };
   const wS = streak(h => (h.water || 0) >= 2000), sS = streak(h => (h.steps || 0) >= 5000);
   TH.streak.filter(t => wS >= t).forEach(t => add("water", "water-" + t, t, `${t} days of 2L water in a row`, `Two litres of water, ${t} days running.`, t + "d"));
   TH.streak.filter(t => sS >= t).forEach(t => add("steps", "steps-" + t, t, `${t} days of 5,000 steps in a row`, `5,000 steps or more, ${t} days running.`, t + "d"));
-  (c.levels || []).forEach((l, i) => { if (i > 0 && i <= c.levelIndex) add("maple", "maple-" + i, i, `Maple: ${l.name}`, `Maple's friendship reached "${l.name}".`, "Lv" + i); });
-  (c.vaults || []).forEach(v => { for (let k = 1; k <= (v.fills || 0); k++) add("vault", `vault-${v.id}-${k}`, k, `Filled the ${v.label} vault${k > 1 ? ` (${k}x)` : ""}`, `The ${v.label} savings jar filled to the top with jewels.`, k > 1 ? k + "x" : "Full"); });
-  TH.kind.filter(t => c.kudos >= t).forEach(t => add("kind", "kind-" + t, t, `${t} kind words pinned`, `${t} compliments pinned to the Kind words board.`, String(t)));
+  (c.levels || []).forEach((l, i) => { if (i > 0 && i <= c.levelIndex) add("maple", "maple-" + i, i, `Friendship: ${l.name}`, `Your pet's friendship reached "${l.name}".`, "Lv" + i); });
   TH.harvest.filter(t => (c.F.harvestTotal || 0) >= t).forEach(t => add("harvest", "harvest-" + t, t, `${t} harvests`, `${t} crops picked from the garden.`, String(t)));
   TH.journal.filter(t => c.journal >= t).forEach(t => add("journal", "journal-" + t, t, `${t} journal pages`, `${t} pages written in your journal.`, String(t)));
   return out;
@@ -61,10 +49,9 @@ export const inBook = F => (F.trophies || []).filter(t => t.book).sort((a, b) =>
 export function nextUp(c){
   const rows = [], row = (label, have, need) => rows.push({label, have, need});
   const q = TH.quests.find(t => (c.F.totalQuests || 0) < t); if (q) row(`${fmt(q)} quests`, c.F.totalQuests || 0, q);
-  Object.entries(APPS).forEach(([k, a]) => { const s = c.ST && c.ST[k]; if (!s || !(s.users > 0)) return; const t = TH.app.find(x => s.users < x); if (t) row(`${fmt(t)} ${s.label || a.unit} on ${a.n}`, s.users, t); });
-  const o = TH.objcount.find(t => Object.keys(c.F.objDone || {}).length < t); if (o) row(`${o} weekly objectives`, Object.keys(c.F.objDone || {}).length, o);
-  const k = TH.kind.find(t => c.kudos < t); if (k) row(`${k} kind words`, c.kudos, k);
-  if (c.revenue && c.revenue.target > 0 && c.revenue.total < c.revenue.target) row(`This month's revenue goal`, Math.round(c.revenue.total), Math.round(c.revenue.target));
+  const board = c.F.board || {}, fv = TH.favours.find(t => (board.done || 0) < t); if (fv) row(`${fv} village requests`, board.done || 0, fv);
+  const best = Object.values(board.hearts || {}).filter(n => n >= 5).length, fr = TH.friends.find(t => best < t); if (fr) row(`${fr} best friend${fr > 1 ? "s" : ""}`, best, fr);
+  const hv = TH.harvest.find(t => (c.F.harvestTotal || 0) < t); if (hv) row(`${hv} harvests`, c.F.harvestTotal || 0, hv);
   return rows.slice(0, 6);
 }
 
@@ -103,7 +90,7 @@ export function trophySVG(t, size = 64){
 }
 
 /* ---------- panels ---------- */
-const when = ms => new Date(ms).toLocaleDateString("en-GB", {day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Singapore"});
+const when = ms => new Date(ms).toLocaleDateString("en-GB", {day: "numeric", month: "long", year: "numeric"});
 export function pedestalPanel(t, nexts, canBook){
   if (!t) return `<span class="tape gingham" aria-hidden="true"></span><h2>An empty pedestal</h2><p class="sub">Your next trophy stands here. Coming up:</p>`
     + (nexts.length ? `<ul class="hlist tnext">${nexts.map(r => `<li><span><b>${esc(r.label)}</b><small>${fmt(r.have)} of ${fmt(r.need)}</small></span><span class="clbar"><i style="width:${Math.min(100, Math.round(100*r.have/r.need))}%"></i></span></li>`).join("")}</ul>` : `<p class="muted">Keep going: quests, objectives and app milestones all earn trophies.</p>`)
@@ -123,33 +110,5 @@ export function wireTrophies(root, F, api){
     const t = (F.trophies || []).find(x => x.id === b.dataset.id); if (!t) return;
     if (b.dataset.tr === "book") { t.book = true; t.bookAt = Date.now(); api.save(); api.undoable("Into the trophy book", () => { t.book = false; api.save(); api.rerender(); }); api.close(); }
     if (b.dataset.tr === "unbook" && onPedestals(F).length < PEDESTALS) { t.book = false; api.save(); api.rerender(); }
-  });
-}
-
-/* ---------- affirmations: fresh every day (Claude writes them from Mel's plans when it can; a kind list otherwise) ---------- */
-const BASE = ["I build things that help people, and it shows.", "I can do hard things and still be gentle with myself.", "Small steps every day add up to big change.",
-  "I'm allowed to rest. Rest is part of the work.", "My ideas are worth sharing.", "I'm a good mum and a good founder, both at once.",
-  "I don't have to do it all today. Just the next thing.", "Clients come back because I care.", "Progress, not perfection.", "I trust myself to figure it out.",
-  "My voice is clear and it matters.", "I'm proud of how far I've come.", "Today I choose calm over rush.", "I'm building something that lasts.",
-  "Good things are on their way to me.", "I keep my promises to myself.", "I am creative, capable and kind.", "Every 'no' makes room for the right 'yes'.",
-  "I celebrate my wins, even the tiny ones.", "My family and my work both get the best of me, in turn."];
-export function dailyAffirmations(day = dayKey()){
-  const n = Math.floor(Date.parse(day + "T00:00:00Z")/864e5), out = [];
-  for (let i = 0; out.length < 5; i++) { const a = BASE[(n*7 + i*3) % BASE.length]; if (!out.includes(a)) out.push(a); }
-  return out;
-}
-export function affirmPanel(A, busy, canWrite){
-  const list = (A && A.day === dayKey() && A.items && A.items.length) ? A.items : dailyAffirmations();
-  return `<span class="tape dots" aria-hidden="true"></span><h2>Affirmations</h2><p class="sub">Today's, fresh every morning. Read one out loud.</p>
-    <ul class="taff">${list.map((a, i) => `<li><span>${esc(a)}</span><button class="kdel tkeep${(A && A.kept || []).includes(a) ? " on" : ""}" data-af="keep" data-i="${i}" aria-label="Keep this one">♡</button></li>`).join("")}</ul>
-    ${(A && A.kept && A.kept.length) ? `<p class="eyebrow" style="margin-top:14px">Ones you kept</p><ul class="taff kept">${A.kept.map((a, i) => `<li><span>${esc(a)}</span><button class="kdel" data-af="unkeep" data-i="${i}" aria-label="Let this one go">×</button></li>`).join("")}</ul>` : ""}
-    <div class="actions">${canWrite ? `<button class="btn alt small" data-af="fresh" ${busy ? "disabled" : ""}>${busy ? "Writing…" : "Write me new ones"}</button>` : ""}<button class="btn alt small" data-close="1">Close</button></div>`;
-}
-export function wireAffirm(root, A, list, api){
-  root.querySelectorAll("[data-af]").forEach(b => b.onclick = () => {
-    const k = b.dataset.af; A.kept = A.kept || [];
-    if (k === "keep") { const a = list[+b.dataset.i]; if (a && !A.kept.includes(a)) A.kept.unshift(a); else A.kept = A.kept.filter(x => x !== a); A.kept = A.kept.slice(0, 30); api.save(); api.rerender(); }
-    if (k === "unkeep") { const [gone] = A.kept.splice(+b.dataset.i, 1); api.save(); api.undoable("Affirmation let go", () => { A.kept.unshift(gone); api.save(); api.rerender(); }); api.rerender(); }
-    if (k === "fresh") api.fresh();
   });
 }

@@ -4,6 +4,7 @@
 // little "…" over their head; tap them to hear it. What's been heard is kept in F.story and listed in the friendship
 // view ("Stories so far").
 // State: F.story = {heard: {npc: n}, day: {npc: lastDay}, log: [{id, k, day}], flags: {}}
+import { boostedStory } from "./quests.js";
 import { STORIES } from "../data/stories.js";
 import { esc, dayKey } from "../util.js";
 import { FISH } from "./fishing.js";
@@ -39,6 +40,7 @@ const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.
 const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason"];   // Ronda's and Kyoto's, and Jason in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
   if (id === "jason") return eligible(F, id, day);   // Jason (Mel's friend) tells his whenever she visits, a chapter a day, outside the two-a-day limit
+  if (boostedStory(F, id, day)) return eligible(F, id, day);   // their request was finished today: their next chapter's ready, outside the two-a-day limit
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;
   const s = storyState(F), told = Object.keys(s.day).filter(x => s.day[x] === day && x !== "jason").length, left = TELLERS_PER_DAY - told;
   if (left <= 0) return null;

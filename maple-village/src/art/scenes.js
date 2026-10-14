@@ -3,13 +3,12 @@ import { paintSVG, framesNow } from "../game/gallery.js";   // round 197: each p
 // SVG scene builders: village, interiors, garden. Generated strings, hand-drawn look via #wob / #marker / #wash.
 // Scene builders read live game state through the `G` context set by core (setArtContext).
 import { mouldPath } from "./moulds.js";
-import { ink, sgHM, dayKey } from "../util.js";
+import { ink, sgHM, dayKey, LOC } from "../util.js";
 import { VILLAGE, ROOMS, stationsOf, MAPLE_BED } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
 import { iconAt } from "./icons.js";
 import { runArt } from "../game/pets.js";
-import { jarArt } from "../game/jars.js";
 import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDefs } from "./village-extras.js";
 import { trophySVG } from "../game/trophies.js";
 import { bankBuilding } from "./buildings.js";
@@ -21,7 +20,6 @@ import { ghOutside } from "./greenhouse.js";
 export { vineyardArt } from "./vineyard.js";
 export { orchardArt, flowerFarmArt } from "./orchard.js";
 import { orchardGate, potsIn } from "./orchard.js";
-import { jarArt as vaultArt, isFull as vaultFull } from "../game/bank.js";
 import { townHall, chordWorkshop, library, chicoCottage, postOffice, lunaHouse, ohayoHouse } from "./buildings.js";
 
 let G = null;
@@ -30,7 +28,7 @@ export const artCtx = () => G;
 
 // Darren's asleep in their bed from 11pm until his morning starts (7:00 on weekdays, 7:30 at weekends)
 export function darrenAsleep(){
-  const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8*3600e3), m = d.getUTCHours()*60 + d.getUTCMinutes(), we = d.getUTCDay() === 0 || d.getUTCDay() === 6;
+  const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + LOC()), m = d.getUTCHours()*60 + d.getUTCMinutes(), we = d.getUTCDay() === 0 || d.getUTCDay() === 6;
   return m >= 23*60 || m < (we ? 7*60 + 30 : 7*60);
 }
 export function tapeLabel(x, y, text, col, size){
@@ -76,13 +74,13 @@ export function villageArt(){
       ${sk(`<rect x="8" y="170" width="6" height="40" style="fill:var(--wood)"/><rect x="32" y="170" width="6" height="40" style="fill:var(--wood)"/><path d="M4 174 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--peri)"/>`,
         `<rect x="8" y="170" width="6" height="40"/><rect x="32" y="170" width="6" height="40"/><path d="M4 174 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`)}
       ${tapeLabel(42, 146, "The field", "var(--peri)", 11)}</g>` +
-    // east gate to Makers' Lane (Chord and Chico live there now)
+    // east gate to Makers' Lane (Bo's workshop and three villagers' homes)
     `<g data-place="toLane" aria-label="Gate to Makers' Lane" transform="translate(-56 -112)"><ellipse class="hov" cx="496" cy="330" rx="26" ry="30" style="fill:var(--butter)"/>
       ${sk(`<rect x="484" y="292" width="6" height="56" style="fill:var(--wood)"/><rect x="508" y="292" width="6" height="56" style="fill:var(--wood)"/><path d="M480 296 q19 -14 38 0 v6 q-19 -12 -38 0z" style="fill:var(--sage)"/>`,
         `<rect x="484" y="292" width="6" height="56"/><rect x="508" y="292" width="6" height="56"/><path d="M480 296 q19 -14 38 0 v6 q-19 -12 -38 0z"/>`)}
       ${tapeLabel(458, 366, "Makers' Lane", "var(--sage)", 11)}</g>` +
     `<g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
-      <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.remaining().length)}</g>
+      <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.boardCount())}</g>
       ${tapeLabel(260, 280, "Quests", "var(--butter)", 11)}</g>
     <g transform="translate(36 64)"><g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M146 312 v20 M174 312 v20"/><path d="M140 314 l20 -12 l20 12z" style="fill:var(--peach)"/><ellipse cx="160" cy="334" rx="17" ry="7" style="fill:var(--stone)"/><path d="M143 334 v6 a17 7 0 0 0 34 0 v-6" style="fill:var(--stone)"/><ellipse cx="160" cy="333" rx="11" ry="4" style="fill:var(--water)"/></g>
@@ -95,11 +93,8 @@ export function villageArt(){
     <g transform="translate(-132 32)"><g data-place="news" aria-label="Good news board"><ellipse class="hov" cx="222" cy="450" rx="34" ry="8" style="fill:var(--butter)"/>
       ${sk(`<rect x="194" y="402" width="56" height="36" rx="3" style="fill:#F6E3A1"/><rect x="200" y="408" width="14" height="12" style="fill:#FFFDF6"/><rect x="218" y="410" width="12" height="14" style="fill:#F4C7CF"/><rect x="233" y="407" width="12" height="11" style="fill:#DCE8C8"/>`,
         `<path d="M202 438 v12 M242 438 v12"/><rect x="194" y="402" width="56" height="36" rx="3"/><rect x="200" y="408" width="14" height="12"/><rect x="218" y="410" width="12" height="14"/><rect x="233" y="407" width="12" height="11"/><path d="M194 402 q28 -10 56 0" opacity=".6"/>`)}
-      ${G.goodNews && G.goodNews() ? `<g class="twinkle">${iconAt("sparkle", 252, 398, 14)}</g>` : ""}${dogArt(270, 450, !!(G.goodNews && G.goodNews()))}${tapeLabel(222, 470, "Good news", "var(--butter)", 11)}</g></g>
+      ${dogArt(270, 450, false)}${tapeLabel(222, 470, "Good news", "var(--butter)", 11)}</g></g>
     ${townRiver()}`;
-  const L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
-  const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
-    return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`; };
   const lamps = [[384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
   // the station road up to Honeybrook station, and the town's welcome sign
   const station = archGate("toStationV", 281, 70, "Station road", 281, 118, "var(--peri)", "Up the station road to Honeybrook station")
@@ -215,7 +210,7 @@ export function skyColour(m){
   for (let i = 1; i < SKY.length; i++) if (m < SKY[i][0]) { const [m0, c0] = SKY[i - 1], [m1, c1] = SKY[i]; return mix(c0, c1, (m - m0)/(m1 - m0)).toUpperCase(); }
   return SKY[0][1];
 }
-// the wash for minute m of the day (Singapore time), quantised to 5 minutes; "" in full daylight
+// the wash for minute m of the day (local time), quantised to 5 minutes; "" in full daylight
 export const skyWash = m => { const c = skyColour(Math.floor(m/5)*5); return c === "#FFFFFF" ? "" : `<rect class="dusk" width="520" height="640" fill="${c}" style="mix-blend-mode:multiply" pointer-events="none"/>`; };
 // After 7pm: the light drops, windows glow, the lamps come on, the firepit is lit and stars come out over the river.
 function duskArt(){
@@ -236,11 +231,8 @@ function dogArt(x, y, awake){
     : `<path d="M-14 -3 q-4 -6 2 -9" fill="none"/><ellipse cx="0" cy="-5" rx="13" ry="6" fill="${fur}"/><ellipse cx="10" cy="-6" rx="6" ry="4.6" fill="${fur}"/><path d="M5 -10 q-4 1 -3 6 q3 -1 3 -6z" fill="${ear}"/><path d="M10 -7 q1.5 1 3 0" fill="none"/><path d="M15 -19 h4 l-4 5 h4 M21 -25 h3 l-3 4 h3" fill="none" stroke-width="1" opacity=".6"/>`)
     + `</g></g>`;
 }
-/* ---------- Makers' Lane: the apps ---------- */
+/* ---------- Makers' Lane: Bo's workshop and three villagers' homes ---------- */
 export function laneArt(){
-  const L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
-  const light = (app, x, y) => { const h = G.health ? G.health(app) : null; if (!h) return "";
-    return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L[h.status]}"/></g>`; };
   const D = VILLAGE;
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
@@ -256,21 +248,19 @@ export function laneArt(){
     ${sk(`<rect x="240" y="588" width="6" height="48" style="fill:var(--wood)"/><rect x="278" y="588" width="6" height="48" style="fill:var(--wood)"/><path d="M236 592 q26 -16 52 0 v6 q-26 -14 -52 0z" style="fill:#9CC27E"/><circle cx="248" cy="596" r="2.2" style="fill:#6B2A55"/><circle cx="276" cy="596" r="2.2" style="fill:#6B2A55"/>`,
       `<rect x="240" y="588" width="6" height="48"/><rect x="278" y="588" width="6" height="48"/><path d="M236 592 q26 -16 52 0 v6 q-26 -14 -52 0z"/>`)}
     ${tapeLabel(330, 612, "Vineyard", "#E8B4C0", 11)}</g>`;
-  // plots for the next apps: fenced patches of turned earth, each with a little "coming soon" sign
+  // a fenced plot of turned earth with a little "coming soon" sign (kept for a new house one day)
   const plotArt = (id, x, name, col) => `<g data-place="${id}" aria-label="${name}'s plot"><ellipse class="hov" cx="${x}" cy="530" rx="56" ry="11" style="fill:var(--butter)"/>
     ${sk(`<rect x="${x-50}" y="456" width="100" height="66" rx="4" style="fill:#C9A27E"/><rect x="${x-32}" y="432" width="64" height="22" rx="2" style="fill:#FFFDF6"/>`,
       `<path d="M${x-54} 526 V452 H${x+54} V526 M${x-54} 526 H${x-12} M${x+12} 526 H${x+54}" fill="none"/><path d="M${x-44} 474 h88 M${x-44} 492 h88 M${x-44} 508 h88" opacity=".35"/><rect x="${x-32}" y="432" width="64" height="22" rx="2"/>`)}
     <text x="${x}" y="447" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="10" textLength="52" lengthAdjust="spacingAndGlyphs" style="fill:var(--line)">coming soon</text>
     ${tapeLabel(x, 552, name, col, 11)}</g>`;
-  const plot = lunaHouse() + ohayoHouse();   // (plotArt is kept for the next app that needs a plot)
+  const plot = lunaHouse() + ohayoHouse();   // Juniper's house and Mr Okada's
   // round 103: the river comes down from the waterfall in the woods along the west edge (on to the vineyard), with a
   // plank bridge where the town square path crosses it; the path up the hill to the woods leaves from the top
   const river = riverPath([[18, -20], [22, 150], [14, 330], [20, 480], [12, 660]], 16) + sk(`<rect x="2" y="322" width="36" height="20" rx="2" style="fill:#C9A27E"/>`, `<rect x="2" y="322" width="36" height="20" rx="2"/><path d="M12 322 v20 M22 322 v20" opacity=".5"/>`);
   const up = `<g filter="url(#wob)"><path d="M262 344 C262 260 300 200 330 150 L330 40" fill="none" style="stroke:var(--path)" stroke-width="16" stroke-linecap="round"/></g>` + archGate("toWoodsM", 330, 48, "Honeybrook Woods", 404, 70, "#C3E8DA", "Up the hill into Honeybrook Woods");
   return lampDefs + ground + river + up + gate + vgate + [[70, 352], [250, 352], [460, 352], [222, 572]].map(([x, y]) => streetLamp(x, y)).join("")
     + `<g transform="translate(60 0)">${chordWorkshop()}</g><g transform="translate(295 -230)">${chicoCottage()}</g>` + plot
-    + light("chord", 200, 196) + light("chico", 433, 206) + light("luna", 212, 452) + light("ohayo", 414, 450)
-    + userGarden("chord", 214, 216, 4, 3, 12) + userGarden("chico", 330, 324, 8, 2, 12) + userGarden("luna", 76, 570, 4, 2, 12) + userGarden("ohayo", 420, 562, 4, 2, 12)
     + upgradesArt(G.F().totalQuests || 0, "lane");
 }
 export function notesArt(x, y, n){
@@ -308,18 +298,6 @@ export function furn(kind, x, y){
       `<rect x="${x-56}" y="${y-30}" width="112" height="24" rx="2"/><circle cx="${x+30}" cy="${y-40}" r="9"/><circle cx="${x+30}" cy="${y-40}" r="3"/><rect x="${x-40}" y="${y-44}" width="30" height="6" rx="2"/><path d="M${x-12} ${y-44} v-8 h8 v8"/><path d="M${x-50} ${y-6} v14 M${x+50} ${y-6} v14"/>`);
     case "press": return sk(`<rect x="${x-44}" y="${y-30}" width="88" height="30" rx="3" style="fill:var(--sage)"/><circle cx="${x-14}" cy="${y-46}" r="14" style="fill:var(--stone)"/><circle cx="${x+18}" cy="${y-46}" r="14" style="fill:var(--stone)"/><rect x="${x-30}" y="${y-70}" width="40" height="14" style="fill:#FFFDF6"/>`,
       `<rect x="${x-44}" y="${y-30}" width="88" height="30" rx="3"/><circle cx="${x-14}" cy="${y-46}" r="14"/><circle cx="${x+18}" cy="${y-46}" r="14"/><rect x="${x-30}" y="${y-70}" width="40" height="14"/><path d="M${x+40} ${y-30} l14 -30"/>`);
-    // Ohayo's reactions board (the latest reactions pinned up as notes, each with its emoji) and its hello chart (an
-    // easel: how many are waiting, and the watched percentage as a filling sun)
-    case "reactboard": { const o = G.ohayo ? G.ohayo() : null, rs = o ? o.reactions.slice(0, 6) : [], c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#FCE2C2", "#DCE8C8", "#C3CDEE"];
-      const notes = Array.from({length: 6}, (_, i) => { const nx = x - 40 + (i % 3)*28, ny = y - 92 + Math.floor(i/3)*30, r = rs[i];
-        return `<rect x="${nx}" y="${ny}" width="22" height="22" transform="rotate(${i % 2 ? 5 : -4} ${nx + 11} ${ny + 11})" style="fill:${r ? c[i] : "#E9D9C2"}"/>${r ? `<text x="${nx + 11}" y="${ny + 16}" text-anchor="middle" font-size="12" pointer-events="none">${r.emoji.replace(/[<&>]/g, "")}</text>` : ""}`; }).join("");
-      return sk(`<rect x="${x-50}" y="${y-102}" width="100" height="66" rx="3" style="fill:#D9B893"/>${notes}`, `<rect x="${x-50}" y="${y-102}" width="100" height="66" rx="3"/><path d="M${x-38} ${y-36} l-6 36 M${x+38} ${y-36} l6 36"/>`)
-        + `<text x="${x}" y="${y-106}" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9" style="fill:var(--line)" pointer-events="none">${rs.length ? "reactions" : "no reactions yet"}</text>`; }
-    case "hellochart": { const o = G.ohayo ? G.ohayo() : null, pct = o ? o.watchRate : 0, q = o ? o.queued : 0;
-      return sk(`<path d="M${x-30} ${y} l14 -86 M${x+30} ${y} l-14 -86 M${x} ${y-80} v80" style="stroke:var(--wood)" stroke-width="3"/><rect x="${x-38}" y="${y-100}" width="76" height="62" rx="3" style="fill:#FFFDF6"/>
-          <path d="M${x-22} ${y-52} a22 22 0 0 1 44 0z" style="fill:#FBE3C8"/>${pct > 0 ? (() => { const t = Math.PI*(1 - Math.min(100, pct)/100); return `<path d="M${x} ${y-52} L${x-22} ${y-52} A22 22 0 0 1 ${(x + 22*Math.cos(t)).toFixed(1)} ${(y - 52 - 22*Math.sin(t)).toFixed(1)}Z" style="fill:#F2A65A"/>`; })() : ""}`,
-        `<rect x="${x-38}" y="${y-100}" width="76" height="62" rx="3"/><path d="M${x-22} ${y-52} a22 22 0 0 1 44 0z M${x-28} ${y-52} h56"/>`)
-        + `<g font-family="Mulish,sans-serif" font-weight="800" text-anchor="middle" pointer-events="none" style="fill:var(--line)"><text x="${x}" y="${y-58}" font-size="11">${o ? pct + "%" : "–"}</text><text x="${x}" y="${y-88}" font-size="7.5">${o ? q + " waiting" : "no numbers yet"}</text><text x="${x}" y="${y-42}" font-size="6.5" font-weight="600">watched</text></g>`; }
     case "cork": { let p = ""; const c = ["#FFFDF6","#F6E3A1","#F4C7CF","#C3CDEE","#DCE8C8","#FFFDF6"];
       for (let i = 0; i < 6; i++) p += `<rect x="${x-36 + (i%3)*26}" y="${y-86 + Math.floor(i/3)*24}" width="18" height="18" style="fill:${c[i]}"/><circle cx="${x-27 + (i%3)*26}" cy="${y-81 + Math.floor(i/3)*24}" r="2" style="fill:var(--rose)"/>`;
       return sk(`<rect x="${x-46}" y="${y-96}" width="92" height="62" rx="3" style="fill:#D9B893"/>${p}`, `<rect x="${x-46}" y="${y-96}" width="92" height="62" rx="3"/><path d="M${x-34} ${y-34} l-6 34 M${x+34} ${y-34} l6 34"/>`); }
@@ -367,7 +345,7 @@ export function furn(kind, x, y){
     // a bedroom door (the family's houses): on the west or east wall depending on where it stands, with a little
     // heart sign; from 11pm to the morning a "shh" sign hangs on it
     case "bedroomdoor": { const left = x < 260, d = left ? `M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z` : `M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z`,
-        sx = left ? x - 26 : x + 26, m = (new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8*3600e3)).getUTCHours(), night = m >= 23 || m < 6;
+        sx = left ? x - 26 : x + 26, m = (new Date(Date.now() + (globalThis.__mapleOffset || 0) + LOC())).getUTCHours(), night = m >= 23 || m < 6;
       return sk(`<path d="${d}" style="fill:#E8B4C0"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2" style="fill:#FFFDF6"/>` : `<path d="M${sx} ${y - 58} c-4 -6 -10 -2 -6 3 l6 5 l6 -5 c4 -5 -2 -9 -6 -3z" style="fill:#E8566C"/>`}`,
         `<path d="${d}"/><circle cx="${left ? x - 17 : x + 17}" cy="${y - 42}" r="1.8"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2"/><path d="M${sx - 6} ${y - 64} h12" opacity=".6"/>` : ""}`); }
     // the home office door on the living room's west wall, below Mel's
@@ -459,9 +437,8 @@ export function furn(kind, x, y){
         `<rect x="${x-28}" y="${y-48}" width="56" height="9" rx="2"/><rect x="${x-22}" y="${y-39}" width="44" height="32"/><path d="M${x-12} ${y-37} v28 M${x} ${y-37} v28 M${x+12} ${y-37} v28" opacity=".35"/><rect x="${x-28}" y="${y-7}" width="56" height="7" rx="2"/>`)
         + (t ? trophySVG(t, 56).replace("<svg ", `<svg x="${x-28}" y="${y-48-63}" class="ptrophy" `) : `<ellipse cx="${x}" cy="${y-50}" rx="15" ry="3" fill="#000" opacity=".06"/>`); }
     // the bank: a tall glass vault jar (savings), and Opal's counter
-    case "vaultjar": { const j = G.vault ? G.vault(x) : null;
-      if (!j) return `<g opacity=".75">${sk(`<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y-152} v20 M${x-10} ${y-142} h20" stroke-width="2"/>`)}</g>`;
-      return `<svg x="${x-34}" y="${y-300}" width="80" height="300" overflow="visible" class="${vaultFull(j) ? "vfull" : ""}">${vaultArt(j, 68, 300, {id: "f" + j.slot, sparkle: vaultFull(j), markers: false})}</svg>`; }
+    case "vaultjar": { 
+      return `<g opacity=".75">${sk(`<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y-152} v20 M${x-10} ${y-142} h20" stroke-width="2"/>`)}</g>`; }
     // the town hall's weekly review desk: a small table with an open scrapbook, photos and washi tape
     case "scrapbook": return sk(`<rect x="${x-48}" y="${y-30}" width="96" height="22" rx="3" style="fill:var(--wood)"/>
         <path d="M${x-40} ${y-42} l38 -6 l38 6 v12 l-38 -4 l-38 4z" style="fill:#FFFDF6"/><rect x="${x-34}" y="${y-46}" width="14" height="12" transform="rotate(-6 ${x-27} ${y-40})" style="fill:#C3CDEE"/>
@@ -675,8 +652,8 @@ export function furn(kind, x, y){
         <circle cx="${x+30}" cy="${y-72}" r="6" style="fill:var(--rose)"/><circle cx="${x+40}" cy="${y-66}" r="5" style="fill:var(--butter)"/><circle cx="${x+22}" cy="${y-65}" r="5" style="fill:var(--peri)"/><circle cx="${x+30}" cy="${y-72}" r="2" style="fill:var(--honey)"/>`,
       `<rect x="${x-62}" y="${y-34}" width="124" height="26" rx="4"/><path d="M${x-56} ${y-8} v14 M${x+56} ${y-8} v14 M${x-56} ${y-21} h112" opacity=".4"/><path d="M${x-40} ${y-44} l26 -4 l26 4 v9 l-26 -3 l-26 3z M${x-14} ${y-48} v9 M${x-34} ${y-42} h14 M${x-8} ${y-42} h14" />
         <path d="M${x+30} ${y-44} q-6 -2 -5 -10 q1 -8 9 -8 q8 0 9 8 q1 8 -5 10z"/><path d="M${x+30} ${y-62} v-4 M${x+32} ${y-62} q4 -2 7 -3 M${x+28} ${y-62} q-3 -1 -5 -2" style="stroke:var(--moss2)"/><circle cx="${x+30}" cy="${y-72}" r="6"/><circle cx="${x+40}" cy="${y-66}" r="5"/><circle cx="${x+22}" cy="${y-65}" r="5"/>`);
-    case "jarshelf": { const js = (G.jars && G.jars()) || [], W = 176, x0 = x - W/2;
-      const mini = (j, i) => { const cx = x0 + 16 + (i % 5)*36, top = y - (i < 5 ? 66 : 32) - 22; return j ? `<svg x="${cx - 11}" y="${top}" width="22" height="29" viewBox="0 0 60 80">${jarArt(j)}</svg>` : ""; };
+    case "jarshelf": { const js = [], W = 176, x0 = x - W/2;
+      const mini = () => "";
       return sk(`<rect x="${x0}" y="${y-70}" width="${W}" height="70" rx="3" style="fill:#E2CBA8"/><rect x="${x0}" y="${y-38}" width="${W}" height="6" style="fill:var(--wood)"/><rect x="${x0}" y="${y-6}" width="${W}" height="6" style="fill:var(--wood)"/>`,
         `<rect x="${x0}" y="${y-70}" width="${W}" height="70" rx="3"/><path d="M${x0} ${y-38} h${W} M${x0} ${y-32} h${W} M${x0} ${y-6} h${W}"/>`) + `<g pointer-events="none">${js.map(mini).join("")}</g>`; }
     case "chartstand": return sk(`<rect x="${x-36}" y="${y-96}" width="72" height="58" rx="2" style="fill:#FFFDF6"/><rect x="${x-26}" y="${y-60}" width="10" height="16" style="fill:#7FB069"/><rect x="${x-12}" y="${y-70}" width="10" height="26" style="fill:#7FB069"/><rect x="${x+2}" y="${y-66}" width="10" height="22" style="fill:#7FB069"/><rect x="${x+16}" y="${y-84}" width="10" height="40" style="fill:#4E9A4A"/>`,
@@ -693,14 +670,6 @@ export function furn(kind, x, y){
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><path d="M${x-36} ${y-30} h28 l-4 -10 h-20z M${x-22} ${y-40} v-10 h-10 h20"/><rect x="${x+10}" y="${y-48}" width="12" height="18" rx="2"/><rect x="${x+28}" y="${y-40}" width="20" height="10"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
     case "treadmill": return sk(`<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8" style="fill:var(--sock)"/><rect x="${x-17}" y="${y-66}" width="34" height="58" rx="4" style="fill:#6B5A52"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4" style="fill:var(--peri)"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2" style="fill:#DCE8C8"/>`,
       `<rect x="${x-24}" y="${y-74}" width="48" height="74" rx="8"/><path d="M${x-17} ${y-56} h34 M${x-17} ${y-44} h34 M${x-17} ${y-32} h34 M${x-17} ${y-20} h34" opacity=".45"/><path d="M${x-26} ${y-80} v28 M${x+26} ${y-80} v28" stroke-width="2.4"/><rect x="${x-30}" y="${y-96}" width="60" height="16" rx="4"/><rect x="${x-14}" y="${y-93}" width="20" height="9" rx="2"/><text x="${x-4}" y="${y-86}" text-anchor="middle" font-family="Klee One,serif" font-size="7" stroke="none" style="fill:var(--line)">1.2</text>`);
-    case "healthchord": case "healthchico": case "healthluna": case "healthohayo": {
-      // a standing sign: three lights (worst check first) and a big status word from the nightly bug check
-      const h = G && G.health ? G.health(kind.slice(6)) : null, L = {green: "#7FB069", amber: "#F3B54A", red: "#E8574C", grey: "#B9B0A4"};
-      const st = h ? h.status : "grey", word = {green: "ALL GOOD", amber: "WATCH", red: "NEEDS YOU", grey: "NO REPORT"}[st];
-      const lights = (h && h.checks.length ? h.checks.slice(0, 3).map(c => c.state) : [st, st, st]).map((c, i) => `<circle cx="${x-18 + i*18}" cy="${y-62}" r="6" style="fill:${L[c]}"/>`).join("");
-      return sk(`<rect x="${x-3}" y="${y-30}" width="6" height="30" style="fill:var(--wood)"/><rect x="${x-34}" y="${y-80}" width="68" height="52" rx="5" style="fill:#FFFDF6"/>${lights}`,
-        `<rect x="${x-34}" y="${y-80}" width="68" height="52" rx="5"/><path d="M${x-3} ${y-28} v28 M${x+3} ${y-28} v28 M${x-12} ${y} h24"/>${lights.replace(/ style="[^"]*"/g, "")}`)
-        + `<text x="${x}" y="${y-38}" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="800" font-size="9" letter-spacing=".6" style="fill:${L[st] === L.grey ? "var(--line)" : L[st]}">${word}</text>`; }
     case "pobox": { let c = ""; for (let r = 0; r < 3; r++) for (let i = 0; i < 2; i++) c += `<rect x="${x-20 + i*21}" y="${y-80 + r*24}" width="19" height="20" rx="1" style="fill:${G && G.postCount && G.postCount() > r*2 + i ? "#FFFDF6" : "#9C7A5C"}"/>`;
       return sk(`<rect x="${x-24}" y="${y-84}" width="48" height="84" rx="3" style="fill:var(--wood)"/>${c}`, `<rect x="${x-24}" y="${y-84}" width="48" height="84" rx="3"/>${c.replace(/ style="[^"]*"/g, "")}`); }
     case "fridge": return sk(`<rect x="${x-20}" y="${y-84}" width="40" height="84" rx="5" style="fill:#F4F1EA"/><rect x="${x-14}" y="${y-74}" width="13" height="16" style="fill:#FFFDF6"/><circle cx="${x+9}" cy="${y-70}" r="3" style="fill:var(--rose)"/><circle cx="${x+3}" cy="${y-46}" r="2.6" style="fill:var(--butter)"/>`,
@@ -760,9 +729,7 @@ export function foreArt(id){
 export function roomArt(id){
   const r = ROOMS[id], st = stationsOf(id);
   let h = roomShell(id);
-  if (id !== "market" && !r.noBoard) h += `<g data-spot="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="204" rx="40" ry="10" style="fill:var(--butter)"/>
-    ${sk(`<rect x="222" y="40" width="76" height="56" rx="3" style="fill:var(--wood)"/>`, `<rect x="222" y="40" width="76" height="56" rx="3"/>${notesArt(230, 50, G.questsIn(id).filter(t => !G.S().doneIds.includes(t.id)).length)}`)}${tapeLabel(260, 112, "Quests here", "var(--butter)")}</g>`;
-  else if (id === "market") h += sk(`<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
+  if (id === "market") h += sk(`<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
     `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`) +
     `<g>${[["apple","dumpling","fish","toast"],["tulip","carrot","strawberry","sunflower"]].map((row, r) => row.map((n, i) => iconAt(n, 64 + i*30, 62 + r*38, 26)).join("")).join("")}${[["yarn","ball","brush","crown"],["bath","fort","corn","blueberry"]].map((row, r) => row.map((n, i) => iconAt(n, 374 + i*30, 62 + r*38, 26)).join("")).join("")}</g>`;
   // the wine shop's chalkboard names today's tapas, once it's chosen
@@ -852,29 +819,3 @@ export function farmArt(){
   return h;
 }
 
-/* ---------- user-count gardens (outside Chord and Chico) ----------
-   stats doc: {chord:{users, per?}, chico:{users, per?}}. One flower per `per` users (default 10).
-   Bloom type steps up at 100 / 250 users; a blossom tree joins at 500 and sparkles at 1000. */
-export const GARDEN_TIERS = [[0, "daisy"], [100, "tulip"], [250, "sunflower"]];
-export function userGarden(key, x, y, cols, rows, gap){
-  const st = (G.stats() || {})[key];
-  if (!st || !(st.users >= 0)) return "";
-  const per = st.per > 0 ? st.per : 10, users = Math.floor(st.users), n = Math.min(cols*rows, Math.ceil(users/per));
-  const tier = GARDEN_TIERS.reduce((t, [min, k]) => users >= min ? k : t, "daisy");
-  const cols4 = key === "chord" ? ["#F3C969", "#FFFDF6", "#C3CDEE"] : key === "luna" ? ["#B9A6E8", "#C3CDEE", "#FFFDF6"] : key === "ohayo" ? ["#F2A65A", "#F3C969", "#FFFDF6"] : ["#EFA3A6", "#F4C7CF", "#FFFDF6"];
-  let f = "";
-  for (let i = 0; i < n; i++) {
-    const cx = x + 4 + (i % cols)*gap + (Math.floor(i/cols) % 2)*gap/2, cy = y + 10 + Math.floor(i/cols)*gap, c = cols4[i % 3];
-    f += `<g class="bloom"><path d="M${cx} ${cy} v${tier === "sunflower" ? -9 : -6}" style="stroke:var(--moss2)" stroke-width="1.2"/>`;
-    if (tier === "daisy") f += `<circle cx="${cx}" cy="${cy-7}" r="2.6" style="fill:${c}"/><circle cx="${cx}" cy="${cy-7}" r="1" fill="#F3C969"/>`;
-    else if (tier === "tulip") f += `<path d="M${cx-3} ${cy-9} q3 -6 6 0 q-1 4 -3 4 q-2 0 -3 -4z" style="fill:${c}" stroke="var(--line)" stroke-width=".6"/>`;
-    else f += `<circle cx="${cx}" cy="${cy-11}" r="4.2" fill="#F3C969" stroke="var(--line)" stroke-width=".6"/><circle cx="${cx}" cy="${cy-11}" r="1.8" fill="#8A5A3A"/>`;
-    f += `</g>`;
-  }
-  const w = cols*gap, signX = x + w/2 + (key === "chord" ? 26 : 0), signY = y + rows*gap + 10;
-  const tree = users >= 500 ? `<g filter="url(#wob)" ${ink}><rect x="${x+w-6}" y="${y+4}" width="4" height="12" style="fill:var(--wood)"/><circle cx="${x+w-4}" cy="${y}" r="9" style="fill:#F4C7CF"/><circle cx="${x+w-10}" cy="${y+4}" r="6" style="fill:#EFA3A6"/></g>` : "";
-  const sparkle = users >= 1000 ? `<g class="twinkle">${iconAt("sparkle", x - 2, y - 2, 12)}${iconAt("sparkle", x + w + 2, y + rows*gap - 4, 11)}</g>` : "";
-  const label = `${users.toLocaleString()} ${st.label || (key === "chord" ? "studios" : key === "chico" ? "families" : "users")}`;
-  return `<g data-ugarden="${key}" aria-label="${label}">${f}${tree}${sparkle}
-    ${tapeLabel(signX, signY, label, key === "chord" ? "var(--sage)" : "var(--blush)", 10)}</g>`;
-}

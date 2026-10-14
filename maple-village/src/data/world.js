@@ -1,28 +1,28 @@
 // Village layout, building interiors (stations) and task -> place/spot matching.
-import { hash, now, H } from "../util.js";
+import { hash, now, H, LOC } from "../util.js";
 import { TOWNS, TOWN_PLACES, TOWN_BRIDGES, TOWN_ARRIVE } from "./towns.js";
 
 // Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
-// buildings. A river joins them: walk onto the bridge to cross. A third screen (say, for Luna) would be one more
+// buildings. A river joins them: walk onto the bridge to cross. A new screen would be one more
 // OUTDOOR entry, a pair of bridge places and a BRIDGES/ARRIVE line.
 export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay", "hfarm", "hlane", "hwoods", ...Object.values(TOWNS).flatMap(t => t.screens)];   // + the towns (towns.js)
 export const VILLAGE = {
   // town square
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
   bank:   {scene:"village", name:"Bank", short:"the bank", door:[380,178], mark:[380,46]},
-  chord:  {scene:"lane", name:"Chord workshop", short:"the Chord workshop", door:[145,272], mark:[145,150]},
-  fresh:  {scene:"village", name:"Fresh Pages library", short:"the library", door:[85,368], mark:[95,256]},
-  chico:  {scene:"lane", name:"Chico cottage", short:"Chico cottage", door:[380,282], mark:[380,170]},
-  luna:   {scene:"lane", name:"Luna house", short:"the Luna house", door:[160,520], mark:[160,380]},
-  ohayo:  {scene:"lane", name:"Ohayo house", short:"the Ohayo house", door:[362,520], mark:[362,380]},
+  // Makers' Lane: Bo's workshop (he lives upstairs) and three villagers' homes (the ids are the old building names)
+  chord:  {scene:"lane", name:"Bo's workshop", short:"Bo's workshop", door:[145,272], mark:[145,150]},
+  fresh:  {scene:"village", name:"Library", short:"the library", door:[85,368], mark:[95,256]},
+  chico:  {scene:"lane", name:"Auntie Lin's cottage", short:"Auntie Lin's cottage", door:[380,282], mark:[380,170]},
+  luna:   {scene:"lane", name:"Juniper's house", short:"Juniper's house", door:[160,520], mark:[160,380]},
+  ohayo:  {scene:"lane", name:"Mr Okada's house", short:"Mr Okada's house", door:[362,520], mark:[362,380]},
   post:   {scene:"village", name:"Post office", short:"the post office", door:[435,502], mark:[435,386]},
   market: {scene:"village", name:"Market", short:"the market", door:[362,350], mark:[362,290]},
   board:  {scene:"village", name:"Quest board", door:[260,338], spot:true, line:"All of today's quests, in one place."},
   well:   {scene:"village", name:"Well", door:[196,414], spot:true, line:"Fresh water! Glug glug."},
   news:   {scene:"village", name:"Good news board", door:[90,488], spot:true, line:"The good news board. Fresh every morning."},
   bench:  {scene:"village", name:"Riverside bench", door:[334,580], spot:true, line:"A bench by the river. Lunch spot for half the town."},
-  toLane: {scene:"village", name:"Gate to Makers' Lane", door:[444,218], spot:true, bridge:"lane", mark:[430,170], line:"Through the gate to Makers' Lane: Chord, Chico, Luna and Ohayo."},
-  // Makers' Lane: the apps (Chord, Chico, and a plot waiting for the next one)
+  toLane: {scene:"village", name:"Gate to Makers' Lane", door:[444,218], spot:true, bridge:"lane", mark:[430,170], line:"Through the gate to Makers' Lane: Bo's workshop and three cottages."},
   toTownE:{scene:"lane", name:"Gate to the town square", door:[20,330], spot:true, bridge:"village", mark:[34,282], line:"Back to the town square."},
   toVineL:{scene:"lane", name:"Path to the vineyard", door:[262,622], spot:true, bridge:"vineyard", mark:[300,586], line:"Down the lane to the vineyard."},
   toBase: {scene:"village", name:"Bridge home", door:[260,598], spot:true, bridge:"base", mark:[260,548], line:"Over the bridge and home."},
@@ -164,17 +164,10 @@ export const VILLAGE = {
   toTown: {scene:"base", name:"Bridge to town", door:[260,114], spot:true, bridge:"village", mark:[260,62], line:"Over the river to the town square."}
 };
 Object.assign(VILLAGE, TOWN_PLACES);   // the towns' places and gates (towns.js)
-// Quests can also happen outdoors at home base: "base" is a quest place whose spots are the base's own places.
-VILLAGE.base = {scene:"(quests)", name:"Home base", short:"home base"};
-export const BASE_SPOTS = [
-  ["swing", /playground|\bpark\b|outing|\bzoo\b|museum|play ?date|play with evan|evan'?s? (activity|class|outing|playtime|swim)|family day|toddler (class|activity)/],
-  ["shed",  /garden|plant|weed|prune|repair|diy|gutter|leak|recycl|declutter the|fix (the |a )?(tap|door|shelf|light|sink|toilet|bike|fan)|bike\b|wash the car/],
-  ["pond",  /stroll|fresh air|picnic|sit outside|sunshine|walk outside|evening walk|nature walk/]
-];
-const WORK_HINT = /chord|chico|luna|ohayo|ambidextrous|fresh pages|client|muse|proposal|invoice|copy|newsletter|launch|website|brand|audit|meeting|call with|zoom/;
-// Saturday or Sunday in Singapore
-export const isWeekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
-const baseSpotFor = s => (BASE_SPOTS.find(([, re]) => re.test(s)) || [])[0] || null;
+// home base's own places (the pond, the swing, the shed) are spots on "base"
+VILLAGE.base = {scene:"(base)", name:"Home base", short:"home base"};
+// Saturday or Sunday, on the local clock
+export const isWeekend = () => [0, 6].includes(new Date(now() + LOC()).getUTCDay());
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where Mel steps off on the other side
 export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField", hlane:"toStationV"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL", hwoods:"toWoodsM"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF", hfarm:"toFarmN"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB", hfarm:"toFarmB"}, hfarm:{bay:"toBayF", hlane:"hfEast", field:"toFieldH"}, hlane:{hfarm:"toFarmL", village:"toTownL", hwoods:"toWoodsL"}, hwoods:{hlane:"toLaneW", lane:"toMakersW"}, ...TOWN_BRIDGES};
 // where Mel steps off, by "from>to"
@@ -211,7 +204,6 @@ export const INNER = {
   cocoakitchen: {parent: "cocoa", door: [64, 400], arrive: [450, 440], exit: [486, 440]},
   millup: {parent: "mill", door: [326, 596], arrive: [96, 520], exit: [70, 584]}   // round 154: upstairs in the old mill (the shop, the workbench, tastings)
 };
-export const WORK = ["hall","chord","fresh","chico","luna","ohayo","post","home"];
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
 // Each room may place its slots differently via `pos` (falls back to POS). Stations with a null regex are never
 // picked for a quest (the market counter, the library's digest shelf).
@@ -220,45 +212,36 @@ export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,5
 // station: [id, name, slot, furniture, keyword regex, line, standDy?]  (standDy: where Mel stands, relative to the front edge; default +42)
 export const ROOMS = {
   hall:  {name:"Town hall", wall:"#E6E9F5", trim:"var(--peri)", pos:{A:[448,262], B:[110,258], C:[420,474], D:[316,266], E:[118,474], R:[40,362], W:[268,420]}, stations:[
-    ["review","Weekly review","W","scrapbook",null,"Your week in the village, in a scrapbook.",30],
-    ["trophydoor","Courtyard","R","trophydoor",null,"Out to the courtyard: trophies, kind words, a bench in the sun.",0],
-    ["table","Planning table","C","plantable",/plan|strategy|review|ceo|goal|week|month|quarter|budget/,"Your week, month and quarter, from Notion."],
-    ["whiteboard","Whiteboard","B","whiteboard",/brainstorm|idea|map|outline|launch|offer|pricing/,"Fresh marker, blank board."],
-    ["revenue","Revenue chart","D","chartstand",/invoice|revenue|sales|finance|money|budget|pricing|accounts/,"How the money's flowing, from Chord."],
-    ["shelf","Bookshelf","A","shelf",/read|research|learn|course|study/,"Smart books, cosy spines."],
-    ["clients","Client table","E","table",/proposal|client|brief|contract|onboard/,"Your client projects, live from Chord."]]},
-  chord: {name:"Chord workshop", wall:"#E9F0E2", trim:"var(--sage)", pos:{A:[130,218], B:[370,446], C:[420,262], D:[120,540], E:[262,336]}, stations:[
-    ["bench","Workbench","A","bench",/build|code|fix|bug|feature|ship|deploy|test|app|flow/,"Tools out. Let's build."],
-    ["press","Printing press","B","press",/post|content|social|marketing|launch|campaign|newsletter|reel/,"Hot off the press."],
-    ["wall","Client wall","C","cork",/client|user|customer|support|feedback|onboard|lead/,"Every face here is a creative you're helping."],
-    ["laptop","Laptop desk","D","desk",/./,"The Chord dashboard awaits."],
-    ["status","Health sign","E","healthchord",null,"Last night's Chord bug check."]]},
-  fresh: {name:"Fresh Pages library", wall:"#F6E8DC", trim:"var(--peach)", pos:{A:[110,540], B:[410,540], C:[420,250], D:[260,420], E:[100,262]}, stations:[
-    ["desk","Writing desk","A","desk",/write|draft|blog|article|essay|journal/,"Pen, paper, quiet."],
-    ["typewriter","Typewriter","B","typewriter",/copy|sales page|website|caption|headline|email/,"Clack clack. Words incoming."],
-    ["nook","Reading nook","C","nook",/read|review|edit|research|audit|feedback/,"Comfy chair, good lamp."],
-    ["digest","Digest shelf","E","bookcase",null,"Juniper's shelf of book digests."]]},
-  chico: {name:"Chico cottage", wall:"#F7E3E6", trim:"var(--blush)", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320], E:[290,350]}, stations:[
-    ["laptop","Laptop desk","A","desk",/build|fix|app|code|feature|bug|test|ship/,"Chico's engine room."],
-    ["shelf","Craft shelf","B","craft",/design|brand|content|post|icon|copy/,"Colours, stickers, ideas."],
-    ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview|parent/,"Perfect for chats with parents."],
-    ["kitchen","Kitchen table","D","table",/plan|family|schedule|meal|roadmap/,"Where family plans happen."],
-    ["status","Health sign","E","healthchico",null,"Last night's Chico bug check."]]},
-  luna: {name:"Luna house", wall:"#EEE9F8", trim:"#B9A6E8", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320], E:[290,350]}, stations:[
-    ["laptop","Laptop desk","A","desk",/build|fix|app|code|feature|bug|test|ship/,"Luna's engine room."],
-    ["shelf","Bookshelf","B","shelf",/design|brand|content|post|icon|copy/,"Star charts and notebooks."],
-    ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview/,"For evening chats with users."],
-    ["table","Planning table","D","table",/plan|schedule|roadmap|launch/,"Where Luna's plans happen."],
-    ["status","Health sign","E","healthluna",null,"Last night's Luna bug check."]]},
-  // Ohayo (not launched yet: it sends video hellos): a reactions board and a hello chart from the founder desk's
-  // numbers (feeds.js ohayoHellos), the health sign, and the usual desk, shelf and sofa
-  ohayo: {name:"Ohayo house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], R:[110,262], H:[372,420], E:[170,420]}, stations:[
-    ["laptop","Laptop desk","A","desk",/build|fix|app|code|feature|bug|test|ship|plan|schedule|roadmap|launch/,"Ohayo's engine room."],
-    ["shelf","Plant shelf","B","craft",/design|brand|content|post|icon|copy/,"Colours, ideas, a lot of plants."],
-    ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview|hello|video/,"For morning chats with users."],
-    ["reactions","Reactions board","R","reactboard",null,"What people sent back from their hellos.",34],
-    ["hellos","Hello chart","H","hellochart",null,"How many people are waiting, and how many watched.",30],
-    ["status","Health sign","E","healthohayo",null,"Last night's Ohayo bug check."]]},
+    ["trophydoor","Courtyard","R","trophydoor",null,"Out to the courtyard: trophies, a notice board, a bench in the sun.",0],
+    ["table","Meeting table","C","plantable",null,"The long table where the village meets. Theo keeps the minutes."],
+    ["whiteboard","Whiteboard","B","whiteboard",null,"Fresh marker, blank board."],
+    ["shelf","Bookshelf","A","shelf",null,"Village records, going back a hundred years."],
+    ["clients","Visitors' table","E","table",null,"Leaflets about the village, and a bowl of mints."]]},
+  chord: {name:"Bo's workshop", wall:"#E9F0E2", trim:"var(--sage)", pos:{A:[130,218], B:[370,446], C:[420,262], D:[120,540]}, stations:[
+    ["bench","Workbench","A","bench",null,"Bo's tools, all in a row. Mind the sawdust."],
+    ["press","Old press","B","press",null,"An old printing press Bo's restoring. Slowly."],
+    ["wall","Pinboard","C","cork",null,"Sketches of shelves, stools and one very ambitious treehouse."],
+    ["laptop","Bo's desk","D","writedesk",null,"Bo's desk, under a pile of plans. His flat's up the stairs."]]},
+  fresh: {name:"Library", wall:"#F6E8DC", trim:"var(--peach)", pos:{A:[110,540], B:[410,540], C:[420,250], D:[260,420], E:[100,262]}, stations:[
+    ["desk","Writing desk","A","desk",null,"Pen, paper, quiet."],
+    ["typewriter","Typewriter","B","typewriter",null,"Clack clack. Words incoming."],
+    ["nook","Reading nook","C","nook",null,"Comfy chair, good lamp."],
+    ["digest","Bookcase","E","bookcase",null,"Juniper's favourites, shelved by feeling, not alphabet."]]},
+  chico: {name:"Auntie Lin's cottage", wall:"#F7E3E6", trim:"var(--blush)", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320]}, stations:[
+    ["laptop","Seed table","A","writedesk",null,"Seed packets, sorted by opinion."],
+    ["shelf","Potting shelf","B","craft",null,"Pots, twine and a lot of very strong views on compost."],
+    ["sofa","Cosy sofa","C","sofa",null,"Lin's sofa. The cushions are embroidered with vegetables."],
+    ["kitchen","Kitchen table","D","table",null,"Where Lin writes her planting calendar."]]},
+  luna: {name:"Juniper's house", wall:"#EEE9F8", trim:"#B9A6E8", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320]}, stations:[
+    ["laptop","Writing desk","A","writedesk",null,"Where Juniper writes her secret poems."],
+    ["shelf","Bookshelf","B","shelf",null,"Star charts and notebooks."],
+    ["sofa","Cosy sofa","C","sofa",null,"For reading by lamplight."],
+    ["table","Star table","D","table",null,"Juniper's star charts, held down with teacups."]]},
+  ohayo: {name:"Mr Okada's house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], R:[110,262]}, stations:[
+    ["laptop","Sorting desk","A","writedesk",null,"Pebbles, sorted by colour. Then by size. Then by colour again."],
+    ["shelf","Plant shelf","B","craft",null,"A lot of plants, all watered at six sharp."],
+    ["sofa","Cosy sofa","C","sofa",null,"For the morning paper and a pot of tea."],
+    ["letters","Old letters","R","cork",null,"Forty years of thank-you notes from the village, pinned up.",34]]},
   post:  {name:"Post office", wall:"#E3EEF5", trim:"var(--sky)", pos:{A:[260,340], B:[436,258], C:[400,530], D:[110,216], E:[72,440], F:[150,560]}, stations:[
     ["hampers","Hamper table","F","hampertable",null,"Penny's hamper table: baskets, straw and ribbon. Out for Valentine's, Mother's Day and Christmas.",30],
     ["counter","Sorting counter","A","counter",/email|inbox|reply|message|dm|respond/,"Letters in, letters out."],
@@ -284,7 +267,7 @@ export const ROOMS = {
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["obooks","Bookshelf","K","bookcase",null,"Files, notebooks, and Darren's one surviving plant.",34],
     ["office","Darren's desk","G","office",null,"Darren's side of the office. Shh, he might be on a call."],
-    ["treadmill","Treadmill","F","treadmill",/treadmill/,"1.2 and go. Walk and work.",-12]]},
+    ["treadmill","Treadmill","F","treadmill",null,"1.2 and go. A gentle walk.",-12]]},
   // Mel's own room, through the door on the west wall of the house. Just her (and Maple): no quests, no visitors.
   room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[262,300], W:[262,206], B:[72,262], E:[62,396], C:[66,500], D:[434,556], J:[260,594], N:[406,132]}, stations:[
     ["routines","My routines","N","routineboard",null,"Your routines, pinned up.",74],
@@ -457,59 +440,11 @@ export const ROOMS = {
 };
 // Maple's basket sits beside Mel's bed, wherever the bed is
 export const MAPLE_BED = [ROOMS.room.pos.A[0] + 110, ROOMS.room.pos.A[1] + 6];
-// board spot in every work room
-export const BOARD = {id:"board", name:"Quest board", x:260, y:200, mark:[260,60]};
 export function stationsOf(scene){
   const r = ROOMS[scene]; if (!r) return [];
   return r.stations.map(([id, name, slot, kind, re, line, dy]) => { const p = (r.pos && r.pos[slot]) || POS[slot];
     return {id, name, kind, re, line, x:p[0], y:p[1], tx:p[0], ty:p[1] + (dy ?? 42)}; });
 }
-export const spotObj = (scene, id) => scene === "base" ? baseSpot(id) : id === "board" ? {id:"board", name:"Quest board", tx:260, ty:200, line:"This building's quests."} : stationsOf(scene).find(s => s.id === id);
+export const spotObj = (scene, id) => scene === "base" ? baseSpot(id) : stationsOf(scene).find(s => s.id === id);
 
-// Tasks that ARE treadmill tasks (a "🚶" or "treadmill" in the title, or chat sent spot "treadmill") always happen on
-// the treadmill at home. Tasks that are only treadmill-able (treadmill: true) get it as an offer instead.
-export const isTreadTask = t => !!t && (t.spot === "treadmill" || /🚶|treadmill/i.test(t.title || ""));
-// Writing of any kind (for any business) happens at the Fresh Pages library's writing desk (Mel's call)
-export const isWriting = t => !!t && /\b(write|writing|rewrite|draft|drafting|blog|article|essay|newsletter|copywrit\w*|copy|caption|script|outline|headline|journal|post copy)\b/i.test(t.title || "");
-// Home quests can land at stations in the home office or the garage (rooms off the living room): spotOf picks from
-// all three, and placeOf says which room that station is actually in.
-const HOME_ROOMS = ["home", "office", "garage"];
-const homeStations = () => HOME_ROOMS.flatMap(r => stationsOf(r));
-const roomOfStation = id => HOME_ROOMS.find(r => ROOMS[r] && ROOMS[r].stations.some(st => st[0] === id)) || "home";
-export function placeOf(t){ const p = basePlace(t); return p === "home" ? roomOfStation(spotOf(t)) : p; }
-function basePlace(t){
-  if (isTreadTask(t)) return "home";
-  if (t.place === "base") return "base";
-  if (isWriting(t)) return "fresh";
-  if (t.place && WORK.includes(t.place)) return t.place;
-  const s = (t.title + " " + (t.channel || "")).toLowerCase();
-  // Personal things that belong outdoors (Evan outings, garden, repairs, a walk) happen at home base, any day.
-  if (!WORK_HINT.test(s) && !t.meeting && baseSpotFor(s)) return "base";
-  if (/chord/.test(s)) return "chord";
-  if (/chico/.test(s)) return "chico";
-  if (/\bluna\b/.test(s)) return "luna";
-  if (/ohayo/.test(s)) return "ohayo";
-  if (/ambidextrous|town hall/.test(s)) return "hall";
-  if (t.meeting) return "hall";
-  if (/clean|fold|laundry|cook|chore|grocer|wash|tidy|evan|hestia|skincare|gym|workout/.test(s)) return "home";
-  if (/copy|write|blog|caption|proposal|audit|muse|fresh pages|newsletter|website|brand/.test(s)) return "fresh";
-  // Weekends: anything without a work hint is personal, so it happens at home instead of the post office.
-  if (isWeekend() && !WORK_HINT.test(s) && !/email|inbox|reply|admin|tax|bank/.test(s)) return "home";
-  return "post";
-}
 function baseSpot(id){ const v = VILLAGE[id]; return v ? {id, name: v.name, tx: v.door[0], ty: v.door[1], x: v.door[0], y: v.door[1], line: v.line} : null; }
-export function spotOf(t){
-  if (basePlace(t) === "base") { const s = (t.title + " " + (t.channel || "")).toLowerCase();
-    return (t.spot && BASE_SPOTS.some(([id]) => id === t.spot)) ? t.spot : baseSpotFor(s) || "pond"; }
-  // The cupboard and treadmill are only picked on purpose (the clean, or "Do it on the treadmill").
-  const pl = basePlace(t), st = (pl === "home" ? homeStations() : stationsOf(pl)).filter(s => (s.id !== "cupboard" || /clean|tidy|wipe|hestia|dust/i.test(t.title)) && s.id !== "treadmill" && s.re);
-  if (isTreadTask(t)) return "treadmill";
-  if (pl === "fresh" && isWriting(t)) return "desk";
-  if (t.spot && st.find(s => s.id === t.spot)) return t.spot;
-  const s = t.title.toLowerCase();
-  const hit = st.find(x => x.re && x.re.source !== "." && x.re.test(s));
-  if (hit) return hit.id;
-  const fallback = st.filter(x => x.id !== "cupboard" && x.re);  // (treadmill already excluded above)
-  const dflt = fallback.find(x => x.re && x.re.source === ".");
-  return dflt ? dflt.id : fallback[hash(t.id) % fallback.length].id;
-}

@@ -35,7 +35,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#journal.slim").count() === 1, "the quest note starts folded when the village opens");
   check(await page.locator("#sceneName").textContent().then(t => /Home base/.test(t)), "the day starts at home base");
   await page.click('#journal [data-qn="open"]');
-  check(await page.locator("#journal h1").textContent().then(t => /Five-minute clean/.test(t)), "day opens with the five-minute clean");
+  check(await page.locator("#journal h1").textContent().then(t => /3 tasks to go/.test(t)), "the quest note shows today's tasks");
   const lay = await page.evaluate(() => ({ hud: document.querySelector(".hudbar").getBoundingClientRect().bottom, map: document.querySelector("#map").getBoundingClientRect().top,
     fits: document.documentElement.scrollHeight <= innerHeight + 2, note: !!document.querySelector("#map #journal h1") }));
   if (vp.name === "phone") {
@@ -50,7 +50,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(fit, "zooming out shows the whole map");
     await page.click("#zoomBtn"); await page.waitForTimeout(300);
     await page.click('#journal [data-qn="open"]');
-    check(await page.locator(".scenebar .hbtn").count() === 6, "six drawn icons in the corner (calendar, quests, backpack, friendship, letters, settings)");
+    check(await page.locator(".scenebar .hbtn").count() === 5, "five drawn icons in the corner (quests, backpack, friendship, letters, settings)");
     check(!(await page.locator(".hbtn").first().textContent()).match(/\p{Extended_Pictographic}/u), "corner icons are drawn, not emoji");
   } else check(await page.locator("#map .hudbar").count() === 1, "trackers sit on the map");
   check(lay.fits, "the whole game fits on screen without scrolling");
@@ -72,88 +72,25 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /2.5k/.test(document.getElementById("stepNote").textContent), null, { timeout: 3000 }).catch(() => {});
   check(await page.locator("#stepNote").textContent().then(t => /2.5k/.test(t)), "steps can be typed in from the steps note");
 
-  // Clean: walk to cupboard, get wipe, done
-  await page.click('#journal [data-a="walk"]');
-  await page.waitForFunction(() => document.querySelector('#journal [data-a="gotWipe"]'), null, { timeout: 15000 });
-  await page.click('#journal [data-a="gotWipe"]');
-  await page.click('#journal [data-a="cleanDone"]');
+  // The quest note: tick a task straight from the map; it pays, and undo takes it back
+  const coins0 = +(await page.locator("#coins").textContent());
+  await page.click('#journal [data-tick="tseed2"]');
   await page.waitForTimeout(300);
-  check(await page.locator("#journal h1").textContent().then(t => /Chord onboarding/.test(t)), "first quest comes from the plan");
-
-  await page.click('#journal [data-a="walk"]');
-  await page.waitForFunction(() => document.querySelector('#journal [data-a="notebook"]'), null, { timeout: 20000 });
-  check(true, "walked to the quest spot and the Do task button shows");
-  await page.click('#journal [data-a="notebook"]');
-  await page.waitForTimeout(400);
-  check(await page.locator("#notebook").isVisible(), "notebook overlay opens");
-  check(await page.locator("#notebook").textContent().then(t => /brand colour picker/.test(t)), "notebook shows the Sunsama notes");
-  await page.screenshot({ path: join(shots, `${vp.name}-2-notebook.png`) });
-  await page.click('#notebook [data-nb="started"]');
-  await page.waitForTimeout(200);
-  check(await page.locator("#notebook .nbtimer").count() > 0, "Started starts the time box inside the notebook");
-  await page.click('#notebook [data-tctl="pause"]');
-  await page.waitForTimeout(1300);
-  const t1 = await page.locator("#notebook .nbtimer [data-tleft]").textContent();
-  await page.waitForTimeout(1200);
-  check(await page.locator("#notebook .nbtimer").textContent().then(t => /paused/.test(t)) && t1 === await page.locator("#notebook .nbtimer [data-tleft]").textContent(), "the time box can be paused");
-  await page.click('#notebook [data-tctl="play"]');
-  await page.click('#notebook [data-tctl="reset"]');
-  check(await page.locator('#notebook [data-tctl="pause"]').count() === 1, "and resumed and restarted");
-  await page.click('#notebook [data-nb="halfway"]');
-  await page.click('#notebook [data-nb="more"]');
-  await page.click('#notebook [data-nb="stuck"]');
-  await page.waitForTimeout(200);
-  await page.screenshot({ path: join(shots, `${vp.name}-3-stuck.png`) });
-  const ask = page.locator('#notebook [data-nb="ask"]');
-  if (await ask.count()) {
-    await page.fill("#nbAsk", "How do I start?");
-    await ask.click();
-    await page.waitForTimeout(4500);
-    check(await page.locator("#notebook .nbchat").textContent().then(t => /dev stub/.test(t)), "talk-to-the-note answers via sample");
-  }
-  await page.click('#notebook [data-nb="done"]');
-  await page.waitForTimeout(400);
-  check(!(await page.locator("#notebook").isVisible()), "Done closes the notebook");
-  check(await page.locator("#journal h1").textContent().then(t => /break/i.test(t)), "a break follows the quest");
-  await page.click('#journal [data-a="back"]');
-  await page.waitForTimeout(300);
-
-  // Email quest
-  await page.click('#journal [data-a="walk"]');
-  await page.waitForFunction(() => document.querySelector('#journal [data-a="notebook"]'), null, { timeout: 25000 });
-  await page.click('#journal [data-a="notebook"]');
-  await page.waitForTimeout(300);
-  check(await page.locator('#notebook a[href^="https://mail.google.com"]').count() > 0, "email quest links out to Gmail");
-  await page.screenshot({ path: join(shots, `${vp.name}-4-email.png`) });
-  await page.click('#notebook [data-nb="started"]');
-  await page.click('#notebook [data-nb="done"]');
-  await page.waitForTimeout(300);
-  await page.click('#journal [data-a="back"]');
-  await page.waitForTimeout(300);
-
-  // Treadmill quest: notebook offers the treadmill, Mel walks home to it, steps prompt afterwards
-  check(await page.locator("#journal h1").textContent().then(t => /Chico beta/.test(t)), "third quest is the treadmill-able one");
-  await page.click('#journal [data-a="walk"]');
-  await page.waitForFunction(() => document.querySelector('#journal [data-a="notebook"]'), null, { timeout: 25000 });
-  await page.click('#journal [data-a="notebook"]');
-  await page.click('#notebook [data-nb="treadmill"]');
-  await page.waitForTimeout(300);
-  check(!(await page.locator("#notebook").isVisible()), "choosing the treadmill closes the notebook and walks");
-  await page.waitForFunction(() => document.querySelector('#journal [data-a="notebook"]'), null, { timeout: 30000 });
-  check(await page.locator("#sceneName").textContent().then(t => /Home/.test(t)), "treadmill quest moved to home");
-  await page.click('#journal [data-a="notebook"]');
-  await page.click('#notebook [data-nb="started"]');
-  await page.waitForTimeout(400);
-  check(await page.locator("#mel").getAttribute("class").then(c => /walk/.test(c)), "Mel walks in place on the treadmill");
-  await page.screenshot({ path: join(shots, `${vp.name}-6-treadmill.png`) });
-  await page.click('#notebook [data-nb="done"]');
-  await page.waitForTimeout(300);
-  check(await page.locator("#journal").textContent().then(t => /Log my steps/.test(t)), "treadmill quest asks for steps");
+  check(+(await page.locator("#coins").textContent()) === coins0 + 3, "ticking a task pays 3 coins");
+  check(await page.locator("#journal h1").textContent().then(t => /2 tasks to go/.test(t)), "the note counts down what's left");
+  await page.click("#undoBtn"); await page.waitForTimeout(300);
+  check(+(await page.locator("#coins").textContent()) === coins0 && await page.locator("#journal h1").textContent().then(t => /3 tasks to go/.test(t)), "undo unticks it and takes the coins back");
 
   // Quest board opens as a cork board on the map
   await page.click('[data-open="quests"]');
   await page.waitForTimeout(400);
-  check(await page.locator("#panel.cork #list li").count() > 0, "quest board opens as a cork board in the game");
+  check(await page.locator("#panel.cork #list li.task").count() === 3, "quest board opens as a cork board with your tasks pinned up");
+  await page.fill("#addTitle", "Post the birthday card"); await page.selectOption("#addKind", "once"); await page.click('#addForm button[type=submit]'); await page.waitForTimeout(200);
+  await page.fill("#addTitle", "Feed the fish"); await page.selectOption("#addKind", "daily"); await page.click('#addForm button[type=submit]'); await page.waitForTimeout(200);
+  check(await page.locator("#list li.task").count() === 5 && await page.locator("#list li.task").last().textContent().then(t => /Feed the fish.*daily/.test(t)), "tasks are added as one-off or daily");
+  await page.locator("#list li.task", {hasText: "Post the birthday card"}).locator("[data-tdel]").click(); await page.waitForTimeout(200);
+  check(await page.locator("#list li.task").count() === 4, "a task can be taken down");
+  check(await page.locator("#reqList li.req").count() >= 1 && await page.locator("#reqList li.req").first().textContent().then(t => /needs \d+ .+ (by|today|tomorrow)/.test(t)), "villagers' requests are pinned up with what, how many and by when");
   await page.screenshot({ path: join(shots, `${vp.name}-9-cork.png`) });
   await page.click("#pclose");
   check(await page.locator("#panel").isHidden(), "closing the board returns to the map");
@@ -163,7 +100,6 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#friendView .hearts .ico").count() === 5, "friendship has its own corner icon and drawn hearts");
   await page.click("#pclose");
 
-  // Library digest shelf: first read is free, the second is locked until an hour passes or a quest is done
   // out of the home office (a room off the living room), then out of the house
   for (let k = 0; k < 2 && !/Town square|Home base/.test(await page.locator("#sceneName").textContent()); k++) {
     await page.evaluate(() => document.querySelector("#world [data-exit]") && document.querySelector("#world [data-exit]").dispatchEvent(new MouseEvent("click", {bubbles: true})));
@@ -177,35 +113,72 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
     check(await page.locator('#world [data-place="pond"]').count() === 0, "the bridge crosses the river to the town square");
   }
-  await page.locator('#world [data-place="fresh"]').first().dispatchEvent("click");
-  await page.waitForFunction(() => /library/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 });
-  await page.waitForTimeout(400);
-  await page.locator('#world [data-spot="digest"]').dispatchEvent("click");
-  await page.waitForFunction(() => document.querySelector('#ctx [data-dig="next"]'), null, { timeout: 20000 });
-  await page.click('#ctx [data-dig="next"]');
-  await page.waitForTimeout(300);
-  check(await page.locator("#notebook").textContent().then(t => /Show Your Work/.test(t)), "digest shelf hands out a book digest");
-  await page.screenshot({ path: join(shots, `${vp.name}-7-digest.png`) });
-  await page.click('#notebook [data-nb="thanks"]');
-  await page.waitForTimeout(200);
-  check(await page.locator("#ctx").textContent().then(t => /Next digest in/.test(t)), "the next digest is rationed");
-
-  // Morning briefing as a gazette
-  await page.click('[data-open="mail"]');
-  await page.locator('#mailList [data-mail]').last().click();
-  await page.waitForTimeout(300);
-  check(await page.locator("#nbPage.news .nmast").count() > 0, "morning briefing opens as The Morning Crier newspaper");
-  await page.screenshot({ path: join(shots, `${vp.name}-8-briefing.png`) });
-  await page.click('#notebook [data-nb="thanks"]');
-
   // NPCs + mail
   await page.waitForTimeout(500);
   check(await page.locator("#actors [data-npc]").count() > 0, "villagers are out and about");
   await page.screenshot({ path: join(shots, `${vp.name}-5-village.png`) });
   await page.close();
 }
+// The quest board's rules (quests.js), checked straight from the module
+try {
+  console.log("\nquest board rules");
+  const QB = await import(pathToFileURL(join(root, "src/game/quests.js")).href);
+  const { ITEMS } = await import(pathToFileURL(join(root, "src/data/items.js")).href);
+  const { dayKey } = await import(pathToFileURL(join(root, "src/util.js")).href);
+  const F = {inv: {}};
+  const ids = Array.from({length: 11}, (_, i) => QB.addTask(F, "Task " + i, i === 0).id);
+  const pays = ids.map(id => QB.tickTask(F, id).coins);
+  check(pays.slice(0, 10).every(c => c === 3) && pays[10] === 0, "the first 10 ticks of a day pay 3 coins each, the 11th pays nothing");
+  check(QB.untickTask(F, ids[3]) === 3 && QB.tickTask(F, ids[3]).coins === 3, "unticking gives the coins back, and ticking again pays again (still 10 a day)");
+  check(QB.untickTask(F, ids[10]) === 0, "unticking an unpaid tick takes nothing");
+  const tomorrow = new Date(Date.parse(dayKey() + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
+  const next = QB.myTasks(F, tomorrow);
+  check(next.length === 2 && next.some(t => t.daily && !QB.isDone(t, tomorrow)), "next day the daily task comes back fresh and ticked one-offs are gone");
+  check(QB.addTask(F, "   ") === null && QB.addTask(F, "x".repeat(300)).title.length === 120, "empty tasks aren't pinned, long ones are trimmed");
+  const priced = Object.keys(ITEMS).filter(id => ITEMS[id].sell > 0 && ITEMS[id].price > 0);
+  check(priced.every(id => QB.payEach(id) <= ITEMS[id].price), "a request never pays more for something than a shop's own price for it");
+  check(Object.keys(ITEMS).filter(id => ITEMS[id].sell > 0).every(id => QB.payEach(id) >= ITEMS[id].sell || ITEMS[id].price), "and pays at least what the market would");
+  const G = {inv: {}}, people = Object.keys(QB.ASKERS).map(id => ({id, name: id[0].toUpperCase() + id.slice(1)}));
+  const day = "2026-10-14", posted = QB.refreshRequests(G, people, day);
+  check(posted.length === 2 && QB.refreshRequests(G, people, day).length === 0, "two requests go up on the first day, and no more that day");
+  for (let k = 1; k <= 6; k++) QB.refreshRequests(G, people, new Date(Date.parse(day + "T00:00:00Z") + k*864e5).toISOString().slice(0, 10));
+  check(QB.board(G).reqs.length <= QB.MAX_REQ, "never more than three at once");
+  check(QB.refreshRequests(G, people, "2026-12-01") !== null && QB.board(G).reqs.every(r => r.due >= "2026-12-01"), "a request past its day quietly comes down");
+  const H = {inv: {}}; QB.board(H).reqs = [{id: "r1", who: "hazel", name: "Hazel", item: "carrot", n: 2, each: 4, posted: day, due: "2099-01-01", why: "for a test"}];
+  const take = (id, n) => { H.inv[id] = (H.inv[id] || 0) - n; }, give = (id, n) => { H.inv[id] = (H.inv[id] || 0) + n; };
+  check(QB.handOver(H, "hazel", take, give) === null, "a request can't be handed over without the things it asks for");
+  H.inv.carrot = 2; const got = QB.handOver(H, "hazel", take, give);
+  check(got && got.coins === 8 && got.hearts === 1 && !H.inv.carrot && !QB.board(H).reqs.length, "handing it over pays, adds a heart and takes the things from the backpack");
+  const again = () => { QB.board(H).reqs = [{id: "r" + Math.random(), who: "hazel", name: "Hazel", item: "carrot", n: 1, each: 4, posted: day, due: "2099-01-01", why: "x"}]; H.inv.carrot = 1; return QB.handOver(H, "hazel", take, give); };
+  const h2 = again(), h3 = again(), h4 = again(), h5 = again(), h6 = again();
+  check(h2.letter && /Thank you/.test(h2.letter.title) && !h3.letter && h4.gift && h4.gift.n === 3 && h5.letter && h6.hearts === 5, "two hearts bring a thank-you letter, four a gift, five a friend; hearts stop at five");
+  check(QB.boostedStory(H, "hazel", dayKey()) && !QB.boostedStory(H, "hana", dayKey()), "finishing a request makes that villager's next story chapter ready today");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+// A village request in the game: the board walks you to the villager, you hand it over, a heart shows in Neighbours
+try {
+  console.log("\nvillage requests");
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  page.on("pageerror", e => errors.push(`requests pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:15&date=2026-10-14");
+  await page.waitForTimeout(1500);
+  const r = await page.evaluate(() => window.__mapleGame.F().board.reqs[0]);
+  check(!!r && r.n > 0, "a request is pinned up on a new game's first morning");
+  await page.evaluate(([id, n]) => window.__mapleGame.give(id, n), [r.item, r.n]);
+  await page.click('[data-open="quests"]'); await page.waitForTimeout(300);
+  check(await page.locator(`#reqList [data-find="${r.who}"]`).textContent().then(t => /hand over/.test(t)), "with the things in the backpack, the board offers to hand it over");
+  const c0 = await page.evaluate(() => window.__mapleGame.F().coins);
+  await page.locator(`#reqList [data-find="${r.who}"]`).click();
+  await page.waitForSelector("#journal [data-say]", { timeout: 30000 });
+  await page.click("#journal [data-say] >> nth=0"); await page.waitForTimeout(500);
+  const after = await page.evaluate(() => { const F = window.__mapleGame.F(); return {coins: F.coins, hearts: F.board.hearts, reqs: F.board.reqs.map(x => x.who)}; });
+  check(after.coins === c0 + r.n*r.each && after.hearts[r.who] === 1 && !after.reqs.includes(r.who), `walking over and handing it to ${r.name} pays ${r.n*r.each} coins and a heart`);
+  await page.click('[data-open="friend"]'); await page.click('#friendView [data-ftab="neighbours"]'); await page.waitForTimeout(200);
+  check(await page.locator("#friendView .nbrs li").first().textContent().then(t => t.includes(r.name)), "Neighbours lists them first, with their heart");
+  await page.screenshot({ path: join(shots, "requests-neighbours.png") });
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 // Darren: Monday lunchtime he's fixing the house at home base; mid-morning he's typing at his desk indoors
-{
+try {
   console.log("\ndarren");
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   page.on("pageerror", e => errors.push(`darren pageerror: ${e.message}`));
@@ -217,7 +190,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.fill("#paperNameIn", "The Maple Gazette");
   await page.click("#paperSave");
   await page.click("#pclose");
-  check(await page.locator("#paperIn").isVisible(), "the morning paper is sticking out of the letterbox at home");
+  await page.goto(url + "?seed=1&time=12:45&date=2026-10-10"); await page.waitForTimeout(1200);   // a Saturday: the weekend paper's out
+  check(await page.locator("#paperIn").isVisible(), "the weekend paper is sticking out of the letterbox at home");
   await page.locator('#world [data-place="letterbox"]').dispatchEvent("click");
   await page.waitForSelector("#nbPage.news .nmast", { timeout: 15000 });
   check(await page.locator("#nbTitle").textContent() === "The Maple Gazette", "tapping the letterbox opens the paper, under the name chosen in Settings");
@@ -225,13 +199,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(300);
   check(await page.locator("#paperIn").isHidden(), "once read, the letterbox is empty");
   await page.click('[data-open="quests"]');
-  const before = await page.locator("#list li:not(.dropped)").count();
-  await page.locator("#list [data-drop]").last().click();
-  await page.waitForTimeout(200);
-  check(await page.locator("#list li:not(.dropped)").count() === before - 1 && await page.locator("#list li.dropped").count() === 1, "a quest that's no longer needed can be dropped for today");
-  await page.locator("#list [data-undrop]").click();
-  await page.waitForTimeout(200);
-  check(await page.locator("#list li:not(.dropped)").count() === before, "and brought back");
+  const before = await page.locator("#list li.task").count();
+  await page.locator("#list [data-tdel]").last().click(); await page.waitForTimeout(200);
+  check(await page.locator("#list li.task").count() === before - 1, "a task that's no longer needed can be taken down");
+  await page.click("#undoBtn"); await page.waitForTimeout(200);
+  check(await page.locator("#list li.task").count() === before, "and put back with Undo");
   await page.click("#pclose");
   await page.locator('#world [data-place="shed"]').dispatchEvent("click");
   await page.waitForFunction(() => /Darren's shed/.test(document.querySelector("#ctx").textContent), null, { timeout: 15000 });
@@ -251,9 +223,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#actors [data-npc="darren"].act-type').count() === 1, "Darren is typing at his desk in the home office on a weekday morning");
   await page.screenshot({ path: join(shots, "darren-desk.png") });
   await page.close();
-}
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 // Family gifts: buy keepsakes and treats at the market, give them in person at home
-{
+try {
   console.log("\nfamily gifts");
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   page.on("pageerror", e => errors.push(`family pageerror: ${e.message}`));
@@ -297,193 +269,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('[data-open="mail"]').catch(() => {});
   await page.screenshot({ path: join(shots, "family-evening.png") });
   await page.close();
-}
-// Hestia at home: chores in the cleaning cupboard, pantry in the fridge, import from a Hestia export
-{
-  console.log("\nhestia");
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  page.on("pageerror", e => errors.push(`hestia pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&nosample=1&time=19:30&date=2026-10-05");
-  await page.waitForTimeout(800);
-  check(await page.locator("#hmarks .hmark").count() === 1, "a hearth badge on the house shows home chores waiting");
-  await page.locator('#world [data-place="home"]').dispatchEvent("click");
-  await page.waitForFunction(() => /^Home/.test(document.querySelector("#sceneName").textContent.trim()) && !/base/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(400);
-  await page.locator('#world [data-spot="gdoor"]').dispatchEvent("click");
-  await page.waitForFunction(() => /garage/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(400);
-  // the first visit is the five-minute clean (grab a wet wipe); after that the cupboard opens Hestia's chores
-  await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
-  await page.waitForTimeout(3000);
-  if (!(await page.locator('#journal [data-a="gotWipe"]').count())) await page.click('#journal [data-qn="open"]').catch(() => {});
-  await page.click('#journal [data-a="gotWipe"]');
-  await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
-  await page.waitForFunction(() => /cleaning cupboard/i.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
-  check(/cleaning cupboard/i.test(await page.locator("#ctx h2").textContent()), "the cleaning cupboard opens Hestia's chores");
-  await page.locator('#ctx [data-hdone^="daily:"]').first().click();   // one tap (ticked chores move to the bottom)
-  await page.waitForTimeout(300);
-  check(/\+1 coins: home chore/.test(await page.locator("#earn").textContent()), "ticking a chore earns a coin");
-  { const c1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
-    check(await page.locator("#undoBar").isVisible() && /Ticked off/.test(await page.locator("#undoMsg").textContent()), "ticking a chore offers Undo");
-    await page.click("#undoBtn"); await page.waitForTimeout(300);
-    check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins) === c1 - 1 && await page.locator('#ctx [data-hdone^="daily:"]:checked').count() === 0, "Undo unticks it and takes the coin back");
-    await page.locator('#ctx [data-hdone^="daily:"]').first().click(); await page.waitForTimeout(300); }
-  // after a reload the cloud copy loads (frozen, like the real database): ticking must still stick, and a delete can be undone
-  await page.waitForTimeout(1200);
-  await page.goto(url + "?seed=1&nosample=1&time=19:30&date=2026-10-05"); await page.waitForTimeout(900);
-  await page.locator('#world [data-place="home"]').dispatchEvent("click");
-  await page.waitForFunction(() => /^Home/.test(document.querySelector("#sceneName").textContent.trim()) && !/base/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(400);
-  await page.locator('#world [data-spot="gdoor"]').dispatchEvent("click");
-  await page.waitForFunction(() => /garage/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400);
-  await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
-  await page.waitForFunction(() => /cleaning cupboard/i.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
-  const box = page.locator('#ctx [data-hdone^="daily:"]:not(:checked)').first(), boxId = await box.getAttribute("data-hdone");
-  await box.click(); await page.waitForTimeout(1500);
-  check(await page.locator(`#ctx [data-hdone="${boxId}"]`).isChecked(), "a ticked chore stays ticked after the cloud copy loads");
-  const n0 = await page.locator('#ctx [data-hdel^="daily:"]').count();
-  await page.locator('#ctx [data-hdel^="daily:"]').first().click(); await page.waitForTimeout(200);
-  check(await page.locator('#ctx [data-hdel^="daily:"]').count() === n0 - 1 && await page.locator("#undoBar").isVisible(), "removing a chore offers Undo");
-  await page.click("#undoBtn"); await page.waitForTimeout(200);
-  check(await page.locator('#ctx [data-hdel^="daily:"]').count() === n0, "and Undo puts it back");
-  await page.click('#ctx [data-htab="zone"]');
-  check(await page.locator("#ctx .hzone").textContent().then(t => /Living Room/.test(t)), "this week's zone is on its own tab");
-  await page.click('#ctx [data-htimer="10"]');
-  check(await page.locator("#ctx [data-htleft]").count() === 1, "the tidy timer runs from the cupboard");
-  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(800);   // the fridge is back in the living room
-  await page.locator('#world [data-spot="fridge"]').dispatchEvent("click");
-  await page.waitForFunction(() => /fridge/i.test(document.querySelector("#ctx h2") && document.querySelector("#ctx h2").textContent), null, { timeout: 15000 });
-  await page.fill('#ctx form[data-hitem] input[name="t"]', "Oat milk");
-  await page.click('#ctx form[data-hitem] button');
-  await page.locator('#ctx [data-hstock]').first().uncheck();
-  await page.click('#ctx [data-hfr="shop"]');
-  check(await page.locator("#ctx [data-hbuy]").count() === 1, "running out puts it on the shopping list in the fridge");
-  await page.screenshot({ path: join(shots, "hestia-fridge.png") });
-  await page.click("#pclose");
-  // import a Hestia export
-  const exp = { zones: [{ id: 9, name: "Kitchen", icon: "kitchen", tasks: [{ text: "Wipe counters", effort: 1 }] }], dailyTasks: [{ id: "d1", text: "Feed the cat", effort: 1, timeOfDay: "morning" }],
-    weeklyTasks: [{ id: "w1", text: "Bins out", effort: 1, weekday: 1 }], pantryItems: [{ id: 1, name: "Rice", category: "food", whereToBuy: "supermarket", inStock: false }], shoppingList: [{ id: 1, purchased: false }] };
-  await page.click('[data-open="settings"]');
-  await page.setInputFiles("#hestiaFile", { name: "mise-en-place-backup.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(exp)) });
-  await page.waitForTimeout(400);
-  check(await page.locator("#hestiaNote").textContent().then(t => /Imported: 1 daily, 1 weekly, 1 zones, 1 pantry/.test(t)), "a Hestia export imports chores, zones and pantry");
-  await page.click("#pclose");
-  await page.evaluate(() => window.__mapleScene("garage")); await page.waitForTimeout(800);
-  await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
-  await page.waitForTimeout(500);
-  await page.screenshot({ path: join(shots, "hestia-cupboard.png") });
-  await page.close();
-}
-// Talk to Maple: the chat button, and actions landing in the game
-{
-  console.log("\ntalk to maple");
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  page.on("pageerror", e => errors.push(`chat pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-05");
-  await page.waitForTimeout(800);
-  check(await page.locator("#chatBtn").isVisible(), "a chat button sits on the map");
-  await page.click("#chatBtn");
-  await page.fill("#chatIn", "add oat milk and eggs to the shopping list");
-  await page.click("#chatForm button");
-  await page.waitForSelector("#chatLog .did", { timeout: 10000 });
-  check(await page.locator("#chatLog .did").first().textContent().then(t => /oat milk, eggs/i.test(t)), "asking Maple adds things to the shopping list");
-  await page.fill("#chatIn", "I need a break");
-  await page.click("#chatForm button");
-  await page.waitForFunction(() => document.querySelectorAll("#chatLog .did").length >= 2, null, { timeout: 10000 });
-  await page.fill("#chatIn", "remind me to get the laundry in in 1 hour"); await page.click("#chatForm button");
-  await page.waitForFunction(() => document.querySelectorAll("#chatLog .did").length >= 3, null, { timeout: 10000 });
-  check(/isn't reachable/.test(await page.locator("#chatLog .did").last().textContent()), "without the calendar, Maple says the reminder couldn't be set (no false promise)");
-  await page.screenshot({ path: join(shots, "chat-phone.png") });
-  await page.click("#pclose");
-  await page.waitForTimeout(300);
-  check(await page.locator("#journal").textContent().then(t => /break/i.test(t)), "and a break she asks for starts in the game");
-  await page.close();
-}
-// Maple knows Mel's plans: the Notion "Plans" pages for this week, month and quarter go into the chat
-{
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  page.on("pageerror", e => errors.push(`plans pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&notion=1&time=10:30&date=2026-10-05");
-  await page.waitForTimeout(800);
-  await page.click("#chatBtn");
-  await page.fill("#chatIn", "what's my focus this week?"); await page.click("#chatForm button");
-  await page.waitForFunction(() => /Week of 5 Oct 2026/.test(window.__lastPrompt || ""), null, { timeout: 10000 }).catch(() => {});
-  const pr = await page.evaluate(() => window.__lastPrompt || "");
-  check(/== Week of 5 Oct 2026 ==/.test(pr) && /== October 2026 ==/.test(pr) && /== Q4 2026 ==/.test(pr) && /fill the Visibility Fix/.test(pr), "Maple reads this week's, month's and quarter's plans from Notion when asked");
-  await page.close();
-}
-// Post box: unread work mail at the post office (Gmail connector, faked by the stub)
-{
-  console.log("\npost box");
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  page.on("pageerror", e => errors.push(`post pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&nosample=1&sunsama=1&time=10:30&date=2026-10-05");
-  await page.waitForTimeout(700);
-  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.locator('#world [data-place="post"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Post office/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(500);
-  await page.locator('#world [data-spot="pobox"]').dispatchEvent("click");
-  await page.waitForFunction(() => document.querySelectorAll("#ctx .hlist.post li").length === 2, null, { timeout: 15000 });
-  check(await page.locator("#ctx .hlist.post li a").first().getAttribute("href").then(h => /mail\.google\.com/.test(h)), "the post box lists unread work mail, each opening in Gmail");
-  await page.screenshot({ path: join(shots, "postbox.png") });
-  await page.close();
-}
-// Feeds from other routines: bug-check health signs and the content calendars
-{
-  console.log("\nfeeds");
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  page.on("pageerror", e => errors.push(`feeds pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&nosample=1&time=10:30&date=2026-10-05");
-  await page.waitForTimeout(500);
-  await page.evaluate(() => {
-    const at = Date.now();
-    localStorage.setItem("stub:data/users/me/health-chord", JSON.stringify({app: "chord", at, status: "amber", headline: "211 of 212 tests green",
-      checks: [{name: "Unit tests", state: "pass", detail: "212/212"}, {name: "E2E onboarding", state: "warn", detail: "1 flaky"}, {name: "Errors (24h)", state: "pass", detail: "0 new"}], link: "https://claude.ai/artifact/P5hPqeNgPURfqecbbXMpxd"}));
-    const d = k => { const x = new Date(Date.now() + (window.__mapleOffset || 0) + 8*3600e3 - 2*3600e3); x.setUTCDate(x.getUTCDate() + k); return x.toISOString().slice(0, 10); };
-    localStorage.setItem("stub:data/users/me/content-chord", JSON.stringify({brand: "chord", at, items: [{date: d(0), time: "09:00", channel: "Instagram", title: "3 signs your client portal is costing you", status: "scheduled"}, {date: d(2), channel: "Blog", title: "HoneyBook alternatives outside the US", status: "draft"}]}));
-    localStorage.setItem("stub:data/users/me/goodnews", JSON.stringify({at, world: [{title: "Coral reef bounces back", summary: "Scientists report record recovery.", source: "Example News", link: "https://example.com/reef"}], wins: ["Chord added 2 studios this week"]}));
-    localStorage.setItem("stub:data/users/me/content-ambidextrous", JSON.stringify({brand: "ambidextrous", at, items: [{date: d(1), channel: "LinkedIn", title: "What I do and what Claude does", status: "idea"}]}));
-  });
-  await page.goto(url + "?nosample=1&time=10:30&date=2026-10-05");
-  await page.waitForTimeout(700);
-  await page.click('[data-open="cal"]');
-  await page.click('[data-caltab="content"]');
-  check(await page.locator("#calBody .hlist.content li").count() === 3, "the content tab shows both calendars' next two weeks");
-  await page.click('[data-cbrand="chord"]');
-  check(await page.locator("#calBody .hlist.content li").count() === 2, "and can show one brand at a time");
-  await page.screenshot({ path: join(shots, "content-calendar.png") });
-  await page.click("#pclose");
-  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(300);
-  await page.locator('#world [data-place="news"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Good news/.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
-  check(await page.locator('#ctx [data-newstab="wins"][aria-selected="true"]').count() === 1 && await page.locator("#ctx .hlist.gnews.world").count() === 0 && await page.locator("#ctx").textContent().then(t => /Chord added 2 studios/.test(t)), "the good news board opens on your wins, in tabs");
-  await page.click('#ctx [data-newstab="news"]');
-  check(await page.locator("#ctx .hlist.gnews.world li").count() === 1, "the good news board shows the world's good news on its own tab");
-  await page.click('#ctx [data-newstab="events"]');
-  { const t = await page.locator("#ctx").textContent();
-    check(/Night market/.test(t) && /Night market, 5:30pm to 10pm/.test(t) && /Sunday farmers market/.test(t) && /Deepavali/.test(t) && /Family dinner at/.test(t), "the good news board pins up the village calendar: markets, the night market, family dinners and festivals coming up"); }
-  await page.screenshot({ path: join(shots, "good-news.png") });
-  await page.click("#pclose");
-  await page.locator('#world [data-place="toLane"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Makers/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(300);
-  check(await page.locator('#sceneArt circle[fill="#F3B54A"]').count() >= 1, "Chord lives on Makers' Lane, through the town's east gate, wearing an amber light");
-  await page.locator('#world [data-place="chord"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Chord/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(400);
-  check(await page.locator("#sceneArt").textContent().then(t => /WATCH/.test(t)), "the health sign in the Chord workshop reads the bug check");
-  await page.locator('#world [data-spot="status"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Chord health/.test((document.querySelector("#ctx h2") || {}).textContent || ""), null, { timeout: 15000 });
-  check(await page.locator("#ctx .hlist.checks li").count() === 3, "tapping the sign shows each check");
-  await page.screenshot({ path: join(shots, "health-sign.png") });
-  await page.close();
-}
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 // Animals: buy chicks and bunnies at the market, feed them in the run at home, upgrade the run; Pancake at the news board
-{
+try {
   console.log("\nanimals");
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   page.on("pageerror", e => errors.push(`animals pageerror: ${e.message}`));
@@ -531,9 +319,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#pclose"); await page.waitForTimeout(300);
   check(await page.locator("#panel").isHidden(), "and closes");
   await page.close();
-}
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 // Saving: a browser with no copy of its own (like the Claude app after a refresh) must load the cloud save, never overwrite it
-{
+try {
   console.log("\nsaving");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`saving pageerror: ${e.message}`));
@@ -556,263 +344,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const st2 = await page.evaluate(() => { const k = Object.keys(localStorage).find(k => /^stub:.*\/fox$/.test(k)); return JSON.parse(localStorage.getItem(k)); });
   check(st2.coins === 55 && st2.inv.strawberry === 2, `a stale page catches up with another device's save instead of overwriting it (coins ${st2.coins})`);
   await page.close();
-}
-// Wardrobe at home: the stylist's three outfits from the "outfit" doc, plus a new one on request
-{
-  console.log("\nwardrobe");
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  page.on("pageerror", e => errors.push(`wardrobe pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-05");
-  await page.waitForTimeout(700);
-  await page.evaluate(() => {
-    const o = (label, top, bottom, shoes) => ({label, top, bottom, shoes, bag: "Black structured tote", jewellery: "Pearl studs", hair: "up", why: "Polished but easy."});
-    localStorage.setItem("stub:data/users/me/outfit", JSON.stringify({at: Date.now(), day: "2026-10-05", weather: "31C, humid", on: "School drop-off, client call at 3pm",
-      options: [o("Polished", "Black boat neck top", "Navy wide-leg trousers", "Black loafers"), o("Elevated casual", "White fitted tee", "Dark jeans", "White sneakers"), o("Wild card", "Plum silk blouse", "Black midi skirt", "Black ballet flats")],
-      wardrobe: {tops: ["Black boat neck top", "White fitted tee"], dresses: ["Emerald wrap midi dress"], shoes: ["Black ballet flats"], bags: ["Black crossbody"]}}));
-  });
-  await page.goto(url + "?seed=1&time=10:30&date=2026-10-05");
-  await page.waitForTimeout(800);
-  await page.locator('#world [data-place="home"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(400);
-  await page.locator('#world [data-spot="mydoor"]').dispatchEvent("click");
-  await page.waitForFunction(() => /My room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(400);
-  await page.locator('#world [data-spot="wardrobe"]').dispatchEvent("click");
-  await page.waitForSelector("#ctx .outfit", { timeout: 20000 });
-  check(await page.locator("#ctx .outfit").count() === 3, "the wardrobe shows the stylist's three outfits");
-  check(await page.locator("#ctx .outfit .garment").count() >= 15, "with a little drawing of each piece");
-  await page.fill("#outfitAsk", "something green"); await page.click('#outfitForm button');
-  await page.waitForFunction(() => document.querySelectorAll("#ctx .outfit").length === 4, null, { timeout: 10000 });
-  check(await page.locator("#ctx .outfit").last().textContent().then(t => /Emerald wrap midi dress/.test(t)), "and a new outfit on request");
-  await page.screenshot({ path: join(shots, "wardrobe.png") });
-  await page.click("#pclose"); await page.waitForTimeout(200);
-  check(await page.locator("#panel").isHidden(), "and closes");
-  // the rest of Mel's room
-  await page.waitForTimeout(2500);
-  check(await page.evaluate(() => document.getElementById("mmaple").classList.contains("sleep")), "Maple curls up in her bed in Mel's room");
-  check(await page.locator("#world .npc").count() === 0, "nobody else comes into Mel's room");
-  await page.locator('#world [data-spot="bed"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-bed="nap"]', { timeout: 15000 });
-  await page.click('#ctx [data-bed="nap"]'); await page.waitForTimeout(300);
-  check(await page.evaluate(() => getComputedStyle(document.getElementById("mel")).visibility === "hidden") && await page.locator("#world .zz").count() === 1, "a nap puts Mel to bed");
-  await page.locator('#world [data-spot="window"]').dispatchEvent("click"); await page.waitForTimeout(3500);
-  check(await page.evaluate(() => getComputedStyle(document.getElementById("mel")).visibility !== "hidden"), "getting up to the window wakes her");
-  await page.locator('#world [data-spot="record"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-track="rainy"]', { timeout: 15000 });
-  check(await page.locator("#ctx .record").count() >= 5, "the record player has a crate of records");
-  await page.click('#ctx [data-track="rainy"]'); await page.waitForTimeout(300);
-  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.sound")).track === "rainy") && await page.locator("#ctx .record.on").textContent().then(t => /Rainy window/.test(t)), "and puts on the one you pick");
-  await page.click("#pclose");
-  await page.locator('#world [data-spot="journal"]').dispatchEvent("click");
-  await page.waitForSelector("#jText", { timeout: 15000 });
-  await page.fill("#jText", "A lovely quiet afternoon."); await page.click('#jForm button'); await page.waitForTimeout(300);
-  check(await page.locator(".jlist details").count() === 1 && await page.evaluate(() => (devDb.get("journal").entries || []).length === 1), "the journal keeps a page");
-  await page.click("#pclose");
-  // emotion jars: make one, see it on the shelf, open it, send it to the journal (and undo), empty it
-  await page.locator('#world [data-spot="jars"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-jar="make"]', { timeout: 15000 });
-  await page.click('#ctx [data-jar="make"]');
-  for (const e of ["anger", "anger", "anger", "tired"]) await page.click(`#ctx [data-emo="${e}"]`);
-  for (const e of ["joy", "sad", "fear"]) await page.click(`#ctx [data-emo="${e}"]`).catch(() => {});
-  check(await page.locator('#ctx [data-emo="calm"]').isDisabled() && /most it holds/.test(await page.locator("#ctx .jhint").first().textContent()), "a jar takes at most four feelings, and says why the rest are resting");
-  await page.click('#ctx [data-jar="custom"]'); await page.fill("#jcName", "overwhelmed"); await page.press("#jcName", "Enter");
-  check(await page.locator("#ctx [data-emo]").count() === 10 && /pick a colour/.test(await page.locator("#jcForm").textContent()), "your own feeling waits for a colour before it's added");
-  await page.click('#jcForm [data-sw]'); await page.click('#jcForm button[type="submit"]');
-  check(await page.locator("#ctx [data-emo]").count() === 11 && await page.evaluate(() => !document.querySelector("#jcForm")), "and you can add your own feeling");
-  check((await page.locator("#ctx .jarmake .muted").first().textContent()).startsWith("6/"), "adding a feeling doesn't drop a blob in by itself");
-  await page.fill("#jNote", "Client moved the deadline again."); await page.click('#ctx [data-jar="place"]'); await page.waitForTimeout(300);
-  check(await page.locator("#ctx .jslot[data-jarid]").count() === 1 && await page.locator('#world [data-spot="jars"] svg').count() >= 1, "the jar goes on the shelf, and shows on the shelf in the room");
-  await page.click("#ctx .jslot[data-jarid]");
-  check(/Client moved the deadline again/.test(await page.locator("#ctx .jnotecard").textContent()) && /Anger ×3/.test(await page.locator("#ctx").textContent()), "opening a jar shows its feelings and note");
-  await page.click('#ctx [data-jar="send"]'); await page.waitForTimeout(300);
-  check(await page.locator("#ctx .jslot[data-jarid]").count() === 0 && await page.evaluate(() => (devDb.get("journal").entries || []).some(e => e.kind === "jar")), "sending it to the journal empties the jar and adds a journal page");
-  await page.click("#undoBtn"); await page.waitForTimeout(300);
-  check(await page.locator("#ctx .jslot[data-jarid]").count() === 1, "and Undo puts the jar back");
-  await page.click("#ctx .jslot[data-jarid]"); await page.click('#ctx [data-jar="send"]'); await page.waitForTimeout(200);
-  await page.click("#pclose");
-  await page.locator('#world [data-spot="journal"]').dispatchEvent("click");
-  await page.waitForSelector("#jText", { timeout: 15000 });
-  check(await page.locator(".jlist .polaroid .jarsvg").count() === 1, "the journal page has a polaroid of the jar");
-  await page.screenshot({ path: join(shots, "jar-polaroid.png") });
-  await page.click("#pclose");
-  await page.locator('#world [data-spot="nook"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-calm="1"]', { timeout: 15000 });
-  await page.click('#ctx [data-calm="1"]'); await page.waitForTimeout(500);
-  check(await page.locator("#ctx .breathe .ring").count() === 1 && /Breathe in/.test(await page.locator("#breathCue").textContent()), "the calm corner has guided breathing with a breathing ring");
-  await page.waitForTimeout(4500);
-  check(/Hold|Breathe out/.test(await page.locator("#breathCue").textContent()), "and talks you through each breath");
-  await page.click('#ctx [data-calm="stop"]'); await page.click('#ctx [data-calm="decompress"]'); await page.waitForTimeout(400);
-  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.today")).mode === "decompress"), "and starts a decompress any time");
-  await page.locator("#world [data-exit]").first().dispatchEvent("click");
-  await page.waitForFunction(() => /^Home/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  check(true, "the door on the east wall goes back into the house");
-  await page.close();
-}
-// Scratchpad: the town hall whiteboard
-{
-  console.log("\nscratchpad");
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  page.on("pageerror", e => errors.push(`scratchpad pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&chord=1&notion=1&time=10:30&date=2026-10-05");
-  await page.waitForTimeout(800);
-  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  // townsfolk walk round buildings, never through them: sample everyone's position for a while
-  { const src = readFileSync(join(root, "src/game/paths.js"), "utf8"), m = /village: (\[[\s\S]*?\]\]),/.exec(src), rects = JSON.parse(m[1]);
-    let bad = 0, seen = 0;
-    for (let i = 0; i < 40; i++) {
-      const pos = await page.evaluate(() => [...document.querySelectorAll("#world .npc")].map(n => (/translate\(([-\d.]+) ([-\d.]+)\)/.exec(n.getAttribute("transform")) || []).slice(1).map(Number)));
-      pos.forEach(([x, y]) => { if (x == null) return; seen++; if (rects.some(r => x > r[0] + 6 && x < r[2] - 6 && y > r[1] + 6 && y < r[3] - 6)) bad++; });
-      await page.waitForTimeout(300);
-    }
-    check(seen > 0 && bad === 0, `townsfolk walk round buildings, not through them (${bad} of ${seen} sightings inside)`); }
-  await page.locator('#world [data-place="hall"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Town hall/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.waitForTimeout(400);
-  await page.locator('#world [data-spot="revenue"]').dispatchEvent("click");
-  await page.waitForSelector("#ctx .rchart", { timeout: 15000 });
-  check(await page.locator("#ctx .rchart .rbar").count() === 6 && /\$1,350/.test(await page.locator("#ctx .rbig").textContent()), "the revenue chart shows six months of paid income from Chord, internal invoices left out");
-  await page.fill("#rvIn", "6000"); await page.click("#rvForm button"); await page.waitForTimeout(200);
-  check(/23% of your \$6,000 target/.test(await page.locator("#ctx .rhero").textContent()) && /Late Co/.test(await page.locator("#ctx").textContent()), "with a target you set and what's still owed");
-  await page.screenshot({ path: join(shots, "revenue.png") });
-  await page.click("#pclose");
-  await page.locator('#world [data-spot="table"]').dispatchEvent("click");
-  await page.waitForSelector("#ctx .pcard.pweek", { timeout: 15000 });
-  check(await page.locator("#ctx .pcard").count() === 3 && /Week of 5 Oct 2026/.test(await page.locator("#ctx .pweek").textContent()), "the planning table lays out this week, month and quarter from Notion");
-  check(/Today · Monday/.test(await page.locator("#ctx .pweek").textContent()) && /Message 12 warm leads/.test(await page.locator("#ctx .pweek").textContent()), "with today's slice of the week pulled out");
-  check(await page.locator("#ctx .pquarter .ptable td").count() >= 2 && !/&lt;td|<td>/.test(await page.locator("#ctx .pquarter").innerHTML().then(h => h.replace(/<td>[^<]*<\/td>/g, ""))), "Notion tables show as tables, not code");
-  check(await page.evaluate(() => { const p = document.getElementById("panel"); document.querySelectorAll("#ctx details").forEach(d => d.open = true); return p.scrollWidth <= p.clientWidth + 2; }), "and opening every section never makes the panel wider");
-  await page.fill("#plIn", "am I on track?"); await page.click("#plForm button");
-  await page.waitForFunction(() => document.querySelectorAll("#plChat .me").length === 1 && document.querySelectorAll("#plChat .fox").length >= 1 && !/Thinking it through|Ask me about your plans/.test(document.querySelector("#plChat").textContent), null, { timeout: 15000 }).catch(() => {});
-  check(await page.locator("#plChat .me").count() === 1 && !/Ask me about your plans/.test(await page.locator("#plChat").textContent()), "and a planning chat that answers");
-  await page.screenshot({ path: join(shots, "planning-table.png") });
-  await page.click("#pclose");
-  await page.locator('#world [data-spot="clients"]').dispatchEvent("click");
-  await page.waitForSelector("#ctx .clprojects li", { timeout: 15000 });
-  check(await page.locator("#ctx .clprojects li").count() === 2 && /overdue tasks/.test(await page.locator("#ctx .clchips").textContent()), "the client table in the town hall shows a live Chord snapshot");
-  check(await page.locator("#clForm").count() === 1, "with a chat about your clients");
-  await page.fill("#clIn", "what's waiting on me?"); await page.click("#clForm button");
-  await page.waitForFunction(() => document.querySelectorAll("#clChat .me").length === 1 && !/Looking through|Ask me anything about your clients/.test(document.querySelector("#clChat").textContent), null, { timeout: 15000 }).catch(() => {});
-  check(await page.locator("#clChat .me").count() === 1 && await page.locator("#clChat .fox").count() >= 1, "and the chat answers");
-  await page.screenshot({ path: join(shots, "client-table.png") });
-  await page.click("#pclose");
-  await page.locator('#world [data-spot="whiteboard"]').dispatchEvent("click");
-  await page.waitForSelector("#scratchText", { timeout: 15000 });
-  await page.fill("#scratchText", "Call the printer about the flyers"); await page.waitForTimeout(1500);
-  check(await page.evaluate(() => (devDb.get("scratch") || {}).text === "Call the printer about the flyers"), "the whiteboard is a scratchpad that saves as you type");
-  await page.close();
-}
-// Sunsama pull: no chat plan, the page fetches today's tasks itself
-{
-  console.log("\nsunsama pull");
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  page.on("pageerror", e => errors.push(`sunsama pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&sunsama=1&time=07:45");
-  await page.waitForFunction(() => /came straight from Sunsama/.test(document.querySelector("#sunsamaLine").textContent), null, { timeout: 15000 });
-  const titles = await page.locator("#list .t").allTextContents();
-  check(titles.length === 5, `all five Sunsama tasks became quests (${titles.length})`);
-  check(await page.locator("#list li.done .t").allTextContents().then(t => t.some(x => /Listen to affirmations/.test(x))) && await page.locator("#list li.done .tk").count() > 0, "a task completed in Sunsama shows as done, ticked");
-  const plan = await page.evaluate(() => devDb.get("plan"));
-  check(plan && plan.source === "sunsama" && (plan.tasks.find(t => t.id === "s1").subtasks || []).map(x => x.title).join("|") === "Check GHL|Check emails", "a checklist in Sunsama's notes becomes subtasks");
-  const s3 = plan.tasks.find(t => t.id === "s3"), sx = (s3.subtasks || []).find(x => x.id === "x"), sy = (s3.subtasks || []).find(x => x.id === "y");
-  check(sx && sy && sx.info.join(" ").includes("Rule of 3") && sy.done && sy.info.some(l => /^Planner: https/.test(l)) && sy.est === "30m", "each subtask keeps its own details from the notes");
-  check(/Walk-friendly/.test(s3.notes) && /Also on this walk/.test(s3.notes) && !/one by one/.test(s3.notes), "and the rest of the notes stay as notes, without the duplicated details");
-  check(plan.tasks.find(t => t.id === "s4").minutes === 90 && plan.tasks.find(t => t.id === "s3").treadmill === true, "time estimates and treadmill flags carry over");
-  check(plan.tasks.find(t => t.id === "s1").email, "comms tasks become email quests at the post office");
-  check(plan.tasks.find(t => t.id === "s3").spot === "treadmill", "treadmill tasks go straight to the treadmill");
-  await page.click('[data-open="quests"]');
-  await page.click('#tomorrow [data-tmr="peek"]');
-  await page.waitForSelector('#tomorrow [data-early="n1"]', { timeout: 10000 });
-  check(await page.locator("#tomorrow .hlist.tmr li").count() === 2, "tomorrow's Sunsama tasks can be previewed");
-  await page.click('#tomorrow [data-early="n1"]'); await page.waitForTimeout(200);
-  check(await page.locator("#list .t").allTextContents().then(t => t.some(x => /Plan the Chord newsletter/.test(x))), "and pulled onto today's board");
-  check(await page.locator('#tomorrow .hbadge').textContent().then(t => /today's board/.test(t)), "marked as on today's board");
-  await page.waitForTimeout(800);
-  await page.evaluate(async () => { const day = (await devDb.get("plan")).day, f = JSON.parse(localStorage.getItem("fox.fox")); f.early = {s2: day}; f.updatedAt = Date.now() + 1e7;
-    localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
-  // a later day's task ticked off early in Sunsama (it comes back in today's list): not on today's boards, but paid now
-  const cA = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
-  await page.goto(url + "?sunsama=1&ahead=1&time=12:00"); await page.waitForTimeout(2500);
-  check(await page.evaluate(c => { const f = JSON.parse(localStorage.getItem("fox.fox")), p = JSON.parse(localStorage.getItem("fox.plan") || "{}");
-    return f.early.a1 === "2099-12-31" && f.coins >= c + 5 && !(p.tasks || []).some(t => t.id === "a1"); }, cA), "a later day's task ticked off early in Sunsama pays now, and stays off today's boards");
-  await page.goto(url + "?sunsama=1&time=07:45"); await page.waitForTimeout(1500);
-  check(await page.locator("#list li.done .t").allTextContents().then(t => t.some(x => /Draft the Visibility Fix email/.test(x))), "a quest done early is already ticked on its day");
-  // finishing a Sunsama quest here ticks it off in Sunsama
-  await page.click("#pclose").catch(() => {});
-  const openNote = async () => { if (await page.locator('#journal [data-qn="open"]').count()) await page.click('#journal [data-qn="open"]'); };
-  await openNote(); await page.click('#journal [data-a="walk"]').catch(() => {});
-  await page.waitForFunction(() => document.querySelector('#journal [data-a="gotWipe"]'), null, { timeout: 15000 }).catch(() => {});
-  await page.click('#journal [data-a="gotWipe"]').catch(() => {}); await page.click('#journal [data-a="cleanDone"]').catch(() => {}); await page.waitForTimeout(300);
-  await openNote(); await page.click('#journal [data-a="walk"]');
-  await page.waitForFunction(() => document.querySelector('#journal [data-a="notebook"]'), null, { timeout: 20000 });
-  await page.click('#journal [data-a="notebook"]'); await page.waitForTimeout(300);
-  if (await page.locator('#notebook [data-nb="started"]').count()) { await page.click('#notebook [data-nb="started"]'); await page.waitForTimeout(300); }
-  await page.click('#notebook [data-nb="done"]');
-  await page.waitForFunction(() => (window.__sunsamaDone || []).length, null, { timeout: 8000 }).catch(() => {});
-  check(await page.evaluate(() => { const d = (window.__sunsamaDone || [])[0]; return !!d && /^s\d$/.test(d.taskId) && /^\d{4}-\d{2}-\d{2}$/.test(d.finishedDay); }), "finishing a Sunsama quest ticks it off in Sunsama too");
-  // the next quest is the treadmill batch: its subtasks are a checklist in the notebook, and ticks reach Sunsama
-  await page.waitForTimeout(400); await openNote(); await page.click('#journal [data-a="back"]', {timeout: 3000}).catch(() => {});   // the break after a quest
-  await page.waitForTimeout(400); await openNote(); await page.click('#journal [data-a="walk"]', {timeout: 5000}).catch(() => {});
-  await page.waitForFunction(() => document.querySelector('#journal [data-a="notebook"]'), null, { timeout: 20000 }).catch(() => {});
-  check(await page.locator("#journal li.subnext").textContent().then(t => /Up next: Post on LinkedIn/.test(t) && /1 of 2 subtasks done/.test(t)).catch(() => false), "the quest note shows the next subtask and progress");
-  await page.click('#journal [data-a="notebook"]'); await page.waitForTimeout(300);
-  check(await page.locator("#notebook .sublist .sub").count() === 1 && await page.locator("#notebook .sub.upnext .subinfo li").count() === 1 && /1 of 2 done/.test(await page.locator("#notebook .subcount").textContent()), "the notebook lists subtasks to do, the next one open with its details");
-  await page.click('#notebook [data-nb="subdone"]');
-  check(await page.locator('#notebook .sub.done .lchip').count() === 0 && await page.locator("#notebook .sub.done").count() === 1, "done subtasks fold away under Done");
-  await page.click('#notebook .sub.done [data-nb="subopen"]');
-  check(await page.locator('#notebook .sub.done a.lchip').textContent().then(t => /Planner/.test(t)), "links show as small named chips");
-  const subC0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
-  await page.click('#notebook .sub.upnext [data-nb="sub"]');
-  await page.waitForFunction(() => (window.__subTicks || []).length, null, { timeout: 8000 }).catch(() => {});
-  check(await page.evaluate(c => JSON.parse(localStorage.getItem("fox.fox")).coins === c + 8, subC0), "a subtask in a treadmill batch pays like a quest (8 coins)");
-  check(await page.evaluate(() => { const x = (window.__subTicks || [])[0]; return !!x && x.tool === "mark_subtask_as_completed" && x.input.taskId === "s3" && x.input.subtaskId === "x"; }), "ticking a subtask ticks it in Sunsama too");
-  check(/2 of 2 done/.test(await page.locator("#notebook .subcount").textContent()) && await page.locator("#notebook .suball").count() === 1, "and the checklist shows everything done");
-  await page.click('#notebook [data-nb="close"]').catch(() => {});
-  await page.goto(url + "?sunsama=1&time=07:45"); await page.waitForTimeout(1500);
-  await page.click('[data-open="settings"]').catch(() => {}); await page.click("#pclose").catch(() => {});
-  await page.click('[data-open="cal"]');
-  await page.waitForFunction(() => document.querySelectorAll("#calBody .calday li").length > 1, null, { timeout: 8000 }).catch(() => {});
-  check(await page.locator("#calBody .calday li b").count() >= 2, "the calendar icon shows today's events");
-  await page.click('[data-open="settings"]');
-  check(await page.locator("#setMusic").count() === 1 && await page.locator("#nameIn").isVisible(), "settings has music, sound and renaming");
-  check(await page.locator("#setQuiet").isChecked(), "quiet evenings are on by default");
-  await page.emulateMedia({ colorScheme: "dark" });
-  check(await page.evaluate(() => { const c = getComputedStyle(document.getElementById("speech")).backgroundColor; return c === "rgb(255, 253, 246)"; }), "speech bubbles stay cream in dark mode");
-  check(await page.evaluate(() => { const l = document.querySelector(".map .lab"); return !l || getComputedStyle(l).fill === "rgb(47, 43, 40)"; }), "place names stay dark ink in dark mode");
-  check(await page.evaluate(() => { const q = document.querySelector(".map .qnote"); const h = document.createElement("span"); h.className = "hl"; h.textContent = "x"; q.appendChild(h); const c = getComputedStyle(h).color; h.remove(); return c === "rgb(47, 43, 40)"; }), "highlighted words on the quest note stay dark in dark mode");
-  check(await page.evaluate(() => getComputedStyle(document.querySelector(".hbtn")).backgroundColor === "rgb(246, 239, 227)"), "the round buttons stay cream in dark mode, so the icons show");
-  check(await page.evaluate(() => getComputedStyle(document.getElementById("world")).getPropertyValue("--sea").trim().toUpperCase() === "#8FC1DE" && getComputedStyle(document.getElementById("world")).getPropertyValue("--card").trim().toUpperCase() === "#F9F7F2"), "the village keeps its own colours in dark mode (only the panels go dark)");
-  await page.emulateMedia({ colorScheme: "light" });
-  await page.click("#setSfx"); check(!(await page.locator("#setSfx").isChecked()), "sound effects can be muted");
-  await page.emulateMedia({ colorScheme: "dark" });
-  check(await page.evaluate(() => { const i = document.getElementById("nameIn"); return !i || getComputedStyle(i).color === "rgb(47, 43, 40)"; }), "typed text in panels stays dark ink in dark mode");
-  await page.emulateMedia({ colorScheme: "light" });
-  await page.click("#pclose");
-  await page.locator('#world [data-place="home"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.locator('#world [data-spot="officedoor"]').dispatchEvent("click");
-  await page.waitForFunction(() => /office/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.locator('#world [data-spot="desk"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-desk="refresh"]', { timeout: 15000 });
-  await page.waitForFunction(() => /Dinner on Sunday/.test(document.querySelector("#ctx").textContent), null, { timeout: 10000 }).catch(() => {});
-  check(/Dinner on Sunday/.test(await page.locator("#ctx").textContent()) && await page.evaluate(() => window.__zapier && window.__zapier.params.query.includes("category:primary") && !!window.__zapier.connection_id), "the home desk shows the personal inbox, through Zapier (Primary only)");
-  check(!/freshpages/.test(await page.locator("#ctx").textContent()), "the home desk is just the personal inbox");
-  await page.click("#pclose"); await page.click("#chatBtn");
-  await page.fill("#chatIn", "remind me to get the laundry in in 1 hour"); await page.click("#chatForm button");
-  await page.waitForFunction(() => [...document.querySelectorAll("#chatLog .did")].some(d => /Reminder at/.test(d.textContent)), null, { timeout: 10000 });
-  check(await page.evaluate(() => { const w = (window.__calWrites || [])[0]; return !!w && w.tool === "create_event" && /laundry/.test(w.input.summary) && w.input.overrideReminders[0].method === "popup" && Math.abs(Date.parse(w.input.startTime) - Date.now() - 3600e3) < 120e3; }), "asking Maple for a reminder puts a calendar event with a phone alert an hour from now");
-  await page.click("#pclose"); await page.click('[data-open="cal"]');
-  await page.waitForSelector("#calBody .rems li", { timeout: 10000 });
-  check(/get the laundry in/.test(await page.locator("#calBody .rems").textContent()), "the calendar panel lists upcoming reminders");
-  await page.click("#calBody [data-rem]"); await page.waitForFunction(() => window.__calWrites.some(w => w.tool === "delete_event"), null, { timeout: 5000 }).catch(() => {});
-  check(await page.evaluate(() => window.__calWrites.some(w => w.tool === "delete_event" && w.input.eventId === "ev1")), "cancelling a reminder takes it off the calendar");
-  await page.click("#undoBtn"); await page.waitForFunction(() => window.__calWrites.filter(w => w.tool === "create_event").length === 2, null, { timeout: 5000 }).catch(() => {}); await page.waitForTimeout(200);
-  check(await page.evaluate(() => window.__calWrites.filter(w => w.tool === "create_event").length === 2) && await page.locator("#calBody .rems li").count() === 1, "and Undo puts it back");
-  await page.click("#pclose");
-  await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Evan's room: Evan leads, Mel waits by the door, the toddler plays, and nothing in Mel's game changes
   console.log("\nevan's room");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -877,38 +410,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => !/Evan's room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 5000 }).catch(() => {});
   check(!/Evan's room/.test(await page.locator("#sceneName").textContent()), "the door still works while he's asleep");
   await page.close();
-}
-{
-  // Kind words: the town hall corkboard for compliments
-  console.log("\nkind words");
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await page.goto(url + "?reset=1&seed=1&time=10:30");
-  await page.waitForTimeout(800);
-  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.locator('#world [data-place="hall"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Town hall/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.locator('#world [data-spot="trophydoor"]').dispatchEvent("click");
-  await page.waitForFunction(() => /courtyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.locator('#world [data-spot="kudos"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-kd="add"]', { timeout: 15000 });
-  check(true, "the courtyard has a Kind words board on the wall");
-  await page.click('#ctx [data-kd="add"]');
-  await page.fill("#kText", "Your copy made our launch. Best money we spent all year."); await page.fill("#kFrom", "A client"); await page.click('#kForm button[type="submit"]');
-  await page.waitForTimeout(300);
-  check(await page.locator("#ctx .knote").count() === 1 && /A client/.test(await page.locator("#ctx .kboard").textContent()), "a compliment is pinned up with who said it");
-  check(await page.evaluate(() => (devDb.get("kudos").items || []).some(e => /launch/.test(e.text || ""))), "and saved privately, so it follows Mel across devices");
-  await page.click('#ctx [data-kd="random"]'); await page.waitForTimeout(200);
-  check(/Best money/.test(await page.locator("#ctx .ktext").textContent()), "Read me one shows a compliment big");
-  await page.click('#ctx [data-kd="board"]'); await page.click('#ctx [data-kd="del"]'); await page.waitForTimeout(200);
-  check(await page.locator("#ctx .knote").count() === 0, "a note can be taken down");
-  await page.click("#undoBtn"); await page.waitForTimeout(300);
-  check(await page.locator("#ctx .knote").count() === 1, "and Undo puts it back");
-  check(await page.locator('#world [data-spot="kudos"] rect').count() >= 3, "the board on the wall shows its notes");
-  await page.screenshot({ path: join(shots, "kind-words.png") });
-  await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // My routines: the noticeboard in Mel's room
   console.log("\nmy routines");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -946,21 +449,20 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#ctx .redit li").count() === n0, "and Undo puts them back");
   await page.screenshot({ path: join(shots, "routines.png") });
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Trophy room: off the town hall; trophies on pedestals, the trophy book, affirmations, kind words
   console.log("\ntrophy room");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await page.goto(url + "?reset=1&seed=1&time=10:30&sunsama=1");
+  await page.goto(url + "?reset=1&seed=1&time=10:30");
   await page.waitForTimeout(1500);
   // patch the save as the next page starts (the old page writes its own copy as it unloads)
   await page.addInitScript(() => { if (!location.search.includes("patchtq")) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.totalQuests = 30; delete f.trophies;
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
-  await page.goto(url + "?seed=1&time=10:30&sunsama=1&patchtq=1");
+  await page.goto(url + "?seed=1&time=10:30&patchtq=1");
   await page.waitForTimeout(12000);
   const tr = await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.fox")).trophies || []).map(t => t.id));
   check(tr.includes("quests-10") && tr.includes("quests-25") && !tr.includes("quests-50"), "trophies are awarded for quest milestones reached");
-  check(tr.some(id => id.startsWith("objw-")), "and for a week with every Sunsama objective done");
   await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
   await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-place="hall"]').dispatchEvent("click");
@@ -970,7 +472,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /courtyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(600);
   check(await page.locator("#world .ptrophy").count() >= 3, "trophies stand on the pedestals");
-  check(await page.locator('#world [data-spot="kudos"]').count() === 1 && await page.locator('#world [data-spot="affirm"]').count() === 1, "with the kind words and affirmations boards on the wall");
+  check(await page.locator('#world [data-spot="kudos"]').count() === 1, "with a notice board on the wall");
   await page.locator('#world [data-spot="ped0"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-tr="book"]', { timeout: 10000 });
   const name = await page.locator("#ctx .tcard h2").textContent();
@@ -979,32 +481,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForSelector("#ctx .tpage", { timeout: 10000 });
   check((await page.locator("#ctx .tpage h3").first().textContent()) === name && await page.locator("#ctx .tpage svg").count() >= 1, "a trophy can go into the trophy book: a page with a polaroid and the story");
   await page.click("#pclose"); await page.waitForTimeout(200);
-  await page.locator('#world [data-spot="affirm"]').dispatchEvent("click");
-  await page.waitForSelector("#ctx .taff li", { timeout: 10000 });
-  check(await page.locator("#ctx .taff li").count() === 5, "five affirmations for today");
-  await page.click("#pclose"); await page.waitForTimeout(200);
   await page.locator('#world [data-spot="bench"]').dispatchEvent("click"); await page.waitForTimeout(2500);
   check(await page.evaluate(() => document.getElementById("mel").classList.contains("sit")), "Mel can sit on the bench");
   check(await page.locator("#world [data-pigeon]").count() >= 2 && await page.locator('#world [data-spot="fountain"]').count() === 1, "with a fountain and pigeons pecking about");
-  await page.locator('#world [data-spot="fountain"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-vz="start"]', { timeout: 10000 });
-  check(true, "wishing at the fountain offers the weekly visualisation");
-  await page.click('#ctx [data-vz="start"]'); await page.waitForSelector('#ctx [data-vz="begin"]:not([disabled])', { timeout: 10000 });
-  await page.click('#ctx [data-vz="begin"]');
-  for (let i = 0; i < 6; i++) { await page.waitForSelector("#vzIn", { timeout: 10000 }); await page.fill("#vzIn", i === 5 ? "Spacious" : "Calm and proud. I sent the Voice Pass email."); await page.click('#ctx [data-vz="next"]'); await page.waitForFunction(() => !document.querySelector('#ctx [data-vz="next"][disabled]'), null, { timeout: 10000 }).catch(() => {}); }
-  await page.waitForSelector("#ctx .vsum", { timeout: 15000 }).catch(() => {});
-  check(await page.locator("#ctx .vsum").count() === 1, "six questions, one at a time, then the week written back");
-  await page.click('#ctx [data-vz="save"]');
-  await page.waitForFunction(() => window.__visSaved, null, { timeout: 10000 }).catch(() => {});
-  check(await page.evaluate(() => !!window.__visSaved && window.__visSaved.pages[0].properties["Feeling Word"] && window.__visSaved.parent.data_source_id.startsWith("ba8f40af")), "saved to the Weekly Visualisations database in Notion");
-  check(await page.evaluate(() => (window.__sunsamaTasks || []).length >= 1), "and the actions go to Sunsama");
-  await page.click("#pclose");
   await page.screenshot({ path: join(shots, "courtyard.png") });
   await page.close();
-}
-{
-  // Letters (writing desk), bedtime, backup
-  console.log("\nletters, bedtime, backup");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
+  // The journal (writing desk), bedtime, backup
+  console.log("\njournal, bedtime, backup");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("dialog", d => d.accept());
   await page.goto(url + "?reset=1&seed=1&time=10:30");
@@ -1014,15 +499,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-spot="mydoor"]').dispatchEvent("click");
   await page.waitForFunction(() => /My room/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-spot="journal"]').dispatchEvent("click");
-  await page.waitForSelector("#ctx [data-letters]", { timeout: 15000 });
-  await page.click("#ctx [data-letters]"); await page.click('#ctx [data-lt="universe"]');
-  await page.fill("#ltText", "Dear Universe, I'm nervous about the Chord launch."); await page.click('#ctx [data-lt="senduni"]');
-  await page.waitForFunction(() => (JSON.parse(localStorage.getItem("fox.letters") || "{}").items || []).some(e => e.reply && e.reply.text), null, { timeout: 15000 }).catch(() => {});
-  check(await page.evaluate(() => { const e = (JSON.parse(localStorage.getItem("fox.letters")).items || [])[0]; return !!(e && e.reply && e.reply.text && e.reply.due > Date.now()); }), "a letter to the universe gets a reply, arriving a little later like post");
-  await page.click('#ctx [data-lt="future"]'); await page.fill("#ltText", "Hi future me. Hope Evan still loves trains."); await page.fill("#ltDate", "2027-10-04"); await page.click('#ctx [data-lt="sendfut"]');
-  check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.letters")).items || []).some(e => e.kind === "future" && e.deliver === "2027-10-04")), "a letter to future me is sealed until the chosen date");
-  await page.click('#ctx [data-lt="open"] >> nth=0'); await page.waitForTimeout(150);
-  check(/Sealed until/.test(await page.locator("#ctx").textContent()) || /On its way|wrote back/.test(await page.locator("#ctx").textContent()), "letters can be opened from the list");
+  await page.waitForSelector("#jText", { timeout: 15000 });
+  await page.fill("#jText", "A lovely quiet day."); await page.click('#jForm button[type=submit]'); await page.waitForTimeout(300);
+  check(await page.locator("#ctx .jlist details").count() === 1, "a journal page is kept at the writing desk");
   await page.click("#pclose");
   await page.click('[data-open="settings"]'); await page.click("#setBackup"); await page.waitForTimeout(300);
   check(await page.evaluate(() => window.__download && /maples-village-backup-.*\.json/.test(window.__download.filename) && window.__download.size > 200), "Settings can download a backup of the whole game");
@@ -1034,7 +513,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => new Set((window.__said || []).filter(t => /winding down|Teeth, then skincare|Phone on charge/.test(t))).size <= 1), "and only one every half a minute or so, with no nagging");
   await page.goto(url + "?seed=1&time=23:50"); await page.waitForTimeout(2500);
   check(!(await page.locator("#bedLock").isHidden()) && await page.evaluate(() => document.body.classList.contains("bedlocked")), "from 11:45pm the village rests: everything waits until 6am");
-  await page.locator("#chatBtn").dispatchEvent("click").catch(() => {}); await page.waitForTimeout(200);
+  await page.locator('[data-open="quests"]').dispatchEvent("click").catch(() => {}); await page.waitForTimeout(200);
   check(await page.locator("#panel").isHidden(), "and nothing can be actioned");
   page.on("dialog", d => { errors.push("bedtime used a browser pop-up (blocked in the artifact frame)"); d.dismiss(); });
   await page.click("#bedUp"); await page.waitForTimeout(300);
@@ -1044,34 +523,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#bedUp"); await page.click("#bedYes"); await page.waitForTimeout(1500);
   check(await page.locator("#bedLock").isHidden(), "unless Mel really needs to get up (just for tonight)");
   await page.close();
-}
-{
-  // Hestia "Last done": every-so-often household jobs
-  console.log("\nlast done");
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await page.goto(url + "?reset=1&seed=1&time=10:30");
-  await page.waitForTimeout(800);
-  // the five-minute clean has the cupboard first thing; get it done
-  if (await page.locator('#journal [data-qn="open"]').count()) await page.click('#journal [data-qn="open"]');
-  await page.click('#journal [data-a="walk"]');
-  await page.waitForFunction(() => document.querySelector('#journal [data-a="gotWipe"]'), null, { timeout: 15000 });
-  await page.click('#journal [data-a="gotWipe"]'); await page.click('#journal [data-a="cleanDone"]'); await page.waitForTimeout(300);
-  await page.waitForFunction(() => /garage/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.locator('#world [data-spot="cupboard"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-htab="last"]', { timeout: 15000 });
-  await page.click('#ctx [data-htab="last"]');
-  check(/Aircon servicing/.test(await page.locator("#ctx").textContent()) && /Evan's sheets/.test(await page.locator("#ctx").textContent()), "the cleaning cupboard has a Last done tab (aircon, sheets)");
-  await page.click('#ctx [data-hlastnow="l3"]'); await page.waitForTimeout(200);
-  check(/today/.test(await page.locator('#ctx li.hlast:has-text("Evan\'s sheets")').textContent()), "Done today logs it");
-  await page.fill('#ctx [data-hlastdate="l1"]', "2026-06-01"); await page.locator('#ctx [data-hlastdate="l1"]').dispatchEvent("change"); await page.waitForTimeout(200);
-  check(/overdue/.test(await page.locator('#ctx li.hlast:has-text("Aircon")').textContent()), "a past date can be keyed in, and it shows when it's overdue");
-  await page.fill('#ctx form[data-hlastadd] input[name="t"]', "Clean the fridge"); await page.click('#ctx form[data-hlastadd] button');
-  check(await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.hestia")).lastDone || []).some(x => x.name === "Clean the fridge")), "new things can be added, and they're saved with the home data");
-  await page.close();
-}
-{
-  // The weekly review in the town hall, and the tasting room's small plates
-  console.log("\nweekly review and tasting room");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
+  // The tasting room's small plates and the kitchen
+  console.log("\ntasting room");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`review pageerror: ${e.message}`));
   await page.addInitScript(() => { const q = location.search; if (!/rvpatch|menupatch|platepatch|dinnerpatch|goatpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
@@ -1084,21 +539,6 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     if (q.includes("platepatch")) { f.vine = f.vine || {}; f.vine.shelf = [{id: "w9", name: "Test Red", type: "red", n: 40, price: 24, open: 0}]; f.vine.menu = {cheese: 40}; f.vine.lastTick = Date.now() - 600*60e3; }
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
   await page.goto(url + "?reset=1&seed=1&date=2026-10-09&time=16:00"); await page.waitForTimeout(800);
-  await page.goto(url + "?seed=1&sunsama=1&date=2026-10-09&time=16:00&rvpatch=1"); await page.waitForTimeout(1200);
-  await page.evaluate(() => window.__mapleScene("hall")); await page.waitForTimeout(700);
-  check(await page.locator('#world [data-spot="review"]').count() === 1, "the town hall has a weekly review desk");
-  await page.locator('#world [data-spot="review"]').dispatchEvent("click");
-  await page.waitForSelector("#ctx .rvcard", { timeout: 15000 });
-  check(/10 quests done/.test(await page.locator("#ctx .rvcard h3").first().textContent()) && await page.locator("#ctx .rvcard").count() >= 7, "the scrapbook gathers the week: quests, routines, trophies, savings, words, body and garden");
-  await page.waitForFunction(() => document.querySelectorAll("#ctx .rvobj li").length >= 2, null, { timeout: 8000 }).catch(() => {});
-  check(await page.locator("#ctx .rvobj li.done").count() === 2, "this week's Sunsama objectives show with their ticks");
-  const c0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
-  await page.fill("#rvP0", "Fill the Visibility Fix cohort"); await page.fill("#rvP1", "Ship the Chord onboarding fixes");
-  await page.click('#ctx [data-rv="send"]');
-  await page.waitForFunction(() => (window.__weeklyObj || []).length >= 2, null, { timeout: 8000 }).catch(() => {});
-  check(await page.evaluate(() => { const o = window.__weeklyObj || []; return o.length === 2 && o.every(x => x.weekStartDay === "2026-10-12") && o[0].title === "Fill the Visibility Fix cohort"; }), "next week's priorities go to Sunsama as next week's weekly objectives");
-  await page.waitForTimeout(400);
-  check(await page.evaluate(c0 => { const f = JSON.parse(localStorage.getItem("fox.fox")); return !!(f.reviews && f.reviews["2026-10-05"]) && f.coins === c0 + 15; }, c0), "the review is kept, with 15 coins for doing it");
   // the kitchen behind the wine shop: ingredients from the backpack, the oven, the stove and the tapas of the day
   await page.goto(url + "?seed=1&time=18:00&menupatch=1"); await page.waitForTimeout(1200);
   await page.click('[data-open="bag"]'); await page.waitForTimeout(300);
@@ -1157,8 +597,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=21:00&platepatch=1"); await page.waitForTimeout(4200);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.plates > 0), "villagers order small plates with their wine");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // The vineyard: grow grapes, ferment and bottle wine, sell it in the wine shop; workers water, an assistant serves
   console.log("\nthe vineyard");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1221,8 +661,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.box > 0), "villagers buy wine while Mel's away and pay into the honesty box");
   await page.screenshot({ path: join(shots, "vineyard.png") });
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Staff: Marco and Ines pick and fill barrels, Celeste stocks the shelves, Pilar runs the kitchen; renaming; diners' tables
   console.log("\nstaff, names and the tasting room tables");
   { const tr = await import(new URL("../src/game/tours.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), cel = np.NPCS.find(n => n.id === "celeste");
@@ -1281,8 +721,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(n => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.today.glasses >= n && v.shelf.length > 0; }, seated), "everyone who sits down orders a glass, poured from an opened bottle");
   await page.screenshot({ path: join(shots, "tasting-tables.png") });
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // A path joins Makers' Lane and the vineyard directly (lane at the bottom, vineyard at the top)
   console.log("\nlane to vineyard path");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1296,8 +736,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /Makers/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "and back up again");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // A grown hen eats breakfast, lunch and dinner, with an egg after each meal
   console.log("\nhens: three meals, three eggs");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1316,8 +756,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).inv.egg === 1), "and lays an egg after her dinner");
   check(/fed and happy/.test(await page.locator("#ctx .pets").textContent()), "then she's full until the next meal");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Ma Ma's orchard and flower farm: plant, Ma Ma picks, the farm shop, bouquets and pots, the fruit crate, tea and cake
   console.log("\nMa Ma's orchard");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1378,8 +818,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await fox().then(f => f.bouquets && f.bouquets.mama === 1 && !f.inv.bq_mum), "a bouquet can be given to Ma Ma in person (or sent to anyone in the family)");
   await page.screenshot({ path: join(shots, "cottage.png") });
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Orchard workers, visitors and weekend tours (paid into Ma Ma's tin); Darren's weekday tours
   console.log("\norchard tours");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1408,8 +848,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("flowers")); await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="mei"]').count() === 1, "Mei looks after the flower farm");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // The field (lake, swans, picnic, football) between the orchard and town; gifts for Ma Ma and Gong Gong
   console.log("\nthe field and grandparents' gifts");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -1441,8 +881,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /field/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "and the field is up the path from the top of the orchard");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // A busy weekend: tourist families at the vineyard playground (and a roundabout), the Sunday farmers market at the field
   // with the wine shop's stall selling off the shop's own shelves, and the field fair on the last Saturday of the month
   console.log("\nplayground families, farmers market, field fair");
@@ -1501,8 +941,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
   check(/Field fair/.test(await page.locator("#sceneArt").textContent()) && await page.locator('#world [data-place^="mstall"]').count() === 5, "on the last Saturday of the month the field fair is on: kites, face painting, lemonade, snacks");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // The foreshore (west of the field): the sea with dolphins and paddleboarders, two family houses, Mum, Dad, Marcus and
   // Angellina with their routines, Mum's exercise class at the field, a family paddle, and gifts for the family
   console.log("\nthe foreshore and Mel's family");
@@ -1548,8 +988,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const c0 = (await ffox()).coins; await page.locator('#world [data-place="exlawn"]').dispatchEvent("click"); await page.waitForTimeout(8500);
   check(await page.locator("#mel.exercise").count() === 1 && (await ffox()).coins === c0 + 2, "Mel can join Mum's class (a couple of coins, once a day)");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Family dinners (Wednesdays and Sundays, rotating round the four houses), who's where today, and the family and
   // villagers out and about: the vineyard, the Sunday market, Makers' Lane
   console.log("\nfamily dinners and who's where");
@@ -1594,8 +1034,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => !!document.querySelector("#sceneArt rect.dusk")) && await page.evaluate(() => getComputedStyle(document.getElementById("world")).getPropertyValue("--sea").trim().toUpperCase() === "#8FC1DE"), "after dark the sea goes dark with the dusk (and dark mode doesn't stack on it)");
   await page.emulateMedia({ colorScheme: "light" });
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Big goals to save up for: the garage (through a door at the back of the house), a scooter and a car (faster between
   // screens), a dolphin cruise boat at the jetty, and a cellar door extension off the wine shop
   console.log("\nbig goals");
@@ -1644,30 +1084,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-spot="flight"]').dispatchEvent("click"); await page.waitForTimeout(2500);
   check(/hosting the wine club/.test(await page.locator("#speech").textContent()), "Mel hosts the club at the tasting bar");
   await page.close();
-}
-{
-  // Wearing an outfit from the wardrobe: choose one, untick what you're skipping, put it on (Mel's sprite changes)
-  console.log("\nwearing an outfit");
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  page.on("pageerror", e => errors.push(`wear pageerror: ${e.message}`));
-  await page.addInitScript(() => { if (!/wearpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    f.outfits = {day: "2026-10-06", list: [{label: "Tropical Wrapped Elegance", dress: "Green botanical wrap dress", shoes: "Gold round-toe ballet flats", bag: "Black YSL structured bag", jewellery: "Gold orchid statement drops", layer: "Charcoal slouchy cardigan (aircon)", hair: "down + soft waves"}]};
-    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
-  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-06"); await page.waitForTimeout(800);
-  await page.goto(url + "?seed=1&time=10:30&date=2026-10-06&wearpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(800);
-  const tie = () => page.evaluate(() => [...document.querySelectorAll("#mel .usual")].every(e => getComputedStyle(e).display !== "none"));
-  await page.locator('#world [data-spot="wardrobe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-wear="0"]', { timeout: 15000 });
-  check(await tie(), "in her usual outfit Mel has the blue hair tie and the sprigs");
-  await page.click('#ctx [data-wear="0"]'); await page.waitForTimeout(300);
-  check(await page.locator("#ctx [data-wearf]:checked").count() === 6, "choosing an outfit lists each piece, all ticked");
-  await page.uncheck('#ctx [data-wearf="layer"]'); await page.click('#ctx [data-wearok="0"]'); await page.waitForTimeout(400);
-  check(await page.evaluate(() => { const w = JSON.parse(localStorage.getItem("fox.fox")).wear; return w && w.dress && !w.layer; }), "unticked pieces are left off");
-  check(await page.evaluate(() => { const d = document.getElementById("oDress"), l = document.getElementById("oLayer"); return getComputedStyle(d).display !== "none" && getComputedStyle(l).display === "none" && document.getElementById("mel").classList.contains("hairdown"); }), "Mel's character puts it on: the dress, hair down, no cardigan");
-  check(!(await page.evaluate(() => [...document.querySelectorAll("#mel .usual")].some(e => getComputedStyle(e).display !== "none"))), "and the blue hair tie and sprigs come off (they're for the usual look only)");
-  await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Paddling home: the stream from the sea feeds the lake, the river runs on home; a little jetty at home and the
   // foreshore's rack take Mel (with Evan and Maple) straight from one to the other
   console.log("\npaddling between home and the foreshore");
@@ -1694,24 +1112,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(2000);
   check(dark && await page.locator('#world [data-place="homejetty"]').count() === 1, "too dark to paddle the river late at night");
   await page.close();
-}
-{
-  // Picking a quest before the five-minute clean: the clean waits on the board for later
-  console.log("\nquests before the clean");
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  page.on("pageerror", e => errors.push(`pick pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-08"); await page.waitForTimeout(900);
-  await page.click('[data-open="quests"]'); await page.waitForTimeout(400);
-  check(await page.locator("#list [data-next]").count() > 0, "\"do this now\" shows on quests even before the five-minute clean");
-  await page.locator("#list [data-next]").first().click(); await page.waitForTimeout(500);
-  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.today") || "{}").cleanLater === true), "picking one puts the clean off for later");
-  await page.click('[data-open="quests"]'); await page.waitForTimeout(400);
-  check(await page.locator('#list li[data-cleannow]').count() === 1, "the clean waits at the top of the board");
-  await page.locator('#list button[data-cleannow]').click(); await page.waitForTimeout(500);
-  check(await page.locator('#list li[data-cleannow]').count() === 0 && /wet wipe/.test(await page.locator("#speech").textContent()), "and \"do this now\" brings it back");
-  await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // The Scoop Shack on the bay: stock the fridge, discover a flavour at the bench, have one free, take one to give
   // (gelato isn't offered to Marcus), and while time passes Tomo makes batches and customers buy
   console.log("\nthe Scoop Shack");
@@ -1804,8 +1206,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await fox().then(f => Object.values(f.scoop.sold).reduce((a, d) => a + d.n, 0) > 0), "customers buy while it's open (the takings come to Mel)");
   check(await fox().then(f => Object.values(f.scoop.made || {}).reduce((a, b) => a + b, 0) === 2), "nobody makes tubs behind Mel's back: only the two she made (Tomo serves now)");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // The Cocoa Room: bought from the bay's old shopfront, then bean to bar in its kitchen (roast 10 min, grind 2 hours,
   // temper, mould) and bars sold off the wall
   console.log("\nthe Cocoa Room");
@@ -1966,8 +1368,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="mstall9"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
   check(/farmers market cart/.test(await page.locator("#ctx").innerText()), "and Mel can serve from it");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Wildflower Farm, east of the bay: Felix's bees, Elena's cows and goats, the farm stand
   console.log("\nWildflower Farm");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2030,8 +1432,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await tap("goats", '#ctx [data-hf="milkall"]');
   check(await page.locator('#ctx [data-hf="milkall"]').isDisabled(), "milking is mornings only");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Farm life: moods and yields, the goat gate, trust and what it unlocks, Felix and Elena's asks, swarms, turning cheese
   console.log("\nfarm life");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2092,8 +1494,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await tap("fstand", '#ctx [data-hf="shelf"]'); await page.click('#ctx [data-hf="shelf"][data-k="chz_cheddar"][data-n="99"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.hfarm.shelf.chz_cheddar === 3 && !f.inv.chz_cheddar), "a partner has her own shelf at the farm stand");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // The cottage lane and Honeybrook station: four cottages, the windmill, the timetable, and trains along the top row
   console.log("\nHoneybrook station");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2131,8 +1533,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await go("12:00", "2026-10-07", "village");
   check(await page.locator('#world [data-place="toStationV"]').count() === 1 && /Honeybrook/.test(await page.locator("#sceneArt").textContent()), "the town square: the station road up to Honeybrook, and the welcome sign");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // The campervan: bought at its spot on the cottage lane, then done up inside from the mood board
   console.log("\nthe campervan");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2161,8 +1563,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-van="pick"][data-k="bedding"][data-s="coastal"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.coins === 90 && f.van.use.bedding === "van_bedding_coastal"), "a piece bought once can be swapped back in for free");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Keepsakes on the shelves of Mel's buildings, and pets adopted at the market that live with someone in the family
   console.log("\nkeepsakes and pets");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2211,36 +1613,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(canPlay === 1 && await fox().then(f => f.companions[0].playDay && f.companions[0].patDay), "pat the puppy, and with Evan home, they play together");
   await page.click("#pclose").catch(() => {});
   await page.close();
-}
-{
-  // Makers' Lane: Luna and Ohayo have their own buildings now, each with a health sign for its nightly bug check
-  console.log("\nLuna and Ohayo on Makers' Lane");
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  page.on("pageerror", e => errors.push(`apps pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-10"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(700);
-  check(await page.locator('#world [data-place="luna"]').count() === 1 && await page.locator('#world [data-place="ohayo"]').count() === 1 && await page.locator('#world [data-place^="plot"]').count() === 0, "Luna and Ohayo have houses on Makers' Lane where their plots were");
-  await page.addInitScript(() => { if (!/hellopatch/.test(location.search)) return;
-    const d = {at: Date.now() - 3600e3, queued: 55, sent30: 3, opened30: 1, watched30: 1, reactions30: 1, watchRate30: 33, avgWatchSecs30: 7, arrived7: 68, sentTotal: 3, reactions: [{name: "Tester", product: "Chord", emoji: "❤️", text: "So lovely!", at: new Date().toISOString()}]};
-    const f = JSON.parse(localStorage.getItem("fox.feeds") || "{}"); f["ohayo-hellos"] = d; localStorage.setItem("fox.feeds", JSON.stringify(f)); localStorage.setItem("stub:data/users/me/ohayo-hellos", JSON.stringify(d)); });
-  await page.goto(url + "?seed=1&time=10:30&date=2026-10-10&hellopatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("ohayo")); await page.waitForTimeout(700);
-  check(/55 waiting/.test(await page.locator("#sceneArt").textContent()) && /33%/.test(await page.locator("#sceneArt").textContent()), "the Ohayo house's hello chart shows who's waiting and the watched percentage");
-  await page.locator('#world [data-spot="reactions"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ohreact li", { timeout: 15000 });
-  check(/So lovely!/.test(await page.locator("#ctx .ohreact").innerText()), "and its reactions board pins up what people sent back");
-  await page.click("#pclose").catch(() => {});
-  await page.locator('#world [data-spot="hellos"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ohfunnel li", { timeout: 15000 });
-  check(await page.locator("#ctx .ohfunnel li").count() === 4, "the hello chart opens: sent, opened, watched and reacted");
-  await page.click("#pclose").catch(() => {});
-  for (const app of ["ohayo", "luna"]) {
-    await page.evaluate(a => window.__mapleScene(a), app); await page.waitForTimeout(700);
-    await page.locator('#world [data-spot="status"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
-    check(new RegExp(`${app === "luna" ? "Luna" : "Ohayo"} health`).test(await page.locator("#ctx h2").innerText()) && /nightly bug check/.test(await page.locator("#ctx").innerText()), `inside the ${app} house, a health sign waiting for its nightly bug check`);
-    await page.click("#pclose").catch(() => {});
-  }
-  await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
@@ -2304,8 +1678,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#pclose"); await page.waitForTimeout(400);
   check(await page.locator("#panel").isHidden() || !(await page.locator("#ctx").innerText()).includes("honesty freezer"), "the ✕ closes the Scoop Shack's panels too");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Ingredients: pantry staples at Hana's deli, grapes out of the vineyard's crates, things back out of the larder
   console.log("\ningredients");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2332,8 +1706,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-k="take"][data-id="fish"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.fish >= 1 && !(f.kitchen.larder.fish)), "anything in the wine shop's larder can be taken back to the backpack");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Accessories in the wardrobe: bought once at Hana's, worn or put away from the wardrobe
   console.log("\naccessories in the wardrobe");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2352,8 +1726,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-acc="me_bow"]'); await page.waitForTimeout(400);
   check(await page.locator("#melBow").isVisible(), "and put them back on");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // The evening light: a sunset from 6pm deepening into dusk by 7:30, the same on every outdoor screen
   console.log("\nsunset and dusk");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2368,8 +1742,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const n = document.querySelectorAll("#sceneArt .nightcopy .nightlab").length, all = document.querySelectorAll("#sceneArt text.lab").length;
     return n > 5 && n*2 === all && document.querySelectorAll("#sceneArt .nightcopy rect").length >= 4; }), "at night the street lamps light up and every place name sits on white tape above the dark");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // The night market: Tuesday and Thursday evenings, 6 to 10pm on the field. Out-of-town traders, fairy lights, a jazz
   // duo on a little stage (tip the band), tourists and a few villagers shopping; the wine shop's evening regulars still come
   console.log("\nthe night market");
@@ -2423,8 +1797,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
   check((await ids()).includes("juniper"), "the wine shop's evening regulars still drop in (Juniper at 6:45 on a night market Tuesday)");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Bedroom doors: Ma Ma and Gong Gong, Mum and Dad, Marcus and Angellina head to bed at 10:50pm and are gone after 11
   console.log("\nbedroom doors");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2448,40 +1822,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(1000);
   check(await page.locator("#world .darrenBed").count() === 0, "but not in the afternoon");
   await page.close();
-}
-{
-  // The bank: six vault jars of jewels for savings goals
-  console.log("\nthe bank");
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await page.goto(url + "?reset=1&seed=1&time=10:30");
-  await page.waitForTimeout(800);
-  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
-  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  check(await page.locator('#world [data-place="bank"]').count() === 1, "the town square has a bank");
-  await page.locator('#world [data-place="bank"]').dispatchEvent("click");
-  await page.waitForFunction(() => /bank/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  check(await page.locator('#world [data-spot^="vault"]').count() === 5, "with five vaults along the back wall");
-  await page.locator('#world [data-spot="vault0"]').dispatchEvent("click");
-  await page.waitForSelector("#vForm", { timeout: 15000 });
-  await page.fill("#vLabel", "Japan trip"); await page.fill("#vGoal", "1000"); await page.selectOption("#vStep", "100"); await page.click('#ctx [data-vcol="emerald"]'); await page.click('#vForm button[type="submit"]');
-  await page.waitForSelector("#vAdd", { timeout: 5000 });
-  await page.fill("#vAmt", "400"); await page.click("#vAdd button");
-  check(await page.locator("#ctx .vdrop").count() > 3, "adding savings pours jewels in");
-  await page.waitForFunction(() => !document.querySelector("#ctx .vdrop"), null, { timeout: 8000 }).catch(() => {});
-  check(/\$400 of \$1,000/.test(await page.locator("#ctx .sub").textContent()) && await page.evaluate(() => (JSON.parse(localStorage.getItem("fox.vaults")).jars || []).some(j => j.label === "Japan trip" && j.amount === 400 && j.color === "emerald")), "then the jar is capped, and the savings are kept privately");
-  await page.fill("#vAmt", "600"); await page.click("#vAdd button");
-  await page.waitForFunction(() => !document.querySelector("#ctx .vdrop"), null, { timeout: 8000 }).catch(() => {}); await page.waitForTimeout(600);
-  check(await page.locator("#ctx .vspark").count() > 0 && /full/.test(await page.locator("#ctx .sub").textContent()), "a full jar sparkles");
-  await page.click('#ctx [data-vb="empty"]'); await page.waitForTimeout(200);
-  check(/\$0 of/.test(await page.locator("#ctx .sub").textContent()), "and can be emptied any time");
-  await page.click("#undoBtn"); await page.waitForTimeout(200);
-  check(/full/.test(await page.locator("#ctx .sub").textContent()), "with Undo");
-  page.on("dialog", d => { errors.push("the bank used a browser pop-up (blocked in the artifact frame)"); d.dismiss(); });
-  await page.fill("#vAmt", "150"); await page.click('#ctx [data-vb="out"]'); await page.waitForTimeout(400);
-  check(/\$850 of \$1,000/.test(await page.locator("#ctx .sub").textContent()), "taking some out uses the amount box (no pop-up)");
-  await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Rain on any day of the year (light showers outside the wet season), and everyone in their own rain gear
   console.log("\nrainy days");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2497,8 +1839,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => document.getElementById("rain").hidden) && await page.locator("#melRain .brolly, #actors .brolly").count() === 0, "and on a dry day the brollies are put away");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Fishing: a rod, worms from real-life quests, cast, wait for the bite, reel in the green; a journal of catches
   console.log("\nfishing");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2529,8 +1871,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/slipped away/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 0), "wait too long after the bite and it slips away");
   check(await page.locator('#ctx [data-fish="cast"]').isDisabled() && /Finish a quest/.test(await page.locator("#ctx").textContent()), "no worms left: finish a quest to dig up another");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Round 101: goat's milk in the press, farm cheeses and honey in the kitchen, the chef's request, more tapas
   console.log("\nmore uses, more tapas");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2554,8 +1896,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#ctx [data-k="dish"][data-dish="shortbread"]').click(); await page.waitForTimeout(300);
   check(await fox().then(f => f.vine.menu.shortbread === 4 && !f.kitchen.larder.tulip), "garden tulips go into flower shortbread");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Phase 4, the rest: sunflower seeds for the hens, petal syrup, bouquet orders, Ma Ma's tomato and egg at dinner
   console.log("\nflowers, eggs and Ma Ma's tomato and egg");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -2594,8 +1936,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-spot="dine"]').dispatchEvent("click"); await page.waitForTimeout(1500);
   check(await fox().then(f => !f.inv.tomato && (f.inv.egg || 0) === eggs0), "at family dinner, two tomatoes and two eggs become Ma Ma's tomato and egg");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Round 103: Honeybrook Woods (the waterfall, the ranger, foraging, the pool), hire bikes, the river taxi, and
   // villagers out and about on the new screens (on bikes, fishing, at the farm and in the cottages)
   console.log("\nHoneybrook Woods, bikes and the river taxi");
@@ -2644,8 +1986,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("honeysuckle")); await page.waitForTimeout(2000);
   check(await ids().then(a => a.includes("mateo") && a.includes("lila")), "Mateo and Lila are home in Honeysuckle in the evening");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Round 104: backstories told a chapter at a time in the bubbles (on days with a quest done), with rewards; and
   // Mel's family at the night market and the fair
   console.log("\nstories and the family out at the fairs");
@@ -2683,8 +2025,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);
   check(await ids().then(a => ["mum", "dad", "mama", "gonggong"].every(x => a.includes(x))), "the field fair: Mum, Dad, Ma Ma and Gong Gong are there in the morning");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   // Round 105: reopening the game the same day picks up where Mel left off; tulip bulbs on sale in autumn
   console.log("\npicking up where you left off");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, resume: true });
@@ -2702,8 +2044,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-shop="seeds"]'); await page.waitForTimeout(300);
   check(await page.locator('#ctx .item[data-id="tulip_seed"]').count() === 1 && await page.locator('#ctx .item[data-id="sunflower_seed"]').count() === 1, "in autumn the seed shelf has tulip bulbs and sunflower seeds");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\na day trip to Kyoto");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), K = tw.TOWNS.kyoto;
   { const own = [...readFileSync(join(root, "src/data/world.js"), "utf8").matchAll(/^  ([a-zA-Z_]+):\s*\{scene:/gm)].map(m => m[1]);
@@ -2781,9 +2123,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /Honeybrook station/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(await fox().then(f => f.trip.done), "and the train home from Kyoto");
   await page.close();
-}
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 
-{
+try {
   console.log("\na day trip to Ronda");
   // who's away: tours, Ma Ma's stall, Mum's class and the family dinner all work round them
   { const t = await import(new URL("../src/game/tours.js", import.meta.url)), sun = "2026-10-11", tue = "2026-10-13", wed = "2026-10-14";
@@ -2923,8 +2265,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-tickets]'); await page.waitForTimeout(400);
   check(await page.locator("#ctx [data-trip]").count() === 0 && /last train to Ronda gone/.test(await page.locator("#ctx").innerText()), "after 6pm there are no more trains out to Ronda");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nJeju, by ferry and by train");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), J = tw.TOWNS.jeju;
   check(J.screens.length === 4 && J.screens.every(sc => tw.townOf(sc) === "jeju" && sc.startsWith("jj_")) && J.arrive[0] === "jj_village" && J.arrive[0] !== J.screens[0] && J.ferry.arrive[0] === "jj_harbour",
@@ -2964,8 +2306,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="wishtower"]').dispatchEvent("click"); await page.waitForTimeout(800);
   check(w1 === 4 && await fox().then(f => f.wish.n === 4), "the wish-tower by the river in the woods: one stone a day, and it grows");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nJeju's rooms, people and things to do");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), J = tw.TOWNS.jeju;
   const jj = await import(new URL("../src/game/jeju.js", import.meta.url)), orch = await import(new URL("../src/data/orchard.js", import.meta.url));
@@ -3045,8 +2387,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-rdspot="dyecloth"]').dispatchEvent("click"); await page.waitForTimeout(3500);
   check(await fox().then(f => f.inv.j_scarf === 1 && !f.jeju.dye), "three days later, the scarf's a deep rust on the washing line at home, and it's a keepsake now");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nCinque Terre: the five villages (well, four)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), C = tw.TOWNS.cinque;
   check(C.screens.length === 4 && C.screens.every(sc => tw.townOf(sc) === "cinque" && sc.startsWith("ct_")) && C.arrive[0] === "ct_corniglia" && C.arrive[0] !== C.screens[0] && tw.TOWN_PLACES[C.station].scene === "ct_corniglia",
@@ -3095,8 +2437,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     ["2026-10-13", "2026-10-14", "2026-10-15"].forEach(d => st.tellStory(F, "jason", add, d));
     check(first && /2015/.test(first.lines.join(" ")) && !again && F.inv.s_poem === 1 && F.story.heard.jason === 4, "Jason tells his stories a chapter a day whenever Mel visits (even after two others that day), and the fourth is a poem for her to keep"); }
   check(cp.KEEP_SPOTS.fridge3 && cp.KEEP_SPOTS.fridge3.only === "magnet" && tw.TOWN_GOODS.c_magnet.magnet && ["c_boat", "c_plate", "c_mortar"].every(k => tw.TOWN_GOODS[k].kind === "keepsake"), "keepsakes (the boat model, the lemon plate, the mortar) and a third magnet spot on the fridge");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nCinque Terre, by train");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`cinque pageerror: ${e.message}`));
@@ -3164,8 +2506,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-loft]'); await page.waitForSelector('#ctx [data-lf="start:rack"]', { timeout: 15000 });
   check(/drying loft/i.test(await page.locator("#ctx h2").textContent()) && await page.locator('#ctx [data-lf="start:rack"]').isDisabled(), "up the ladder in the barrel shed: the drying loft (three bunches isn't enough for the racks yet)");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nthe kite and the farm brush (round 130 fixes)");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`kite pageerror: ${e.message}`));
@@ -3194,8 +2536,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   for (const id of ["chz_cheddar", "chz_brie_ex", "honey_lav"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(300); }
   check(await fox().then(f => f.coins === c0 + 17 + 21 + 10 && !f.inv.chz_cheddar), "your own cheese and honey sell at the market, tiered by how long they ripen: cheddar (4 days) 17, an excellent brie (3 days) 21, lavender honey 10");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nthe ice cream trolley, and the delivery bike's orders");
   { const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), g = await import(new URL("../src/game/goals.js", import.meta.url)), F = {coins: 0}, s = sc.scoopState(F);
     s.recipes = ["a", "b", "c", "d"].map(id => ({id, ings: [], name: id.toUpperCase() + " Gelato", col: "#FFF"})); s.tubs = {a: 20, b: 5, c: 20, d: 20};
@@ -3235,8 +2577,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const rode = await page.locator("#actors .rideby .bikeArt").count(); await page.waitForTimeout(7000);
   check(rode === 1 && await page.locator("#actors .rideby").count() === 0, "an order goes out while Mel's in the square: Tomo pedals past on the mint bike with the cool box, and is gone");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nthe bike takes bonbons and tapas too, and every shop says its takings at closing");
   { const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), d = "2026-10-12";
     const c = cc.cocoaState({}); c.sold[d] = {n: 3, coins: 40, bonbons: 6, deliv: 2}; const early = cc.cocoaNews(c, d, 19*60), eve = cc.cocoaNews(c, d, 20*60 + 5), again = cc.cocoaNews(c, d, 21*60);
@@ -3256,8 +2598,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-gvother="bar:milk"]'); await page.waitForSelector('#ctx [data-gvto="mum"]', { timeout: 15000 }); await page.click('#ctx [data-gvto="mum"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.cocoa.bars.milk === 2 && f.thanks.some(t => t.who === "mum" && t.item === "bar_milk")), "from the delivery bike: a milk chocolate bar off the Cocoa Room's wall, pedalled round to Mum (a thank-you note to come)");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nSaturday disco night at the cellar door");
   { const t = await import(new URL("../src/game/tours.js", import.meta.url)), sat = "2026-10-10", fri = "2026-10-09", crowd = t.discoCrowd(sat);
     check(t.discoNow(sat, 21*60) && !t.discoNow(sat, 19*60) && !t.discoNow(fri, 21*60) && !t.discoNow(sat, 23*60 + 40), "disco night is Saturdays, 8 to 11:30pm");
@@ -3282,8 +2624,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1500);
   check(await page.locator("#sceneArt .disco").count() === 0, "before 8 the cellar's its usual calm self");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nPilar's list, keeping things back, and more tapas");
   const k = await import(new URL("../src/game/kitchen.js", import.meta.url)), day = "2026-10-14", F = {coins: 0, inv: {}};
   const kk = k.kitchenState(F); Object.assign(kk.larder, {tulip: 2, flour: 3, potato: 4, egg: 4, tomato: 4, loaf: 2});
@@ -3302,8 +2644,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     k.cookTick(G, day); const held = !(G.vine.menu || {}).honeycake && gk.larder.honey === 1;
     gk.fresh.honey.until = Date.now() - 1; k.cookTick(G, day);
     check(held && G.vine.menu.honeycake === 4, "honey just brought in waits 15 minutes before Pilar can bake it into honey cake (time to set keep)"); }
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nthe greenhouse, herbs and gambas");
   { const g = await import(new URL("../src/game/greenhouse.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), k = await import(new URL("../src/game/kitchen.js", import.meta.url)), fi = await import(new URL("../src/game/fishing.js", import.meta.url));
     const F = {inv: {garlic_seed: 1, basil_seed: 1, gh_strawberry_seed: 1}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; if (F.inv[id] <= 0) delete F.inv[id]; };
@@ -3350,8 +2692,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.plots[1] && f.plots[1].crop === "tomato" && !f.inv.tomato_seed; }), "with the auto seeder, one tap sows every empty plot it has seeds for");
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.coins <= 100 && f.goals && f.goals.greenhouse; }), "the greenhouse cost 400 coins");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nthe old mill and the olive grove");
   { const tw = await import(new URL("../src/data/towns.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ml = await import(new URL("../src/game/mill.js", import.meta.url));
     check(tw.TOWN_GOODS.oliveoil.sell > ml.JARS_PER_BOTTLE*it.ITEMS.olives.sell && tw.TOWN_GOODS.oliveoil.price > tw.TOWN_GOODS.oliveoil.sell, "a bottle of oil sells for more than the three jars of olives it takes (and Rafael's costs more than it sells for)");
@@ -3390,8 +2732,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-mill="press"][data-n="2"]'); await page.waitForTimeout(800);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.mill && f.mill.press && f.mill.press.n === 2 && f.inv.olives === 1 && f.goals.mill; }), "seven jars of olives: two bottles' worth goes under the millstone");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nFriday evenings: aperitivo, the bonfire, Sal's van, kites");
   const t = await import(new URL("../src/game/tours.js", import.meta.url)), fr = await import(new URL("../src/game/friday.js", import.meta.url));
   const fri = "2026-10-16", thu = "2026-10-15";
@@ -3437,8 +2779,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="screen"]').count() === 1 && await page.locator('#actors .npc[data-npc="mum"]').count() === 1, "the last Friday: movie night on the field, Mum on a blanket");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nBellbird Valley: the Vines (rounds 141-144)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
   const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), ba = await import(new URL("../src/game/bbacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
@@ -3504,8 +2846,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("bv_opshop")); await page.waitForTimeout(6000);
   check(await page.locator('#actors .npc[data-npc="mama"].act-rummage').count() === 1, "Ma Ma rummaging in the op shop");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe Coast Road (rounds 148-150)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
   const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), ca = await import(new URL("../src/game/cracts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
@@ -3562,8 +2904,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("cw_beach")); await page.waitForTimeout(2500);
   check(await page.locator("#sceneArt .zzz").count() === 1 && !(await page.locator("#evan").isVisible()) && /tuck him into the back of the van/.test(await page.locator("#speech").textContent()), "after eight, Evan's tucked up asleep in the van");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe Tablelands (rounds 157-160)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
   const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), ta = await import(new URL("../src/game/tlacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
@@ -3632,8 +2974,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-rbuy="b_rosella"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.b_rosella === 1 && f.coins === 294), "the Range Café: a jar of rosella jam to take home");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe Lavender Hills (rounds 161-164)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), bb = await import(new URL("../src/game/bellbird.js", import.meta.url));
   const br = await import(new URL("../src/game/bbrooms.js", import.meta.url)), la = await import(new URL("../src/game/lvacts.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
@@ -3694,8 +3036,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-bba="lv:cutdone"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.bq_lavender === 2 && f.bellbird.lv.cut === "2026-10-12"), "the lavender harvest with Émile, two bunches to take home");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe terrace and the Sunday long lunch (round 146)");
   const lu = await import(new URL("../src/game/lunch.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
   const sun = "2026-10-11", ids = new Set(np.NPCS.map(n => n.id)), bk = lu.bookingsFor(sun), seats = lu.seatsTaken(bk);
@@ -3735,8 +3077,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="terrace"]').dispatchEvent("click"); await page.waitForFunction(() => /terrace/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }).catch(() => {});
   check(/terrace/i.test(await page.locator("#sceneName").textContent()), "and back up by tapping the little terrace");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nMulled wine, and the mill workshop and shop (round 153)");
   const ml = await import(new URL("../src/game/mulled.js", import.meta.url)), mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   const go = await import(new URL("../src/game/goals.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), tw = await import(new URL("../src/data/towns.js", import.meta.url));
@@ -3819,8 +3161,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-goal="millshop"]'); await page.waitForTimeout(600);
   check(await fox().then(f => f.goals.millshop && f.coins === 800), "the Mill Shop opens upstairs (1200)");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe terrace's week: weddings, trivia, sip and paint, and the special days (round 152)");
   const oc = await import(new URL("../src/game/occasions.js", import.meta.url)), lu = await import(new URL("../src/game/lunch.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
   const np = await import(new URL("../src/data/npcs.js", import.meta.url)), tp = await import(new URL("../src/data/terrace-people.js", import.meta.url)), ids = new Set(np.NPCS.map(n => n.id));
@@ -3865,8 +3207,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-lbtab="coming"]'); await page.waitForTimeout(300);
   check(/wedding of/i.test(await page.locator("#ctx").textContent()), "the bookings book's Coming up page shows the weddings booked in");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nStorage at home: the fridge and the garage shelf (round 166)");
   const sg = await import(new URL("../src/game/storage.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   check(sg.placeFor("raspberry") === "fridge" && sg.placeFor("flour") === "fridge" && sg.placeFor("balloon") === "shelf" && sg.placeFor("tulip_seed") === "shelf" && !Object.keys(it.ITEMS).some(id => ["tool", "pet"].includes(it.ITEMS[id].kind) && sg.placeFor(id)), "food and flowers go in the fridge; everything else on the garage shelf; tools and pets stay out");
@@ -3919,8 +3261,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click('#ctx [data-st="put"][data-id="balloon"]'); await page.waitForTimeout(300);
   check(await fox().then(f => !f.inv.balloon && f.storage.shelf.balloon === 1), "the garage shelf takes the rest");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe Christmas market and hampers (rounds 172-174)");
   const tr = await import(new URL("../src/game/tours.js", import.meta.url)), xm = await import(new URL("../src/game/xmas.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url));
   check(tr.xmasOn("2026-11-20") && tr.xmasOn("2026-12-24") && !tr.xmasOn("2026-11-19") && !tr.xmasOn("2026-12-25"), "the Christmas market's season: 20 November to Christmas Eve");
@@ -3978,8 +3320,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-spot="hampers"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-xh="start:small"]', { timeout: 20000 }).catch(() => {});
   check(await page.locator('#ctx [data-xh="start:big"]').count() === 1, "Penny's hamper table at the post office, in the season");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nBonbon moulds (round 176)");
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 200, goals: {cocoa: 1}}, c = cc.cocoaState(F); c.choc.dark = 50; c.pantry.honey = 4; c.pantry.raspberry = 2;
   check(cc.mouldsOwned(c).join() === "dome" && cc.buyCcUp(F, "m_heart") && F.coins === 140 && cc.mouldsOwned(c).includes("heart"), "the dome to start; heart moulds from the shop upgrades");
@@ -3988,8 +3330,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(!cc.makeBonbons(F, "dark", ["raspberry"], "star").r.shape, "no star moulds yet, so a dome");
   check(cc.makeBonbons(F, "dark", ["honey"], "dome").r.name === b.r.base, "back in the dome, back to its old name");
   check(/data-cc="bshape"/.test(cc.bonbonPanel(F, {})), "the moulds are on the bonbon table");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe gift shop (round 178)");
   const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), go = await import(new URL("../src/game/goals.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url));
   check(go.GOALS.giftshop && go.GOALS.giftshop.price === 800 && np.NPCS.some(n => n.id === "posy" && n.routine.some(r => r.scene === "giftshop" && r.needs === "giftshop")), "the gift shop (800 coins), with Posy at the till");
@@ -4001,8 +3343,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(coins > 0 && F.giftshop.sold["2026-10-14"].n >= 1 && (c.trays.b1 < 2 || c.bars.dark < 1 || !store.mc_x || v.shelf[0].n < 1), "it sells from the same stock: the Cocoa Room's trays and bars, the mill's shelves, the wine shop's bottles");
   check(gs.giftSellMinute(F, "2026-10-14", 11*60, null, o) === 0, "shut, it sells nothing");
   check(/shared stock/.test(gs.giftPanel(F, "gtill", {...o, day: "2026-10-14", hm: 11*60, keeper: true})) && /Dark Honey Heart|Nothing in the Cocoa Room/.test(gs.giftPanel(F, "gcase", {...o, day: "2026-10-14"})), "the till and the bonbon case panels");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nPairing boxes in the gift shop (round 179)");
   const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url));
   const F = {goals: {cocoa: 1, vineyard: 1}, inv: {}, vine: {shelf: [{id: "w", name: "Red", type: "red", n: 3, price: 18}]}}, c = cc.cocoaState(F);
@@ -4015,8 +3357,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(gs.pairSeason("2026-02-10") && gs.pairSeason("2026-12-20") && !gs.pairSeason("2026-10-14"), "busier before Valentine's, Mother's Day and Christmas");
   const real = Math.random; Math.random = () => .01; const got = gs.giftSellMinute(F, "2026-10-14", 11*60, "keeper", o); Math.random = real;
   check(got === 18 + 4*c.prices.bonbon && !F.giftshop.pairs.length && F.giftshop.sold["2026-10-14"].pair === 1 && /pairing boxes/.test(gs.giftPanel(F, "gtill", {...o, hm: 11*60})), "it sells as a box, for no more than its parts");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nShoppers you can see (round 181)");
   const br = await import(new URL("../src/game/browse.js", import.meta.url)), pool = ["a", "b", "c", "d", "e", "f"], day = "2026-10-13";
   const vs = br.browseVisits("cocoa", day, 11*60, 20*60, pool);
@@ -4025,8 +3367,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(at(0).scene === "cocoa" && at(3).at && at(8).at && at(11).at === br.BROWSE.cocoa.till[0] && at(13).act === "shopbag", "in the door, at the case, at the shelf, at the counter, out with a paper bag");
   check(!br.browseSlot(id, day, v.from + 13, {...o, stock: false}).act && br.browseSlot(id, day, v.from + 11, {...o, stock: false}).at === br.BROWSE.cocoa.door, "bare shelves: they look and leave empty-handed");
   check(!br.browseSlot(id, day, v.from + 3, {...o, open: false}) && !at(20), "nobody when it's shut, or between visits");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe Cocoa Room's vending machine (round 182)");
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 500, goals: {cocoa: 1}}, c = cc.cocoaState(F);
   c.bars.dark = 10; c.plan.on = false; check(cc.buyCcUp(F, "vending") && F.coins === 100, "the vending machine, 400 coins from the catalogue");
@@ -4036,8 +3378,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const box = c.vend; check(cc.emptyVending(F) === box && F.coins === 100 + box && !c.vend, "empty it at the counter");
   const late = Date.parse("2026-10-12T15:30:00Z"); c.at = late - 20*60e3; globalThis.__mapleOffset = late - Date.now(); Math.random = () => .005; const b0 = c.bars.dark; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
   check(c.bars.dark === b0, "nothing after 11 at night");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe paperie in Montrose (round 183)");
   const pp = await import(new URL("../src/game/paperie.js", import.meta.url)), go = await import(new URL("../src/game/goals.js", import.meta.url)), ic = await import(new URL("../src/art/paper-icons.js", import.meta.url));
   const it = await import(new URL("../src/data/items.js", import.meta.url));
@@ -4077,8 +3419,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const f2 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   check(f2.paperie.soak && f2.paperie.scraps === 2 && /2\. Soak/.test(await page.locator("#ctx .ppstep.now").textContent()), "tear two bundles into the tub: the steps along the top move on to Soak");
   await page.close();
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nHampers for Valentine's and Mother's Day (round 184)");
   const xm = await import(new URL("../src/game/xmas.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url));
   check(xm.hamperSeason("2027-02-10") === "valentine" && xm.hamperSeason("2027-05-09") === "mothers" && xm.mothersDay(2027) === 9 && !xm.hamperSeason("2027-05-10") && xm.hamperSeason("2026-12-01") === "xmas" && !xm.hamperSeason("2026-10-12"),
@@ -4094,8 +3436,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const pk = {kind: "box", size: 4, sel: {}};
   check(cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && !cc.pickAdd(G, pk, "b", 1) && cc.packBox(G, 4, pk.sel) === "box4d" && c.trays.a === 2 && c.trays.b === 6, "choose four dark ones: exactly those come out of the case");
   check(cc.packBox(G, 4, {a: 1}) === null && c.trays.a === 2, "a choice that doesn't add up packs nothing");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nWrapping with handmade paper (paperie round 2, round 185)");
   const wr = await import(new URL("../src/game/wrap.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ic = await import(new URL("../src/art/paper-icons.js", import.meta.url));
   const F = {coins: 100, inv: {pairbox: 1, pp_blush_lavender: 1, pp_sage_seeds: 1}, goals: {paperie: 1, giftshop: 1}};
@@ -4114,8 +3456,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(gs.putWrapped(F, "wr_1") && !F.inv.wr_1 && F.giftshop.wrapped[0] === "wr_1", "out on the gift shop's wrapping table");
   const rnd = Math.random; Math.random = () => .01; const got = gs.giftSellMinute(F, "2026-10-14", 11*60, "keeper", {cocoa: null, onDisplay: () => [], store: {}, v: {shelf: []}}); Math.random = rnd;
   check(got === W.price && !F.giftshop.wrapped.length && F.giftshop.sold["2026-10-14"].wrap === 1, "and it sells as wrapped, at its own price");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe paperie, round 3: Lise, the card class, the seasons, seeds that grow (round 186)");
   const pp = await import(new URL("../src/game/paperie.js", import.meta.url)), go = await import(new URL("../src/game/goals.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), wr = await import(new URL("../src/game/wrap.js", import.meta.url)), np = await import(new URL("../src/data/lv-people.js", import.meta.url));
   check(go.GOALS.paperkeeper && go.GOALS.paperkeeper.needs === "paperie" && np.LV_PEOPLE.some(n => n.id === "lvlise" && n.routine[0].scene === "bv_hpaper" && n.routine[0].needs === "paperkeeper"), "Lise keeps the paperie (600 coins, once it's yours)");
@@ -4130,8 +3472,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(it.CROPS.wildflower && it.ITEMS.pp_sage_seeds.plantable && it.ITEMS.pp_sage_seeds.crop === "wildflower" && it.ITEMS.tag_seeded.plantable && it.ITEMS.wildflower.kind === "flower", "seeded paper and seeded tags plant in the garden and come up as wildflowers");
   const G = {coins: 100, inv: {box4: 1, pp_blush_none: 1, tag_seeded: 1}, goals: {paperie: 1}}, id = wr.wrapIt(G, {item: "box4", paper: "pp_blush_none", tag: "seeded"}), t0 = Date.now();
   check(pp.bloomFor(G, id, "mum", t0) && !pp.bloomMail(G, t0 + 864e5).length && pp.bloomMail(G, t0 + 2*864e5 + 1).length === 1 && /front step/.test(pp.bloomMail(G, t0 + 3*864e5)[0].body), "a gift with a seeded tag: two days later Mum writes about the flowers by her front step");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nLip balms and lip oils, dyed with Mel's flowers (round 187)");
   const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), tw = await import(new URL("../src/data/towns.js", import.meta.url)), li = await import(new URL("../src/art/lip-icons.js", import.meta.url));
   const F = {coins: 50, goals: {mill: 1}, inv: {honeycomb: 1, oliveoil: 3, honey: 2, mint: 1, tulip: 1}, orch: {stock: {"stem:dahlia": 2}}};
@@ -4146,8 +3488,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(o.recipe && o.recipe.name === "Tulip-tinted mint lip oil" && !F.inv.tulip && F.craft.lipoil.length === 1 && it.ITEMS[mc.itemId(o.recipe)].ico === "lipoil_tulip", "a Tulip-tinted mint lip oil, steeping in the rollers");
   const done = mc.craftDone(F, Date.now() + 2*864e5);
   check(F.craft.store[mc.itemId(b.recipe)] === 4 && F.craft.store[mc.itemId(o.recipe)] === 3 && !F.craft.balm && !F.craft.lipoil.length && done.length === 2, "four tins and three bottles onto the mill's shelves");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nTake from the gift shop, and shop-bought wrapping paper (round 188)");
   const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), wr = await import(new URL("../src/game/wrap.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), ic = await import(new URL("../src/art/paper-icons.js", import.meta.url));
   const F = {coins: 20, inv: {}, goals: {giftshop: 1}}, v = {shelf: [{id: "w1", name: "Merlot-ish", type: "red", n: 2, price: 18}]};
@@ -4158,8 +3500,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(["gw_kraft", "gw_gold", "gw_red", "gw_green", "wrp_gold_none_none_none_none", "wrp_kraft_none_star_twine_plain"].every(n => ic.wrapIcon(n)), "each paper has its drawing, wrapped or not");
   const id = wr.wrapIt(F, {item: "wb_w1", paper: "gw_gold", tag: "plain"});
   check(id && !F.inv.gw_gold && it.ITEMS[id].price === 18 + 1 + 1 && /gold paper/.test(it.ITEMS[id].n) && it.ITEMS[id].ico === "wrp_gold_none_none_none_plain", "a bottle wrapped in gold paper with a tag: a coin or two more (handmade paper's worth more)");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nPairing boxes packed in the gift shop's wine corner, Tempranillo too (round 189)");
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url));
   const F = {coins: 0, inv: {}, goals: {giftshop: 1, cocoa: 1}, cocoa: {bars: {}, trays: {a: 6}, bonbons: [{id: "a", shell: "dark", fills: ["honey"], name: "Dark Honey Heart"}], display: ["a"]},
@@ -4169,8 +3511,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(cc.pickAdd(F, pk, "a", 1) && cc.pickFill(F, pk) && pk.sel.a === 4, "four bonbons chosen in the wine corner");
   const w = cc.packPairing(F, pk.k, pk.sel), k = gs.putOutPairs(F, c, 1);
   check(w === "Ronda Red" && k === 1 && !F.inv.pairbox && gs.giftState(F).pairs[0] === 28 + 4*c.prices.bonbon && F.vine.shelf[0].n === 1 && c.trays.a === 2, "packed and straight out on the display, at the bottle plus four bonbons");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe address book: post gifts and letters to people met on trips (round 190)");
   await import(new URL("../src/game/ronda.js", import.meta.url)); const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   const T = Date.UTC(2026, 9, 14, 3), D = 864e5;
@@ -4195,16 +3537,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(abroad.every(p => bk.PEN[p.id]), "round 192: and everyone in Ronda, Kyoto, Jeju and Cinque Terre too (" + abroad.length + ")");
   const J = {coins: 20, inv: {box4: 1}, met: {jason: true}}; bk.addContact(J, "jason", "d"); const je = bk.postTo(J, "jason", {item: "box4"}, T), jb = bk.replyBody(je);
   check(!je.err && je.at === T + 3*D && /^My dear Mel,/.test(jb) && jb.includes("yellow house by the harbour") && /\nP\.S\. /.test(jb) && jb.split("\n\n").length >= 6 && /;/.test(jb), "Jason writes back at length, semicolons and all, with a P.S.");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nEvery two-filling bonbon has a name (round 194: mint and pear crashed the bonbon table)");
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url));
   const ids = Object.keys(sc.INGR).filter(cc.isFilling); let bad = [];
   for (const sh of ["dark", "milk", "white"]) for (const a of ids) for (const b of ids) if (a < b) { try { const n = cc.bonbonName(sh, [a, b]); if (!n || /undefined/.test(n)) bad.push(sh + ":" + a + "+" + b); } catch (e) { bad.push(sh + ":" + a + "+" + b + " " + e.message); } }
   check(!bad.length, "named every pairing of " + ids.length + " fillings in all three shells" + (bad.length ? ": " + bad.slice(0, 3).join(", ") : ""));
   check(/\S/.test(cc.bonbonName("white", ["mint", "pear"])), "white chocolate, mint and pear: " + cc.bonbonName("white", ["mint", "pear"]));
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe gift shop's gallery wall and makers' shelf (round 196)");
   await import(new URL("../src/game/ronda.js", import.meta.url));   // (Mel's sip-and-paint paintings join ITEMS here)
   const gal = await import(new URL("../src/game/gallery.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
@@ -4224,8 +3566,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), ms = new Set(Object.values(gal.PAINTERS).flatMap(p => p.works.map(w => w[4])));
   check(ms.size === Object.values(gal.PAINTERS).reduce((a, p) => a + p.works.length, 0) && [...ms].every(m => gal.paintSVG(0, 0, 38, 48, {m, c1: "#000", c2: "#fff"}).length > 80), "round 197: every painting has its own picture (" + ms.size + ")");
   check(it.ITEMS.p_view.to === "family" && it.ITEMS.p_view.kind === "keepsake" && bk.postable(it.ITEMS.p_view), "and Mel's own paintings can be given, or posted to a friend");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nFrom our travels: friends send boxes for the gift shop (round 198)");
   await import(new URL("../src/game/ronda.js", import.meta.url));
   const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), gal = await import(new URL("../src/game/gallery.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
@@ -4248,8 +3590,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(bk.stopLine(F, who) && !bk.lines(F).length && !bk.offersOpen(F, T + 40*D).length, "and Mel can stop the boxes whenever she likes");
   const G2 = {coins: 0, met: {}, goals: {}}; G2.met[who] = true; bk.addContact(G2, who, "d"); [0, 1, 2].forEach(k => bk.postTo(G2, who, {open: "Hi"}, T + k));
   check(!bk.offersOpen(G2, T + 9*D).length, "no offers before there's a gift shop to send to");
-}
-{
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+try {
   console.log("\nThe gift basket beside the wrapping table (round 202)");
   const gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), wr = await import(new URL("../src/game/wrap.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   const F = {coins: 20, inv: {box4: 2, gw_red: 1}, goals: {giftshop: 1}}, id = wr.wrapIt(F, {item: "box4", paper: "gw_red"});
@@ -4258,7 +3600,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(gs.putWrapped(F, id) && !F.inv[id] && /data-gs="wback:0"/.test(gs.giftPanel(F, "gbasket", {F, day: "2026-10-14"})), "in it goes, and it's listed in the basket");
   check(gs.takeWrapped(F, 0) === id && F.inv[id] === 1 && !gs.giftState(F).wrapped.length, "and it can come back out");
   check(!/Put out:/.test(wr.wrapPanel(F, {}, {where: "giftshop", table: []})), "the wrapping table just points to the basket now");
-}
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

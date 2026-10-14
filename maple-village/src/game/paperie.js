@@ -16,7 +16,7 @@
 // State: F.paperie = {scraps, scrapDay, soak: {done}, soaked, pulp: {col, add}, wet: {col, add, n}, press: {col, add,
 // n, done}, line: [{col, add, n, done}], stock: {id: n}, sold: {day: {n, coins}}, at, made}
 import { ITEMS, CROPS } from "../data/items.js";
-import { esc } from "../util.js";
+import { esc, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
 
 export const COLOURS = {
@@ -104,7 +104,7 @@ export function paperTick(F, here, t = now()){
   const p = paperState(F), out = {n: 0, coins: 0, wage: 0, cls: 0, down: 0}, kept = keeperHired(F);
   if (!p.at || (!here && !kept)) { p.at = t; return out; }
   for (let at = Math.max(p.at, t - 2*864e5) + M; at <= t; at += M) {
-    const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
+    const sg = new Date(at + LOC()), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     const lise = kept && keeperIn(day, hm), open = here || lise, s = () => (p.sold[day] = p.sold[day] || {n: 0, coins: 0});
     if (lise && p.wageDay !== day) { p.wageDay = day; F.coins -= WAGE; s().wage = WAGE; out.wage += WAGE; }
     if (lise) { const d = takeDown(F, at); if (d) out.down += d; }

@@ -9,7 +9,7 @@
 // lavender or orchard blossom, turn and turn about); milk becomes yoghurt in the crocks straight away; and the cheese
 // press makes a named wheel (suggested names, like the wines) that ages on a shelf in the cave (6 shelves): fresh goat's
 // cheese in a day, farmhouse cheddar in four, Honeybrook blue in six. A ripe wheel is cut into wedges for the backpack.
-import { esc, dayKey, sgHM, hash } from "../util.js";
+import { esc, dayKey, sgHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
 import { stormyOn } from "../art/village-extras.js";
@@ -207,7 +207,7 @@ export function stockShelf(F, id, n){ const h = hfState(F), inv = F.inv || {}; i
 export function hfTick(F){
   const h = hfState(F), t = clock(), from = Math.max(h.at || t, t - DAY), out = {coins: 0, n: 0, swarms: swarmCheck(F)};
   for (let at = from + 60000; at <= t; at += 60000) {
-    const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
+    const sg = new Date(at + LOC()), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     if (hm < 8*60 || hm >= 18*60) continue; const ids = Object.keys(h.shelf).filter(k => h.shelf[k] > 0); if (!ids.length || Math.random() >= .02) continue;
     const id = ids[Math.floor(Math.random()*ids.length)], p = shelfPrice(id); h.shelf[id]--; if (!h.shelf[id]) delete h.shelf[id];
     const s = h.sold[day] = h.sold[day] || {n: 0, coins: 0}; s.n++; s.coins += p; out.coins += p; out.n++;

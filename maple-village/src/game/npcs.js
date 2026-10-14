@@ -1,10 +1,10 @@
-// NPC engine: places villagers by their Singapore-time routine, walks them about, handles taps and daily reactions,
+// NPC engine: places villagers by their daily routine (local time), walks them about, handles taps and daily reactions,
 // and runs agent messengers who carry unread mail to Mel. Core owns the frame loop and calls tickNpcs / tapNpc.
 import { NPCS, AGENTS } from "../data/npcs.js";
 import { personArt, letterArt, rainGearFor } from "../art/people.js";
 import { rainyOn } from "../art/village-extras.js";
 import { OUTDOOR } from "../data/world.js";
-import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
+import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey, LOC } from "../util.js";
 import { lunchSlot } from "./lunch.js";
 import { occasionSlot } from "./occasions.js";
 import { toursOn, visitsOn, eventOn, keepersOn, TOURISTS, NIGHT_TOURISTS } from "./tours.js";
@@ -27,8 +27,8 @@ let sayer = null, sayT = null;
 const greeted = new Set();  // messengers say hello once, then just tag along quietly
 
 export function initNpcs(a){ api = a; }
-const weekend = () => [0, 6].includes(new Date(now() + 8*H).getUTCDay());
-const dowNow = () => new Date(now() + 8*H).getUTCDay();
+const weekend = () => [0, 6].includes(new Date(now() + LOC()).getUTCDay());
+const dowNow = () => new Date(now() + LOC()).getUTCDay();
 // Orchard tours and drop-in visits (tours.js) win over the usual routine while they're on
 // A family paddle (Mel at the paddleboard rack): any of the family who are on the foreshore come out on boards too
 const SUP_FAMILY = ["mum", "dad", "marcus", "angelina"];
@@ -37,7 +37,7 @@ function supSlot(def){
   const base = routineNow(def); if (!base || base.scene !== "shore") return null;
   return {from: sup.from, to: sup.from + 999, scene: "shore", wander: SEA, act: "sup", free: true, glide: true};
 }
-// Where someone is on a given day at a given time (Singapore minutes): the special happenings first (a family paddle,
+// Where someone is on a given day at a given time (local minutes): the special happenings first (a family paddle,
 // dinner, the market, a tour, Mum's class, visits, tastings), then their own routine. slotNow is right now.
 const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
 const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw === 6, owned = Object.assign({}, (api && api.F().fam && api.F().fam.owned) || {}, (api && api.F().goals) || {}, ...Object.keys((api && api.F().cocoa && api.F().cocoa.up) || {}).map(k => ({["cc_" + k]: 1})));   // things bought for the family, big goals, Cocoa Room upgrades (cc_<k>)
@@ -74,6 +74,8 @@ const slotNow = def => { const sup = api && api.sup && api.sup(), k = `${dayKey(
   if (k !== slotKey) { slotCache = {}; slotKey = k; }
   return def.id in slotCache ? slotCache[def.id] : (slotCache[def.id] = slotAt(def, dayKey(), sgHM(), true)); };
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
+// where they are right now, with a point to walk to (their own spot, or the first stop of their stroll), or null
+export const whereAt = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); if (!s) return null; const e = ents[id], p = e ? [e.x, e.y] : s.at || (s.wander || [])[0]; return p ? {scene: s.scene, x: p[0], y: p[1]} : null; };
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
 export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
 const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: "rod", guitar: "guitar", sketch: "sketchbook", photo: "camera", notes: "notebook", doze: "newspaper",
