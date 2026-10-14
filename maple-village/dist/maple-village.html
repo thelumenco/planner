@@ -5806,6 +5806,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       const fn = S3[g10.art[0]] || S3.box;
       I[id] = fn(g10.art[1], g10.art[2]);
     });
+    [["mk_cards", "tile", "#FFFDF6", "#F4C7CF"], ["mk_spoon", "disc", "#C9A27E", "#8A5A3A"], ["mk_pettoy", "tile", "#C3CDEE", "#F4C7CF"], ["mk_bird", "bird", "#C9A27E"], ["mk_honeybutter", "jar", "#F3D98A", "#FFFDF6"], ["mk_wraps", "cloth", "#F6E3A1", "#9EBE8C"]].forEach(([id, sh, a, b]) => {
+      if (!I[id]) I[id] = (S3[sh] || S3.box)(a, b);
+    });
     [["w_raisin", "bottle", "#C98A2E", "#5A3A2E"], ["limoncino", "bottle", "#F3D34A", "#FFFDF6"], ["anchovy_salt", "jar", "#9FC3D9", "#F3ECDD"]].forEach(([id, sh, a, b]) => {
       if (!I[id]) I[id] = (S3[sh] || S3.box)(a, b);
     });
@@ -6313,15 +6316,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // the cellar door (a big goal): Mel's wine wall, the tasting bar, barrel racks, a high table
     // round 178: the gift shop, through the wine shop's bottom-left door (game/giftshop.js): shared stock from the other shops
-    giftshop: { name: "The gift shop", wall: "#F6EEE6", trim: "#C9A3E0", noBoard: true, pos: { A: [110, 262], B: [262, 262], C: [414, 262], D: [110, 500], E: [300, 470], F: [320, 592] }, stations: [
+    giftshop: { name: "The gift shop", wall: "#F6EEE6", trim: "#C9A3E0", noBoard: true, pos: { A: [110, 262], B: [262, 262], C: [414, 262], D: [110, 500], E: [300, 470], F: [320, 592], G: [262, 150], H: [446, 594] }, stations: [
       ["gcase", "Bonbon case", "A", "bonboncase", null, "A little case of bonbons, from the Cocoa Room's trays.", 36],
       ["gbars", "Chocolate shelf", "B", "giftbars", null, "Bars from the Cocoa Room's wall.", 34],
       ["gmill", "From the mill", "C", "giftmill", null, "Oils, soaps and lotions from the mill.", 34],
       ["gwine", "Wine corner", "D", "wineshelf", null, "A few of your bottles to take home.", 30],
       ["gtill", "Till", "E", "gifttill", null, "The till. Stand here and it's open.", 30],
-      ["gwrap", "Wrapping table", "F", "wraptable", null, "Paper, ribbon and tags: wrap a gift, or put wrapped ones out to sell.", 30]
+      ["gwrap", "Wrapping table", "F", "wraptable", null, "Paper, ribbon and tags: wrap a gift, or put wrapped ones out to sell.", 30],
+      // round 185
+      ["ggallery", "Gallery wall", "G", "gallerywall", null, "Local painters' work, between the windows. And yours, if you like.", 146],
+      // round 196
+      ["gmakers", "Makers' shelf", "H", "makershelf", null, "Handmade things from around Honeybrook, on consignment.", -4]
     ] },
-    // round 185
     cellar: { name: "The cellar door", wall: "#E9DCCB", trim: "#6B3A2A", noBoard: true, pos: { W: [130, 262], B: [340, 262], R: [140, 500], T: [360, 500] }, stations: [
       ["winewall", "Wine wall", "W", "winewall", null, "A bottle of every wine you've made. It's getting full.", 36],
       ["flight", "Tasting bar", "B", "tastebar", null, "The tasting bar. Pour yourself a flight (and on the first Friday of the month, host the wine club).", 34],
@@ -17394,10 +17400,10 @@ ${r.n}`;
   }
   var flowers = (pts) => pts.map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="2.6" style="fill:${c}"/><circle cx="${x}" cy="${y}" r="1" fill="#FFF6D8"/>`).join("");
   function villageArt() {
-    const D4 = VILLAGE;
+    const D5 = VILLAGE;
     const ground5 = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M250 300 C226 250 ${D4.hall.door[0]} 236 ${D4.hall.door[0]} ${D4.hall.door[1]} M276 298 C300 250 ${D4.bank.door[0]} 232 ${D4.bank.door[0]} ${D4.bank.door[1]} M220 320 C180 330 120 350 ${D4.fresh.door[0]} ${D4.fresh.door[1]} M260 322 C200 380 120 430 ${D4.news.door[0]} ${D4.news.door[1]} M260 322 C320 380 410 420 ${D4.post.door[0]} ${D4.post.door[1]} M290 316 C350 290 400 250 ${D4.toLane.door[0]} ${D4.toLane.door[1]} M260 322 L260 ${D4.toBase.door[1]} M260 540 C290 560 310 570 ${D4.bench.door[0]} ${D4.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M250 300 C226 250 ${D5.hall.door[0]} 236 ${D5.hall.door[0]} ${D5.hall.door[1]} M276 298 C300 250 ${D5.bank.door[0]} 232 ${D5.bank.door[0]} ${D5.bank.door[1]} M220 320 C180 330 120 350 ${D5.fresh.door[0]} ${D5.fresh.door[1]} M260 322 C200 380 120 430 ${D5.news.door[0]} ${D5.news.door[1]} M260 322 C320 380 410 420 ${D5.post.door[0]} ${D5.post.door[1]} M290 316 C350 290 400 250 ${D5.toLane.door[0]} ${D5.toLane.door[1]} M260 322 L260 ${D5.toBase.door[1]} M260 540 C290 560 310 570 ${D5.bench.door[0]} ${D5.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[30, 262, "#EFA3A6"], [44, 270, "#F3C969"], [60, 214, "#C3CDEE"], [300, 214, "#EFA3A6"], [488, 270, "#F3C969"], [300, 448, "#EFA3A6"], [214, 450, "#C3CDEE"], [470, 540, "#C3CDEE"], [20, 430, "#F3C969"], [505, 380, "#EFA3A6"]])}
     ${tree(26, 96, 1.05)}${tree(494, 96, 1.05)}${tree(24, 350, 0.9)}${tree(498, 330, 0.9)}${tree(504, 520, 0.85)}${tree(190, 470, 0.8)}${tree(330, 470, 0.8)}
@@ -17475,7 +17481,7 @@ ${r.n}`;
     ${tapeLabel(132, 146, "Paddleboards", "var(--sky)", 10)}</g>`;
   }
   function baseArt() {
-    const D4 = VILLAGE;
+    const D5 = VILLAGE;
     const grown = (G2.F().plots || []).filter((p) => p && p.crop).length;
     const sprouts = Array.from({ length: Math.min(6, grown) }, (_, i) => {
       const x = 58 + i % 3 * 44, y = 430 + Math.floor(i / 3) * 24;
@@ -17487,7 +17493,7 @@ ${r.n}`;
     <g filter="url(#wob)">${waterBand(40, 98)}<path d="M478 94 C470 180 500 300 474 420 C464 470 468 510 452 540" fill="none" style="stroke:var(--water)" stroke-width="14" stroke-linecap="round"/></g>
     ${ripples2([[60, 66], [150, 78], [350, 62], [420, 80]])}${ducks(76, false, 20)}
     <g filter="url(#wob)" fill="none" style="stroke:var(--line)" stroke-width="1.1"><path d="M0 44 Q65 36 130 43 T260 42 T390 44 T520 40 M0 100 Q65 104 130 95 T260 98 T390 96 T520 102"/></g>
-    <g filter="url(#wob)"><path d="M260 112 L260 ${D4.home.door[1]} M260 326 C200 360 130 420 ${D4.farm.door[0]} ${D4.farm.door[1]} M260 326 C290 420 300 500 ${D4.pond.door[0]} ${D4.pond.door[1]} M266 312 C330 300 390 290 ${D4.shed.door[0]} ${D4.shed.door[1]} M254 318 C200 320 150 320 ${D4.swing.door[0]} ${D4.swing.door[1]} M290 500 C270 552 240 566 ${D4.run.door[0]} ${D4.run.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M260 112 L260 ${D5.home.door[1]} M260 326 C200 360 130 420 ${D5.farm.door[0]} ${D5.farm.door[1]} M260 326 C290 420 300 500 ${D5.pond.door[0]} ${D5.pond.door[1]} M266 312 C330 300 390 290 ${D5.shed.door[0]} ${D5.shed.door[1]} M254 318 C200 320 150 320 ${D5.swing.door[0]} ${D5.swing.door[1]} M290 500 C270 552 240 566 ${D5.run.door[0]} ${D5.run.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/>
       <ellipse cx="260" cy="322" rx="44" ry="20" style="fill:var(--path)"/></g>
     ${flowers([[30, 140, "#EFA3A6"], [44, 150, "#F3C969"], [200, 140, "#C3CDEE"], [330, 150, "#EFA3A6"], [488, 180, "#F3C969"], [214, 410, "#EFA3A6"], [200, 470, "#C3CDEE"], [160, 600, "#F3C969"], [176, 612, "#EFA3A6"], [300, 620, "#C3CDEE"], [24, 520, "#F3C969"], [372, 600, "#EFA3A6"], [400, 170, "#C3CDEE"]])}
     ${tree(26, 370, 0.9)}${tree(500, 610, 0.9)}${tree(26, 620, 0.95)}${tree(360, 180, 0.8)}`;
@@ -17564,10 +17570,10 @@ ${r.n}`;
       if (!h3) return "";
       return `<g pointer-events="none"><circle cx="${x}" cy="${y}" r="7.5" fill="#FFFDF6" style="stroke:var(--line)" stroke-width="1.2"/><circle class="${h3.status === "red" ? "twinkle" : ""}" cx="${x}" cy="${y}" r="4.5" fill="${L2[h3.status]}"/></g>`;
     };
-    const D4 = VILLAGE;
+    const D5 = VILLAGE;
     const ground5 = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D4.chico.door[0]} ${D4.chico.door[1]} M150 336 L${D4.chord.door[0]} ${D4.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D4.luna.door[0]} ${D4.luna.door[1]} M262 420 C300 470 340 500 ${D4.ohayo.door[0]} ${D4.ohayo.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D5.chico.door[0]} ${D5.chico.door[1]} M150 336 L${D5.chord.door[0]} ${D5.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D5.luna.door[0]} ${D5.luna.door[1]} M262 420 C300 470 340 500 ${D5.ohayo.door[0]} ${D5.ohayo.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40, 200, "#EFA3A6"], [60, 214, "#F3C969"], [480, 330, "#C3CDEE"], [300, 420, "#EFA3A6"], [200, 600, "#F3C969"], [90, 560, "#C3CDEE"], [460, 600, "#EFA3A6"], [330, 250, "#F3C969"]])}
     ${tree(70, 120, 1)}${tree(220, 80, 0.9)}${tree(490, 110, 1)}${tree(40, 620, 0.95)}${tree(490, 620, 0.9)}${tree(470, 430, 0.85)}${tree(60, 440, 0.9)}`;
     const gate6 = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
@@ -17812,6 +17818,25 @@ ${r.n}`;
         ${Array.from({ length: Math.min(6, m.oil) }, (_, i) => `<rect x="${x - 40 + i * 14}" y="${y - 84}" width="8" height="24" rx="3" style="fill:${["#B9B04A", "#8FA34A", "#C9B84A"][i % 3]}"/><rect x="${x - 38 + i * 14}" y="${y - 90}" width="4" height="6" style="fill:#5A3A2A"/>`).join("")}
         ${Array.from({ length: Math.min(6, m.soap) }, (_, i) => `<rect x="${x - 40 + i * 14}" y="${y - 44}" width="12" height="9" rx="2" style="fill:${["#E8C9D8", "#F3E1A0", "#C9DDB0"][i % 3]}"/>`).join("")}${Array.from({ length: Math.min(6, m.lotion) }, (_, i) => `<ellipse cx="${x - 34 + i * 14}" cy="${y - 38}" rx="0" ry="0"/>`).join("")}`,
           `<rect x="${x - 46}" y="${y - 92}" width="92" height="92" rx="3"/>`
+        );
+      }
+      case "gallerywall": {
+        G2.galleryStock && G2.galleryStock();
+        const fr = (((G2.F && G2.F() || {}).giftshop || {}).gallery || {}).frames || [null, null, null, null];
+        return sk(
+          fr.map((f5, i) => {
+            const fx = x - 108 + i * 56, c1 = f5 ? f5.c1 || "#A68FCB" : "#EFE8DC", c22 = f5 ? f5.c2 || "#F3DDB0" : "#EFE8DC";
+            return `<rect x="${fx}" y="${y - 92}" width="48" height="58" rx="2" style="fill:${f5 ? "#8A5A3A" : "#D9CBB6"}"/><rect x="${fx + 5}" y="${y - 87}" width="38" height="48" style="fill:${c1}"/>${f5 ? `<path d="M${fx + 5} ${y - 56} Q${fx + 18} ${y - 68} ${fx + 28} ${y - 58} T${fx + 43} ${y - 62} V${y - 39} H${fx + 5}z" style="fill:${c22}"/>` : ""}${f5 && f5.by ? `<rect x="${fx + 16}" y="${y - 30}" width="16" height="6" rx="1" style="fill:#FFFDF6"/>` : ""}`;
+          }).join(""),
+          fr.map((f5, i) => `<rect x="${x - 108 + i * 56}" y="${y - 92}" width="48" height="58" rx="2"/>`).join("")
+        );
+      }
+      case "makershelf": {
+        const st6 = (((G2.F && G2.F() || {}).giftshop || {}).makers || {}).stock || {}, cols = [["mk_cards", "#F4C7CF"], ["mk_spoon", "#C9A27E"], ["mk_pettoy", "#C3CDEE"], ["mk_bird", "#B08A62"], ["mk_honeybutter", "#F3D98A"], ["mk_wraps", "#9EBE8C"]];
+        return sk(
+          `<rect x="${x - 40}" y="${y - 34}" width="80" height="34" rx="3" style="fill:#B08A62"/><rect x="${x - 44}" y="${y - 40}" width="88" height="8" rx="2" style="fill:#E3D5C0"/><rect x="${x - 40}" y="${y - 74}" width="80" height="6" rx="2" style="fill:#E3D5C0"/><rect x="${x - 38}" y="${y - 74}" width="4" height="36" style="fill:#B08A62"/><rect x="${x + 34}" y="${y - 74}" width="4" height="36" style="fill:#B08A62"/>
+        ${cols.map(([id, c], i) => (st6[id] || 0) > 0 ? `<rect x="${x - 32 + i % 3 * 24}" y="${y - (i < 3 ? 88 : 52)}" width="16" height="12" rx="2" style="fill:${c}"/>` : "").join("")}`,
+          `<rect x="${x - 40}" y="${y - 34}" width="80" height="34" rx="3"/><rect x="${x - 44}" y="${y - 40}" width="88" height="8" rx="2"/><rect x="${x - 40}" y="${y - 74}" width="80" height="6" rx="2"/>`
         );
       }
       case "wraptable":
@@ -18518,7 +18543,7 @@ ${r.n}`;
         const j = G2.vault && G2.vault(s.x);
         return j ? j.label : "Empty";
       })() : s.name;
-      h3 += `<g data-spot="${s.id}" aria-label="${s.name || (nm6 ? "Trophy: " + nm6 : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm6 ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm6, "var(--card)") : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm6.length > 10 ? nm6.slice(0, 9) + "…" : nm6, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm6.length > 15 ? nm6.slice(0, 14).trim() + "…" : nm6, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm6.length > 24 ? nm6.slice(0, 23) + "…" : nm6, "var(--card)") : ""}</g>`;
+      h3 += `<g data-spot="${s.id}" aria-label="${s.name || (nm6 ? "Trophy: " + nm6 : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm6 ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm6, "var(--card)") : s.kind === "gallerywall" ? tapeLabel(s.x, s.y - 108, nm6, "var(--card)", 11) : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm6.length > 10 ? nm6.slice(0, 9) + "…" : nm6, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm6.length > 15 ? nm6.slice(0, 14).trim() + "…" : nm6, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm6.length > 24 ? nm6.slice(0, 23) + "…" : nm6, "var(--card)") : ""}</g>`;
     });
     if (id === "kidroom") {
       const k = G2.kid ? G2.kid() : {};
@@ -24028,8 +24053,8 @@ ${e.text}`;
   var SG = 8 * 36e5;
   var iso = (ms) => new Date(ms).toISOString().slice(0, 10);
   var comingMonday = () => {
-    const t2 = Date.parse(dayKey() + "T00:00:00Z"), dow5 = new Date(t2).getUTCDay();
-    return iso(t2 + ((8 - dow5) % 7 || 7) * 864e5);
+    const t2 = Date.parse(dayKey() + "T00:00:00Z"), dow6 = new Date(t2).getUTCDay();
+    return iso(t2 + ((8 - dow6) % 7 || 7) * 864e5);
   };
   var nice = (d) => (/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   async function lastVision() {
@@ -25906,6 +25931,179 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return { ...base, from: v.from + 13, to: v.from + VISIT, at: sh.door, act: "shopbag" };
   }
 
+  // src/game/gallery.js
+  var TOKEN = 10;
+  var CUT = 0.2;
+  var FRAMES = 4;
+  var D3 = 864e5;
+  var PAINTERS = {
+    dad: {
+      name: "Dad",
+      what: "Sip-and-paint landscapes",
+      sign: "Love, Dad",
+      works: [["The terrace at dusk", 48, "#E9A87A", "#5A6B8C"], ["Vines in October", 44, "#C98A3A", "#7A8C4A"], ["The jetty, early", 40, "#9FC3D9", "#E8D3A6"], ["Lavender rows", 46, "#A68FCB", "#F3DDB0"], ["Ma Ma's orchard", 42, "#7FA35A", "#F3C969"]],
+      note: ["Mel! Somebody bought my painting. A real person, with real money. I've told everyone at the class. Twice.", "Posy rang to say '{t}' sold. I had to sit down. Your mother says I'm insufferable now. She's right.", "'{t}' has gone to a good home, Posy says. I hope they hang it where the light's kind. I've already started the next one."]
+    },
+    juniper: {
+      name: "Juniper",
+      what: "Watercolours from the library garden",
+      sign: "With love, Juniper (from behind the returns desk)",
+      works: [["Rain on the reading room", 32, "#BFD6E6", "#8A8279"], ["Wisteria by the steps", 36, "#C3A9E0", "#9EBE8C"], ["The library cat, asleep", 28, "#E8C49A", "#5A4A3E"], ["Autumn, through the window", 34, "#D98A4A", "#F3E7C8"]],
+      note: ["I've been grinning at the date stamp all morning. '{t}' sold! I may frame the receipt.", "Thank you for giving my little watercolours a wall. '{t}' found a home, and I found I can't stop telling the regulars.", "Someone bought '{t}'. I keep imagining it on their wall, getting rained on in a painted sort of way."]
+    },
+    okada: {
+      name: "Mr Okada",
+      what: "Ink-brush landscapes",
+      sign: "With thanks, K. Okada",
+      works: [["The well, in mist", 52, "#E6E2DA", "#2F2B28"], ["Two herons", 56, "#F3EFE6", "#3A4A5A"], ["Pine on the headland", 50, "#E9E4D6", "#2E3A2E"], ["Bridge in snow", 54, "#F6F3EE", "#4A4A4A"]],
+      note: ["I am told '{t}' has been sold. Forty years of sorting other people's letters, and now one of my brushes has travelled further than I ever did. Thank you.", "Ink is patient. So, it seems, was the person who bought '{t}'. I am very quietly delighted.", "A small note to say thank you. '{t}' sold, and I have bought myself a new brush to celebrate. A modest one."]
+    },
+    mei: {
+      name: "Mei",
+      what: "Botanical paintings from the flower farm",
+      sign: "Mei, from the flower farm",
+      works: [["Sweet peas, in a jar", 30, "#F4C7CF", "#7FA35A"], ["Dahlia study", 34, "#D9534F", "#5E8A3A"], ["Cosmos in the wind", 28, "#F3B6D0", "#9EBE8C"], ["The first rose", 32, "#E8566C", "#6A8A4A"]],
+      note: ["'{t}' sold! I've been telling the dahlias. They're very proud.", "I painted '{t}' between waterings and never thought anyone would want it. Thank you for hanging it up.", "Posy says '{t}' went to a lady who smelled it first. That's the nicest thing anyone's ever done to one of my paintings."]
+    }
+  };
+  var MAKERS = {
+    lin: { name: "Auntie Lin", item: "mk_cards" },
+    bo: { name: "Bo", item: "mk_spoon" },
+    noor: { name: "Noor", item: "mk_pettoy" },
+    wren: { name: "Wren", item: "mk_bird" },
+    hana: { name: "Hana", item: "mk_honeybutter" },
+    felix: { name: "Felix", item: "mk_wraps" }
+  };
+  Object.assign(ITEMS, {
+    mk_cards: { n: "Pressed-flower cards", kind: "gift", to: "family", price: 6, art: ["tile", "#FFFDF6", "#F4C7CF"], maker: "lin", say: "Auntie Lin's pressed-flower cards! Too pretty to write in. I'll write in one anyway." },
+    mk_spoon: { n: "A carved wooden spoon", kind: "gift", to: ["mum", "mama", "dad", "darren"], price: 9, art: ["disc", "#C9A27E", "#8A5A3A"], maker: "bo", say: "A wooden spoon Bo carved by hand! It's too nice for porridge. It's getting porridge." },
+    mk_pettoy: { n: "A knitted mouse for a pet", kind: "gift", to: ["evan", "angelina"], price: 5, art: ["tile", "#C3CDEE", "#F4C7CF"], maker: "noor", say: "A little knitted mouse from Noor's rescue! Every cat in the street will want it." },
+    mk_bird: { n: "A whittled wren", kind: "gift", to: ["dad", "gonggong", "evan"], price: 8, art: ["bird", "#C9A27E"], maker: "wren", say: "A little wooden wren, whittled by the ranger! It's sitting on the windowsill, looking out." },
+    mk_honeybutter: { n: "Hana's honey butter", kind: "gift", to: "family", price: 6, art: ["jar", "#F3D98A", "#FFFDF6"], maker: "hana", say: "Hana's honey butter, the one from her toast! On everything. On everything." },
+    mk_wraps: { n: "Beeswax food wraps", kind: "gift", to: ["mum", "mama", "angelina"], price: 7, art: ["cloth", "#F6E3A1", "#9EBE8C"], maker: "felix", say: "Beeswax wraps from Felix's bees! No more cling film. The kitchen smells like honey." }
+  });
+  var MAKER_ITEMS = Object.values(MAKERS).map((m) => m.item);
+  var STOCK = 3;
+  var galleryState = (F2) => {
+    F2.giftshop = F2.giftshop || {};
+    const g10 = F2.giftshop.gallery = F2.giftshop.gallery || {};
+    g10.frames = g10.frames || Array(FRAMES).fill(null);
+    g10.sold = g10.sold || [];
+    return g10;
+  };
+  var makersState = (F2) => {
+    F2.giftshop = F2.giftshop || {};
+    const m = F2.giftshop.makers = F2.giftshop.makers || {};
+    m.stock = m.stock || {};
+    m.week = m.week || {};
+    return m;
+  };
+  var dow5 = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
+  var hashS = (s) => {
+    let h3 = 0;
+    for (const c of String(s)) h3 = h3 * 31 + c.charCodeAt(0) | 0;
+    return Math.abs(h3);
+  };
+  function stockUp(F2, day) {
+    const g10 = galleryState(F2), m = makersState(F2);
+    let n = 0;
+    if (!g10.filled || dow5(day) === 1 && g10.filled !== day) {
+      g10.filled = day;
+      const hung = new Set(g10.frames.filter((f5) => f5 && f5.by).map((f5) => f5.by));
+      const queue = Object.keys(PAINTERS).filter((p) => !hung.has(p)).sort((a, b) => hashS(day + a) - hashS(day + b));
+      const mine = ownPaintings(F2).length || g10.frames.some((f5) => f5 && f5.own);
+      let room4 = (mine ? FRAMES - 1 : FRAMES) - g10.frames.filter((f5) => f5 && f5.by).length;
+      g10.frames = g10.frames.map((f5) => {
+        if (f5 || !queue.length || room4 <= 0) return f5;
+        room4--;
+        const by = queue.shift(), done = new Set(g10.sold.filter((s) => s.by === by).map((s) => s.t)), w = PAINTERS[by].works, pick5 = w.find((x) => !done.has(x[0])) || w[hashS(day + by) % w.length];
+        n++;
+        return { by, t: pick5[0], price: pick5[1], c1: pick5[2], c2: pick5[3] };
+      });
+    }
+    if (!m.filled || dow5(day) === 1 && m.filled !== day) {
+      m.filled = day;
+      m.week = {};
+      MAKER_ITEMS.forEach((id) => {
+        if ((m.stock[id] || 0) < STOCK) {
+          m.stock[id] = STOCK;
+          n++;
+        }
+      });
+    }
+    return n;
+  }
+  var forSale = (F2) => galleryState(F2).frames.filter((f5) => f5 && f5.by);
+  function sellPainting(F2, i, at2) {
+    const g10 = galleryState(F2), f5 = g10.frames[i];
+    if (!f5 || !f5.by) return 0;
+    g10.frames[i] = null;
+    g10.sold = [...g10.sold, { by: f5.by, t: f5.t, price: f5.price, at: at2 + 7 * D3, id: `gal-${f5.by}-${at2}` }].slice(-40);
+    return Math.min(TOKEN, f5.price);
+  }
+  function sellMade(F2, id) {
+    const m = makersState(F2);
+    if (!(m.stock[id] > 0)) return 0;
+    m.stock[id]--;
+    const it = ITEMS[id];
+    m.week[it.maker] = (m.week[it.maker] || 0) + it.price;
+    return Math.max(1, Math.round(it.price * CUT));
+  }
+  function buyMade(F2, id) {
+    const it = ITEMS[id];
+    if (!it || !(makersState(F2).stock[id] > 0) || (F2.coins || 0) < it.price) return false;
+    F2.coins -= it.price;
+    sellMade(F2, id);
+    F2.inv = F2.inv || {};
+    F2.inv[id] = (F2.inv[id] || 0) + 1;
+    return true;
+  }
+  var ownPaintings = (F2) => Object.keys(F2.inv || {}).filter((id) => /^p_/.test(id) && F2.inv[id] > 0 && ITEMS[id]);
+  function hangOwn(F2, id) {
+    const g10 = galleryState(F2), i = g10.frames.indexOf(null);
+    if (i < 0 || !(F2.inv[id] > 0)) return false;
+    F2.inv[id]--;
+    if (!F2.inv[id]) delete F2.inv[id];
+    const a = (PAINTINGS[id] || {}).art || [0, "#A68FCB", "#F3DDB0"];
+    g10.frames[i] = { own: id, c1: a[1], c2: a[2] };
+    return true;
+  }
+  function takeDown(F2, i) {
+    const g10 = galleryState(F2), f5 = g10.frames[i];
+    if (!f5 || !f5.own) return false;
+    g10.frames[i] = null;
+    F2.inv[f5.own] = (F2.inv[f5.own] || 0) + 1;
+    return true;
+  }
+  var galleryMail = (F2, t2) => galleryState(F2).sold.filter((s) => s.at <= t2 && PAINTERS[s.by]).map((s) => {
+    const p = PAINTERS[s.by], line = p.note[hashS(s.id) % p.note.length].replace(/\{t\}/g, s.t);
+    return { id: s.id, from: "postie", at: s.at, title: `${p.name}'s painting sold`, body: `${s.by === "dad" ? "Hello love" : "Dear Mel"},
+
+${line}
+
+${p.sign}` };
+  });
+  var swatch2 = (c1, c22) => `<span class="wpic"><svg width="30" height="30" viewBox="0 0 30 30"><rect x="2" y="3" width="26" height="24" rx="2" fill="#8A5A3A"/><rect x="5" y="6" width="20" height="18" fill="${c1}"/><path d="M5 18 Q12 12 18 17 T25 15 V24 H5z" fill="${c22}"/></svg></span>`;
+  function galleryPanel(F2) {
+    const g10 = galleryState(F2), own = ownPaintings(F2), free = g10.frames.filter((f5) => !f5).length;
+    let h3 = `<h2>The gallery wall</h2><p class="sub">Four frames between the windows. Local painters hang their work here; when one sells you keep ${TOKEN} coins and the rest goes to the painter. They bring new ones on Mondays.</p><ul class="hlist wlist">`;
+    h3 += g10.frames.map((f5, i) => !f5 ? `<li><span class="wtxt"><b>An empty frame</b><small>${own.length ? "Hang one of yours, or a painter will fill it on Monday" : "A painter will fill it on Monday"}</small></span></li>` : f5.own ? `<li>${swatch2(f5.c1 || "#A68FCB", f5.c2 || "#F3DDB0")}<span class="wtxt"><b>${esc(ITEMS[f5.own].n.replace(/^Your painting: /, "").replace(/^./, (c) => c.toUpperCase()))}</b><small>Yours · not for sale</small></span><span class="orbtns"><button class="btn small alt" data-gg="down:${i}">Take it down</button></span></li>` : `<li>${swatch2(f5.c1, f5.c2)}<span class="wtxt"><b>${esc(f5.t)}</b><small>${esc(PAINTERS[f5.by].name)} · ${esc(PAINTERS[f5.by].what.toLowerCase())} · ${f5.price} coins</small></span></li>`).join("") + `</ul>`;
+    if (own.length && free) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Hang one of yours</p><div class="actions">${own.map((id) => `<button class="btn small alt" data-gg="hang:${id}">${esc(ITEMS[id].n.replace(/^Your painting: /, ""))}</button>`).join("")}</div>`;
+    const recent2 = g10.sold.slice(-3).reverse();
+    if (recent2.length) h3 += `<p class="muted">Sold lately: ${recent2.map((s) => `"${esc(s.t)}" by ${esc(PAINTERS[s.by].name)}`).join(", ")}.</p>`;
+    return h3;
+  }
+  function makersPanel(F2) {
+    const m = makersState(F2), wk = Object.entries(m.week).filter(([, c]) => c > 0);
+    let h3 = `<h2>The makers' shelf</h2><p class="sub">Little handmade things from around Honeybrook, on consignment: when one sells, the maker gets the money and you keep about a fifth. They top it up on Mondays.</p><ul class="hlist wlist">`;
+    h3 += Object.entries(MAKERS).map(([k, mk]) => {
+      const it = ITEMS[mk.item], n = m.stock[mk.item] || 0;
+      return `<li><span class="wpic">${icon(mk.item, 28)}</span><span class="wtxt"><b>${esc(it.n)}</b><small>${esc(mk.name)} · ${it.price} coins · ${n ? `${n} on the shelf` : "sold out till Monday"}</small></span><span class="orbtns"><button class="btn small alt" data-gg="buy:${mk.item}" ${n && (F2.coins || 0) >= it.price ? "" : "disabled"}>Buy one</button></span></li>`;
+    }).join("") + `</ul>`;
+    if (wk.length) h3 += `<p class="muted">This week the makers have taken home ${wk.map(([k, c]) => `${esc(MAKERS[k].name)} ${c}`).join(", ")} coins.</p>`;
+    return h3;
+  }
+
   // src/game/giftshop.js
   var GIFT_HOURS = { from: 10 * 60, to: 18 * 60, closed: [1] };
   var giftState = (F2) => {
@@ -25997,6 +26195,23 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       t3.wrap = (t3.wrap || 0) + 1;
       return coins2;
     }
+    if (forSale(F2).length && Math.random() < 0.05) {
+      const fr = galleryState(F2).frames, idx = fr.map((f5, i2) => f5 && f5.by ? i2 : -1).filter((i2) => i2 >= 0), i = idx[Math.floor(Math.random() * idx.length)], at2 = o.at || Date.now(), coins2 = sellPainting(F2, i, at2), t3 = g10.sold[day] = g10.sold[day] || { n: 0, coins: 0 };
+      t3.n++;
+      t3.coins += coins2;
+      t3.art = (t3.art || 0) + 1;
+      return coins2;
+    }
+    {
+      const mk = MAKER_ITEMS.filter((id) => (makersState(F2).stock[id] || 0) > 0);
+      if (mk.length && Math.random() < 0.18) {
+        const coins2 = sellMade(F2, mk[Math.floor(Math.random() * mk.length)]), t3 = g10.sold[day] = g10.sold[day] || { n: 0, coins: 0 };
+        t3.n++;
+        t3.coins += coins2;
+        t3.made = (t3.made || 0) + 1;
+        return coins2;
+      }
+    }
     if (g10.pairs.length && Math.random() < (pairSeason(day) ? 0.35 : 0.12)) {
       const coins2 = g10.pairs.shift(), t3 = g10.sold[day] = g10.sold[day] || { n: 0, coins: 0 };
       t3.n++;
@@ -26052,6 +26267,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return `<p class="eyebrow" style="margin:12px 0 6px">Pairing boxes</p><ul class="hlist wlist"><li><span class="wpic">${icon("pairbox", 30)}</span><span class="wtxt"><b>Wine and chocolate pairing box</b><small>${g10.pairs.length ? `${g10.pairs.length} out · ${price}` : "None out yet"}${have2 ? ` · ${have2} in your backpack` : ""}</small></span><span class="orbtns">` + (have2 ? `<button class="btn small primary" data-gp="put" data-n="1">Put out 1</button>${have2 > 1 ? `<button class="btn small alt" data-gp="put" data-n="99">All</button>` : ""}` : "") + (g10.pairs.length ? `<button class="btn small alt" data-gp="take">Take 1 back</button>` : "") + `</span></li></ul>` + (pairSeason(o.day) ? `<p class="muted">People are buying these for someone special this time of year.</p>` : "");
   }
   var PANEL = {
+    ggallery: (o) => galleryPanel(o.F),
+    // round 196
+    gmakers: (o) => makersPanel(o.F),
     gcase: (o) => {
       const s = stockOf(o);
       return `<h2>The bonbon case</h2><p class="sub">A little glass case on the counter end, filled from the Cocoa Room's own display: the same trays, so what sells here is gone there too.${o.cocoa ? ` ${o.cocoa.prices.bonbon} coins a bonbon.` : ""}</p>` + (!o.cocoa ? `<p class="muted">Empty: there's no Cocoa Room to fill it from yet.</p>` : s.bon.length ? `<ul class="hlist wlist">${s.bon.map((b) => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${o.cocoa.trays[b.id]} left in the trays</small></span><span class="orbtns"><button class="btn small alt" data-gs="eat:${esc(b.id)}">Have one</button><button class="btn small alt" data-gs="box:${esc(b.id)}" ${o.cocoa.trays[b.id] >= 4 ? "" : "disabled"}>Box of 4</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing in the Cocoa Room's display case right now. Make a tray at the bonbon table.</p>`);
@@ -26074,7 +26292,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (PANEL[spot6]) return `<span class="tape gingham" aria-hidden="true"></span>` + PANEL[spot6](o) + shut8;
     const open2 = keeperOn(day, o.hm);
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The gift shop</h2><p class="sub">${o.here ? "You're behind the till. People browse longer when you're chatting." : o.keeper ? `Posy's at the till, rearranging the bonbon case for the third time today.` : open2 ? "Nobody's at the till." : "Shut for now: Posy opens 10 till 6, every day but Monday. Stand behind the till yourself and it's open."}</p>
-    <p class="muted">${t2.n ? `Sold today: ${t2.n}, for ${t2.coins} coins (${["bonbon", "bar", "mill", "wine", "pair", "wrap"].filter((k) => t2[k]).map((k) => `${t2[k]} ${{ bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes", wrap: "wrapped gifts" }[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut8;
+    <p class="muted">${t2.n ? `Sold today: ${t2.n}, for ${t2.coins} coins (${["bonbon", "bar", "mill", "wine", "pair", "wrap", "art", "made"].filter((k) => t2[k]).map((k) => `${t2[k]} ${{ bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes", wrap: "wrapped gifts", art: "paintings", made: "from the makers" }[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut8;
   }
 
   // src/game/millcraft.js
@@ -32604,7 +32822,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     p.press = null;
     return true;
   }
-  function takeDown(F2, t2 = now3()) {
+  function takeDown2(F2, t2 = now3()) {
     const p = paperState(F2), dry = p.line.filter((s) => s.done <= t2);
     if (!dry.length) return 0;
     p.line = p.line.filter((s) => s.done > t2);
@@ -32674,7 +32892,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         out.wage += WAGE;
       }
       if (lise) {
-        const d = takeDown(F2, at2);
+        const d = takeDown2(F2, at2);
         if (d) out.down += d;
       }
       if (open2 && dowOf4(day) === CLASS.dow && hm6 === CLASS.to - 1 && p.classDay !== day && sheetsIn(p) >= CLASS.size) {
@@ -35175,7 +35393,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
 
   // src/game/contacts.js
-  var D3 = 24 * 60 * 60 * 1e3;
+  var D4 = 24 * 60 * 60 * 1e3;
   var PEN = { ...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_JL, ...PEN_RK, ...PEN_JC };
   var REGIONS2 = { bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre" };
   var POSTAGE = { bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8 };
@@ -35237,7 +35455,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       item: item || null,
       open: open2,
       text: String(text).trim().slice(0, 400),
-      at: at2 + days * D3,
+      at: at2 + days * D4,
       back: item && p && p.back && ITEMS[p.back] && h3 % 5 === 0 ? p.back : null
     };
     b.sent = [...b.sent, e].slice(-60);
@@ -37335,7 +37553,7 @@ ${p ? p.sign : `Warmly, ${first}`}`;
   }, ped: (x, y) => {
     const i = stationsOf("trophy").filter((s) => s.kind === "pedestal").findIndex((s) => s.x === x && s.y === y);
     return i < 0 ? null : onPedestals(F)[i] || null;
-  }, kid: () => ({ sleep: kid.sleep || evanNight() }), millCrate: () => owns2(F, "mill") && !owns2(F, "millshop") && !owns2(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), xmasSeason: () => xmasOn(dayKey()) });
+  }, kid: () => ({ sleep: kid.sleep || evanNight() }), millCrate: () => owns2(F, "mill") && !owns2(F, "millshop") && !owns2(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns2(F, "giftshop") && stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey()) });
   function isDusk() {
     const t2 = sgHM();
     return t2 >= 19 * 60 || t2 < 6 * 60;
@@ -39480,7 +39698,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
   var localCache = { key: "", items: [] };
   var dayKeyAt = (ms) => new Date(ms + 6 * H).toISOString().slice(0, 10);
   function localMail() {
-    const day = dayKey(), hm6 = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm6 / 10)}:${S2.doneIds.length}:${S2.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}:${slowMail(F).length}:${bloomMail(F).length}:${bookMail(F).length}`;
+    const day = dayKey(), hm6 = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm6 / 10)}:${S2.doneIds.length}:${S2.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}:${slowMail(F).length}:${bloomMail(F).length}:${bookMail(F).length}:${galleryMail(F, Date.now()).length}`;
     if (key === localCache.key) return localCache.items;
     const out = [], wd = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
     if (wd === 5 && hm6 >= 900 || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
@@ -39494,7 +39712,7 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
       body: `Meet me at the pond. Each of today's wins gets a lantern on the water.
 Then tell chat "wind down" whenever you're ready.`
     });
-    out.push(...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...bloomMail(F), ...bookMail(F));
+    out.push(...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...bloomMail(F), ...bookMail(F), ...galleryMail(F, Date.now()));
     return (localCache = { key, items: out }).items;
   }
   var allMail = () => [...MAIL.items || [], ...localMail()];
@@ -40817,6 +41035,28 @@ ${SIGNOFF[t2.who] || ""}`;
         }
       }
       save2();
+      ctx();
+    });
+    if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gg]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      const [a, v] = b.dataset.gg.split(/:(.*)/s);
+      if (a === "hang") {
+        if (hangOwn(F, v)) {
+          sfx("paper", true);
+          flash("Up on the gallery wall");
+        }
+      } else if (a === "down") {
+        if (takeDown(F, +v)) {
+          sfx("paper", true);
+          flash("Back in your backpack");
+        }
+      } else if (a === "buy") {
+        if (buyMade(F, v)) {
+          sfx("coin");
+          flash(`${ITEMS[v].n}, in your backpack (the coins go to ${MAKERS[ITEMS[v].maker].name})`);
+        }
+      }
+      save2(true);
       ctx();
     });
     if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gp]").forEach((b) => b.onclick = (ev) => {
@@ -44275,7 +44515,7 @@ ${SIGNOFF[t2.who] || ""}`;
       }
       return;
     }
-    if (scene === "giftshop" && ["gcase", "gbars", "gmill", "gwine", "gtill", "gwrap"].includes(id)) {
+    if (scene === "giftshop" && ["gcase", "gbars", "gmill", "gwine", "gtill", "gwrap", "ggallery", "gmakers"].includes(id)) {
       if (id === "gwrap") wrSt = {};
       fieldView = id;
       sfx("paper", true);
@@ -45284,11 +45524,12 @@ ${SIGNOFF[t2.who] || ""}`;
         n++;
       }
       if (owns2(F, "giftshop")) {
-        const g10 = giftSellMinute(F, day, hm6, at2 + 6e4 > now5 && scene === "giftshop" && atSpot === "gtill" ? "mel" : keeperOn(day, hm6) ? "keeper" : null, giftOpts());
+        const fr0 = JSON.stringify(galleryState(F).frames.concat([makersState(F).stock])), g10 = giftSellMinute(F, day, hm6, at2 + 6e4 > now5 && scene === "giftshop" && atSpot === "gtill" ? "mel" : keeperOn(day, hm6) ? "keeper" : null, giftOpts());
         if (g10) {
           gcoins += g10;
           gn++;
         }
+        if (scene === "giftshop" && JSON.stringify(galleryState(F).frames.concat([makersState(F).stock])) !== fr0) galleryRedraw = true;
       }
       const ev = eventNow(day, hm6);
       if (ev && ev.kind === "market") ["market", "grace"].forEach((w) => {
@@ -45306,9 +45547,13 @@ ${SIGNOFF[t2.who] || ""}`;
         }
       }
     }
+    if (galleryRedraw) {
+      galleryRedraw = false;
+      if (!gcoins) save2(true);
+    }
     if (gcoins) {
       F.coins += gcoins;
-      save2();
+      save2(scene === "giftshop");
       if (scene === "giftshop") {
         sfx("coin");
         flash(`+${gcoins}: the gift shop`);
@@ -45443,8 +45688,9 @@ ${SIGNOFF[t2.who] || ""}`;
       if (evanHere()) setTimeout(() => evanSays("SO SPARKLY!"), 1200);
     }, 7200);
   }
-  var giftOpts = () => ({ F, cocoa: owns2(F, "cocoa") ? cocoaState(F) : null, onDisplay: onDisplay2, store: craftState(F).store, v: vineState(F), day: dayKey(), hm: sgHM(), here: scene === "giftshop" && atSpot === "gtill", keeper: isHere("posy"), pk: fieldView === "gwine" ? gsPk : null });
+  var giftOpts = () => (owns2(F, "giftshop") && stockUp(F, dayKey()), { F, cocoa: owns2(F, "cocoa") ? cocoaState(F) : null, onDisplay: onDisplay2, store: craftState(F).store, v: vineState(F), day: dayKey(), hm: sgHM(), here: scene === "giftshop" && atSpot === "gtill", keeper: isHere("posy"), pk: fieldView === "gwine" ? gsPk : null });
   var gsPk = null;
+  var galleryRedraw = false;
   function xmasTreat(id) {
     if (id === "mulled") {
       const m = F.mull || {};
@@ -45810,7 +46056,7 @@ ${SIGNOFF[t2.who] || ""}`;
           say3 = "You peg them up on the line, one by one. They'll be dry by this time tomorrow.";
         }
       } else if (a === "down") {
-        const n = takeDown(F);
+        const n = takeDown2(F);
         if (n) {
           sfx("chime");
           gainXp(2);

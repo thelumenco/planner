@@ -2447,3 +2447,16 @@ test naming every pairing of every filling in all three shells.
 
 ## Round 195: letters breathe
 - `notesHTML` (ui/notebook.js) keeps a blank line as one empty ruled line (`p.gap`, 32px), so long letters read in paragraphs.
+
+## Round 196: the gift shop's gallery wall and makers' shelf
+Mel: paintings for sale, "the money goes to the person who made it... they could write a letter to say thank you, I'm so
+excited about selling my painting"; makers' cut about a fifth, fine.
+- `game/gallery.js`: `PAINTERS` (Dad, Juniper, Mr Okada, Mei: works with titles, prices, colours, and their thank-you lines),
+  `MAKERS` (Auntie Lin, Bo, Noor, Wren, Hana, Felix) and their `mk_*` items (kind "gift"; icons in icons.js).
+  `stockUp` on Mondays (and the first time): painters fill empty frames (one left free while Mel has a sip-and-paint painting),
+  makers top up to 3. `sellPainting` (Mel keeps `TOKEN` 10, the letter a week later: `galleryMail` into `localMail`),
+  `sellMade` (Mel keeps about a fifth), `buyMade` (Mel pays full price, all to the maker), `hangOwn`/`takeDown` (never for sale).
+- giftshop.js: `giftSellMinute` sells a painting now and then (.05 of sale chances) and makers' things (.18); panels `ggallery`, `gmakers`.
+- world.js: gift shop `G:[262,150]` (wall, label above via scenes.js) and `H:[446,594]`; scenes.js art `gallerywall`, `makershelf`
+  (`G.galleryStock` stocks before drawing). core.js: `data-gg` (hang, down, buy); the wall redraws when something sells while Mel's there.
+- Next (round 197): imports from trip friends in the address book.

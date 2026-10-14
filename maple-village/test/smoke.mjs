@@ -4196,6 +4196,24 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(!bad.length, "named every pairing of " + ids.length + " fillings in all three shells" + (bad.length ? ": " + bad.slice(0, 3).join(", ") : ""));
   check(/\S/.test(cc.bonbonName("white", ["mint", "pear"])), "white chocolate, mint and pear: " + cc.bonbonName("white", ["mint", "pear"]));
 }
+{
+  console.log("\nThe gift shop's gallery wall and makers' shelf (round 196)");
+  await import(new URL("../src/game/ronda.js", import.meta.url));   // (Mel's sip-and-paint paintings join ITEMS here)
+  const gal = await import(new URL("../src/game/gallery.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
+  const F = {coins: 50, inv: {p_view: 1}, goals: {giftshop: 1}}, mon = "2026-10-19", T = Date.UTC(2026, 9, 19, 3), D = 864e5;
+  const n = gal.stockUp(F, mon), fr = gal.galleryState(F).frames;
+  check(fr.filter(f => f && f.by).length === 3 && fr.filter(f => !f).length === 1 && new Set(fr.filter(Boolean).map(f => f.by)).size === 3, "three painters hang a painting each, and leave a frame for Mel's own");
+  check(Object.values(gal.makersState(F).stock).every(x => x === 3) && Object.keys(gal.makersState(F).stock).length === 6, "six makers fill their spots on the shelf");
+  check(gal.hangOwn(F, "p_view") && !F.inv.p_view && gal.forSale(F).length === 3 && gal.takeDown(F, fr.findIndex(f => f && f.own)) && F.inv.p_view === 1, "Mel hangs her own painting (never for sale) and takes it down again");
+  const i = fr.findIndex(f => f && f.by), f0 = fr[i], c = gal.sellPainting(F, i, T);
+  check(c === gal.TOKEN && !fr[i] && f0.price > gal.TOKEN, "a painting sells: Mel keeps a token " + gal.TOKEN + " and the painter the rest (" + f0.price + ")");
+  check(!gal.galleryMail(F, T + 6*D).length && gal.galleryMail(F, T + 7*D).length === 1 && gal.galleryMail(F, T + 7*D)[0].body.includes(f0.t) && gal.galleryMail(F, T + 7*D)[0].body.includes(gal.PAINTERS[f0.by].sign), "a week later the painter writes to say it sold");
+  check(gal.sellMade(F, "mk_spoon") === 2 && gal.makersState(F).stock.mk_spoon === 2 && gal.makersState(F).week.bo === 9, "a spoon sells: Mel keeps about a fifth (2 of 9), Bo the rest");
+  check(gal.buyMade(F, "mk_cards") && F.coins === 44 && F.inv.mk_cards === 1 && it.ITEMS.mk_cards.kind === "gift", "Mel buys Auntie Lin's cards at the full price, to give");
+  check(gal.stockUp(F, "2026-10-20") === 0 && gal.stockUp(F, "2026-10-26") > 0 && gal.forSale(F).length === 3, "the painters and makers come back the next Monday");
+  let sold = 0; for (let k = 0; k < 4000; k++) { const g2 = {coins: 0, inv: {}, goals: {giftshop: 1}}; gal.stockUp(g2, mon); if (gs.giftSellMinute(g2, mon, 600, "mel", {store: {}, v: {shelf: []}, cocoa: null, onDisplay: () => []}) === gal.TOKEN) sold++; }
+  check(sold > 0 && sold < 400, "shoppers buy a painting now and then, not often (" + sold + " in 4000 busy minutes)");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

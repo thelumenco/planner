@@ -11,6 +11,7 @@
 import { esc } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
+import { forSale, sellPainting, sellMade, makersState, MAKER_ITEMS, galleryPanel, makersPanel, galleryState } from "./gallery.js";
 
 export const GIFT_HOURS = {from: 10*60, to: 18*60, closed: [1]};
 export const giftState = F => { F.giftshop = F.giftshop || {}; F.giftshop.sold = F.giftshop.sold || {}; F.giftshop.pairs = F.giftshop.pairs || []; F.giftshop.wrapped = F.giftshop.wrapped || []; return F.giftshop; };
@@ -56,6 +57,14 @@ export function giftSellMinute(F, day, hm, mode, o){
   if (g.wrapped.length && Math.random() < (pairSeason(day) ? .3 : .12)) {   // a wrapped gift off the table
     const id = g.wrapped.shift(), coins = (ITEMS[id] || {price: 6}).price, t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.wrap = (t.wrap || 0) + 1; return coins;
   }
+  // round 196: now and then a painting off the gallery wall (Mel keeps a token; the painter gets the rest and writes),
+  // and the makers' shelf (Mel keeps about a fifth)
+  if (forSale(F).length && Math.random() < .05) {
+    const fr = galleryState(F).frames, idx = fr.map((f, i) => f && f.by ? i : -1).filter(i => i >= 0), i = idx[Math.floor(Math.random()*idx.length)], at = o.at || Date.now(),
+      coins = sellPainting(F, i, at), t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.art = (t.art || 0) + 1; return coins;
+  }
+  { const mk = MAKER_ITEMS.filter(id => (makersState(F).stock[id] || 0) > 0); if (mk.length && Math.random() < .18) {
+    const coins = sellMade(F, mk[Math.floor(Math.random()*mk.length)]), t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.made = (t.made || 0) + 1; return coins; } }
   if (g.pairs.length && Math.random() < (pairSeason(day) ? .35 : .12)) {
     const coins = g.pairs.shift(), t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.pair = (t.pair || 0) + 1; return coins;
   }
@@ -89,6 +98,8 @@ function pairsHTML(o){
     + (pairSeason(o.day) ? `<p class="muted">People are buying these for someone special this time of year.</p>` : "");
 }
 const PANEL = {
+  ggallery: o => galleryPanel(o.F),   // round 196
+  gmakers: o => makersPanel(o.F),
   gcase: o => { const s = stockOf(o); return `<h2>The bonbon case</h2><p class="sub">A little glass case on the counter end, filled from the Cocoa Room's own display: the same trays, so what sells here is gone there too.${o.cocoa ? ` ${o.cocoa.prices.bonbon} coins a bonbon.` : ""}</p>`
     + (!o.cocoa ? `<p class="muted">Empty: there's no Cocoa Room to fill it from yet.</p>` : s.bon.length ? `<ul class="hlist wlist">${s.bon.map(b => `<li><span class="wtxt"><b>${esc(b.name)}</b><small>${o.cocoa.trays[b.id]} left in the trays</small></span><span class="orbtns"><button class="btn small alt" data-gs="eat:${esc(b.id)}">Have one</button><button class="btn small alt" data-gs="box:${esc(b.id)}" ${o.cocoa.trays[b.id] >= 4 ? "" : "disabled"}>Box of 4</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing in the Cocoa Room's display case right now. Make a tray at the bonbon table.</p>`); },
   gbars: o => { const s = stockOf(o); return `<h2>The chocolate shelf</h2><p class="sub">Bars from the Cocoa Room's wall, stood up in a row.${o.cocoa ? ` ${o.cocoa.prices.bar} coins a bar.` : ""}</p>`
@@ -105,5 +116,5 @@ export function giftPanel(F, spot, o){
   // the till
   const open = keeperOn(day, o.hm);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The gift shop</h2><p class="sub">${o.here ? "You're behind the till. People browse longer when you're chatting." : o.keeper ? `Posy's at the till, rearranging the bonbon case for the third time today.` : open ? "Nobody's at the till." : "Shut for now: Posy opens 10 till 6, every day but Monday. Stand behind the till yourself and it's open."}</p>
-    <p class="muted">${t.n ? `Sold today: ${t.n}, for ${t.coins} coins (${["bonbon", "bar", "mill", "wine", "pair", "wrap"].filter(k => t[k]).map(k => `${t[k]} ${{bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes", wrap: "wrapped gifts"}[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut;
+    <p class="muted">${t.n ? `Sold today: ${t.n}, for ${t.coins} coins (${["bonbon", "bar", "mill", "wine", "pair", "wrap", "art", "made"].filter(k => t[k]).map(k => `${t[k]} ${{bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes", wrap: "wrapped gifts", art: "paintings", made: "from the makers"}[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut;
 }

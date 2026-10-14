@@ -437,13 +437,15 @@ export const ROOMS = {
     ["car","Car","C","carbay",null,"The car's spot.",30]]},
   // the cellar door (a big goal): Mel's wine wall, the tasting bar, barrel racks, a high table
   // round 178: the gift shop, through the wine shop's bottom-left door (game/giftshop.js): shared stock from the other shops
-  giftshop: {name:"The gift shop", wall:"#F6EEE6", trim:"#C9A3E0", noBoard:true, pos:{A:[110,262], B:[262,262], C:[414,262], D:[110,500], E:[300,470], F:[320,592]}, stations:[
+  giftshop: {name:"The gift shop", wall:"#F6EEE6", trim:"#C9A3E0", noBoard:true, pos:{A:[110,262], B:[262,262], C:[414,262], D:[110,500], E:[300,470], F:[320,592], G:[262,150], H:[446,594]}, stations:[
     ["gcase","Bonbon case","A","bonboncase",null,"A little case of bonbons, from the Cocoa Room's trays.",36],
     ["gbars","Chocolate shelf","B","giftbars",null,"Bars from the Cocoa Room's wall.",34],
     ["gmill","From the mill","C","giftmill",null,"Oils, soaps and lotions from the mill.",34],
     ["gwine","Wine corner","D","wineshelf",null,"A few of your bottles to take home.",30],
     ["gtill","Till","E","gifttill",null,"The till. Stand here and it's open.",30],
-    ["gwrap","Wrapping table","F","wraptable",null,"Paper, ribbon and tags: wrap a gift, or put wrapped ones out to sell.",30]]},   // round 185
+    ["gwrap","Wrapping table","F","wraptable",null,"Paper, ribbon and tags: wrap a gift, or put wrapped ones out to sell.",30],   // round 185
+    ["ggallery","Gallery wall","G","gallerywall",null,"Local painters' work, between the windows. And yours, if you like.",146],   // round 196
+    ["gmakers","Makers' shelf","H","makershelf",null,"Handmade things from around Honeybrook, on consignment.",-4]]},
   cellar: {name:"The cellar door", wall:"#E9DCCB", trim:"#6B3A2A", noBoard:true, pos:{W:[130,262], B:[340,262], R:[140,500], T:[360,500]}, stations:[
     ["winewall","Wine wall","W","winewall",null,"A bottle of every wine you've made. It's getting full.",36],
     ["flight","Tasting bar","B","tastebar",null,"The tasting bar. Pour yourself a flight (and on the first Friday of the month, host the wine club).",34],
