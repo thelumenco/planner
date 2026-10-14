@@ -2479,3 +2479,6 @@ Mel: "I took four bottles of olive oil... put it in the basket, and it disappear
 
 ## Round 200: Tomi only presses
 Mel: "I dont want Tomi to do anything upstairs... take the olives from the crate, press it into bottles of olive oil, and then put them into the basket upstairs. Thats it." `inesStep` no longer infuses; his pressing goes into `basket.oliveoil` (old `c.oil` bottles move there too, in `craftState`). Olive oil tastings are Hazel's now (`millSlot`, the tasting panel, core's line), and the weekend one moves to 4:15 (`TASTE.weekend`) so it follows her Saturday workshop. Tomi's intro and a line updated.
+
+## Round 201: beeswax in the basket
+Mel: "I need to be able to put beeswax in the basket". `basketable` already allowed it, but the basket tab only listed herbs, goat's milk and olive oil, so there was no button. Added.
