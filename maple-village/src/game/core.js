@@ -1258,6 +1258,9 @@ function bookCard(){
     else if (a === "write") { bkSt = {open: bkSt.open === v ? null : v, letter: {}}; }
     else if (a === "cancel") bkSt = {};
     else if (a === "open") { bkSt.letter = {...(bkSt.letter || {}), open: bkSt.letter && bkSt.letter.open === v ? "" : v}; }
+    else if (a === "yes") { if (BK.acceptOffer(F, v)) { sfx("chime"); flash(`${BK.person(v).name} will send a box each week`); } }   // round 198: from our travels
+    else if (a === "no") { BK.declineOffer(F, v); flash("Maybe another time"); }
+    else if (a === "stop") { if (BK.stopLine(F, v)) flash(`No more boxes from ${BK.person(v).name}. You can still write.`); }
     else if (a === "send") { const l = bkSt.letter || {}, r = BK.postTo(F, v, {open: l.open, text: l.text}); if (r.err) { flash(r.err); return; } sfx("chime"); flash(`Posted to ${BK.person(v).name}`); speak(`Off it goes to ${BK.REGIONS[BK.regionOf(v)]}. Watch your mailbox for a reply.`, 4000); bkSt = {}; }
     save(); bookCard(); });
 }
@@ -1860,6 +1863,7 @@ function ctx(){
   if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gg]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const [a, v] = b.dataset.gg.split(/:(.*)/s);   // round 196: the gallery and the makers' shelf
     if (a === "hang") { if (GAL.hangOwn(F, v)) { sfx("paper", true); flash("Up on the gallery wall"); } }
     else if (a === "down") { if (GAL.takeDown(F, +v)) { sfx("paper", true); flash("Back in your backpack"); } }
+    else if (a === "take") { if (GAL.takeTravel(F, v)) { sfx("paper", true); flash(`${ITEMS[v].n}, in your backpack`); } }
     else if (a === "buy") { if (GAL.buyMade(F, v)) { sfx("coin"); flash(`${ITEMS[v].n}, in your backpack (the coins go to ${GAL.MAKERS[ITEMS[v].maker].name})`); } }
     save(true); ctx(); });
   if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gp]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const cc = owns(F, "cocoa") ? cocoaState(F) : null;   // round 179
@@ -3104,6 +3108,7 @@ function millTick(){
   const now = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(c.at || now, now - 864e5); let coins = 0, n = 0, xcoins = 0, xn = 0, gcoins = 0, gn = 0;
   for (let at = from + 60000; at <= now; at += 60000) { const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     const got = craftSellMinute(F, day, hm, owns(F, "millshop") ? "shop" : owns(F, "giftshop") ? null : vineState(F).shelf ? "wineshop" : null); if (got) { coins += got; n++; }
+    if (owns(F, "giftshop") && hm % 60 === 0) { const r = BK.travelTick(F, at); r.got.forEach(g => setTimeout(() => flash(`A box from ${g.who}: ${BK.BOX} ${ITEMS[g.item].n.toLowerCase()} for the gift shop (${g.cost} coins)`), 1200)); r.skip.forEach(g => setTimeout(() => flash(`${g.who}'s box waits a week: it's ${g.cost} coins`), 1200)); }   // round 198
     if (owns(F, "giftshop")) { const fr0 = JSON.stringify(GAL.galleryState(F).frames.concat([GAL.makersState(F).stock])), g = giftSellMinute(F, day, hm, at + 60000 > now && scene === "giftshop" && atSpot === "gtill" ? "mel" : giftKeeperOn(day, hm) ? "keeper" : null, giftOpts()); if (g) { gcoins += g; gn++; }
       if (scene === "giftshop" && JSON.stringify(GAL.galleryState(F).frames.concat([GAL.makersState(F).stock])) !== fr0) galleryRedraw = true; }
     const ev = eventNow(day, hm); if (ev && ev.kind === "market") ["market", "grace"].forEach(w => { const g = craftSellMinute(F, day, hm, w); if (g) { coins += g; n++; } });

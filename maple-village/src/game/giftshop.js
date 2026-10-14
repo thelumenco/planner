@@ -63,6 +63,8 @@ export function giftSellMinute(F, day, hm, mode, o){
     const fr = galleryState(F).frames, idx = fr.map((f, i) => f && f.by ? i : -1).filter(i => i >= 0), i = idx[Math.floor(Math.random()*idx.length)], at = o.at || Date.now(),
       coins = sellPainting(F, i, at), t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.art = (t.art || 0) + 1; return coins;
   }
+  { const tr = F.giftshop.travel || {}, ts = Object.keys(tr).filter(id => tr[id] > 0 && ITEMS[id]); if (ts.length && Math.random() < .12) {   // round 198: from our travels (Mel paid for the box, so it's all hers)
+    const id = ts[Math.floor(Math.random()*ts.length)], coins = ITEMS[id].price; tr[id]--; const t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.travel = (t.travel || 0) + 1; return coins; } }
   { const mk = MAKER_ITEMS.filter(id => (makersState(F).stock[id] || 0) > 0); if (mk.length && Math.random() < .18) {
     const coins = sellMade(F, mk[Math.floor(Math.random()*mk.length)]), t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.made = (t.made || 0) + 1; return coins; } }
   if (g.pairs.length && Math.random() < (pairSeason(day) ? .35 : .12)) {
@@ -116,5 +118,5 @@ export function giftPanel(F, spot, o){
   // the till
   const open = keeperOn(day, o.hm);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The gift shop</h2><p class="sub">${o.here ? "You're behind the till. People browse longer when you're chatting." : o.keeper ? `Posy's at the till, rearranging the bonbon case for the third time today.` : open ? "Nobody's at the till." : "Shut for now: Posy opens 10 till 6, every day but Monday. Stand behind the till yourself and it's open."}</p>
-    <p class="muted">${t.n ? `Sold today: ${t.n}, for ${t.coins} coins (${["bonbon", "bar", "mill", "wine", "pair", "wrap", "art", "made"].filter(k => t[k]).map(k => `${t[k]} ${{bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes", wrap: "wrapped gifts", art: "paintings", made: "from the makers"}[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut;
+    <p class="muted">${t.n ? `Sold today: ${t.n}, for ${t.coins} coins (${["bonbon", "bar", "mill", "wine", "pair", "wrap", "art", "made", "travel"].filter(k => t[k]).map(k => `${t[k]} ${{bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes", wrap: "wrapped gifts", art: "paintings", made: "from the makers", travel: "from your travels"}[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut;
 }

@@ -4217,6 +4217,30 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(ms.size === Object.values(gal.PAINTERS).reduce((a, p) => a + p.works.length, 0) && [...ms].every(m => gal.paintSVG(0, 0, 38, 48, {m, c1: "#000", c2: "#fff"}).length > 80), "round 197: every painting has its own picture (" + ms.size + ")");
   check(it.ITEMS.p_view.to === "family" && it.ITEMS.p_view.kind === "keepsake" && bk.postable(it.ITEMS.p_view), "and Mel's own paintings can be given, or posted to a friend");
 }
+{
+  console.log("\nFrom our travels: friends send boxes for the gift shop (round 198)");
+  await import(new URL("../src/game/ronda.js", import.meta.url));
+  const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), gs = await import(new URL("../src/game/giftshop.js", import.meta.url)), gal = await import(new URL("../src/game/gallery.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
+  const T = Date.UTC(2026, 9, 14, 3), D = 864e5, who = "lvroux", item = bk.importable(who);
+  const F = {coins: 200, inv: {}, met: {[who]: true}, goals: {giftshop: 1}}; bk.addContact(F, who, "d");
+  check(item === "b_calissons" && it.ITEMS[item].kind === "gift", "Madame Roux has something of her own for a shop shelf: " + it.ITEMS[item].n);
+  bk.postTo(F, who, {open: "Thinking of you"}, T); bk.postTo(F, who, {open: "Just saying hello"}, T + D);
+  check(!bk.offersOpen(F, T + 9*D).length, "no offer after only two letters");
+  const e = bk.postTo(F, who, {open: "Thank you for the day"}, T + 2*D);
+  check(e.offer === item && !bk.offersOpen(F, T + 3*D).length && bk.offersOpen(F, T + 4*D).length === 1 && /gift shop now/.test(bk.replyBody(e)), "the third letter's reply offers a box a week, in a P.S.");
+  check(bk.acceptOffer(F, who, T + 4*D) && bk.lines(F).length === 1 && !bk.offersOpen(F, T + 4*D).length, "Mel says yes please");
+  const cost = bk.BOX*bk.tradeOf(item), c0 = F.coins, r = bk.travelTick(F, T + 5*D);
+  check(r.got.length === 1 && F.coins === c0 - cost && F.giftshop.travel[item] === bk.BOX && cost < bk.BOX*it.ITEMS[item].price, "the first box comes, paid for on arrival (" + cost + " coins for " + bk.BOX + ")");
+  check(!bk.travelTick(F, T + 6*D).got.length && bk.travelTick(F, T + 12*D + 1).got.length === 1, "then one box a week, and only one even after a long time away");
+  F.coins = 1; check(bk.travelTick(F, T + 30*D).skip.length === 1 && F.giftshop.travel[item] === 2*bk.BOX, "no coins, no box that week (nothing owed)");
+  check(gal.takeTravel(F, item) && F.inv[item] === 1 && F.giftshop.travel[item] === 2*bk.BOX - 1, "Mel can take one off the shelf to give");
+  let made = 0; const G = {coins: 0, inv: {}, goals: {giftshop: 1}, giftshop: {travel: {[item]: 500}}};
+  for (let k = 0; k < 2000; k++) { const c = gs.giftSellMinute(G, "2026-10-21", 600, "mel", {store: {}, v: {shelf: []}, cocoa: null, onDisplay: () => []}); if (c === it.ITEMS[item].price) made++; }
+  check(made > 0 && G.giftshop.travel[item] === 500 - made, "shoppers buy them at Madame Roux's own price (" + made + " sold)");
+  check(bk.stopLine(F, who) && !bk.lines(F).length && !bk.offersOpen(F, T + 40*D).length, "and Mel can stop the boxes whenever she likes");
+  const G2 = {coins: 0, met: {}, goals: {}}; G2.met[who] = true; bk.addContact(G2, who, "d"); [0, 1, 2].forEach(k => bk.postTo(G2, who, {open: "Hi"}, T + k));
+  check(!bk.offersOpen(G2, T + 9*D).length, "no offers before there's a gift shop to send to");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

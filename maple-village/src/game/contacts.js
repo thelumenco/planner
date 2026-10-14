@@ -65,6 +65,9 @@ export function postTo(F, to, {item = null, open = "", text = ""} = {}, at = now
   const days = DAYS[postage(to)] || 2, p = PEN[to], b = bookState(F), h = hash(to + at + b.sent.length);
   const e = {id: `post-${to}-${at}-${b.sent.length}`, to, item: item || null, open, text: String(text).trim().slice(0, 400), at: at + days*D,
     back: item && p && p.back && ITEMS[p.back] && h % 5 === 0 ? p.back : null};   // about one parcel in five comes back with a little something
+  // round 198: after a few posts, a friend with something of their own to sell offers to send some for the gift shop
+  const imp = importable(to);
+  if (imp && (F.goals || {}).giftshop && !(b.offers || {})[to] && !(b.lines || {})[to] && b.sent.filter(x => x.to === to).length >= 2) { b.offers = b.offers || {}; b.offers[to] = {item: imp, at: e.at}; e.offer = imp; }
   b.sent = [...b.sent, e].slice(-60); return e;
 }
 // what kind of thing a gift is, for which thank-you line they write
@@ -87,6 +90,7 @@ export function replyBody(e){
     const two = [p.news[h % p.news.length], p.news[(h + 1 + (h >> 3) % (p.news.length - 1)) % p.news.length]];
     body = `${p.dear || "Dear Mel,"}\n\n${p.open[h % p.open.length]}\n\n${fill(e.item ? (p[giftKind(e.item)] || p.other) : p.letter)}\n\n${two.join("\n\n")}`;
     if (e.back && ITEMS[e.back]) body += `\n\n${p.backNote}`;
+    if (e.offer && ITEMS[e.offer]) body += `\n\n${offerLine(e.to, e.offer)}`;
     return `${body}\n\n${p.sign}\n\n${p.ps[(h >> 2) % p.ps.length]}`;
   }
   if (e.item) {
@@ -96,6 +100,7 @@ export function replyBody(e){
   if (p && p.news && p.news.length) body += `\n\n${p.news[h % p.news.length]}`;
   else if (d.lines && d.lines.length) body += `\n\nP.S. ${d.lines[h % d.lines.length]}`;
   if (e.back && ITEMS[e.back]) body += `\n\n${p.backNote || `I've tucked in a little ${nm(e.back)}.`}`;
+  if (e.offer && ITEMS[e.offer]) body += `\n\n${offerLine(e.to, e.offer)}`;
   return `${body}\n\n${p ? p.sign : `Warmly, ${first}`}`;
 }
 export const bookMail = (F, t = now()) => bookState(F).sent.filter(e => e.at <= t && DEF[e.to]).map(e => ({id: e.id, from: "postie", at: e.at,
@@ -106,6 +111,29 @@ export function collectBack(F, t = now()){
   return got;
 }
 export const onTheWay = (F, t = now()) => bookState(F).sent.filter(e => e.at > t).length;
+/* ---------- from our travels (round 198) ---------- */
+// A friend whose own goods would sit on a shop shelf (their PEN `back`, a gift) offers, after Mel's third post, to send
+// a few each week. Mel says yes or no in the address book. Each week's box costs her TRADE of the price (she pays on
+// arrival; no coins, no box that week), and it sells at their own price in the gift shop: a small margin, never more.
+// State: F.book.offers {id: {item, at}}, F.book.lines {id: {item, next}}, F.giftshop.travel {item: n}
+export const BOX = 4, TRADE = .8, MAX_LINES = 5;
+export const importable = id => { const p = PEN[id], it = p && p.back && ITEMS[p.back]; return it && it.kind === "gift" && it.price > 0 ? p.back : null; };
+export const tradeOf = item => Math.max(1, Math.round((ITEMS[item] || {price: 0}).price*TRADE));
+const offerLine = (to, item) => `P.S. ${DEF[to] && DEF[to].name === "Jason" ? "Forgive my presumption, but I hear you keep a gift shop now. Should you ever want some of my own for the shelves" : "I hear you've a gift shop now. If you ever wanted some of mine for the shelves"}, I could send ${BOX} a week (${nm(item)}), for a little under what I charge here. Just say the word.`;
+export const offersOpen = (F, t = now()) => Object.entries(bookState(F).offers || {}).filter(([id, o]) => o.at <= t && !o.no && !(bookState(F).lines || {})[id] && DEF[id]).map(([id, o]) => ({id, item: o.item}));
+export const lines = F => Object.entries(bookState(F).lines || {}).filter(([id]) => DEF[id]).map(([id, l]) => ({id, ...l}));
+export function acceptOffer(F, id, t = now()){ const b = bookState(F), o = (b.offers || {})[id]; if (!o || o.no || lines(F).length >= MAX_LINES) return false;
+  b.lines = b.lines || {}; b.lines[id] = {item: o.item, next: t + D}; return true; }
+export function declineOffer(F, id){ const o = (bookState(F).offers || {})[id]; if (!o) return false; o.no = 1; return true; }
+export function stopLine(F, id){ const b = bookState(F); if (!(b.lines || {})[id]) return false; delete b.lines[id]; if (b.offers && b.offers[id]) b.offers[id].no = 1; return true; }
+// boxes due: at most one each per call (a long time away is still just one box), paid for on arrival
+export function travelTick(F, t = now()){
+  const got = [], skip = []; F.giftshop = F.giftshop || {}; const tr = F.giftshop.travel = F.giftshop.travel || {};
+  lines(F).forEach(l => { const L = bookState(F).lines[l.id]; if (L.next > t) return; L.next = Math.max(L.next + 7*D, t + D);
+    const cost = BOX*tradeOf(l.item); if ((F.coins || 0) < cost) { skip.push({who: DEF[l.id].name, item: l.item, cost}); return; }
+    F.coins -= cost; tr[l.item] = (tr[l.item] || 0) + BOX; got.push({who: DEF[l.id].name, item: l.item, cost}); });
+  return {got, skip};
+}
 const lastTo = (F, id) => { const s = bookState(F).sent.filter(e => e.to === id); return s[s.length - 1]; };
 
 /* ---------- the book, in the mail tab ---------- */
@@ -115,8 +143,11 @@ export function bookHTML(F, st, t = now()){
   const list = contacts(F), add = addable(F), way = onTheWay(F, t);
   let h = `<h2 style="margin-top:18px">Address book</h2><p class="muted">People you've met on your travels. Post them a letter (free) or a gift from your backpack (tap it there, then "By post"). Replies come back in a day or three.${way ? ` ${way} on the way.` : ""}</p>`;
   h += list.length ? `<ul class="qlist book">${list.map(id => { const d = DEF[id], l = lastTo(F, id);
+    const off = offersOpen(F, t).find(o => o.id === id), ln = (bookState(F).lines || {})[id];
+    const tradeRow = off ? `<li style="${ROW}"><span class="wtxt" style="flex:1"><small>Offers a weekly box for the gift shop: ${BOX} × ${esc(nm(off.item))}, ${BOX*tradeOf(off.item)} coins a box. They sell for ${ITEMS[off.item].price} each.</small></span><span class="orbtns" style="display:flex;gap:6px;flex-shrink:0"><button class="btn small primary" data-bk="yes:${id}" ${lines(F).length < MAX_LINES ? "" : "disabled"}>Yes please</button><button class="btn small alt" data-bk="no:${id}">No thanks</button></span></li>`
+      : ln ? `<li style="${ROW}"><span class="wtxt" style="flex:1"><small>Sends a weekly box to the gift shop: ${BOX} × ${esc(nm(ln.item))}, ${BOX*tradeOf(ln.item)} coins a box.</small></span><span class="orbtns" style="flex-shrink:0"><button class="btn small alt" data-bk="stop:${id}">Stop</button></span></li>` : "";
     return `<li style="${ROW}"><span class="wtxt" style="flex:1"><b>${esc(d.name)}</b><small>${esc(d.job || "")} · ${REGIONS[REGION[id]]}${l ? ` · last: ${l.item ? nm(l.item) : "a letter"}` : ""}</small></span><span class="orbtns" style="display:flex;gap:6px;flex-shrink:0"><button class="btn small alt" data-bk="write:${id}">Write</button><button class="btn small alt" data-bk="del:${id}" aria-label="Take ${esc(d.name)} out of your address book">×</button></span></li>`
-      + (st.open === id ? writeHTML(id, st.letter || {}) : ""); }).join("")}</ul>` : `<p class="muted">Nobody yet.</p>`;
+      + tradeRow + (st.open === id ? writeHTML(id, st.letter || {}) : ""); }).join("")}</ul>` : `<p class="muted">Nobody yet.</p>`;
   if (add.length) h += st.more ? `<p class="eyebrow" style="margin:12px 0 6px">Met on your travels</p><ul class="qlist book">${add.sort((a, b) => DEF[a].name.localeCompare(DEF[b].name)).map(id => `<li style="${ROW}"><span class="wtxt" style="flex:1"><b>${esc(DEF[id].name)}</b><small>${esc(DEF[id].job || "")} · ${REGIONS[REGION[id]]}</small></span><span class="orbtns" style="flex-shrink:0"><button class="btn small alt" data-bk="add:${id}">Add</button></span></li>`).join("")}</ul><div class="actions"><button class="btn small alt" data-bk="less">Hide</button></div>`
     : `<div class="actions"><button class="btn small alt" data-bk="more">Add someone you've met (${add.length})</button></div>`;
   return h;

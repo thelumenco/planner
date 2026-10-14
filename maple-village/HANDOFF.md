@@ -2464,3 +2464,12 @@ excited about selling my painting"; makers' cut about a fifth, fine.
 ## Round 197: every painting its own picture; give your own paintings
 Mel: "The paintings all look the same". `gallery.js` `paintSVG` draws each work's motif (`works[i][4]`: dusk, vines, jetty, rows, orchard, rain, wisteria, cat, window, well, herons, pine, bridge, jar, dahlia, cosmos, rose; Mel's own: rows, cypress, still), on the wall (scenes.js) and in the panel. `framesNow` gives older frames their motif by title.
 Mel: "When I take down the painting, can I gift it?" PAINTINGS (terrace-people.js) gain `to: "family"` and lines; a keepsake with `to` opens the gift chooser (still with Keep it), and `postable` lets it go by post.
+
+## Round 198: from our travels
+- contacts.js: `importable(id)` (their PEN `back`, a gift with a price; 50 friends have one). On Mel's third post to someone
+  (with the gift shop owned) the reply's P.S. offers a weekly box (`b.offers`, `offerLine`; Jason's own wording). The address
+  book shows Yes please / No thanks, then Stop (`acceptOffer`, `declineOffer`, `stopLine`; up to `MAX_LINES` 5).
+  `travelTick` (hourly in core's sales loop): a box of `BOX` 4 at `TRADE` 0.8 of the price, paid on arrival; no coins, no box
+  that week; only one box however long Mel's away. Stock in `F.giftshop.travel`.
+- giftshop.js sells them at the friend's own price (all Mel's). gallery.js `makersPanel` has a "From our travels" section with Take one (`takeTravel`).
+- Test block "round 198".

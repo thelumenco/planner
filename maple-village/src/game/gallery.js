@@ -13,6 +13,7 @@ import { esc } from "../util.js";
 import { ITEMS } from "../data/items.js";
 import { icon } from "../art/icons.js";
 import { PAINTINGS } from "../data/terrace-people.js";
+import { lines, person, tradeOf } from "./contacts.js";
 
 export const TOKEN = 10, CUT = .2, FRAMES = 4;
 const D = 864e5;
@@ -81,6 +82,8 @@ export function sellMade(F, id){ const m = makersState(F); if (!(m.stock[id] > 0
   m.week[it.maker] = (m.week[it.maker] || 0) + it.price; return Math.max(1, Math.round(it.price*CUT)); }
 export function buyMade(F, id){ const it = ITEMS[id]; if (!it || !(makersState(F).stock[id] > 0) || (F.coins || 0) < it.price) return false;
   F.coins -= it.price; sellMade(F, id); F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; return true; }
+// round 198: one of the travel boxes' things, into Mel's backpack (she's already paid for it)
+export function takeTravel(F, id){ const tr = (F.giftshop || {}).travel || {}; if (!(tr[id] > 0)) return false; tr[id]--; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; return true; }
 // Mel's own paintings (the sip-and-paint keepsakes): up on the wall, never for sale
 export const ownPaintings = F => Object.keys(F.inv || {}).filter(id => /^p_/.test(id) && F.inv[id] > 0 && ITEMS[id]);
 export function hangOwn(F, id){ const g = galleryState(F), i = g.frames.indexOf(null); if (i < 0 || !(F.inv[id] > 0)) return false;
@@ -139,6 +142,12 @@ export function makersPanel(F){
   let h = `<h2>The makers' shelf</h2><p class="sub">Little handmade things from around Honeybrook, on consignment: when one sells, the maker gets the money and you keep about a fifth. They top it up on Mondays.</p><ul class="hlist wlist">`;
   h += Object.entries(MAKERS).map(([k, mk]) => { const it = ITEMS[mk.item], n = m.stock[mk.item] || 0;
     return `<li><span class="wpic">${icon(mk.item, 28)}</span><span class="wtxt"><b>${esc(it.n)}</b><small>${esc(mk.name)} · ${it.price} coins · ${n ? `${n} on the shelf` : "sold out till Monday"}</small></span><span class="orbtns"><button class="btn small alt" data-gg="buy:${mk.item}" ${n && (F.coins || 0) >= it.price ? "" : "disabled"}>Buy one</button></span></li>`; }).join("") + `</ul>`;
+  // round 198: from our travels: friends' own goods, in weekly boxes Mel has paid for (so the takings are all hers)
+  const tr = (F.giftshop || {}).travel || {}, ls = lines(F), ids = [...new Set([...ls.map(l => l.item), ...Object.keys(tr).filter(id => tr[id] > 0)])].filter(id => ITEMS[id]);
+  h += `<p class="eyebrow" style="margin:14px 0 6px">From our travels</p>`;
+  h += ids.length ? `<ul class="hlist wlist">${ids.map(id => { const l = ls.find(x => x.item === id), who = l && person(l.id) ? person(l.id).name : "a friend", n = tr[id] || 0;
+      return `<li><span class="wpic">${icon(ITEMS[id].ico || id, 28)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>From ${esc(who)} · ${ITEMS[id].price} each (${tradeOf(id)} to you) · ${n ? `${n} on the shelf` : "next box on its way"}</small></span><span class="orbtns"><button class="btn small alt" data-gg="take:${id}" ${n ? "" : "disabled"}>Take one</button></span></li>`; }).join("")}</ul>`
+    : `<p class="muted">Write to the friends you've made on your travels. After a few letters, some of them offer to send a little of their own for this shelf.</p>`;
   if (wk.length) h += `<p class="muted">This week the makers have taken home ${wk.map(([k, c]) => `${esc(MAKERS[k].name)} ${c}`).join(", ")} coins.</p>`;
   return h;
 }
