@@ -2112,8 +2112,8 @@ function ctx(){
     if (a === "polish") { swView = "swpolish"; swSt = {polish: polishStart()}; sfx("paper", true); ev(["my one's shiny too!", "rub rub rub", "it was a TREE?"], 1400); }
     else if (a === "rub" || a === "buff") { if (swSt.polish && polishStep(swSt.polish, a)) sfx("tap"); }
     else if (a === "polished") { if (!swSt.polish || !polishDone(swSt.polish)) return; const r = finishPolish(F, addInv); if (!r) return; swSt = {}; sfx("chime"); gainXp(2); hearts(2);
-      if (r.charm) { flash(`Jet charm: ${r.charm.name}`); speak("Priya drills a tiny hole, and your piece becomes a little jet anchor. "Your first charm," she says. "Earn the rest round town and I'll thread you a bracelet."", 7000); if (r.charm.all) braceletDone(); }
-      else { flash("A jet pendant"); speak("Priya sets your shining piece on a fine chain: a pendant, to keep or to give. "You're getting good at this," she says. "Don't tell Mr Ellerby."", 6500); }
+      if (r.charm) { flash(`Jet charm: ${r.charm.name}`); speak("Priya drills a tiny hole, and your piece becomes a little jet anchor. \"Your first charm,\" she says. \"Earn the rest round town and I\'ll thread you a bracelet.\"", 7000); if (r.charm.all) braceletDone(); }
+      else { flash("A jet pendant"); speak("Priya sets your shining piece on a fine chain: a pendant, to keep or to give. \"You\'re getting good at this,\" she says. \"Don\'t tell Mr Ellerby.\"", 6500); }
       ev(["mine shines, Mama!", "look, LOOK", "it's like a beetle!"], 2200); save(); }
     else if (a === "charms") { swView = "swcharms"; sfx("paper", true); }
     else if (a === "shantyopen") { swView = "swshanty"; swSt = {}; sfx("paper", true); }
