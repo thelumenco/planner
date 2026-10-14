@@ -342,14 +342,14 @@ export const ROOMS = {
     ["dine","Dining table","X","dining",null,"The supper table. There's always food on it. Take some home.",44]]},
   // Marcus and Angellina's: the games corner, Angellina's study desk and psychology books, the sofa
   // Auntie Lin and Juniper share the little green cottage by the flower-farm gate (Ada and Idris have their old houses
-  // on Makers' Lane for the shops): seed trays and star charts, two armchairs, one teapot
+  // on Makers' Lane for the shops): seed trays and a telescope, one sofa, two cushions, one teapot
   linjun: {name:"Lin and Juniper's", wall:"#F2F5EA", trim:"#5E8A48", noBoard:true, pos:{S:[120,262], T:[420,262], B:[270,262], P:[130,520], X:[360,470], R:[480,340]}, stations:[
     ["bedroom","Bedroom","R","bedroomdoor",null,"Two bedrooms off the landing. Lin's is up with the sun; Juniper's light is on till late.",0],
     ["seeds","Seed trays","S","plantable",null,"Lin's seed trays on the sill, each labelled in capitals: TOMATOES. DO NOT TOUCH.",30],
-    ["scope","Telescope","T","curtwindow",null,"Juniper's telescope at the window, pointed at whatever's brightest tonight.",30],
+    ["scope","Window and telescope","T","curtwindow",null,"Juniper's telescope by the window, pointed at whatever's brightest tonight.",30],
     ["books","Bookshelf","B","bookcase",null,"Poetry and seed catalogues, mixed up on purpose. Lin says it keeps them both honest.",30],
-    ["chairs","Two armchairs","P","sofa",null,"Two armchairs pulled close, a pot of tea between them. They've been arguing about compost for an hour.",34],
-    ["dine","Kitchen table","X","dining",null,"A small table with two mismatched chairs and a jar of whatever's flowering.",44]]},
+    ["chairs","Sofa","P","sofa",null,"A squashy sofa with two cushions: Lin's, yellow, embroidered with tomatoes, and Juniper's, pink, embroidered with stars.",34],
+    ["table","Tea table","X","teatable",null,"A little table for two, one teapot, and a jar of whatever's flowering. They've been arguing about compost for an hour.",34]]},
   tomiposy: {name:"Tomi and Posy's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[110,262], K:[432,261], D:[284,262], S:[110,420], X:[340,470], R:[480,340]}, stations:[
     ["bedroom","Bedroom","R","bedroomdoor",null,"Tomi and Posy's room.",0],
     ["games","Games corner","G","gamingtv",null,"Tomi's games. He says he's 'nearly finished' this one. He's been nearly finished for a month.",36],

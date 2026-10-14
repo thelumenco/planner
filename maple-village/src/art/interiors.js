@@ -56,7 +56,9 @@ const SHELLS = {
     ${wallBase("#F2F5EA", "#5E8A48")}
     <g style="fill:#FFF3C4" opacity=".8">${rows(6, r => rows(8, i => `<path transform="translate(${i*30 + (r % 2)*15 + 8} ${r*22 + 12})" d="M0 -3 l1 2 l2 1 l-2 1 l-1 2 l-1 -2 l-2 -1 l2 -1z"/>`))}</g>
     <g opacity=".7">${rows(6, r => rows(8, i => `<rect x="${280 + i*28 + (r % 2)*14}" y="${r*22 + 6}" width="12" height="15" rx="1" style="fill:${["#F4C7CF", "#DCE8C8", "#F3E1A0"][(r + i) % 3]}"/>`))}</g>
-    ${skirting}${plant(52, 430, 1)}${plant(478, 430, .9)}`,
+    ${skirting}${plant(52, 430, 1)}${plant(478, 430, .9)}
+    ${sk(`<path d="M374 268 l42 -34 l5 6 l-42 34z" style="fill:#7E6CB8"/><rect x="414" y="226" width="10" height="14" rx="2" transform="rotate(-39 419 233)" style="fill:#5E4E98"/><circle cx="396" cy="258" r="3" style="fill:#D9A93A"/>`,
+      `<path d="M374 268 l42 -34 l5 6 l-42 34z"/><path d="M396 258 l-14 44 M396 258 l14 44 M396 258 v46"/><circle cx="396" cy="258" r="3"/>`)}`,
 
   chico: () => `<rect width="520" height="640" style="fill:#F2E2D8"/>
     <g opacity=".4" style="stroke:#E2C9BB" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>

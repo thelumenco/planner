@@ -133,3 +133,12 @@ unless the page has ?setup=1. The leak check now finds nothing but window.claude
   present that suits them) is a heart; anything else half a heart. Hearts open up stories: the first chapter once
   you've met, the last at five hearts. Every chapter re-introduces what it's about, and the Stories tab keeps the
   whole story per villager. Ada and Idris have stories of their own (Ada's button jar, Idris's grandfather's suit).
+
+## Planned: Elena sells her cottages (Mel, 2026-10-14)
+Bluebell and Fig Tree, the two holiday lets on the cottage lane by the station, are Elena's. They stay holiday lets
+(guests for the week, out on the porch mornings and evenings) until you reach five hearts with her. Then Elena decides
+to sell them to you: a letter or a chat (she'd rather sell to a friend than a stranger off the train), with the
+prices from the personal edition's plan (about 3,000 for Bluebell and 2,000 for Fig Tree). Once bought, you do them up
+(the six styles the campervan uses) and let them to guests yourself. Still to design: what the guests pay, how often
+they come, and whether doing them up changes who books. Nothing is built yet; her hearts already count from requests
+and gifts.
