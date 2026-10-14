@@ -2476,3 +2476,6 @@ Mel: "When I take down the painting, can I gift it?" PAINTINGS (terrace-people.j
 
 ## Round 199: Mel's olive oil in the basket
 Mel: "I took four bottles of olive oil... put it in the basket, and it disappeared immediately". Basket oil joined the mill's own bottles (`c.oil`), and Tomi (`inesStep`, 2 to 5:30pm) infuses as soon as there's oil, a free jar and basket herbs; his `craft(..., "basket")` also took oil from Mel's backpack first. Now Mel's oil stays in `basket.oliveoil` ("Your olive oil"); Tomi uses only `c.oil` ("The mill's own olive oil", `unbasket:milloil`); Mel's bench takes backpack, then her basket, then the mill's bottles. Upstairs, a flash says when Tomi starts an infusion.
+
+## Round 200: Tomi only presses
+Mel: "I dont want Tomi to do anything upstairs... take the olives from the crate, press it into bottles of olive oil, and then put them into the basket upstairs. Thats it." `inesStep` no longer infuses; his pressing goes into `basket.oliveoil` (old `c.oil` bottles move there too, in `craftState`). Olive oil tastings are Hazel's now (`millSlot`, the tasting panel, core's line), and the weekend one moves to 4:15 (`TASTE.weekend`) so it follows her Saturday workshop. Tomi's intro and a line updated.

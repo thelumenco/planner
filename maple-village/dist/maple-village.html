@@ -8809,13 +8809,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       away: "Ines is off for the day."
     },
     // round 153: Tomi, Ines's little brother (named after Tomás, who planted the olive by the mill in 1912), works the
-    // mill once it's open: presses the olive crate and steeps the infused oils, 10 to 5, every day but Sunday
+    // mill once it's open: presses the olive crate and carries the bottles up to the basket (round 200: that's all), 10 to 5, every day but Sunday
     {
       id: "tomi",
       pitch: 1.1,
       name: "Tomi",
       job: "Works the press at the old mill (Ines's little brother)",
-      intro: "Tomi. Ines's brother, the one named after the great-great-grandfather. So the mill's sort of a family thing. I press, I steep, I sweep up the olive stones.",
+      intro: "Tomi. Ines's brother, the one named after the great-great-grandfather. So the mill's sort of a family thing. I press, I bottle, I carry it upstairs, I sweep up the olive stones.",
       look: { skin: "#E8B996", hair: "#5A2E1A", hairStyle: "spiky", top: "#7FA35A", bottom: "#4F5A6A", extra: "apron" },
       // round 154: his week. Before the mill opened he helped Ines on the vines; Sundays off: football on the field,
       // then the Scoop Shack; Wednesday and Friday evenings at the wine shop, Tuesdays down at the bay with Ines
@@ -8828,7 +8828,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         slot5("18:00", "20:00", "wineshop", [[300, 500], [360, 520]], { dow: [3, 5] }),
         slot5("18:00", "19:30", "bay", [[180, 420], [300, 420]], { dow: [2] })
       ],
-      lines: ["Three jars to a bottle. Every time. The stone doesn't lie.", "Rosemary oil's steeping. Six hours. I count.", "T.R. 1912. Ines thinks I carved it. I didn't. Probably.", "Smell that? Green and peppery. That's a good pressing."],
+      lines: ["Three jars to a bottle. Every time. The stone doesn't lie.", "Four bottles, up the stairs, into the basket. Then back down for more.", "T.R. 1912. Ines thinks I carved it. I didn't. Probably.", "Smell that? Green and peppery. That's a good pressing."],
       away: "Tomi's finished at the mill for the day."
     },
     // round 178: Posy keeps the gift shop behind the wine shop, 10 to 6, every day but Monday (giftshop.js)
@@ -28550,6 +28550,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.basket = c.basket || {};
     c.oil = c.oil || 0;
     c.sold = c.sold || {};
+    if (c.oil > 0) {
+      c.basket.oliveoil = (c.basket.oliveoil || 0) + c.oil;
+      c.oil = 0;
+    }
     return c;
   }
   var keyOf4 = (kind, base, adds, dye) => `${kind}_${base ? base + "_" : ""}${[...adds].sort().join("-")}${dye ? "~" + dye : ""}`;
@@ -28753,7 +28757,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function inesStep(F2, m, v, t2 = Date.now()) {
     const c = craftState(F2), did = {};
     if (m.press && m.press.by === "ines" && m.press.start + m.press.dur <= t2) {
-      c.oil += m.press.n;
+      c.basket.oliveoil = (c.basket.oliveoil || 0) + m.press.n;
       m.made = (m.made || 0) + m.press.n;
       did.pressed = m.press.n;
       m.press = null;
@@ -28763,13 +28767,6 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       v.oliveCrate -= n * 3;
       m.press = { start: t2, dur: 36e5, n, by: "ines" };
       did.started = n;
-    }
-    if (c.steep.length < CRAFT.jars && c.oil >= CRAFT.oilPer) {
-      const r = c.recipes.filter((x) => x.kind === "oil" && x.adds.every((a) => c.basket[a] > 0)).sort((a, b) => b.adds.length - a.adds.length)[0];
-      if (r) {
-        const r2 = craft(F2, "oil", null, r.adds, "basket");
-        if (r2.recipe) did.infused = r.name;
-      }
     }
     return did;
   }
@@ -28823,12 +28820,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return h3 + `<p class="sub">Everything made, on the mill's shelves. ${o.shop ? "Hazel sells from here, downstairs." : "The wine shop sells a little of it from a shelf by the counter: open the Mill Shop downstairs to sell it all day."} Take some for yourself, or to give away.</p>
       ${ids.length ? `<ul class="hlist wlist">${ids.map((id) => `<li><span class="wtxt"><b>${esc(ITEMS[id] ? ITEMS[id].n : id)}</b><small>${c.store[id]} on the shelf · ${ITEMS[id] ? ITEMS[id].price : "?"} coins each</small></span><button class="btn small alt" data-mc="takeit:${id}">Take one</button></li>`).join("")}</ul>` : `<p class="muted">Nothing on the shelves yet.</p>`}
       ${c.steep.length || c.cure.length || c.pot ? `<p class="eyebrow" style="margin:10px 0 6px">On the go</p><ul class="hlist wlist">${jobs(c.steep, "steeping")}${jobs(c.cure, "curing")}${c.pot ? jobs([c.pot], "warming") : ""}</ul>` : ""}
-      <p class="muted">Plain oil in the mill: ${c.oil} bottle${c.oil === 1 ? "" : "s"}${o.ines ? " (Tomi presses the olive crate while he's in)" : ""}.</p>` + shut9;
+      <p class="muted">Olive oil in the basket: ${c.basket.oliveoil || 0} bottle${c.basket.oliveoil === 1 ? "" : "s"}${o.ines ? " (Tomi presses the olive crate while he's in, and brings it up)" : ""}.</p>` + shut9;
     }
     if (tab === "basket") {
       const herbs = [...Object.keys(HERB), "goatmilk", "oliveoil"], inBag2 = herbs.filter((a) => have(F2, a)), bn = (a) => a === "goatmilk" ? "Goat's milk" : a === "oliveoil" ? "Olive oil" : nm4(a);
-      return h3 + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk, olive oil. The bench takes from it as well as your backpack, and Tomi infuses oil with the herbs while he's in, using the oils you've worked out.</p>
-      <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some((a) => c.basket[a] > 0) || c.oil > 0 ? `<ul class="hlist wlist">${Object.keys(c.basket).filter((a) => c.basket[a] > 0).concat(c.oil > 0 ? ["milloil"] : []).map((a) => `<li><span class="wpic">${icon(a === "milloil" ? "oliveoil" : (ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(a === "milloil" ? "The mill's own olive oil" : a === "oliveoil" ? "Your olive oil" : bn(a))}</b><small>${a === "milloil" ? `${c.oil} bottle${c.oil === 1 ? "" : "s"} from Tomi's pressing (he infuses with these)` : a === "oliveoil" ? `${c.basket[a]} bottle${c.basket[a] === 1 ? "" : "s"}, kept for you (Tomi won't touch them)` : `${c.basket[a]} in the basket`}</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
+      return h3 + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk, olive oil. The bench takes from it as well as your backpack. Tomi brings up the oil he presses and leaves it here for you.</p>
+      <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some((a) => c.basket[a] > 0) || c.oil > 0 ? `<ul class="hlist wlist">${Object.keys(c.basket).filter((a) => c.basket[a] > 0).concat(c.oil > 0 ? ["milloil"] : []).map((a) => `<li><span class="wpic">${icon(a === "milloil" ? "oliveoil" : (ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(a === "milloil" ? "The mill's own olive oil" : a === "oliveoil" ? "Your olive oil" : bn(a))}</b><small>${a === "milloil" ? `${c.oil} bottle${c.oil === 1 ? "" : "s"} from Tomi's pressing (he infuses with these)` : a === "oliveoil" ? `${c.basket[a]} bottle${c.basket[a] === 1 ? "" : "s"}, yours and Tomi's pressing` : `${c.basket[a]} in the basket`}</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
       <p class="eyebrow" style="margin:10px 0 6px">From your backpack</p>
       ${inBag2.length ? `<div class="actions">${inBag2.map((a) => `<button class="btn small alt" data-mc="basket:${a}">${HERB[a] ? dots2([a]) : ""} Put in ${have(F2, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from Ma Ma's orchard and the garden, flowers from her flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut9;
     }
@@ -28869,7 +28866,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return h3 + `<div class="actions"><button class="btn primary" data-mc="make" ${ready ? "" : "disabled"}>${ready ? c.recipes.some((r) => r.id === keyOf4(tab, tab === "soap" ? base : null, pick5)) ? `Make ${esc(craftName(tab, base, pick5))}` : "Try something new" : "Make it"}</button></div>` + shut9;
   }
   var HERB_OF = (kind) => Object.keys(HERB).filter((a) => HERB[a][kind]);
-  var TASTE = { at: [11 * 60], weekend: [15 * 60], dur: 45, size: 4, boost: 60 };
+  var TASTE = { at: [11 * 60], weekend: [16 * 60 + 15], dur: 45, size: 4, boost: 60 };
   var WORKSHOP2 = { dow: [3, 6], from: 14 * 60, to: 16 * 60, size: 5, fee: 15 };
   var weekend = (day) => {
     const d = (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay();
@@ -28897,7 +28894,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const pool2 = tourists.filter((t2) => !busy2.includes(t2)), t0 = tastingNow(day, hm6);
     if (t0 != null) {
       const w = [t0, t0 + TASTE.dur];
-      if (id === "tomi") return { from: w[0], to: w[1], scene: "millup", at: [150, 356], dir: 1, act: "point", tasting: true };
+      if (id === "hazel") return { from: w[0], to: w[1], scene: "millup", at: [150, 356], dir: 1, act: "point", tasting: true };
       const k = pickN(pool2, TASTE.size, day + "taste" + t0).indexOf(id);
       if (k >= 0) {
         const [x, y, d] = TASTE_SEATS[[0, 3, 4, 7][k]];
@@ -28959,19 +28956,19 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     return false;
   }
-  ITEMS.t_glass = { n: "A cobalt tasting glass", kind: "keepsake", price: 0, ico: "olives", line: "A little cobalt-blue tasting glass from your first olive oil tasting upstairs at the mill. Blue so the colour can't fool you: you taste with your nose and your tongue, Tomi says. Like that afternoon in Córdoba." };
+  ITEMS.t_glass = { n: "A cobalt tasting glass", kind: "keepsake", price: 0, ico: "olives", line: "A little cobalt-blue tasting glass from your first olive oil tasting upstairs at the mill. Blue so the colour can't fool you: you taste with your nose and your tongue, Hazel says. Like that afternoon in Córdoba." };
   function tastePanel(F2, st6, o = {}) {
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The tasting table</h2>`;
-    if (o.shop === false) return h3 + `<p class="sub">A long table under dust sheets. Once the Mill Shop opens, Tomi will run olive oil tastings here: every day at 11, and at 3 at the weekend. Afterwards, people buy more oil.</p>` + shut9;
-    if (!o.on) return h3 + `<p class="sub">Olive oil tastings at the long table: every day at 11, and at 3 at the weekend. Tomi pours, everyone tastes, and after, they buy.${craftState(F2).tastings ? ` You've sat in on ${craftState(F2).tastings}.` : ""}</p>` + shut9;
+    if (o.shop === false) return h3 + `<p class="sub">A long table under dust sheets. Once the Mill Shop opens, Hazel will run olive oil tastings here: every day at 11, and at quarter past 4 at the weekend. Afterwards, people buy more oil.</p>` + shut9;
+    if (!o.on) return h3 + `<p class="sub">Olive oil tastings at the long table: every day at 11, and at quarter past 4 at the weekend. Hazel pours, everyone tastes, and after, they buy.${craftState(F2).tastings ? ` You've sat in on ${craftState(F2).tastings}.` : ""}</p>` + shut9;
     if (o.done) return h3 + `<p class="sub">You've tasted today. The bread's all gone and the glasses are in the sink.</p>` + shut9;
-    if (!st6) return h3 + `<p class="sub">Bottles down the middle, a little cobalt glass at every place, a board of bread and saucers for dipping. Tomi: "Warm the glass in your hand. Smell first. Then a sip, and suck in some air over it. Tell me what you get."</p><div class="actions"><button class="btn primary" data-tst="sit">Take a seat</button></div>` + shut9;
+    if (!st6) return h3 + `<p class="sub">Bottles down the middle, a little cobalt glass at every place, a board of bread and saucers for dipping. Hazel: "Warm the glass in your hand. Smell first. Then a sip, and suck in some air over it. Tell me what you get."</p><div class="actions"><button class="btn primary" data-tst="sit">Take a seat</button></div>` + shut9;
     if (tasteDone(st6)) {
       const max = st6.oils.reduce((a, x) => a + x.notes.length, 0);
-      return h3 + `<p class="sub">${st6.score >= max - 2 ? `Tomi raises his glass to you. "You've got the nose. Seriously."` : st6.score >= max / 2 ? `"Not bad at all," Tomi says. "The pepper's the hardest to name."` : '"It takes years," Tomi says kindly. "I still argue with Ines about bitter."'} You found ${st6.score} of ${max} notes. Around the table, everyone's reaching for their purses: bottles for the road.</p><div class="actions"><button class="btn primary" data-tst="done">Mop up the last of the bread</button></div>`;
+      return h3 + `<p class="sub">${st6.score >= max - 2 ? `Hazel raises her glass to you. "You've got the nose. Seriously."` : st6.score >= max / 2 ? `"Not bad at all," Hazel says. "The pepper's the hardest to name."` : '"It takes years," Tomi says kindly. "I still argue with Ines about bitter."'} You found ${st6.score} of ${max} notes. Around the table, everyone's reaching for their purses: bottles for the road.</p><div class="actions"><button class="btn primary" data-tst="done">Mop up the last of the bread</button></div>`;
     }
     const ol = st6.oils[st6.i], p = st6.picks[st6.i] || [];
-    h3 += st6.said ? `<p class="muted">Tomi, on ${esc(st6.said.oil.toLowerCase())}: "${st6.said.notes.join(", ")}." You got ${st6.said.hits}.</p>` : "";
+    h3 += st6.said ? `<p class="muted">Hazel, on ${esc(st6.said.oil.toLowerCase())}: "${st6.said.notes.join(", ")}." You got ${st6.said.hits}.</p>` : "";
     h3 += `<p class="eyebrow">Glass ${st6.i + 1} of ${st6.oils.length}</p><p class="sub">${esc(ol.name)}. Warm it, smell it, sip. What do you taste? (Up to three.)</p><div class="gchips">${NOTES2.map((n) => `<button class="gchip${p.includes(n) ? " on" : ""}" data-tst="note:${n}" aria-pressed="${p.includes(n)}">${n}</button>`).join("")}</div>`;
     return h3 + `<div class="actions"><button class="btn primary" data-tst="next" ${p.length ? "" : "disabled"}>${st6.i + 1 < st6.oils.length ? "Next glass" : "Last one"}</button></div>`;
   }
@@ -41752,7 +41749,7 @@ ${SIGNOFF[t2.who] || ""}`;
         mel.sitting = true;
         nodes.mel.classList.add("sit");
         sfx("paper", true);
-        if (isHere("tomi")) npcSay("tomi", "Cup the glass. Warm it. Now smell.");
+        if (isHere("hazel")) npcSay("hazel", "Cup the glass. Warm it. Now smell.");
       } else if (a === "note") {
         if (tstSt) {
           tastePick(tstSt, v);
@@ -45666,10 +45663,10 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     if (owns2(F, "mill") && whereIs("tomi") === "mill") {
       const d = inesStep(F, millState(F), vineState(F));
-      if (d.started || d.pressed || d.infused) {
+      if (d.started || d.pressed) {
         save2();
-        if (scene === "mill" && isHere("tomi") && !quietNow()) npcSay("tomi", d.infused ? `${d.infused}, steeping. Six hours. I'll count.` : d.started ? "The crate was full, so in they go. An hour under the stone." : "Bottled! Onto the shelf with them.");
-        else if (d.infused && scene === "millup") flash(`Tomi's started ${d.infused} steeping, with the mill's own oil`);
+        if (scene === "mill" && isHere("tomi") && !quietNow()) npcSay("tomi", d.started ? "The crate was full, so in they go. An hour under the stone." : `Bottled! ${d.pressed} up to the basket for you.`);
+        else if (d.pressed && scene === "millup") flash(`Tomi's brought up ${d.pressed} bottle${d.pressed > 1 ? "s" : ""} of olive oil: they're in the basket`);
       }
     }
     {

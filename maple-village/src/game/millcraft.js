@@ -10,7 +10,7 @@
 // What's made goes onto the mill's shelves (the store). Until the Mill Shop's open the wine shop sells a little of it
 // from a "from the mill" shelf by the counter; once it's open, Hazel sells it all day downstairs. Mel can take things
 // for herself or to give away. And Tomi (Ines's little brother), at the mill 10 to 5 but Sundays, presses whatever's in the olive crate into the mill's own
-// bottles, and infuses oil from the herb basket (Mel leaves herbs there) using the recipes Mel's found.
+// bottles and carries them up to the basket (round 200: that's all; the infusing is Mel's).
 // State: F.craft = {recipes: [{id, kind, base, adds, name}], steep: [{id, start, dur}], cure: [{id, start, dur}],
 //   pot: {id, start, dur} | null, store: {itemId: n}, basket: {herb: n}, oil: n (the mill's own plain bottles), sold}
 import { esc, dayKey } from "../util.js";
@@ -50,7 +50,9 @@ export const dyeHave = (F, d) => (((F.orch || {}).stock || {})["stem:" + d] || 0
 const useDye = (F, d) => { if ((F.inv || {})[d] > 0 && ITEMS[d] && ITEMS[d].kind === "flower") { F.inv[d]--; if (!F.inv[d]) delete F.inv[d]; return; } F.orch.stock["stem:" + d]--; if (F.orch.stock["stem:" + d] <= 0) delete F.orch.stock["stem:" + d]; };
 const capW = w => w[0].toUpperCase() + w.slice(1);   // (every recipe sells for more than its ingredients cost: smoke test)
 export function craftState(F){ F.craft = F.craft || {}; const c = F.craft; c.recipes = c.recipes || []; c.steep = c.steep || []; c.cure = c.cure || []; if (!("pot" in c)) c.pot = null;
-  c.store = c.store || {}; c.basket = c.basket || {}; c.oil = c.oil || 0; c.sold = c.sold || {}; return c; }
+  c.store = c.store || {}; c.basket = c.basket || {}; c.oil = c.oil || 0; c.sold = c.sold || {};
+  if (c.oil > 0) { c.basket.oliveoil = (c.basket.oliveoil || 0) + c.oil; c.oil = 0; }   // round 200: the mill's bottles all live in the basket now
+  return c; }
 const keyOf = (kind, base, adds, dye) => `${kind}_${base ? base + "_" : ""}${[...adds].sort().join("-")}${dye ? "~" + dye : ""}`;
 const nm = a => HERB[a].n;
 export function craftName(kind, base, adds, dye){ const a = [...adds].sort().map(nm), list = a.length === 2 ? `${a[0]} & ${a[1]}` : a[0];
@@ -67,13 +69,11 @@ export function registerCraft(F){ craftState(F).recipes.forEach(r => { const k =
     say: r.kind === "oil" ? `Your own ${r.name.toLowerCase()}! On bread, tonight. Thank you!` : r.kind === "soap" ? `Handmade ${r.name.toLowerCase()}? It smells beautiful.` : `${r.name}! My hands needed this. Thank you.`}; }); }
 const have = (F, id) => (F.inv || {})[id] || 0;
 const take = (F, id, n = 1) => { F.inv[id] -= n; if (F.inv[id] <= 0) delete F.inv[id]; };
-// plain oil for infusing: the backpack first, then the mill's own bottles (Tomi's pressing)
-// round 199 (Mel: "I put four bottles of olive oil in the basket and it disappeared"): Tomi was infusing with them. Mel's
-// own bottles now stay hers in the basket (basket.oliveoil); Tomi only ever uses the mill's pressing (c.oil), never her
-// backpack or her basket. The bench, for Mel, takes from her backpack, then her basket, then the mill's bottles.
+// plain oil for the bench: the backpack first, then the basket (round 199/200: Mel: "I put four bottles of olive oil in the
+// basket and it disappeared": Tomi was infusing with them. He doesn't infuse any more; his pressing goes into the basket).
 const oilHave = (F, c) => have(F, "oliveoil") + (c.basket.oliveoil || 0) + c.oil;
 // round 168: the mill's basket holds anything the bench uses (herbs, fruit, flowers, honey, goat's milk); the bench
-// takes from the backpack first, then the basket. (Tomi still only infuses oils from it.)
+// takes from the backpack first, then the basket.
 export const basketable = id => !!HERB[id] || id === "goatmilk" || id === "oliveoil" || id === "beeswax";   // (olive oil goes in with the mill's own bottles, round 175)
 const got = (F, c, id) => have(F, id) + (c.basket[id] || 0);
 const use = (F, c, id, n = 1) => { const a = Math.min(n, have(F, id)); if (a) take(F, id, a); if (n - a) { c.basket[id] -= n - a; if (c.basket[id] <= 0) delete c.basket[id]; } };
@@ -122,15 +122,13 @@ export function toBasket(F, herb, n = 99){ const c = craftState(F), k = Math.min
   take(F, herb, k); c.basket[herb] = (c.basket[herb] || 0) + k; return k; }
 
 /* ---------- Tomi at the press, and Hazel at the shop (both on the clock) ---------- */
-// Tomi (10 to 5, not Sundays, once the mill's open): presses the olive crate into the mill's bottles, and starts an infusion
-// from the herb basket when there's oil and a free jar (a recipe Mel's found, the one with the most herbs to hand)
+// Tomi (10 to 5, not Sundays, once the mill's open) has three jobs and only three (round 200, Mel: "take the olives from the
+// crate, press it into bottles of olive oil, and then put them into the basket upstairs... That's it"). Nothing else upstairs.
 export const PRESSER = {from: 14*60, to: 17*60 + 30}, SHOPKEEP = {from: 10*60, to: 17*60, closed: [1]};
 export function inesStep(F, m, v, t = Date.now()){
   const c = craftState(F), did = {};
-  if (m.press && m.press.by === "ines" && m.press.start + m.press.dur <= t) { c.oil += m.press.n; m.made = (m.made || 0) + m.press.n; did.pressed = m.press.n; m.press = null; }
+  if (m.press && m.press.by === "ines" && m.press.start + m.press.dur <= t) { c.basket.oliveoil = (c.basket.oliveoil || 0) + m.press.n; m.made = (m.made || 0) + m.press.n; did.pressed = m.press.n; m.press = null; }
   if (!m.press && (v.oliveCrate || 0) >= 3) { const n = Math.min(4, Math.floor(v.oliveCrate/3)); v.oliveCrate -= n*3; m.press = {start: t, dur: 3600e3, n, by: "ines"}; did.started = n; }
-  if (c.steep.length < CRAFT.jars && c.oil >= CRAFT.oilPer) { const r = c.recipes.filter(x => x.kind === "oil" && x.adds.every(a => c.basket[a] > 0)).sort((a, b) => b.adds.length - a.adds.length)[0];
-    if (r) { const r2 = craft(F, "oil", null, r.adds, "basket"); if (r2.recipe) did.infused = r.name; } }
   return did;
 }
 // what sells, and how fast: the Mill Shop all day while Hazel's in; before that, a little from the wine shop's shelf
@@ -166,10 +164,10 @@ export function benchPanel(F, st = {}, o = {}){
     return h + `<p class="sub">Everything made, on the mill's shelves. ${o.shop ? "Hazel sells from here, downstairs." : "The wine shop sells a little of it from a shelf by the counter: open the Mill Shop downstairs to sell it all day."} Take some for yourself, or to give away.</p>
       ${ids.length ? `<ul class="hlist wlist">${ids.map(id => `<li><span class="wtxt"><b>${esc(ITEMS[id] ? ITEMS[id].n : id)}</b><small>${c.store[id]} on the shelf · ${ITEMS[id] ? ITEMS[id].price : "?"} coins each</small></span><button class="btn small alt" data-mc="takeit:${id}">Take one</button></li>`).join("")}</ul>` : `<p class="muted">Nothing on the shelves yet.</p>`}
       ${c.steep.length || c.cure.length || c.pot ? `<p class="eyebrow" style="margin:10px 0 6px">On the go</p><ul class="hlist wlist">${jobs(c.steep, "steeping")}${jobs(c.cure, "curing")}${c.pot ? jobs([c.pot], "warming") : ""}</ul>` : ""}
-      <p class="muted">Plain oil in the mill: ${c.oil} bottle${c.oil === 1 ? "" : "s"}${o.ines ? " (Tomi presses the olive crate while he's in)" : ""}.</p>` + shut; }
+      <p class="muted">Olive oil in the basket: ${c.basket.oliveoil || 0} bottle${c.basket.oliveoil === 1 ? "" : "s"}${o.ines ? " (Tomi presses the olive crate while he's in, and brings it up)" : ""}.</p>` + shut; }
   if (tab === "basket") { const herbs = [...Object.keys(HERB), "goatmilk", "oliveoil"], inBag = herbs.filter(a => have(F, a)), bn = a => a === "goatmilk" ? "Goat's milk" : a === "oliveoil" ? "Olive oil" : nm(a);
-    return h + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk, olive oil. The bench takes from it as well as your backpack, and Tomi infuses oil with the herbs while he's in, using the oils you've worked out.</p>
-      <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some(a => c.basket[a] > 0) || c.oil > 0 ? `<ul class="hlist wlist">${Object.keys(c.basket).filter(a => c.basket[a] > 0).concat(c.oil > 0 ? ["milloil"] : []).map(a => `<li><span class="wpic">${icon(a === "milloil" ? "oliveoil" : (ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(a === "milloil" ? "The mill's own olive oil" : a === "oliveoil" ? "Your olive oil" : bn(a))}</b><small>${a === "milloil" ? `${c.oil} bottle${c.oil === 1 ? "" : "s"} from Tomi's pressing (he infuses with these)` : a === "oliveoil" ? `${c.basket[a]} bottle${c.basket[a] === 1 ? "" : "s"}, kept for you (Tomi won't touch them)` : `${c.basket[a]} in the basket`}</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
+    return h + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk, olive oil. The bench takes from it as well as your backpack. Tomi brings up the oil he presses and leaves it here for you.</p>
+      <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some(a => c.basket[a] > 0) || c.oil > 0 ? `<ul class="hlist wlist">${Object.keys(c.basket).filter(a => c.basket[a] > 0).concat(c.oil > 0 ? ["milloil"] : []).map(a => `<li><span class="wpic">${icon(a === "milloil" ? "oliveoil" : (ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(a === "milloil" ? "The mill's own olive oil" : a === "oliveoil" ? "Your olive oil" : bn(a))}</b><small>${a === "milloil" ? `${c.oil} bottle${c.oil === 1 ? "" : "s"} from Tomi's pressing (he infuses with these)` : a === "oliveoil" ? `${c.basket[a]} bottle${c.basket[a] === 1 ? "" : "s"}, yours and Tomi's pressing` : `${c.basket[a]} in the basket`}</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
       <p class="eyebrow" style="margin:10px 0 6px">From your backpack</p>
       ${inBag.length ? `<div class="actions">${inBag.map(a => `<button class="btn small alt" data-mc="basket:${a}">${HERB[a] ? dots([a]) : ""} Put in ${have(F, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from Ma Ma's orchard and the garden, flowers from her flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut; }
   const ok = HERB_OF(tab), base = st.base || "goatmilk", pick = st.adds || [];
@@ -204,11 +202,11 @@ export function benchPanel(F, st = {}, o = {}){
   return h + `<div class="actions"><button class="btn primary" data-mc="make" ${ready ? "" : "disabled"}>${ready ? (c.recipes.some(r => r.id === keyOf(tab, tab === "soap" ? base : null, pick)) ? `Make ${esc(craftName(tab, base, pick))}` : "Try something new") : "Make it"}</button></div>` + shut;
 }
 const HERB_OF = kind => Object.keys(HERB).filter(a => HERB[a][kind]);
-// round 154: upstairs (art/millup.js). Olive oil tastings at the long table, every day at 11 (and 3 at weekends), led by
-// Tomi, four day-trippers at a time; afterwards the oils sell twice as fast for an hour. Soap workshops in the corner,
+// round 154: upstairs (art/millup.js). Olive oil tastings at the long table, every day at 11 (and 4:15 at weekends, round 200), led by
+// Hazel, four day-trippers at a time; afterwards the oils sell twice as fast for an hour. Soap workshops in the corner,
 // Wednesdays and Saturdays 2 to 4, Hazel teaching five: a ticket each to the till. And at weekends a few day-trippers
 // walk up the lane just to browse the shelves.
-export const TASTE = {at: [11*60], weekend: [15*60], dur: 45, size: 4, boost: 60};
+export const TASTE = {at: [11*60], weekend: [16*60 + 15], dur: 45, size: 4, boost: 60};   // round 200: Hazel hosts now, so the weekend one follows her Saturday workshop
 export const WORKSHOP = {dow: [3, 6], from: 14*60, to: 16*60, size: 5, fee: 15};
 const weekend = day => { const d = new Date(day + "T00:00:00Z").getUTCDay(); return d === 0 || d === 6; };
 export const tastingTimes = day => [...TASTE.at, ...(weekend(day) ? TASTE.weekend : [])];
@@ -223,7 +221,7 @@ const WORK_SEATS = [[380, 452, 1], [408, 452, 1], [436, 452, -1], [380, 556, 1],
 // npcs.js: where someone is, upstairs (needs the Mill Shop open); tourists are the out-of-towners, busy = touring or a stall
 export function millSlot(id, day, hm, open, tourists, busy = []){
   if (!open) return null; const pool = tourists.filter(t => !busy.includes(t)), t0 = tastingNow(day, hm);
-  if (t0 != null) { const w = [t0, t0 + TASTE.dur]; if (id === "tomi") return {from: w[0], to: w[1], scene: "millup", at: [150, 356], dir: 1, act: "point", tasting: true};
+  if (t0 != null) { const w = [t0, t0 + TASTE.dur]; if (id === "hazel") return {from: w[0], to: w[1], scene: "millup", at: [150, 356], dir: 1, act: "point", tasting: true};
     const k = pickN(pool, TASTE.size, day + "taste" + t0).indexOf(id); if (k >= 0) { const [x, y, d] = TASTE_SEATS[[0, 3, 4, 7][k]]; return {from: w[0], to: w[1], scene: "millup", at: [x, y], dir: d, act: "sit", tasting: true}; } }
   if (workshopNow(day, hm)) { const w = [WORKSHOP.from, WORKSHOP.to]; if (id === "hazel") return {from: w[0], to: w[1], scene: "millup", at: [410, 508], dir: -1, act: "point", workshop: true};
     const k = pickN(pool, WORKSHOP.size, day + "work").indexOf(id); if (k >= 0) { const [x, y, d] = WORK_SEATS[k]; return {from: w[0], to: w[1], scene: "millup", at: [x, y], dir: d, act: "sit", workshop: true}; } }
@@ -250,17 +248,17 @@ export function tastePick(st, note){ if (st.i >= st.oils.length) return; const p
 export function tasteNext(st){ if (st.i >= st.oils.length) return null; const o = st.oils[st.i], p = st.picks[st.i] || [], hits = p.filter(n => o.notes.includes(n)).length; st.score += hits; st.said = {oil: o.name, notes: o.notes, hits}; st.i++; return hits; }
 export const tasteDone = st => st.i >= st.oils.length;
 export function finishTaste(F, st, addInv){ const c = craftState(F); c.tasted = dayKey(); c.tastings = (c.tastings || 0) + 1; if (!c.glass && !(F.inv || {}).t_glass) { c.glass = true; addInv("t_glass", 1); return true; } return false; }
-ITEMS.t_glass = {n: "A cobalt tasting glass", kind: "keepsake", price: 0, ico: "olives", line: "A little cobalt-blue tasting glass from your first olive oil tasting upstairs at the mill. Blue so the colour can't fool you: you taste with your nose and your tongue, Tomi says. Like that afternoon in Córdoba."};
+ITEMS.t_glass = {n: "A cobalt tasting glass", kind: "keepsake", price: 0, ico: "olives", line: "A little cobalt-blue tasting glass from your first olive oil tasting upstairs at the mill. Blue so the colour can't fool you: you taste with your nose and your tongue, Hazel says. Like that afternoon in Córdoba."};
 export function tastePanel(F, st, o = {}){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The tasting table</h2>`;
-  if (o.shop === false) return h + `<p class="sub">A long table under dust sheets. Once the Mill Shop opens, Tomi will run olive oil tastings here: every day at 11, and at 3 at the weekend. Afterwards, people buy more oil.</p>` + shut;
-  if (!o.on) return h + `<p class="sub">Olive oil tastings at the long table: every day at 11, and at 3 at the weekend. Tomi pours, everyone tastes, and after, they buy.${craftState(F).tastings ? ` You've sat in on ${craftState(F).tastings}.` : ""}</p>` + shut;
+  if (o.shop === false) return h + `<p class="sub">A long table under dust sheets. Once the Mill Shop opens, Hazel will run olive oil tastings here: every day at 11, and at quarter past 4 at the weekend. Afterwards, people buy more oil.</p>` + shut;
+  if (!o.on) return h + `<p class="sub">Olive oil tastings at the long table: every day at 11, and at quarter past 4 at the weekend. Hazel pours, everyone tastes, and after, they buy.${craftState(F).tastings ? ` You've sat in on ${craftState(F).tastings}.` : ""}</p>` + shut;
   if (o.done) return h + `<p class="sub">You've tasted today. The bread's all gone and the glasses are in the sink.</p>` + shut;
-  if (!st) return h + `<p class="sub">Bottles down the middle, a little cobalt glass at every place, a board of bread and saucers for dipping. Tomi: "Warm the glass in your hand. Smell first. Then a sip, and suck in some air over it. Tell me what you get."</p><div class="actions"><button class="btn primary" data-tst="sit">Take a seat</button></div>` + shut;
+  if (!st) return h + `<p class="sub">Bottles down the middle, a little cobalt glass at every place, a board of bread and saucers for dipping. Hazel: "Warm the glass in your hand. Smell first. Then a sip, and suck in some air over it. Tell me what you get."</p><div class="actions"><button class="btn primary" data-tst="sit">Take a seat</button></div>` + shut;
   if (tasteDone(st)) { const max = st.oils.reduce((a, x) => a + x.notes.length, 0);
-    return h + `<p class="sub">${st.score >= max - 2 ? 'Tomi raises his glass to you. "You\'ve got the nose. Seriously."' : st.score >= max/2 ? '"Not bad at all," Tomi says. "The pepper\'s the hardest to name."' : '"It takes years," Tomi says kindly. "I still argue with Ines about bitter."'} You found ${st.score} of ${max} notes. Around the table, everyone's reaching for their purses: bottles for the road.</p><div class="actions"><button class="btn primary" data-tst="done">Mop up the last of the bread</button></div>`; }
+    return h + `<p class="sub">${st.score >= max - 2 ? 'Hazel raises her glass to you. "You\'ve got the nose. Seriously."' : st.score >= max/2 ? '"Not bad at all," Hazel says. "The pepper\'s the hardest to name."' : '"It takes years," Tomi says kindly. "I still argue with Ines about bitter."'} You found ${st.score} of ${max} notes. Around the table, everyone's reaching for their purses: bottles for the road.</p><div class="actions"><button class="btn primary" data-tst="done">Mop up the last of the bread</button></div>`; }
   const ol = st.oils[st.i], p = st.picks[st.i] || [];
-  h += st.said ? `<p class="muted">Tomi, on ${esc(st.said.oil.toLowerCase())}: "${st.said.notes.join(", ")}." You got ${st.said.hits}.</p>` : "";
+  h += st.said ? `<p class="muted">Hazel, on ${esc(st.said.oil.toLowerCase())}: "${st.said.notes.join(", ")}." You got ${st.said.hits}.</p>` : "";
   h += `<p class="eyebrow">Glass ${st.i + 1} of ${st.oils.length}</p><p class="sub">${esc(ol.name)}. Warm it, smell it, sip. What do you taste? (Up to three.)</p><div class="gchips">${NOTES.map(n => `<button class="gchip${p.includes(n) ? " on" : ""}" data-tst="note:${n}" aria-pressed="${p.includes(n)}">${n}</button>`).join("")}</div>`;
   return h + `<div class="actions"><button class="btn primary" data-tst="next" ${p.length ? "" : "disabled"}>${st.i + 1 < st.oils.length ? "Next glass" : "Last one"}</button></div>`;
 }

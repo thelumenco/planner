@@ -1989,7 +1989,7 @@ function ctx(){
       const r = mullStart(F, vs, base, adds, dayKey()); speak(r.msg, 5000); if (r.recipe) { sfx("chime"); gainXp(r.fresh ? 2 : 1); if (r.fresh) flash(`New mulled wine: ${r.recipe.name}`); mullSt = {}; if (isHere("pilar")) setTimeout(() => npcSay("pilar", pick(["Mmm, the whole kitchen smells like Christmas.", "Low heat! Never let it boil.", "Save me a cup, eh?"])), 1800); save(); } }
     ctx(); });
   c.querySelectorAll("[data-tst]").forEach(b => b.onclick = () => { const i = b.dataset.tst.indexOf(":"), a = i < 0 ? b.dataset.tst : b.dataset.tst.slice(0, i), v = i < 0 ? "" : b.dataset.tst.slice(i + 1);
-    if (a === "sit") { tstSt = tasteStart(F); mel.sitting = true; nodes.mel.classList.add("sit"); sfx("paper", true); if (isHere("tomi")) npcSay("tomi", "Cup the glass. Warm it. Now smell."); }
+    if (a === "sit") { tstSt = tasteStart(F); mel.sitting = true; nodes.mel.classList.add("sit"); sfx("paper", true); if (isHere("hazel")) npcSay("hazel", "Cup the glass. Warm it. Now smell."); }
     else if (a === "note") { if (tstSt) { tastePick(tstSt, v); sfx("tap"); } }
     else if (a === "next") { if (!tstSt) return; const hits = tasteNext(tstSt); sfx(hits >= 2 ? "chime" : "tap"); }
     else if (a === "done") { if (!tstSt || !tasteDone(tstSt)) return; const glass = finishTaste(F, tstSt, addInv); tstSt = null; gainXp(2); hearts(2); sfx("chime"); if (glass) { flash("A cobalt tasting glass"); speak("Tomi rinses your little blue glass and hands it to you. \"Keep it. Your first tasting.\" Just like Córdoba.", 6500); } save(); }
@@ -3101,7 +3101,7 @@ function crateTick(){
 }
 function millTick(){
   const c = craftState(F), done = craftDone(F); if (done.length) { save(); const msg = done.map(d => `${d.n} ${d.recipe.name.toLowerCase()}`).join(", "); if ((scene === "mill" || scene === "millup") && !quietNow()) speak(`Ready, and onto the shelves: ${msg}.`, 5000); else flash(`At the mill: ${msg}`); }
-  if (owns(F, "mill") && whereIs("tomi") === "mill") { const d = inesStep(F, millState(F), vineState(F)); if (d.started || d.pressed || d.infused) { save(); if (scene === "mill" && isHere("tomi") && !quietNow()) npcSay("tomi", d.infused ? `${d.infused}, steeping. Six hours. I'll count.` : d.started ? "The crate was full, so in they go. An hour under the stone." : "Bottled! Onto the shelf with them."); else if (d.infused && scene === "millup") flash(`Tomi's started ${d.infused} steeping, with the mill's own oil`); } }
+  if (owns(F, "mill") && whereIs("tomi") === "mill") { const d = inesStep(F, millState(F), vineState(F)); if (d.started || d.pressed) { save(); if (scene === "mill" && isHere("tomi") && !quietNow()) npcSay("tomi", d.started ? "The crate was full, so in they go. An hour under the stone." : `Bottled! ${d.pressed} up to the basket for you.`); else if (d.pressed && scene === "millup") flash(`Tomi's brought up ${d.pressed} bottle${d.pressed > 1 ? "s" : ""} of olive oil: they're in the basket`); } }
   { const day = dayKey(), hm = sgHM(); if (owns(F, "millshop") && WORKSHOP.dow.includes(new Date(day + "T00:00:00Z").getUTCDay()) && hm >= WORKSHOP.to && c.workshopPaid !== day) {   // round 154: the workshop's tickets
     c.workshopPaid = day; const fee = WORKSHOP.fee*WORKSHOP.size; F.coins += fee; save(); if (scene === "millup") { sfx("coin"); flash(`+${fee}: the soap workshop`); } } }
   // sales, minute by minute since the last look (at most a day): the Mill Shop, or the wine shop's little shelf

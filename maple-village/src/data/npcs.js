@@ -171,10 +171,10 @@ export const NPCS = [
     away: "Ines is off for the day."
   },
   // round 153: Tomi, Ines's little brother (named after Tomás, who planted the olive by the mill in 1912), works the
-  // mill once it's open: presses the olive crate and steeps the infused oils, 10 to 5, every day but Sunday
+  // mill once it's open: presses the olive crate and carries the bottles up to the basket (round 200: that's all), 10 to 5, every day but Sunday
   {
     id: "tomi", pitch: 1.1, name: "Tomi", job: "Works the press at the old mill (Ines's little brother)",
-    intro: "Tomi. Ines's brother, the one named after the great-great-grandfather. So the mill's sort of a family thing. I press, I steep, I sweep up the olive stones.",
+    intro: "Tomi. Ines's brother, the one named after the great-great-grandfather. So the mill's sort of a family thing. I press, I bottle, I carry it upstairs, I sweep up the olive stones.",
     look: {skin: "#E8B996", hair: "#5A2E1A", hairStyle: "spiky", top: "#7FA35A", bottom: "#4F5A6A", extra: "apron"},
     // round 154: his week. Before the mill opened he helped Ines on the vines; Sundays off: football on the field,
     // then the Scoop Shack; Wednesday and Friday evenings at the wine shop, Tuesdays down at the bay with Ines
@@ -182,7 +182,7 @@ export const NPCS = [
       slot("10:00", "16:00", "vineyard", [[262, 440], [340, 490], [418, 390]], {act: "farm", dow: [1, 2, 3, 4, 5, 6]}),
       slot("9:00", "11:00", "field", [[200, 420], [260, 400], [320, 430]], {act: "footy", dow: [0]}), slot("13:00", "15:00", "bay", [[180, 420], [240, 430], [300, 420]], {dow: [0]}),
       slot("18:00", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [3, 5]}), slot("18:00", "19:30", "bay", [[180, 420], [300, 420]], {dow: [2]})],
-    lines: ["Three jars to a bottle. Every time. The stone doesn't lie.", "Rosemary oil's steeping. Six hours. I count.", "T.R. 1912. Ines thinks I carved it. I didn't. Probably.", "Smell that? Green and peppery. That's a good pressing."],
+    lines: ["Three jars to a bottle. Every time. The stone doesn't lie.", "Four bottles, up the stairs, into the basket. Then back down for more.", "T.R. 1912. Ines thinks I carved it. I didn't. Probably.", "Smell that? Green and peppery. That's a good pressing."],
     away: "Tomi's finished at the mill for the day."
   },
   // round 178: Posy keeps the gift shop behind the wine shop, 10 to 6, every day but Monday (giftshop.js)
