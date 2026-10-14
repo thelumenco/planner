@@ -534,7 +534,8 @@ function findAsker(who){
 function offerHandOver(who){
   const r = QB.requestFrom(F, who); if (!r) return false;
   if (haveOf(r.item) < r.n) {   // not enough yet: a gentle reminder once a day, then their usual chat
-    if (S.npcSaid["req:" + r.id]) return false; S.npcSaid["req:" + r.id] = true;
+    if (S.npcSaid["req:" + r.id] || storyReady(F, who)) return false;   // a story chapter waiting comes first
+    S.npcSaid["req:" + r.id] = true;
     npcSay(who, `Still hoping for ${QB.reqLine(r)} ${QB.dueLine(r)}, if you can. No rush!`); save(); return true; }
   setSay(`${r.name} needs ${QB.reqLine(r)}. You have them.`, [[`Hand over ${QB.reqLine(r)}`, () => handOverTo(who)], ["Not yet", () => setSay("Keeping them for now.")]]);
   qnOpen = true; journal(); return true;

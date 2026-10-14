@@ -34913,7 +34913,7 @@ ${r.name}` })
     const r = requestFrom(F, who);
     if (!r) return false;
     if (haveOf(r.item) < r.n) {
-      if (S2.npcSaid["req:" + r.id]) return false;
+      if (S2.npcSaid["req:" + r.id] || storyReady(F, who)) return false;
       S2.npcSaid["req:" + r.id] = true;
       npcSay(who, `Still hoping for ${reqLine(r)} ${dueLine(r)}, if you can. No rush!`);
       save();
