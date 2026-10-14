@@ -36,7 +36,7 @@ export const NPCS = [
     look: {skin: "#F3D2B8", hair: "#5A3A2A", hairStyle: "bun", top: "#EFA3A6", bottom: "#7A6A8C", extra: "apron"},
     routine: [slot("7:00", "7:45", "hfarm", [[130, 600], [190, 590]], {dow: [1, 4]}), slot("19:30", "21:00", "wineshop", [227, 518], {act: "sit", dow: [0]}), slot("8:00", "12:00", "market", [260, 352]), slot("12:00", "13:00", "market", [[200, 352], [320, 352], [260, 352]]),
       slot("13:00", "15:00", "market", [260, 352]), slot("15:00", "15:40", "village", [[362, 372], [392, 360], [340, 380]]), slot("15:40", "19:00", "market", [260, 352])],
-    lines: ["Fresh dumplings today. Don't tell {pet}, they'll want three.", "You look like a honey toast kind of person today.", "Lunch rush is wild. Everyone wants toast at once!",
+    lines: ["Your Uncle Wilf bought his bread here every Saturday. Always the seeded loaf, always a bun for {pet}.", "Fresh dumplings today. Don't tell {pet}, they'll want three.", "You look like a honey toast kind of person today.", "Lunch rush is wild. Everyone wants toast at once!",
       "Remember to eat something proper, not just snacks.", "The strawberries sell out first. Every time."],
     away: "Hana's popped out. The shop still works: honesty box on the counter.",
     react: {harvest: "Ooh, homegrown! I'll buy anything you grow, you know.", quests3: "Three quests done already? Have a dumpling, you've earned it.", lunch: "Have you had lunch? Proper lunch?"}
@@ -47,7 +47,7 @@ export const NPCS = [
     look: {skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses"},
     routine: [slot("7:15", "7:30", "hlane", [[250, 300], [250, 180], [460, 186]], {dow: [2, 4]}), slot("7:30", "9:00", "hwoods", WOODS_WALK, {dow: [2, 4]}), slot("6:30", "9:00", "field", [96, 352], {act: "fish", dow: [0], dir: 1}), slot("14:00", "15:00", "lane", LANE, {dow: [1, 3, 5]}),
       slot("19:30", "21:00", "wineshop", [313, 518], {act: "sit", dow: [1, 3, 4, 5]}), slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566])],
-    lines: ["Letters used to come in sacks. Now it's all on your little phone.", "The well water is sweeter in the afternoon. Don't ask me why.", "I've sorted the pebbles by colour. Then by size. Then by colour again.",
+    lines: ["Wilf Song and I played draughts on this bench for twenty years. He cheated. Charmingly.", "Letters used to come in sacks. Now it's all on your little phone.", "The well water is sweeter in the afternoon. Don't ask me why.", "I've sorted the pebbles by colour. Then by size. Then by colour again.",
       "A tidy inbox is a tidy mind. Mine is a shoebox.", "The river's high today. Good for the ducks."],
     react: {inbox: "An email quest! Just like the old days. Stamp it and send it.", water: "Good, drink up. Forty years of walking taught me that.", quests3: "Steady work. That's the postmaster's way."}
   },
@@ -69,7 +69,7 @@ export const NPCS = [
     routine: [slot("12:30", "13:30", "bay", [[180, 420], [240, 430], [300, 420]], {dow: [3, 5]}), slot("8:00", "10:00", "hwoods", WOODS_RIDE, {dow: [6], look: BIKE}), slot("12:30", "13:30", "lane", LANE, {dow: [2, 4]}),
       slot("18:30", "20:00", "wineshop", [227, 518], {act: "sit", dow: [0, 1, 3, 4, 5]}), slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566]),
       slot("13:30", "18:00", "village", [[170, 300], [400, 280], [300, 450], [150, 520], [440, 560]])],
-    lines: ["*hums a tune* Fixed the market's wobbly leg this morning.", "Measure twice, cut once. Or just cut and laugh.", "The workshop smells like sawdust and big ideas.",
+    lines: ["I built those trellis posts for Wilf, back in the day. They've leaned a bit since. We'll fix them.", "*hums a tune* Fixed the market's wobbly leg this morning.", "Measure twice, cut once. Or just cut and laugh.", "The workshop smells like sawdust and big ideas.",
       "Shipping is just building, but braver.", "Need a shelf? I always need a shelf."],
     react: {building: "Building something? Tools are out. Go for it.", quests3: "That's three. Nails in straight, every one."}
   },
@@ -106,7 +106,7 @@ export const NPCS = [
     intro: "Theo, town clerk. I keep the village records. And, if you have a moment, I have a stamp collection you would not believe.",
     look: {skin: "#F0D0B4", hair: "#6B4A2E", hairStyle: "short", top: "#C3CDEE", bottom: "#3A3A48", extra: "tie"},
     routine: [slot("9:00", "12:00", "hwoods", WOODS_WALK, {dow: [6]}), slot("15:00", "17:00", "bay", [[180, 420], [240, 430]], {dow: [0], act: "sit"}), slot("17:30", "19:00", "wineshop", [313, 518], {act: "sit"}), slot("9:00", "12:00", "hall", [[200, 320], [330, 320]]), slot("12:00", "13:00", "trophy", [228, 590], {act: "sit"}), slot("13:00", "17:00", "hall", [[200, 320], [330, 320]])],
-    lines: ["Records say you've been busy. I'm very proud. Officially.", "This stamp is from 1962. Look at the little bird!", "Everything filed, everything stamped. Bliss.",
+    lines: ["I filed your uncle's papers myself. Wilfred Song: beautiful handwriting, terrible at forms.", "Records say you've been busy. I'm very proud. Officially.", "This stamp is from 1962. Look at the little bird!", "Everything filed, everything stamped. Bliss.",
       "The quest board is the most important document in town.", "I've started a register of {pet}'s naps. It's long."],
     react: {quests3: "I've stamped three completed quests in the register. Gold stamp!", planning: "A planning quest! My favourite kind of paperwork."}
   },
@@ -159,7 +159,7 @@ export const NPCS = [
     routine: [slot("09:45", "10:00", "wineshop", [[120, 520], [60, 560]], {needs: "giftshop", dow: [0, 2, 3, 4, 5, 6]}),
       slot("10:00", "18:00", "giftshop", [[300, 520], [180, 380], [380, 380]], {needs: "giftshop", dow: [0, 2, 3, 4, 5, 6]}),
       slot("10:00", "12:00", "village", [[330, 380], [300, 400]], {dow: [1]}), slot("18:30", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [5, 6]})],
-    lines: ["The honey heart bonbons go first. Every time.", "Someone bought three bars just for the box they come in.", "I've moved the soaps next to the wine. People sniff, then buy both.", "Tea towels. One day. Trust me."],
+    lines: ["Old Wilf's labels were all hand-drawn. Little grapes in the corner. I've kept one.", "The honey heart bonbons go first. Every time.", "Someone bought three bars just for the box they come in.", "I've moved the soaps next to the wine. People sniff, then buy both.", "Tea towels. One day. Trust me."],
     away: "Posy's gone home. The gift shop's shut."
   },
   // round 153: Hazel runs the Mill Shop (once Mel's opened it): every day but Monday, 10 to 5, behind the counter
@@ -198,7 +198,7 @@ export const NPCS = [
     routine: [slot("8:00", "12:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 510], [310, 330]], {act: "farm"}),
       slot("12:00", "13:00", "orchard", [470, 330], {act: "sit"}),
       slot("13:00", "17:30", "orchard", [[160, 420], [260, 510], [360, 330], [410, 420]], {act: "water"})],
-    lines: ["The trees are the boss. I just carry things.", "The apples are looking good this week.", "I baked too much again. There's cake at the cottage at three.", "Best office in the village, this."],
+    lines: ["Wilf traded me a case of red for a crate of plums, every autumn. I'd like to keep that going.", "The trees are the boss. I just carry things.", "The apples are looking good this week.", "I baked too much again. There's cake at the cottage at three.", "Best office in the village, this."],
     actLines: {guide: ["Over here we've got the fruit trees. My pride and joy.", "You can taste one at the farm shop after!", "Step around the hose, please. Everyone always forgets the hose."], farm: ["Pruning the old branches. More fruit next time.", "Mulch. Very glamorous."], water: ["Deep water, twice a week. That's the rule.", "These trees drink more than I do."]},
     away: "Farid's gone home for the day."
   },
@@ -209,7 +209,7 @@ export const NPCS = [
     routine: [slot("7:00", "8:00", "hwoods", [[132, 590], [180, 560], [100, 600]], {dow: [0]}), slot("8:00", "12:00", "flowers", [[160, 300], [260, 380], [360, 470], [210, 470], [310, 300]], {act: "water"}),
       slot("12:00", "13:00", "flowers", [44, 486], {act: "sit"}),
       slot("13:00", "17:30", "flowers", [[160, 380], [260, 470], [360, 300], [410, 380]], {act: "farm"})],
-    lines: ["The dahlias are showing off today.", "My mother said flowers know when you're happy.", "Bouquet for someone special? Just say.", "I could do this forever."],
+    lines: ["Your uncle always kept a jar of my sweet peas on his kitchen table. I'll bring you some.", "The dahlias are showing off today.", "My mother said flowers know when you're happy.", "Bouquet for someone special? Just say.", "I could do this forever."],
     actLines: {guide: ["These beds bloom again every day or so. Isn't that lovely?", "That one's my favourite. Don't tell the others.", "Bouquets at the farm shop, if anyone's feeling romantic."], water: ["Gentle on the petals.", "Morning water, happy flowers."], farm: ["Deadheading. Snip, snip.", "Cutting a few for the shop."]},
     away: "Mei's finished for the day."
   },
@@ -256,7 +256,7 @@ export const NPCS = [
     routine: [slot("06:00", "11:00", "hfarm", [[30, 400], [260, 400], [490, 420], [440, 516]]), slot("11:00", "13:00", "barn", [[262, 520], [380, 560], [160, 560]]),
       slot("13:00", "18:00", "hfarm", [[200, 600], [260, 524], [440, 512], [458, 270]])],
     intro: "I'm Elena. Cows, goats, and soon a proper cheese cave in the barn. The cheese at my market stall? Aged right here.",
-    lines: ["Daisy's the boss of the paddock. Mochi just pretends.", "Milking at six. The goats prefer six-fifteen.", "A good cheese takes patience. So does a good goat.", "Pepper ate my notebook again."],
+    lines: ["Wilf used to bring {pet} up to see the goats. Daisy pretended not to care. She cared.", "Daisy's the boss of the paddock. Mochi just pretends.", "Milking at six. The goats prefer six-fifteen.", "A good cheese takes patience. So does a good goat.", "Pepper ate my notebook again."],
     hellos: ["Hi! Grab a bucket.", "Morning! Hay's in the barn."], away: "Elena's done for the day. Even the goats are asleep."},
   // Amara serves at the Cocoa Room's counter (once Mel opens it, goals.js "cocoa"), Tuesday to Sunday
   {id: "amara", pitch: 1.15, name: "Amara", job: "Serves at the Cocoa Room",

@@ -158,3 +158,14 @@ Then they're yours to furnish and let, a mini landlord business:
 - Still to design: the tiers and prices, the completeness checklist, how often bookings come, and how payment
   works (paid when a stay ends, into your coins, with the review).
 Nothing is built yet; hearts with Elena already count from requests and gifts.
+
+## The opening story (2026-10-14)
+A new game starts with a short story told through your own eyes (game/intro.js, pictures in art/intro.js): a tired
+office worker in Singapore (late nights, dinner at the desk, the view of Marina Bay, the packed morning train) gets a
+letter from Pembury & Vale, Solicitors, Honeybrook. Their great-uncle, Wilfred Song, has left them his house and
+vineyard; his will turned up years late inside a cookery book. His note asks two things: look after the vineyard, and
+look after his companion, who'll be waiting. Then the train to Honeybrook, the bare vineyard at golden hour, and the
+setup card, whose last question ("Who's waiting on the porch?") is the pet. Your hands (and once your reflection)
+are always in shadow, since you haven't chosen how you look yet. Skippable; "Watch the story again" in Settings.
+Eight villagers have a line about Wilf. Singapore is allowed in the story's two files only (leak-check.mjs ALLOW).
+Dev builds skip it unless the page has ?intro=1; window.__mapleIntro(i) opens one screen.

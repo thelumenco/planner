@@ -1004,3 +1004,19 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .supet{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;border-radius:14px;border:1.5px solid rgba(120,104,84,.25);background:#FFFDF6;font:inherit;cursor:pointer;flex:1 1 84px}
 .supet.on{background:#E3F2EC;border-color:#5E9A86;font-weight:700}
 :root[data-theme="dark"] .sucard{background:#2E2A33;color:#F1EBE0}
+/* the opening story (game/intro.js): a picture on top, a few lines below, letters on paper */
+.intro{position:fixed;inset:0;z-index:61;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));background:#2A2630}
+.intro[hidden]{display:none}
+.incard{width:min(560px,100%);max-height:100%;overflow:auto;background:var(--card,#FFFDF6);border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.35);animation:infade .6s ease both}
+.inpicbox{line-height:0;border-bottom:1.5px solid var(--line,#3b3530)}
+.inpic{width:100%;height:auto;aspect-ratio:400/240;display:block;border-radius:18px 18px 0 0}
+.inbody{padding:16px 20px 20px}
+.intext{font:600 1.08rem/1.45 "Klee One",serif;margin:.2em 0 .6em}
+.inletter{background:#FBF7EE;border:1.5px solid rgba(120,104,84,.3);border-radius:6px;padding:12px 16px;margin:8px 0 4px;font-size:.92rem;line-height:1.45;box-shadow:0 2px 0 rgba(120,104,84,.15)}
+.inletter p{margin:0 0 .6em}.inletter p:last-child{margin:0}
+.inletter.hand{font-family:"Klee One",serif;font-size:1rem;color:#2F3B73;background:#FFFDF6;transform:rotate(-.6deg)}
+.inride{z-index:2;animation-duration:3.4s}
+@keyframes infade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.incard{animation:none}}
+:root[data-theme="dark"] .incard{background:#2E2A33;color:#F1EBE0}
+:root[data-theme="dark"] .inletter{background:#3A3540;color:#F1EBE0}

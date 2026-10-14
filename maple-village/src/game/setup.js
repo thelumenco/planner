@@ -34,9 +34,9 @@ function page(){
       <div class="actions">${s.lookOnly ? `<button type="button" class="btn primary" data-su="done">Done</button><button type="button" class="btn alt" data-su="cancel">Never mind</button>` : `<button type="button" class="btn alt" data-su="go:you">Back</button><button type="button" class="btn primary" data-su="go:pet">Next: your pet</button>`}</div>`; }
   // the pet
   const k = s.pet, sp = SPECIES[k];
-  return `<p class="eyebrow">Step 3 of 3</p><h2>Who's coming with you?</h2>
+  return `<p class="eyebrow">Step 3 of 3</p><h2>Who's waiting on the porch?</h2><p class="sub">Uncle Wilf's dear companion. Which one was it?</p>
     <div class="supets" role="radiogroup">${KINDS.map(x => `<button type="button" class="supet${x === k ? " on" : ""}" data-su="pet:${x}" aria-pressed="${x === k}">${petSvg(x, 64)}<span>${esc(SPECIES[x].n)}</span></button>`).join("")}</div>
-    <p class="sub">${esc(sp.line)} Yours for this whole game.</p>
+    <p class="sub">${esc(sp.line)} Yours to look after now, for this whole game.</p>
     <label class="sulabel" for="suPet">Your ${esc(sp.n.toLowerCase())}'s name</label><input id="suPet" class="suinput" maxlength="20" autocomplete="off" value="${esc(s.petName)}">
     <div class="gchips">${sp.names.map(n => `<button type="button" class="gchip${n === s.petName ? " on" : ""}" data-su="pname:${esc(n)}"><span>${esc(n)}</span></button>`).join("")}</div>
     <div class="actions"><button type="button" class="btn alt" data-su="go:look">Back</button><button type="button" class="btn primary" data-su="done" ${s.petName.trim() ? "" : "disabled"}>Move in</button></div>`;

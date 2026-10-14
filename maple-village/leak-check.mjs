@@ -24,7 +24,11 @@ export const TERMS = [
 const bundle = join(root, "dist", "maple-village.html");
 if (!existsSync(bundle)) { console.error("Build first: node build.mjs"); process.exit(2); }
 const text = readFileSync(bundle, "utf8");
-const hits = TERMS.map(([label, re]) => [label, (text.match(re) || []).length]).filter(([, n]) => n > 0);
+// The opening story (a tired office worker in Singapore inherits a vineyard) is the one place Singapore is allowed:
+// its two files may use the word, and the game may carry exactly as many as they do. Nowhere else.
+const ALLOW = {"Singapore": ["src/game/intro.js", "src/art/intro.js"]};
+const allowed = label => (ALLOW[label] || []).reduce((n, f) => n + (readFileSync(join(root, f), "utf8").match(TERMS.find(t => t[0] === label)[1]) || []).length, 0);
+const hits = TERMS.map(([label, re]) => [label, Math.max(0, (text.match(re) || []).length - allowed(label))]).filter(([, n]) => n > 0);
 
 const summary = process.argv.includes("--summary");
 if (!hits.length) { console.log("leak check: clean. Nothing personal in the public game."); process.exit(0); }
@@ -35,7 +39,7 @@ for (const [label, n] of hits) {
   console.log(`  ${label}: ${n}`);
   if (summary) continue;
   const re = TERMS.find(t => t[0] === label)[1];
-  const per = files.map(f => [relative(root, f), (readFileSync(f, "utf8").match(re) || []).length]).filter(([, k]) => k).sort((a, b) => b[1] - a[1]);
+  const per = files.map(f => [relative(root, f), (readFileSync(f, "utf8").match(re) || []).length]).filter(([f, k]) => k && !(ALLOW[label] || []).includes(f)).sort((a, b) => b[1] - a[1]);
   console.log("     " + per.slice(0, 8).map(([f, k]) => `${f} (${k})`).join(", ") + (per.length > 8 ? `, and ${per.length - 8} more files` : ""));
 }
 process.exit(1);

@@ -29,6 +29,7 @@ import * as GU from "./guests.js";
 import * as TL from "./tailor.js";
 import { lookOf, applyLook } from "./look.js";
 import { openSetup, setupOpen } from "./setup.js";
+import { openIntro, introOpen, introAt } from "./intro.js";
 import { SPECIES, speciesOf, petArt, petify } from "../art/pets.js";
 import { sendOptions, takeSend, sendMorePanel } from "./bikesend.js";
 import { rideBy, initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, whereAt, npcSay, npcPos, daySchedule, clearSlots } from "./npcs.js";
@@ -202,9 +203,13 @@ function dressPet(){
 // (with a plain look and a fox) unless the page asks for it with ?setup=1, so test pages start straight in the village.
 function needSetup(){
   if (F.me && F.pet) return;
-  if (window.__mapleDevStub && !/[?&]setup=1/.test(location.search)) { F.me = F.me || {name: "", pron: {they: "they", them: "them", their: "their"}, look: lookOf(F)}; if (!F.pet) { F.pet = "fox"; F.name = F.name || SPECIES.fox.names[0]; } return; }
-  setTimeout(() => { if ((F.me && F.pet) || setupOpen()) return;
-    openSetup(F, {done: () => { dressPet(); applyWear(); save(true); speak(`Welcome to Honeybrook, ${myName(F)}. ${F.name} has already found the best spot in the house.`, 6000); }}); }, 900);
+  if (window.__mapleDevStub && !/[?&](setup|intro)=1/.test(location.search)) { F.me = F.me || {name: "", pron: {they: "they", them: "them", their: "their"}, look: lookOf(F)}; if (!F.pet) { F.pet = "fox"; F.name = F.name || SPECIES.fox.names[0]; } return; }
+  const setup = () => openSetup(F, {done: () => { dressPet(); applyWear(); save(true);
+    speak(`Welcome to Honeybrook, ${myName(F)}. The neighbours have aired out Uncle Wilf's house and left bread on the table, and ${F.name} has already found the best spot in it.`, 7000); }});
+  setTimeout(() => { if ((F.me && F.pet) || setupOpen() || introOpen()) return;
+    // a new game starts with the story (intro.js), once; then the setup card
+    if (F.introSeen) { setup(); return; }
+    openIntro({trainArt: () => trainRideArt(false), sfx, done: () => { F.introSeen = true; setup(); }}); }, 900);
 }
 // A small per-day record for the Friday paper (last 21 days).
 function noteHistory(){
@@ -2851,6 +2856,7 @@ function playground(id){
 }
 setTimeout(vineTick, 3000);
 // dev builds only (the stub sets the flag): test scripts jump straight to a scene
+if (window.__mapleDevStub) window.__mapleIntro = i => introAt(i, {replay: true, trainArt: () => trainRideArt(false), sfx});
 if (window.__mapleDevStub) window.__mapleScene = (id, at) => setScene(id, at || (OUTDOOR.includes(id) ? [260, 330] : INNER[id] ? INNER[id].arrive : [260, 596]));
 if (window.__mapleDevStub) window.__mapleOrder = (shop = "The Scoop Shack") => { S.orderAt = 0; scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0); orderNote([{shop: "scoop", coins: 6, what: "a cone of mango"}], shop, false); };   // tests: an order note, and Tomo riding past
 // dev builds only: test scripts read and nudge the save (the quest board tests give the backpack what a request needs)
@@ -3137,6 +3143,7 @@ $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
 $("setVol").oninput = e => setMusicVol(+e.target.value);
 $("setTest").onclick = () => { unlockAudio(); setTimeout(() => { alarm(); $("setTestNote").textContent = audioRunning() ? "Sound is on. If you heard nothing, check the volume and the silent switch." : "Your browser is still blocking sound. Tap anywhere on the map, then try again."; }, 120); };
+$("setStory").onclick = () => { closePanel(); openIntro({replay: true, trainArt: () => trainRideArt(false), sfx}); };
 $("setQuiet").onchange = e => { F.quietEvening = e.target.checked; save(true); };
 $("setSfx").onchange = e => { setSfx(e.target.checked); if (e.target.checked) sfx("coin"); };
 ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { qnQuietUntil = 0; }, {capture: true, once: true}));
