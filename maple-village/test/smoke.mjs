@@ -4392,8 +4392,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(7000); };
   const name = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
   // 2026-10-17 is a Saturday: Jason and Luca are over for lunch
-  await page.goto(url + "?reset=1&seed=1&time=10:45&date=2026-10-17"); await page.waitForTimeout(800);
-  await page.goto(url + "?seed=1&time=10:45&date=2026-10-17&pvpatch=1"); await page.waitForTimeout(1500);
+  await page.goto(url + "?reset=1&seed=1&time=11:15&date=2026-10-17"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=11:15&date=2026-10-17&pvpatch=1"); await page.waitForTimeout(1500);
   await go("shore"); await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-btown="porto"]', { timeout: 15000 });
   await page.click('#ctx [data-btown="porto"]'); await page.waitForTimeout(300);
   check(/Fuel 24/.test(await page.locator("#ctx").innerText()), "your boat sails to Portovenere (fuel 24)");
