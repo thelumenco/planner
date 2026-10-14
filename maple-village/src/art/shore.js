@@ -64,9 +64,9 @@ export function shoreArt(){
   const bench = `<g data-place="dolphins" aria-label="Boardwalk bench: watch for dolphins"><ellipse class="hov" cx="214" cy="256" rx="30" ry="9" style="fill:var(--butter)"/>
     ${sk(`<rect x="192" y="238" width="44" height="7" rx="2" style="fill:var(--wood)"/><rect x="192" y="228" width="44" height="6" rx="2" style="fill:var(--wood)"/>`, `<rect x="192" y="238" width="44" height="7" rx="2"/><rect x="192" y="228" width="44" height="6" rx="2"/><path d="M196 245 v9 M232 245 v9 M196 234 v4 M232 234 v4"/>`)}
     ${tapeLabel(214, 276, "Dolphin bench", "var(--peri)", 10)}</g>`;
-  const mumdad = house("mumdad", 300, 140, 120, 76, "#EAF2F5", "#3E6B8C", "Mum and Dad's", "var(--sky)",
+  const hanatheo = house("hanatheo", 300, 140, 120, 76, "#EAF2F5", "#3E6B8C", "Mum and Dad's", "var(--sky)",
     {art: `<path d="M318 168 l4 -10 l4 10z M330 164 v-8 l6 -2 v8" style="fill:#2F2B28"/><rect x="300" y="210" width="120" height="6" style="fill:#3E6B8C"/>`, lines: `<circle cx="333" cy="164" r="2"/><circle cx="339" cy="162" r="2"/>`});
-  const marcus = house("marcus", 340, 384, 120, 76, "#FFF3E6", "#8E5B9A", "Marcus and Angellina's", "var(--blush)",
+  const marcus = house("tomiposy", 340, 384, 120, 76, "#FFF3E6", "#8E5B9A", "Marcus and Angellina's", "var(--blush)",
     {art: `<path d="M452 396 h-10 v10" style="fill:none"/><circle cx="356" cy="452" r="5" style="fill:#7FA35A"/><circle cx="444" cy="452" r="5" style="fill:#7FA35A"/>`, lines: `<path d="M352 456 h8 l-1 4 h-6z M440 456 h8 l-1 4 h-6z"/>`});
   // the dolphin cruise boat (a big goal) at the end of the jetty; out on a cruise it sails up the coast and back with
   // the family aboard and dolphins alongside. Before it's bought: a mooring post with a "your boat here" sign
@@ -81,7 +81,7 @@ export function shoreArt(){
     : `<g data-place="boat" aria-label="The mooring: save up for a dolphin cruise boat"><ellipse class="hov" cx="206" cy="552" rx="26" ry="8" style="fill:var(--butter)"/>
       ${sk(`<rect x="200" y="512" width="8" height="34" style="fill:var(--wood)"/><rect x="178" y="512" width="52" height="18" rx="2" style="fill:#FFFDF6"/>`, `<rect x="200" y="512" width="8" height="34"/><rect x="178" y="512" width="52" height="18" rx="2"/><path d="M186 521 h36" opacity=".55"/>`)}
       ${tapeLabel(168, 588, "Boat mooring", "var(--peri)", 10)}</g>`;
-  return lampDefs + ground + sea + jetty + ferry + boat + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + mumdad + marcus
+  return lampDefs + ground + sea + jetty + ferry + boat + [[272, 214], [272, 440]].map(([x, y]) => streetLamp(x, y)).join("") + bench + rack + hanatheo + marcus
     + archGate("toFieldS", 500, 292, "The field", 446, 320, "var(--peri)", "Gate to the field")
     + archGate("toBay", 250, 30, "The bay", 312, 26, "var(--blush)", "Up the boardwalk to the bay and the Scoop Shack")
     + archGate("toFlowersS", 250, 616, "Flower farm", 326, 606, "var(--blush)", "Gate to the flower farm");

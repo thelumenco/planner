@@ -90,8 +90,8 @@ export const VILLAGE = {
   toShoreFl:{scene:"flowers", name:"Gate to the foreshore", door:[52,152], spot:true, bridge:"shore", mark:[52,96], line:"Up through the arch to the foreshore."},
   toFieldS:{scene:"shore", name:"Gate to the field", door:[498,300], spot:true, bridge:"field", mark:[490,246], line:"East through the gate to the field and the lake."},
   toFlowersS:{scene:"shore", name:"Gate to the flower farm", door:[250,622], spot:true, bridge:"flowers", mark:[290,560], line:"Down the boardwalk to Ma Ma's flower farm."},
-  mumdad: {scene:"shore", name:"Mum and Dad's", short:"Mum and Dad's house", door:[360,226], mark:[360,110]},
-  marcus: {scene:"shore", name:"Marcus and Angellina's", short:"Marcus and Angellina's house", door:[400,470], mark:[400,354]},
+  hanatheo: {scene:"shore", name:"Mum and Dad's", short:"Mum and Dad's house", door:[360,226], mark:[360,110]},
+  tomiposy: {scene:"shore", name:"Marcus and Angellina's", short:"Marcus and Angellina's house", door:[400,470], mark:[400,354]},
   suprack:{scene:"shore", name:"Paddleboards", door:[216,488], spot:true, line:"The paddleboard rack by the jetty. Fancy a paddle?"},
   ferry:  {scene:"shore", name:"Ferry to Jeju", door:[86,466], spot:true, mark:[78,400], line:"The ferry stop at the end of the jetty: boats to Jeju."},
   wishtower:{scene:"hwoods", name:"The wish-tower", door:[124,470], spot:true, mark:[110,400], line:"A little tower of stones by the river. Add one and make a wish."},
@@ -331,7 +331,7 @@ export const ROOMS = {
     ["tea","Tea table","C","teatable",null,"Tea and cake with Ma Ma.",34],
     ["dine","Dining table","X","dining",null,"Ma Ma's big table. She cooks for twenty, every time.",44]]},
   // Mum and Dad's house on the foreshore: Dad's piano, double bass and easel, Mum's exercise mat, the kitchen table
-  mumdad: {name:"Mum and Dad's", wall:"#EAF2F5", trim:"#3E6B8C", noBoard:true, pos:{P:[112,250], B:[232,262], E:[376,290], Y:[110,392], X:[270,500], R:[480,330]}, stations:[
+  hanatheo: {name:"Mum and Dad's", wall:"#EAF2F5", trim:"#3E6B8C", noBoard:true, pos:{P:[112,250], B:[232,262], E:[376,290], Y:[110,392], X:[270,500], R:[480,330]}, stations:[
     ["bedroom","Bedroom","R","bedroomdoor",null,"Mum and Dad's room.",0],
     ["piano","Piano","P","piano",null,"Dad's piano. He's been working on the same song all week.",42],
     ["bass","Double bass","B","doublebass",null,"Dad's double bass. Taller than Evan. Much taller.",38],
@@ -339,7 +339,7 @@ export const ROOMS = {
     ["mat","Mum's mat","Y","yogamat",null,"Mum's mat. Pilates, Zumba, Piloxing: she does them all.",26],
     ["dine","Dining table","X","dining",null,"The family table. There's always food on it. Take some home.",44]]},
   // Marcus and Angellina's: the games corner, Angellina's study desk and psychology books, the sofa
-  marcus: {name:"Marcus and Angellina's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[110,262], K:[432,261], D:[284,262], S:[110,420], X:[340,470], R:[480,340]}, stations:[
+  tomiposy: {name:"Marcus and Angellina's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[110,262], K:[432,261], D:[284,262], S:[110,420], X:[340,470], R:[480,340]}, stations:[
     ["bedroom","Bedroom","R","bedroomdoor",null,"Marcus and Angellina's room.",0],
     ["games","Games corner","G","gamingtv",null,"Marcus's games. He says he's 'nearly finished' this one. He's been nearly finished for a month.",36],
     ["books","Bookshelf","K","psychshelf",null,"Angellina's psychology books, all with sticky notes.",36],

@@ -31,7 +31,7 @@ const weekend = () => [0, 6].includes(new Date(now() + LOC()).getUTCDay());
 const dowNow = () => new Date(now() + LOC()).getUTCDay();
 // Orchard tours and drop-in visits (tours.js) win over the usual routine while they're on
 // A family paddle (Mel at the paddleboard rack): any of the family who are on the foreshore come out on boards too
-const SUP_FAMILY = ["mum", "dad", "marcus", "angelina"];
+const SUP_FAMILY = ["hana", "theo", "tomi", "posy"];
 function supSlot(def){
   const sup = api && api.sup && api.sup(); if (!sup || !SUP_FAMILY.includes(def.id)) return null;
   const base = routineNow(def); if (!base || base.scene !== "shore") return null;
@@ -97,7 +97,7 @@ function makeNode(id, look, kid, letter, act){
   if (act === "sunbathe") look = Object.assign({}, look, {towel: true, hat: null});   // Cinque Terre: Mum on the Manarola rocks
   if (act === "tandem") look = Object.assign({}, look, {bike: "#C8432F"});   // Jeju: Marcus and Angellina on the coast road
   const owned = (api.F().fam && api.F().fam.owned) || {};
-  if (id === "darren" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
+  if (id === "bo" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
   // a rainy day outdoors: everyone has their own brolly or raincoat (a coat if their right hand's busy or they're on a board)
   if (OUTDOOR.includes(api.scene()) && !townOf(api.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, {rain: rainGearFor(id, {coat: !!look.bike || !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look.extra)})});
   g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "") + `<g class="storycue" transform="translate(0 ${kid ? -48 : -72})" pointer-events="none"><g filter="url(#wob)"><rect x="-13" y="-9" width="26" height="16" rx="8" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1.2"/><circle cx="-6" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="0" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="6" cy="-1" r="1.8" style="fill:var(--line)"/></g></g>`;
@@ -159,7 +159,7 @@ function tickVillager(def, dt){
       let p = jitter(pick(slot.wander));
       for (let k = 0; k < 6 && outdoors(scene) && blocked(scene, p[0], p[1]); k++) p = jitter(pick(slot.wander));   // never wander into a building
       if (def.id === "pip" && scene === "base" && Math.random() < .35) {   // Pip races Evan to the pond
-        p = [330 + rnd(-10, 10), 520]; api.evan.tx = 350 + rnd(-14, 14); api.evan.ty = 516; api.evan.run = true;
+        p = [330 + rnd(-10, 10), 520]; false.tx = 350 + rnd(-14, 14); false.ty = 516; false.run = true;
         if (Math.random() < .6) { say(e, "Race you, Evan!"); setTimeout(() => api.evanSays("race!"), 600); }
       }
       if (slot.free) { e.tx = p[0]; e.ty = p[1]; e.path = []; }   // paddleboarders drift straight across the water

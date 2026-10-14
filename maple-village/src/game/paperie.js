@@ -42,7 +42,7 @@ export const sheetId = (col, add) => `pp_${col}_${add}`;
 export const sheetName = (col, add) => add === "seeds" ? `Seeded ${COLOURS[col].n.toLowerCase()} paper` : `${COLOURS[col].n} handmade paper${add === "none" ? "" : " " + ADDS[add].word}`;
 export const sheetPrice = (col, add) => BASE + ADDS[add].bonus + (col === "ink" ? 1 : 0);
 // every sheet Mel can make is an item (a gift, or stock for the shelves)
-for (const col of Object.keys(COLOURS)) for (const add of Object.keys(ADDS)) ITEMS[sheetId(col, add)] = {n: sheetName(col, add), kind: "gift", to: ["mum", "angelina", "mama", "marcus"], price: sheetPrice(col, add), ico: sheetId(col, add), paper: true,
+for (const col of Object.keys(COLOURS)) for (const add of Object.keys(ADDS)) ITEMS[sheetId(col, add)] = {n: sheetName(col, add), kind: "gift", to: ["hana", "posy", "farid", "tomi"], price: sheetPrice(col, add), ico: sheetId(col, add), paper: true,
   what: "A deckled sheet, made by hand in Montrose.", say: add === "seeds" ? "Paper with seeds in it? I can plant this? I'm planting this." : "Handmade paper! Look at the edges. I'm going to write you a proper letter on this."};
 
 export function paperState(F){ const p = F.paperie = F.paperie || {}; p.scraps = p.scraps || 0; p.line = p.line || []; p.stock = p.stock || {}; p.sold = p.sold || {}; return p; }
@@ -126,11 +126,11 @@ for (const col of Object.keys(COLOURS)) Object.assign(ITEMS[sheetId(col, "seeds"
 export function bloomFor(F, id, who, at = now()){ const it = ITEMS[id]; if (!it || !it.wrapped) return false;
   const w = (paperState(F).wraps || []).find(r => r.id === id); if (!w || w.tag !== "seeded") return false;
   const p = paperState(F); p.blooms = [...(p.blooms || []), {who, at: at + 2*864e5, id: `bloom-${who}-${at}`}].slice(-20); return true; }
-const BLOOM = {mum: "Dear Mel,\n\nThat little seed tag! I planted it by the front step like you said, and look: cornflowers and two poppies, already. Dad waters them every morning and pretends he isn't.\n\nLove, Mum xx",
-  dad: "Mel,\n\nThe tag came up. Poppies. I've drawn them twice.\n\nLove, Dad", marcus: "Zeh,\n\nAngie planted your seed tag in the window box. It's a tiny meadow now. The neighbours are jealous.\n\nMarcus",
-  angelina: "Hi Mel!\n\nThe seed tag grew!! Little blue flowers in my window box. I talk to them while I study.\n\nLove, Angellina", grands: "Ah girl,\n\nGong Gong planted the paper with the seeds next to Ma Ma's herbs. Now there are flowers! Pretty pretty. Ma Ma puts some by the altar.\n\nMa Ma (and Gong Gong)",
-  evan: "Dear Mama,\n\nMY FLOWERS CAME UP. Papa helped. They are blue and red and one is yellow.\n\nLove, Evan (Darren held the pencil)", darren: "Mel,\n\nThe seed tag from the present came up by the back door. Wildflowers. I didn't kill them. Proud of me?\n\nD"};
-export const bloomMail = (F, t = now()) => (paperState(F).blooms || []).filter(b => b.at <= t).map(b => ({id: b.id, from: "postie", at: b.at, title: "The seed tag came up", body: BLOOM[b.who] || BLOOM.mum}));
+const BLOOM = {hana: "Dear Mel,\n\nThat little seed tag! I planted it by the front step like you said, and look: cornflowers and two poppies, already. Dad waters them every morning and pretends he isn't.\n\nLove, Mum xx",
+  theo: "Mel,\n\nThe tag came up. Poppies. I've drawn them twice.\n\nLove, Dad", tomi: "Zeh,\n\nAngie planted your seed tag in the window box. It's a tiny meadow now. The neighbours are jealous.\n\nMarcus",
+  posy: "Hi Mel!\n\nThe seed tag grew!! Little blue flowers in my window box. I talk to them while I study.\n\nLove, Angellina", grands: "Ah girl,\n\nGong Gong planted the paper with the seeds next to Ma Ma's herbs. Now there are flowers! Pretty pretty. Ma Ma puts some by the altar.\n\nMa Ma (and Gong Gong)",
+  bo: "Mel,\n\nThe seed tag from the present came up by the back door. Wildflowers. I didn't kill them. Proud of me?\n\nD"};
+export const bloomMail = (F, t = now()) => (paperState(F).blooms || []).filter(b => b.at <= t).map(b => ({id: b.id, from: "postie", at: b.at, title: "The seed tag came up", body: BLOOM[b.who] || BLOOM.hana}));
 
 /* ---------- panels ---------- */
 const coin = () => icon("coin", 13), shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;

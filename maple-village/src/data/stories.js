@@ -23,37 +23,6 @@ export const STORIES = {
     {lines: ["The very first red from these vines, I named it Margaux. She laughed until she cried."]},
     {lines: ["I kept one bottle of that first vintage. Margaux, 1984.", "It belongs in your cellar, not under my bed. Open it on a good day."], reward: "margaux"}
   ],
-  dad: [
-    {lines: ["Did I ever tell you how I met your mother? She walked into the music shop with a guitar. Cracked neck.", "I was the boy behind the counter who fixed things."]},
-    {lines: ["I took three weeks to fix that guitar.", "It only needed one."]},
-    {lines: ["First date: a noodle place by the river in the city. She talked the whole time. I drew her on a napkin. Still got it."]},
-    {needs: ["celeste:3"], lines: ["I was at art school then, too. A lady from the coast came into class, looking for someone to paint a chocolate box.", "Margaux Marchand! I painted her label: a ribbon and a little copper pot. Never dreamed we'd live down the road from her shop one day."]},
-    {needs: ["cocoa"], lines: ["Found my old sketch of that label in a drawer. It should hang in your Cocoa Room, don't you think?"], reward: "label"}
-  ],
-  mum: [
-    {lines: ["Your father will tell you he fixed my guitar. He did. Slowly. Very, very slowly."]},
-    {lines: ["We all moved here together from the city when Ma Ma found the orchard. The city was too loud for her trees, she said."]},
-    {lines: ["I still play that guitar, you know. Not well. Your dad pretends it's wonderful."]},
-    {lines: ["Moving here was the best thing we ever did. Everyone round one table on Wednesdays and Sundays. That was always the dream."]}
-  ],
-  mama: [
-    {lines: ["These trees came from cuttings. I carried them from the city in wet newspaper, on my lap, the whole way."]},
-    {lines: ["The lemon tree nearly died the first winter. Gong Gong sat up with it all night. Talked to it."]},
-    {lines: ["Twenty years ago a swarm of bees landed in my apple tree. A young man came running with a cardboard box.", "Felix! Now he says my blossom honey is HIS honey. Hmph."]},
-    {lines: ["Mei's mother was my dearest friend. When she passed, Mei was so small.", "I taught her the roses, the way her mother sang to them."]},
-    {lines: ["Tell Felix from me: the bees love the orchard best just after Gong Gong prunes. More blossom honey for everybody.", "Here, take a jar from the last batch. Don't tell him."], reward: "blossom"}
-  ],
-  gonggong: [
-    {lines: ["Darren is a good boy. When he first came, he couldn't fix a tap. Now he fixes my radio."]},
-    {lines: ["That old radio in his shed? Mine. Forty years. Still plays the news."]},
-    {lines: ["I taught him everything: hammer, nail, patience. Mostly patience."]},
-    {lines: ["Fishing at the lake on Sundays is my thinking time. Your grandmother thinks I'm napping. Sometimes I am."]}
-  ],
-  darren: [
-    {lines: ["Gong Gong taught me to fix things. Lesson one: always turn the water off first. Learnt that one the hard way."]},
-    {lines: ["The radio in the shed is his. I keep saying I'll give it back. He keeps telling me to keep it."]},
-    {lines: ["Best day here? Evan on the swing I built. Gong Gong checked every bolt. Twice."]}
-  ],
   okada: [
     {lines: ["In forty years, I delivered every letter but one."]},
     {lines: ["It came the winter of my first year. Addressed only to 'H., the seaside town'. No street. No town I knew."]},
@@ -117,12 +86,12 @@ export const STORIES = {
     {lines: ["I left the week I cried at a spreadsheet. Bought two goats with my bonus. Best trade I ever made."]},
     {needs: ["marcus:2"], lines: ["Marcus came up on Saturday to help in the dairy. He's terrible at milking. He's very good at laughing about it."]}
   ],
-  marcus: [
+  tomi: [
     {lines: ["You know Elena, from the farm? We worked together in the city. She left. I stayed."]},
     {needs: ["elena:3"], lines: ["Sometimes I think about doing what she did. Then I think about my mortgage. Then I think about goats."]},
     {lines: ["Angellina says I should 'explore the feeling'. So I'm exploring it. On Saturdays. With a milking stool."]}
   ],
-  angelina: [
+  posy: [
     {lines: ["Marcus pretends he loves spreadsheets. I'm literally doing a module on that."]},
     {needs: ["marcus:2"], lines: ["I told him: you don't have to quit to try something. Try it on a Saturday. That's psychology, Mel."]}
   ],

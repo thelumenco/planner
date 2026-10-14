@@ -43,12 +43,12 @@ export function occasionNow(day = dayKey(), hm){
 }
 
 /* ---------- who's where ---------- */
-const TRIVIA = {master: "amara", teams: [{n: "The Quizzly Bears", ids: ["hana", "okada", "lin"]}, {n: "Les Vignerons", ids: ["celeste", "farid", "mei"]}, {n: "Bo Knows", ids: ["bo", "opal", "theo"]}], mine: ["darren", "angelina"]};
-const PAINT = {teacher: "dad", ids: ["juniper", "wren", "noor", "elena", "felix", "lila"]};
+const TRIVIA = {master: "amara", teams: [{n: "The Quizzly Bears", ids: ["hana", "okada", "lin"]}, {n: "Les Vignerons", ids: ["celeste", "farid", "mei"]}, {n: "Bo Knows", ids: ["bo", "opal", "theo"]}], mine: ["bo", "posy"]};
+const PAINT = {teacher: "theo", ids: ["juniper", "wren", "noor", "elena", "felix", "lila"]};
 const EASELS = [[150, 330, -1], [150, 420, -1], [150, 510, -1], [370, 330, 1], [370, 420, 1], [370, 510, 1]];
-const VALENTINE = [["mum", "dad"], ["marcus", "angelina"], ["mama", "gonggong"], ["aiko", "hiro"], ["rosa", "bastien"]];
-const CHRISTMAS = ["mama", "gonggong", "mum", "dad", "marcus", "angelina", "darren"];
-const NYE = ["mum", "dad", "marcus", "angelina", "darren", "hana", "okada", "juniper", "bo", "opal", "theo", "felix", "elena", "farid", "mei", "celeste"];
+const VALENTINE = [["hana", "theo"], ["tomi", "posy"], ["farid", "mei"], ["aiko", "hiro"], ["rosa", "bastien"]];
+const CHRISTMAS = ["farid", "mei", "hana", "theo", "tomi", "posy", "bo"];
+const NYE = ["hana", "theo", "tomi", "posy", "bo", "okada", "juniper", "opal", "felix", "elena", "farid", "mei", "celeste"];
 const KNOTS = [[130, 350], [130, 470], [130, 560], [390, 360], [390, 470], [390, 560]];
 const MOVES = ["dance", "boogie", "armsup", "twirl", "shuffle"];
 const seat = i => ({at: [SEATS[i][0], SEATS[i][1]], dir: SEATS[i][2], act: "sit"});

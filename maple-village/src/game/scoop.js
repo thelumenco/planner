@@ -273,7 +273,7 @@ export function collectBox(F){ const s = scoopState(F), n = s.box; if (!n) retur
 /* ---------- gifts: an ice cream to take away ---------- */
 // every flavour in each type becomes a backpack gift ("Mango Sorbet cone"); sorbets suit everyone, gelato everyone
 // but Marcus (lactose intolerant)
-const NO_DAIRY = ["evan", "darren", "mama", "gonggong", "mum", "dad", "angelina"];
+const NO_DAIRY = ["bo", "farid", "mei", "hana", "theo", "posy"];
 export const giftId = (r, fmt) => `gel_${fmt}_${r.id.replace(/[^a-z0-9]+/g, "-")}`;
 // dipped ones ("Mango Gelato cone, dark-chocolate dipped with sprinkles") are registered as they're made (s.dipIds)
 const DAIRY_DIP = ["milk", "white", "matcha"];
@@ -284,13 +284,13 @@ function registerDip(s, id){
   const r = s.recipes.find(x => x.id.replace(/[^a-z0-9]+/g, "-") === m[4]); if (!r) return;
   const top = m[3] === "none" ? null : m[3], dairy = r.dairy || DAIRY_DIP.includes(m[2]);
   ITEMS[id] = {n: dipName(r, m[1], m[2], top), kind: "gift", to: dairy ? NO_DAIRY : "family", tab: "scoop", ico: "ic_" + m[1], gel: true, dip: true,
-    say: `Dipped AND topped? You spoil me. ${r.name}, wow.`, says: {evan: "CHOCOLATE ONE!! *chocolate everywhere*", marcus: "Dark choc and sorbet, so no tummy trouble. Legend, Zeh.", mama: "So fancy! Ma Ma eat slowly, slowly.", dad: "Now that's an ice cream. Your mum wants a bite. She can't have one."}};
+    say: `Dipped AND topped? You spoil me. ${r.name}, wow.`, says: {tomi: "Dark choc and sorbet, so no tummy trouble. Legend, Zeh.", farid: "So fancy! Ma Ma eat slowly, slowly.", theo: "Now that's an ice cream. Your mum wants a bite. She can't have one."}};
 }
 export function registerItems(F){
   const s0 = scoopState(F); s0.dipIds.forEach(id => registerDip(s0, id)); Object.keys(F.inv || {}).filter(k => k.startsWith("gel_dip_")).forEach(id => registerDip(s0, id));
   s0.recipes.forEach(r => Object.keys(FORMATS).forEach(fmt => { const id = giftId(r, fmt);
     ITEMS[id] = {n: `${r.name} ${FORMATS[fmt].n.toLowerCase()}`, kind: "gift", to: r.dairy ? NO_DAIRY : "family", tab: "scoop", ico: "ic_" + fmt, gel: true,
-      say: `Ice cream! ${r.name}? Ooh, I've never had that one.`, says: {evan: "ICE CREAM!! *happy dance*", marcus: "A sorbet, so no tummy trouble. Nice one, Zeh.", mama: "Ice cream for Ma Ma? Aiyo, so cold! So nice.", dad: "Ah Gong loves ice cream. Don't tell your mum."}}; }));
+      say: `Ice cream! ${r.name}? Ooh, I've never had that one.`, says: {tomi: "A sorbet, so no tummy trouble. Nice one, Zeh.", farid: "Ice cream for Ma Ma? Aiyo, so cold! So nice.", theo: "Ah Gong loves ice cream. Don't tell your mum."}}; }));
 }
 export function takeAway(F, rid, fmt){
   const s = scoopState(F), r = recipeOf(s, rid); if (!r || !(s.tubs[rid] > 0) || !FORMATS[fmt]) return null;
@@ -372,7 +372,7 @@ export function deliverPanel(F, st){
   if (!r) return h + `<ul class="hlist wlist">${tubs.map(x => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops${x.dairy ? "" : " · dairy-free"}</small></span><button class="btn small primary" data-gvpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
   const fmt = FORMATS[st.fmt] ? st.fmt : "cone";
   h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p><div class="gchips">${Object.keys(FORMATS).map(f => `<button class="gchip${f === fmt ? " on" : ""}" data-gvfmt="${f}" aria-pressed="${f === fmt}"><span>${FORMATS[f].n}</span></button>`).join("")}</div>`;
-  h += `<p class="eyebrow" style="margin:10px 0 6px">Send it to</p><div class="actions">${(st.who || []).filter(([w]) => !r.dairy || w !== "marcus").map(([w, n]) => `<button class="btn small alt" data-gvto="${w}">${esc(n)}</button>`).join("")}</div>`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">Send it to</p><div class="actions">${(st.who || []).filter(([w]) => !r.dairy || w !== "tomi").map(([w, n]) => `<button class="btn small alt" data-gvto="${w}">${esc(n)}</button>`).join("")}</div>`;
   return h + `<div class="actions"><button class="btn alt small" data-gvback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function counterPanel(F, st){
@@ -384,7 +384,7 @@ export function counterPanel(F, st){
   if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), then make more tubs from the recipe book there.</p>` + upBtn + shut;
   const pick = st.pick && s.tubs[st.pick] > 0 ? recipeOf(s, st.pick) : null;
   if (pick) return h + `<div class="gpick"><p class="olabel">${dot(pick.col)} ${esc(pick.name)}${pick.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick.ings.map(i => INGR[i][0]).join(", "))} · ${s.tubs[pick.id]} scoops left</p>
-    <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick.id)}">Have one now${st.evan ? ", and one for Evan" : ""}</button></div>
+    <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick.id)}">Have one now${("")}</button></div>
     <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map(f => `<button class="btn small alt" data-gtake="${f}">${FORMATS[f].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
   h += `<ul class="hlist wlist">${tubs.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;

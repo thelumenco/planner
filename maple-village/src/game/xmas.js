@@ -14,9 +14,9 @@ const shut = `<div class="actions"><button class="btn alt small" data-close="1">
 
 // treats: bought and eaten (or drunk) right there, a cone or a cup for Evan too when he's along
 export const TREATS = {
-  xm_chestnut: {n: "A cone of roast chestnuts", price: 3, say: ["Hot chestnuts in a paper cone. You peel one and burn your fingers, every single time. Worth it.", "Sweet, smoky, a bit floury. Christmas in a paper cone."], evan: ["hot hot hot!", "more nuts Mama!"]},
-  xm_hotchoc: {n: "Hot chocolate", price: 3, say: ["Thick hot chocolate from the Scoop Shack's winter stand. Both hands round the cup.", "Rich and not too sweet. Sofia used the Cocoa Room's dark."], evan: ["chocolate moustache!", "yummy!"]},
-  xm_hotchoc_m: {n: "Hot chocolate with marshmallows", price: 4, say: ["A mountain of marshmallows, slowly melting into the chocolate. Sofia doesn't do half measures.", "Marshmallows first, then the chocolate. That's the rule."], evan: ["MARSHMALLOWS!", "I got the pink one!"]}
+  xm_chestnut: {n: "A cone of roast chestnuts", price: 3, say: ["Hot chestnuts in a paper cone. You peel one and burn your fingers, every single time. Worth it.", "Sweet, smoky, a bit floury. Christmas in a paper cone."]},
+  xm_hotchoc: {n: "Hot chocolate", price: 3, say: ["Thick hot chocolate from the Scoop Shack's winter stand. Both hands round the cup.", "Rich and not too sweet. Sofia used the Cocoa Room's dark."]},
+  xm_hotchoc_m: {n: "Hot chocolate with marshmallows", price: 4, say: ["A mountain of marshmallows, slowly melting into the chocolate. Sofia doesn't do half measures.", "Marshmallows first, then the chocolate. That's the rule."]}
 };
 export const treatsHTML = (st, coins) => (st.treats || []).length ? `<div class="actions">${st.treats.map(id => { const t = TREATS[id];
   return `<button class="btn ${coins >= t.price ? "primary" : "alt"}" data-xtreat="${id}" ${coins >= t.price ? "" : "disabled"}>${icon(id, 18)} ${esc(t.n)} · ${t.price} ${icon("coin", 13)}</button>`; }).join("")}</div>` : "";
@@ -176,7 +176,7 @@ export function grottoPanel(F, day, hm, o = {}){
   if (!grottoOn(day)) return h + `<p class="sub">A little wooden hut with snow painted on the roof and a sign: "Santa's grotto. Saturday and Sunday evenings, 5 till 8." It's shut till the weekend.</p>` + shut;
   if (!grottoNow(day, hm)) return h + `<p class="sub">The grotto's ${hm < GROTTO[0] ? "not open yet: Santa comes at 5" : "shut for tonight. Santa's gone home for his tea"}.</p>` + shut;
   if ((x.grotto || {})[day]) return h + `<p class="sub">Santa waves through the window. "Evan's been already tonight! I've written his wish in my book, don't you worry."</p>` + shut;
-  if (!o.evan) return h + `<p class="sub">Santa in his big chair, a sack of little parcels beside him, the elf (it's Pip) checking names on a clipboard. "Is there a young man called Evan coming tonight?"</p><p class="muted">Bring Evan along.</p>` + shut;
+  return h + `<p class="sub">Santa in his big chair, a sack of little parcels beside him, the elf (it's Pip) checking names on a clipboard. "Is there a young man called Evan coming tonight?"</p><p class="muted">Bring Evan along.</p>` + shut;
   return h + `<p class="sub">Santa in his big chair, a sack of little parcels beside him. Pip, as the elf, is checking names on a clipboard. Evan's gone very quiet and is holding your hand tight.</p><div class="actions"><button class="btn primary" data-xgrotto="1">Evan goes in to see Santa</button></div>` + shut;
 }
 export function grottoVisit(F, day){
@@ -190,7 +190,7 @@ export function grottoVisit(F, day){
 // The family write back (ten minutes), villagers (half an hour; now and then they want one for someone else), friends
 // far away the next day, with a postcard and a little something from where they live.
 export const RECIPS = [
-  {id: "mumdad", n: "Mum and Dad", kind: "family"}, {id: "mamagg", n: "Ma Ma and Gong Gong", kind: "family"}, {id: "marcusang", n: "Marcus and Angellina", kind: "family"},
+  {id: "hanatheo", n: "Mum and Dad", kind: "family"}, {id: "mamagg", n: "Ma Ma and Gong Gong", kind: "family"}, {id: "marcusang", n: "Marcus and Angellina", kind: "family"},
   {id: "hana", n: "Hana", kind: "village"}, {id: "okada", n: "Mr Okada", kind: "village"}, {id: "juniper", n: "Juniper", kind: "village"}, {id: "opal", n: "Opal", kind: "village"}, {id: "celeste", n: "Celeste", kind: "village"}, {id: "lin", n: "Lin", kind: "village"},
   {id: "bvkel", n: "Kel at the Cellar Door", kind: "friend", stop: "bv_cellar", gift: "b_print", sign: "Cheers, Kel", body: i => `G'day Mel,\n\nYour hamper made it all the way to the Cellar Door! The ${i} went down a treat with the team at smoko. I've popped a print of the valley in the post, so you don't forget us.`},
   {id: "crwin", n: "Win at the lighthouse", kind: "friend", stop: "bv_lighthouse", gift: "b_chime", sign: "Warmly, Win", body: i => `Dear Mel,\n\nThe postman carried your hamper up the lighthouse steps, puffing all the way. The ${i} is on the tearoom counter for everyone to admire. Here's a little shell wind chime for your window.`},
@@ -198,7 +198,7 @@ export const RECIPS = [
   {id: "lvarnaud", n: "Madame Arnaud at Rosehill", kind: "friend", stop: "bv_perfume", gift: "b_lavbunch", sign: "Avec affection, Madame Arnaud", body: i => `Chère Mel,\n\nYour hamper arrived at Rosehill. The ${i}: magnifique. I send you a bunch of our lavender, dried in the old barn. Put it under your pillow.`}];
 export const recipsFor = F => RECIPS.filter(r => r.kind !== "friend" || !!(F.bellbird && F.bellbird.stamps && F.bellbird.stamps[r.stop]));
 const FAM_NOTE = {
-  mumdad: (i, hp) => hp.season === "mothers" ? `Dear Mel,\n\nA Mother's Day hamper! Lilac ribbon and everything. I've put the ${i} by my bed and told Dad it's mine, all mine. You're a good girl. The best.\n\nLove, Mum xx (Dad says hello too)`
+  hanatheo: (i, hp) => hp.season === "mothers" ? `Dear Mel,\n\nA Mother's Day hamper! Lilac ribbon and everything. I've put the ${i} by my bed and told Dad it's mine, all mine. You're a good girl. The best.\n\nLove, Mum xx (Dad says hello too)`
     : hp.season === "valentine" ? `Dear Mel,\n\nA Valentine's hamper for your old mum and dad! Dad's pretending it was his idea. We had the ${i} with a cup of tea, like teenagers.\n\nLove, Mum and Dad xx`
     : `Dear Mel,\n\nThe hamper came this morning! Dad had the ${i} open before I'd even read the tag. We're saving the rest for Christmas Eve, if he lets us.\n\nLove, Mum and Dad xx`,
   mamagg: (i, hp) => `Ah girl,\n\nSo big, the basket! Gong Gong carried it in like a trophy. Ma Ma is keeping the ${i} for when you all come over. You work too hard, you know. Thank you, thank you.\n\nMa Ma (and Gong Gong)`,

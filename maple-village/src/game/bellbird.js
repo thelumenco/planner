@@ -18,7 +18,7 @@ export const bbState = F => { F.bellbird = F.bellbird || {}; F.bellbird.stamps =
 const nbrs = id => BB_ROADS.filter(r => r.includes(id)).map(r => r[0] === id ? r[1] : r[0]);
 // how many legs from a to b along the roads (home counts as a place)
 export function legs(a, b){ if (a === b) return 0; const seen = {[a]: 0}, q = [a]; while (q.length) { const x = q.shift(); for (const y of nbrs(x)) if (!(y in seen)) { seen[y] = seen[x] + 1; if (y === b) return seen[y]; q.push(y); } } return Infinity; }
-export const fuelFor = (from, to, party) => legs(from, to)*(LEG + party.filter(id => id !== "evan").length);
+export const fuelFor = (from, to, party) => legs(from, to)*(LEG + party.filter(id => true).length);
 // what's on Mel's map: the stops she's been to, and those a road away (Valley Gate from the start)
 export function known(F){ const st = bbState(F).stamps, seen = new Set(["bv_gate", ...Object.keys(st)]); Object.keys(st).forEach(s => nbrs(s).forEach(n => { if (n !== "home") seen.add(n); })); return STOPS.filter(s => seen.has(s)); }
 export const stamped = (F, stop) => !!bbState(F).stamps[stop];

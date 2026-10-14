@@ -269,7 +269,7 @@ const SHELLS = {
     ${plant(30, 610, 1.1)}${plant(490, 610, 1)}`,
 
   // Mum and Dad's on the foreshore: pale timber, a big window onto the sea, Dad's framed sketches and a music stand
-  mumdad: () => `<rect width="520" height="640" style="fill:#D8C3A0"/>
+  hanatheo: () => `<rect width="520" height="640" style="fill:#D8C3A0"/>
     <g opacity=".4" style="stroke:#B9A27E" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}${rows(30, i => `<path d="M${(i*83) % 520} ${170 + (i % 13)*36} v36"/>`)}</g>
     ${wallBase("#EAF2F5", "#3E6B8C")}${skirting}
     ${sk(`<rect x="300" y="26" width="170" height="92" rx="4" style="fill:#BFE0EE"/><path d="M300 86 q42 -10 85 0 t85 0 v32 h-170z" style="fill:#7FB8E8"/><path d="M402 78 q8 -12 16 -4 q-6 2 -8 8z" style="fill:#5E7A94"/>`, `<rect x="300" y="26" width="170" height="92" rx="4"/><path d="M385 26 v92"/><path d="M300 86 q42 -10 85 0 t85 0" opacity=".6"/>`)}
@@ -278,7 +278,7 @@ const SHELLS = {
     <g filter="url(#wob)">${[96, 70, 44].map((rx, i) => `<ellipse cx="300" cy="420" rx="${rx}" ry="${rx*.42}" style="fill:${["#BFE0EE", "#FFFDF6", "#E8B4C0"][i]}" opacity=".75"/>`).join("")}</g>
     ${plant(490, 610, 1)}${plant(24, 610, .85)}`,
   // Marcus and Angellina's: soft lilac walls, a gallery wall (their engagement photo), fairy lights, a plant shelf
-  marcus: () => `<rect width="520" height="640" style="fill:#CDB59A"/>
+  tomiposy: () => `<rect width="520" height="640" style="fill:#CDB59A"/>
     <g opacity=".4" style="stroke:#AE9578" stroke-width="1.2">${rows(13, i => `<path d="M0 ${170 + i*36} H520"/>`)}${rows(30, i => `<path d="M${(i*59) % 520} ${170 + (i % 13)*36} v36"/>`)}</g>
     ${wallBase("#F3ECF7", "#8E5B9A")}${skirting}
     <g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1" fill="none"><path d="M10 18 Q130 34 260 18 T510 18"/></g>

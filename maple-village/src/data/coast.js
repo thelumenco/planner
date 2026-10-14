@@ -11,8 +11,8 @@
 //   The Sisters        bv_sisters:     cs_lookout / cs_beach
 //   Koala Cove         bv_cove:        cc_park | cc_mouth
 
-const VAN = {by: "van", fare: 0, free: ["evan"], outFrom: 7*60, outTo: 18*60, backTo: 22*60};
-const FAM = ["mum", "dad", "mama", "gonggong", "darren", "marcus", "angelina"];
+const VAN = {by: "van", fare: 0, free: [], outFrom: 7*60, outTo: 18*60, backTo: 22*60};
+const FAM = ["hana", "theo", "farid", "mei", "bo", "tomi", "posy"];
 // the family's wander points: two each per screen, picked from a screen's open ground
 const famSpots = per => Object.fromEntries(FAM.map((id, i) => [id, Object.fromEntries(Object.entries(per).map(([sc, pts]) => [sc, [pts[i % pts.length], pts[(i + 3) % pts.length]]]))]));
 const room = (door, n, say) => ({door, n, music: door.replace(/^bv/, "bv_"), party: [[200, 560], [330, 560], [120, 540], [420, 540]], say});
@@ -26,20 +26,19 @@ export const CR_TOWNS = {
     hints: {cw_beach: "Breakwater: the surf beach, the surf shop and the van. East: the main street.", cw_street: "The main street: fish and chips, the bakery, the Norfolk pines and the esplanade. West: back to the beach."},
     spots: famSpots({cw_beach: [[250, 420], [330, 400], [220, 480], [380, 330], [180, 400], [300, 470]], cw_street: [[220, 380], [320, 400], [260, 450], [180, 330], [380, 340], [300, 330]]}),
     acts: {   // round 150: what the family does here (and nowhere else)
-      marcus: {cw_beach: {act: "bodyboard", at: [220, 300], dir: 1}},
-      mum: {cw_beach: {act: "yoga", at: [96, 400], dir: 1, hours: [[7*60, 11*60], [16*60, 18*60 + 30]]}}
+      tomi: {cw_beach: {act: "bodyboard", at: [220, 300], dir: 1}},
+      hana: {cw_beach: {act: "yoga", at: [96, 400], dir: 1, hours: [[7*60, 11*60], [16*60, 18*60 + 30]]}}
     }, rooms: {
       bv_surfshop: room("bvsurfshop", "Swell Surf Shop", "The surf shop: boards in racks to the ceiling, wetsuits on hangers, a wall of photos of big waves, and a dog asleep on a pile of towels."),
       bv_chippy: room("bvchippy", "The Golden Gull", "The fish and chip shop: a hissing fryer, a chalkboard of today's catch, butcher's paper, and salt and vinegar on every table."),
       bv_bakery: room("bvbakery", "Crumb & Co. bakery", "The bakery: pies in the warmer, vanilla slices, cinnamon scrolls, and a queue of sandy surfers out the door.")},
-    lines: {mum: ["The sea air! I can feel my skin thanking me.", "Look at the little kids on the foam boards. So brave."],
-      dad: ["Those Norfolk pines must be a hundred years old.", "Fish and chips on the beach. Some things you don't improve on."],
-      mama: ["Ma Ma will watch from here. Too many waves.", "The bakery smells like heaven. Ma Ma is going in."],
-      gonggong: ["Gong Gong used to swim like that. Long time ago.", "Good wind today. The surfers are happy."],
-      darren: ["I'm getting a pie. Then another pie.", "Watch the gulls. They're professionals."],
-      marcus: ["Zeh, I'm getting on a board. Film it. Don't film the falling.", "This is the life."],
-      angelina: ["The water's so clear you can see the sand ripples.", "I want a little beach house here one day."],
-      evan: ["the sea is so BIG", "I'm a surfer!", "can I have chips?"]},
+    lines: {hana: ["The sea air! I can feel my skin thanking me.", "Look at the little kids on the foam boards. So brave."],
+      theo: ["Those Norfolk pines must be a hundred years old.", "Fish and chips on the beach. Some things you don't improve on."],
+      farid: ["Ma Ma will watch from here. Too many waves.", "The bakery smells like heaven. Ma Ma is going in."],
+      mei: ["Gong Gong used to swim like that. Long time ago.", "Good wind today. The surfers are happy."],
+      bo: ["I'm getting a pie. Then another pie.", "Watch the gulls. They're professionals."],
+      tomi: ["Zeh, I'm getting on a board. Film it. Don't film the falling.", "This is the life."],
+      posy: ["The water's so clear you can see the sand ripples.", "I want a little beach house here one day."]},
     say: {bvsurf: "The surf: little rolling waves, perfect for learning. Jet's lessons are on the hour, from the flags.",
       bvflags: "The red and yellow flags: swim between them. The lifeguard waves from her tall chair.",
       bvbench: "A bench under the Norfolk pines, facing the sea. A seagull is watching you very closely.",
@@ -54,20 +53,19 @@ export const CR_TOWNS = {
     hints: {cl_light: "Lighthouse Point: the lighthouse, the keeper's cottage tearoom and the van. South: the cliff walk.", cl_cliff: "The cliff walk: the whale lookout, the heath and the gift shop. North: back to the lighthouse."},
     spots: famSpots({cl_light: [[260, 420], [320, 470], [220, 380], [300, 340], [380, 430], [200, 470]], cl_cliff: [[200, 380], [260, 440], [180, 300], [300, 300], [220, 520], [280, 560]]}),
     acts: {
-      gonggong: {cl_cliff: {act: "telescope", at: [262, 372], dir: 1}},
-      angelina: {cl_light: {act: "paint", at: [240, 430], dir: 1}}
+      mei: {cl_cliff: {act: "telescope", at: [262, 372], dir: 1}},
+      posy: {cl_light: {act: "paint", at: [240, 430], dir: 1}}
     }, rooms: {
       bv_lighthouse: room("bvlighthouse", "Inside the lighthouse", "Inside the lighthouse: a spiral of iron stairs going up and up, round windows, and at the top the great glass lens and a balcony right round."),
       bv_tearoom: room("bvtearoom", "The keeper's cottage tearoom", "The keeper's cottage, now a tearoom: lace curtains, a ship in a bottle, scones on the dresser, and the old logbooks on a shelf."),
       bv_giftshop: room("bvgiftshop", "The Point gift shop", "The gift shop: lighthouse models, shell wind chimes, postcards and tea towels, and the sound of the sea through the open door.")},
-    lines: {mum: ["Imagine living out here. Just you, the light and the sea.", "Look at the wildflowers in the heath. Purple and yellow."],
-      dad: ["A first-order lens. They don't make them like that any more.", "I'd like to paint that lighthouse. In this light."],
-      mama: ["Very windy. Ma Ma's hat nearly went to sea.", "Scones in the cottage. Ma Ma is ready."],
-      gonggong: ["Gong Gong will look for whales. You go on.", "The old keepers wrote down every ship. Every one."],
-      darren: ["How many stairs, do you reckon? Bet you it's over a hundred.", "Whale watching. Patience. Snacks help."],
-      marcus: ["Zeh, the view from the top is going to be unreal.", "This wind! Hold onto Evan."],
-      angelina: ["The light keeps changing on the water. I need to paint it.", "Ships used to see this light from twenty miles out."],
-      evan: ["is there a giant in the lighthouse?", "whales! where are the whales?", "I want to go to the top!"]},
+    lines: {hana: ["Imagine living out here. Just you, the light and the sea.", "Look at the wildflowers in the heath. Purple and yellow."],
+      theo: ["A first-order lens. They don't make them like that any more.", "I'd like to paint that lighthouse. In this light."],
+      farid: ["Very windy. Ma Ma's hat nearly went to sea.", "Scones in the cottage. Ma Ma is ready."],
+      mei: ["Gong Gong will look for whales. You go on.", "The old keepers wrote down every ship. Every one."],
+      bo: ["How many stairs, do you reckon? Bet you it's over a hundred.", "Whale watching. Patience. Snacks help."],
+      tomi: ["Zeh, the view from the top is going to be unreal.", "This wind! Hold onto Evan."],
+      posy: ["The light keeps changing on the water. I need to paint it.", "Ships used to see this light from twenty miles out."]},
     say: {bvwhales: "The whale lookout: a railing on the cliff edge, a sign of whale shapes, and the whole ocean in front of you.",
       bvheath: "The coastal heath: low, wind-bent bushes, purple and yellow flowers, and honeyeaters darting about.",
       bvlighthouse: "The lighthouse: white, round, with a red cap, a little green door, and 1891 over the lintel.",
@@ -81,20 +79,19 @@ export const CR_TOWNS = {
     hints: {cg_ferns: "Fern Gully: the tree ferns, the treetop walk, the ranger's hut, the mushroom café and the van. South: down to the hidden cove.", cg_cove: "The hidden cove: the waterfall onto the sand, the glow-worm grotto in the cliff, and the sea. North: back up to the ferns."},
     spots: famSpots({cg_ferns: [[260, 430], [320, 470], [220, 500], [300, 400], [380, 470], [200, 440]], cg_cove: [[260, 300], [320, 340], [220, 380], [300, 260], [380, 360], [200, 320]]}),
     acts: {
-      dad: {cg_ferns: {act: "macro", at: [220, 520], dir: -1}},
-      darren: {cg_ferns: {act: "count", at: [350, 380], dir: -1}}
+      theo: {cg_ferns: {act: "macro", at: [220, 520], dir: -1}},
+      bo: {cg_ferns: {act: "count", at: [350, 380], dir: -1}}
     }, rooms: {
       bv_rangerhut: room("bvrangerhut", "The ranger's hut", "The ranger's hut: maps and pinned-up leaves, a jar of lost things, a lyrebird feather, and the treetop-walk tickets."),
       bv_mushcafe: room("bvmushcafe", "The Toadstool café", "The Toadstool café: mismatched chairs, mushroom soup and toasted sandwiches, and a wood stove that's always lit."),
       bv_grotto: room("bvgrotto", "The glow-worm grotto", "The glow-worm grotto: a low overhang in the cliff, cool and dripping. In the dark, the ceiling is speckled with tiny blue-green stars.")},
-    lines: {mum: ["Smell that! Wet earth and ferns.", "A beach at the bottom of a rainforest. How is that real?"],
-      dad: ["Look at the fungi on that log. Orange, like little shelves.", "Mountain ash. The tallest flowering trees in the world."],
-      mama: ["So cool here. Ma Ma likes it.", "Mushroom soup in the café. Ma Ma's choice."],
-      gonggong: ["Listen. A lyrebird. Copying a camera.", "Gong Gong will rest by the creek."],
-      darren: ["Treetop walk. I'm counting the steps. All of them.", "Glow-worms are just shiny bugs, but I'm still excited."],
-      marcus: ["Zeh, this is like a movie.", "A waterfall straight onto the beach. Unreal."],
-      angelina: ["Everything's dripping and green. I love it.", "The glow-worms only come out in the dark. Can we stay?"],
-      evan: ["dinosaurs live here", "I hear water!", "glow worms! can I hold one?"]},
+    lines: {hana: ["Smell that! Wet earth and ferns.", "A beach at the bottom of a rainforest. How is that real?"],
+      theo: ["Look at the fungi on that log. Orange, like little shelves.", "Mountain ash. The tallest flowering trees in the world."],
+      farid: ["So cool here. Ma Ma likes it.", "Mushroom soup in the café. Ma Ma's choice."],
+      mei: ["Listen. A lyrebird. Copying a camera.", "Gong Gong will rest by the creek."],
+      bo: ["Treetop walk. I'm counting the steps. All of them.", "Glow-worms are just shiny bugs, but I'm still excited."],
+      tomi: ["Zeh, this is like a movie.", "A waterfall straight onto the beach. Unreal."],
+      posy: ["Everything's dripping and green. I love it.", "The glow-worms only come out in the dark. Can we stay?"]},
     say: {bvtreetop: "The treetop walk: a steel walkway high up in the canopy, swaying a little, with the ferns far below.",
       bvcreek: "The creek: clear brown water tumbling over mossy rocks, on its way down to the sea.",
       bvfalls: "The waterfall: the creek drops straight off the cliff onto the sand, into a clear pool, then runs out to the sea.",
@@ -109,20 +106,19 @@ export const CR_TOWNS = {
     hints: {ch_wharf: "Fisher's Harbour: the wharf and the boats, the co-op and the van. East: the cottages.", ch_cottages: "The cottages along the bay: the old pub, the smokehouse and a little beach. West: back to the wharf."},
     spots: famSpots({ch_wharf: [[200, 300], [260, 320], [380, 300], [440, 330], [300, 280], [180, 340]], ch_cottages: [[200, 340], [300, 380], [380, 340], [260, 450], [160, 400], [420, 400]]}),
     acts: {
-      darren: {ch_wharf: {act: "chips", at: [380, 330], dir: 1}},
-      mama: {ch_wharf: {act: "prawns", at: [310, 470], dir: -1, hours: [[7*60, 13*60]]}}
+      bo: {ch_wharf: {act: "chips", at: [380, 330], dir: 1}},
+      farid: {ch_wharf: {act: "prawns", at: [310, 470], dir: -1, hours: [[7*60, 13*60]]}}
     }, rooms: {
       bv_coop: room("bvcoop", "The fishermen's co-op", "The co-op: tubs of ice, crayfish waving their feelers, prawns, scallops and flathead, and a scale that clanks."),
       bv_pub: room("bvpub", "The Anchor Hotel", "The Anchor: an old pub with a fire, a dartboard, a ship's wheel over the bar, and photos of every big catch since 1920."),
       bv_smokehouse: room("bvsmokehouse", "The smokehouse", "The smokehouse: rows of fish turning gold in the smoke, the smell of woodchips, and jars of smoked trout pâté.")},
-    lines: {mum: ["The colours of the boats! Red, blue, yellow.", "Those little cottages are like a postcard."],
-      dad: ["Look at the old timber in that wharf. Generations of it.", "A crayfish fresh off the boat. That's dinner sorted."],
-      mama: ["Ma Ma wants prawns. Straight off the boat. The best.", "Very fresh fish. Ma Ma can tell by the eyes."],
-      gonggong: ["Gong Gong grew up near a harbour like this.", "The fishermen are back early. Good catch."],
-      darren: ["I'm getting chips. I'll guard them with my life.", "Those gulls have no fear."],
-      marcus: ["Zeh, imagine heading out at four in the morning.", "Smoked fish. Yes."],
-      angelina: ["The pub's from 1920! Imagine the stories.", "I love the little beach by the cottages."],
-      evan: ["a boat! I want to drive it!", "crabs! in the bucket!", "the seagull said MINE"]},
+    lines: {hana: ["The colours of the boats! Red, blue, yellow.", "Those little cottages are like a postcard."],
+      theo: ["Look at the old timber in that wharf. Generations of it.", "A crayfish fresh off the boat. That's dinner sorted."],
+      farid: ["Ma Ma wants prawns. Straight off the boat. The best.", "Very fresh fish. Ma Ma can tell by the eyes."],
+      mei: ["Gong Gong grew up near a harbour like this.", "The fishermen are back early. Good catch."],
+      bo: ["I'm getting chips. I'll guard them with my life.", "Those gulls have no fear."],
+      tomi: ["Zeh, imagine heading out at four in the morning.", "Smoked fish. Yes."],
+      posy: ["The pub's from 1920! Imagine the stories.", "I love the little beach by the cottages."]},
     say: {bvboats: "The cray boats: blue and red, stacked with cane pots. Mags is getting hers ready for the morning.",
       bvgulls: "The gulls: one on every post, watching every chip in a hundred metres.",
       bvbayshore: "The little beach below the cottages: dinghies pulled up on the sand, and the bay as flat as glass.",
@@ -137,20 +133,19 @@ export const CR_TOWNS = {
     hints: {cs_lookout: "The Sisters: the boardwalk lookout, the kiosk and the van. Down the steps: the beach.", cs_beach: "The beach below the cliffs: the surf club, the penguin hide, and the stacks right there. Up the steps: the lookout."},
     spots: famSpots({cs_lookout: [[220, 330], [300, 360], [360, 320], [260, 390], [180, 360], [420, 360]], cs_beach: [[200, 300], [260, 360], [320, 280], [220, 400], [380, 380], [300, 410]]}),
     acts: {
-      mama: {cs_beach: {act: "shells", at: [300, 392], dir: -1}},
-      dad: {cs_beach: {act: "shelter", at: [170, 330], dir: 1}}
+      farid: {cs_beach: {act: "shells", at: [300, 392], dir: -1}},
+      theo: {cs_beach: {act: "shelter", at: [170, 330], dir: 1}}
     }, rooms: {
       bv_kiosk: room("bvkiosk", "The lookout kiosk", "The kiosk: hot chips, coffee, ice creams, a rack of postcards of the Sisters at sunset, and a map of the shipwrecks."),
       bv_slsc: room("bvslsc", "The surf club", "The surf lifesaving club: red and yellow everywhere, rescue boards on the wall, a honour board of every patrol, and a canteen."),
       bv_hide: room("bvhide", "The penguin hide", "The penguin hide: a low timber shelter in the dunes, benches, a long window onto the beach, and a sign: no torches, no flash, whisper.")},
-    lines: {mum: ["They're so golden in this light.", "Penguins! Tiny ones! I can't wait."],
-      dad: ["Thousands of years of waves did that.", "There used to be more of them. The sea takes them, one by one."],
-      mama: ["Very beautiful. Ma Ma will take a photo. Many photos.", "Steps down to the beach. Ma Ma counts. Many steps."],
-      gonggong: ["Gong Gong likes the wind. It blows the cobwebs away.", "Look for shells, Ma Ma."],
-      darren: ["The light at sunset here is meant to be crazy.", "Hot chips at a lookout. Correct."],
-      marcus: ["Zeh, this is the photo. This is the one.", "Imagine the shipwrecks out there."],
-      angelina: ["The penguins come home every single night. Every night!", "It's like the edge of the world."],
-      evan: ["the rocks are giants sleeping", "where are the penguins?", "can I climb the big rock?"]},
+    lines: {hana: ["They're so golden in this light.", "Penguins! Tiny ones! I can't wait."],
+      theo: ["Thousands of years of waves did that.", "There used to be more of them. The sea takes them, one by one."],
+      farid: ["Very beautiful. Ma Ma will take a photo. Many photos.", "Steps down to the beach. Ma Ma counts. Many steps."],
+      mei: ["Gong Gong likes the wind. It blows the cobwebs away.", "Look for shells, Ma Ma."],
+      bo: ["The light at sunset here is meant to be crazy.", "Hot chips at a lookout. Correct."],
+      tomi: ["Zeh, this is the photo. This is the one.", "Imagine the shipwrecks out there."],
+      posy: ["The penguins come home every single night. Every night!", "It's like the edge of the world."]},
     say: {bvplatform: "The lookout platform: the boardwalk ends at a railing over the cliff, and the Sisters stand in the surf below.",
       bvpenguins: "The shoreline where the penguins come in: little tracks in the sand, and a rope to keep people back.",
       bvkiosk: "The lookout kiosk: a little timber hut with a hatch and a striped awning.",
@@ -164,21 +159,20 @@ export const CR_TOWNS = {
     hints: {cc_park: "Koala Cove: the caravan park, the king parrots, the koala gums, the park store, the laundry café and the van. East: the river mouth.", cc_mouth: "The river mouth: the beach, Nippers on the sand, and the rec hall. West: back to the park."},
     spots: famSpots({cc_park: [[260, 420], [320, 460], [220, 480], [300, 380], [380, 470], [200, 400]], cc_mouth: [[220, 360], [300, 380], [380, 340], [260, 430], [180, 420], [420, 420]]}),
     acts: {
-      mum: {cc_park: {act: "parrot", at: [236, 440], dir: 1}},
-      gonggong: {cc_park: {act: "quoits", at: [300, 540], dir: 1}},
-      angelina: {cc_mouth: {act: "postcard", at: [300, 320], dir: 1}}
+      hana: {cc_park: {act: "parrot", at: [236, 440], dir: 1}},
+      mei: {cc_park: {act: "quoits", at: [300, 540], dir: 1}},
+      posy: {cc_mouth: {act: "postcard", at: [300, 320], dir: 1}}
     }, rooms: {
       bv_parkstore: room("bvparkstore", "The park store", "The park store: milk, bread, bait, icy poles, bird seed for the parrots (one scoop only!), and a lost-property box full of thongs."),
       bv_laundry: room("bvlaundry", "The laundry café", "The laundry café: washing machines along one wall, a coffee machine on the other, a book swap shelf, and the best banana bread on the coast."),
       bv_rechall: room("bvrechall", "The rec hall", "The rec hall: a ping-pong table, a piano, jigsaws, and a board of everyone's high scores on the old pinball machine.")},
-    lines: {mum: ["A parrot just landed on me! Look!", "Koalas! Three in that one tree!"],
-      dad: ["Caravan parks haven't changed since I was a kid. I love that.", "The river mouth's moved since last time. The sea decides."],
-      mama: ["The birds are so bright. Like little lanterns.", "Ma Ma will do the washing. Then coffee."],
-      gonggong: ["Gong Gong will sit under the tree. Watch the koalas sleep.", "Quoits! Gong Gong was champion, once."],
-      darren: ["Banana bread from a laundry. Only on the coast.", "That koala hasn't moved in an hour. Goals."],
-      marcus: ["Zeh, the river and the sea right next to each other.", "Nippers! Evan's going to be a lifesaver."],
-      angelina: ["I'm writing postcards to everyone. Everyone.", "The parrots are so cheeky."],
-      evan: ["the koala is SNORING", "a red bird on my hat!", "I'm a lifesaver!"]},
+    lines: {hana: ["A parrot just landed on me! Look!", "Koalas! Three in that one tree!"],
+      theo: ["Caravan parks haven't changed since I was a kid. I love that.", "The river mouth's moved since last time. The sea decides."],
+      farid: ["The birds are so bright. Like little lanterns.", "Ma Ma will do the washing. Then coffee."],
+      mei: ["Gong Gong will sit under the tree. Watch the koalas sleep.", "Quoits! Gong Gong was champion, once."],
+      bo: ["Banana bread from a laundry. Only on the coast.", "That koala hasn't moved in an hour. Goals."],
+      tomi: ["Zeh, the river and the sea right next to each other.", "Nippers! Evan's going to be a lifesaver."],
+      posy: ["I'm writing postcards to everyone. Everyone.", "The parrots are so cheeky."]},
     say: {bvparrots: "The king parrots: red heads, green wings, very bold. They'll land on your arm if you stand still.",
       bvkoalas: "The koala gums: look up. One, two, three koalas asleep in the forks, one with a baby on her back.",
       bvnippers: "Nippers on the beach: little lifesavers in red and yellow caps, running to the flags.",
@@ -272,22 +266,22 @@ export const CR_NAMES = {cw_beach: "Breakwater", cw_street: "Breakwater: the mai
 // honey go in the larder (the scallop pie special; heath honey in the gelato); the crayfish for the crayfish roll
 // comes off Mags's boat (or the lake at home). The magnet has its own spot on the fridge.
 export const CR_GOODS = {
-  b_wax: {n: "A block of surf wax", kind: "gift", to: ["marcus", "darren", "dad"], price: 4, shop: "bv_surfshop", art: ["box", "#F3E7B0", "#4F9CC4"], say: "Surf wax! Smells like coconut. I'm putting it on everything. Even the ironing board."},
-  b_rashie: {n: "A little rash vest", kind: "gift", to: ["evan", "angelina"], price: 12, shop: "bv_surfshop", art: ["tee", "#4F9CC4"], say: "A rash vest with a wave on it! For the beach. I'm wearing it now."},
+  b_wax: {n: "A block of surf wax", kind: "gift", to: ["tomi", "bo", "theo"], price: 4, shop: "bv_surfshop", art: ["box", "#F3E7B0", "#4F9CC4"], say: "Surf wax! Smells like coconut. I'm putting it on everything. Even the ironing board."},
+  b_rashie: {n: "A little rash vest", kind: "gift", to: ["posy"], price: 12, shop: "bv_surfshop", art: ["tee", "#4F9CC4"], say: "A rash vest with a wave on it! For the beach. I'm wearing it now."},
   b_sourdough: {n: "A sourdough loaf", kind: "gift", to: "family", price: 5, shop: "bv_bakery", art: ["box", "#D9A05A", "#F3E7C8"], say: "A crusty sourdough from the coast. Still warm. Who's got butter?"},
-  b_shortbread: {n: "Keeper's shortbread", kind: "gift", to: ["mama", "gonggong", "mum"], price: 6, shop: "bv_tearoom", art: ["box", "#F3E7B0", "#C8432F"], say: "Shortbread in a tin with a lighthouse on it! Melts in the mouth."},
+  b_shortbread: {n: "Keeper's shortbread", kind: "gift", to: ["farid", "mei", "hana"], price: 6, shop: "bv_tearoom", art: ["box", "#F3E7B0", "#C8432F"], say: "Shortbread in a tin with a lighthouse on it! Melts in the mouth."},
   b_lhmodel: {n: "Lighthouse model", kind: "keepsake", price: 14, shop: "bv_giftshop", art: ["bottle", "#FFFDF6", "#C8432F"], line: "A little white lighthouse with a red cap, from the gift shop at Lighthouse Point. The light inside really comes on."},
   b_chime: {n: "Shell wind chime", kind: "keepsake", price: 10, shop: "bv_giftshop", art: ["bell", "#F4C7CF"], line: "A wind chime of shells and sea glass from Lighthouse Point. It sounds like the beach when the window's open."},
   b_crmagnet: {n: "Coast Road fridge magnet", kind: "gift", to: "family", price: 3, shop: "bv_giftshop", art: ["disc", "#4F93B4", "#FFFDF6"], say: "A tiny lighthouse and a wave. For the fridge!"},
-  b_teatowel: {n: "Coast Road tea towel", kind: "gift", to: ["mum", "mama", "dad"], price: 7, shop: "bv_giftshop", art: ["cloth", "#FFFDF6", "#4F93B4"], say: "A tea towel with a map of the whole Coast Road! I'll never dry a dish with it."},
-  b_birdguide: {n: "A pocket guide to rainforest birds", kind: "gift", to: ["gonggong", "dad", "angelina"], price: 8, shop: "bv_rangerhut", art: ["box", "#7FA35A", "#C8432F"], say: "A bird guide! The lyrebird's on page twelve. I'm going to find one."},
+  b_teatowel: {n: "Coast Road tea towel", kind: "gift", to: ["hana", "farid", "theo"], price: 7, shop: "bv_giftshop", art: ["cloth", "#FFFDF6", "#4F93B4"], say: "A tea towel with a map of the whole Coast Road! I'll never dry a dish with it."},
+  b_birdguide: {n: "A pocket guide to rainforest birds", kind: "gift", to: ["mei", "theo", "posy"], price: 8, shop: "bv_rangerhut", art: ["box", "#7FA35A", "#C8432F"], say: "A bird guide! The lyrebird's on page twelve. I'm going to find one."},
   honey_heath: {n: "Coastal heath honey", kind: "ingredient", price: 7, sell: 4, shop: "bv_mushcafe", art: ["jar", "#E3B04B", "#9DAA78"], what: "for gelato and bonbons: floral and a bit wild, from the hives on the heath"},
   scallop: {n: "Scallops", kind: "ingredient", price: 7, sell: 4, shop: "bv_coop", art: ["disc", "#F3E7C8", "#E8913A"], what: "scallop pies at the kitchen (a Coast Road special)"},
-  b_pate: {n: "Smoked trout pâté", kind: "gift", to: ["dad", "gonggong", "darren", "mum"], price: 8, shop: "bv_smokehouse", art: ["jar", "#E3B47A", "#8A5A3A"], say: "Smoked trout pâté! On crackers, with a squeeze of lemon. Gone in a minute."},
-  b_smoked: {n: "A whole smoked trout", kind: "gift", to: ["gonggong", "mama", "dad"], price: 10, shop: "bv_smokehouse", art: ["fish", "#D9A05A"], say: "A smoked trout, golden all over. Gong Gong is very happy."},
+  b_pate: {n: "Smoked trout pâté", kind: "gift", to: ["theo", "mei", "bo", "hana"], price: 8, shop: "bv_smokehouse", art: ["jar", "#E3B47A", "#8A5A3A"], say: "Smoked trout pâté! On crackers, with a squeeze of lemon. Gone in a minute."},
+  b_smoked: {n: "A whole smoked trout", kind: "gift", to: ["mei", "farid", "theo"], price: 10, shop: "bv_smokehouse", art: ["fish", "#D9A05A"], say: "A smoked trout, golden all over. Gong Gong is very happy."},
   b_postcard: {n: "A postcard of the Sisters", kind: "gift", to: "family", price: 2, shop: "bv_kiosk", art: ["box", "#E8913A", "#4F93B4"], say: "A postcard of those rocks at sunset! I'm putting it on the fridge."},
-  b_penguin: {n: "Plush little penguin", kind: "gift", to: ["evan", "angelina", "mama"], price: 9, shop: "bv_kiosk", art: ["plush", "#4E6E8C"], say: "A little penguin! Blue and white and very small. Like the real ones!"},
-  b_cap: {n: "A Nippers cap", kind: "gift", to: ["evan"], price: 5, shop: "bv_slsc", art: ["beanie", "#E8566C"], say: "A Nippers cap! Red and yellow! I'm a lifesaver now, Mama!"},
+  b_penguin: {n: "Plush little penguin", kind: "gift", to: ["posy", "farid"], price: 9, shop: "bv_kiosk", art: ["plush", "#4E6E8C"], say: "A little penguin! Blue and white and very small. Like the real ones!"},
+  b_cap: {n: "A Nippers cap", kind: "gift", to: [], price: 5, shop: "bv_slsc", art: ["beanie", "#E8566C"], say: "A Nippers cap! Red and yellow! I'm a lifesaver now, Mama!"},
   b_surfphoto: {n: "Photo of your first wave", kind: "keepsake", price: 0, art: ["tile", "#9CC4D0", "#F3C969"], line: "You on your very first wave at Breakwater: arms out, knees bent, mouth wide open. Jet printed it at the surf shop."},
   b_whalecard: {n: "Whale sighting card", kind: "keepsake", price: 0, art: ["tile", "#FFFDF6", "#4E6E8C"], line: "A card from the lighthouse at Lighthouse Point, stamped with a little humpback and the date, and signed by Win: you saw whales from the balcony."},
   b_nipmedal: {n: "Evan's Nippers medal", kind: "keepsake", price: 0, art: ["disc", "#F3C969", "#E8566C"], line: "Evan's first Nippers medal, on a red and yellow ribbon, from Coach Dimi at Koala Cove. He wanted to wear it in the bath."},

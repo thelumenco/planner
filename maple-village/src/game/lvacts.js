@@ -87,11 +87,11 @@ export const knowsBanon = F => !!((F.hfarm || {}).learnt || {}).banon;
 
 /* ---------- the panels ---------- */
 export function lvPanel(F, kind, st, o = {}){
-  const t = st.t, s = lvState(F), evan = !!o.evan, hm = o.hm || 12*60;
+  const t = st.t, s = lvState(F), evan = false, hm = o.hm || 12*60;
   switch (kind) {
     case "harvest": { let h = tape("stripe") + `<h2>The lavender harvest</h2>`;
       if (s.cut === dayKey() && !t) return h + `<p class="sub">You've helped with the harvest today. Émile's still is full and bubbling, and the whole farm smells of it.</p>` + shut;
-      if (!t) return h + `<p class="sub">Émile hands you a curved sickle. "Only the bushes in full flower: deep purple, buzzing with bees. The pale ones, leave for next week."${evan ? " Evan's holding the basket." : ""}</p><div class="actions">${btn("cutgo", "Start cutting")}</div>` + shut;
+      if (!t) return h + `<p class="sub">Émile hands you a curved sickle. "Only the bushes in full flower: deep purple, buzzing with bees. The pale ones, leave for next week."${("")}</p><div class="actions">${btn("cutgo", "Start cutting")}</div>` + shut;
       if (harvestDone(t)) return h + `<p class="sub">${t.wrong ? "A pale one or two in the basket. Émile shrugs: \"Next time.\"" : "Only the ripe ones. \"Parfait,\" says Émile."} Into the copper still they go, and out drips a thread of golden oil. Émile ties two bunches for you with raffia.</p><div class="actions">${btn("cutdone", "Take the bunches")}</div>`;
       return h + `<ul class="hlist wlist">${t.ready.map((r, i) => `<li><span class="wtxt"><b>Bush ${i + 1}</b><small>${t.cut.includes(i) ? "cut" : r ? "deep purple, humming with bees" : "pale, still opening"}</small></span>${t.cut.includes(i) ? "" : `<button class="btn small primary" data-bba="lv:cut.${i}">Cut</button>`}</li>`).join("")}</ul>`; }
     case "petanque": { let h = tape() + `<h2>Pétanque with Monsieur Pagnol</h2>`;
@@ -101,22 +101,22 @@ export function lvPanel(F, kind, st, o = {}){
       return h + `<p class="sub">${esc(said)} (end ${t.end + 1} of ${PET.ENDS}: the jack looks ${["near", "in the middle", "a long way off"][t.jack[t.end]]})</p><div class="actions">${btn("pet.short", "Short and gentle")}${btn("pet.middle", "Middle")}${btn("pet.long", "Long")}</div>`; }
     case "scent": { let h = tape("stripe") + `<h2>Blend your own perfume</h2>`;
       const known = s.scents.length ? `<p class="muted">Your perfumes: ${s.scents.map(x => esc(x.name)).join(", ")}.</p>` : "";
-      if (!t) return h + `<p class="sub">Madame Arnaud sits you at the organ. "A top note, to say hello. A heart note, the real you. A base note, the one that stays."${evan ? " Evan is smelling everything and sneezing." : ""}</p>${known}<div class="actions"><button class="btn primary" data-bba="lv:scentgo" ${F.coins >= SCENT.price ? "" : "disabled"}>Sit at the organ · ${SCENT.price} ${coin()}</button></div>` + shut;
+      if (!t) return h + `<p class="sub">Madame Arnaud sits you at the organ. "A top note, to say hello. A heart note, the real you. A base note, the one that stays."${("")}</p>${known}<div class="actions"><button class="btn primary" data-bba="lv:scentgo" ${F.coins >= SCENT.price ? "" : "disabled"}>Sit at the organ · ${SCENT.price} ${coin()}</button></div>` + shut;
       if (t.done) return h + `<p class="sub">${t.fresh ? `A new perfume: <b>${esc(t.name)}</b>! Madame Arnaud writes the name on a label in her curly handwriting.` : `<b>${esc(t.name)}</b> again: one of yours.`} ${t.first ? "She pours it into a little bottle for you to keep." : ""}</p><div class="actions">${btn("scentdone", "Thank Madame Arnaud")}</div>`;
       const stage = !t.top ? "top" : !t.heart ? "heart" : "base";
       return h + `<p class="sub">${{top: "First, the top note: bright, it's what you smell first.", heart: "Now the heart: the middle, the one that lasts an afternoon.", base: "And the base: deep, the one still there tomorrow."}[stage]}</p><div class="actions">${Object.entries(NOTES[stage]).map(([k, n]) => btn(`note.${k}`, n)).join("")}</div>`; }
     case "bees": { let h = tape("stripe") + `<h2>The hives with Mathis</h2>`;
       if (s.hives === dayKey() && !t) return h + `<p class="sub">You've been in the hives today. The bees have had enough of visitors, says Mathis.</p>` + shut;
-      if (!t) return h + `<p class="sub">Into the white suit and the veil. Mathis hands you the smoker. "A little puff before you lift each frame. It calms them."${evan ? " Evan watches from behind the fence in a tiny veil of his own." : ""}</p><div class="actions">${btn("beesgo", "Suit up")}</div>` + shut;
+      if (!t) return h + `<p class="sub">Into the white suit and the veil. Mathis hands you the smoker. "A little puff before you lift each frame. It calms them."${("")}</p><div class="actions">${btn("beesgo", "Suit up")}</div>` + shut;
       if (beesDone(t)) return h + `<p class="sub">${t.calm <= 0 ? "The buzzing rises, and Mathis says it's time to close up. \"They're cross today. Not your fault.\"" : `${t.lifted} frames of capped honey, golden and heavy.`} He gives you a jar from yesterday's spin.</p><div class="actions">${btn("beesdone", "Take off the veil")}</div>`;
       return h + `<p class="sub">${t.last === "buzz" ? "Bzzzz! You lifted it without smoke. The bees are cross." : t.last === "frame" ? "Up comes a frame, thick with honeycomb and slow, calm bees." : t.smoked ? "A puff of cool smoke drifts over the frames." : "The lid's off. Thousands of bees, humming."} (frame ${t.frame + 1} of ${BEES.FRAMES})</p><p class="muted">Calm: ${"●".repeat(t.calm)}${"○".repeat(3 - t.calm)}</p><div class="actions">${btn("bee.smoke", "A puff of smoke", false)}${btn("bee.lift", "Lift the frame")}</div>`; }
     case "maze": { let h = tape() + `<h2>The sunflower maze</h2>`;
-      if (!t) return h + `<p class="sub">Paths cut through sunflowers taller than Dad. Somewhere in the middle there's a bench and a little bell.${evan ? " Evan's leading. Of course he is." : ""}</p><div class="actions">${btn("mazego", "In you go")}</div>` + shut;
-      if (mazeDone(t)) return h + `<p class="sub">The middle! A little clearing, a bench, and a bell on a post. Ring, ring!${evan ? " Evan rings it about forty times." : ""} ${t.wrong ? `(Only ${t.wrong} dead end${t.wrong > 1 ? "s" : ""}.)` : "Not one wrong turn!"}</p><div class="actions">${btn("mazedone", "Find the way out")}</div>`;
+      if (!t) return h + `<p class="sub">Paths cut through sunflowers taller than Dad. Somewhere in the middle there's a bench and a little bell.${("")}</p><div class="actions">${btn("mazego", "In you go")}</div>` + shut;
+      if (mazeDone(t)) return h + `<p class="sub">The middle! A little clearing, a bench, and a bell on a post. Ring, ring!${("")} ${t.wrong ? `(Only ${t.wrong} dead end${t.wrong > 1 ? "s" : ""}.)` : "Not one wrong turn!"}</p><div class="actions">${btn("mazedone", "Find the way out")}</div>`;
       return h + `<p class="sub">${t.last === "dead" ? "A dead end! Just sunflowers, all staring at you. Back you go." : t.at ? "On you go, the sunflowers closing in overhead..." : "Sunflowers on every side. Which way?"} (turn ${t.at + 1})</p><div class="actions">${btn("turn.left", "Left")}${btn("turn.straight", "Straight on")}${btn("turn.right", "Right")}</div>`; }
     case "sticks": { let h = tape() + `<h2>Pooh-sticks off the Old Bridge</h2>`;
       if (!t) return h + `<p class="sub">Everyone picks a stick, drops it off the upstream side at the same moment, and runs to the other side to see whose comes out first. Dad says he's never lost. Best of three.</p><div class="actions">${btn("sticksgo", "Find a stick")}</div>` + shut;
-      if (sticksDone(t)) return h + `<p class="sub">${t.mine > t.dads ? "You win! Dad demands a recount. There is no recount in Pooh-sticks." : "Dad wins, and does a little dance on the bridge."} (${t.mine} to ${t.dads})${evan ? " Evan's stick got stuck in the weeds and he declared it the winner anyway." : ""}</p><div class="actions">${btn("sticksdone", "Back over the bridge")}</div>`;
+      if (sticksDone(t)) return h + `<p class="sub">${t.mine > t.dads ? "You win! Dad demands a recount. There is no recount in Pooh-sticks." : "Dad wins, and does a little dance on the bridge."} (${t.mine} to ${t.dads})${("")}</p><div class="actions">${btn("sticksdone", "Back over the bridge")}</div>`;
       return h + `<p class="sub">${t.last === "won" ? "Yours pops out first!" : t.last === "lost" ? "Dad's pops out first. \"Undefeated!\"" : "Pick your stick."} (race ${t.round + 1} of ${STICKS.ROUNDS})</p><div class="actions">${Object.entries(STICK_N).map(([k, n]) => btn(`stick.${k}`, n)).join("")}</div>`; }
     case "bell": { let h = tape("stripe") + `<h2>The chapel of Saint Anne</h2>`;
       if (!t) return h + `<p class="sub">Light a candle, for anyone, for no reason at all.${bellOpen(hm) ? " And it's nearly sunset: Père Gaston holds out the bell rope. \"Pull when it swings back down to you. Five strokes.\"" : " From half past five, someone rings the bell for the sunset."}</p><div class="actions">${btn("candle", "Light a candle", false)}${bellOpen(hm) ? btn("bellgo", "Take the bell rope") : ""}</div>` + shut;
@@ -137,12 +137,12 @@ export function lvPanel(F, kind, st, o = {}){
 export function lvAct(F, kind, st, verb, arg, o = {}){
   const s = lvState(F), hm = o.hm || 12*60, add = o.addInv || (() => {}), rng = o.rng || Math.random, t = st.t;
   switch (verb) {
-    case "cutgo": if (s.cut === dayKey()) return null; st.t = harvestStart(rng); return {sfx: "paper", evan: ["the bees are HUMMING", "purple purple purple"]};
+    case "cutgo": if (s.cut === dayKey()) return null; st.t = harvestStart(rng); return {sfx: "paper"};
     case "cut": { if (!t) return null; const r = harvestCut(t, +arg); if (!r) return null; return {sfx: r === "cut" ? "pop" : "tap"}; }
     case "cutdone": if (!t || !harvestDone(t) || s.cut === dayKey()) return null; s.cut = dayKey(); st.t = null; add("bq_lavender", HARVEST.BUNCHES);
       return {close: true, xp: 1, hearts: 2, flash: "Two bunches of lavender", say: "Two bunches of lavender, tied with raffia: for the mill's soaps and oils, or a vase on the kitchen table."};
-    case "petgo": st.t = petStart(rng); return {sfx: "paper", evan: ["throw it, Mama!", "the little ball is the baby"]};
-    case "pet": { if (!t) return null; const r = petThrow(t, arg, rng); if (!r) return null; return {sfx: r === "far" ? "tap" : "chime", evan: r === "kiss" ? ["it KISSED the baby ball!", "yay Mama!"] : null}; }
+    case "petgo": st.t = petStart(rng); return {sfx: "paper"};
+    case "pet": { if (!t) return null; const r = petThrow(t, arg, rng); if (!r) return null; return {sfx: r === "far" ? "tap" : "chime"}; }
     case "petdone": { if (!t || !petDone(t)) return null; s.games = (s.games || 0) + 1; const won = t.mine > t.his; if (won) s.wins = (s.wins || 0) + 1; st.t = null; return {close: true, xp: won ? 2 : 1, hearts: won ? 2 : 1}; }
     case "scentgo": if (F.coins < SCENT.price) return null; F.coins -= SCENT.price; st.t = {top: null, heart: null, base: null, done: false}; return {sfx: "chaching"};
     case "note": { if (!t || t.done) return null; const stage = !t.top ? "top" : !t.heart ? "heart" : "base"; if (!NOTES[stage][arg]) return null; t[stage] = arg;
@@ -150,18 +150,18 @@ export function lvAct(F, kind, st, verb, arg, o = {}){
         t.first = !(F.inv || {}).b_myperfume && !s.bottled; if (t.first) { s.bottled = true; add("b_myperfume", 1); } }
       return {sfx: "pop"}; }
     case "scentdone": if (!t || !t.done) return null; st.t = null; return {close: true, xp: 2, hearts: 2, flash: t.first ? "Your own perfume" : t.fresh ? `A new perfume: ${t.name}` : null};
-    case "beesgo": if (s.hives === dayKey()) return null; st.t = beesStart(); return {sfx: "paper", evan: ["bzzz bzzz", "you look like a SPACEMAN"]};
+    case "beesgo": if (s.hives === dayKey()) return null; st.t = beesStart(); return {sfx: "paper"};
     case "bee": { if (!t) return null; const r = beesDo(t, arg); if (!r) return null; t.last = r; return {sfx: r === "buzz" ? "pop" : "tap"}; }
     case "beesdone": if (!t || !beesDone(t) || s.hives === dayKey()) return null; s.hives = dayKey(); st.t = null; add("honey_sun", 1); return {close: true, xp: 2, hearts: 2, flash: "A jar of sunflower honey", say: "Mathis gives you a jar of sunflower honey, golden and creamy. \"For your gelato,\" he says. Word gets around."};
-    case "mazego": st.t = mazeStart(rng); return {sfx: "paper", evan: ["follow ME", "I know the way!"]};
-    case "turn": { if (!t) return null; const r = mazeTurn(t, arg); if (!r) return null; t.last = r; return {sfx: r === "dead" ? "tap" : r === "middle" ? "chime" : "pop", evan: r === "middle" ? ["WE FOUND IT!", "ring the bell! ring it!"] : null}; }
-    case "mazedone": { if (!t || !mazeDone(t)) return null; s.maze = (s.maze || 0) + 1; const cert = !!o.evan && !s.cert && !(F.inv || {}).b_mazecert; if (cert) { s.cert = true; add("b_mazecert", 1); } st.t = null;
+    case "mazego": st.t = mazeStart(rng); return {sfx: "paper"};
+    case "turn": { if (!t) return null; const r = mazeTurn(t, arg); if (!r) return null; t.last = r; return {sfx: r === "dead" ? "tap" : r === "middle" ? "chime" : "pop"}; }
+    case "mazedone": { if (!t || !mazeDone(t)) return null; s.maze = (s.maze || 0) + 1; const cert = false; if (cert) { s.cert = true; add("b_mazecert", 1); } st.t = null;
       return {close: true, xp: 1, hearts: 2, flash: cert ? "Evan's sunflower maze certificate" : null, say: cert ? "Odile stamps a little certificate with a sunflower: Evan found the middle of the maze. He wants it framed." : "Out of the sunflowers, blinking, with pollen on everything."}; }
-    case "sticksgo": st.t = sticksStart(); return {sfx: "paper", evan: ["MY stick is the fastest", "ready, steady, DROP"]};
+    case "sticksgo": st.t = sticksStart(); return {sfx: "paper"};
     case "stick": { if (!t) return null; const r = sticksDrop(t, arg, rng); if (!r) return null; return {sfx: r === "won" ? "chime" : "tap"}; }
     case "sticksdone": { if (!t || !sticksDone(t)) return null; s.sticks = (s.sticks || 0) + 1; if (t.mine > t.dads) s.beatDad = (s.beatDad || 0) + 1; st.t = null; return {close: true, xp: 1, hearts: 2}; }
     case "candle": s.candles = (s.candles || 0) + 1; return {sfx: "chime", hearts: 1, say: "You light a little candle and set it with the others. The flames lean together in the draught from the door."};
-    case "bellgo": if (!bellOpen(hm)) return null; st.t = bellStart(rng); return {sfx: "paper", evan: ["can I pull too?", "ding dong!"]};
+    case "bellgo": if (!bellOpen(hm)) return null; st.t = bellStart(rng); return {sfx: "paper"};
     case "bell": { if (!t) return null; const r = bellDo(t, arg); if (!r) return null; t.last = r; return {sfx: r === "dong" ? "chime" : "tap"}; }
     case "belldone": { if (!t || !bellDone(t)) return null; s.bells = (s.bells || 0) + 1; const first = t.rung >= BELL.STROKES && !s.medal && !(F.inv || {}).b_bellmedal; if (first) { s.medal = true; add("b_bellmedal", 1); } st.t = null;
       return {close: true, xp: 2, hearts: 3, flash: first ? "A little chapel bell" : null, say: first ? "Père Gaston presses a tiny brass bell into your hand. \"For the one who rang Saint Anne.\" Outside, the sun's going down over the lavender." : "Out into the evening, the last of the sun on the cypresses."}; }

@@ -23,7 +23,7 @@ const PARTIES = [
   {ids: ["jonah", "zara"], from: "A family up for the day"}, {ids: ["mia", "ava", "ollie"], from: "A family up for the day"}
 ];
 const BIRTHDAY = {ids: ["juniper", "bo", "opal", "theo"], birthday: true};
-const FAMILY_TURNS = [{ids: ["mama", "gonggong"], family: true, at: 13*60 + 15}, {ids: ["mum", "dad"], family: true}, {ids: ["marcus", "angelina"], family: true}];
+const FAMILY_TURNS = [{ids: ["farid", "mei"], family: true, at: 13*60 + 15}, {ids: ["hana", "theo"], family: true}, {ids: ["tomi", "posy"], family: true}];
 const weekNo = day => Math.floor(Date.parse(day + "T00:00:00Z")/(7*864e5));
 const cache = {};
 // one Sunday's bookings -> [{ids, size, at (arrival minute), family?, birthday?, from?}]
@@ -33,7 +33,7 @@ export function bookingsFor(sunday){
   // round 152: Mother's Day (the second Sunday in May): the whole family, Mum and Ma Ma guests of honour, and the
   // village's families round the rest of the table
   const mday = sunday.slice(5, 7) === "05" && +sunday.slice(8) >= 8 && +sunday.slice(8) <= 14;
-  if (mday) take({ids: ["mum", "mama", "dad", "gonggong", "marcus", "angelina", "darren"], family: true, mothers: true});
+  if (mday) take({ids: ["hana", "farid", "theo", "mei", "tomi", "posy", "bo"], family: true, mothers: true});
   else take(FAMILY_TURNS[weekNo(sunday) % FAMILY_TURNS.length]);
   if (!mday && hash(sunday + ":bday") % 3 === 0) take(BIRTHDAY);
   const order = PARTIES.map((p, i) => [hash(sunday + ":" + i), p]).sort((a, b) => a[0] - b[0]).map(([, p]) => p);

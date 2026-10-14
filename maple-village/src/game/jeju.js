@@ -47,8 +47,8 @@ export function haenyeoPanel(F, st, evan){
         <div class="actions">${going ? `<button class="btn primary big" data-jj="up">Come up and whistle</button>` : `<button class="btn primary" data-jj="down">Breathe in, and dive</button>`}</div>`;
       return h;
     }
-    h += `<p class="sub">${st.good >= 2 ? `Three dives, ${st.good} good ones. Halmang laughs and taps the window: "Next year you come diving with us." She gives you an abalone from today's catch.` : `"Good try. It took me ten years," says Halmang, and pours you a cup of barley tea.`}${evan ? " Evan's been practising the whistle the whole time. Fweee! Fweeeee!" : ""}</p><div class="actions"><button class="btn alt" data-jj="again">Dive again</button></div>`;
-  } else h += `<h3 class="ph3">The breath song</h3><p class="muted">Three practice dives with Halmang Kim. Free.${evan ? " Evan gets a little whistle of his own." : ""}</p><div class="actions"><button class="btn primary" data-jj="dive">Sit with Halmang</button></div>`;
+    h += `<p class="sub">${st.good >= 2 ? `Three dives, ${st.good} good ones. Halmang laughs and taps the window: "Next year you come diving with us." She gives you an abalone from today's catch.` : `"Good try. It took me ten years," says Halmang, and pours you a cup of barley tea.`}${("")}</p><div class="actions"><button class="btn alt" data-jj="again">Dive again</button></div>`;
+  } else h += `<h3 class="ph3">The breath song</h3><p class="muted">Three practice dives with Halmang Kim. Free.${("")}</p><div class="actions"><button class="btn primary" data-jj="dive">Sit with Halmang</button></div>`;
   h += `<h3 class="ph3">A bowl of abalone porridge · ${JUK} ${coin()}</h3><p class="muted">Green from the abalone, sesame oil on top, kimchi on the side. What the divers eat after a dive.</p><div class="actions"><button class="btn alt" data-jj="juk" ${F.coins >= JUK ? "" : "disabled"}>A bowl, please</button></div>`;
   return h + list(F, "jj_haenyeo", "From the divers") + shut;
 }
@@ -72,7 +72,7 @@ export function shedPanel(F, st, evan){
   if (st && !st.done) {
     const left = Math.max(0, Math.ceil((SORT.MS - (Date.now() - st.t0))/1000)), size = st.sizes[st.i];
     return h + `<h3 class="ph3">Sorting · ${st.i + 1} of ${SORT.N} · ${left}s on Mr Ko's clock</h3><div class="jjtang" data-size="${size}">${tangPic(size)}</div>
-      <div class="actions">${Object.entries(SORT.SIZES).map(([k, n]) => `<button class="btn primary" data-jj="crate:${k}">${n}</button>`).join("")}</div>${evan ? `<p class="muted">Evan's sorting too: all of his go in the "eat now" crate.</p>` : ""}`;
+      <div class="actions">${Object.entries(SORT.SIZES).map(([k, n]) => `<button class="btn primary" data-jj="crate:${k}">${n}</button>`).join("")}</div>${("")}`;
   }
   if (st && st.done) h += `<p class="sub">${st.late ? "Time's up! " : ""}${st.good} of ${SORT.N} in the right crates. ${st.good >= 6 ? "\"You can come back next winter,\" says Mr Ko, very seriously, and fills a bag for you." : "\"Fine, fine. The big ones are tricky,\" says Mr Ko, and gives you one to eat."}</p><div class="actions"><button class="btn alt" data-jj="sort">Sort again</button></div>`;
   else h += `<h3 class="ph3">Sort the tangerines with Mr Ko</h3><p class="muted">Small, medium or large: eight of them, against his clock. Do well and he'll fill you a bag.</p><div class="actions"><button class="btn primary" data-jj="sort">Start sorting</button></div>`;
@@ -88,7 +88,7 @@ export function cafeTreat(F, k){ const c = CAFE[k]; if (!c || F.coins < c[1]) re
 export function cafePanel(F, evan){
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The stone-house café</h2><p class="sub">Ha-eun's grandmother lived in this house. Now there's a coffee machine where the kitchen was, and the window looks straight out to sea.</p>
     <h3 class="ph3">Sit down with something</h3><ul class="hlist wlist">${Object.entries(CAFE).map(([k, [n, p, l]]) => `<li><span class="wtxt"><b>${esc(n)}</b><small>${esc(l)}</small></span><button class="btn small primary" data-jj="cafe:${k}" ${F.coins >= p ? "" : "disabled"}>${p} ${coin()}</button></li>`).join("")}</ul>
-    ${evan ? `<p class="muted">Evan gets a tangerine juice with a straw, on the house.</p>` : ""}` + list(F, "jj_cafe", "To take home") + shut;
+    ${("")}` + list(F, "jj_cafe", "To take home") + shut;
 }
 
 /* ---------- the market hall, and the slow-post box ---------- */
@@ -127,7 +127,7 @@ export function dyePanel(F, st = {}, evan){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The dye workshop</h2><p class="sub">Mr Moon's hands are orange to the wrist. "Galot," he says, holding up a shirt the colour of rust. "Farmers wore it. Cool, strong, never shows the dirt. The sun does the work."</p>`;
   h += `<h3 class="ph3">Dye a scarf with green persimmons · ${DYE.price} ${coin()}</h3>`;
   if (j.dye) h += `<p class="muted">Your scarf's drying on the washing line at home: ${dyeDays(F) >= DYE.DAYS ? "it's ready to take down!" : `${DYE.DAYS - dyeDays(F)} more day${DYE.DAYS - dyeDays(F) === 1 ? "" : "s"} of sun.`}</p>`;
-  else if (st.step == null) h += `<p class="muted">Four steps, then you take it home: it hangs on your own washing line and darkens in the sun over three days, from pale green to deep rust.${evan ? " Evan gets to squish the persimmons." : ""}</p><div class="actions"><button class="btn primary" data-jj="dyego" ${F.coins >= DYE.price ? "" : "disabled"}>Start</button></div>`;
+  else if (st.step == null) h += `<p class="muted">Four steps, then you take it home: it hangs on your own washing line and darkens in the sun over three days, from pale green to deep rust.${("")}</p><div class="actions"><button class="btn primary" data-jj="dyego" ${F.coins >= DYE.price ? "" : "disabled"}>Start</button></div>`;
   else if (st.step < 4) h += `<p class="muted">${st.step ? `${esc(DYE.steps[st.step - 1])}: done. ` : ""}Next: tap the right step.${st.oops ? " (Mr Moon steers your hands: not that one yet.)" : ""}</p><div class="gchips">${[2, 0, 3, 1].map(i => `<button class="gchip" data-jj="dstep:${i}"><span>${esc(DYE.steps[i])}</span></button>`).join("")}</div>`;
   else h += `<p class="muted">The scarf's pale and green-ish and smells like unripe fruit. "Now the sun," says Mr Moon. "Three days. Every day it changes."</p><div class="actions"><button class="btn primary" data-jj="dyedone" ${F.coins >= DYE.price ? "" : "disabled"}>Take it home to dry · ${DYE.price} ${coin()}</button></div>`;
   return h + list(F, "jj_dye", "From the workshop") + shut;
@@ -135,6 +135,6 @@ export function dyePanel(F, st = {}, evan){
 
 // the room spots and the panel for each
 export function jejuPanel(F, view, st = {}){
-  return view === "jj_haenyeo" ? haenyeoPanel(F, st.dive, st.evan) : view === "jj_shed" ? shedPanel(F, st.sort, st.evan) : view === "jj_cafe" ? cafePanel(F, st.evan)
-    : view === "jj_market" ? marketPanel(F) : view === "jjpost" ? postPanel(F) : view === "jj_dye" ? dyePanel(F, st.dye || {}, st.evan) : "";
+  return view === "jj_haenyeo" ? haenyeoPanel(F, st.dive, false) : view === "jj_shed" ? shedPanel(F, st.sort, false) : view === "jj_cafe" ? cafePanel(F, false)
+    : view === "jj_market" ? marketPanel(F) : view === "jjpost" ? postPanel(F) : view === "jj_dye" ? dyePanel(F, st.dye || {}, false) : "";
 }

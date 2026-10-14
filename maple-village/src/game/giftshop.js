@@ -50,7 +50,7 @@ export function takeBottle(F, v, shelfId){
   b.n--; const id = "wb_" + b.id, g = giftState(F); g.bottles = g.bottles || {}; g.bottles[id] = {name: b.name, type: b.type, price: b.price}; registerBottles(F);
   F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; return id;
 }
-export function registerBottles(F){ for (const [id, b] of Object.entries((F.giftshop || {}).bottles || {})) ITEMS[id] = {n: `A bottle of ${b.name}`, kind: "gift", to: ["mum", "dad", "darren", "marcus", "angelina", "gonggong"], price: b.price,
+export function registerBottles(F){ for (const [id, b] of Object.entries((F.giftshop || {}).bottles || {})) ITEMS[id] = {n: `A bottle of ${b.name}`, kind: "gift", to: ["hana", "theo", "bo", "tomi", "posy", "mei"], price: b.price,
   ico: "wine_" + (["red", "rose", "white", "sparkling"].includes(b.type) ? b.type : "red"), say: `Your own ${b.name}! We'll open it this weekend.`, wine: true}; }
 // one minute of trade: mode "mel" (she's at the till), "keeper" (Posy's in), else shut -> coins
 export function giftSellMinute(F, day, hm, mode, o){

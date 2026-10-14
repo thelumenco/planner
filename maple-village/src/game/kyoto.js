@@ -45,8 +45,8 @@ export function rentYukata(F, col, day = dayKey()){ if (!YUKATA.cols[col] || F.c
 export function yukataPanel(F, evanToo){
   const on = yukataOn(F);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The yukata shop</h2><p class="sub">Rows of cotton summer kimonos, an obi sash to go with each, and wooden sandals. Wear one round Kyoto for the day; bring it back on your way to the train.</p>`;
-  h += on ? `<p><b>You're wearing the ${esc(YUKATA.cols[on][0].toLowerCase())} today.</b>${evanToo ? " Evan's in his little jinbei, very pleased with himself." : ""}</p>`
-    : `<h3 class="ph3">Rent one for the day · ${YUKATA.price} ${coin()}</h3><ul class="hlist wlist">${Object.entries(YUKATA.cols).map(([k, [nm]]) => `<li><span class="wtxt"><b>${esc(nm)}</b><small>${evanToo ? "Evan gets a matching jinbei, free." : "With an obi and sandals."}</small></span><button class="btn small primary" data-kt="yukata:${k}" ${F.coins >= YUKATA.price ? "" : "disabled"}>Wear it</button></li>`).join("")}</ul>`;
+  h += on ? `<p><b>You're wearing the ${esc(YUKATA.cols[on][0].toLowerCase())} today.</b>${("")}</p>`
+    : `<h3 class="ph3">Rent one for the day · ${YUKATA.price} ${coin()}</h3><ul class="hlist wlist">${Object.entries(YUKATA.cols).map(([k, [nm]]) => `<li><span class="wtxt"><b>${esc(nm)}</b><small>${("With an obi and sandals.")}</small></span><button class="btn small primary" data-kt="yukata:${k}" ${F.coins >= YUKATA.price ? "" : "disabled"}>Wear it</button></li>`).join("")}</ul>`;
   return h + list(F, "ktyukata", "And to take home") + shut;
 }
 
@@ -145,5 +145,5 @@ export function marketPanel(F){
 // the room spots and the panel for each
 export function kyotoPanel(F, view, st = {}){
   return view === "kt_tea" ? teaPanel(F, st.tea) : view === "kt_hall" ? hallPanel(F, st.sit, st.fortune) : view === "kt_sweets" ? sweetsPanel(F, st.neri) : view === "kt_pottery" ? potteryPanel(F, st.cup)
-    : view === "kt_market" ? marketPanel(F) : view === "ktyukata" ? yukataPanel(F, st.evan) : "";
+    : view === "kt_market" ? marketPanel(F) : view === "ktyukata" ? yukataPanel(F, false) : "";
 }

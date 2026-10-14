@@ -24,7 +24,8 @@ import { journalCount } from "./myroom.js";
 import { attachMyDocs, journalPanel, wireJournal } from "./myroom.js";
 import { reached, award, onPedestals, nextUp, pedestalPanel, bookPanel, wireTrophies, PEDESTALS } from "./trophies.js";
 import { attachRoutines, routinesPanel, wireRoutines, rv, todaysSteps, checklistLeft } from "./routines.js";
-import { kid, kidPanel, wireKid, stopKidGame, SNACKS, snackPic, EVAN_TAPS, pickSay } from "./kid.js";
+import { kid, kidPanel, stopKidGame, pickSay } from "./kid.js";
+import { myName, dearMe } from "./me.js";
 import { sendOptions, takeSend, sendMorePanel } from "./bikesend.js";
 import { rideBy, initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, whereAt, npcSay, npcPos, daySchedule, clearSlots } from "./npcs.js";
 import { dishArt, glassArt } from "../art/wine.js";
@@ -121,7 +122,7 @@ function migrate(){
   if (F.coins == null) F.coins = S.berries || 0;
   if (!F.inv) { F.inv = {tulip_seed:2, carrot_seed:1}; F.gift = true; }
   if (!F.tools) F.tools = {};
-  if (!F.fam) F.fam = {owned: {}, gifts: {evan: 0, darren: 0}};
+  if (!F.fam) F.fam = {owned: {}, gifts: {bo: 0}};
   ensurePets(F);
   if (!Array.isArray(F.plots) || F.plots.length !== 12) F.plots = Array.from({length:12}, () => null);
   if (!F.cool) F.cool = {};
@@ -136,7 +137,7 @@ function migrate(){
 }
 migrate();
 setPaperArtF(() => F);
-setArtContext({cocoa: () => cocoaState(F), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, boardCount: () => QB.tasksLeft(F) + QB.board(F).reqs.length, growth:p => growth(p), stats:() => ({}), day:() => dayKey(), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()}), millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns(F, "giftshop") && GAL.stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey())});
+setArtContext({cocoa: () => cocoaState(F), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, boardCount: () => QB.tasksLeft(F) + QB.board(F).reqs.length, growth:p => growth(p), stats:() => ({}), day:() => dayKey(), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: false}), millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns(F, "giftshop") && GAL.stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey())});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, selPlot = null, shopTab = "seeds";
@@ -258,7 +259,7 @@ let hfView = null, hfSt = {kind: "cheddar", name: "", sug: 0};   // Wildflower F
 let ccView = null, lastCocoa = 0, ccSt = {shell: "dark", sel: []};   // ccSt: the bonbon table's picks
 const COCOA_IN = ["cocoa", "cocoakitchen"];
 let keepItem = null, keepSpot = null, adoptItem = null, adoptSt = {}, petView = null;
-let goalView = null, paddling = false, scView = null, scSt = {pick: null, sel: []}, evanSeat = null, lastScoop = 0;
+let goalView = null, paddling = false, scView = null, scSt = {pick: null, sel: []}, lastScoop = 0;
 // the Scoop Shack's rooms, and its panels that open from anywhere (the catalogue, the honesty freezer, the delivery bike)
 const SCOOP_IN = ["scoopshop", "scoopkitchen", "scoopdip"], SC_ANY = ["upgrade", "honesty", "deliver", "trolley"];   // a big goal's "save up for it" card ("garagepick": the garage's ride chooser)
 let fieldView = null, orView = null, orAt = null, orTab = null, potItem = null, kView = null, vyView = null, vyAt = null, trophyView = null, routOpen = false, shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, calmOpen = false, recOpen = false;
@@ -284,7 +285,7 @@ function tickBreath(){
 function buyTool(id){
   const t = SHED[id]; if (!t || F.tools[id] || F.coins < t.price) return;
   F.coins -= t.price; F.tools[id] = true; sfx("chaching"); act("cheer"); flash(`New in the shed: ${t.n.toLowerCase()}`);
-  speak(isHere("darren") ? `Darren's setting up the ${t.n.toLowerCase()} for you!` : `The ${t.n.toLowerCase()} is ready in the garden.`, 4500);
+  speak(isHere("bo") ? `Darren's setting up the ${t.n.toLowerCase()} for you!` : `The ${t.n.toLowerCase()} is ready in the garden.`, 4500);
   if (id === "can") F.plots.forEach((p, i) => { if (p && p.crop && !p.wateredAt) p.wateredAt = Date.now(); });
   save();
 }
@@ -311,7 +312,7 @@ function feedAnimals(which){
 function buyRunUpgrade(){
   const nx = upgradeRun(F); if (!nx) return;
   sfx("chaching"); act("cheer"); flash(`The run is now: ${nx.n.toLowerCase()}`);
-  speak(isHere("darren") ? `Darren's building the ${nx.n.toLowerCase()}. Hammer, hammer!` : `Ta-da! The ${nx.n.toLowerCase()} is ready.`, 4500); save(true);
+  speak(isHere("bo") ? `Darren's building the ${nx.n.toLowerCase()}. Hammer, hammer!` : `Ta-da! The ${nx.n.toLowerCase()} is ready.`, 4500); save(true);
 }
 const readyCount = () => F.plots.filter(p => p && p.crop && growth(p) >= 1).length;
 
@@ -381,31 +382,10 @@ function speak(text, ms, force){
   if (ms) speechT = setTimeout(() => { speechLock = 0; el.textContent = plain(say ? say.line : defaultLine()); }, ms);
 }
 function setSay(line, buttons){ say = {line, buttons}; speak(line); }
-let evanT;
 // Hugs: every few minutes Evan runs over with his arms up. Tap him and Mel hugs him back; otherwise she still
 // gives him a little "aww". Pure fun: nothing is saved or earned.
-let hug = null, hugAt = Date.now() + (/[?&]hugsoon/.test(location.search) ? 3 : 60 + Math.random()*90)*1000, melT;   // ?hugsoon: tests
+let melT;   // ?hugsoon: tests
 function melSays(t){ const e = $("melSay"); e.innerHTML = `<b class="who">Mel</b>${esc(plain(t))}`; e.hidden = false; clearTimeout(melT); melT = setTimeout(() => e.hidden = true, 2800); }
-function hugTick(){
-  if (!hug) {
-    const busy = !$("panel").hidden || kid.sleep || kid.open || route.length || mel.moving || (scene === "base" && atSpot === "swing");
-    if (Date.now() > hugAt && evanHere() && !busy) { hug = {phase: "run", t: Date.now()}; evan.tx = mel.x + (mel.dir > 0 ? 16 : -16); evan.ty = mel.y + 4; evan.run = true; evan.path = null; evan.rk = ""; kid.pending = null; evanSays("Mama!"); }
-    return false;
-  }
-  if (!evanHere() || Date.now() - hug.t > 20000) { endHug(); return false; }
-  if (hug.phase === "run") { evan.tx = mel.x + (mel.dir > 0 ? 16 : -16); evan.ty = mel.y + 4;
-    if (Math.hypot(evan.x - evan.tx, evan.y - evan.ty) < 6) { hug.phase = "ask"; hug.t = Date.now(); evan.dir = evan.x < mel.x ? 1 : -1; nodes.evan.classList.add("hug"); evanSays("hug?"); mprop("heart", evan.x, evan.y - 36); } }
-  else if (hug.phase === "ask" && Date.now() - hug.t > 6000) { mel.dir = evan.x < mel.x ? -1 : 1; mprop("heart", mel.x, mel.y - 56); melSays(pickSay(["Aww, hi baby.", "Hello, you.", "Mwah!"])); endHug(); }
-  return true;   // Evan's busy hugging: no wandering off
-}
-function hugBack(){
-  mel.dir = evan.x < mel.x ? -1 : 1; nodes.mel.classList.add("hugging"); nodes.evan.classList.add("hug");
-  [0, 250, 500].forEach(d => setTimeout(() => mprop("heart", (mel.x + evan.x)/2 + rnd(-10, 10), mel.y - 50, 1900), d));
-  sfx("chime"); melSays(pickSay(["Love you, little one!", "Biggest hug!", "Squeeze!", "My favourite boy."])); setTimeout(() => evanSays(pickSay(["hehe!", "love you Mama!", "again!"])), 900);
-  setTimeout(() => nodes.mel.classList.remove("hugging"), 1800); endHug(1800);
-}
-function endHug(ms){ hug = null; hugAt = Date.now() + (240 + Math.random()*240)*1000; setTimeout(() => nodes.evan.classList.remove("hug"), ms || 0); }
-function evanSays(t){ if (scene !== "kidroom" && quietNow()) return; const e = $("evanSay"); e.innerHTML = `<b class="who">Evan</b>${esc(plain(t))}`; e.hidden = false; clearTimeout(evanT); evanT = setTimeout(() => e.hidden = true, 2200); }
 
 /* =================== PORTRAIT ANIMATION =================== */
 const portrait = $("scene"), props = $("props");
@@ -455,8 +435,6 @@ setInterval(() => {
   bedtimeTick(); vineTick(); orchardTick();
   if (scene === "field" && countdownDue(F, dayKey(), sgHM())) treeCountdown();
   { const got = collectReplies(F, Date.now() + (globalThis.__mapleOffset || 0)); if (got.length) { save(); got.forEach((g, k) => setTimeout(() => { if (g.gift) { flash(ITEMS[g.gift] ? ITEMS[g.gift].n : "A little something"); speak(`A parcel from ${g.from}, with a postcard. It's in your backpack, and the postcard's in your letterbox.`, 5500); } else speak(`${g.from} wrote to say thank you for the hamper, and they've pinned up an order for another at the post office.`, 5500); }, 1500 + k*6000)); } }
-  $("evan").style.display = evanHere() ? "" : "none";
-  if (scene === "kidroom" && evanNight() && !kid.sleep) { kid.sleep = true; kid.open = null; stopKidGame(); ctx(); drawScene(); }
   if (S.day !== dayKey()) { S = freshToday(); say = null; save(true); speak(defaultLine()); return; }
   // the morning's village requests go up once the save has loaded (so a cloud copy can't wipe them straight away)
   if (QB.board(F).lastPost !== dayKey() && (!refs || synced.fox)) { if (postRequests()) save(true); else persist("fox"); }
@@ -479,7 +457,6 @@ setInterval(() => {
   // the field when a market, fair or night market starts or packs up (and the night market's light drops at 7): redraw, and the jazz starts or stops
   if (scene === "field") { const ev = eventNow(dayKey(), sgHM()), k = ev ? ev.kind + (sgHM() >= 19*60) : ""; if (k !== lastFieldEv) { lastFieldEv = k; drawScene(); } }
   setLive(liveNow());
-  renderEvanHold();
   lastDusk = isDusk();
 }, 1000);
 /* =================== ACTIONS =================== */
@@ -576,7 +553,7 @@ function villageCalendar(){
   for (let i = 0; i < CAL_DAYS; i++) {
     const k = addD(today, i), dn = dinnerOn(k), list = [];
     for (const ev of eventsOn(k)) list.push(`${ev.name}, ${hhmm(ev.from)} to ${hhmm(ev.to)} on the field${ev.kind === "market" ? ` (our wine stall's there${F.cocoa && F.cocoa.up && F.cocoa.up.cart ? `, and ${cocoaState(F).name}'s chocolate cart` : ""})` : ev.kind === "night" ? ` (with a jazz duo, and the cart from ${scoopState(F).name})` : ev.kind === "xmas" ? ` (the tree's lit at 5:30${k.slice(5) === "11-20" ? ", for the very first time tonight" : ""})` : ""}`);
-    if (xmasOn(k)) { const d = new Date(k + "T00:00:00Z").getUTCDay(); if (d === 5) list.push("Carols by the Christmas tree, 7pm"); if (d === 0 || d === 6) list.push("Santa's grotto on the field, 5 to 8pm (bring Evan)"); if (k.slice(5) === "12-24") list.push("The lantern walk round the field, 8:15pm"); if (k.slice(5) === "12-01") list.push("Hamper orders start at the post office"); }
+    if (xmasOn(k)) { const d = new Date(k + "T00:00:00Z").getUTCDay(); if (d === 5) list.push("Carols by the Christmas tree, 7pm"); if (d === 0 || d === 6) list.push("Santa's grotto on the field, 5 to 8pm"); if (k.slice(5) === "12-24") list.push("The lantern walk round the field, 8:15pm"); if (k.slice(5) === "12-01") list.push("Hamper orders start at the post office"); }
     if (F.cocoa && F.cocoa.up && F.cocoa.up.workshop && new Date(k + "T00:00:00Z").getUTCDay() === 6) list.push(`Bonbon workshop at ${cocoaState(F).name}, 2 to 4pm`);
     if (owns(F, "cellar") && wineClubOn(k)) list.push(`Wine club at the cellar door, 6 to 9pm`);
     if (owns(F, "cellar") && discoOn(k)) list.push(`Disco night at the cellar door, 8 to 11:30pm`);
@@ -756,11 +733,11 @@ function useItem(id){
 // Arriving at the orchard or flower farm: Ma Ma hands over the farm shop's takings and says hello (or calls Mel in
 // for tea in the afternoon)
 function orchardArrive(id){
-  const o = orchState(F), n = handTin(F), here = isHere("mama"), today = dayKey();
+  const o = orchState(F), n = handTin(F), here = isHere("farid"), today = dayKey();
   if (n) { sfx("chaching"); flash(`+${n} coins from the farm shop`); S.earned += n; save(true); }
   const empty = !o.trees.some(Boolean) && !o.beds.some(Boolean) && !o.bushes.some(Boolean);
   const faded = [...o.trees.map(p => stateOf("tree", p, today)), ...o.beds.map(p => stateOf("bed", p, today)), ...o.bushes.map(p => stateOf("bush", p, today))].filter(x => x.stage === "faded").length;
-  const tea = whereIs("mama") === "cottage" && sgHM() >= 15*60 && sgHM() < 16*60 && o.tea !== today && S.teaAsk !== today;
+  const tea = whereIs("farid") === "cottage" && sgHM() >= 15*60 && sgHM() < 16*60 && o.tea !== today && S.teaAsk !== today;
   const line = tea ? (S.teaAsk = today, "Ma Ma's waving from her cottage door: \"Come, come! Tea and cake!\"")
     : n ? `Ma Ma presses ${n} coins into your hand. "I sold some at the shop today. For you."`
     : empty && id === "orchard" ? "So much empty ground! Ma Ma says: \"Plant some trees, I'll take care of them.\""
@@ -769,57 +746,52 @@ function orchardArrive(id){
   if (tr && !line) { const who = [tr.guide, ...tr.group].map(x => (NPCS.find(n => n.id === x) || {name: x}).name);
     setTimeout(() => speak(`A farm tour's on! ${who[0]} is showing ${who.slice(1, -1).join(", ")} and ${who[who.length - 1]} around.`, 5500), 1200); return; }
   const quote = /"(.+)"$/.exec(line || "");
-  if (line) setTimeout(() => { if (here && quote && !tea && !n) npcSay("mama", quote[1]); else speak(line, 5500); }, 1200);
+  if (line) setTimeout(() => { if (here && quote && !tea && !n) npcSay("farid", quote[1]); else speak(line, 5500); }, 1200);
 }
-// A bouquet goes to whoever's nearest in this scene (a villager, Darren, Evan, or Ma Ma, who loves them most)
-const BQ_THANKS = ["Flowers? For me? You're too kind!", "Oh, they're beautiful. Thank you!", "These are going straight in a jar on my table.", "What a lovely surprise. Thank you, Mel."];
-const MAMA_THANKS = ["Aiyo, so pretty! You shouldn't spend on Ma Ma. I love you.", "Flowers for Ma Ma? My girl is so sweet.", "I'll put them by the TV. Thank you, sayang."];
+// A bouquet goes to whoever's nearest in this scene
+const BQ_THANKS = ["Flowers? For me? You're too kind!", "Oh, they're beautiful. Thank you!", "These are going straight in a jar on my table.", "What a lovely surprise. Thank you!"];
 function giveBouquet(id){
   const it = ITEMS[id], near = npcActors().map(([, e]) => e).filter(e => e.kind === "npc").map(e => [e, Math.hypot(e.x - mel.x, e.y - mel.y)]).sort((a, b) => a[1] - b[1])[0];
-  const ev = evanHere() && Math.hypot(evan.x - mel.x, evan.y - mel.y);
-  if (ev !== false && ev < 160 && (!near || ev < near[1])) { addInv(id, -1); if (openView) { openView = null; ctx(); } evanSays("flowers! for me?"); mprop("heart", evan.x, evan.y - 44, 1800); gainXp(1); flash("Evan sniffed every single flower"); save(true); return; }
-  if (!near) { speak("Nobody about to give it to. Find a friend, or Ma Ma!", 3500); return; }
+  if (!near) { speak("Nobody about to give it to. Go and find a friend!", 3500); return; }
   if (near[1] > 170) { speak(`Walk over to ${near[0].def.name} to give it.`, 3200); return; }
   const who = near[0].def; addInv(id, -1); if (openView) { openView = null; ctx(); }
   F.bouquets = F.bouquets || {}; F.bouquets[who.id] = (F.bouquets[who.id] || 0) + 1;
-  npcSay(who.id, pick(who.id === "mama" ? MAMA_THANKS : BQ_THANKS)); mprop("heart", near[0].x, near[0].y - 50, 1800); sfx("chime"); gainXp(1);
+  npcSay(who.id, pick(BQ_THANKS)); mprop("heart", near[0].x, near[0].y - 50, 1800); sfx("chime"); gainXp(1);
   flash(`${who.name} loved the ${it.n.toLowerCase()}`); save(true);
 }
-// a bouquet handed to one of the family who's right here
+// a bouquet handed to one of your friends who's right here
 function bouquetTo(id, w){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return;
   addInv(id, -1); F.bouquets = F.bouquets || {}; F.bouquets[w] = (F.bouquets[w] || 0) + 1; F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
-  if (w === "evan") { evanSays("flowers! for me?"); mprop("heart", evan.x, evan.y - 44, 1800); flash("Evan sniffed every single flower"); }
-  else { const p = npcPos(w); npcSay(w, pick(w === "mama" ? MAMA_THANKS : BQ_THANKS)); if (p) mprop("heart", p.x, p.y - 50, 1800); flash(`${GIFT_NAME[w]} loved the ${it.n.toLowerCase()}`); }
+  { const p = npcPos(w); npcSay(w, pick(BQ_THANKS)); if (p) mprop("heart", p.x, p.y - 50, 1800); flash(`${GIFT_NAME[w]} loved the ${it.n.toLowerCase()}`); }
   sfx("chime"); gainXp(1); save(true);
 }
-// Tea and cake with Ma Ma in her cottage, once a day: a few coins, a little xp, and a lot of love
+// Tea and cake with Farid in the orchard cottage, once a day: a few coins, a little xp, and a lot of kindness
 function haveTea(){
-  const o = orchState(F); if (o.tea === dayKey() || !isHere("mama")) return;
-  o.tea = dayKey(); earn(3, "tea with Ma Ma"); gainXp(1); sfx("chime"); orView = null; ctx();
-  npcSay("mama", pick(["Eat more cake! You're too thin.", "Slowly, slowly. Tea is for resting.", "I'm so proud of you, ah girl. I love you.", "Did you sleep enough? You look tired."]));
-  setTimeout(() => speak("Pandan chiffon and jasmine tea. Maple got the crumbs.", 4500), 2500); save(true);
+  const o = orchState(F); if (o.tea === dayKey() || !isHere("farid")) return;
+  o.tea = dayKey(); earn(3, "tea with Farid"); gainXp(1); sfx("chime"); orView = null; ctx();
+  npcSay("farid", pick(["Another slice? I baked too much again. I always bake too much.", "Slowly. Tea is for resting.", "My uncle's recipe. Don't tell Mei it has three kinds of butter.", "You look like you needed a sit down."]));
+  setTimeout(() => speak(`Almond cake, still warm, and mint tea in little glasses. ${F.name} got the crumbs.`, 4500), 2500); save(true);
 }
 // Send all of one ingredient from the backpack to the wine shop kitchen's larder
 function toKitchen(id){
   const n = sendToKitchen(F, id); if (!n) return;
   sfx("paper", true); speak(`${n} ${(ITEMS[id].n || id).toLowerCase()} off to the kitchen larder at the wine shop.`, 3500); save(true);
 }
-// Gifts for the family. Evan is wherever home is (home base or inside); Darren follows his routine.
-const DARREN_AT = {base: "outside at home", home: "inside the house", farm: "in the garden"};
+// Gifts for your close friends in the village: they get them in person, wherever they are (or sent round)
 let bubbleT = null;
-// Who a gift suits: one of the family, Ma Ma and Gong Gong ("grands"), anyone in the family ("family"), or a list
-const GIFT_NAME = {evan: "Evan", darren: "Darren", mama: "Ma Ma", gonggong: "Gong Gong", mum: "Mum", dad: "Dad", marcus: "Marcus", angelina: "Angellina"};
-const FOLKS = ["mum", "dad", "marcus", "angelina"];   // Mel's family on the foreshore: gifts go to them in person, wherever they are
-const giftWho = to => to === "family" ? ["evan", "darren", "mama", "gonggong", ...FOLKS] : to === "grands" ? ["mama", "gonggong"] : Array.isArray(to) ? to : [to];
-// a bouquet can go to anyone in the family (in person, or sent round), or to whoever's standing nearby
-const FAMILY_ALL = ["evan", "darren", "mama", "gonggong", ...FOLKS];
+// Who a gift suits: one friend, Farid and Mei at the orchard cottage ("grands"), any of them ("family"), or a list
+const FOLKS = ["hana", "theo", "farid", "mei", "tomi", "posy", "bo"];
+const GIFT_NAME = Object.fromEntries(FOLKS.map(id => [id, (NPCS.find(n => n.id === id) || {name: id}).name]));
+const giftWho = to => to === "family" ? FOLKS : to === "grands" ? ["farid", "mei"] : Array.isArray(to) ? to : [to];
+// a bouquet can go to any of them (in person, or sent round), or to whoever's standing nearby
+const FAMILY_ALL = FOLKS;
 function nearVillager(){ const n = npcActors().map(([, e]) => e).filter(e => e.kind === "npc" && !FAMILY_ALL.includes(e.def.id)).map(e => [e, Math.hypot(e.x - mel.x, e.y - mel.y)]).sort((a, b) => a[1] - b[1])[0]; return n && n[1] < 170 ? n[0] : null; }
 const recipients = it => it.kind === "bouquet" ? [...FAMILY_ALL, ...(nearVillager() ? ["near"] : [])] : giftWho(it.to);
 const recipName = w => w === "near" ? ((nearVillager() || {}).def || {name: "someone nearby"}).name : GIFT_NAME[w];
-const giftNames = to => to === "grands" ? "Ma Ma or Gong Gong" : to === "family" ? "the family" : giftWho(to).map(g => GIFT_NAME[g]).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
+const giftNames = to => to === "grands" ? "Farid or Mei" : to === "family" ? "a friend" : giftWho(to).map(g => GIFT_NAME[g]).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
 // Who's close enough to hand a gift to in person (null if they're not on this screen)
-const giftPos = w => w === "evan" ? (evanHere() ? evan : null) : w === "darren" ? (isHere("darren") ? npcPos("darren") : null) : npcPos(w);
+const giftPos = w => npcPos(w);
 // Tapping a gift in the backpack opens a little chooser of who it suits. Someone here gets it in person; anyone else
 // gets it sent round, and their thank-you note arrives in the mailbox a little later (F.thanks).
 let giftPick = null, postPick = false;
@@ -839,12 +811,12 @@ function giveTo(id, w){
   F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
   sfx("chime"); flash(`Sent to ${GIFT_NAME[w]}`); speak(`Wrapped up and sent to ${GIFT_NAME[w]}. Watch your mailbox for a thank-you note.`, 4500); save(); bag();
 }
-const SIGNOFF = {mum: "Love, Mum xx", dad: "Love, Dad", mama: "Love you, ah girl. Ma Ma", gonggong: "Gong Gong", marcus: "Cheers Zeh, Marcus", angelina: "Love, Angellina", darren: "Love you. D", evan: "Love, Evan (Darren held the pencil)"};
-const BQ_NOTE = {mama: "Ma Ma put them by the TV. So pretty, I look at them every day.", gonggong: "Gong Gong put them in water for Ma Ma. Okay, also for me.", mum: "They're on the dining table. Dad keeps saying they're from him.", dad: "I'm going to draw them before they fade.",
-  marcus: "Angie put them in a vase. The flat smells amazing.", angelina: "They're on my desk while I study. Thank you!", darren: "In a jar by the kettle. Very fancy.", evan: "I smelled ALL of them."};
+const SIGNOFF = {hana: "Love, Hana x", theo: "Yours sincerely (and gratefully), Theo", farid: "Your friend, Farid", mei: "Mei x", tomi: "Cheers, Tomi", posy: "Posy x", bo: "Bo"};
+const BQ_NOTE = {farid: "They're on the cottage table, next to the cake tin. Mei says they're nearly as nice as hers.", mei: "A flower farmer, given flowers! I put them in my best jug. Nobody ever does that.", hana: "They're on the counter at the market. Three people have asked where they're from.", theo: "I've pressed one in the village register. For the record.",
+  tomi: "They're on the windowsill. Posy says I have to change the water. I will.", posy: "They're by the till in the gift shop. Customers keep sniffing them.", bo: "In a jar on the workbench. Sawdust and roses. Not bad."};
 function thankNote(t){
   const it = ITEMS[t.item] || {n: "present", say: ""}, line = it.kind === "bouquet" ? BQ_NOTE[t.who] || "They're beautiful." : (it.says && it.says[t.who]) || it.say || "";
-  return `${t.who === "evan" ? "Dear Mama" : "Dear Mel"},\n\nThank you for the ${it.n.toLowerCase()}! ${line}\n\n${SIGNOFF[t.who] || ""}`;
+  return `${dearMe(F)},\n\nThank you for the ${it.n.toLowerCase()}! ${line}\n\n${SIGNOFF[t.who] || ""}`;
 }
 // thank-you notes that have arrived (they take about ten minutes to come back)
 const thanksMail = () => (F.thanks || []).filter(t => t.at <= Date.now()).map(t => ({id: t.id, from: "postie", at: t.at, title: `Thank you from ${GIFT_NAME[t.who] || "someone"}`, body: thankNote(t)}));
@@ -856,59 +828,26 @@ function giveGift(id, chosen){
   // more than one person it'd suit: hand it to whichever of them is nearest
   let to = it.to, g = null;
   if (who.length > 1 && it.to !== "grands") {
-    const here = who.map(w => [w, w === "evan" ? (evanHere() ? evan : null) : w === "darren" ? (isHere("darren") ? npcPos("darren") : null) : npcPos(w)]).filter(([, p]) => p)
+    const here = who.map(w => [w, npcPos(w)]).filter(([, p]) => p)
       .sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
     if (!here) { speak(`That's a present for ${giftNames(it.to)}. Give it to ${who.length > 2 ? "one of them" : "either of them"} in person!`, 4500); return; }
-    to = here[0] === "mama" || here[0] === "gonggong" ? "grands" : here[0]; g = to === "grands" ? here[0] : null;
-  } else if (who.length === 1 && (who[0] === "mama" || who[0] === "gonggong")) { to = "grands"; g = who[0]; }
+    to = here[0] === "farid" || here[0] === "mei" ? "grands" : here[0]; g = to === "grands" ? here[0] : null;
+  } else if (who.length === 1 && (who[0] === "farid" || who[0] === "mei")) { to = "grands"; g = who[0]; }
   else if (who.length === 1) to = who[0];
   const say = w => (it.says && it.says[w]) || it.say;
   if (FOLKS.includes(to)) {
-    const p = npcPos(to); if (!p) { speak(`${GIFT_NAME[to]}'s not here. Give it to ${to === "dad" || to === "marcus" ? "him" : "her"} in person!`, 3500); return; }
+    const p = npcPos(to); if (!p) { speak(`${GIFT_NAME[to]}'s not here. Give it to them in person!`, 3500); return; }
     addInv(id, -1); F.fam.gifts[to] = (F.fam.gifts[to] || 0) + 1; PP.bloomFor(F, id, to);
     showMap(); npcSay(to, say(to)); burst(p.x, p.y - 20); sfx("chime"); flash(`${GIFT_NAME[to]} loved the ${it.n.toLowerCase()}`); gainXp(1); save(); return;
   }
-  if (to === "evan") {
-    if (!evanHere()) { speak("Evan's at home. Give it to him there!", 3500); return; }
-    addInv(id, -1); const n = ++F.fam.gifts.evan; PP.bloomFor(F, id, "evan");
-    evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; evan.wait = 5;
-    showMap(); evanSays(say("evan")); burst(evan.x, evan.y); sfx("chime"); flash(`Evan loved the ${it.n.toLowerCase()}!`);
-    if (id === "icecream" || id === "storybook") S.evanHold = {k: id, until: Date.now() + 3*M};
-    if (it.gel) S.evanHold = {k: "icecream", until: Date.now() + 3*M};
-    if (id === "balloon") S.evanHold = {k: "balloon", until: 0};
-    if (id === "storybook" && scene === "home") { const s = spotObj("home", "dine"); evan.tx = s.tx + 20; evan.ty = s.ty; }
-    if (id === "wand") { clearInterval(bubbleT); let k = 0; bubbleT = setInterval(() => { if (++k > 16 || !evanHere()) return clearInterval(bubbleT); mprop("bubbles", evan.x + rnd(-14, 14), evan.y - 34); }, 1200); }
-    if (n % 3 === 0) setTimeout(() => { evanSays("for you, Mama!"); addInv("tulip", 1); flash("Evan picked you a tulip"); save(); }, 4000);
-  } else if (to === "grands") {
+  if (to === "grands") {
     // whichever grandparent is nearest (both live in the cottage in the orchard)
-    const here = (g ? [g] : ["mama", "gonggong"]).map(g => [g, npcPos(g)]).filter(([, p]) => p).sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
-    if (!here) { const w = whereIs("mama"); speak(`Ma Ma and Gong Gong aren't here. ${w === "cottage" ? "They're home in the cottage" : w ? "Ma Ma's out at the " + ({orchard: "orchard", flowers: "flower farm", village: "town square", vineyard: "vineyard", base: "house", field: "field"}[w] || w) : "Try the orchard"}. Give it to them in person!`, 4500); return; }
+    const here = (g ? [g] : ["farid", "mei"]).map(g => [g, npcPos(g)]).filter(([, p]) => p).sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
+    if (!here) { const w = whereIs("farid"); speak(`Farid and Mei aren't here. ${w === "cottage" ? "They're home in the cottage" : w ? "Farid's out at the " + ({orchard: "orchard", flowers: "flower farm", village: "town square", vineyard: "vineyard", base: "house", field: "field"}[w] || w) : "Try the orchard"}. Give it to them in person!`, 4500); return; }
     const [gp, p] = here; addInv(id, -1); F.fam.gifts[gp] = (F.fam.gifts[gp] || 0) + 1; PP.bloomFor(F, id, "grands");
-    showMap(); npcSay(gp, say(gp) + (gp === "mama" ? " I love you." : "")); burst(p.x, p.y - 20); sfx("chime"); flash(`${gp === "mama" ? "Ma Ma" : "Gong Gong"} loved the ${it.n.toLowerCase()}`);
-  } else {
-    if (!isHere("darren")) { const w = whereIs("darren"); speak(w ? `Darren's ${DARREN_AT[w] || "around"} right now. Give it to him there!` : "Darren's not around right now.", 4000); return; }
-    addInv(id, -1); const n = ++F.fam.gifts.darren;
-    showMap(); npcSay("darren", say("darren")); const p = npcPos("darren"); if (p) burst(p.x, p.y - 20); sfx("chime"); flash(`Darren says thanks for the ${it.n.toLowerCase()}`);
-    if (n % 3 === 0) setTimeout(() => { npcSay("darren", "Got you something too. Found it in the shed."); addInv("strawberry_seed", 1); flash("Darren gave you strawberry seeds"); save(); }, 4500);
+    showMap(); npcSay(gp, say(gp)); burst(p.x, p.y - 20); sfx("chime"); flash(`${GIFT_NAME[gp]} loved the ${it.n.toLowerCase()}`);
   }
   gainXp(1); save();
-}
-// What Evan is holding: a gift from today, or his toy truck.
-let holdKey = "";
-function renderEvanHold(){
-  const h = S.evanHold, k = h && (h.until === 0 || Date.now() < h.until) ? h.k : F.fam.owned.truck ? "truck" : "";
-  if (k === holdKey) return; holdKey = k;
-  let el = $("evanHold");
-  if (!el) { const bob = document.querySelector("#evan .bob"); if (!bob) return; el = document.createElementNS("http://www.w3.org/2000/svg", "g"); el.id = "evanHold"; bob.appendChild(el); }
-  el.innerHTML = {
-    balloon: `<path d="M7.4 -11 C10 -22 9 -30 12 -40" fill="none" stroke-width=".8"/><ellipse cx="12" cy="-47" rx="5.2" ry="6.4" fill="#E8574C"/><path d="M11 -40.6 h2 l-1 1.4z" fill="#E8574C"/>`,
-    icecream: `<path d="M5.6 -14 h4.4 l-2.2 7z" fill="#E8C48E"/><circle cx="7.8" cy="-15.5" r="2.6" fill="#F4C7CF"/>`,
-    storybook: `<rect x="5" y="-17" width="8" height="6" rx="1" fill="#B9D2A6"/><path d="M9 -17 v6" fill="none" stroke-width=".6"/>`,
-    dino: `<path d="M6 -14 q3 -6 7 -3 q3 0 4 4 l-2 0 l-1 3 h-6z" fill="#7FA35A"/><circle cx="14.5" cy="-14.5" r=".7" fill="#2F2B28"/>`,
-    plane: `<path d="M4 -16 h12 l3 -2 v4 l-3 -1 h-12z" fill="#7FB8E8"/><path d="M9 -16 l-2 -5 h3 l2 5z M9 -15 l-2 4 h3 l2 -4z" fill="#E8566C"/>`,
-    robot: `<rect x="7" y="-18" width="8" height="8" rx="1.5" fill="#C9CED6"/><rect x="8.5" y="-22" width="5" height="4" rx="1" fill="#C9CED6"/><circle cx="10" cy="-20" r=".6" fill="#2F2B28"/><circle cx="12" cy="-20" r=".6" fill="#2F2B28"/><path d="M11 -22 v-2" stroke="#E8566C" stroke-width=".8"/>`,
-    truck: `<rect x="7" y="-6.5" width="7" height="4" rx=".8" fill="#F3C969"/><path d="M14 -5.5 h2.5 l1.5 1.8 v1.2 h-4z" fill="#EFA3A6"/><circle cx="9" cy="-1.8" r="1.3" fill="#5E5A55"/><circle cx="15.5" cy="-1.8" r="1.3" fill="#5E5A55"/>`
-  }[k] || "";
 }
 function playFree(kind){
   const lines = {pet:["*leans into the pat*", "Happy fox noises!", "More pats please."], hide:["You found me!"], nap:["Mmm… cosy…"]};
@@ -1051,12 +990,12 @@ function ctx(){
   if (kid.open && scene === "kidroom") h = kidPanel(kid.open);
   else if (homeView && (scene === "home" || scene === "garage")) h = homeView === "shelf" ? storePanel(F, "shelf", {owns: k => owns(F, k)}) : fridgeHead() + (homeView === "shoplist" ? SL.shopPanelHTML(F, slDraft.showText) : storePanel(F, "fridge", {owns: k => owns(F, k)}));
   else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "trolley" ? trolleyPanel(F, {sel: scSt.tsel || []}) : scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverMore(deliverPanel(F, {pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo()}))
-    : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, {pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt}) : scView === "counter" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), server: isHere("sofia")}) : scView === "menu" ? scMenuPanel(F)
+    : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, {pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt}) : scView === "counter" ? scCounterPanel(F, {pick: scSt.pick, server: isHere("sofia")}) : scView === "menu" ? scMenuPanel(F)
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});
-  else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, evanHere()) : goalPanel(F, goalView);
+  else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, false) : goalPanel(F, goalView);
   else if (fieldView === "xtree" && scene === "field") h = treePanel(F, dayKey(), sgHM());
-  else if (fieldView === "xgrotto" && scene === "field") h = grottoPanel(F, dayKey(), sgHM(), {evan: evanHere()});
-  else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, evan: evanHere(), cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, xmas: !!st.xmas, server: isHere("mateo"), pk: ccSt.pk}) : st.kind === "mulled" ? mulledStallPanel(F, {keeper: isHere("celeste") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "mine" ? xmStallPanel(F, vineState(F), {day: dayKey(), here: atSpot === fieldView, hazel: st.id === "hazel" && isHere("hazel") && !keeperAway(st, dayKey(), sgHM())}) : marketStallPanel(st); }
+  else if (fieldView === "xgrotto" && scene === "field") h = grottoPanel(F, dayKey(), sgHM(), {});
+  else if (fieldView && scene === "field") { const st = stallAt(dayKey(), sgHM(), +fieldView.slice(-1)); h = !st ? "" : st.kind === "wine" ? stallMarketPanel(F, serving()) : st.kind === "orchard" ? shopPanel(F, dayKey(), orTab, true) : st.kind === "scoop" ? scCounterPanel(F, {pick: scSt.pick, cart: true, keeper: isHere("tomo") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "cocoa" ? ccCounterPanel(F, {cart: true, xmas: !!st.xmas, server: isHere("mateo"), pk: ccSt.pk}) : st.kind === "mulled" ? mulledStallPanel(F, {keeper: isHere("celeste") && !keeperAway(st, dayKey(), sgHM())}) : st.kind === "mine" ? xmStallPanel(F, vineState(F), {day: dayKey(), here: atSpot === fieldView, hazel: st.id === "hazel" && isHere("hazel") && !keeperAway(st, dayKey(), sgHM())}) : marketStallPanel(st); }
   else if ((lunchView === "book" || lunchView === "coming") && scene === "terrace") { const tabs = `<div class="tabs" role="tablist"><button role="tab" data-lbtab="book" aria-selected="${lunchView === "book"}">Sunday lunch</button><button role="tab" data-lbtab="coming" aria-selected="${lunchView === "coming"}">Coming up</button></div>`;
     h = lunchView === "book" ? lunchBookPanel(F, id => NPCS.find(n => n.id === id) ? NPCS.find(n => n.id === id).name : id, {terrace: !!vineState(F).terrace, shelf: shelfStock(vineState(F))}).replace("</h2>", "</h2>" + tabs)
       : `<span class="tape gingham" aria-hidden="true"></span><h2>The bookings book</h2>${tabs}<p class="sub">What's on at the terrace: weddings pencilled in weeks ahead, trivia on Wednesdays, sip and paint on Thursdays, and the special days.</p>${comingUpHTML(dayKey(), !!vineState(F).terrace)}<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
@@ -1065,20 +1004,20 @@ function ctx(){
   else if (lunchView === "table" && scene === "terrace") h = lunchTablePanel();
   else if (ppView && scene === "bv_hpaper") h = ppView === "pp_rack" ? WR.rackPanel(F) : ppView === "pp_wrap" ? WR.wrapPanel(F, wrSt, {where: "paperie"}) : PP.paperPanel(F, ppView, {day: dayKey(), came: ppCame, lise: isHere("lvlise")});   // round 183, 185
   else if (fieldView === "gwrap" && scene === "giftshop") h = WR.wrapPanel(F, wrSt, {where: "giftshop", table: giftState(F).wrapped});   // round 185
-  else if (bbRoom && townOf(scene) && TOWNS[townOf(scene)].by === "van") { const evanOn = inParty(F, "evan") && !evanNight(), tp = tripOn(F) ? tripOn(F).party : [];
-    h = bbRoom === "balloon" ? BBA.balloonPanel(F, bbSt.flight, {hm: sgHM(), party: tp}) : bbRoom === "riddle" ? BBA.riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? BBA.berriesPanel(F, bbSt.berries, evanOn)
-      : bbRoom === "dip" ? BBA.dipPanel(F, bbSt.dip, evanOn) : bbRoom === "joey" ? BBA.joeyPanel(F, bbSt.joey, evanOn) : bbRoom === "canoe" ? BBA.canoePanel(F, bbSt.canoe, evanOn, bbSt.paid)
+  else if (bbRoom && townOf(scene) && TOWNS[townOf(scene)].by === "van") { const evanOn = false, tp = tripOn(F) ? tripOn(F).party : [];
+    h = bbRoom === "balloon" ? BBA.balloonPanel(F, bbSt.flight, {hm: sgHM(), party: tp}) : bbRoom === "riddle" ? BBA.riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? BBA.berriesPanel(F, bbSt.berries, false)
+      : bbRoom === "dip" ? BBA.dipPanel(F, bbSt.dip, false) : bbRoom === "joey" ? BBA.joeyPanel(F, bbSt.joey, false) : bbRoom === "canoe" ? BBA.canoePanel(F, bbSt.canoe, false, bbSt.paid)
       : bbRoom === "fire" ? BBA.firePanel(F, bbSt.bag, {hm: sgHM(), folk: FIRE_FOLK.some(isHere)})
-      : bbRoom === "surf" ? CRA.surfPanel(F, bbSt.surf, evanOn, bbSt.paid) : bbRoom === "whales" ? CRA.whalePanel(F, bbSt.whale, evanOn) : bbRoom === "glow" ? CRA.glowPanel(F, bbSt.glow, {hm: sgHM(), evan: evanOn})
-      : bbRoom === "pots" ? CRA.potsPanel(F, bbSt.pots, {hm: sgHM(), evan: evanOn}) : bbRoom === "penguins" ? CRA.pengPanel(F, bbSt.peng, {hm: sgHM(), evan: evanOn}) : bbRoom === "nippers" ? CRA.nipPanel(F, bbSt.nip, {hm: sgHM(), evan: evanOn}) : TLA.TL_KINDS.includes(bbRoom) ? TLA.tlPanel(F, bbRoom, bbSt, {hm: sgHM(), evan: evanOn}) : LVA.LV_KINDS.includes(bbRoom) ? LVA.lvPanel(F, bbRoom, bbSt, {hm: sgHM(), evan: evanOn}) : bbRoomPanel(F, bbRoom, {evan: evanOn, party: !!tp.length}); }
+      : bbRoom === "surf" ? CRA.surfPanel(F, bbSt.surf, false, bbSt.paid) : bbRoom === "whales" ? CRA.whalePanel(F, bbSt.whale, false) : bbRoom === "glow" ? CRA.glowPanel(F, bbSt.glow, {hm: sgHM()})
+      : bbRoom === "pots" ? CRA.potsPanel(F, bbSt.pots, {hm: sgHM()}) : bbRoom === "penguins" ? CRA.pengPanel(F, bbSt.peng, {hm: sgHM()}) : bbRoom === "nippers" ? CRA.nipPanel(F, bbSt.nip, {hm: sgHM()}) : TLA.TL_KINDS.includes(bbRoom) ? TLA.tlPanel(F, bbRoom, bbSt, {hm: sgHM()}) : LVA.LV_KINDS.includes(bbRoom) ? LVA.lvPanel(F, bbRoom, bbSt, {hm: sgHM()}) : bbRoomPanel(F, bbRoom, {party: !!tp.length}); }
   else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van"), region: bvRegion});
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
   else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, "jeju", sgHM(), "ferry");   // round 127: the Jeju ferry from the jetty
   else if (railOpen && scene === "hlane") h = timetablePanel(dayKey(), sgHM(), true);
   else if (railOpen && townOf(scene)) h = homePanel(F, townOf(scene), sgHM(), railOpen === "ferry" ? "ferry" : "train");
-  else if (kyotoView && townOf(scene) === "kyoto") h = kyotoPanel(F, kyotoView, {...ktSt, evan: inParty(F, "evan") && !evanNight()});
-  else if (jejuView && townOf(scene) === "jeju") h = jejuPanel(F, jejuView, {...jjSt, evan: inParty(F, "evan") && !evanNight()});
-  else if (cinqueView && townOf(scene) === "cinque") h = cinquePanel(F, cinqueView, {...ctSt, evan: inParty(F, "evan") && !evanNight()});
+  else if (kyotoView && townOf(scene) === "kyoto") h = kyotoPanel(F, kyotoView, {...ktSt});
+  else if (jejuView && townOf(scene) === "jeju") h = jejuPanel(F, jejuView, {...jjSt});
+  else if (cinqueView && townOf(scene) === "cinque") h = cinquePanel(F, cinqueView, {...ctSt});
   else if (rondaView && townOf(scene)) h = rondaPanel(F, rondaView, {flam: flamSt, hm: sgHM(), tea: teaSt, amina: isHere("amina"), paint: paintSt});
   else if (fishSpot && FISH_SPOTS[fishSpot].scene === scene) h = fishPanel(F, fishSpot, fishSt);
   else if (woodsView === "ranger" && scene === "hwoods") h = rangerPanel(F, isHere("wren"));
@@ -1094,7 +1033,7 @@ function ctx(){
   else if (keepSpot) h = placedPanel(F, keepSpot);
   else if (adoptItem && F.inv[adoptItem]) h = adoptPanel(F, adoptItem, adoptSt);
   else if (petView && companions(F).some(c => c.id === petView)) { const c = companions(F).find(c => c.id === petView); h = petPanel(F, c, !!giftPos(c.owner)); }
-  else if (orView === "tea" && scene === "cottage") h = teaPanel(F, dayKey(), isHere("mama"));
+  else if (orView === "tea" && scene === "cottage") h = teaPanel(F, dayKey(), isHere("farid"));
   else if (orView && (scene === "orchard" || scene === "flowers")) h = orView === "shop" ? shopPanel(F, dayKey(), orTab) : orView === "tours" ? tourBoard(F, dayKey(), sgHM()) : spotPanel(F, orAt.where, orAt.i, dayKey());
   else if (kView === "mull" && scene === "kitchen") h = mullPanel(F, vineState(F), mullSt);   // round 153: mulled wine
   else if (kView && scene === "kitchen") h = kView === "oven" ? ovenPanel(F) : kView === "press" ? pressPanel(F) : kView === "stove" ? stovePanel(F, dayKey()) : larderPanel(F);
@@ -1107,7 +1046,7 @@ function ctx(){
   else if (fieldView === "hampers" && scene === "post") h = hamperPanel(F, vineState(F), {day: dayKey(), pick: xmPick, season: hamperSeason(dayKey()) || "xmas"});   // round 173
   else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar(), newsTab);
   else if (scene === "market" && !shopClosed) {
-    const tabs = [["seeds","Seeds"],["treats","Treats"],["deli","Deli"],["care","Care"],["family","Family"],["animals","Animals"],["home","Home"],["me","Me & my room"],["sell","Sell"]];
+    const tabs = [["seeds","Seeds"],["treats","Treats"],["deli","Deli"],["care","Care"],["family","Gifts"],["animals","Animals"],["home","Home"],["me","Me & my room"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
     if (shopTab === "home" || shopTab === "me") {
@@ -1138,7 +1077,7 @@ function ctx(){
   } else if (scene === "millup" && millOpen === "workshop") { h = workshopPanel(F, {on: workshopNow(dayKey(), sgHM()) && owns(F, "millshop"), shop: owns(F, "millshop")});
   } else if ((scene === "mill" || scene === "millup") && millOpen) { h = millOpen === "story" ? millStory(F) : millOpen === "bench" ? millBenchPanel(F, mcSt, {shop: owns(F, "millshop"), ines: owns(F, "mill")}) : millOpen === "shop" ? millShopPanel() : millPanel(F);
   } else if (friView && scene === "field" && (/^bm\d$/.test(friView) || friView === "kites")) { h = bayMarketPanel(friView);
-  } else if (friView && (scene === "bay" || scene === "field" || scene === "base")) { const fam = ["dad", "mum", "gonggong", "mama", "marcus", "angelina", "darren"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
+  } else if (friView && (scene === "bay" || scene === "field" || scene === "base")) { const fam = ["theo", "hana", "mei", "farid", "tomi", "posy", "bo"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
     h = friView === "van" ? vanPanel(F) : bonfirePanel(F, fam.length ? `${fam.join(", ").replace(/, ([^,]*)$/, " and $1")} ${fam.length > 1 ? "are" : "is"} round the fire` : "");
   } else if (scene === "farm" && selPlot != null) {
     const p = F.plots[selPlot], i = selPlot;
@@ -1173,7 +1112,7 @@ function ctx(){
   } else if (runOpen && scene === "base") {
     h = runPanel(F);
   } else if (shedOpen) {
-    h = `<span class="tape stripe" aria-hidden="true"></span><h2>Darren's shed</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Tools for the garden, bought once and kept forever.${isHere("darren") ? " Darren's around to set them up." : ""}</p><div class="items shop">`
+    h = `<span class="tape stripe" aria-hidden="true"></span><h2>Darren's shed</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Tools for the garden, bought once and kept forever.${isHere("bo") ? " Darren's around to set them up." : ""}</p><div class="items shop">`
       + Object.keys(SHED).map(id => { const t = SHED[id], own = F.tools[id];
         return `<button class="item" data-tool="${id}" ${own || F.coins < t.price ? "disabled" : ""}><span class="e">${icon(t.ico, 34)}</span><span class="n">${esc(t.n)}</span><span class="c">${own ? "in use" : `<b>${t.price}</b> ${icon("coin", 13)}`}</span><span class="d">${esc(t.what)}</span></button>`; }).join("")
       + `</div><div class="actions"><button class="btn alt small" data-close="1">Close the shed</button></div>`;
@@ -1182,7 +1121,6 @@ function ctx(){
   { const hn = scView === "fridge" && SCOOP_IN.includes(scene) ? "scoop" : ccView === "pantry" && COCOA_IN.includes(scene) ? "cocoa" : kView === "larder" && scene === "kitchen" ? "kitchen" : kView === "mull" && scene === "kitchen" ? "rack" : null, note = hn ? homeNote(F, hn) : "";
     if (note) { const i = h.lastIndexOf('<div class="actions">'); h = i < 0 ? h + note : h.slice(0, i) + note + h.slice(i); } }
   c.innerHTML = h;
-  if (kid.open && scene === "kidroom") wireKid(c, kid.open, {eat: id => { kid.open = null; ctx(); kidEat(id); }, close: () => { kid.open = null; stopKidGame(); ctx(); }});
   if (homeView && (scene === "home" || scene === "garage")) wireStorage(c);
   if (ppView && scene === "bv_hpaper") wirePaper(c);
   if ((ppView && scene === "bv_hpaper") || (fieldView === "gwrap" && scene === "giftshop")) wireWrap(c);
@@ -1232,13 +1170,11 @@ function ctx(){
   c.querySelectorAll("[data-fire]").forEach(b => b.onclick = () => {
     if (b.dataset.fire === "lanterns") { const n = releaseLanterns(F); if (n == null) return; friView = null; ctx(); lanternFlight(Math.max(1, n)); gainXp(Math.min(5, 1 + Math.floor(n/3))); sfx("chime");
       speak(n ? `${n} paper lantern${n > 1 ? "s" : ""}, one for each quest this week, lifting off over the house. Look at that.` : "One lantern, for getting through the week. It drifts up over the roof.", 7000);
-      if (evanHere()) setTimeout(() => evanSays(pick(["lanterns! so many!", "bye bye lanterns!", "up up up!"])), 1800);
-      ["mum", "dad", "mama"].filter(isHere).slice(0, 1).forEach(id => setTimeout(() => npcSay(id, pick(["Look at all of them! You worked hard this week.", "So pretty. Well done, my girl.", "Every one of those is something you did."])), 3600));
+      ["hana", "theo", "farid"].filter(isHere).slice(0, 1).forEach(id => setTimeout(() => npcSay(id, pick(["Look at all of them! You worked hard this week.", "So pretty. Well done, my girl.", "Every one of those is something you did."])), 3600));
       save(); return; }
     if (b.dataset.fire === "grill") { const n = grillFish(F); if (!n) return; friView = null; ctx(); gainXp(2); hearts(3); sfx("chime");
       speak(`${n} fish on the grill, a squeeze of lemon, and everyone eating with their fingers. Perfect.`, 6000);
-      if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["fishy! yum!", "more please!", "I ate the crispy bit!"])), 1800);
-      const who = ["gonggong", "dad", "mum", "mama"].filter(isHere)[0]; if (who) setTimeout(() => npcSay(who, pick(["Ah, that's the smell of a Friday.", "Grilled just right. Who taught you that?", "Best sardines this side of the sea!"])), 3600);
+      const who = ["mei", "theo", "hana", "farid"].filter(isHere)[0]; if (who) setTimeout(() => npcSay(who, pick(["Ah, that's the smell of a Friday.", "Grilled just right. Who taught you that?", "Best sardines this side of the sea!"])), 3600);
       save(); return; }
     mel.sitting = true; nodes.mel.classList.add("sit"); friView = null; ctx(); sfx("paper", true); speak(pick(["The fire pops and crackles. Nobody needs to say anything.", "Warm on your face, cool on your back. Friday.", "Sparks going up into the dark. The week's done."]), 4500); });
   c.querySelectorAll("[data-mill]").forEach(b => b.onclick = () => { const l = b.dataset.mill === "press" ? startPress(F, +b.dataset.n) : collectOil(F, addInv);
@@ -1268,39 +1204,39 @@ function ctx(){
     save(); ctx(); });
   c.querySelectorAll("[data-rcafe]").forEach(b => b.onclick = () => { if (!cafeTreat(F, b.dataset.rcafe)) return; rondaView = null; ctx(); sfx("chime"); gainXp(1); hearts(2);
     mel.sitting = true; nodes.mel.classList.add("sit"); if (b.dataset.rcafe === "choc") speak(pick(["Dip, bite, dip again. The chocolate's so thick the churro stands up in it.", "Hot churros, crisp and sugary, and a cup of chocolate you could stand a spoon in. Heaven."]), 6000); else speak(pick(["Café con leche in a glass, a churro to dip, and the fan ticking round overhead. Bliss.", "Doña Carmen sets it down: \"Eat, eat. You're too thin.\" The churro's still hot.", "Coffee, sugar, the plaza going by outside the window. Nobody's in a rush."]), 6000);
-    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["churro! mine!", "sugar on my nose!", "more churro please"])), 1800); save(); });
-  c.querySelectorAll("[data-kt]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.kt.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); };
-    if (a === "yukata") { const n = rentYukata(F, v); if (!n) return; sfx("chaching"); flash("A yukata for the day"); speak(`You change into the ${n.toLowerCase()}, an obi tied at the back, wooden sandals clacking.${evanOn ? " Evan's in a little indigo jinbei and won't stop twirling." : ""}`, 6000); ev(["look at me, Mama!", "I'm a samurai!", "twirl twirl!"], 2200); save(); dressMel(); }
+    ; save(); });
+  c.querySelectorAll("[data-kt]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.kt.split(":"), evanOn = false, ev = (l, d = 1600) => { ; };
+    if (a === "yukata") { const n = rentYukata(F, v); if (!n) return; sfx("chaching"); flash("A yukata for the day"); speak(`You change into the ${n.toLowerCase()}, an obi tied at the back, wooden sandals clacking.${("")}`, 6000); ; save(); dressMel(); }
     else if (a === "tea") { if (F.coins < TEA.price) return; F.coins -= TEA.price; ktSt = {tea: whiskStart()}; sfx("paper", true); save(); }
     else if (a === "teaagain") { ktSt = {}; }
     else if (a === "whisk") { if (!ktSt.tea) return; const ok = whisk(ktSt.tea); sfx(ok ? "tap" : "paper", true); }
     else if (a === "bow") { if (!ktSt.tea || !ktSt.tea.done) return; ktSt.tea.bowed = true; const k = kyotoState(F); k.teas = (k.teas || 0) + 1; gainXp(froth(ktSt.tea) ? 2 : 1); hearts(froth(ktSt.tea) ? 3 : 1); sfx("chime");
-      speak(froth(ktSt.tea) ? "You turn the bowl twice and bow. Sachiko bows back, very low. That's the best thing that's happened all week." : "You turn the bowl twice and bow. Sachiko bows back and smiles.", 5500); ev(["I bowed too!", "sweetie for me?", "bow bow!"]); save(); }
+      speak(froth(ktSt.tea) ? "You turn the bowl twice and bow. Sachiko bows back, very low. That's the best thing that's happened all week." : "You turn the bowl twice and bow. Sachiko bows back and smiles.", 5500); ; save(); }
     else if (a === "sit") { ktSt = {sit: sitStart()}; sfx("paper", true); [0, 1, 2, 3, 4, 5, 6].forEach(i => setTimeout(() => { if (kyotoView === "kt_hall" && ktSt.sit && !ktSt.sit.done) ctx(); }, 1600 + i*4000)); }
     else if (a === "in" || a === "out") { if (!ktSt.sit) return; const r = breathe(ktSt.sit, a); if (!r) return; sfx(r === "ok" ? "tap" : "paper", true);
-      if (ktSt.sit.done) { const k = kyotoState(F); k.sits = (k.sits || 0) + 1; gainXp(calm(ktSt.sit) ? 2 : 1); sfx("chime"); mel.sitting = true; nodes.mel.classList.add("sit"); ev(["BONG!", "can I ring it? can I?", "shhh, Mama's being quiet"], 2000); save(); } }
+      if (ktSt.sit.done) { const k = kyotoState(F); k.sits = (k.sits || 0) + 1; gainXp(calm(ktSt.sit) ? 2 : 1); sfx("chime"); mel.sitting = true; nodes.mel.classList.add("sit"); ; save(); } }
     else if (a === "donate") { if (F.coins < 2) return; F.coins -= 2; sfx("coin"); speak("The coin drops into the wooden box. Jōshin bows, smiling.", 3500); save(); }
     else if (a === "fortune") { const f = drawFortune(F); if (!f) return; ktSt = {fortune: f}; sfx("paper", true); speak(f[0] === "Bad luck" ? "Bad luck! You tie the slip to the rack and leave it there. Already feeling better." : `${f[0]}! ${f[1]}`, 5000); save(); }
     else if (a === "shape") { ktSt = {neri: {shape: v, step: 0}}; sfx("tap"); }
     else if (a === "step") { const n = ktSt.neri; if (!n) return; if (+v === n.step) { n.step++; n.oops = false; sfx("tap"); } else { n.oops = true; sfx("paper", true); } }
     else if (a === "nerireset") { ktSt = {}; }
     else if (a === "neri") { const n = ktSt.neri; if (!n || !makeNerikiri(F, n.shape, addInv)) return; ktSt = {}; sfx("chime"); gainXp(1); flash(`Nerikiri: ${NERI.shapes[n.shape][0].replace(/^A /, "").toLowerCase()}`);
-      speak(`${NERI.shapes[n.shape][0]}, in a little box with a paper ribbon. "Very good," says Mr Tanaka. "My father would say: too good for a beginner." A gift for someone at home.`, 6500); ev(["can I eat it? please?", "I made one too!", "pink! pretty!"]); save(); }
+      speak(`${NERI.shapes[n.shape][0]}, in a little box with a paper ribbon. "Very good," says Mr Tanaka. "My father would say: too good for a beginner." A gift for someone at home.`, 6500); ; save(); }
     else if (a === "wheel") { if (F.coins < 10) return; ktSt = {cup: {t0: Date.now(), good: 0, tries: 0}}; sfx("paper", true); }
     else if (a === "centre") { const c = ktSt.cup; if (!c || c.good >= 3) return; sfx(ktCentre(c) ? "tap" : "paper", true); }
-    else if (a === "glaze") { const c = ktSt.cup; if (!c || c.good < 3) return; const dadToo = inParty(F, "dad"); if (!throwCup(F, dadToo, addInv)) return; ktSt = {}; sfx("chime"); gainXp(1); flash("Your Kyoto teacup");
+    else if (a === "glaze") { const c = ktSt.cup; if (!c || c.good < 3) return; const dadToo = inParty(F, "theo"); if (!throwCup(F, dadToo, addInv)) return; ktSt = {}; sfx("chime"); gainXp(1); flash("Your Kyoto teacup");
       speak(`Ishida dips it in ${v === "indigo" ? "deep indigo" : v === "celadon" ? "pale celadon" : "warm amber"} glaze and fires it. A little wonky. Perfect. It's a keepsake for a shelf at home.${dadToo ? " Dad's comes out too, leaning badly. He's thrilled." : ""}`, 6500);
-      if (dadToo && isHere("dad")) setTimeout(() => npcSay("dad", "Expressive. That's the word. It's expressive."), 2400); save(); }
+      if (dadToo && isHere("theo")) setTimeout(() => npcSay("theo", "Expressive. That's the word. It's expressive."), 2400); save(); }
     ctx(); });
   // Cinque Terre (rounds 132–133): pesto, the harvest, the boats, gelato, focaccia, the tasting
   // Bellbird Valley's rooms (round 142): treats, the long lunch, the chocolaterie's free tasting
-  c.querySelectorAll("[data-bb]").forEach(b => b.onclick = () => { const [a, room, k] = b.dataset.bb.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); };
+  c.querySelectorAll("[data-bb]").forEach(b => b.onclick = () => { const [a, room, k] = b.dataset.bb.split(":"), evanOn = false, ev = (l, d = 1600) => { ; };
     if (a === "treat") { if (room === "bv_restaurant" && bbState(F).lunch === dayKey()) return; const t = bbTreat(F, room, k); if (!t) return; sfx(k === "flight" ? "chime" : "slurp"); gainXp(1); hearts(2); speak(`${t[0]}. ${t[2]}`, 6500);
-      if (room === "bv_restaurant") { bbState(F).lunch = dayKey(); const tr = tripOn(F), who = tr ? tr.party.filter(x => x !== "evan" && isHere(x)) : []; who.slice(0, 3).forEach((id, i) => setTimeout(() => npcSay(id, pick(["Pass the bread down? Thank you, love.", "This lamb. I'm not talking for a minute.", "We should do this every Sunday.", "Look at the view. Look at it!"])), 2400 + i*2400)); }
-      ev(k === "babycino" ? ["a coffee for ME!", "froth moustache!"] : k === "freddo" ? ["a chocolate FROG!", "ribbit! chomp!"] : k === "icypole" ? ["it's dripping!", "my tongue is red!"] : ["yummy!", "can I have some?", "mmm, Mama"]); }
-    else if (a === "pingpong") { sfx("tap"); gainXp(1); speak(pick(["Ping. Pong. Ping. Pong. A rally of twenty-two! Then you hit it into the piano.", "You win 11 to 9. Evan claims he won. Nobody argues.", "A long, ridiculous rally, both of you laughing. The ball ends up under the pinball machine."]), 5500); ev(["my turn! my turn!", "PING! PONG!", "I hit it, Mama!"]); }
+      if (room === "bv_restaurant") { bbState(F).lunch = dayKey(); const tr = tripOn(F), who = tr ? tr.party.filter(x => (isHere(x))) : []; who.slice(0, 3).forEach((id, i) => setTimeout(() => npcSay(id, pick(["Pass the bread down? Thank you, love.", "This lamb. I'm not talking for a minute.", "We should do this every Sunday.", "Look at the view. Look at it!"])), 2400 + i*2400)); }
+      ; }
+    else if (a === "pingpong") { sfx("tap"); gainXp(1); speak(pick(["Ping. Pong. Ping. Pong. A rally of twenty-two! Then you hit it into the piano.", "You win 11 to 9. Your opponent demands a rematch. You say no.", "A long, ridiculous rally, both of you laughing. The ball ends up under the pinball machine."]), 5500); ; }
     else if (a === "cut") { const n = bbCuttings(F, room); if (!n) return; sfx("chaching"); gainXp(1); flash(`Three ${n} cuttings`); speak(`Kel snips three ${n} cuttings, wraps them in damp newspaper and a bit of hessian. "Full sun, a good drink, and talk to them now and then." Plant them on a trellis at home.`, 7000); }
-    else if (a === "choc") { if (!chocTaste(F)) return; sfx("chime"); gainXp(1); hearts(2); speak("Sophie sets down a little dish: dark, milk, white, and one speckled with wattleseed, nutty and toasty. \"The wattleseed's from the bush out the back,\" she says.", 6500); ev(["one for me? one for ME?", "chocolate! for free!", "the brown one, Mama!"]); }
+    else if (a === "choc") { if (!chocTaste(F)) return; sfx("chime"); gainXp(1); hearts(2); speak("Sophie sets down a little dish: dark, milk, white, and one speckled with wattleseed, nutty and toasty. \"The wattleseed's from the bush out the back,\" she says.", 6500); ; }
     save(); ctx(); });
   c.querySelectorAll("[data-newstab]").forEach(b => b.onclick = () => { newsTab = b.dataset.newstab; sfx("tap"); ctx(); });
   // round 152: the terrace's bookings book tabs, trivia night and sip and paint (occasions.js)
@@ -1338,94 +1274,94 @@ function ctx(){
   c.querySelectorAll("[data-lbtab]").forEach(b => b.onclick = () => { lunchView = b.dataset.lbtab; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-trv]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.trv.split(":");
     if (a === "join") { if ((occasionNow(dayKey(), sgHM()) || {}).kind !== "trivia" || F.coins < QUIZ.entry) return; F.coins -= QUIZ.entry; trvSt = triviaStart(dayKey(), TEAM_NAMES[+v]); sfx("chaching"); if (isHere("amara")) npcSay("amara", "Round one! Eyes on the screen, phones in pockets."); save(); }
-    else if (a === "ans") { const ok = trvSt && triviaAnswer(trvSt, +v); if (ok == null) return; sfx(ok ? "chime" : "tap"); if (ok && Math.random() < .3) { const who = pick(["darren", "angelina"]); if (isHere(who)) npcSay(who, pick(["Yes! Knew it.", "Write it down, write it down!", "Team genius."])); } }
+    else if (a === "ans") { const ok = trvSt && triviaAnswer(trvSt, +v); if (ok == null) return; sfx(ok ? "chime" : "tap"); if (ok && Math.random() < .3) { const who = pick(["bo", "posy"]); if (isHere(who)) npcSay(who, pick(["Yes! Knew it.", "Write it down, write it down!", "Team genius."])); } }
     else if (a === "next") { if (!trvSt) return; triviaNext(trvSt); sfx("paper", true); if (trvSt.q === 0 && !trvSt.done && isHere("amara")) npcSay("amara", `Round ${trvSt.r + 1}: ${trvSt.rounds[trvSt.r].n}!`); }
     else if (a === "end" || a === "tie") { if (!trvSt || !trvSt.done) return; const r = finishTrivia(F, trvSt, a === "tie" ? +v : null); trvSt = null; gainXp(r.win ? 3 : 2); hearts(r.win ? 3 : 2); sfx(r.win ? "chaching" : "chime"); if (r.win) { act("cheer"); flash(`Trivia winners! +${r.pot}`); }
       speak(a === "tie" ? (r.win ? "128! Spot on. The jar's yours." : "It's 128. So close! The other lot take it.") : r.win ? `Amara reads it out: "And the winners, with ${r.score}..." Darren jumps up and knocks his chair over.` : `${r.score} out of 20. Angellina's already planning next week's tactics.`, 6000); save(); }
     ctx(); });
   c.querySelectorAll("[data-pnt]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.pnt.split(":");
-    if (a === "sub") { if ((occasionNow(dayKey(), sgHM()) || {}).kind !== "paint" || F.coins < PAINT_PRICE) return; F.coins -= PAINT_PRICE; pntSt = paintStart(v); sfx("chaching"); if (isHere("dad")) npcSay("dad", pick(["Big brush first. Don't be shy with it.", "Background, then the middle, then the bit you love.", "There are no mistakes. Only happy little hills."])); save(); }
+    if (a === "sub") { if ((occasionNow(dayKey(), sgHM()) || {}).kind !== "paint" || F.coins < PAINT_PRICE) return; F.coins -= PAINT_PRICE; pntSt = paintStart(v); sfx("chaching"); if (isHere("theo")) npcSay("theo", pick(["Big brush first. Don't be shy with it.", "Background, then the middle, then the bit you love.", "There are no mistakes. Only happy little hills."])); save(); }
     else if (a === "col") { if (!pntSt || paintStep(pntSt, +v) == null) return; sfx("tap"); }
     else if (a === "done") { if (!pntSt || !paintDone(pntSt)) return; const got = finishPaint(F, pntSt, addInv), n = PAINT_SUBJECTS[pntSt.subject].n.toLowerCase(); pntSt = null; gainXp(2); hearts(2); sfx("chime"); if (got) flash("Your painting");
       speak(got ? `You carry ${n} home, still a bit wet. It's a keepsake now: it can go on a wall at home.` : `Another go at ${n}. Better than the last, Dad says, and he means it.`, 6000); save(); }
     ctx(); });
   // Bellbird Valley's activities (round 143: bbacts.js)
-  c.querySelectorAll("[data-bba]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.bba.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); }, tp = tripOn(F) ? tripOn(F).party : [];
+  c.querySelectorAll("[data-bba]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.bba.split(":"), evanOn = false, ev = (l, d = 1600) => { ; }, tp = tripOn(F) ? tripOn(F).party : [];
     if (a === "open") { bbRoom = v; bbSt = {}; sfx("paper", true); }
     // the balloon
-    else if (a === "fly") { const cost = BBA.flightCost(tp); if (!BBA.balloonOpen(sgHM()) || F.coins < cost) return; F.coins -= cost; bbSt.flight = BBA.flightStart(); sfx("chaching"); speak("The burner roars, the basket creaks, and the ground just... lets go. Gus grins. \"Here we go.\"", 5000); ev(["we're FLYING!", "Mama, the cars are tiny!", "hold my hand, hold it"], 2200); save(); }
+    else if (a === "fly") { const cost = BBA.flightCost(tp); if (!BBA.balloonOpen(sgHM()) || F.coins < cost) return; F.coins -= cost; bbSt.flight = BBA.flightStart(); sfx("chaching"); speak("The burner roars, the basket creaks, and the ground just... lets go. Gus grins. \"Here we go.\"", 5000); ; save(); }
     else if (a === "burn" || a === "hold" || a === "drift") { const st = bbSt.flight; if (!st) return; if (st.i >= st.sights.length) { if (a === "drift") st.alt = Math.max(1, st.alt - 1); sfx("tap"); }
-      else { const ok = BBA.flightMove(st, a); sfx(a === "burn" ? "pop" : "tap"); if (ok) { gainXp(0); ev(["look, LOOK!", "kangaroos! tiny ones!", "wow", "I can see our van!"], 400); } } }
-    else if (a === "land") { const st = bbSt.flight; if (!st || BBA.flightLand(st) == null) return; sfx(st.soft ? "chime" : "tap"); ev(st.soft ? ["we landed! like a feather!"] : ["BUMP! again again!"], 800); }
-    else if (a === "flown") { const st = bbSt.flight; if (!st || !st.landed) return; const cert = BBA.finishFlight(F, st, addInv); bbSt = {}; gainXp(2); hearts(3); act("cheer"); if (cert) flash("A flight certificate"); speak(`Gus pops a bottle of sparkling and pours little cups for everyone${evanOn ? " (apple juice for Evan)" : ""}. ${cert ? "He signs a certificate for you: you've flown over Bellbird Valley." : "\"Back again! You're a regular.\""}`, 7000); save(); }
+      else { const ok = BBA.flightMove(st, a); sfx(a === "burn" ? "pop" : "tap"); if (ok) { gainXp(0); ; } } }
+    else if (a === "land") { const st = bbSt.flight; if (!st || BBA.flightLand(st) == null) return; sfx(st.soft ? "chime" : "tap"); ; }
+    else if (a === "flown") { const st = bbSt.flight; if (!st || !st.landed) return; const cert = BBA.finishFlight(F, st, addInv); bbSt = {}; gainXp(2); hearts(3); act("cheer"); if (cert) flash("A flight certificate"); speak(`Gus pops a bottle of sparkling and pours little cups for everyone${("")}. ${cert ? "He signs a certificate for you: you've flown over Bellbird Valley." : "\"Back again! You're a regular.\""}`, 7000); save(); }
     // riddling
-    else if (a === "riddle") { bbSt.riddle = BBA.riddleStart(); sfx("paper", true); ev(["twist twist!", "can I do one?"], 1200); }
+    else if (a === "riddle") { bbSt.riddle = BBA.riddleStart(); sfx("paper", true); ; }
     else if (a === "turn") { if (!bbSt.riddle || !BBA.riddleTap(bbSt.riddle, +v)) return; sfx("tap"); }
     else if (a === "riddled") { if (!bbSt.riddle || !BBA.riddleDone(bbSt.riddle)) return; const first = BBA.finishRiddle(F); bbSt = {}; sfx("chime"); gainXp(2); hearts(2);
-      speak(first ? "Jono claps. \"You've got the wrist for it.\" He draws you a plan of a riddling rack on a napkin. Back home, there's one in your wine cellar now: lay your sparkling on it, and the longer it's riddled the more it sells for." : "Every mark pointing up. Jono nods. \"Same time tomorrow?\"", 7500); ev(["I turned one! the little one!", "clink clink"], 2000); save(); }
+      speak(first ? "Jono claps. \"You've got the wrist for it.\" He draws you a plan of a riddling rack on a napkin. Back home, there's one in your wine cellar now: lay your sparkling on it, and the longer it's riddled the more it sells for." : "Every mark pointing up. Jono nods. \"Same time tomorrow?\"", 7500); ; save(); }
     // berries and dipping
-    else if (a === "pick") { bbSt.berries = BBA.berriesStart(); sfx("paper", true); ev(["one for me, one for the basket", "a big one!"], 1400); }
-    else if (a === "berry") { const r = BBA.pickBerry(bbSt.berries, +v); if (!r) return; sfx(r === "ok" ? "tap" : "paper", true); if (r === "unripe" && Math.random() < .5) ev(["that one's white, Mama!", "not ready!"], 300); }
+    else if (a === "pick") { bbSt.berries = BBA.berriesStart(); sfx("paper", true); ; }
+    else if (a === "berry") { const r = BBA.pickBerry(bbSt.berries, +v); if (!r) return; sfx(r === "ok" ? "tap" : "paper", true); if (r === "unripe" && Math.random() < .5) ; }
     else if (a === "picked") { if (!bbSt.berries || !BBA.berriesDone(bbSt.berries)) return; const got = BBA.finishBerries(F, bbSt.berries, addInv); bbSt = {}; sfx("chime"); gainXp(1); hearts(2);
       if (got) { flash(`${got.rasp} raspberries, ${got.straw} strawberries`); speak("A basket of berries, warm from the sun. Pay at the gate by the weight: Shaz waves you through. \"First basket's on the house.\"", 6000); } else speak("Another basket! These ones are for eating, right here, right now.", 4500);
-      ev(["my hands are RED", "I only ate a few. Some. Lots."], 1800); save(); }
+      ; save(); }
     else if (a === "choc" || a === "top") { bbSt.dip = {...(bbSt.dip || {}), [a]: v}; sfx("tap"); }
     else if (a === "dip") { const d = bbSt.dip || {}; if (!BBA.dipBerries(F, d.choc, d.top)) return; addInv("b_dipped", 1); bbSt = {}; sfx("chime"); gainXp(1); hearts(2); flash("Chocolate-dipped strawberries");
-      speak(`Into the ${d.choc} chocolate, a twirl, ${d.top === "none" ? "and nothing else: perfect as they are" : `and a roll in ${BBA.DIP.tops[d.top].toLowerCase()}`}. Sophie boxes them up with a ribbon.`, 6000); ev(["can I lick the spoon?", "chocolate on my nose!"], 1800); save(); }
+      speak(`Into the ${d.choc} chocolate, a twirl, ${d.top === "none" ? "and nothing else: perfect as they are" : `and a roll in ${BBA.DIP.tops[d.top].toLowerCase()}`}. Sophie boxes them up with a ribbon.`, 6000); ; save(); }
     // the joey
-    else if (a === "joey") { bbSt.joey = BBA.joeyStart(); sfx("paper", true); ev(["she's SO small", "hello baby kangaroo"], 1400); }
+    else if (a === "joey") { bbSt.joey = BBA.joeyStart(); sfx("paper", true); ; }
     else if (a === "jstep") { const r = BBA.joeyDo(bbSt.joey, +v); if (!r) return; sfx(r === "ok" ? "tap" : "paper", true); }
     else if (a === "fed") { if (!bbSt.joey || !BBA.joeyDone(bbSt.joey)) return; const r = BBA.finishJoey(F); bbSt = {}; sfx("chime"); gainXp(r.again ? 1 : 2); hearts(3);
       speak(r.again ? "Pip's already had her feed today, so Kim lets you give her a cuddle instead. She smells of milk and hay." : r.release ? "Kim smiles. \"That's her third feed with you, and she's strong now. Jack's taking her back to the mob at the creek this week.\" Pip sticks her head out of her pouch and sniffs your hand, like she's saying goodbye." : `Pip drains the bottle, does a hiccup, and falls asleep in her pouch. Kim writes your name in the feeding book. (${r.feeds} of ${BBA.JOEY.RELEASE} feeds before she goes home to the bush.)`, 7500);
-      ev(["she hiccupped!", "night night Pip", "can we take her home? no? okay"], 2200); save(); }
+      ; save(); }
     // the canoe
-    else if (a === "canoe") { if (!bbSt.paid) { if (F.coins < BBA.CANOE.price) return; F.coins -= BBA.CANOE.price; bbSt.paid = true; sfx("chaching"); } bbSt.canoe = BBA.canoeStart(); ev(["I'm a pirate!", "row row row!"], 1400); save(); }
+    else if (a === "canoe") { if (!bbSt.paid) { if (F.coins < BBA.CANOE.price) return; F.coins -= BBA.CANOE.price; bbSt.paid = true; sfx("chaching"); } bbSt.canoe = BBA.canoeStart(); ; save(); }
     else if (a === "paddle") { if (!bbSt.canoe || BBA.paddle(bbSt.canoe, v) == null) return; sfx("tap"); }
     else if (a === "canoed") { if (!bbSt.canoe || !BBA.canoeDone(bbSt.canoe)) return; const straight = BBA.finishCanoe(F, bbSt.canoe); bbSt = {}; sfx("chime"); gainXp(2); hearts(2);
-      speak(straight ? "Round the bend, smooth as anything, and there: a flash of blue on a dead branch. A kingfisher! It dives, comes up with a tiny fish, and is gone." : "You zigzag round the bend, bump the bank, and get the giggles. A kingfisher watches from a branch, unimpressed.", 7000); ev(["a blue bird! a BLUE bird!", "again, Mama!"], 2400); save(); }
+      speak(straight ? "Round the bend, smooth as anything, and there: a flash of blue on a dead branch. A kingfisher! It dives, comes up with a tiny fish, and is gone." : "You zigzag round the bend, bump the bank, and get the giggles. A kingfisher watches from a branch, unimpressed.", 7000); ; save(); }
     // marshmallows
     else if (a === "bag") { const st = BBA.openBag(F); if (!st) return; bbSt.bag = st; sfx("paper", true); const who = FIRE_FOLK.filter(isHere); if (who.length) setTimeout(() => npcSay(who[0], pick(["Here, take my good stick. It's the long one.", "Not too close! Patience.", "Golden. Not black. Golden."])), 1200); save(); }
-    else if (a === "toast") { const r = BBA.toast(bbSt.bag); if (!r) return; sfx(r === "burnt" ? "pop" : "tap"); if (r === "burnt") ev(["it's ON FIRE!", "blow it out!"], 300); }
-    else if (a === "pull") { const r = BBA.pullOut(F, bbSt.bag); if (!r) return; sfx(r === "golden" ? "chime" : "tap"); if (r === "golden") { mprop("sparkle", mel.x, mel.y - 50, 1000); ev(["give me that one!", "gooey!", "mmmm"], 400); } save(); }
+    else if (a === "toast") { const r = BBA.toast(bbSt.bag); if (!r) return; sfx(r === "burnt" ? "pop" : "tap"); if (r === "burnt") ; }
+    else if (a === "pull") { const r = BBA.pullOut(F, bbSt.bag); if (!r) return; sfx(r === "golden" ? "chime" : "tap"); if (r === "golden") { mprop("sparkle", mel.x, mel.y - 50, 1000); ; } save(); }
     else if (a === "mdone") { bbSt = {}; gainXp(1); hearts(2); const who = FIRE_FOLK.filter(isHere); who.slice(0, 2).forEach((id, i) => setTimeout(() => npcSay(id, pick(NPCS.find(n => n.id === id).lines)), 800 + i*2600)); }
     // the Coast Road's (round 150: cracts.js)
-    else if (a === "surf") { if (!bbSt.paid) { const cost = CRA.surfCost(evanOn); if (F.coins < cost) return; F.coins -= cost; bbSt.paid = true; sfx("chaching"); } bbSt.surf = CRA.surfStart(); if (isHere("crjet")) npcSay("crjet", "Chest up, look at the beach, not your feet. Here comes one!"); ev(["I'm a SURFER!", "the water's cold, Mama!", "Jet's holding my board"], 1600); save(); }
-    else if (a === "spaddle" || a === "popup") { const st = bbSt.surf; if (!st) return; const r = CRA.surfDo(st, a === "spaddle" ? "paddle" : "pop"); if (!r) return; sfx(r === "ride" ? "chime" : r === "dumped" ? "pop" : "tap"); if (r === "ride") { mprop("sparkle", mel.x, mel.y - 50, 900); ev(["MAMA YOU'RE STANDING!", "woooo!", "do it again!"], 300); } }
+    else if (a === "surf") { if (!bbSt.paid) { const cost = CRA.surfCost(false); if (F.coins < cost) return; F.coins -= cost; bbSt.paid = true; sfx("chaching"); } bbSt.surf = CRA.surfStart(); if (isHere("crjet")) npcSay("crjet", "Chest up, look at the beach, not your feet. Here comes one!"); ; save(); }
+    else if (a === "spaddle" || a === "popup") { const st = bbSt.surf; if (!st) return; const r = CRA.surfDo(st, a === "spaddle" ? "paddle" : "pop"); if (!r) return; sfx(r === "ride" ? "chime" : r === "dumped" ? "pop" : "tap"); if (r === "ride") { mprop("sparkle", mel.x, mel.y - 50, 900); ; } }
     else if (a === "surfed") { const st = bbSt.surf; if (!st || !CRA.surfDone(st)) return; const photo = CRA.finishSurf(F, st, addInv); bbSt = {}; gainXp(2); hearts(2); act("cheer"); if (photo) flash("A photo of your first wave"); speak(photo ? "Jet's mate on the sand got a photo of you on your first wave: arms out, mouth wide open. Jet prints it at the shop for you." : "Wetsuit off, towel on, sand everywhere. The best kind of tired.", 6000); save(); }
-    else if (a === "whales") { bbSt.whale = CRA.whaleStart(dayKey()); sfx("paper", true); ev(["where? WHERE?", "I see a wave!"], 1400); }
-    else if (a === "look") { const st = bbSt.whale; if (!st) return; const r = CRA.whaleLook(st, +v); if (!r) return; sfx(r === "sea" ? "tap" : "chime"); if (r !== "sea") ev(st.whales ? ["A WHALE! a real one!", "it's SO big", "it waved its tail at me!"] : ["dolphins! hello dolphins!", "they're jumping!"], 300); }
+    else if (a === "whales") { bbSt.whale = CRA.whaleStart(dayKey()); sfx("paper", true); ; }
+    else if (a === "look") { const st = bbSt.whale; if (!st) return; const r = CRA.whaleLook(st, +v); if (!r) return; sfx(r === "sea" ? "tap" : "chime"); if (r !== "sea") ; }
     else if (a === "whaled") { const st = bbSt.whale; if (!st || !CRA.whaleDone(st)) return; const card = CRA.finishWhales(F, st, addInv); bbSt = {}; gainXp(st.seen.length ? 2 : 1); hearts(st.seen.length ? 2 : 1); if (card) flash("A whale sighting card"); if (card) speak("Win stamps a sighting card for you, with the date and a little humpback, and writes what you saw in the lighthouse log.", 6000); save(); }
     else if (a === "glow") { if (!CRA.glowOpen(sgHM())) return; bbSt.glow = CRA.glowStart(); sfx("paper", true); }
-    else if (a === "gwait") { if (!bbSt.glow || CRA.glowWait(bbSt.glow) == null) return; sfx("tap"); if (bbSt.glow.wait >= CRA.GLOW.WAIT) ev(["(whispering) stars... inside...", "(whispering) Mama, they're glowing"], 600); }
+    else if (a === "gwait") { if (!bbSt.glow || CRA.glowWait(bbSt.glow) == null) return; sfx("tap"); if (bbSt.glow.wait >= CRA.GLOW.WAIT) ; }
     else if (a === "gcount") { if (!bbSt.glow || CRA.glowCount(bbSt.glow, +v) == null) return; sfx("tap"); }
     else if (a === "glowed") { const st = bbSt.glow; if (!st || !CRA.glowDone(st)) return; const r = CRA.finishGlow(F, st); bbSt = {}; gainXp(2); hearts(2); speak(`Back out into the evening, blinking. ${r.n} glow-worms.${r.best ? " Your best count yet." : ""} Tash says that's a good night for it.`, 5000); save(); }
-    else if (a === "pots") { if (!CRA.potsOpen(sgHM())) return; bbSt.pots = CRA.potsStart(); sfx("paper", true); ev(["a boat! we're on a BOAT!", "the bait smells YUCKY"], 1400); }
-    else if (a === "haul") { if (!bbSt.pots || !CRA.potHaul(bbSt.pots)) return; sfx("tap"); if (bbSt.pots.last !== "empty") ev(["it's waving at me!", "big claws! BIG CLAWS!", "can I hold it? no thank you"], 500); }
+    else if (a === "pots") { if (!CRA.potsOpen(sgHM())) return; bbSt.pots = CRA.potsStart(); sfx("paper", true); ; }
+    else if (a === "haul") { if (!bbSt.pots || !CRA.potHaul(bbSt.pots)) return; sfx("tap"); if (bbSt.pots.last !== "empty") ; }
     else if (a === "keep") { if (!bbSt.pots || CRA.potChoose(bbSt.pots, v === "1") == null) return; sfx("tap"); }
     else if (a === "potted") { const st = bbSt.pots; if (!st || !CRA.potsDone(st)) return; const n = CRA.finishPots(F, st, addInv); bbSt = {}; gainXp(2); hearts(2); if (n) flash(`${n} crayfish from Mags`); speak(n ? `Mags wraps two crays in wet newspaper for you: "For a crayfish roll. Lemon, butter, soft bun. Nothing else." (Crayfish rolls are on the kitchen's specials now.)` : "Mags gives you a wave from the wheelhouse. \"Same time tomorrow, deckhand.\"", 7000); save(); }
-    else if (a === "peng") { if (!CRA.pengOpen(sgHM())) return; bbSt.peng = CRA.pengStart(evanOn); sfx("paper", true); }
+    else if (a === "peng") { if (!CRA.pengOpen(sgHM())) return; bbSt.peng = CRA.pengStart(false); sfx("paper", true); }
     else if (a === "pstill" || a === "pshush") { if (!bbSt.peng || CRA.pengDo(bbSt.peng, a === "pstill" ? "still" : "shush") == null) return; }
-    else if (a === "penged") { const st = bbSt.peng; if (!st || !CRA.pengDone(st)) return; const n = CRA.finishPeng(F, st); bbSt = {}; gainXp(2); hearts(3); sfx("chime"); speak(`${n} little penguins home for the night. Outside, the stars are out over the Sisters.`, 5000); ev(["can we come back tomorrow?", "goodnight penguins", "I was SO quiet"], 2200); save(); }
-    else if (a === "nip") { if (!evanOn || !CRA.nipOpen(sgHM())) return; bbSt.nip = CRA.nipStart(); sfx("paper", true); if (isHere("crdimi")) npcSay("crdimi", "On your marks... get set... GO!"); }
+    else if (a === "penged") { const st = bbSt.peng; if (!st || !CRA.pengDone(st)) return; const n = CRA.finishPeng(F, st); bbSt = {}; gainXp(2); hearts(3); sfx("chime"); speak(`${n} little penguins home for the night. Outside, the stars are out over the Sisters.`, 5000); ; save(); }
+    else if (a === "nip") { return; bbSt.nip = CRA.nipStart(); sfx("paper", true); if (isHere("crdimi")) npcSay("crdimi", "On your marks... get set... GO!"); }
     else if (a === "ncheer" || a === "nduck") { if (!bbSt.nip || CRA.nipDo(bbSt.nip, a === "ncheer" ? "cheer" : "duck") == null) return; sfx("tap"); }
     // the Tablelands' (round 159: tlacts.js): one action for them all
-    else if (a === "tl" || a === "lv") { const [verb, arg] = v.split("."), r = (a === "tl" ? TLA.tlAct : LVA.lvAct)(F, bbRoom, bbSt, verb, arg, {evan: evanOn, hm: sgHM(), addInv}); if (!r) return;   // (round 163: and the Lavender Hills', lvacts.js)
-      if (r.sfx) sfx(r.sfx); if (r.evan) ev(r.evan, 900); if (r.xp) gainXp(r.xp); if (r.hearts) hearts(r.hearts); if (r.flash) flash(r.flash); if (r.say) speak(r.say, 5500); if (r.close) { bbRoom = null; bbSt = {}; act("cheer"); } save(true); }
-    else if (a === "nipped") { const st = bbSt.nip; if (!st || !CRA.nipDone(st)) return; const r = CRA.finishNip(F, st, addInv); bbSt = {}; gainXp(2); hearts(3); act("cheer"); if (r.medal) flash("Evan's Nippers medal"); speak(r.medal ? "Coach Dimi hangs a medal round Evan's neck: his first Nippers. He won't take it off. Not even in the bath, he says." : "Hot chips on the surf club balcony, Evan still in his cap.", 6500); ev(["I'm a LIFESAVER!", "did you see me, Mama?", "I dived for the flag!"], 1800); save(); }
+    else if (a === "tl" || a === "lv") { const [verb, arg] = v.split("."), r = (a === "tl" ? TLA.tlAct : LVA.lvAct)(F, bbRoom, bbSt, verb, arg, {hm: sgHM(), addInv}); if (!r) return;   // (round 163: and the Lavender Hills', lvacts.js)
+      if (r.sfx) sfx(r.sfx); ; if (r.xp) gainXp(r.xp); if (r.hearts) hearts(r.hearts); if (r.flash) flash(r.flash); if (r.say) speak(r.say, 5500); if (r.close) { bbRoom = null; bbSt = {}; act("cheer"); } save(true); }
+    else if (a === "nipped") { const st = bbSt.nip; if (!st || !CRA.nipDone(st)) return; const r = CRA.finishNip(F, st, addInv); bbSt = {}; gainXp(2); hearts(3); act("cheer"); if (r.medal) flash("A surf club medal"); speak(r.medal ? "Coach Dimi hangs a medal round your neck: your first surf club swim. You might wear it in the bath." : "Hot chips on the surf club balcony, still in your swim cap.", 6500); ; save(); }
     ctx(); });
-  c.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.ct.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); };
-    if (a === "pesto") { ctSt = {pesto: pestoStart()}; sfx("paper", true); ev(["bash bash bash!", "it smells green, Mama!", "my pesto!"], 1200); }
+  c.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.ct.split(":"), evanOn = false, ev = (l, d = 1600) => { ; };
+    if (a === "pesto") { ctSt = {pesto: pestoStart()}; sfx("paper", true); ; }
     else if (a === "padd") { const r = pestoAdd(ctSt.pesto, +v); sfx(r === "ok" ? "tap" : "paper", true); }
     else if (a === "pound") { if (pestoPound(ctSt.pesto)) sfx("tap"); }
     else if (a === "pestodone") { if (!ctSt.pesto || !pestoDone(ctSt.pesto) || !finishPesto(F, addInv)) return; ctSt = {}; sfx("chime"); gainXp(2); hearts(2); flash("Two jars of pesto"); speak("Two jars of your own pesto. Nonna Pina leans in: \"The secret? Ligurian basil, young leaves, and patience.\" Now you can make it at home too, in the loft over the barrels.", 7000); save(); }
-    else if (a === "ride" || a === "monorail") { cinqueView = "monorail"; ctSt = a === "ride" ? {harvest: harvestStart()} : {}; sfx("paper", true); if (a === "ride") ev(["choo choo! up up up!", "SO high, Mama!", "grapes! everywhere!"], 1400); }
+    else if (a === "ride" || a === "monorail") { cinqueView = "monorail"; ctSt = a === "ride" ? {harvest: harvestStart()} : {}; sfx("paper", true); if (a === "ride") ; }
     else if (a === "arrive") { if (ctSt.harvest) ctSt.harvest.riding = false; sfx("tap"); }
     else if (a === "pick") { const r = ctPick(ctSt.harvest, +v); if (!r) return; sfx(r === "ok" ? "tap" : "paper", true); }
     else if (a === "harvestdone") { if (!ctSt.harvest || !harvestDone(ctSt.harvest)) return; const n = finishHarvest(F, addInv); ctSt = {}; sfx("chime"); gainXp(2); act("cheer"); if (n) flash(`${n} bunches of white grapes`); speak(`Signor Bruno shakes your hand. "Next year you come back." ${n ? "He gives you three bunches to start your own racks. " : ""}Up the ladder in your barrel shed at home, the drying loft is ready for raisin wine.`, 7000); save(); }
     else if (a === "hull" || a === "stripe" || a === "bname") { ctSt.boat = {...(ctSt.boat || {}), [a === "bname" ? "name" : a]: v}; sfx("tap"); }
     else if (a === "paint") { const st = ctSt.boat || {}; const bt = paintBoat(F, st.hull, st.stripe, st.name, addInv); if (!bt) return; ctSt = {boat: {}}; sfx("chime"); gainXp(2); hearts(2); flash("Your painted boat");
-      speak(`Fresh paint, gleaming: "${st.name}" along the bow${evanOn ? ", in Evan's wobbly letters" : ""}. Aldo gives you a little carved model of her to keep, and says he'll see one just like her at your jetty. Fishermen talk.`, 7000); ev(["I painted the E!", "my boat! MY boat!", "it says EVAN, Mama"], 1800); drawScene(); save(); }
-    else if (a === "gelato" || a === "focaccia") { const t = ctTreat(F, a === "gelato" ? GELATO : FOCACCIA, v); if (!t) return; sfx("slurp"); gainXp(1); hearts(2); speak(`${t[0]}. ${t[2]}`, 5500); ev(a === "gelato" ? ["green ice cream!", "lick lick", "can I have the lemon one too?"] : ["crunchy bread!", "more please!", "yummy"]); save(); }
+      speak(`Fresh paint, gleaming: "${st.name}" along the bow${("")}. Aldo gives you a little carved model of her to keep, and says he'll see one just like her at your jetty. Fishermen talk.`, 7000); ; drawScene(); save(); }
+    else if (a === "gelato" || a === "focaccia") { const t = ctTreat(F, a === "gelato" ? GELATO : FOCACCIA, v); if (!t) return; sfx("slurp"); gainXp(1); hearts(2); speak(`${t[0]}. ${t[2]}`, 5500); ; save(); }
     else if (a === "taste") { if (F.coins < TASTE.price) return; F.coins -= TASTE.price; sfx("chime"); gainXp(1); speak("The white tastes of salt and sunshine. Then the Sciacchetrà: amber, honey, apricots, a long sweet finish. Signor Bruno watches your face and nods.", 6500); save(); }
     ctx(); });
   // the drying loft (round 132): up the ladder from the barrels; start a batch, collect a finished one
@@ -1437,26 +1373,26 @@ function ctx(){
       if (r.cask) speak("The grapes have shrivelled into sweet little raisins. Pressed, and into the cask for four days.", 5000); else { flash(`${r.n} × ${ITEMS[r.id].n.toLowerCase()}`); speak(r.id === "w_raisin" ? "Three bottles of amber raisin wine, sticky and sweet. A week of waiting, and worth every day." : `${ITEMS[r.id].n}, ready. Into the backpack.`, 5000); } save(); }
     ctx(); });
   // Jeju (rounds 128–129): the breath song, the sorting, the café, the porridge, the slow post, the dye
-  c.querySelectorAll("[data-jj]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.jj.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); };
+  c.querySelectorAll("[data-jj]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.jj.split(":"), evanOn = false, ev = (l, d = 1600) => { ; };
     if (a === "dive" || a === "again") { jjSt = {dive: diveStart()}; sfx("paper", true); }
     else if (a === "down") { const d = jjSt.dive; if (!d || !descend(d)) return; sfx("tap"); }
-    else if (a === "up") { const d = jjSt.dive; if (!d) return; const r = surface(d); sfx(r === "ok" ? "chime" : "paper", true); if (r === "ok") ev(["fweee!", "FWEEEEE!", "I whistled too, Mama!"], 600);
+    else if (a === "up") { const d = jjSt.dive; if (!d) return; const r = surface(d); sfx(r === "ok" ? "chime" : "paper", true); if (r === "ok");
       if (d.done) { const got = diveReward(F, d, addInv); gainXp(d.good >= 2 ? 2 : 1); if (got) { flash("Abalone from Halmang Kim"); hearts(3); } save(); } }
-    else if (a === "juk") { if (F.coins < JUK) return; F.coins -= JUK; const j = jejuState(F); j.juk = (j.juk || 0) + 1; sfx("slurp"); gainXp(1); hearts(2); speak("A bowl of abalone porridge: green, silky, a swirl of sesame oil. The divers at the next table nod at you. You're one of them now. Nearly.", 6000); ev(["more please!", "it's GREEN", "yummy porridge"]); save(); }
+    else if (a === "juk") { if (F.coins < JUK) return; F.coins -= JUK; const j = jejuState(F); j.juk = (j.juk || 0) + 1; sfx("slurp"); gainXp(1); hearts(2); speak("A bowl of abalone porridge: green, silky, a swirl of sesame oil. The divers at the next table nod at you. You're one of them now. Nearly.", 6000); ; save(); }
     else if (a === "sort") { jjSt = {sort: sortStart()}; sfx("paper", true); setTimeout(() => { if (jejuView === "jj_shed" && jjSt.sort && !jjSt.sort.done) { jjSt.sort.done = true; jjSt.sort.late = true; ctx(); } }, 30500); }
     else if (a === "crate") { const st = jjSt.sort; if (!st) return; const r = sortTap(st, v); sfx(r === "ok" ? "tap" : "paper", true);
-      if (st.done) { const n = sortReward(F, st, addInv); gainXp(st.good >= 6 ? 2 : 1); if (n) { flash(`${n} tangerines from Mr Ko`); hearts(2); } ev(["I sorted the BIG one!", "can I eat this one?", "orange orange orange!"]); save(); } }
-    else if (a === "cafe") { const c = jjCafe(F, v); if (!c) return; sfx("slurp"); gainXp(1); hearts(2); speak(`${c[0]}. ${c[2]}`, 5500); ev(["juice! with a straw!", "orange juice! for me!", "slurrrp"]); save(); }
+      if (st.done) { const n = sortReward(F, st, addInv); gainXp(st.good >= 6 ? 2 : 1); if (n) { flash(`${n} tangerines from Mr Ko`); hearts(2); } ; save(); } }
+    else if (a === "cafe") { const c = jjCafe(F, v); if (!c) return; sfx("slurp"); gainXp(1); hearts(2); speak(`${c[0]}. ${c[2]}`, 5500); ; save(); }
     else if (a === "post") { const at = slowPost(F, v); if (!at) return; sfx("paper", true); flash("Into the slow-post box"); speak(v === "family" ? "A postcard to the family, into the orange box. It'll turn up in Honeybrook in two weeks, when everyone's forgotten about it. Perfect." : "A postcard to yourself, into the orange box. In two weeks, a little bit of Jeju will arrive in your mailbox.", 5500); save(); }
-    else if (a === "dyego") { jjSt = {dye: {step: 0}}; sfx("paper", true); ev(["squish! squish!", "it's sticky, Mama", "green and squishy!"], 1200); }
+    else if (a === "dyego") { jjSt = {dye: {step: 0}}; sfx("paper", true); ; }
     else if (a === "dstep") { const d = jjSt.dye; if (!d) return; if (+v === d.step) { d.step++; d.oops = false; sfx("tap"); } else { d.oops = true; sfx("paper", true); } }
     else if (a === "dyedone") { if (!dyeScarf(F)) return; jjSt = {}; sfx("chime"); gainXp(1); flash("A scarf to dry at home"); speak("Mr Moon rolls the damp scarf in paper. \"Hang it in the sun. Look at it every day.\" It'll be on your washing line when you're home.", 6000); save(); }
     ctx(); });
   c.querySelectorAll("[data-rflam]").forEach(b => b.onclick = () => {
-    if (b.dataset.rflam === "start") { flamSt = palmasStart(); clearTimeout(flamT); sfx("tap"); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["clap clap CLAP!", "I'm clapping, Mama!", "olé! olé!"])), 2400);
+    if (b.dataset.rflam === "start") { flamSt = palmasStart(); clearTimeout(flamT); sfx("tap"); ;
       flamT = setTimeout(() => { flamSt.done = true; const won = ole(flamSt); const r = rondaState(F); if (won) { r.oles = (r.oles || 0) + 1; gainXp(2); hearts(3); sfx("yay"); act("cheer"); go(scene, 430, 540, () => { act("cheer"); mprop("sparkle", mel.x, mel.y - 60, 1600); });
-          speak("Paloma takes your hands and spins you round the stage. The whole bar shouts ¡Olé!", 6000); if (isHere("mum")) setTimeout(() => npcSay("mum", "THAT'S my girl! Olé!"), 2000); } else sfx("chime");
-        if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(won ? "Mama DANCED!" : "again! again!"), 1600); save(); ctx(); }, palmasEnd(flamSt) - Date.now() + 300);
+          speak("Paloma takes your hands and spins you round the stage. The whole bar shouts ¡Olé!", 6000); if (isHere("hana")) setTimeout(() => npcSay("hana", "THAT'S my girl! Olé!"), 2000); } else sfx("chime");
+        ; save(); ctx(); }, palmasEnd(flamSt) - Date.now() + 300);
       ctx(); return; }
     if (!flamSt || flamSt.done) return; const r = clap(flamSt); if (r === "hit") sfx("tap"); else if (r === "miss") sfx("paper", true); ctx(); });
   c.querySelectorAll("[data-rtea]").forEach(b => b.onclick = () => {
@@ -1464,18 +1400,18 @@ function ctx(){
     if (!teaSt || teaSt.glasses.length >= TEA_GLASSES) return; const ok = pour(teaSt); sfx(ok ? "chime" : "tap");
     if (teaSt.glasses.length >= TEA_GLASSES) { const good = teaSt.glasses.filter(Boolean).length, r = rondaState(F); if (r.teaDay !== dayKey()) { r.teaDay = dayKey(); gainXp(good >= 2 ? 2 : 1); }
       if (good >= 2) hearts(2); speak(good >= 2 ? "Sweet, minty, frothy on top. Amina raises her glass: \"To Ronda.\"" : "A bit flat, but still lovely. Amina says the froth comes with practice.", 5000);
-      if (inParty(F, "evan") && !evanNight()) setTimeout(() => { evanSays(pick(["sugar cube! for me?", "crunch crunch", "Amina gave me sugar!"])); }, 1600); save(); }
+      ; save(); }
     ctx(); });
   c.querySelectorAll("[data-rpaint]").forEach(b => b.onclick = () => { const [k, v] = b.dataset.rpaint.split(":");
     if (k === "c" || k === "p") paintSt = {...paintSt, [k]: v, step: 0, oops: false};
     else if (k === "s") { const want = (paintSt.step || 0) + 1; if (+v === want) { paintSt = {...paintSt, step: want, oops: false}; sfx("tap"); } else { paintSt = {...paintSt, oops: true}; sfx("paper", true); } }
     else if (k === "reset") paintSt = {};
-    else if (k === "fire") { const evanToo = inParty(F, "evan") && !evanNight(), id = paintTile(F, paintSt.c, paintSt.p, evanToo, addInv); if (!id) return; paintSt = {}; sfx("chime"); gainXp(1); flash("Your painted tile");
-      speak(`Lucía slides it into the kiln and brings it out an hour later, glazed and shiny. Yours to keep: put it on a shelf at home.${evanToo ? " Evan's finger-painted one comes out too, mostly thumbprints." : ""}`, 7000);
-      if (evanToo) setTimeout(() => evanSays(pick(["I PAINTED it!", "blue! my blue!", "for my room!"])), 1800); save(); }
+    else if (k === "fire") { const evanToo = false, id = paintTile(F, paintSt.c, paintSt.p, false, addInv); if (!id) return; paintSt = {}; sfx("chime"); gainXp(1); flash("Your painted tile");
+      speak(`Lucía slides it into the kiln and brings it out an hour later, glazed and shiny. Yours to keep: put it on a shelf at home.${("")}`, 7000);
+      ; save(); }
     ctx(); });
   c.querySelectorAll("[data-rtaste]").forEach(b => b.onclick = () => { const r = taste(F, b.dataset.rtaste); if (!r) return; sfx("chime"); act("cheer"); gainXp(r.fresh ? 1 : 0);
-    speak(r.line + (r.fresh ? " You've got the recipe now: it's on your stove at home." : ""), 8000); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["more!", "yummy!", "Mama, can I try?"])), 1800); save(); ctx(); });
+    speak(r.line + (r.fresh ? " You've got the recipe now: it's on your stove at home." : ""), 8000); ; save(); ctx(); });
   c.querySelectorAll("[data-rtile]").forEach(b => b.onclick = () => { const r = buyTile(F, b.dataset.rtile); if (!r) return; sfx("chaching"); flash(`Tile: ${r.t.n}`);
     speak(r.all ? "The eighth tile! Lucía claps. \"A bench! Send me a photo.\" Your tiled bench is waiting by the pond at home." : `Lucía wraps the tile in newspaper: ${r.t.n.toLowerCase()}.`, 6000); if (r.all) { gainXp(3); mprop("sparkle", mel.x, mel.y - 60, 1800); } save(); ctx(); });
   c.querySelectorAll("[data-taxiopen]").forEach(b => b.onclick = () => { goalView = null; woodsView = b.dataset.taxiopen; sfx("paper", true); ctx(); });   // the home jetty: the taxi stops there too
@@ -1501,12 +1437,12 @@ function ctx(){
   c.querySelectorAll("[data-fair]").forEach(b => b.onclick = () => fairActivity(b.dataset.fair));
   c.querySelectorAll("[data-xtreat]").forEach(b => b.onclick = () => xmasTreat(b.dataset.xtreat));
   c.querySelectorAll("[data-xcarol]").forEach(b => b.onclick = () => { const r = singCarol(F, dayKey(), +b.dataset.xcarol); sfx("chime"); hearts(2); if (r.fresh) gainXp(1); speak(`You call "${r.song.n}" and the whole tree joins in: ${r.song.a}`, 5500);
-    const near = ["hana", "okada", "mama", "gonggong", "mum", "dad", "pip", "juniper"].filter(id => isHere(id)); near.slice(0, 2).forEach((id, k) => setTimeout(() => npcSay(id, r.song.b), 2400 + k*1600)); if (evanHere()) setTimeout(() => evanSays(pick(["la la LAAA!", "I know this one!", "jingle bells!"])), 3800); save(true); ctx(); });
+    const near = ["hana", "okada", "farid", "mei", "theo", "pip", "juniper"].filter(id => isHere(id)); near.slice(0, 2).forEach((id, k) => setTimeout(() => npcSay(id, r.song.b), 2400 + k*1600)); ; save(true); ctx(); });
   c.querySelectorAll("[data-xlwalk]").forEach(b => b.onclick = () => { const first = lanternWalk(F, dayKey()); if (first) { addInv("xm_lantern", 1); flash("A paper lantern"); } fieldView = null; ctx(); sfx("chime"); hearts(3); gainXp(2);
-    speak("A lantern each, and off you all go round the field: past the stalls, along the lake, the tree glowing at the end. Nobody talks much. Nobody needs to.", 7000); go("field", 104, 380, () => go("field", 302, 202, () => go("field", 184, 640 - 14, () => { if (evanHere()) evanSays("again! again!"); mprop("heart", mel.x, mel.y - 60, 2200); }))); save(true); });
+    speak("A lantern each, and off you all go round the field: past the stalls, along the lake, the tree glowing at the end. Nobody talks much. Nobody needs to.", 7000); go("field", 104, 380, () => go("field", 302, 202, () => go("field", 184, 640 - 14, () => { ; mprop("heart", mel.x, mel.y - 60, 2200); }))); save(true); });
   c.querySelectorAll("[data-xgrotto]").forEach(b => b.onclick = () => { const r = grottoVisit(F, dayKey()); if (!r) return; addInv(r.gift, 1); if (r.photo) addInv("xm_santaphoto", 1); fieldView = null; ctx(); sfx("chime"); hearts(3); gainXp(2);
-    speak(`Evan climbs up next to Santa and whispers his wish: ${r.wish} Santa nods very seriously and writes it in his big book. Then a little parcel: ${r.giftN}!${r.photo ? " And Pip takes a photo for you to keep." : ""}`, 8000);
-    setTimeout(() => { evanSays(pick(["SANTA KNOWS MY NAME!", "he has a real beard!", "I was SO brave"])); mprop("heart", evan.x, evan.y - 44, 2000); }, 2600); save(true); });
+    speak(`You sit down next to Santa and whisper a wish: ${r.wish} Santa nods very seriously and writes it in his big book. Then a little parcel: ${r.giftN}!${r.photo ? " And Pip takes a photo for you to keep." : ""}`, 8000);
+    save(true); });
   // round 173: Mel's stall, and the hamper table
   c.querySelectorAll("[data-xst]").forEach(b => b.onclick = () => { const [a, id, n] = b.dataset.xst.split(":"), v = vineState(F); let k = 0;
     if (a === "put") k = putOut(F, id, +n || 99); else if (a === "take") k = xmTakeBack(F, id); else if (a === "wine") k = putWine(F, v, id); else if (a === "unwine") k = takeWine(F, v, id);
@@ -1659,7 +1595,6 @@ function drawTableware(){
 const wearToday = () => F.wear && F.wear.day === dayKey() ? F.wear : null;
 function applyWear(pj){
   const m = $("mel"); if (!m) return; const yk = !pj && townOf(scene) === "kyoto" && yukataOn(F), w = yk ? {dress: `${YUKATA.cols[yk][1]} maxi`, shoes: "tan"} : pj ? null : wearToday(), c = (f, fb) => colourOf(w[f], fb);
-  { const e = $("evan"); if (e) { if (yk && inParty(F, "evan")) { e.style.setProperty("--tee", "#3E5E7A"); e.style.setProperty("--pants", "#3E5E7A"); } else { e.style.removeProperty("--tee"); e.style.removeProperty("--pants"); } } }
   const fill = (el, col) => { el.style.display = col ? "" : "none"; if (col) el.style.fill = col; };
   if (w && w.top && !w.dress) m.style.setProperty("--tank", c("top", "#FFFDF6")); else m.style.removeProperty("--tank");
   if (w && w.bottom && !w.dress) m.style.setProperty("--denim", c("bottom", "#2F2B28")); else m.style.removeProperty("--denim");
@@ -1707,7 +1642,6 @@ function flyKite(){
   if (!(F.inv.kite > 0)) { speak("A good breeze for a kite! Hana sells them (the Family shelf at the market).", 4500); render(); return; }
   S.kite = {until: Date.now() + 60e3, x: mel.x, y: mel.y}; mel.dir = -1; sfx("whistle"); drawScene(); gainXp(1);
   speak(pick(["Up it goes! The red kite catches the wind.", "Run, run... and up! It's flying.", "The kite tugs on the string like it wants to go to sea."]), 4500);
-  if (evanHere() && !evanNight()) { evan.tx = mel.x - 40; evan.ty = mel.y + 10; evan.run = true; evan.wait = 8; [900, 4000, 8000].forEach((d, i) => setTimeout(() => evanSays(["kite! up up!", "my turn! my turn!", "it's so HIGH, Mama!"][i]), d)); }
   save(); render();
 }
 // the week's lanterns: little glowing paper lanterns rising from the fire and drifting up over the house
@@ -1738,7 +1672,7 @@ function startTrip(town, by = "train"){
   (boat ? ferryRide : trainRide)(boat ? `All aboard the ferry for ${r.town.n}!` : `All aboard for ${r.town.n}!`, boat ? false : town, () => { if (town === "ronda") rondaVisit(F); setScene(land[0], land[1]);
     if (town === "jeju" && sgHM() < 8*60) setTimeout(() => speak("And look: the sun's just coming up out of the sea behind Seongsan, turning the crater gold. Worth the early start.", 6000), 8000);   // round 129: the early boat
     setTimeout(() => speak(`${(boat && r.town.ferry.arriveLine) || r.town.arriveLine || `${r.town.n}! Whitewashed walls, orange trees and a sky so blue it hums.`}${t.party.length ? ` ${partyList(t)} pile${t.party.length > 1 ? "" : "s"} off the ${boat ? "ferry" : "train"} behind you.` : ""} The last ${boat ? "ferry" : "train"} home is at 10pm.`, 6500), 900);
-    if (inParty(F, "evan")) setTimeout(() => evanSays(pick(r.town.evanArrive || ["Mama, it's SO sunny!", "Big birdies in the sky!", "Are we in Spain? Is this Spain?"])), 3200); });
+    ; });
 }
 // Bellbird Valley (round 141): set off in the van, drive between stops, drive home
 function vanRide(text, then, ms = 3200){
@@ -1750,11 +1684,8 @@ function vanGo(stop){
   const t = tripOn(F), T = TOWNS[stop]; bvView = null; tripPick = []; ctx(); sfx("chaching"); flash("Fuel for the drive"); save(true);
   vanRide(on ? `On down the road to ${T.n}...` : `Off to Bellbird Valley!${t.party.length ? ` ${partyList(t)} pile${t.party.length > 1 ? "" : "s"} in.` : ""}`, () => { setScene(T.arrive[0], T.arrive[1]);
     setTimeout(() => speak(`${T.arriveLine}${!on && t.party.length ? ` ${partyList(t)} climb${t.party.length > 1 ? "" : "s"} out behind you.` : ""} ${!on || (r && r.first) ? "A new stamp in the passport!" : ""}`.trim(), 7000), 700);
-    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(T.evanArrive || ["are we there?"])), 3400); });
+    ; });
 }
-// round 152 (Mel): on a campervan trip, from Evan's bedtime (8pm) he's curled up asleep in the back of the van under a
-// blanket, a little face in the first window and some floating z's
-const evanInVan = () => { const t = tripOn(F), T = t && TOWNS[t.town]; return !!(T && T.by === "van" && t.party.includes("evan") && evanNight() && townOf(scene) === t.town); };
 function vanCrateArt(){
   const t = tripOn(F), T = t && TOWNS[t.town]; if (!T || T.by !== "van" || !crateCount(vanCrate(F))) return ""; const st = TOWN_PLACES[T.station]; if (!st || st.scene !== scene) return "";
   const [x, y] = st.door, cx = x + 68, cy = y - 4;
@@ -1762,7 +1693,7 @@ function vanCrateArt(){
     <path d="M${cx + 22} ${cy} l4 -22 l4 22" fill="none" stroke="#8A6A52" stroke-width="1.6"/><rect x="${cx + 18}" y="${cy - 30}" width="16" height="12" rx="1" fill="#3A4A44"/><text x="${cx + 26}" y="${cy - 22}" text-anchor="middle" font-family="Klee One,serif" font-size="4.6" fill="#FFFDF6">For sale</text></g>`;
 }
 function vanSleeper(){
-  if (!evanInVan()) return ""; const T = TOWNS[tripOn(F).town], st = TOWN_PLACES[T.station]; if (!st || st.scene !== scene) return "";
+  return ""; const T = TOWNS[tripOn(F).town], st = TOWN_PLACES[T.station]; if (!st || st.scene !== scene) return "";
   const [x, y] = st.door, wx = x - 27, wy = y - 40;
   return `<g pointer-events="none" aria-hidden="true"><circle cx="${wx}" cy="${wy}" r="4.6" fill="#F2D3BC" stroke="#2F2B28" stroke-width=".8"/><path d="M${wx - 4.6} ${wy - 1} q4.6 -6 9.2 0" fill="#2A2420"/><path d="M${wx - 2.6} ${wy + .6} q1 .8 2 0 M${wx + .8} ${wy + .6} q1 .8 2 0" fill="none" stroke="#2F2B28" stroke-width=".7"/>
     <path d="M${wx - 8} ${wy + 6.4} q8 -4 16 0 v1.6 h-16z" fill="#E8A0B4" stroke="#2F2B28" stroke-width=".6"/>
@@ -1771,8 +1702,8 @@ function vanSleeper(){
 function vanHome(late){
   const t = tripOn(F); if (!t) return; const cost = Math.min(F.coins, bbHomeFuel(F)); F.coins -= cost; endTrip(F); bvView = null; ctx(); save(true);
   vanRide(late ? "The long drive home in the dark, everyone sleepy..." : "Home along the valley road to Honeybrook...", () => { setScene("hlane", VILLAGE.van.door);
-    const sleepy = t.party.includes("evan") && evanNight();
-    setTimeout(() => speak(`Back home in the lane. Bellbird Valley was ${pick(["glorious", "a proper adventure", "just lovely"])}.${sleepy ? " Evan slept the whole way, and doesn't stir when you carry him in to bed." : ""}${t.party.length ? ` ${partyList(t)} head${t.party.length > 1 ? "" : "s"} off home.` : ""}`, 5000), 800); });
+    const sleepy = false;
+    setTimeout(() => speak(`Back home in the lane. Bellbird Valley was ${pick(["glorious", "a proper adventure", "just lovely"])}.${t.party.length ? ` ${partyList(t)} head${t.party.length > 1 ? "" : "s"} off home.` : ""}`, 5000), 800); });
 }
 function tripHome(late, by){
   const t = tripOn(F), town = t ? TOWNS[t.town] : TOWNS[townOf(scene) || "ronda"]; endTrip(F); railOpen = false; kyotoView = null; ctx();
@@ -1780,8 +1711,8 @@ function tripHome(late, by){
   const boat = (by || (t && t.by)) === "ferry" && !!town.ferry;
   // Ma Ma folded paper cranes all day in Kyoto: a string of them comes home, one for each of the family (once)
   // Ma Ma brings a tangerine sapling home from Jeju: the orchard can grow tangerine trees now (once)
-  if (t && t.town === "jeju" && t.party.includes("mama") && !jejuState(F).sapling) { jejuState(F).sapling = true; setTimeout(() => { flash("Ma Ma's tangerine sapling"); speak("Ma Ma's carried a tangerine sapling all the way home on her lap. \"For the orchard. Mr Ko says: lots of sun, lots of wind.\" Tangerine trees are in the orchard's planting list now.", 7000); }, 3400); }
-  if (t && t.town === "kyoto" && t.party.includes("mama") && !kyotoState(F).cranes) { kyotoState(F).cranes = true; addInv("k_cranes", 1); setTimeout(() => flash("Ma Ma's paper cranes"), 3400); }
+  if (t && t.town === "jeju" && t.party.includes("farid") && !jejuState(F).sapling) { jejuState(F).sapling = true; setTimeout(() => { flash("Ma Ma's tangerine sapling"); speak("Ma Ma's carried a tangerine sapling all the way home on her lap. \"For the orchard. Mr Ko says: lots of sun, lots of wind.\" Tangerine trees are in the orchard's planting list now.", 7000); }, 3400); }
+  if (t && t.town === "kyoto" && t.party.includes("farid") && !kyotoState(F).cranes) { kyotoState(F).cranes = true; addInv("k_cranes", 1); setTimeout(() => flash("Ma Ma's paper cranes"), 3400); }
   save(true);
   (boat ? ferryRide : trainRide)(late ? `The last ${boat ? "ferry" : "train"} home, everyone sleepy...` : boat ? "Home across the sea to Honeybrook..." : "Home to Honeybrook...", boat ? true : null, () => { setScene(boat ? "shore" : "hlane", boat ? VILLAGE.ferry.door : VILLAGE.timetable.door);
     setTimeout(() => speak(`Back in Honeybrook. ${town.n} was ${pick(["unforgettable", "a proper adventure", "glorious"])}.${t && t.party.length ? ` ${partyList(t)} head${t.party.length > 1 ? "" : "s"} off home.` : ""}`, 5000), 800); });
@@ -1819,7 +1750,7 @@ function terraceSpot(id){
   if (id === "table") { if (lunchNow(dayKey(), sgHM())) { lunchView = "table"; sfx("paper", true); render(); return; }
     speak(new Date(dayKey() + "T00:00:00Z").getUTCDay() === 0 && sgHM() < LUNCH.from ? "Pilar's laying the long table: white linen, jugs of lavender, the good glasses. Lunch is at twelve." : pick(["The long table, under the canvas. On Sundays it seats twelve, and nobody leaves before three.", "Linen folded, a jug of lavender in the middle. It's waiting for Sunday.", "You straighten a chair. The canvas lifts and settles overhead, like the terrace is breathing."]), 5500); render(); return; }
   if (id === "view") { mel.sitting = true; nodes.mel.classList.add("sit"); speak(pick(["Rows of lavender running away to the hills, the cypresses dark against them, a stone farmhouse with blue shutters. The canvas billows. Somewhere, cicadas.", "The light's gone honey-coloured. The curtains lift and fall in the breeze. You could stay out here all afternoon.", "Olive trees, silver when the wind turns their leaves. A long, slow, golden afternoon."]), 6500);
-    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["purple flowers! all of them!", "the curtains are dancing, Mama", "pointy trees!"])), 2400); render(); return; }
+    ; render(); return; }
 }
 function lunchTablePanel(){
   const hm = sgHM(), list = bookingsFor(dayKey()).filter(b => hm >= b.at), nm = id => (NPCS.find(n => n.id === id) || {name: id}).name, t = vineState(F).today || {};
@@ -1833,7 +1764,7 @@ function roomSpot(id){
   // Bellbird Valley (round 142): the platypus window and the noticeboard are for looking; every other room has a panel
   if (id === "bv_platypus") { const seen = watchWater(F, sgHM()); mel.sitting = true; nodes.mel.classList.add("sit");
     speak(seen ? pick(["There! A small brown shape, paddling hard, then a duck-bill and a flat tail, and gone in a stream of bubbles. A platypus!", "She's there: turning over stones on the bottom with her bill, round and round. Then up for air, and down again."]) : pick(["The water's still. A few bubbles by the reeds... no. Just a leaf. Patience.", "Nothing yet. The ranger says dawn and dusk are best. You wait a little longer, listening to the water."]), 6500);
-    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(seen ? pick(["a DUCK-BEAVER!", "she's swimming! she's SWIMMING!", "platypus, platypus!"]) : "shhh. she's shy, Mama"), 2600); if (seen) gainXp(1); save(); render(); return; }
+    ; if (seen) gainXp(1); save(); render(); return; }
   if (id === "bv_campkitchen") { speak(`A note on the noticeboard: "${pick(BB_NOTES)}"`, 6500); render(); return; }
   if (id === "pp_buy") { goalView = "paperie"; sfx("paper", true); render(); return; }   // round 183: the paperie
   if (id.startsWith("pp_")) { ppView = id; if (id === "pp_rack") wrSt = {}; paperNow(); sfx("paper", true); render(); return; }
@@ -1846,59 +1777,50 @@ function roomSpot(id){
   if (id === "jjradio") { sfx("chime"); speak(pick(["The radio's playing a trot song, all trumpets and heartbreak. Mr Ko hums along without looking up.", "The weather forecast: wind, sun, more wind. Mr Ko nods. Good tangerine weather.", "A call-in show about the best way to peel a tangerine. Mr Ko has opinions."]), 5000); render(); return; }
   if (id === "jjwindow") { mel.sitting = true; nodes.mel.classList.add("sit"); speak(pick(["The sea, the crater, a fishing boat, the divers' orange floats. You could watch this all afternoon.", "A ferry slides across the window. Somewhere out there is Honeybrook.", "The wind's whipping the sea white. Inside, it's warm, and smells of coffee and tangerines."]), 5000); render(); return; }
   if (id === "kt_tea" || id === "kt_hall" || id === "kt_sweets" || id === "kt_market" || id === "kt_pottery") { kyotoView = id; ktSt = {}; sfx("paper", true); render(); return; }
-  if (id === "ktbell") { sfx("chime"); speak(pick(["BONNNG. The sound rolls round the hall and out over the garden, and keeps going long after.", "You strike the bell gently. It hums for a whole minute."]), 5000); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["BONG! again!", "it's SO loud", "my turn! BONG!"])), 1600); render(); return; }
+  if (id === "ktbell") { sfx("chime"); speak(pick(["BONNNG. The sound rolls round the hall and out over the garden, and keeps going long after.", "You strike the bell gently. It hums for a whole minute."]), 5000); ; render(); return; }
   if (id === "ktchime") { sfx("chime"); speak("The wind chime tinkles: a little glass bell with a goldfish painted on it. Ishida sells them for 10.", 4000); render(); return; }
   if (id === "flamenco" || id === "tea") { rondaView = id; if (id === "flamenco") { flamSt = null; clearTimeout(flamT); } else teaSt = null; sfx("paper", true); render(); return; }
   if (id === "cat") { sfx("chime"); speak(pick(["The workshop cat opens one eye, decides you're alright, and goes back to sleep on the hides.", "A purr like a little engine. Antonio says she's called Piel. Of course she is.", "The cat stretches, yawns, and rolls over onto a half-finished belt."]), 4500);
-    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["kitty!", "soft kitty", "she's purring, Mama!"])), 1400); render(); return; }
+    ; render(); return; }
   if (id === "tapas" || id === "mercado" || id === "dulces" || id === "cuero" || id === "especias" || id === "ceramica" || id === "postales") { rondaView = id; sfx("paper", true); render(); return; }
-  if (id === "banos") { mel.dir = 1; speak(BATH_FACTS[bathFact++ % BATH_FACTS.length], 7000); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["stars! in the roof!", "echo! ECHO!", "it's dark and sparkly"])), 1600); render(); return; }
+  if (id === "banos") { mel.dir = 1; speak(BATH_FACTS[bathFact++ % BATH_FACTS.length], 7000); ; render(); return; }
   if (id === "jardin") { mel.sitting = true; nodes.mel.classList.add("sit"); sfx("chime"); speak(pick(["The fountain splashes, the water runs off down the channel, and the noise of the town just... stops.", "Orange blossom, myrtle, cool stone. You could sit here all afternoon.", "A sparrow drinks from the edge of the fountain. Nobody's in a hurry."]), 5500);
-    const t = tripOn(F), who = t ? t.party.filter(x => x !== "evan" && isHere(x)) : []; if (who.length) setTimeout(() => npcSay(who[0], pick(TOWNS[townOf(scene)].lines[who[0]] || ["Lovely."])), 2600); render(); return; }
+    const t = tripOn(F), who = t ? t.party.filter(x => (isHere(x))) : []; if (who.length) setTimeout(() => npcSay(who[0], pick(TOWNS[townOf(scene)].lines[who[0]] || ["Lovely."])), 2600); render(); return; }
 }
 function townSpot(id){
   const town = townOf(scene), T = TOWNS[town];
-  if (id === T.station && T.by === "van") { bvView = "map"; sfx("paper", true); if (evanInVan()) speak(pick(["Evan's fast asleep in the back, one arm flung out, under the pink blanket.", "Shh. Evan's asleep in the van, snoring very softly.", "Evan's curled up in the back with his toy, fast asleep."]), 4500); render(); return; }   // round 141: the campervan's road map
+  if (id === T.station && T.by === "van") { bvView = "map"; sfx("paper", true); ; render(); return; }   // round 141: the campervan's road map
   // round 143: Bellbird Valley's activities out of doors: the balloons, the berry rows, the canoes, the campfire; and the rope swing
   const bbOut = {bvballoons: "balloon", bvberries: "berries", bvcanoe: "canoe", bvfire: "fire", bvsurf: "surf", bvwhales: "whales", bvboats: "pots", bvpenguins: "penguins", bvnippers: "nippers", bvtfalls: "swim", bvtplatypus: "platypus", bvtcalves: "calves", bvttrees: "shake", bvtpanning: "pan", bvttrain: "steam", bvhrows: "harvest", bvhpiste: "petanque", bvhhives: "bees", bvhmaze: "maze", bvhbridge: "sticks", bvhsunset: "bell"}[id];
   // round 150: the king parrots at Koala Cove, with a scoop of seed from the park store
-  if (id === "bvparrots") { const evanOn = inParty(F, "evan") && !evanNight();
+  if (id === "bvparrots") { const evanOn = false;
     if (!((F.inv || {}).b_seed > 0)) { speak("The king parrots eye you from the fence: red heads, green wings. They'd come to your arm for a scoop of seed (the park store has it, 2 coins).", 5000); render(); return; }
     addInv("b_seed", -1); const s = bbState(F); s.parrots = (s.parrots || 0) + 1; sfx("chime"); gainXp(1); hearts(2); mel.dir = 1;
     speak("You hold out your arm with seed in your palm and stand very still. A flash of red and green, and a king parrot lands, heavy and warm, and starts cracking seeds. Then another, on your shoulder.", 6500);
-    if (evanOn) setTimeout(() => { speak("One hops onto Evan's head. He goes completely still, eyes enormous, grinning.", 4500); evanSays(pick(["it's on my HEAD!", "its feet are tickly!", "don't move, Mama, don't move"])); }, 4200);
     mprop("sparkle", mel.x + 20, mel.y - 60, 1400); save(); render(); return; }
   if (T.by === "van" && bbOut) { bbRoom = bbOut; bbSt = {}; sfx("paper", true); speak(T.say[id] || "", 4000); render(); return; }
   if (id === "bvswing") { speak(T.say[id] || "The rope swing: a fat rope with a knot at the bottom, hanging off a river red gum over the swimming hole.", 4000); sfx("chime"); gainXp(1);
     setTimeout(() => { speak(pick(["You grab the rope, run, and swing out over the water... and let go. SPLASH. It's freezing! It's wonderful!", "Out, out, out over the river, and back again. You chicken out of letting go. Next time.", "You swing, let go at the very top, and hit the water with a whoop that sends the cockatoos up."]), 6000); mprop("sparkle", mel.x + 30, mel.y - 40, 1400); }, 1800);
-    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["MY turn! hold me, Mama!", "WHEEEEEE!", "again! AGAIN!"])), 4200); save(); render(); return; }
+    ; save(); render(); return; }
   if (id === T.station) { railOpen = true; sfx("paper", true); render(); return; }
   if (T.ferry && id === T.ferry.pier) { railOpen = "ferry"; sfx("paper", true); render(); return; }   // Jeju: the ferry home
   const room = roomBehind(town, id);   // round 116: the tapas bar, the café, the market, the baths and the garden have insides
   if (room) { sfx("paper", true); setScene(room, [260, 560]); setTimeout(() => speak(T.rooms[room].say, 5000), 700); if (town === "kyoto") setTimeout(() => stampHere(room), 5800);
     // a touch (round 134): Beppe gives Evan a warm heel of focaccia (once a day)
-    if (room === "ct_focacceria" && inParty(F, "evan") && !evanNight() && cinqueState(F).bread !== dayKey()) setTimeout(() => { if (scene !== "ct_focacceria" || !isHere("beppe")) return; cinqueState(F).bread = dayKey(); npcSay("beppe", "Per il piccolo! The best bit, the crusty end."); setTimeout(() => evanSays("warm bread! mmm!"), 2200); save(); }, 3200);
     // touches (round 144): Mrs Dunn slips Evan a Freddo from the jar (once a day); Pinot the cellar dog trots in to the tasting room after you
-    if (room === "bv_store" && inParty(F, "evan") && !evanNight() && bbState(F).freddo !== dayKey()) setTimeout(() => { if (scene !== "bv_store" || !isHere("mrsdunn")) return; bbState(F).freddo = dayKey(); npcSay("mrsdunn", "Here, love. One for the little fella. Don't tell your mum. Oh, she's right there."); setTimeout(() => evanSays("a chocolate FROG! thank you!"), 2400); save(); }, 3200);
-    if (room === "bv_tasting") setTimeout(() => { if (scene !== "bv_tasting") return; speak("Pinot the cellar dog pads in behind you, sniffs your shoes, and flops down under the bar with a sigh.", 4500); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays("doggy! he's called WINE!"), 2000); }, 5600);
+    if (room === "bv_tasting") setTimeout(() => { if (scene !== "bv_tasting") return; speak("Pinot the cellar dog pads in behind you, sniffs your shoes, and flops down under the bar with a sigh.", 4500); ; }, 5600);
     // a touch (round 129): the divers give Evan a sea snail shell (once)
-    if (room === "jj_haenyeo" && inParty(F, "evan") && !evanNight() && !jejuState(F).shell) setTimeout(() => { if (scene !== "jj_haenyeo" || !isHere("halmang")) return; jejuState(F).shell = true; addInv("j_shell", 1);
-      npcSay("halmang", "For the little one. Listen: the sea's inside."); setTimeout(() => evanSays("I can hear it, Mama! the SEA!"), 2400); flash("A sea snail shell for Evan"); save(); }, 3200);
     // a touch: at Kyoto's market, Fumiko gives Evan a rice cracker (once a day)
-    if (room === "kt_market" && inParty(F, "evan") && !evanNight() && kyotoState(F).cracker !== dayKey()) setTimeout(() => { if (scene !== "kt_market" || !isHere("fumiko")) return; kyotoState(F).cracker = dayKey(); npcSay("fumiko", "A rice cracker for the little one! Careful, crunchy."); setTimeout(() => evanSays("CRUNCH! more?"), 2200); save(); }, 3200);
     // a touch: Rocío gives Evan a carnation (once a day), and he gives it straight to Mel
-    const r = rondaState(F); if (room === "rd_mercado" && inParty(F, "evan") && !evanNight() && r.flowerDay !== dayKey() && NPCS.some(n => n.id === "rocio") ) setTimeout(() => { if (scene !== "rd_mercado" || !isHere("rocio")) return; r.flowerDay = dayKey(); addInv("clavel", 1);
-      npcSay("rocio", "¡Para ti, guapo! A carnation, for the little one."); setTimeout(() => evanSays("for you, Mama!"), 2200); save(); }, 3200);
+    const r = rondaState(F); ;
     return; }
   if (["mercado", "tapas", "dulces", "convento", "azulejos"].includes(id)) { rondaView = id; sfx("paper", true); speak(T.say[id], 4000);
-    if (id === "convento" && inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["Knock knock! Hello nuns!", "The wall is spinning!", "Biscuits from a WALL?"])), 1600);
     render(); return; }
   if (id === "alameda" && (F.inv.picnic || 0) > 0) { rondaPicnic(F, addInv); mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = -1; sfx("chime"); gainXp(1);
-    const t = tripOn(F), who = t ? t.party.filter(x => x !== "evan") : [];
+    const t = tripOn(F), who = t ? t.party.filter(x => true) : [];
     speak(`A picnic at the balcony: bread, payoyo, jamón and oranges, with the whole valley below.${who.length ? " Everyone squeezes onto the blanket." : ""}`, 6500);
     [0, 300, 600].forEach((d, i) => setTimeout(() => mprop("heart", mel.x + (i - 1)*16, mel.y - 50, 1600), d));
     who.slice(0, 3).forEach((id, i) => setTimeout(() => npcSay(id, pick(T.lines[id] || ["Mmm."])), 2400 + i*2600));
-    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["Picnic!", "Orange for Evan!", "Look, the birdies want some!"])), 1800);
     save(); render(); return; }
   if (id === "ktyukata") { kyotoView = "ktyukata"; sfx("paper", true); render(); return; }
   // Cinque Terre (rounds 132–134): the monorail harvest and the boat painting open their panels; a padlock on the
@@ -1907,32 +1829,27 @@ function townSpot(id){
   if (id === "ctboats") { cinqueView = "boats"; ctSt = {boat: {}}; sfx("paper", true); if (Math.random() < .4) setTimeout(() => speak("A ginger cat is asleep in the red boat, in a coil of rope. Nobody's going to move him.", 4000), 600); render(); return; }
   if (id === "ctpadlock") { const c = cinqueState(F); if (!c.padlock && F.coins >= 3) { F.coins -= 3; c.padlock = dayKey(); sfx("chime"); gainXp(1); speak("A little brass padlock, two sets of initials scratched on with a key, clicked onto the railing over the sea. It stays there now.", 6000); drawScene(); save(); }
     else speak(c.padlock ? "Your padlock's still there, among the hundreds, catching the sun." : T.say.ctpadlock, 5000); render(); return; }
-  if (id === "ctbeach" && inParty(F, "evan") && !evanNight()) { speak(T.say.ctbeach, 4500); setTimeout(() => { evanSays(pick(["a castle! for you, Mama!", "dig dig dig", "the sea is coming for my castle!"])); mprop("sparkle", mel.x + 30, mel.y - 20, 1600); }, 2000); gainXp(1); render(); return; }
   // Jason (round 135): on the harbour in the evening he's saved Mel a slice of pizza, like the night in 2015 (once a day)
   if (id === "ctharbour" && sgHM() >= 18*60 && isHere("jason") && cinqueState(F).pizza !== dayKey()) { cinqueState(F).pizza = dayKey(); mel.sitting = true; nodes.mel.classList.add("sit"); sfx("chime"); hearts(2);
     speak("Jason pats the cold stones beside him and opens a pizza box. \"I saved you a slice. Some traditions ought to be kept.\" The harbour lights come on, one by one, over the dark water.", 7500);
     setTimeout(() => npcSay("jason", pick(["Just like 2015. Except this time your train was on time. I'm almost disappointed.", "I'd have waited, you know. I always would.", "Margherita. Some things one doesn't improve upon."])), 4200);
-    if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["pizza on the rocks!", "Uncle Jason, more please!"])), 8500);
     save(); render(); return; }
   // Jeju (round 129): Evan's rock-pool net; add a stone to a wish-tower; pat the stone grandfather's nose
-  if (id === "jjpools" && inParty(F, "evan") && !evanNight()) { speak(T.say.jjpools, 5000); setTimeout(() => { evanSays(pick(["a CRAB! a tiny crab!", "Mama, a snail! it's walking!", "look in my net! LOOK!"])); mprop("sparkle", mel.x - 20, mel.y - 50, 1400); }, 2200); gainXp(1); render(); return; }
-  if (id === "jjcairns") { sfx("chime"); speak(pick(["You find a flat black stone and balance it on the tallest tower. A wish for everyone at home.", "One more stone, very carefully. It wobbles, and holds."]), 4500); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays("my stone! my wish!"), 1600); render(); return; }
-  if (id === "jjstatues") { speak(T.say.jjstatues + " People rub their noses for luck; the noses are worn smooth.", 6500); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["hello stone grandpa!", "his nose is shiny!", "he's smiling at me"])), 1800); render(); return; }
+  if (id === "jjcairns") { sfx("chime"); speak(pick(["You find a flat black stone and balance it on the tallest tower. A wish for everyone at home.", "One more stone, very carefully. It wobbles, and holds."]), 4500); ; render(); return; }
+  if (id === "jjstatues") { speak(T.say.jjstatues + " People rub their noses for luck; the noses are worn smooth.", 6500); ; render(); return; }
   if (town === "kyoto") stampHere(id);
   speak(T.say[id] || VILLAGE[id].line, 6000);
-  if (inParty(F, "evan") && (id === "mirador" || id === "alameda") && !evanNight()) setTimeout(() => evanSays(pick(["so HIGH", "Mama, hold hand", "big birdies!"])), 1800);
   render();
 }
 // in town: someone in the party says something about the place now and then; and the last train home at 10pm
 let townSaid = 0;
 function townTick(){
   const town = townOf(scene); if (!town) return;
-  if (evanInVan() && S.vanBed !== dayKey()) { S.vanBed = dayKey(); speak("Evan's yawning his head off. You tuck him into the back of the van under his blanket; he's asleep before you've closed the door.", 6000); drawScene(); }
   if (sgHM() >= TOWNS[town].backTo && TOWNS[town].by === "van" && !document.querySelector(".trainride")) { speak("It's getting late: everyone in the van, time to drive home.", 3500); vanHome(true); return; }
   if (sgHM() >= TOWNS[town].backTo && !document.querySelector(".trainride")) { const t0 = tripOn(F); speak(`That's the last ${t0 && t0.by === "ferry" ? "ferry" : "train"}! Everyone on, quick.`, 3500); tripHome(true); return; }
   if (scene === "ct_vernazza" && sgHM() >= 12*60 && sgHM() < 12*60 + 5 && S.ctBells !== dayKey()) { S.ctBells = dayKey(); sfx("chime"); speak("Noon: the church bells ring out over the harbour, and the whole of Vernazza stops for lunch.", 5000); }   // round 134
   const t = tripOn(F); if (!t || !t.party.length || Date.now() - townSaid < 70000 || Math.random() > .25) return;
-  const who = t.party.filter(id => id !== "evan" && isHere(id)), id = pick(who.length ? who : [null]); if (!id) return;
+  const who = t.party.filter(id => (isHere(id))), id = pick(who.length ? who : [null]); if (!id) return;
   const l = TOWNS[town].lines[id]; if (l) { townSaid = Date.now(); npcSay(id, pick(l)); }
 }
 // Fishing (fishing.js): cast, wait for the bite, reel while the marker's in the green
@@ -1948,22 +1865,20 @@ function fishGo(a, k){
     else { const r = fishLand(F, c.fish, Math.random, addInv); fishSt = {result: r}; gainXp(r.isNew ? 2 : 1);
       if (r.isNew || r.id === "koi") { sfx("yay"); act("cheer"); [0, 300].forEach((d, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 20 : -20), mel.y - 60, 1600), d)); } else sfx("chime");
       if (r.id === "koi") { speak("A golden koi! It's going in the pond at home.", 5000); drawScene(); }
-      else if (evanHere() && !FISH[r.id].junk) setTimeout(() => evanSays(pick(["A fish! A real fish!", "It's wiggly!", "Can I hold it?", "Big one, Mama!"])), 800); }
+      else ; }
   }
   save(); dressMel(); ctx();
 }
 function fishBite(){ const c = fishSt.cast; if (!c || !fishSpot) return; c.t0 = Date.now(); sfx("chime"); dressMel(); ctx();
   fishT = setTimeout(() => { if (fishSt.cast === c) { fishSt = {msg: "It nibbled the worm and slipped away while you weren't looking."}; dressMel(); ctx(); } }, FISH_ESCAPE); }
 // Rainy days outdoors: Mel under her periwinkle brolly with white dots; Evan in a yellow raincoat, hood up, red wellies.
-const MEL_BROLLY = {kind: "brolly", a: "#9AA9DD", b: "#FFFDF6", pat: "dots"}, EVAN_COAT = {kind: "coat", a: "#F3C969", b: "#E8566C"};
+const MEL_BROLLY = {kind: "brolly", a: "#9AA9DD", b: "#FFFDF6", pat: "dots"};
 let rainDressed = null;
 function dressRain(){
   const wet = outside() && !townOf(scene) && rainyOn(dayKey()) && !($("mel") && $("mel").classList.contains("sup")), k = wet ? "y" : "";
   if (k === rainDressed) return; rainDressed = k;
-  const mr = $("melRain"), er = $("evanRain"), ev = $("evan");
+  const mr = $("melRain");
   if (mr) mr.innerHTML = wet ? brollyArt(MEL_BROLLY, 1) : "";
-  if (er) er.innerHTML = wet ? hoodArt(EVAN_COAT, .61, -28, 8.6) : "";
-  if (ev) { ev.classList.toggle("raincoat", wet); if (wet) ev.style.setProperty("--tee", EVAN_COAT.a); else ev.style.removeProperty("--tee"); }
 }
 function dressMel(){
   const d = F.decor || {}, show = (id, on) => { const e = $(id); if (e) e.style.display = on ? "" : "none"; };
@@ -1984,7 +1899,6 @@ function render(redraw){
   registerBottles(F);   // round 188: bottles taken from the gift shop's wine corner
   WR.registerWraps(F);   // round 185: and every gift she's wrapped
   setLive(liveNow());   // the jazz duo at the night market, the guitar in Ronda: live, over the record player
-  $("evan").style.display = evanHere() ? "" : "none";
   QB.noteSeen(F); dressMel();
   if (redraw) drawScene();
   const L = level(), next = LEVELS[L+1];
@@ -2006,7 +1920,7 @@ function render(redraw){
   const ftabs = [["where", "Who's where"], ["neighbours", "Neighbours"], ["maple", esc(F.name)], ["stories", "Stories"], ["family", "Family"]], noHead = h => h.replace(/^\s*<h3 class="ph3">[^<]*<\/h3>/, "");
   $("friendTitle").textContent = {where: "Who's where today", neighbours: "Neighbours", maple: `Friendship with ${F.name}`, stories: "Stories so far", family: "Family"}[friendTab];
   const fbody = friendTab === "where" ? noHead(whosWhereHTML()) : friendTab === "neighbours" ? neighboursHTML() : friendTab === "stories" ? noHead(storiesHTML(F, Object.fromEntries(NPCS.map(n => [n.id, n.name]))))
-    : friendTab === "family" ? `<p class="muted">${icon("heart", 14)} Gifts for Evan: ${F.fam.gifts.evan} · for Darren: ${F.fam.gifts.darren}. Every third gift, they give you something back. Treats and keepsakes are in the market's Family tab.</p>`
+    : friendTab === "family" ? `<p class="muted">${icon("heart", 14)} Gifts given: ${FOLKS.map(w => `${esc(GIFT_NAME[w])} ${F.fam.gifts[w] || 0}`).join(" · ")}. Treats and keepsakes for friends are in the market's Gifts tab.</p>`
     : `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${Array.from({length: 5}, (_, i) => icon("heart", 22, i < filled ? "" : "faint")).join("")}</p>
     <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>
     <h3 class="ph3">Village upgrades</h3>
@@ -2014,7 +1928,6 @@ function render(redraw){
     <ul class="uplist">${UPGRADES.map(u => `<li class="${(F.totalQuests || 0) >= u.at ? "got" : ""}">${icon((F.totalQuests || 0) >= u.at ? "sparkle" : "clock", 16)} <span>${esc(u.name)}</span> <small>${u.at}</small></li>`).join("")}</ul>`;
   $("friendBody").innerHTML = `<div class="tabs" role="tablist">${ftabs.map(([k, n]) => `<button role="tab" data-ftab="${k}" aria-selected="${k === friendTab}">${n}</button>`).join("")}</div>` + fbody;
   $("friendBody").querySelectorAll("[data-ftab]").forEach(b => b.onclick = () => { friendTab = b.dataset.ftab; sfx("tap"); render(); });
-  renderEvanHold();
   renderBoard();
   const pin = $("paperIn"), paper = paperWaiting(); if (pin) pin.style.display = paper ? "" : "none";
   if (scene === "base" && paper && S.paperSaid !== paper.id) { S.paperSaid = paper.id; setTimeout(() => speak(`${paperName()} is in the letterbox!`, 4500), 1800); }
@@ -2043,14 +1956,8 @@ function renderBoard(){
 /* =================== WORLD SIM =================== */
 const mel = {x:VILLAGE.home.door[0], y:VILLAGE.home.door[1], tx:VILLAGE.home.door[0], ty:VILLAGE.home.door[1], dir:1, moving:false};
 const maple = {x:mel.x - 24, y:mel.y + 2, tx:mel.x - 24, ty:mel.y + 2, dir:1, moving:false};
-const evan = {x:250, y:360, tx:250, ty:360, dir:1, moving:false, run:false, wait:2};
 let route = [], keys = new Set();
 const svg = $("world");
-// Evan's bedtime: 8pm to 7am he's asleep in his car bed, so he isn't out at home base or in the house
-const evanNight = () => { const m = sgHM(); return m >= 20*60 || m < 7*60; };
-const evanHere = () => scene === "kidroom" || (townOf(scene) && inParty(F, "evan") && !evanNight()) || ((scene === "base" || scene === "home" || scene === "vineyard" || scene === "field" || scene === "shore" || scene === "bay" || scene === "hfarm" || scene === "hwoods" || scene === "barn" || scene === "hlane" || scene === "honeysuckle" || scene === "clover" || scene === "van" || scene === "scoopshop" || scene === "scoopkitchen" || scene === "scoopdip" || scene === "cocoa" || scene === "cocoakitchen" || scene === "mumdad" || scene === "marcus") && !evanNight()) || evanAtDinner();
-// family dinner nights: Evan's at the table wherever dinner is (then home to bed)
-const evanAtDinner = () => { const d = dinnerNow(dayKey(), sgHM()); return !!d && scene === d.host; };
 function outside(){ return OUTDOOR.includes(scene); }
 const bounds = () => TOWN_BOUNDS[scene] ? TOWN_BOUNDS[scene] : scene === "van" ? [182, 210, 338, 612] : scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : (scene === "lane" || scene === "vineyard" || scene === "orchard" || scene === "flowers") ? [14, 140, W - 14, HH - 14] : scene === "field" ? [14, 150, W - 14, HH - 14] : scene === "shore" ? [186, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
 
@@ -2058,28 +1965,14 @@ function setScene(id, at){
   const w = $("world"), from = scene; w.classList.add("fading");
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
-    scView = null; scSt.pick = null; scSt.dpick = null; evanSeat = null; ppView = null;
+    scView = null; scSt.pick = null; scSt.dpick = null; ppView = null;
     scene = id; cam.snap = true; atSpot = null; boardOpen = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; resetNpcs();
     const p = at || [260, 596];
     mel.x = mel.tx = p[0]; mel.y = mel.ty = p[1]; mel.path = []; maple.x = maple.tx = p[0] - 22; maple.y = maple.ty = p[1] + 2;
-    if (id === "base") { evan.x = evan.tx = 300; evan.y = evan.ty = 360; }
-    else if (townOf(id) || id === "vineyard" || id === "field" || id === "shore" || id === "bay" || id === "hfarm" || id === "hwoods" || id === "barn" || id === "hlane" || id === "honeysuckle" || id === "clover" || id === "van" || id === "scoopshop" || id === "scoopkitchen" || id === "scoopdip" || id === "cocoa" || id === "cocoakitchen" || id === "mumdad" || id === "marcus" || id === "cottage") { evan.x = evan.tx = p[0] + 26; evan.y = evan.ty = p[1] + 10; evan.run = false; evan.wait = 2; }
-    else if (id === "home" && from === "kidroom") { evan.x = evan.tx = p[0] - 24; evan.y = evan.ty = p[1] + 6; evan.run = false; evan.wait = 3; }
-    else if (id === "home") { evan.x = evan.tx = 300; evan.y = evan.ty = 520; }
     // Evan's room: he runs in ahead, Mel waits just inside the door, Maple stays out in the house
-    kid.open = null; kid.pending = null; stopKidGame();
-    if (id === "kidroom") { kid.sleep = evanNight(); mel.dir = 1; evan.x = p[0] + 30; evan.y = p[1] + 8; evan.tx = kid.sleep ? 170 : 200; evan.ty = kid.sleep ? 340 : 440; evan.run = true; evan.path = null; evan.rk = "";
-      if (!kid.sleep) setTimeout(() => evanSays(pickSay(["my room!", "yay!", "play!"])), 700); }
-    else kid.sleep = false;
-    document.body.classList.toggle("kidmode", id === "kidroom");
-    $("mmaple").style.display = id === "kidroom" ? "none" : ""; if (id === "kidroom") $("speech").hidden = true;
-    $("evan").style.display = evanHere() ? "" : "none";
     render(true); w.classList.remove("fading");
     if (id === "bv_hpaper" && owns(F, "paperie")) { ppCame = PP.collectScraps(F, dayKey()); if (ppCame) setTimeout(() => speak(`${ppCame} bundle${ppCame === 1 ? "" : "s"} of scraps from your shops came up in the van: wine labels, chocolate wrappers, receipts. Into the scrap bin.`, 5500), 900); }
     if (townOf(id)) save();   // a day out: remember which screen of the town (reopening puts Mel back there)
-    if (townOf(id) && evanHere() && (TOWNS[townOf(id)].evanScreen || {})[id]) setTimeout(() => evanSays(pick(TOWNS[townOf(id)].evanScreen[id])), 1400);
-    else if (townOf(id) && evanHere()) setTimeout(() => { evanSays(pick(id === "rd_bridge" ? ["so HIGH", "Mama, hold hand", "big big hole!"] : id === "rd_plaza" ? ["pigeons!", "catch it!", "birdies, come back!"] : ["Spain!", "big birdies!", "it's SO sunny"]));
-      if (id === "rd_bridge") { evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.target = "mel"; evan.wait = 6; } }, 1400);
     if (route.length) nextLeg();
     if (id === "base" && hungryCount(F) && !S.petNudge) { S.petNudge = true; setTimeout(() => speak("The chicks and bunnies are peeping for breakfast. Their run is by the garden.", 4500), 1400); }
     if (id === "room" && S.routSaid !== dayKey() && sgHM() < 12*60) { const st = todaysSteps().filter(x => !x.done), left = checklistLeft(); if (st.length || left) { S.routSaid = dayKey(); setTimeout(() => speak(st.length ? `${st[0].name}, today: ${st[0].text}.` : `${left} morning routine step${left > 1 ? "s" : ""} on the board.`, 5000), 1500); } }
@@ -2090,20 +1983,18 @@ function setScene(id, at){
       setTimeout(() => speak(m < 18*60 ? "Wine club tonight at the cellar door, 6pm! Eight members are coming to taste and buy." : "The wine club's on at the cellar door right now! Pop in and host.", 6000), 2800); } }
     if (SCOOP_IN.includes(id) || id === "bay") scoopNow();   // catch up on arrival: sales, and anything the churner's finished
     if (id === "scoopshop" && trolleyOn(F)) setTimeout(trolleyHome, 900);   // wheeling the trolley back in puts it away
-    if (id === "cocoa" && evanHere() && ccUp(cocoaState(F), "fountain")) setTimeout(() => evanSays(pick(["THE FOUNTAIN!! Can I put my hand in? Just one finger?", "Mama, it's a chocolate waterfall!", "Can we dip a strawberry? Pleeease?"])), 1400);
     if (id === "wineshop" && aperitivoNow(dayKey(), sgHM()) && S.aperoSaid !== dayKey()) { S.aperoSaid = dayKey(); setTimeout(() => speak("Friday aperitivo hour! The whole village is knocking off for a glass and a plate. Stand behind the counter: they tip.", 6000), 1200); }
     // round 140: Saturday disco night (a nudge during the day, and the floor's packed when Mel walks in)
     { const m = sgHM(); if (owns(F, "cellar") && discoOn(dayKey()) && m >= 15*60 && m < 23*60 && S.discoSaid !== dayKey() && id !== "cellar") { S.discoSaid = dayKey();
       setTimeout(() => speak(m < DISCO_FROM ? "It's Saturday: disco night at the cellar door from 8! The glitter ball's coming out." : "Disco night's in full swing at the cellar door! Can you hear it from here?", 6000), 3200); } }
-    if (id === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM())) setTimeout(() => { speak("Disco night! The glitter ball's spinning, the lights are flashing, and the whole floor's dancing. Stand at the tasting bar to pour: they're thirsty.", 6500); if (evanHere()) setTimeout(() => evanSays(pick(["SPARKLY BALL! dance dance!", "Mama, dance with me!", "I'm doing my robot dance!"])), 2600); }, 1200);
+    if (id === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM())) setTimeout(() => { speak("Disco night! The glitter ball's spinning, the lights are flashing, and the whole floor's dancing. Stand at the tasting bar to pour: they're thirsty.", 6500); ; }, 1200);
     if (id === "cellar" && wineClubNow(dayKey(), sgHM())) setTimeout(() => speak("The wine club's here! Glasses clinking, everyone talking at once. Tap the tasting bar to host.", 5000), 1200);
-    if (id === "marcus" && evanHere()) setTimeout(() => { evanSays(pick(["Uncle Marcus! Can I play Mario?", "Can we watch Spiderman? Pleeease?", "Game! Game! Can I play the game?"])); if (isHere("marcus")) setTimeout(() => npcSay("marcus", "Ha! Ask your mum, little man. Zeh? One level?"), 2200); }, 1500);
-    if (id === "wineshop" && isHere("marcus") && isHere("angelina") && sgHM() >= 19*60 + 30 && S.dateSaid !== dayKey()) { S.dateSaid = dayKey(); setTimeout(() => speak("Marcus and Angellina are on a date night at the middle table. Act natural.", 5000), 1600); }
+    if (id === "wineshop" && isHere("tomi") && isHere("posy") && sgHM() >= 19*60 + 30 && S.dateSaid !== dayKey()) { S.dateSaid = dayKey(); setTimeout(() => speak("Marcus and Angellina are on a date night at the middle table. Act natural.", 5000), 1600); }
     { const dn = dinnerOn(dayKey()), m = sgHM(); if (dn && m >= 17*60 + 30 && m < dn.to && S.dinnerSaid !== dayKey()) { S.dinnerSaid = dayKey();
       setTimeout(() => speak(m < dn.from ? `Family dinner tonight at ${HOST_NAME[dn.host]}, 6:30! Tap the table when you get there.` : `Family dinner's on at ${HOST_NAME[dn.host]}! Everyone's at the table.`, 6000), 2600); } }
-    if (id === "shore" && S.shoreSaid !== dayKey()) { S.shoreSaid = dayKey(); const fam = ["mum", "dad", "marcus", "angelina"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
+    if (id === "shore" && S.shoreSaid !== dayKey()) { S.shoreSaid = dayKey(); const fam = ["hana", "theo", "tomi", "posy"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
       setTimeout(() => speak(`The foreshore. Sea breeze, Norfolk pines, and keep an eye out for dolphins.${fam.length ? ` ${fam.join(fam.length > 2 ? ", " : " and ").replace(/, ([^,]*)$/, " and $1")} ${fam.length > 1 ? "are" : "is"} out too.` : ""}`, 5500), 1200); }
-    if (id === "field") { const ev = eventNow(dayKey(), sgHM()); if (ev && S.eventSaid !== dayKey()) { S.eventSaid = dayKey(); setTimeout(() => speak(ev.kind === "market" ? "It's the Sunday farmers market! Stalls all along the top, our wine stall with Ines, and Ma Ma's fruit and flowers." : ev.kind === "night" ? "The night market! Fairy lights, street food all along the top, and a jazz duo on the little stage." : "It's the field fair! Kites, face painting, lemonade. Evan's going to love this.", 6000), 1200); } }
+    if (id === "field") { const ev = eventNow(dayKey(), sgHM()); if (ev && S.eventSaid !== dayKey()) { S.eventSaid = dayKey(); setTimeout(() => speak(ev.kind === "market" ? "It's the Sunday farmers market! Stalls all along the top, our wine stall with Ines, and fruit and flowers from the orchard." : ev.kind === "night" ? "The night market! Fairy lights, street food all along the top, and a jazz duo on the little stage." : "It's the field fair! Kites, face painting, lemonade. Where to start?", 6000), 1200); } }
     // remember the screen, so reopening the game today picks up here (save() keeps F.where)
     F.where = {scene, x: Math.round(mel.x), y: Math.round(mel.y), day: dayKey()}; persist("fox");
     if (id === "market") speak(isHere("hana") ? "Welcome to the market! Hana's in. Have a browse." : NPCS.find(n => n.id === "hana").away, 4500);
@@ -2149,7 +2040,7 @@ function arriveSpot(id){
   if (id === "mydoor") { setScene("room", INNER.room.arrive); return; }
   if (scene === "cottage" && id === "tea") { orView = "tea"; sfx("paper", true); render(); return; }
   if (id === "dine") { sitForDinner(); return; }
-  if (id === "bedroom") { const m = sgHM(), who = {cottage: "Ma Ma and Gong Gong", mumdad: "Mum and Dad", marcus: "Marcus and Angellina"}[scene] || "They";
+  if (id === "bedroom") { const m = sgHM(), who = {cottage: "Ma Ma and Gong Gong", hanatheo: "Mum and Dad", tomiposy: "Marcus and Angellina"}[scene] || "They";
     speak(m >= 23*60 || m < 6*60 + 30 ? `Shh. ${who} are fast asleep. See them in the morning.` : `${who}'s bedroom. Private! The door stays shut.`, 4000); render(); return; }
   if (id === "gdoor") { setScene("garage", INNER.garage.arrive); return; }
   if (id === "officedoor") { setScene("office", INNER.office.arrive); return; }
@@ -2165,7 +2056,7 @@ function arriveSpot(id){
   if (scene === "cellar" && id === "racks" && owns(F, "cellar")) { vyView = "barrels"; sfx("paper", true); render(); return; }   // round 152: the cellar's barrels are on these racks
   if (scene === "cellar" && id === "flight") { const first = S.flightDay !== dayKey(); if (first) { S.flightDay = dayKey(); gainXp(2); save(); }
     speak(first ? "A tasting flight: a splash of each of your wines, lined up on the bar. Honestly? They're good." : "Another little pour. Just to be sure.", 4500); render(); return; }
-  if (scene === "marcus" && id === "games") { marcusGames(); return; }
+  if (scene === "tomiposy" && id === "games") { speak("A games console and two controllers. Tomi's high score is taped to the side of the telly.", 4000); render(); return; }
   if (id === "kiddoor") { setScene("kidroom", INNER.kidroom.arrive); return; }
   if (id === "routines") { routOpen = true; rv.edit = false; sfx("paper", true); render(); return; }
   if (id === "bed") { bedOpen = true; sfx("paper", true); render(); return; }
@@ -2192,12 +2083,12 @@ function arriveSpot(id){
   if (scene === "scoopshop" && id === "gtables") { sitAt(SHOP_SEATS); return; }
   if (id === "ckdoor") { setScene("cocoakitchen", INNER.cocoakitchen.arrive); return; }
   if (scene === "cocoa" && id === "ctables" && workshopGroup(dayKey()).length && sgHM() >= 14*60 && sgHM() < 16*60) { speak("The bonbon workshop's on! Six makers at the tables, piping ganache and arguing about sprinkles. You show them how to temper.", 5500); gainXp(1);
-    if (evanHere()) setTimeout(() => evanSays(pick(["Can I make one? I'll make a dinosaur one!", "I'm helping! *licks spoon*", "Mine has sprinkles AND more sprinkles."])), 1500); render(); return; }
+    ; render(); return; }
   if (scene === "cocoa" && id === "ctables") { sitAt(SHOP_SEATS); return; }
   if (scene === "van" && id === "vmap") { bvView = "map"; tripPick = []; sfx("paper", true); render(); return; }   // round 141: Bellbird Valley
   if (scene === "van" && id === "vboard") { vanView = "board"; sfx("paper", true); render(); return; }
   if (scene === "van" && id === "vtable") { vanView = "crate"; sfx("paper", true); render(); return; }   // round 153: pack the pop-up crate
-  if (scene === "van" && id === "vbed") { speak(pick(["You stretch out under the pop-top. Stars through the roof window. Bliss.", "A little lie-down. Maple curls up at your feet.", "The quietest bed in Honeybrook."]), 4500); if (evanHere()) setTimeout(() => evanSays(pick(["Can we sleep in the van tonight? PLEASE?", "This is my bed now.", "It's like a tiny house!"])), 1200); render(); return; }
+  if (scene === "van" && id === "vbed") { speak(pick(["You stretch out under the pop-top. Stars through the roof window. Bliss.", "A little lie-down. Maple curls up at your feet.", "The quietest bed in Honeybrook."]), 4500); ; render(); return; }
   if (scene === "barn" && (id === "extractor" || id === "crock" || id === "press" || id === "cave")) { hfView = id; hfState(F); sfx("paper", true);
     if (id === "cave" && isHere("elena")) npcSay("elena", pick(["Turn them every morning. They like the attention.", "Smell that? That's a cheese thinking."]));
     else if (id === "press" && isHere("elena")) npcSay("elena", "Name it something nice. A wheel with a good name ages better. Everyone knows that.");
@@ -2227,14 +2118,14 @@ function arriveVillageSpot(id){
   if (townOf(scene)) { townSpot(id); return; }
   if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }
   if (id === "olive") { vyView = "olive"; sfx("paper", true); render(); return; }
-  if (id === "bonfire") { if (bonfireNow(dayKey(), sgHM())) { friView = "fire"; sfx("paper", true); if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["marshmallow! please!", "it's so warm!", "fire! big fire!"])), 1200); }
+  if (id === "bonfire") { if (bonfireNow(dayKey(), sgHM())) { friView = "fire"; sfx("paper", true); ; }
     else speak(isFri() && sgHM() < 19*60 ? "The bonfire's lit at seven tonight. Bring the family." : "Your firepit. On Friday nights the family come round for a bonfire, 7 to 10.", 4500); render(); return; }
   if (id === "fishvan") { if (vanNow(dayKey(), sgHM())) { friView = "van"; sfx("paper", true); } else speak("Sal's fish van parks here on Friday evenings, five till ten.", 4000); render(); return; }
   if (id === "kitefly") { flyKite(); return; }
   if (/^bm\d$/.test(id) || id === "kites") { if (!bayMarketNow(dayKey(), sgHM())) { speak("The Friday market's packed away. It's on Fridays, 4:30 to 7:15, here on the field.", 4000); render(); return; } friView = id; sfx("paper", true); render(); return; }
   if (id === "screen") { if (!movieNow(dayKey(), sgHM())) { render(); return; } mel.sitting = true; nodes.mel.classList.add("sit"); sfx("paper", true); gainXp(S.movieDay !== dayKey() ? 1 : 0); S.movieDay = dayKey();
-    speak(`Movie night: "${filmOf(dayKey())}". Blankets, the dark, the whole village laughing at the same bits.`, 6000); if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["shh Mama, it's starting!", "is it a fox? IT'S A FOX!", "popcorn please?"])), 2000); render(); return; }
-  if (id === "popcorn") { if (!movieNow(dayKey(), sgHM())) { render(); return; } if (F.coins < 3) { speak("Popcorn's 3 coins.", 2500); return; } F.coins -= 3; addInv("popcorn", 1); sfx("pop"); speak("A paper cone of popcorn, still warm. (It's in your backpack: give it to someone, or Evan.)", 4500); save(); render(); return; }
+    speak(`Movie night: "${filmOf(dayKey())}". Blankets, the dark, the whole village laughing at the same bits.`, 6000); ; render(); return; }
+  if (id === "popcorn") { if (!movieNow(dayKey(), sgHM())) { render(); return; } if (F.coins < 3) { speak("Popcorn's 3 coins.", 2500); return; } F.coins -= 3; addInv("popcorn", 1); sfx("pop"); speak("A paper cone of popcorn, still warm. (It's in your backpack: eat it, or give it to someone.)", 4500); save(); render(); return; }
   if (id === "grove") { vyView = "grove"; sfx("paper", true); if (isHere("marco")) npcSay("marco", pick(["Olives are coming on nicely.", "I'll put what I pick in the crate.", "Taste one? No! Not raw. Trust me."])); render(); return; }
   if (id === "windmill") { if (owns(F, "mill")) { setScene("mill", [260, 560]); setTimeout(() => speak(millState(F).press ? "The millstone's still turning..." : "The old mill. Smells of olives and old wood.", 3500), 600); }
     else { goalView = "mill"; sfx("paper", true); speak("The old windmill. Inside it's dusty... but you could make olive oil here.", 4000); render(); } return; }
@@ -2245,17 +2136,16 @@ function arriveVillageSpot(id){
   if (id === "bikeswoods" || id === "bikesst" || id === "bikesvillage") { woodsView = "bike"; sfx("paper", true); render(); return; }
   if (TAXI_STOPS[id]) { woodsView = id; sfx("paper", true); render(); return; }
   if (id === "forage") { const r = forage(F, addInv); if (!r) { speak("You've foraged here today. Come back tomorrow: the woods need time to grow back.", 4000); render(); return; }
-    sfx("chime"); gainXp(1); act("cheer"); speak(`${r.line} +${r.n} ${ITEMS[r.id].n.toLowerCase()} in your backpack.`, 5500); mprop("sparkle", mel.x, mel.y - 60, 1600); if (evanHere()) setTimeout(() => evanSays(pick(["I found one!", "In the basket!", "Can I eat it?"])), 1200); save(); render(); return; }
+    sfx("chime"); gainXp(1); act("cheer"); speak(`${r.line} +${r.n} ${ITEMS[r.id].n.toLowerCase()} in your backpack.`, 5500); mprop("sparkle", mel.x, mel.y - 60, 1600); ; save(); render(); return; }
   if (id === "fishriver" || id === "fishlake" || id === "fishsea" || id === "fishpool" || id === "fishbay") { fishSpot = spotIn(scene); fishSt = {}; fishState(F); mel.dir = scene === "shore" || scene === "bay" ? -1 : 1; sfx("paper", true); render(); return; }
   if ((id === "bluebell" || id === "figtree") && scene === "hlane") { const g = letGuests(dayKey())[id === "bluebell" ? 0 : 1]; speak(`${VILLAGE[id].line}${g && g.length ? ` Staying this week: ${g.map(x => (NPCS.find(n => n.id === x) || {}).name).join(" and ")}.` : ""}`, 5000); render(); return; }
   if (scene === "hfarm" && id === "farmhouse") { hfView = "house"; hfState(F); sfx("paper", true); render(); return; }
-  if (scene === "hfarm" && id === "stray") { const g = catchGoat(F); if (!g) { render(); return; } sfx("chime"); act("cheer"); gainXp(1); farmTrust(3); speak(`Got you, ${g.n}! Back in the paddock you go. Latch the gate tonight and nobody gets out.`, 5000); if (evanHere()) setTimeout(() => evanSays("The goat ran away! I helped catch it!"), 1200); save(); drawScene(); render(); return; }
+  if (scene === "hfarm" && id === "stray") { const g = catchGoat(F); if (!g) { render(); return; } sfx("chime"); act("cheer"); gainXp(1); farmTrust(3); speak(`Got you, ${g.n}! Back in the paddock you go. Latch the gate tonight and nobody gets out.`, 5000); ; save(); drawScene(); render(); return; }
   if (scene === "hfarm" && (id === "cows" || id === "goats" || id === "hives" || id === "fstand")) { hfView = id === "fstand" ? "stand" : id; hfState(F); sfx("paper", true);
     if (id === "hives" && isHere("felix")) npcSay("felix", fullHives(hfState(F)).length ? "There's honey ready! Here, take the veil." : "Not quite ready. The bees are still busy.");
     else if ((id === "cows" || id === "goats") && isHere("elena")) npcSay("elena", pick(id === "cows" ? ["Daisy first, she insists.", "Mind Mochi's tail. It has opinions."] : ["Keep your shoelaces away from Toffee.", "Pepper! Out of the bucket!"]));
-    if (evanHere() && (id === "cows" || id === "goats")) setTimeout(() => evanSays(pick(id === "cows" ? ["MOO! Mama, the cow said moo!", "Can I pat her? Is she soft?"] : ["The goat is eating my shoe!", "Baby goat! Can we take it home?"])), 1300);
     render(); return; }
-  if (id === "farmshop") { orView = "shop"; orTab = null; sfx("paper", true); if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma picked them for you.", "Fresh this morning. Choose any.", "For you, no charge. You're my girl."])); render(); return; }
+  if (id === "farmshop") { orView = "shop"; orTab = null; sfx("paper", true); if (isHere("farid")) npcSay("farid", pick(["Take, take! Ma Ma picked them for you.", "Fresh this morning. Choose any.", "For you, no charge. You're my girl."])); render(); return; }
   if (id === "barrels") { vyView = "barrels"; sfx("paper", true); render(); return; }
   if (id === "vinestall") { vyView = "stall"; sfx("paper", true); render(); return; }
   if (id === "pswing" || id === "pslide" || id === "pseesaw" || id === "pround") { playground(id); return; }
@@ -2265,7 +2155,7 @@ function arriveVillageSpot(id){
     else if (st.kind === "cocoa") { cocoaNow(); speak("Behind the chocolate cart. More people stop while you're serving.", 3500); if (isHere("mateo") && !keeperAway(st, dayKey(), sgHM())) setTimeout(() => npcSay("mateo", pick(["Market people LOVE hot chocolate, even in the morning.", "Better than studying, boss.", "Ma Ma traded me a mango for a bar. Good deal?"])), 1200); }
     else if (st.kind === "mulled") { vineTick(); if (isHere("celeste") && !keeperAway(st, dayKey(), sgHM())) setTimeout(() => npcSay("celeste", pick(["Mind, it's hot! Cinnamon on top?", "Everyone wants a cup tonight. Your pot's a hit.", "I've ladled forty cups. My arm's a noodle."])), 900); }
     else if (st.kind === "mine") { speak(pick(["Behind your own stall. Shoppers stop more while you're here.", "Your stall, your garland, your name on the board."]), 3500); if (st.id === "hazel" && isHere("hazel")) setTimeout(() => npcSay("hazel", pick(["The lavender soap's flying, dear.", "I've told everyone the oils are from the mill up the lane.", "Go and have a mulled wine. I've got this."])), 1100); }
-    else if (st.kind === "orchard") { orchardTick(); if (isHere("mama")) npcSay("mama", pick(["Take, take! Ma Ma brought plenty.", "Everybody wants Ma Ma's fruit today.", "For you, free. For them, they pay!"])); }
+    else if (st.kind === "orchard") { orchardTick(); if (isHere("farid")) npcSay("farid", pick(["Take, take! Ma Ma brought plenty.", "Everybody wants Ma Ma's fruit today.", "For you, free. For them, they pay!"])); }
     else if (isHere(st.id) && !keeperAway(st, dayKey(), sgHM())) npcSay(st.id, st.line);
     else speak("Nobody's minding this one just now. It's an honesty tin: pop your coins in.", 3500); render(); return; }
   if (id === "deck") { sitAt(DECK_SEATS); return; }
@@ -2275,23 +2165,23 @@ function arriveVillageSpot(id){
   if (id === "lake" || id === "picnic" || id === "pitch") { fieldSpot(id); return; }
   if (id === "exlawn") { joinClass(); return; }
   if (id === "jazzhat") { tipBand(); return; }
-  if (id === "xgrotto") { fieldView = "xgrotto"; sfx("paper", true); if (evanHere()) evanSays(pick(["Santa?!", "is he IN there?", "Mama, hold my hand"])); render(); return; }
+  if (id === "xgrotto") { fieldView = "xgrotto"; sfx("paper", true); ; render(); return; }
   if (id === "xtree") { fieldView = "xtree"; sfx("paper", true); if (treeLit(dayKey(), sgHM(), F)) mprop("heart", mel.x, mel.y - 60, 1600); render(); return; }
   if (id === "suprack" || id === "homejetty") { goalView = "jetty"; sfx("paper", true); render(); return; }
   if (id === "ferry") { railOpen = "ferry"; tripPick = []; sfx("paper", true); render(); return; }   // round 127: the Jeju ferry's ticket board
   if (id === "wishtower") { const w = F.wish = F.wish || {n: 3}; if (w.day === dayKey()) { speak("You've added your stone today. The wish is in there now: it just needs time.", 4000); render(); return; }
     w.day = dayKey(); if (w.n < 9) w.n++; sfx("chime"); gainXp(1); speak(pick(["You find a flat black-ish pebble by the river, balance it on top, and make a wish. Don't tell anyone what it was.", "Clack. One more stone on the tower. A wish for today.", "Very carefully... there. The tower's a little taller, and so is the wish."]), 5000);
-    if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["my turn! my stone!", "wish wish wish", "don't let it fall, Mama!"])), 1800); save(); render(); return; }
+    ; save(); render(); return; }
   if (id === "boat") { if (owns(F, "boat")) startCruise(); else { goalView = "boat"; sfx("paper", true); render(); } return; }
   if (id === "dolphins") { mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = -1; sfx("paper", true);
     const m = sgHM(), morning = m >= 6*60 && m < 11*60;
-    if (morning && S.dolphinDay !== dayKey()) { S.dolphinDay = dayKey(); gainXp(1); setTimeout(() => { speak(pick(["There! Dolphins, three of them, just past the jetty.", "A fin! Then another. The dolphins are out this morning."]), 5000); [0, 300].forEach((d, k) => setTimeout(() => mprop("heart", 90 + k*30, 220, 1800), d)); if (evanHere()) evanSays("DOLPHIN! Mama, dolphin!"); }, 2400); save(); }
+    if (morning && S.dolphinDay !== dayKey()) { S.dolphinDay = dayKey(); gainXp(1); setTimeout(() => { speak(pick(["There! Dolphins, three of them, just past the jetty.", "A fin! Then another. The dolphins are out this morning."]), 5000); [0, 300].forEach((d, k) => setTimeout(() => mprop("heart", 90 + k*30, 220, 1800), d)); ; }, 2400); save(); }
     speak(morning ? "A sit on the bench, looking out to sea. The dolphins come by most mornings." : pick(["The sea's all sparkly. Nothing to do but look at it for a minute.", "Sea breeze. A pelican going past. A proper break."]), 4500); render(); return; }
-  if (id === "swing") { evan.tx = 112 + rnd(-4, 4); evan.ty = 302; evan.run = true; evan.wait = 6; setTimeout(() => evanSays(pick(["wheee!", "push me!", "higher!"])), 900); speak(v.line, 3500); render(); return; }
+  if (id === "swing") { speak(v.line, 3500); render(); return; }
   if (id === "letterbox") { const p = paperWaiting() || unreadMail()[0]; if (p) { sfx("paper"); openMail(p); } else speak(`Nothing in the letterbox. ${paperName()} comes on Fridays.`, 3800); render(); return; }
   if (id === "news") { newsOpen = true; newsTab = "wins"; sfx("paper"); speak(pick(["Pancake the village dog opens one eye. Here's what's new.", "The good news board. Pancake's guarding it."]), 3500); render(); return; }
   if (id === "cacao") { const c = cocoaState(F), h = Math.max(1, Math.round(((c.treeAt || Date.now()) + 2*864e5 - Date.now() - (globalThis.__mapleOffset || 0))/36e5));
-    speak(`Ma Ma's cacao tree, heavy with pods. She picks them and sends a sack of beans to the Cocoa Room's kitchen every two days: the next in about ${h} hour${h === 1 ? "" : "s"}.`, 5500); if (isHere("mama")) setTimeout(() => npcSay("mama", pick(["Ma Ma talk to it every morning. That's why so many pods!", "Chocolate tree! Who knew can grow here?"])), 1500); render(); return; }
+    speak(`Ma Ma's cacao tree, heavy with pods. She picks them and sends a sack of beans to the Cocoa Room's kitchen every two days: the next in about ${h} hour${h === 1 ? "" : "s"}.`, 5500); if (isHere("farid")) setTimeout(() => npcSay("farid", pick(["Ma Ma talk to it every morning. That's why so many pods!", "Chocolate tree! Who knew can grow here?"])), 1500); render(); return; }
   if (id === "shed") { shedOpen = true; speak(v.line, 3800); render(); return; }
   if (id === "run") { runOpen = true; const n = hungryCount(F); speak(!F.pets.animals.length ? "An empty run. Chicks and bunnies are at the market." : n ? `${n === 1 ? "Someone's" : n + " little ones are"} peeping for breakfast.` : VILLAGE.run.line, 3800); render(); return; }
   if (id === "bench") { speak(v.line, 3800); render(); return; }
@@ -2308,7 +2198,7 @@ function orchardTick(){
   const out = orchTick(F, dayKey()); if (!out) return;
   const picked = Object.keys(out.picked).length, here = scene === "orchard" || scene === "flowers";
   (out.tours || []).forEach(tr => { if (here && !quietNow()) setTimeout(() => speak(`Tour finished! ${tr.n} visitors paid ${tr.fee} coins into Ma Ma's tin.`, 4500), 800); });
-  if (picked && (scene === "orchard" || scene === "flowers")) { drawScene(); if (isHere("mama") && !quietNow()) npcSay("mama", pick(["Picked these for the shop. So sweet this year.", "Look, so many! Ma Ma's back is aching, but worth it.", "Fresh from the tree. Take some home for Evan."])); }
+  if (picked && (scene === "orchard" || scene === "flowers")) { drawScene(); if (isHere("farid") && !quietNow()) npcSay("farid", pick(["Picked these for the shop. So sweet this year.", "Look, so many! Ma Ma's back is aching, but worth it.", "Fresh from the tree. Take some home for Evan."])); }
   save(scene === "orchard" || scene === "flowers");
 }
 // round 154: upstairs at the mill: what the shelves show, and Mel at a tasting
@@ -2326,7 +2216,7 @@ function millShopPanel(){
 }
 // round 153: the pop-up crate by the van on a campervan trip: passers-by buy while Mel's at the stop
 function crateTick(){
-  const c = craftState(F), t = tripOn(F), now = Date.now(), here = t && t.by === "van" && townOf(scene) === t.town && crateCount(vanCrate(F)) > 0 && !evanNight();
+  const c = craftState(F), t = tripOn(F), now = Date.now(), here = t && t.by === "van" && townOf(scene) === t.town && crateCount(vanCrate(F)) > 0;
   if (!here) { c.vanAt = now; return; } let coins = 0; const what = [];
   for (let at = (c.vanAt || now) + 60000; at <= now; at += 60000) { const r = vanSellMinute(F); if (r) { coins += r.coins; what.push(r.what); } }
   c.vanAt = (c.vanAt || now) + Math.floor((now - (c.vanAt || now))/60000)*60000;
@@ -2398,11 +2288,11 @@ const fieldKind = () => /^mstall\d$/.test(fieldView || "") ? (stallAt(dayKey(), 
 // round 172: the first night of the Christmas market, the village counts the tree's lights on
 function treeCountdown(){
   xmasState(F).lit[dayKey().slice(0, 4)] = true; save(true);
-  const near = ["gonggong", "mama", "hana", "okada", "pip", "darren"].filter(id => isHere(id));
+  const near = ["mei", "farid", "hana", "okada", "pip", "bo"].filter(id => isHere(id));
   speak("Everyone's gathered round the tree in the dark. Here we go...", 3500, true);
-  ["Three!", "Two!", "One!"].forEach((n, k) => setTimeout(() => { sfx("tap"); near.slice(k, k + 2).forEach(id => npcSay(id, n)); if (evanHere()) evanSays(n.toLowerCase()); }, 3200 + k*1300));
+  ["Three!", "Two!", "One!"].forEach((n, k) => setTimeout(() => { sfx("tap"); near.slice(k, k + 2).forEach(id => npcSay(id, n)); ; }, 3200 + k*1300));
   setTimeout(() => { drawScene(); sfx("chime"); hearts(3); gainXp(2); speak("The lights come on all at once: hundreds of them, warm white, right up to the star. The whole field goes \"ooh\". Christmas has started.", 7000, true);
-    if (isHere("gonggong")) setTimeout(() => npcSay("gonggong", "The star is crooked. Every year, crooked."), 2600); if (evanHere()) setTimeout(() => evanSays("SO SPARKLY!"), 1200); }, 7200);
+    if (isHere("mei")) setTimeout(() => npcSay("mei", "The star is crooked. Every year, crooked."), 2600); ; }, 7200);
 }
 // round 178: the gift shop's shared stock, from the other shops
 const giftOpts = () => (owns(F, "giftshop") && GAL.stockUp(F, dayKey()), {F, cocoa: owns(F, "cocoa") ? cocoaState(F) : null, onDisplay: ccOnDisplay, store: craftState(F).store, v: vineState(F), day: dayKey(), hm: sgHM(), here: scene === "giftshop" && atSpot === "gtill", keeper: isHere("posy"), pk: fieldView === "gwine" ? gsPk : null});
@@ -2411,7 +2301,7 @@ let gsPk = null, galleryRedraw = false;   // round 196: the gallery wall or the 
 function xmasTreat(id){
   if (id === "mulled") { const m = F.mull || {}; if (!(m.cups > 0)) return; m.cups--; sfx("chime"); hearts(2); speak(pick(["A paper cup of your own mulled wine, warm through your gloves. Not bad, if you say so yourself.", "Cinnamon, orange, and the red from your own vines. The whole market smells like this."]), 5000); save(); ctx(); return; }
   const t = TREATS[id]; if (!t || F.coins < t.price) return; F.coins -= t.price; xmasState(F).treats++; sfx("coin"); hearts(2); gainXp(1);
-  speak(pick(t.say), 5000); if (evanHere()) setTimeout(() => { evanSays(pick(t.evan)); mprop("heart", evan.x, evan.y - 44, 1800); }, 900); save(true); ctx(); }
+  speak(pick(t.say), 5000); ; save(true); ctx(); }
 function marketStallPanel(st){
   const ev = eventNow(dayKey(), sgHM()); if (!ev) return "";
   const who = (NPCS.find(n => n.id === st.id) || {name: "Someone"}).name;
@@ -2426,21 +2316,21 @@ function marketStallPanel(st){
   if (st.decor) h += `<div class="items shop">${st.decor.map(id => { const d = DECOR[id], own = F.decorOwned[id], on = own && F.decor[d.slot] === d.val;
     return `<button class="item" data-decor="${id}" ${!own && F.coins < d.price ? "disabled" : ""}><span class="e">${icon(d.ico, 34)}</span><span class="n">${esc(d.n)}</span><span class="c">${on ? (d.where === "room" ? "in your room" : "in your home") : own ? "tap to use" : `<b>${d.price}</b> ${icon("coin", 13)}`}</span></button>`; }).join("")}</div><p class="muted">Bought once, kept forever. You have ${F.coins} coins.</p>`;
   h += treatsHTML(st, F.coins);   // round 172: the Christmas market's chestnuts and hot chocolate
-  if (st.act) h += `<div class="actions"><button class="btn primary" data-fair="${st.act}" ${evanHere() ? "" : "disabled"}>${st.act === "kite" ? "Get Evan a kite (3 coins)" : "Face paint for Evan (3 coins)"}</button></div>${evanHere() ? "" : `<p class="muted">Bring Evan along for this one.</p>`}`;
+  if (st.act) h += `<div class="actions"><button class="btn primary" data-fair="${st.act}" ${F.coins < 3 ? "disabled" : ""}>${st.act === "kite" ? "Fly a kite (3 coins)" : "Get your face painted (3 coins)"}</button></div>`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 function fairActivity(k){
-  if (!evanHere() || F.coins < 3) return; F.coins -= 3; gainXp(1); sfx("chime"); fieldView = null; goalView = null; ctx();
-  if (k === "kite") { evan.tx = 200; evan.ty = 420; evan.run = true; evan.wait = 10; setTimeout(() => evanSays(pick(["kite! up up!", "it's flying!", "look Mama!"])), 900); speak("A red kite for Evan. He's running with it and it's actually flying. Mostly.", 5000); }
-  else { setTimeout(() => evanSays(pick(["I'm a tiger! RAWR", "butterfly!", "dinosaur face!"])), 800); speak("Face paint for Evan. He chose a tiger and won't stop roaring.", 5000); }
-  [0, 300].forEach((d, k2) => setTimeout(() => mprop("heart", evan.x + (k2 - .5)*20, evan.y - 44, 1800), d)); save(true);
+  if (F.coins < 3) return; F.coins -= 3; gainXp(1); sfx("chime"); fieldView = null; goalView = null; ctx();
+  if (k === "kite") { walkTo(200, 420); speak(`A red kite. You run with it across the field and it actually flies. Mostly. ${F.name} chases the tail.`, 5000); }
+  else speak("Face paint: a little tiger on your cheek. The children at the next table are very impressed.", 5000);
+  [0, 300].forEach((d, k2) => setTimeout(() => mprop("heart", mel.x + (k2 - .5)*20, mel.y - 50, 1800), d)); save(true);
 }
 // The Scoop Shack: the shop ticks along (customers buying) whenever Mel's anywhere in the village
 const SHOP_SEATS = [[87, 518], [173, 518], [227, 518], [313, 518], [367, 512], [453, 512]];
 // Mel's at the Scoop Shack's night market cart (stall place 8), scooping
 const atCart = () => scene === "field" && atSpot === "mstall8" && (stallAt(dayKey(), sgHM(), 8) || {}).kind === "scoop";
 // delivery orders (round 137): a little note now and then as Tomo pedals one round (not while Mel's been away)
-const ORDER_WHO = ["hana", "okada", "juniper", "bo", "lin", "opal", "theo", "farid", "mei", "felix", "elena", "amara", "lila", "noor", "wren", "mum", "dad", "marcus", "angelina", "darren", "mama", "gonggong"];
+const ORDER_WHO = ["hana", "okada", "juniper", "bo", "lin", "opal", "theo", "farid", "mei", "felix", "elena", "amara", "lila", "noor", "wren", "tomi", "posy"];
 function orderNote(orders, shop, till){
   if (!orders || !orders.length || Date.now() - (S.orderAt || 0) < 150000) return; S.orderAt = Date.now();
   const o = orders[orders.length - 1], names = ORDER_WHO.map(id => NPCS.find(n => n.id === id)).filter(Boolean), who = names.length ? pick(names).name : "A neighbour";
@@ -2455,7 +2345,7 @@ function trolleyHome(){ const r = returnTrolley(F); if (!r) return; sfx(r.melted
 // someone tapped while Mel's pushing the trolley outdoors in Honeybrook: do they want one? -> true if it was an offer
 function trolleyOffer(id){
   const def = NPCS.find(n => n.id === id), fam = FAMILY_ALL.includes(id); if (!def && !fam) return false;
-  const r = trolleySell(F, id, dayKey(), {kid: !!(def && def.kid) || id === "evan", family: fam, rainy: rainyOn(dayKey()), season: seasonOf(dayKey()), hm: sgHM()}); if (!r) return false;
+  const r = trolleySell(F, id, dayKey(), {kid: (!!(def && def.kid)), family: fam, rainy: rainyOn(dayKey()), season: seasonOf(dayKey()), hm: sgHM()}); if (!r) return false;
   if (r.no) { npcSay(id, pick(["Not today, thanks!", "Ooh, tempting. Maybe later!", "I've just had lunch, sorry!", "Not for me, but it looks lovely."])); save(); return true; }
   const what = r.items.map(([f, n]) => `a ${f} of ${n.replace(/ (Gelato|Sorbet)$/, "").toLowerCase()}`).join(" and ");
   npcSay(id, pick([`Yes please! ${what[0].toUpperCase() + what.slice(1)}.`, `Oh, perfect timing. ${what[0].toUpperCase() + what.slice(1)}, please!`, `Go on then: ${what}.`]));
@@ -2485,21 +2375,17 @@ function sitAt(seats){
   if (!free.length) { speak("Every seat's taken. Busy day!", 3000); render(); return; }
   const near = free.map(p => [p, Math.hypot(p[0] - mel.x, p[1] - mel.y)]).sort((a, b) => a[1] - b[1])[0][0];
   mel.tx = near[0]; mel.ty = near[1]; mel.path = []; setTimeout(() => { mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = scene === "bay" ? -1 : 1; }, 700);
-  const mate = evanHere() && free.find(p => p !== near && Math.hypot(p[0] - near[0], p[1] - near[1]) < 70);
-  if (mate) evanSeat = {x: mate[0], y: mate[1], scene};
   const cone = S.cone && Date.now() < S.cone.until;
   speak(cone ? (scene === "bay" ? "Ice cream on the deck, the whole foreshore in front of you. Bliss." : "A little sit with an ice cream. Lovely.") : scene === "bay" ? "A seat on the deck. The dolphins might come by." : "A seat by the window.", 4000);
-  if (mate && cone) setTimeout(() => evanSays(pick(["mine's melting!", "yummy!", "Mama, taste mine!"])), 1800);
   render();
 }
 // a free ice cream at the counter: Mel has one (and Evan, if he's here)
 function haveIceCream(rid){
   const r = eatOne(F, rid); if (!r) return;
-  S.cone = {until: Date.now() + 4*M, col: r.col}; if (evanHere() && eatOne(F, rid) !== null) S.evanHold = {k: "icecream", until: Date.now() + 4*M};
+  S.cone = {until: Date.now() + 4*M, col: r.col}; ;
   scView = null; scSt.pick = null; if (fieldView === "mstall8") fieldView = null; ctx(); sfx("chime"); act("cheer"); mprop("heart", mel.x, mel.y - 60, 1600);
   if (S.iceDay !== dayKey()) { S.iceDay = dayKey(); gainXp(1); }
-  speak(`${r.name}! ${evanHere() ? "Evan's got one too and it's already on his nose." : "Find a seat, or take it for a walk along the foreshore."}`, 5000);
-  if (evanHere()) setTimeout(() => evanSays(pick(["ICE CREAM!!", "yummy yummy!", "it's so cold!"])), 900);
+  speak(`${r.name}! ${("Find a seat, or take it for a walk along the foreshore.")}`, 5000);
   save(); render();
 }
 // the delivery bike: Tomo pedals one round to someone in the family, and a thank-you note comes back
@@ -2594,7 +2480,7 @@ function wireCocoa(c){
     else if (a === "ups" || a === "counter") { ccView = a; }
     else if (a === "buyup") { const line = buyCcUp(F, k); if (!line) return; sfx("coin"); act("cheer"); gainXp(2); speak(line, 5000); if (k === "cart") render(); }
     else if (a === "hprice") { const s = cocoaState(F); s.prices.hot = Math.max(1, Math.min(20, s.prices.hot + n)); }
-    else if (a === "hot") { const kk = haveHot(F); if (!kk) return; sfx("chime"); mprop("heart", mel.x, mel.y - 60, 1600); speak(pick(["Hot chocolate, from your own chocolate. Pure comfort.", "Mmm. Thick, rich, a little bit of foam.", "The perfect rainy-day cup."]), 4000); if (evanHere()) setTimeout(() => evanSays(pick(["Can I have one too? With marshmallows?", "Mama, you have a chocolate moustache!"])), 900); }
+    else if (a === "hot") { const kk = haveHot(F); if (!kk) return; sfx("chime"); mprop("heart", mel.x, mel.y - 60, 1600); speak(pick(["Hot chocolate, from your own chocolate. Pure comfort.", "Mmm. Thick, rich, a little bit of foam.", "The perfect rainy-day cup."]), 4000); ; }
     else if (a === "grand") { const id = packGrand(F); if (!id) return; sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); }
     else if (a === "bprice") { const s = cocoaState(F); s.prices.bonbon = Math.max(1, Math.min(20, s.prices.bonbon + n)); }
     else if (a === "fill") { const got = stockPantry(F, k, n, b.dataset.src, orchState(F)); if (got) { sfx("tap"); flash(`+${got} on the fillings shelf`); } }
@@ -2614,7 +2500,7 @@ function wireCocoa(c){
     else if (a === "pair") { const w = packPairing(F, k); if (!w) return; sfx("paper", true); flash(`Pairing box with ${w}, in your backpack`); speak("A bottle and four bonbons, ribboned together. Tap it in your backpack to choose who it's for.", 4500); }
     else if (a === "special") { const sp = makeSpecial(F); if (!sp) return; sfx("chime"); act("cheer"); gainXp(2); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 20 : -20), mel.y - 60, 1500), t)); speak(`${sp.make} ${sp.n.toLowerCase()}${sp.make > 1 && !/s$/.test(sp.n) ? "s" : ""} for ${sp.fest}! They'll sell beside the display case.`, 5000); }
     else if (a === "takesp") { if (!takeSpecial(F, k)) return; sfx("chime"); flash(`${ITEMS[k].n} in your backpack`); }
-    else if (a === "eatbb") { const bb = eatBonbon(F, k); if (!bb) return; sfx("chime"); mprop("heart", mel.x, mel.y - 60, 1600); speak(`${bb.name}. Oh, that's good.`, 3500); if (evanHere() && eatBonbon(F, k)) setTimeout(() => evanSays(pick(["chocolate!!", "another one!", "mmm!"])), 900); }
+    else if (a === "eatbb") { const bb = eatBonbon(F, k); if (!bb) return; sfx("chime"); mprop("heart", mel.x, mel.y - 60, 1600); speak(`${bb.name}. Oh, that's good.`, 3500); ; }
     // round 184: choose the bonbons for a box or a pairing box
     else if (a === "pkopen") { ccSt.pk = k.startsWith("pair:") ? {kind: "pair", k: k.slice(5), size: 4, sel: {}} : {kind: k, size: n, sel: {}}; sfx("paper", true); }
     else if (a === "pkadd" || a === "pksub") { if (ccSt.pk) pickAdd(F, ccSt.pk, k, a === "pkadd" ? 1 : -1); }
@@ -2627,7 +2513,7 @@ function wireCocoa(c){
     else if (a === "box") { const id = packBox(F, n); if (!id) return; sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); speak("Packed with a ribbon and in your backpack. Tap it there to choose who it's for.", 4500); }
     else if (a === "eat" || a === "give") { if (!takeBar(F, k, a === "give")) return; sfx("chime");
       if (a === "give") { flash(`${CC_KINDS[k].n} bar in your backpack`); speak("Wrapped and in your backpack. Tap it there to choose who it's for.", 4000); }
-      else { mprop("heart", mel.x, mel.y - 60, 1600); speak(pick(["Snap! Your own chocolate. Perfect.", "It melts just right. You made this!", "From the bean. Mmm."]), 4000); if (evanHere() && takeBar(F, k, false)) setTimeout(() => evanSays(pick(["chocolate!!", "more Mama!", "mmm!"])), 900); } }
+      else { mprop("heart", mel.x, mel.y - 60, 1600); speak(pick(["Snap! Your own chocolate. Perfect.", "It melts just right. You made this!", "From the bean. Mmm."]), 4000); ; } }
     re(); });
   const nf = c.querySelector("[data-ccname]"); if (nf) nf.onsubmit = e => { e.preventDefault(); const v = (nf.querySelector("input").value || "").trim().slice(0, 30); if (!v) return; cocoaState(F).name = v; speak(`The sign now says ${v}.`, 3500); re(); render(); };
 }
@@ -2669,7 +2555,7 @@ function wireCompanions(c){
   c.querySelectorAll("[data-adoptat]").forEach(b => b.onclick = () => { const item = adoptItem, p = adoptPet(F, item, adoptSt.owner, b.dataset.adoptat); if (!p) return;
     adoptItem = null; adoptSt = {}; F.fam.gifts[p.owner] = (F.fam.gifts[p.owner] || 0) + 1; gainXp(2); sfx("chime"); act("cheer");
     const where = PET_HOMES[p.scene].n.replace(/ \(.*\)$/, ""), who = OWNER_NAME[p.owner];
-    if (giftPos(p.owner)) { const line = petFill(`A ${PETS[p.kind].n}! I'm calling it {p}!`, p); if (p.owner === "evan") evanSays(line); else npcSay(p.owner, line); }
+    if (giftPos(p.owner)) { const line = petFill(`A ${PETS[p.kind].n}! I'm calling it {p}!`, p); npcSay(p.owner, line); }
     else F.thanks = [...(F.thanks || []), {id: `thanks-${p.owner}-${Date.now()}`, who: p.owner, item, at: Date.now() + 10*M}].slice(-30);
     speak(`${p.name} the ${PETS[p.kind].n} is ${who}'s now, and lives at ${where}.${giftPos(p.owner) ? "" : ` ${who}'ll send a thank-you note.`} Tap ${p.name} there to say hello.`, 6000); done(); });
   const pc = () => companions(F).find(x => x.id === petView);
@@ -2677,7 +2563,7 @@ function wireCompanions(c){
     if (b.dataset.petdo === "pat") { mprop("heart", x, y - 30, 1600); sfx("purr"); if (p.patDay !== dayKey()) { p.patDay = dayKey(); gainXp(1); } speak(petFill(["{p} leans into the pat.", "{p} looks very pleased with itself.", "A happy little wiggle from {p}."][Math.floor(Math.random()*3)], p), 3500); save(); return; }
     if (!giftPos(p.owner) || p.playDay === dayKey()) return;
     p.playDay = dayKey(); gainXp(2); [0, 300, 600].forEach((t, k) => setTimeout(() => mprop("heart", x + (k - 1)*14, y - 34, 1800), t)); sfx("chime");
-    speak(playLine(p), 5000); setTimeout(() => { const l = ownerLine(p); if (p.owner === "evan") evanSays(l); else npcSay(p.owner, l); }, 1800); done(); });
+    speak(playLine(p), 5000); setTimeout(() => { const l = ownerLine(p); npcSay(p.owner, l); }, 1800); done(); });
   const nf = c.querySelector("[data-petname]"); if (nf) nf.onsubmit = e => { e.preventDefault(); const p = pc(), v = (nf.querySelector("input").value || "").trim().slice(0, 20); if (!p || !v) return; p.name = v; flash(`Say hello to ${v}`); done(); };
   const hs = c.querySelector("[data-pethome]"); if (hs) hs.onchange = () => { const p = pc(); if (!p || !PET_HOMES[hs.value]) return; p.scene = hs.value; p.spot = companions(F).filter(x => x.scene === hs.value && x !== p).length; speak(`${p.name} has moved to ${PET_HOMES[hs.value].n.replace(/ \(.*\)$/, "")}.`, 4000); done(); };
 }
@@ -2721,7 +2607,7 @@ function wireScoop(c){
     const out = makeDipped(F, scSt.dpick, scSt.dfmt === "waffle" ? "waffle" : "cone", dip, top, give); if (!out) return;
     if (give) { sfx("paper", true); flash(`${out.n} in your backpack`); speak("Wrapped in a napkin and into the cool pocket of your backpack. Tap it there to choose who it's for.", 4500); }
     else { S.cone = {until: Date.now() + 4*M, col: out.col}; sfx("chime"); act("cheer"); mprop("heart", mel.x, mel.y - 60, 1600); if (S.iceDay !== dayKey()) { S.iceDay = dayKey(); gainXp(1); }
-      speak(`${out.name[0].toUpperCase() + out.name.slice(1)}. The chocolate's still setting. Eat fast!`, 5000); if (evanHere()) setTimeout(() => evanSays(pick(["I want chocolate one!", "sprinkles!! for me?", "Mama, share!"])), 1000); scView = null; }
+      speak(`${out.name[0].toUpperCase() + out.name.slice(1)}. The chocolate's still setting. Eat fast!`, 5000); ; scView = null; }
     scSt.dpick = null; save(); ctx(); render(); });
   c.querySelectorAll("[data-gvpick]").forEach(b => b.onclick = () => { scSt.vpick = b.dataset.gvpick; ctx(); });
   c.querySelectorAll("[data-gvback]").forEach(b => b.onclick = () => { scSt.vpick = null; ctx(); });
@@ -2753,7 +2639,7 @@ function tipBand(){
 // minute, and any of the family on the foreshore paddle out too. Maple guards the towels. Tap the shore to come back.
 let sup = null;   // {from: local minutes when it started, until: ms, out: reached the water}
 const SUP_BOARD = k => `<g class="supboard"><ellipse cx="0" cy="${-1*k}" rx="${22*k}" ry="${3.6*k}" style="fill:#7FB8E8;stroke:var(--line)" stroke-width="1"/><path d="M${-18*k} ${-1*k} h${36*k}" style="stroke:#FFFDF6" stroke-width=".9"/><path d="M${12*k} ${-30*k} l${5*k} ${32*k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16*k} ${-2*k} l${2*k} ${8*k} l${3*k} ${-1*k} l${-2*k} ${-8*k}z" style="fill:#F3C969;stroke:var(--line)" stroke-width=".8"/></g>`;
-[["mel", 1], ["evan", .62]].forEach(([id, k]) => { const b = document.querySelector(`#${id} .bob`); if (b) b.insertAdjacentHTML("beforebegin", SUP_BOARD(k)); });
+[["mel", 1]].forEach(([id, k]) => { const b = document.querySelector(`#${id} .bob`); if (b) b.insertAdjacentHTML("beforebegin", SUP_BOARD(k)); });
 // Mel's scooter (under her feet) and car (round her, her head above the roof line), shown while she's on the move outdoors
 { const b = document.querySelector("#mel .bob"); if (b) {
   // a hire bike (transport.js): a child seat on the back for Evan, a basket on the front for Maple
@@ -2774,8 +2660,7 @@ function familyPaddle(){
   if (stormyOn(dayKey())) { speak("Choppy and rainy out there. Better on a sunny day.", 3500); render(); return; }
   sup = {from: m, until: Date.now() + 60000, out: false};
   route = []; atSpot = null; mel.path = []; mel.tx = 104; mel.ty = 372; mel.sitting = false; nodes.mel.classList.remove("sit"); nodes.mel.classList.add("sup"); sfx("paper", true);
-  if (evanHere()) { evan.tx = 132; evan.ty = 404; evan.rk = "132,404"; evan.path = [[132, 404]]; evan.run = false; evan.wait = 99; evan.target = null; nodes.evan.classList.add("sup"); setTimeout(() => evanSays(pick(["I'm standing up! Look!", "wobbly! wobbly!", "paddle paddle!"])), 2500); }
-  const fam = ["mum", "dad", "marcus", "angelina"].filter(isHere);
+  const fam = ["hana", "theo", "tomi", "posy"].filter(isHere);
   speak(fam.length ? `Boards out! ${fam.map(n => NPCS.find(d => d.id === n).name).join(" and ").replace(/ and (?=.* and )/g, ", ")} ${fam.length > 1 ? "are" : "is"} paddling out with you.` : "Boards out! Off the jetty and onto the water. Maple's minding the towels.", 4500);
   setTimeout(() => { if (sup && scene === "shore") { speak("Dolphins! Right next to the boards. Don't fall in. Okay, maybe a little.", 4500); [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("heart", 80 + k*24, 330, 1800), d)); if (fam.length) npcSay(fam[0], "Dolphin! Over there, look!"); } }, 20000);
   render();
@@ -2786,14 +2671,13 @@ const JETTY = {shore: [216, 500], base: [150, 134]};
 function paddleTo(dest){
   if (paddling || sup) return;
   const m = sgHM(); if (m >= 22*60 || m < 6*60) { speak("Too dark to paddle the river now. Walk tonight, paddle in the morning.", 3500); render(); return; }
-  const kid = evanHere(), off = scene === "shore" ? [[104, 372], [132, 404]] : [[124, 84], [96, 88]]; paddling = true; route = []; atSpot = null; mel.path = []; mel.sitting = false;
+  const kid = false, off = scene === "shore" ? [[104, 372], [132, 404]] : [[124, 84], [96, 88]]; paddling = true; route = []; atSpot = null; mel.path = []; mel.sitting = false;
   mel.x = mel.tx = off[0][0]; mel.y = mel.ty = off[0][1]; maple.x = maple.tx = off[0][0] + 6; maple.y = maple.ty = off[0][1] - 2; nodes.mel.classList.remove("sit"); nodes.mel.classList.add("sup");
-  if (kid) { evan.x = evan.tx = off[1][0]; evan.y = evan.ty = off[1][1]; evan.rk = off[1].join(","); evan.path = [off[1]]; evan.run = false; evan.wait = 99; evan.target = null; nodes.evan.classList.add("sup"); }
-  sfx("paper", true); speak(dest === "shore" ? (kid ? "Boards on! Evan's kneeling on his, Maple's on yours. Off down the river." : "Board on, Maple on the front. Off down the river.") : (kid ? "Boards on! Up the stream, across the lake and home." : "Board on. Up the stream and home."), 2500);
+  sfx("paper", true); speak(dest === "shore" ? `Board on, ${F.name} on the front. Off down the river.` : "Board on. Up the stream and home.", 2500);
   setTimeout(() => {
-    nodes.mel.classList.remove("sup"); nodes.evan.classList.remove("sup"); paddling = false;
+    nodes.mel.classList.remove("sup"); paddling = false;
     setScene(dest, JETTY[dest]);
-    setTimeout(() => { if (evanHere()) { evan.x = evan.tx = JETTY[dest][0] + 26; evan.y = evan.ty = JETTY[dest][1] + 10; evan.run = false; evan.wait = 3; }
+    setTimeout(() => { ;
       speak(dest === "shore" ? "Out at the foreshore. Salty air, and the dolphins are about." : "Home! Boards back on the rack.", 3500); }, 450);
   }, 1300);
 }
@@ -2803,13 +2687,13 @@ function startCruise(){
   if (S.cruise && Date.now() < S.cruise.until) return;
   const m = sgHM(); if (m >= 19*60 || m < 6*60) { speak("Too dark for a cruise. The dolphins are tucked up for the night.", 3500); render(); return; }
   S.cruise = {until: Date.now() + 45000}; route = []; mel.path = []; atSpot = null;
-  [nodes.mel, nodes.maple, nodes.evan].forEach(n => n.style.visibility = "hidden"); sfx("chime"); drawScene();
-  speak(evanHere() ? "All aboard! Evan's at the front, Maple's on your lap. Off up the coast." : "All aboard! Maple's on your lap. Off up the coast.", 5000);
+  [nodes.mel, nodes.maple].forEach(n => n.style.visibility = "hidden"); sfx("chime"); drawScene();
+  speak(("All aboard! Maple's on your lap. Off up the coast."), 5000);
   setTimeout(() => { if (S.cruise && scene === "shore") { speak("Dolphins! A whole pod, right alongside the boat. One jumps clean out of the water.", 5500); [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("heart", 90 + k*20, 260, 1800), d)); } }, 16000);
   render();
 }
 function endCruise(){
-  S.cruise = null; [nodes.mel, nodes.maple, nodes.evan].forEach(n => n.style.visibility = "");
+  S.cruise = null; [nodes.mel, nodes.maple].forEach(n => n.style.visibility = "");
   if (scene !== "shore") return;
   mel.x = mel.tx = 206; mel.y = mel.ty = 556; maple.x = maple.tx = 184; maple.y = maple.ty = 558;
   if (S.cruiseDay !== dayKey()) { S.cruiseDay = dayKey(); gainXp(3); act("cheer"); }
@@ -2817,9 +2701,9 @@ function endCruise(){
 }
 function endPaddle(walkBack){
   if (!sup) return; const was = sup; sup = null;
-  nodes.mel.classList.remove("sup"); nodes.evan.classList.remove("sup"); evan.wait = 1;
+  nodes.mel.classList.remove("sup");
   if (scene !== "shore") return;
-  if (walkBack) { walkTo(216, 500); if (evanHere()) { evan.tx = 240; evan.ty = 508; } }
+  if (walkBack) { walkTo(216, 500); ; }
   if (was.out && S.supDay !== dayKey()) { S.supDay = dayKey(); gainXp(2); act("cheer"); speak("Back on the sand. Wet, salty and very happy. Same time next weekend?", 4500); save(); }
 }
 // Who's where today: everyone's day at a glance (in the friendship view), family first, then the village
@@ -2828,11 +2712,11 @@ const PLACE_NAME = {greenhouse: "the greenhouse", mill: "the old mill", rd_stati
 const ACT_WORD = {water: "watering", farm: "gardening", sit: "sitting down", game: "gaming", sup: "paddleboarding", guide: "leading a tour", lead: "leading the class",
   exercise: "exercise class", cone: "with an ice cream", cook: "cooking", rest: "in the hammock", repair: "fixing things", type: "busy", play: "playing"};
 const placeName = sc => PLACE_NAME[sc] || (ROOMS[sc] && ROOMS[sc].name) || sc;
-const WHO_FAMILY = ["darren", "mama", "gonggong", "mum", "dad", "marcus", "angelina"];
+const WHO_FAMILY = ["bo", "farid", "mei", "hana", "theo", "tomi", "posy"];
 function whosWhereHTML(){
   const day = dayKey(), t = sgHM(), hhmm = m => fmtTime(m);
   const row = n => { const sch = daySchedule(n.id, day), cur = sch.find(x => t >= x.from && t < x.to);
-    const cls = classOn(day), word = a => a === "lead" && cls ? `leading ${cls.kind}` : a === "exercise" && cls && n.id !== "mum" ? `${cls.kind} with Mum` : ACT_WORD[a];
+    const cls = classOn(day), word = a => a === "lead" && cls ? `leading ${cls.kind}` : a === "exercise" && cls && n.id !== "hana" ? `${cls.kind} with Mum` : ACT_WORD[a];
     const what = x => x.club ? "the wine club at the cellar door" : x.dinner ? `family dinner at ${HOST_NAME[x.scene] || placeName(x.scene)}` : `${placeName(x.scene)}${x.act && word(x.act) ? ` (${word(x.act)})` : ""}`;
     return `<details class="whowhere"><summary><b>${esc(n.name)}</b> <small class="muted">${cur ? `now: ${esc(what(cur))}` : "not about just now"}</small></summary>
       <ul>${sch.map(x => `<li class="${x === cur ? "now" : ""}"><span>${hhmm(x.from)}–${hhmm(x.to)}</span> ${esc(what(x))}</li>`).join("") || "<li>Not in the village today.</li>"}</ul></details>`; };
@@ -2846,35 +2730,6 @@ function whosWhereHTML(){
 // exchange (Ah Gong: "Ah Gong loves who the most?"; Evan's cheeky with them), and once a day a surprise toy for him
 const SURPRISES = [["dino", "a little dinosaur"], ["plane", "a toy aeroplane"], ["robot", "a wind-up robot"]];
 let banterAt = Date.now() + 20000;
-function grandBanter(){
-  if (Date.now() < banterAt || !evanHere() || quietNow() || route.length) return;
-  const here = ["dad", "mum"].filter(w => npcPos(w)); if (!here.length) return;
-  banterAt = Date.now() + (60 + Math.random()*60)*1000;
-  const g = pick(here), title = g === "dad" ? "Ah Gong" : "Ah Ma", p = npcPos(g);
-  if (S.surpriseDay !== dayKey() && Math.random() < .6) {
-    const [k, n] = pick(SURPRISES); S.surpriseDay = dayKey();
-    npcSay(g, g === "dad" ? "Evan! Come, come. Ah Gong has a surprise for you!" : "Evan, come here! Ah Ma brought you something!");
-    setTimeout(() => { evan.tx = p.x + 20; evan.ty = p.y + 6; evan.run = true; evan.wait = 8; }, 800);
-    setTimeout(() => { S.evanHold = {k, until: Date.now() + 3*H}; renderEvanHold(); evanSays(`WOW! ${n[0].toUpperCase() + n.slice(1)}! Thank you ${title}!`); [0, 250, 500].forEach((d, i) => setTimeout(() => mprop("heart", evan.x + (i - 1)*14, evan.y - 40, 1600), d)); save(); }, 2600);
-    return;
-  }
-  if (g === "dad") { npcSay("dad", pick(["Ah Gong loves who the most?", "Evan! Ah Gong loves who the most?"]));
-    setTimeout(() => evanSays(pick(["ME!", "Evan! Hehe.", "Maple! Hehe. No, ME!", "Spiderman!", "Ah Ma! ...no, ME!"])), 1800);
-    setTimeout(() => npcSay("dad", pick(["Correct answer!", "Aiyo, this cheeky boy!", "Hahaha, so smart!"])), 4200); }
-  else { npcSay("mum", pick(["Evan, come give Ah Ma a hug!", "Evan, have you eaten? Come, Ah Ma feeds you.", "Evan, so handsome today!"]));
-    setTimeout(() => { evanSays(pick(["Catch me first, Ah Ma!", "No! Hehehe.", "Only if you say please!", "Ah Ma, look! I can jump!"])); const b = bounds(); evan.tx = clamp(evan.x + rnd(-80, 80), b[0] + 20, b[2] - 20); evan.ty = clamp(evan.y + rnd(-30, 30), b[1] + 20, b[3] - 20); evan.run = true; evan.wait = 5; }, 1800);
-    setTimeout(() => npcSay("mum", pick(["Aiyo, this boy!", "Come back here, cheeky!", "So naughty! Come, Ah Ma wants a hug."])), 4200); }
-}
-setInterval(grandBanter, 5000);
-// Evan at Marcus and Angellina's: he wants games (Mario, Spiderman) the moment he's in the door
-function marcusGames(){
-  if (!evanHere()) { speak(VILLAGE.marcus ? ROOMS.marcus.stations.find(x => x[0] === "games")[5] : "", 4000); render(); return; }
-  evan.tx = 150; evan.ty = 300; evan.run = true; evan.wait = 12; sfx("chime");
-  setTimeout(() => evanSays(pick(["Mario jump! Again! Again!", "Spiderman! Thwip thwip!", "I'm winning! I'm winning!"])), 1200);
-  if (isHere("marcus")) setTimeout(() => npcSay("marcus", pick(["Okay, one level. Then we ask your mum. Right, Zeh?", "Jump! No, the other jump! Haha.", "He's better than me already, Zeh."])), 2600);
-  if (S.gamesDay !== dayKey()) { S.gamesDay = dayKey(); gainXp(1); save(); }
-  speak(isHere("marcus") ? "Evan and Uncle Marcus play Mario. Evan mostly jumps into holes and laughs." : "One level of Mario for Evan. He mostly jumps into holes and laughs.", 4500); render();
-}
 // Family dinner: Mel takes her seat at the table (once a night it's a little xp, and a lot of hearts)
 function sitForDinner(){
   const d = dinnerNow(dayKey(), sgHM()), next = dinnerOn(dayKey());
@@ -2882,11 +2737,11 @@ function sitForDinner(){
     speak(d ? `Dinner's at ${HOST_NAME[d.host]} tonight. Everyone's there already!` : next && sgHM() < next.from ? `Family dinner tonight at ${HOST_NAME[next.host]}, 6:30.` : "The family table. Dinners are on Wednesdays and Sundays, at a different house each time.", 4500); render(); return; }
   const seat = dinnerSeat(scene, "mel"); mel.tx = seat[0]; mel.ty = seat[1]; mel.path = []; setTimeout(() => { mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = -1; }, 700);
   if (S.dinnerDay !== dayKey()) { S.dinnerDay = dayKey(); gainXp(3); [0, 250, 500, 750].forEach((t, k) => setTimeout(() => mprop("heart", seat[0] - 120 + k*70, seat[1] - 70, 1800), t)); save(); }
-  const who = ["mama", "mum", "gonggong", "dad"].find(isHere);
-  if (who) setTimeout(() => npcSay(who, pick(who === "mama" ? ["Eat, eat! Ma Ma made too much again.", "Come, sit next to Ma Ma."] : who === "mum" ? ["Have more! You're too thin.", "Everyone's here. This is the best."] : who === "gonggong" ? ["Have you eaten? Now you have.", "Pass the soup, pass the soup."] : ["Who wants to hear what I played today?", "Evan, eat your vegetables. For Grandpa."])), 1200);
+  const who = ["farid", "hana", "mei", "theo"].find(isHere);
+  if (who) setTimeout(() => npcSay(who, pick(who === "farid" ? ["Eat, eat! Ma Ma made too much again.", "Come, sit next to Ma Ma."] : who === "hana" ? ["Have more! You're too thin.", "Everyone's here. This is the best."] : who === "mei" ? ["Have you eaten? Now you have.", "Pass the soup, pass the soup."] : ["Who wants to hear what I played today?", "Evan, eat your vegetables. For Grandpa."])), 1200);
   // bring two tomatoes and two eggs and Ma Ma makes her tomato and egg for the table (once a dinner)
   if (S.tomeggDay !== dayKey() && (F.inv.tomato || 0) >= 2 && (F.inv.egg || 0) >= 2) { S.tomeggDay = dayKey(); addInv("tomato", -2); addInv("egg", -2); gainXp(2);
-    setTimeout(() => { if (isHere("mama")) npcSay("mama", "Tomatoes and eggs! Ma Ma makes her tomato and egg. Everybody eat!"); if (evanHere()) setTimeout(() => evanSays(pick(["Ma Ma's eggs are the best!", "More rice please!", "Yummy yummy!"])), 1800); }, 2600);
+    setTimeout(() => { if (isHere("farid")) npcSay("farid", "Tomatoes and eggs! Ma Ma makes her tomato and egg. Everybody eat!"); ; }, 2600);
     speak("You hand Ma Ma two tomatoes and two eggs. Ten minutes later: her tomato and egg, over rice. Everyone goes quiet, then asks for seconds.", 6500); save(); render(); return; }
   speak((F.inv.tomato || 0) || (F.inv.egg || 0) ? "Family dinner. Everyone round one table, all talking at once. (Two tomatoes and two eggs and Ma Ma will make her tomato and egg.)" : "Family dinner. Everyone round one table, all talking at once. The best.", 4500); render();
 }
@@ -2894,11 +2749,11 @@ function sitForDinner(){
 let melEx = null;
 function joinClass(){
   const c = classOn(dayKey()), m = sgHM();
-  if (awayOn(F).includes("mum") && m < 9*60) { speak(`No class this morning: Mum's away in ${TOWNS[tripOn(F).town].n} for the day.`, 4500); render(); return; }
+  if (awayOn(F).includes("hana") && m < 9*60) { speak(`No class this morning: Mum's away in ${TOWNS[tripOn(F).town].n} for the day.`, 4500); render(); return; }
   if (!c || m < c.from || m >= c.to) { const next = classOn(dayKey());
     speak(`Mum's classes are here at 8am: Pilates on Mondays and Wednesdays, Zumba on Tuesdays and Thursdays, Piloxing on Fridays and Saturdays.${next && m < next.from ? ` Today's is ${next.kind}.` : ""}`, 6000); render(); return; }
   melEx = [436, 482]; walkTo(436, 482); sfx("paper", true);
-  if (isHere("mum")) setTimeout(() => npcSay("mum", pick([`My girl's here! Everybody, this is my daughter. ${c.kind} time!`, "Come, come, there's a mat for you. Follow me!", "Darling! Good, good. Stretch first."])), 900);
+  if (isHere("hana")) setTimeout(() => npcSay("hana", pick([`My girl's here! Everybody, this is my daughter. ${c.kind} time!`, "Come, come, there's a mat for you. Follow me!", "Darling! Good, good. Stretch first."])), 900);
   if (S.classDay !== dayKey()) { S.classDay = dayKey(); setTimeout(() => { gainXp(2); earn(2, `Mum's ${c.kind} class`); save(); }, 6000); }
   speak(`${c.kind} with Mum on the lawn. Arms up, and breathe.`, 4000); render();
 }
@@ -2909,32 +2764,23 @@ function fieldSpot(id){
     if (S.swans === today) { speak("The swans have had their crumbs today. They're pretending not to notice you.", 4000); render(); return; }
     S.swans = today; gainXp(1); sfx("chime"); [0, 300].forEach((d, k) => setTimeout(() => mprop("heart", 200 + k*60, 300, 1800), d));
     speak(pick(["You toss some crumbs. The swans glide over, very dignified, and eat every one.", "Crumbs for the swans. One honks politely. The other pretends it didn't."]), 5000);
-    if (evanHere()) { evan.tx = 240; evan.ty = 380; evan.run = true; evan.wait = 6; setTimeout(() => evanSays("swan! big swan!"), 900); }
     save(); render(); return;
   }
   if (id === "picnic") {
     mel.sitting = true; nodes.mel.classList.add("sit"); mel.dir = 1; sfx("paper", true);
     if (F.inv.picnic > 0) { addInv("picnic", -1); gainXp(4); act("cheer"); speak("Picnic time! Sandwiches, fruit, and Maple guarding the basket.", 5000);
-      if (evanHere()) { evan.tx = mel.x + 30; evan.ty = mel.y + 6; evan.run = true; evan.wait = 10; setTimeout(() => evanSays("sandwich!"), 1200); } }
+      ; }
     else speak(pick(["A rest on the picnic blanket. Clouds, a breeze, nothing to do for a minute.", "Sit, breathe, look at the lake. That counts as a break."]), 4500);
     save(); render(); return;
   }
   // the football pitch: Evan runs to the ball (and Pip, if he's here, wants a pass)
-  if (evanHere()) {
-    evan.tx = 176 + rnd(-20, 20); evan.ty = 560; evan.run = true; evan.wait = 8; setTimeout(() => evanSays(pick(["goal!", "kick it!", "my ball!"])), 1000);
-    if (isHere("pip")) setTimeout(() => npcSay("pip", "Pass, Evan! Pass to me!"), 2200);
-    if (S.kickabout !== today) { S.kickabout = today; gainXp(1); setTimeout(() => mprop("heart", evan.x, evan.y - 44, 1800), 1600); }
-    speak("A kickabout with Evan. He's mostly running after the ball and shouting. Perfect.", 4500);
-  } else speak(isHere("pip") ? "Pip's practising his penalties. He's very serious about it." : VILLAGE.pitch.line, 4000);
+  speak(isHere("pip") ? "Pip's practising his penalties. He's very serious about it." : VILLAGE.pitch.line, 4000);
   save(); render();
 }
 // The playground: Evan runs over to play (Pip too, if he's here)
 function playground(id){
   const v = VILLAGE[id];
-  if (!evanHere()) { speak(v.line, 3500); render(); return; }
-  evan.tx = v.door[0] + rnd(-6, 6); evan.ty = v.door[1] - 6; evan.run = true; evan.wait = 8;
-  setTimeout(() => evanSays(pick(id === "pswing" ? ["wheee!", "push me!", "higher!"] : id === "pslide" ? ["again!", "whoosh!", "down!"] : id === "pround" ? ["round round!", "faster!", "dizzy!"] : ["up!", "down!", "bumpy!"])), 900);
-  if (isHere("pip")) setTimeout(() => npcSay("pip", pick(["Evan! Over here!", "My turn, then your turn!", "Race you to the slide!"])), 1800);
+  if (isHere("pip")) setTimeout(() => npcSay("pip", pick(["Push me on the swing? Higher!", "Watch me on the slide!", "Race you to the slide!"])), 1800);
   speak(v.line, 3500); render();
 }
 setTimeout(vineTick, 3000);
@@ -3010,35 +2856,8 @@ function checkTrophies(){
 setInterval(checkTrophies, 30000); setTimeout(checkTrophies, 4000);
 
 /* ---------- Evan's room: Evan is the one who moves. Nothing here saves or earns. ---------- */
-function kidTap(ev){
-  if (ev.target.closest("[data-exit]")) { leaveKidRoom(); return; }   // the door always works, even while Evan sleeps
-  if (kid.sleep) {
-    if (evanNight()) { evanSays("shh… sleeping"); return; }   // bedtime: he stays asleep
-    kid.sleep = false; evan.x = evan.tx = 230; evan.y = evan.ty = 340; drawScene(); evanSays(pickSay(["morning!", "awake!", "*yawn*"])); sfx("chime"); return;
-  }
-  const ent = ev.target.closest("[data-ent]");
-  if (ent && ent.dataset.ent === "mel") { evan.tx = mel.x + 18; evan.ty = mel.y + 4; evan.run = true; kid.pending = null; evanSays("Mama!"); mprop("heart", mel.x, mel.y - 50); return; }
-  if (ent && ent.dataset.ent === "evan" && hug && hug.phase === "ask") { hugBack(); return; }
-  if (ent && ent.dataset.ent === "evan") { evanSays(pickSay(EVAN_TAPS)); mprop("heart", evan.x, evan.y - 36); sfx("tap"); return; }
-  const sp = ev.target.closest("[data-spot]");
-  if (sp) { const s = spotObj(scene, sp.dataset.spot); if (!s) return; evan.tx = s.tx; evan.ty = s.ty; evan.run = true; kid.pending = s.id; sfx("tap"); return; }
-  const [x, y] = toWorld(ev), b = bounds(); evan.tx = clamp(x, b[0] + 30, b[2]); evan.ty = clamp(y, b[1] + 20, b[3]); evan.run = Math.random() < .5; kid.pending = null;
-}
-function kidAction(id){
-  if (id === "kbed") { kid.sleep = true; drawScene(); evanSays("night night"); sfx("bowl"); return; }
-  if (id === "snacks" || ["dino", "train", "cars", "balloons"].includes(id)) { kid.open = id; sfx("paper", true); ctx(); return; }
-}
-function kidEat(id){
-  const sn = SNACKS[id]; if (!sn) return;
-  const p = document.createElement("div"); p.className = "mprop kprop"; p.innerHTML = snackPic(id, 40);
-  p.style.left = (evan.x*cam.s + cam.ox) + "px"; p.style.top = ((evan.y - 52)*cam.s + cam.oy) + "px"; $("mprops").appendChild(p); setTimeout(() => p.remove(), 2600);
-  sfx(sn.fx); setTimeout(() => sfx(sn.fx), 700); evanSays(pickSay(sn.say));
-  nodes.evan.classList.remove("hop"); void nodes.evan.getBBox(); nodes.evan.classList.add("hop"); setTimeout(() => nodes.evan.classList.remove("hop"), 700);
-}
-function leaveKidRoom(){ if (scene !== "kidroom") return; kid.open = null; stopKidGame(); kid.sleep = false; const I = INNER.kidroom; setScene("home", [I.door[0] - 10, I.door[1] + 24]); }
 function toWorld(ev){ const r = $("map").getBoundingClientRect(); return [(ev.clientX - r.left - cam.ox)/cam.s, (ev.clientY - r.top - cam.oy)/cam.s]; }
 svg.addEventListener("click", ev => {
-  if (scene === "kidroom") { kidTap(ev); return; }
   const pg = ev.target.closest("[data-pigeon]");
   if (pg) { pg.classList.remove("flap"); void pg.getBBox(); pg.classList.add("flap"); sfx("paper", true); setTimeout(() => pg.classList.remove("flap"), 1600); return; }
   if (S.sleep && scene === "room") { S.sleep = null; speak("Up we get!", 2500); save(true); }   // any tap wakes Mel
@@ -3049,8 +2868,6 @@ svg.addEventListener("click", ev => {
   const kp = ev.target.closest("[data-keep]");
   if (kp) { keepSpot = kp.dataset.keep; sfx("paper", true); render(); return; }
   const ent = ev.target.closest("[data-ent]");
-  if (ent && ent.dataset.ent === "evan" && hug && hug.phase === "ask") { hugBack(); return; }
-  if (ent && ent.dataset.ent === "evan") { evanSays(pick(["Mama!", "hug!", "hehe!", "up up!"])); mprop("heart", evan.x, evan.y - 40); evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; return; }
   if (ent && ent.dataset.ent === "maple") { sfx("purr"); if (Math.random() < .35) { hearts(2); speak("Purr… treats and toys are in your backpack. Tap the bag up top!", 4000); return; } hearts(2); speak(pick(["*leans into the pat*", "Happy fox noises!", "More pats please."]), 3000); return; }
   // the orchard's tree spots and the flower farm's beds and bushes: walk over, then the spot's card
   const ot = ev.target.closest("[data-tree], [data-bed], [data-bush]");
@@ -3073,7 +2890,7 @@ svg.addEventListener("click", ev => {
   }
   const sp = ev.target.closest("[data-spot]");
   if (sp) { const s = spotObj(scene, sp.dataset.spot); go(scene, s.tx, s.ty, () => arriveSpot(s.id));
-    if (s.id === "kiddoor" && evanHere()) { evan.tx = s.tx - 20; evan.ty = s.ty + 6; evan.run = true; evan.wait = 9; evanSays("my room!"); }   // Evan leads the way
+    ;   // Evan leads the way
     return; }
   if (scene === "terrace" && ev.target.closest("[data-exit]")) { const ex = ev.target.closest("[data-exit]").dataset.exit; if (ex === "vineyard") go("vineyard", VILLAGE.terrace.door[0], VILLAGE.terrace.door[1] + 10, null); else go("terrace", 56, 456, () => setScene("wineshop", [440, 560])); return; }
   if (ev.target.closest("[data-exit]")) { if (INNER[scene]) { const I = INNER[scene]; go(I.parent, I.door[0] + 30, I.door[1] + 20, null); } else go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null); return; }
@@ -3119,41 +2936,7 @@ function nearSpot(){
   const list = [...stationsOf(scene), scene !== "market" ? {id:"board", tx:260, ty:200} : null].filter(Boolean);
   const s = list.find(s => Math.hypot(s.tx - mel.x, s.ty - mel.y) < 26); return s ? s.id : null;
 }
-const EVAN_SPOTS = {...BB_EVAN, ct_vernazza:[[300,360],[200,440],[400,330],[330,560]], ct_corniglia:[[200,420],[300,380],[440,350],[160,520]], ct_monterosso:[[200,480],[260,420],[300,300],[150,500]], ct_manarola:[[262,400],[150,500],[300,320],[420,500]], jj_shore:[[200,470],[300,320],[420,300],[260,560]], jj_farms:[[400,410],[150,540],[262,360],[300,520]], jj_harbour:[[214,436],[260,300],[360,480],[300,540]], jj_village:[[262,150],[220,330],[300,440],[404,580]], kt_station:[[220,420],[300,540],[400,300],[260,260]], kt_lane:[[200,320],[300,520],[260,240],[160,580]], kt_temple:[[230,520],[260,250],[200,420],[330,260]], kt_river:[[262,300],[200,260],[320,500],[160,500]], rd_station:[[200,520],[300,330],[240,460],[160,420]], rd_plaza:[[220,300],[300,420],[180,380],[340,330],[260,460]], rd_bridge:[[310,120],[300,260],[420,300],[330,520]], rd_old:[[220,300],[300,480],[160,300],[420,300]], hwoods:[[240,360],[300,440],[200,480],[380,400],[260,560]], van:[[220,560],[330,600]], hlane:[[230,520],[200,560],[300,580],[230,300],[120,500]], honeysuckle:[[200,560],[330,600]], clover:[[200,560],[360,600],[160,380]], barn:[[200,560],[330,600],[160,380]], hfarm:[[260,520],[200,560],[330,580],[260,290],[60,500],[460,520]], bay:[[300,400],[250,560],[300,330],[200,300],[290,500]], scoopshop:[[200,440],[380,440],[300,560],[140,560],[260,420]], scoopkitchen:[[200,560],[380,540],[300,580]], scoopdip:[[180,560],[420,560],[140,420]], cocoa:[[200,440],[380,450],[140,560]], cocoakitchen:[[200,560],[380,560]], mumdad:[[300,560],[200,380],[420,420],[150,560],[460,560]], marcus:[[230,560],[120,500],[460,560],[250,340],[300,600]], cottage:[[200,560],[440,540],[300,340]], shore:[[230,200],[246,320],[300,320],[236,430],[260,560],[200,380],[214,520]], field:[[150,560],[200,570],[120,470],[230,390],[60,330],[280,470],[110,600]], vineyard:[[110,600],[262,598],[410,606],[200,560],[160,320],[300,330],[230,580]], base:[[260,350],[200,360],[330,360],[150,330],[230,420],[160,540],[300,600],[360,516],[240,560],[420,340]], home:[[150,340],[260,330],[380,330],[200,580],[330,590]]};
-// Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
-function evanWalk(speed, dt){
-  const key = evan.tx + "," + evan.ty;
-  if (key !== evan.rk) { evan.rk = key; evan.path = outside() || townRoom(scene) ? findPath(scene, [evan.x, evan.y], [evan.tx, evan.ty], bounds()) : [[evan.tx, evan.ty]]; }
-  const p = evan.path && evan.path[0]; if (!p) { evan.moving = false; return true; }
-  const want = [evan.tx, evan.ty]; evan.tx = p[0]; evan.ty = p[1];
-  const r = stepTo(evan, speed, dt); evan.tx = want[0]; evan.ty = want[1];
-  if (r) { evan.path.shift(); if (evan.path.length) { evan.moving = true; return false; } return true; }
-  return false;
-}
-function tickEvan(dt){
-  if (!evanHere()) return;
-  if (evanAtDinner() && !route.length) { const st = dinnerSeat(scene, "evan"); evan.tx = st[0]; evan.ty = st[1]; evan.run = false; evan.wait = 9; evanWalk(90, dt); nodes.evan.classList.toggle("sit", !evan.moving); return; }
-  if (evanSeat && !route.length) { evan.tx = evanSeat.x; evan.ty = evanSeat.y; evan.run = false; evan.wait = 9; evanWalk(90, dt); nodes.evan.classList.toggle("sit", !evan.moving); return; }
-  nodes.evan.classList.remove("sit");
-  if (hugTick()) { evanWalk(140, dt); return; }
-  if (scene === "kidroom") { if (kid.sleep) return; if (evanWalk(evan.run ? 140 : 95, dt) && kid.pending) { const id = kid.pending; kid.pending = null; kidAction(id); } return; }
-  if (evanWalk(evan.run ? 130 : 70, dt)) {
-    evan.wait -= dt;
-    if (evan.wait <= 0) {
-      const r = Math.random(), b = bounds();
-      if (r < .3) { evan.tx = clamp(mel.x + rnd(-24, 24), b[0], b[2]); evan.ty = clamp(mel.y + rnd(4, 16), b[1], b[3]); evan.run = true; evan.target = "mel"; }
-      else if (r < .5) { evan.tx = clamp(maple.x + rnd(-18, 18), b[0], b[2]); evan.ty = clamp(maple.y + rnd(2, 12), b[1], b[3]); evan.run = true; evan.target = "maple"; }
-      else if (scene === "base" && F.pets.animals.length && r < .45 && r > .3) { evan.tx = 196 + rnd(-4, 6); evan.ty = 548 + rnd(-6, 6); evan.run = true; evan.target = null; const k = F.pets.animals.some(a => a.kind === "rabbit"); setTimeout(() => evanSays(pick(k ? ["bunny!", "hop hop!", "soft!"] : ["chick chick!", "cheep!", "birdie!"])), 1500); }
-      else if (scene === "base" && F.fam.owned.sandpit && r < .75) { evan.tx = 236 + rnd(-10, 10); evan.ty = 530 + rnd(-3, 3); evan.run = true; evan.target = null; if (Math.random() < .4) setTimeout(() => evanSays(pick(["dig dig!", "sandcastle!", "look Mama!"])), 1500); }
-      else { const s = pick(EVAN_SPOTS[scene] || (townRoom(scene) || {}).party || [[260, 420]]); evan.tx = s[0] + rnd(-14, 14); evan.ty = s[1] + rnd(-8, 8); evan.run = Math.random() < .35; evan.target = null; }
-      evan.wait = rnd(2.5, 6);
-    } else if (evan.target && evan.wait > 1.9 && evan.wait < 2.0 + dt) {
-      if (Math.random() < .5) evanSays(evan.target === "maple" ? pick(["doggy!", "fox fox!", "hi Maple!"]) : pick(["Mama!", "hehe!", "look!"]));
-      evan.target = null;
-    }
-  }
-}
-const nodes = {mel: $("mel"), evan: $("evan"), maple: $("mmaple")};
+const nodes = {mel: $("mel"), maple: $("mmaple")};
 function placeNode(n, e){
   n.setAttribute("transform", `translate(${e.x.toFixed(1)} ${e.y.toFixed(1)})`);
   n.firstElementChild.setAttribute("transform", `scale(${e.dir} 1)`);
@@ -3170,7 +2953,7 @@ function updateCam(dt){
   const m = $("map"), cw = m.clientWidth, ch = m.clientHeight; if (!cw || !ch) return;
   cam.canFollow = cw/ch < W/HH - .005;
   if (cam.canFollow && !cam.fit) {
-    const fx = scene === "kidroom" ? evan.x : mel.x;   // in Evan's room the camera follows Evan
+    const fx = mel.x;   // in Evan's room the camera follows Evan
     const s = ch/HH, vw = cw/s, tx = clamp(fx - vw/2, 0, W - vw);
     cam.x = cam.snap ? tx : cam.x + (tx - cam.x)*Math.min(1, dt*3.2);
     cam.s = s; cam.ox = -cam.x*s; cam.oy = 0;
@@ -3234,19 +3017,18 @@ function frame(now){
     }
   }
   if (S.cruise && (scene !== "shore" || Date.now() > S.cruise.until)) endCruise();
-  { const rd = outside() && !townOf(scene) ? ride(F) : "walk", drive = rd === "car" && mel.moving && !sup, carry = (drive || rd === "bike") && mel.moving && !sup, withEvan = carry && evanHere() && !evanNight();
+  { const rd = outside() && !townOf(scene) ? ride(F) : "walk", drive = rd === "car" && mel.moving && !sup, carry = (drive || rd === "bike") && mel.moving && !sup;
     nodes.mel.classList.toggle("trolley", trolleyOn(F) && outside() && !townOf(scene) && !sup);
     nodes.mel.classList.toggle("scoot", rd === "scooter" && mel.moving && !sup); nodes.mel.classList.toggle("biking", rd === "bike" && mel.moving && !sup);
-    if (rd === "bike" && F.bike && nodes.mel.dataset.bikeCol !== F.bike.col) { nodes.mel.dataset.bikeCol = F.bike.col; nodes.mel.querySelectorAll(".rideBike .bikeArt > path").forEach(p => p.style.stroke = F.bike.col); } nodes.mel.classList.toggle("drive", drive); nodes.mel.classList.toggle("withEvan", withEvan);
+    if (rd === "bike" && F.bike && nodes.mel.dataset.bikeCol !== F.bike.col) { nodes.mel.dataset.bikeCol = F.bike.col; nodes.mel.querySelectorAll(".rideBike .bikeArt > path").forEach(p => p.style.stroke = F.bike.col); } nodes.mel.classList.toggle("drive", drive);
     // Maple and Evan ride along in the convertible (or on the hire bike: Evan in the child seat, Maple in the front
     // basket), and hop out beside Mel when she stops
-    if (carry) { mel.carEvan = withEvan; } else if (mel.wasDriving) { maple.x = maple.tx = mel.x - mel.dir*22; maple.y = maple.ty = mel.y + 3; if (mel.carEvan) { evan.x = evan.tx = mel.x + 18; evan.y = evan.ty = mel.y + 6; evan.path = [[evan.x, evan.y]]; evan.rk = evan.tx + "," + evan.ty; } mel.carEvan = false; }
+    if (!carry && mel.wasDriving) { maple.x = maple.tx = mel.x - mel.dir*22; maple.y = maple.ty = mel.y + 3; }
     mel.wasDriving = carry; }
   if (sup) { if (scene !== "shore" || Date.now() > sup.until) endPaddle(true); else if (!sup.out && mel.x < 160) sup.out = true; else if (sup.out && mel.tx > 170) endPaddle(false); }
   if (melEx && (scene !== "field" || Math.hypot(mel.tx - melEx[0], mel.ty - melEx[1]) > 4 || !classOn(dayKey()) || sgHM() >= classOn(dayKey()).to)) melEx = null;
   nodes.mel.classList.toggle("exercise", !!melEx && !mel.moving);
   if (mel.sitting && (mel.moving || (scene !== "trophy" && scene !== "field" && scene !== "shore" && scene !== "bay" && scene !== "scoopshop" && !DINING[scene]))) { mel.sitting = false; nodes.mel.classList.remove("sit"); }
-  if (evanSeat && (!mel.sitting || evanSeat.scene !== scene)) evanSeat = null;
   mel.wasMoving = mel.moving;
   const inRoom = scene === "room", MB = [MAPLE_BED[0], MAPLE_BED[1] + 2];
   if (inRoom) { maple.tx = MB[0]; maple.ty = MB[1]; stepTo(maple, 110, dt); }
@@ -3256,19 +3038,15 @@ function frame(now){
   else if (sup && scene === "shore") { maple.tx = 196; maple.ty = 486; stepTo(maple, 120, dt); }
   else if (!sleeping) { maple.tx = mel.x - mel.dir*24; maple.ty = mel.y + 3; const d = Math.hypot(maple.tx - maple.x, maple.ty - maple.y); stepTo(maple, Math.max(120, d*3.2), dt); if (!maple.moving) maple.dir = mel.dir; }
   else maple.moving = false;
-  tickEvan(dt);
   tickNpcs(dt); updateCam(dt); drawTableware();
-  placeNode(nodes.mel, mel); placeNode(nodes.maple, maple); placeNode(nodes.evan, evan);
-  nodes.evan.style.visibility = (scene === "kidroom" && kid.sleep) || cruisingNow() || (mel.wasDriving && mel.carEvan) ? "hidden" : "";
+  placeNode(nodes.mel, mel); placeNode(nodes.maple, maple);
   nodes.maple.style.visibility = cruisingNow() || mel.wasDriving ? "hidden" : "";
   // On the treadmill: a gentle walk in place.
   if (scene === "office" && atSpot === "treadmill" && !route.length && Math.abs(mel.x - mel.tx) < 2) { nodes.mel.classList.add("walk"); mel.dir = 1; }
-  nodes.evan.classList.toggle("run", evan.run && evan.moving);
-  const order = [[nodes.mel, mel], [nodes.maple, maple], [nodes.evan, evan], ...npcActors(), ...stallFronts()].sort((a, b) => a[1].y - b[1].y);
+  const order = [[nodes.mel, mel], [nodes.maple, maple], ...npcActors(), ...stallFronts()].sort((a, b) => a[1].y - b[1].y);
   const g = $("actors"); order.forEach(([n]) => { if (g.lastElementChild !== n) g.appendChild(n); });
   const close = Math.hypot(maple.x - mel.x, maple.y - mel.y) < 60;
   bubbleAt($("speech"), close ? (maple.x*0.35 + mel.x*0.65) : maple.x, close ? Math.min(maple.y, mel.y) : maple.y, close ? 76 : (sleeping ? 18 : 30));
-  if (evanHere()) bubbleAt($("evanSay"), evan.x, evan.y, 40); else $("evanSay").hidden = true;
   bubbleAt($("melSay"), mel.x, mel.y, 70);
   requestAnimationFrame(frame);
 }
@@ -3285,7 +3063,7 @@ $("pclose").onclick = closePanel;
 // Speech bubbles close with a tap (the next thing anyone says brings them back)
 // Tapping a speech bubble closes it, and if someone's standing under it (Penny with the post, a villager), the tap
 // reaches them too: a bubble shouldn't make the person beneath it untappable.
-["speech", "npcSay", "evanSay", "melSay"].forEach(id => $(id).addEventListener("click", ev => { ev.stopPropagation(); $(id).hidden = true;
+["speech", "npcSay", "melSay"].forEach(id => $(id).addEventListener("click", ev => { ev.stopPropagation(); $(id).hidden = true;
   const under = document.elementFromPoint(ev.clientX, ev.clientY), who = under && under.closest("#actors [data-npc], #actors [data-ent]");
   if (who) who.dispatchEvent(new MouseEvent("click", {bubbles: true, clientX: ev.clientX, clientY: ev.clientY})); }));
 $("zoomBtn").onclick = () => toggleZoom();
@@ -3301,7 +3079,7 @@ initNotebook({windDown, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glas
 // the add-a-task form on the quest board
 $("addForm").onsubmit = e => { e.preventDefault(); if (addMine($("addTitle").value, $("addKind").value === "daily")) { $("addTitle").value = ""; $("addTitle").focus(); } };
 setStallOwned(() => ({cocoa: owns(F, "cocoa"), millshop: owns(F, "millshop"), cc_cart: !!(F.cocoa && F.cocoa.up && F.cocoa.up.cart), cc_workshop: !!(F.cocoa && F.cocoa.up && F.cocoa.up.workshop)}));   // the Cocoa Room's market cart and Saturday workshop, once bought
-initNpcs({sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyReady(F, id), flash, quiet: () => quietNow(), chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, evan, sup: () => sup, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, evanSays, unreadMail,
+initNpcs({sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyReady(F, id), flash, quiet: () => quietNow(), chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, mel, sup: () => sup, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
 initTrips(() => F);

@@ -19,7 +19,7 @@ export const TOKEN = 10, CUT = .2, FRAMES = 4;
 const D = 864e5;
 // the painters, what they paint (title, price, two colours for the little picture on the wall), and how they write
 export const PAINTERS = {
-  dad: {name: "Dad", what: "Sip-and-paint landscapes", sign: "Love, Dad",
+  theo: {name: "Dad", what: "Sip-and-paint landscapes", sign: "Love, Dad",
     works: [["The terrace at dusk", 48, "#E9A87A", "#5A6B8C", "dusk"], ["Vines in October", 44, "#C98A3A", "#7A8C4A", "vines"], ["The jetty, early", 40, "#9FC3D9", "#E8D3A6", "jetty"], ["Lavender rows", 46, "#A68FCB", "#F3DDB0", "rows"], ["Ma Ma's orchard", 42, "#7FA35A", "#F3C969", "orchard"]],
     note: ["Mel! Somebody bought my painting. A real person, with real money. I've told everyone at the class. Twice.", "Posy rang to say '{t}' sold. I had to sit down. Your mother says I'm insufferable now. She's right.", "'{t}' has gone to a good home, Posy says. I hope they hang it where the light's kind. I've already started the next one."]},
   juniper: {name: "Juniper", what: "Watercolours from the library garden", sign: "With love, Juniper (from behind the returns desk)",
@@ -39,11 +39,11 @@ export const MAKERS = {
 };
 Object.assign(ITEMS, {
   mk_cards: {n: "Pressed-flower cards", kind: "gift", to: "family", price: 6, art: ["tile", "#FFFDF6", "#F4C7CF"], maker: "lin", say: "Auntie Lin's pressed-flower cards! Too pretty to write in. I'll write in one anyway."},
-  mk_spoon: {n: "A carved wooden spoon", kind: "gift", to: ["mum", "mama", "dad", "darren"], price: 9, art: ["disc", "#C9A27E", "#8A5A3A"], maker: "bo", say: "A wooden spoon Bo carved by hand! It's too nice for porridge. It's getting porridge."},
-  mk_pettoy: {n: "A knitted mouse for a pet", kind: "gift", to: ["evan", "angelina"], price: 5, art: ["tile", "#C3CDEE", "#F4C7CF"], maker: "noor", say: "A little knitted mouse from Noor's rescue! Every cat in the street will want it."},
-  mk_bird: {n: "A whittled wren", kind: "gift", to: ["dad", "gonggong", "evan"], price: 8, art: ["bird", "#C9A27E"], maker: "wren", say: "A little wooden wren, whittled by the ranger! It's sitting on the windowsill, looking out."},
+  mk_spoon: {n: "A carved wooden spoon", kind: "gift", to: ["hana", "farid", "theo", "bo"], price: 9, art: ["disc", "#C9A27E", "#8A5A3A"], maker: "bo", say: "A wooden spoon Bo carved by hand! It's too nice for porridge. It's getting porridge."},
+  mk_pettoy: {n: "A knitted mouse for a pet", kind: "gift", to: ["posy"], price: 5, art: ["tile", "#C3CDEE", "#F4C7CF"], maker: "noor", say: "A little knitted mouse from Noor's rescue! Every cat in the street will want it."},
+  mk_bird: {n: "A whittled wren", kind: "gift", to: ["theo", "mei"], price: 8, art: ["bird", "#C9A27E"], maker: "wren", say: "A little wooden wren, whittled by the ranger! It's sitting on the windowsill, looking out."},
   mk_honeybutter: {n: "Hana's honey butter", kind: "gift", to: "family", price: 6, art: ["jar", "#F3D98A", "#FFFDF6"], maker: "hana", say: "Hana's honey butter, the one from her toast! On everything. On everything."},
-  mk_wraps: {n: "Beeswax food wraps", kind: "gift", to: ["mum", "mama", "angelina"], price: 7, art: ["cloth", "#F6E3A1", "#9EBE8C"], maker: "felix", say: "Beeswax wraps from Felix's bees! No more cling film. The kitchen smells like honey."}
+  mk_wraps: {n: "Beeswax food wraps", kind: "gift", to: ["hana", "farid", "posy"], price: 7, art: ["cloth", "#F6E3A1", "#9EBE8C"], maker: "felix", say: "Beeswax wraps from Felix's bees! No more cling film. The kitchen smells like honey."}
 });
 export const MAKER_ITEMS = Object.values(MAKERS).map(m => m.item);
 const STOCK = 3;   // each maker tops their spot up to this on Mondays
@@ -92,7 +92,7 @@ const OWN_MOTIF = {p_view: "rows", p_cypress: "cypress", p_still: "still"};
 export function takeDown(F, i){ const g = galleryState(F), f = g.frames[i]; if (!f || !f.own) return false; g.frames[i] = null; F.inv[f.own] = (F.inv[f.own] || 0) + 1; return true; }
 // the painters' letters, a week after a sale
 export const galleryMail = (F, t) => galleryState(F).sold.filter(s => s.at <= t && PAINTERS[s.by]).map(s => { const p = PAINTERS[s.by], line = p.note[hashS(s.id) % p.note.length].replace(/\{t\}/g, s.t);
-  return {id: s.id, from: "postie", at: s.at, title: `${p.name}'s painting sold`, body: `${s.by === "dad" ? "Hello love" : "Dear Mel"},\n\n${line}\n\n${p.sign}`}; });
+  return {id: s.id, from: "postie", at: s.at, title: `${p.name}'s painting sold`, body: `${s.by === "theo" ? "Hello love" : "Dear Mel"},\n\n${line}\n\n${p.sign}`}; });
 
 /* ---------- the pictures (round 197, Mel: "the paintings all look the same") ---------- */
 // what's painted inside a frame's canvas (x, y, w, h): each work its own little scene, in its two colours

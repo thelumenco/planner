@@ -83,9 +83,9 @@ export const NOTES = ["LOST: one blue thong, left foot. If found, keep it, I've 
 
 // each room's panel
 export function bbRoomPanel(F, room, o = {}){
-  const evan = !!o.evan;
+  const evan = false;
   switch (room) {
-    case "bv_store": return head(room, `Mrs Dunn has run the store for forty years. There's a post office counter, a jar of Freddos, and a fly screen door that bangs.`) + treats(F, room) + listOf(F, shopGoods(room), "Off the shelves") + (evan ? `<p class="muted">Mrs Dunn keeps an eye on the little one and the Freddo jar.</p>` : "") + shut;
+    case "bv_store": return head(room, `Mrs Dunn has run the store for forty years. There's a post office counter, a jar of Freddos, and a fly screen door that bangs.`) + treats(F, room) + listOf(F, shopGoods(room), "Off the shelves") + (("")) + shut;
     case "bv_shed": return head(room, `No one minds the shed: everything has a price on a bit of cardboard, and the money goes in the honesty tin. Mel counts out the right coins, carefully.`) + treats(F, room, "From the honesty box") + listOf(F, shopGoods(room), "To take home") + shut;
     case "bv_opshop": { const today = opshopToday();
       return head(room, `Joan and Marg run the op shop on Tuesdays and every other day they feel like it. The money goes to the bush fire brigade. New things come in every day.`, "stripe") + listOf(F, today, "Today's treasures") + `<p class="muted">Different things tomorrow. "You never know what's coming in," says Marg. "Last week, a canoe."</p>` + shut; }
@@ -130,7 +130,7 @@ export function bbRoomPanel(F, room, o = {}){
     case "bv_tlake": return head(room, `The Lake House: big windows onto the still water, a fire, deep armchairs, and pancakes all day.`) + treats(F, room) + shut;
     case "bv_tturner": return head(room, `Old Joe turns bowls from fallen rainforest timber: red cedar, silky oak, black bean. "Never cut one down," he says. "The forest gives me plenty."`) + listOf(F, shopGoods(room), "From the shelves") + shut;
     case "bv_tbakery": return head(room, `The Willow Bend bakehouse has had its wood oven since 1911. Bread's out at six; the lamingtons at nine.`) + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut;
-    case "bv_tlolly": return head(room, `Jarrah's lolly shop: jars to the ceiling, a sliding ladder, and paper bags filled by the scoop. Jarrah remembers everyone's favourite.`, "stripe") + treats(F, room) + listOf(F, shopGoods(room), "By the bag") + (o.evan ? `<p class="muted">Jarrah slips a raspberry lolly into Evan's hand. "On the house, mate."</p>` : "") + shut;
+    case "bv_tlolly": return head(room, `Jarrah's lolly shop: jars to the ceiling, a sliding ladder, and paper bags filled by the scoop. Jarrah remembers everyone's favourite.`, "stripe") + treats(F, room) + listOf(F, shopGoods(room), "By the bag") + (("")) + shut;
     case "bv_tbooks": return head(room, `The book barn: two floors of second-hand books, armchairs between the shelves, and Pages the cat asleep on the poetry, as usual.`) + treats(F, room) + listOf(F, shopGoods(room), "From the shelves") + shut;
     case "bv_tmilk": return head(room, `Milking's at three: the cows walk in by themselves, one by one, each to her own place. Bill's radio is always on the country station.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:milking">Help with the milking</button></div>` + shut;
     case "bv_tcheese": return head(room, `Meg makes the dairy's cheeses: a vintage cheddar, a soft white one, and her Tableland havarti, creamy and buttery, with little holes.`) + listOf(F, shopGoods(room), "From the shelves") + `<div class="actions"><button class="btn alt" data-bba="open:cheese">Learn to make Meg's havarti</button></div>` + shut;
@@ -146,7 +146,7 @@ export function bbRoomPanel(F, room, o = {}){
     case "bv_hshop": return head(room, `The farm shop: everything lavender, from oil to honey to little bags for the drawers. Bunches hang from every beam.`) + listOf(F, shopGoods(room), "From the farm") + shut;
     case "bv_htea": return head(room, `The tea room: lace at the windows, a view down the rows, and lavender in the scones, the lemonade and the honey.`) + treats(F, room) + shut;
     case "bv_hboul": return head(room, `The boulangerie: Monsieur Bernard has been baking here since he was fourteen. Baguettes at seven, croissants at eight, gone by ten.`) + treats(F, room) + listOf(F, shopGoods(room), "To take home") + shut;
-    case "bv_hnougat": return head(room, `Madame Roux makes the nougat in copper pans behind the shop: honey, almonds, egg whites, and a lot of stirring.`, "stripe") + listOf(F, shopGoods(room), "From the shop") + (o.evan ? `<p class="muted">Madame Roux gives Evan a little cube of nougat on the end of her knife. "Pour le petit."</p>` : "") + shut;
+    case "bv_hnougat": return head(room, `Madame Roux makes the nougat in copper pans behind the shop: honey, almonds, egg whites, and a lot of stirring.`, "stripe") + listOf(F, shopGoods(room), "From the shop") + (("")) + shut;
     case "bv_hcafe": return head(room, `Café de la Place: the zinc bar, the wicker chairs, and the best view in town of the pétanque.`) + treats(F, room) + `<div class="actions"><button class="btn alt" data-bba="open:petanque">A game of pétanque in the square</button></div>` + shut;
     case "bv_hperfume": return head(room, `Madame Arnaud's perfumer's organ: hundreds of little brown bottles in a curve, top notes at the top, the deep ones at the bottom.`, "stripe") + `<div class="actions"><button class="btn primary" data-bba="open:scent">Blend your own perfume</button></div>` + shut;
     case "bv_hsavon": return head(room, `The soap maker: big blocks of olive oil soap, cut while you watch and stamped with a lavender sprig.`) + listOf(F, shopGoods(room), "From the shelves") + shut;

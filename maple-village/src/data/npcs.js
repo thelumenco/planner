@@ -110,40 +110,6 @@ export const NPCS = [
       "The quest board is the most important document in town.", "I've started a register of Maple's naps. It's long."],
     react: {quests3: "I've stamped three completed quests in the register. Gold stamp!", planning: "A planning quest! My favourite kind of paperwork."}
   },
-  {
-    id: "darren", pitch: 0.7, name: "Darren", job: "Keeps the home running",
-    intro: "Hey you. I'm on garden duty, roof duty and meeting duty today. Shout if you need anything.",
-    look: {skin: "#E6BC98", hair: "#1A1716", hairStyle: "short", top: "#9A9A9A", bottom: "#4F6B8A", tall: true},
-    // Weekdays: water the garden, work at the home office desk, fix something at lunch, tend the farm after work.
-    // Weekends: mostly outdoors.
-    routine: [slot("14:30", "16:00", "hwoods", WOODS_WALK, {dow: [6]}), 
-      slot("19:30", "21:30", "base", [430, 606], {act: "rest", needs: "hammock"}),   // once Mel buys him the hammock
-      slot("15:00", "16:30", "shore", SEA, {dow: [0], act: "sup", free: true}),   // Sunday afternoons: paddleboarding off the foreshore
-      slot("7:00", "8:30", "base", [190, 452], {days: "wd", act: "water", dir: -1}),
-      slot("8:30", "12:30", "office", [430, 258], {days: "wd", act: "type", dir: -1}),
-      slot("12:30", "13:30", "base", [340, 300], {days: "wd", act: "repair", dir: -1}),
-      slot("13:30", "17:30", "office", [430, 258], {days: "wd", act: "type", dir: -1}),
-      slot("17:30", "19:00", "farm", [[90, 250], [430, 400], [250, 520]], {days: "wd", act: "farm"}),
-      slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600], [400, 330]], {days: "wd"}),
-      slot("7:30", "10:30", "farm", [[90, 250], [430, 400], [250, 520]], {days: "we", act: "farm"}),
-      slot("10:30", "12:00", "base", [190, 452], {days: "we", act: "water", dir: -1}),
-      slot("12:00", "14:30", "base", [340, 300], {days: "we", act: "repair", dir: -1}),
-      slot("14:30", "17:00", "base", [[230, 360], [310, 612], [160, 540], [400, 330]], {days: "we"}),
-      slot("17:00", "19:00", "farm", [[90, 250], [430, 400], [250, 520]], {days: "we", act: "farm"}),
-      slot("19:00", "22:00", "base", [[230, 360], [300, 590], [200, 600]], {days: "we"}),
-      slot("22:00", "23:00", "home", [150, 262], {act: "sit"})],   // winds down on the sofa, then bed by 11 (drawn in Mel's bed: darrenAsleep)
-    lines: ["Coffee's fresh if you want some.", "Evan watered my shoes again. Very thorough.", "Go get 'em. I'll hold the fort.",
-      "The shed radio only gets one station. It's a good station.", "Dinner's sorted, don't worry about it.", "You've got this. One thing at a time."],
-    actLines: {guide: ["Welcome to the farm tour! I'll be your guide. My qualifications: enthusiasm.", "Mel planted this one. I watered it. Once.", "And these are flowers. Moving on."], 
-      type: ["*typing* Back-to-back calls. Wave if it's urgent.", "On mute. Hi! *waves*", "Two more emails and I'm free."],
-      water: ["Morning! The tomatoes say hi.", "Watering before it gets hot. Lin's orders."],
-      repair: ["Gutter's nearly fixed. Nearly.", "Hold the ladder? Kidding. Mostly.", "If it squeaks, I fix it."],
-      farm: ["Weeding. It's weirdly relaxing.", "These carrots are going to be enormous."],
-      sup: ["Sunday paddle. Best hour of the week.", "Saw a dolphin! Well, a fin. It counts.", "Don't tell Evan I nearly fell in."],
-      rest: ["Best present ever. Don't wake me for anything less than dinner.", "*sways* Five more minutes.", "The stars are out. Come look."]
-    },
-    react: {harvest: "Nice haul! I'll cook with that.", quests3: "Three done already? Look at you go.", lunch: "Lunch? I'll make toast."}
-  },
   // The vineyard's workers: while they're on shift they water, pick ripe grapes and fill empty barrels (each can be
 // switched off in the staff card at the shop counter)
   {
@@ -222,56 +188,6 @@ export const NPCS = [
     routine: [slot("9:00", "10:45", "hwoods", [[132, 590], [180, 560], [100, 600]], {dow: [1]}), slot("10:00", "15:00", "wineshop", [372, 286]), slot("15:00", "15:30", "vineyard", [[300, 260], [440, 270], [360, 300]]), slot("15:30", "21:30", "wineshop", [372, 286])],
     lines: ["The honesty box is very honest today.", "Someone asked who makes these. I said a very busy lady.", "Evenings are the best. Everyone wants a glass.", "If the shelves are full, I'm happy."],
     away: "Celeste's not on. The honesty box minds the shop."
-  },
-  // Ma Ma, Mel's grandma: she tends the orchard and the flower farm (watering, picking), has tea in her cottage in
-  // the afternoon, and now and then pops up in town (Saturdays), at the vineyard (Tuesdays and Thursdays) and at
-  // Mel's home (Sundays). Specific days come first: the first slot that matches wins.
-  {
-    id: "mama", pitch: 0.9, name: "Ma Ma", job: "Grandma, keeper of the orchard",
-    intro: "Ah girl! Come, come. Have you eaten? I've cut some fruit for you. I love you, you know that?",
-    look: {skin: "#D9A57E", hair: "#1E1A18", hairStyle: "curly", top: "#3E6B8C", bottom: "#7A4A2E", batik: "#F3D9A0", hat: "sunhat"},
-    routine: [slot("15:00", "16:30", "hfarm", [[200, 530], [280, 520], [340, 530]], {dow: [2]}), slot("9:30", "11:30", "village", [[200, 420], [300, 440], [250, 520]], {dow: [6]}),
-      slot("15:00", "17:00", "base", [[230, 360], [300, 590], [160, 520]], {dow: [0]}),
-      slot("16:00", "17:30", "vineyard", [[262, 390], [340, 440], [300, 300]], {dow: [2, 4]}),
-      slot("7:00", "11:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 500], [310, 330]], {act: "water"}),
-      slot("11:00", "13:00", "flowers", [[160, 300], [260, 380], [360, 470], [210, 300]], {act: "water"}),
-      slot("13:00", "15:00", "cottage", [[300, 330], [200, 360], [470, 530]]),
-      slot("15:00", "16:00", "cottage", [154, 564], {act: "sit"}),
-      slot("16:00", "18:00", "flowers", [[160, 380], [260, 470], [360, 300], [310, 300]], {act: "farm"}),
-      slot("18:00", "22:50", "cottage", [398, 352], {act: "sit"}), slot("22:50", "23:00", "cottage", [66, 352])],
-    lines: ["I love you, ah girl.", "Have you eaten? Come, I cut fruit for you.", "Don't work so hard. Rest a little.", "Eat more. You're too thin.",
-      "Bring Evan to see the flowers, ok?", "Wear a jacket. The office aircon is very cold.", "You're doing very well. Ma Ma is proud of you.", "Drink some water. And not only coffee."],
-    actLines: {guide: ["And this is my apple tree. Planted it with my granddaughter!", "Smell this rose. Go on, smell.", "This way, this way. Mind the mud."], water: ["Watering, watering. The trees are thirsty today.", "Plants are like children. Talk to them nicely.", "The fruit is coming along. Patience."],
-      farm: ["The flowers grow better when you sing to them.", "Look at this one. So pretty, like you.", "Cutting some for the shop. Want some?"]},
-    away: "Ma Ma's resting. She'll be out in the garden in the morning.",
-    react: {harvest: "So clever! You grow things like Ma Ma.", quests3: "Three already? Don't forget to eat lunch.", lunch: "Lunch time! Eat properly, ok?"}
-  },
-  // Gong Gong, Mel's grandpa: lives with Ma Ma in the cottage. At home he's in his white singlet and berms, watching
-  // TV or helping in the orchard and flower farm; going out (town on Mondays and Saturdays, the vineyard on Wednesdays,
-  // Mel's home at the weekend) he puts on a pressed shirt and long trousers.
-  {
-    id: "gonggong", pitch: 0.75, name: "Gong Gong", job: "Grandpa, Ma Ma's helper in the orchard",
-    intro: "Ah, my girl is here. Sit, sit. Gong Gong is just watching the news. Have you eaten?",
-    look: {skin: "#F2D6BD", hair: "#D9D4CC", hairStyle: "short", top: "#FFFFFF", bottom: "#8C8F7A", shorts: true, specs: "#C9A23A", tall: true},
-    routine: [slot("6:30", "9:00", "field", [76, 300], {act: "fish", dow: [0], dir: 1}), slot("15:00", "16:30", "hfarm", [[180, 520], [260, 520], [330, 520]], {dow: [2], look: OUT}), slot("10:00", "12:00", "village", [[230, 420], [300, 470], [190, 520]], {dow: [1], look: OUT}),
-      slot("9:30", "11:30", "village", [[220, 430], [290, 450], [260, 520]], {dow: [6], look: OUT}),
-      slot("15:00", "17:00", "vineyard", [[300, 300], [380, 300], [262, 440]], {dow: [3], look: OUT}),
-      slot("15:00", "17:00", "base", [[250, 360], [320, 590], [180, 520]], {dow: [0, 6], look: OUT}),
-      slot("7:30", "9:00", "cottage", [458, 358], {act: "sit"}),
-      slot("9:00", "11:30", "orchard", [[160, 420], [260, 510], [360, 420], [210, 330]], {act: "farm"}),
-      slot("11:30", "13:00", "cottage", [458, 358], {act: "sit"}),
-      slot("13:00", "14:00", "flowers", [[160, 330], [260, 420], [360, 510]], {act: "water"}),
-      slot("14:00", "15:00", "cottage", [458, 358], {act: "sit"}),
-      slot("15:00", "16:00", "cottage", [66, 564], {act: "sit"}),
-      slot("16:00", "17:00", "cottage", [458, 358], {act: "sit"}),
-      slot("17:00", "18:00", "orchard", [[160, 330], [260, 420], [360, 510]], {act: "water"}),
-      slot("18:00", "22:50", "cottage", [458, 358], {act: "sit"}), slot("22:50", "23:00", "cottage", [86, 360])],
-    lines: ["Have you eaten? Ma Ma made too much again.", "Work is important, but rest is also important.", "Come, sit with Gong Gong. The news is on.", "Your Ma Ma's flowers are the best in the village. Don't tell her I said.",
-      "Slowly, slowly. No need to rush.", "Gong Gong is very proud of you.", "Bring Evan next time, ok? I want to see how tall he is."],
-    actLines: {guide: ["This tree here is older than my eldest grandson. Almost.", "Ma Ma does the flowers, I do the talking.", "Any questions? No? Good, I don't know the answers."], farm: ["Loosening the soil for Ma Ma. She's the boss here.", "These trees will give good fruit. Patience."], water: ["Gong Gong waters, Ma Ma checks. Teamwork.", "A little water, a little sun. Same as people."],
-      sit: ["Shh, the drama is at the good part.", "Ma Ma says I watch too much TV. She's watching also."]},
-    away: "Gong Gong's having his afternoon nap.",
-    react: {harvest: "Wah, so much! You grow like Ma Ma.", quests3: "Three already? Clever girl.", lunch: "Lunchtime. Don't skip, ok?"}
   },
   // The orchard's two workers: Farid looks after the fruit trees, Mei the flower farm (both help Ma Ma, and take turns
   // leading the weekend tours)
@@ -962,102 +878,6 @@ export const NPCS = [
     lines: ["Table four wants another round. Table four always wants another round.", "Best view in the village, this deck.", "Napkins! Who needs napkins?", "I dream in pistachio."],
     actLines: {cone: ["Two cones for the deck, coming through!", "Mind the drips!", "Anyone for a waffle?", "Enjoy! Don't let the gulls see."]},
     away: "Tomo's off for the day."
-  },
-  // Mel's family on the foreshore (west of the field): Mum and Dad in one house, her brother Marcus and his fiancee
-  // Angellina in the other. All four help Ma Ma and Gong Gong in the orchard now and then, and walk about town.
-  // Mum: always off to an exercise class (she leads one at the field most mornings, see classSlot in tours.js) or
-  // volunteering. Dad: music (piano, double bass) and drawing (the easel, sketching on the sand).
-  {
-    id: "mum", pitch: 1.05, name: "Mum", job: "Mel's mum: exercise classes and volunteering",
-    intro: "Hello darling! Can't stop long, I'm going for my Pilates. Have you eaten? There's food at home, take some!", hellos: ["Hello darling! Have you eaten?", "Darling! Off to my Zumba, see you!"],
-    look: {skin: "#E8C3A2", hair: "#1E1A18", hairStyle: "bobfringe", top: "#E8566C", bottom: "#2F2B28"},
-    routine: [slot("13:00", "15:00", "hwoods", WOODS_WALK, {dow: [3]}), slot("15:00", "16:30", "vineyard", VINE_WALK, {dow: [4]}),
-      slot("15:00", "17:00", "base", [[230, 360], [300, 590], [160, 520]], {dow: [0]}),
-      slot("8:00", "13:00", "field", [[120, 200], [220, 196], [320, 200], [130, 470]], {dow: [0]}),
-      slot("6:45", "7:45", "shore", SHORE_WALK),
-      slot("9:00", "11:00", "fresh", [[200, 330], [300, 420], [160, 450]], {dow: [1, 3]}),
-      slot("9:00", "11:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 500]], {dow: [2, 4], act: "water"}),
-      slot("9:00", "11:00", "hall", [[200, 320], [330, 320]], {dow: [5]}),
-      slot("9:30", "11:30", "village", [[200, 420], [300, 440], [250, 520]], {dow: [6]}),
-      slot("11:00", "13:00", "mumdad", [270, 476], {act: "sit"}),
-      slot("13:00", "15:00", "flowers", [[160, 300], [260, 380], [360, 470]], {dow: [1, 2, 3, 4, 5], act: "farm"}),
-      slot("15:00", "17:00", "village", [[220, 430], [290, 450], [260, 520], [330, 400]], {dow: [1, 2, 3, 4, 5, 6]}),
-      slot("17:00", "18:00", "mumdad", [104, 404], {act: "exercise"}),
-      slot("18:00", "22:50", "mumdad", [270, 476], {act: "sit"}), slot("22:50", "23:00", "mumdad", [454, 352])],
-    lines: ["I'm going for my Pilates! Back in an hour.", "Going for Zumba later, want to come?", "Piloxing tonight. It's pilates AND boxing, very good for the arms.", "Volunteering at the library this morning. The children love the stories.",
-      "Have you eaten? Take some food home for Evan.", "Drink more water, darling.", "Your dad is playing that same song again.", "Come to my class! First one's free. They're all free, actually."],
-    actLines: {lead: ["And stretch! Two, three, four!", "Big smiles, everybody!", "Keep going, nearly there!"], exercise: ["Just my stretches. Don't mind me.", "Core, darling. It's all about the core."],
-      water: ["Helping Ma Ma. She says I'm too slow.", "Watering for Ma Ma. Good for the arms too!"], farm: ["Ma Ma's flowers are so beautiful this year.", "Weeding is basically a workout."]},
-    away: "Mum's out. Probably at an exercise class.",
-    react: {quests3: "Three done already? That's my girl!", lunch: "Lunch! Eat properly, ok?", harvest: "So much! You must bring some to Ma Ma."}
-  },
-  {
-    id: "dad", pitch: 0.72, name: "Dad", job: "Mel's dad: music and drawing",
-    intro: "Hi darling! Love you, have a good day. Oh, and come listen to this. I've been working on it all week.", hellos: ["Hi darling! Love you, have a good day.", "Hi darling, love you!", "Hi darling! Have a good day, ok?"],
-    look: {skin: "#E6BC98", hair: "#141110", hairStyle: "short", top: "#5B7DB1", bottom: "#8C8F7A", shorts: true, specs: "#141110"},
-    routine: [slot("7:00", "9:00", "shore", [140, 468], {act: "fish", dow: [6], dir: -1}), slot("9:00", "11:00", "field", MARKET_WALK, {dow: [0]}), slot("11:00", "12:30", "lane", LANE, {dow: [2]}), slot("15:00", "16:30", "vineyard", VINE_WALK, {dow: [6]}), slot("17:30", "18:30", "field", [170, 384], {dow: [3], act: "type"}),
-      slot("15:00", "17:00", "base", [[250, 360], [320, 590], [180, 520]], {dow: [0]}),
-      slot("7:00", "9:00", "shore", [212, 372], {act: "type", dir: -1}),
-      slot("9:00", "11:00", "mumdad", [112, 292], {act: "type"}),
-      slot("11:00", "12:30", "village", [[230, 420], [300, 470], [190, 520], [340, 420]]),
-      slot("12:30", "13:30", "mumdad", [330, 476], {act: "sit"}),
-      slot("13:30", "15:30", "orchard", [[160, 420], [260, 510], [360, 420], [210, 330]], {dow: [1, 3, 5], act: "farm"}),
-      slot("13:30", "15:30", "mumdad", [262, 300], {act: "type"}),
-      slot("15:30", "17:30", "mumdad", [446, 362], {act: "type", dir: -1}),
-      slot("17:30", "19:00", "shore", SHORE_WALK),
-      slot("19:00", "22:50", "mumdad", [112, 292], {act: "type", dow: [0, 2, 4, 6]}),
-      slot("19:00", "22:50", "mumdad", [262, 300], {act: "type"}), slot("22:50", "23:00", "mumdad", [434, 360])],
-    lines: ["Hi darling, love you, have a good day.", "Listen to this bit. No, wait, listen.", "Ah Gong loves who the most? Evan knows.", "I drew the dolphins this morning. They wouldn't sit still.", "Music is good for the soul. And the brain.", "Have you heard of this band? No? Let me play it for you.",
-      "I'm sketching Evan next time he visits. He has to sit still for ten minutes. We'll see.", "Your mum's at Zumba. Or Pilates. One of those.", "Proud of you, you know."],
-    actLines: {type: ["*plays a little jazz*", "This bar is tricky. Again.", "Just shading the clouds. Nearly done.", "*hums along*"], farm: ["Helping your Ma Ma. She's the boss.", "Gong Gong and I are on soil duty."]},
-    away: "Dad's out. Maybe drawing by the water.",
-    react: {quests3: "Three already? Clever girl.", lunch: "Have you had lunch? Don't skip."}
-  },
-  // Marcus, Mel's brother: a banker (he covers Opal's counter at the village bank on Mondays, Wednesdays and Fridays,
-  // and works in the city on Tuesdays and Thursdays); loves games. Angellina, his fiancee, is studying for her master's
-  // in psychology (the library in the mornings, her desk at home after lunch). Weekend afternoons they paddleboard.
-  {
-    id: "marcus", pitch: 0.7, name: "Marcus", job: "Mel's brother, a banker",
-    intro: "Zeh! Want a game later? I'll go easy on you. Probably.", hellos: ["Zeh!", "Oi, Zeh!", "Hey Zeh. Eaten yet?"],
-    look: {skin: "#E6BC98", hair: "#1A1716", hairStyle: "short", top: "#3E4A5C", bottom: "#2F3A4A", specs: "#C0C4CC", tall: true},
-    routine: [slot("7:30", "9:30", "hwoods", WOODS_RIDE, {dow: [0], look: BIKE}), slot("10:00", "12:00", "field", MARKET_WALK, {dow: [0]}), slot("17:30", "19:00", "vineyard", VINE_WALK, {dow: [5]}), slot("13:00", "14:00", "lane", LANE, {dow: [6]}),
-      slot("8:30", "9:00", "shore", SHORE_WALK, {days: "wd"}),
-      slot("12:30", "13:30", "bank", [260, 500], {dow: [1, 3, 5], look: BANKER}),
-      slot("9:00", "17:30", "bank", [404, 500], {dow: [1, 3, 5], look: BANKER}),
-      slot("17:30", "19:00", "shore", SHORE_WALK, {days: "wd"}),
-      slot("19:00", "22:50", "marcus", [90, 428], {act: "game"}), slot("22:50", "23:00", "marcus", [454, 362]),
-      slot("9:00", "11:00", "orchard", [[160, 330], [260, 420], [360, 510], [210, 500]], {days: "we", act: "farm"}),
-      slot("11:00", "13:00", "village", [[220, 430], [290, 450], [260, 520]], {days: "we"}),
-      slot("13:00", "16:00", "marcus", [90, 428], {act: "game", days: "we"}),
-      slot("16:00", "17:00", "shore", SEA, {days: "we", act: "sup", free: true}),
-      slot("17:00", "19:00", "shore", SHORE_WALK, {days: "we"})],
-    lines: ["One more game. Then I'll sleep. Probably.", "Need a hand with your jars? Compound interest, Zeh.", "Angellina's studying, so I'm being very quiet.", "Paddleboarding this weekend, Zeh? Bring Evan!", "Date night at the wine shop on Tuesday. Don't tell Mum we skipped her Zumba.", "Evan wants Spiderman again. I've created a monster.",
-      "Mum's at Zumba again.", "Dad played the same song four times today. Four.", "Banker tip, Zeh: pay yourself first. You're welcome."],
-    actLines: {game: ["Shh, boss fight.", "Nearly beat this level.", "Okay one more round."], farm: ["Ma Ma says I'm doing it wrong. I'm doing it great.", "Gong Gong's supervising. From the shade."], sup: ["Don't splash! Don't splash!", "Dolphin! Over there!"]},
-    away: "Marcus is at work in the city.",
-    react: {quests3: "Three done? Okay, overachiever.", lunch: "Lunch break! Even bankers eat."}
-  },
-  {
-    id: "angelina", pitch: 1.15, name: "Angellina", job: "Studying for her master's in psychology",
-    intro: "Hi Mel! Sorry, I'm in exam mode. Ask me anything about attachment theory. Actually don't.",
-    look: {skin: "#F0D0B4", hair: "#3A2A22", hairStyle: "long", top: "#C9A3E0", bottom: "#F0D0B4", dress: "#C9A3E0"},
-    routine: [slot("8:00", "9:00", "bay", [[180, 420], [240, 430]], {dow: [6]}), slot("10:00", "12:00", "field", MARKET_WALK, {dow: [0]}), slot("17:30", "19:00", "vineyard", VINE_WALK, {dow: [5]}), slot("12:00", "13:00", "lane", LANE, {dow: [3]}),
-      slot("9:00", "12:00", "fresh", [420, 300], {days: "wd", act: "type"}),
-      slot("12:00", "13:00", "village", [[220, 430], [290, 450], [260, 520]], {days: "wd"}),
-      slot("13:00", "16:30", "marcus", [322, 302], {days: "wd", act: "type"}),
-      slot("16:30", "17:30", "flowers", [[160, 300], [260, 380], [360, 470]], {days: "wd", act: "water"}),
-      slot("17:30", "19:00", "shore", SHORE_WALK, {days: "wd"}),
-      slot("9:00", "11:00", "flowers", [[160, 300], [260, 380], [360, 470]], {days: "we", act: "water"}),
-      slot("11:00", "13:00", "village", [[220, 430], [290, 450], [260, 520]], {days: "we"}),
-      slot("13:00", "16:00", "marcus", [322, 302], {days: "we", act: "type"}),
-      slot("16:00", "17:00", "shore", SEA, {days: "we", act: "sup", free: true}),
-      slot("17:00", "19:00", "shore", SHORE_WALK, {days: "we"}),
-      slot("19:00", "22:50", "marcus", [132, 428], {act: "sit"}), slot("22:50", "23:00", "marcus", [434, 370])],
-    lines: ["Did you know naming a feeling makes it smaller? It's true. I read it last night.", "Three more chapters. Then a break. Then three more chapters.", "Marcus says he's 'helping'. He's playing games.",
-      "How are you, really? Not the polite answer.", "The library's so quiet in the mornings. Perfect for studying.", "Your mum invited me to Zumba again. I'm scared.", "Marcus booked us a table at your wine shop. Very romantic. He's had two cheese boards.", "Evan made me watch Mario jump for twenty minutes. Fascinating, honestly."],
-    actLines: {type: ["Highlighting everything. That's how studying works, right?", "Footnotes. So many footnotes.", "Nearly done this essay."], water: ["Helping Mei with the flowers. Good study break.", "Plants are very calming. That's actual research."], sup: ["I'm standing! I'm standing!", "Look, a dolphin!"]},
-    away: "Angellina's studying somewhere quiet.",
-    react: {quests3: "Three already? That's real momentum.", lunch: "Brain food time!"}
   },
   ...BB_PEOPLE,   // round 143: Bellbird Valley (data/bb-people.js)
   ...CR_PEOPLE,   // round 150: the Coast Road (data/cr-people.js)

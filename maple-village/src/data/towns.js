@@ -16,39 +16,38 @@ import { BB_TOWNS, BB_PLACES, BB_BRIDGES, BB_ARRIVE, BB_BOUNDS, BB_OBST, BB_GOOD
 import { PAINTINGS } from "./terrace-people.js";
 export const TOWNS = {
   ronda: {
-    n: "Ronda", by: "train", fare: 40, free: ["evan"], outFrom: 7*60, outTo: 18*60, backTo: 22*60,
+    n: "Ronda", by: "train", fare: 40, free: [], outFrom: 7*60, outTo: 18*60, backTo: 22*60,
     screens: ["rd_station", "rd_plaza", "rd_bridge", "rd_old"], arrive: ["rd_station", [330, 200]], station: "rdtrain", music: "ronda",
     blurb: "A white town on a cliff in the south of Spain, split in two by a deep gorge. Orange trees, a bridge over the abyss, guitar in the streets.",
     // where each of the family likes to be on each screen (they follow Mel round the town and settle near these)
     spots: {
-      mum: {rd_plaza: [[290, 392], [250, 400], [310, 380]], rd_station: [[200, 500], [240, 470]], rd_bridge: [[400, 300], [300, 480]], rd_old: [[260, 300], [220, 460]]},
-      dad: {rd_bridge: [[452, 300], [440, 312]], rd_plaza: [[330, 280], [190, 300]], rd_station: [[130, 430], [260, 480]], rd_old: [[200, 280], [300, 480]]},
-      mama: {rd_plaza: [[130, 220], [160, 230], [100, 226]], rd_station: [[240, 420], [180, 520]], rd_bridge: [[260, 470], [380, 520]], rd_old: [[400, 280], [260, 470]]},
-      gonggong: {rd_plaza: [[196, 446], [204, 450]], rd_station: [[140, 400], [150, 410]], rd_bridge: [[420, 300], [240, 560]], rd_old: [[200, 470], [180, 480]]},
-      darren: {rd_station: [[180, 560], [210, 556]], rd_bridge: [[380, 250], [300, 240]], rd_plaza: [[330, 560], [260, 540]], rd_old: [[120, 120], [160, 160]]},
-      marcus: {rd_old: [[120, 140], [240, 300], [300, 520]], rd_bridge: [[300, 240], [460, 280]], rd_plaza: [[240, 480], [400, 330]], rd_station: [[130, 500], [330, 300]]},
-      angelina: {rd_plaza: [[420, 236], [440, 246]], rd_bridge: [[300, 520], [380, 500]], rd_station: [[260, 460], [150, 520]], rd_old: [[300, 470], [420, 480]]}
+      hana: {rd_plaza: [[290, 392], [250, 400], [310, 380]], rd_station: [[200, 500], [240, 470]], rd_bridge: [[400, 300], [300, 480]], rd_old: [[260, 300], [220, 460]]},
+      theo: {rd_bridge: [[452, 300], [440, 312]], rd_plaza: [[330, 280], [190, 300]], rd_station: [[130, 430], [260, 480]], rd_old: [[200, 280], [300, 480]]},
+      farid: {rd_plaza: [[130, 220], [160, 230], [100, 226]], rd_station: [[240, 420], [180, 520]], rd_bridge: [[260, 470], [380, 520]], rd_old: [[400, 280], [260, 470]]},
+      mei: {rd_plaza: [[196, 446], [204, 450]], rd_station: [[140, 400], [150, 410]], rd_bridge: [[420, 300], [240, 560]], rd_old: [[200, 470], [180, 480]]},
+      bo: {rd_station: [[180, 560], [210, 556]], rd_bridge: [[380, 250], [300, 240]], rd_plaza: [[330, 560], [260, 540]], rd_old: [[120, 120], [160, 160]]},
+      tomi: {rd_old: [[120, 140], [240, 300], [300, 520]], rd_bridge: [[300, 240], [460, 280]], rd_plaza: [[240, 480], [400, 330]], rd_station: [[130, 500], [330, 300]]},
+      posy: {rd_plaza: [[420, 236], [440, 246]], rd_bridge: [[300, 520], [380, 500]], rd_station: [[260, 460], [150, 520]], rd_old: [[300, 470], [420, 480]]}
     },
     // what they do at their favourite spots (some only at certain times: Mum dances while Manolo's playing, Ma Ma
     // haggles while the market's on). act: an npcs.js act (a prop, an animation)
     acts: {
-      mum: {rd_plaza: {act: "dance", at: [282, 398], hours: [[11*60, 14*60], [18*60, 22*60]]}},
-      dad: {rd_bridge: {act: "sketch", at: [452, 304], dir: -1}, rd_station: {act: "sketch", at: [130, 470], dir: -1}, rd_banos: {act: "sketch", at: [430, 380], dir: -1}},
-      mama: {rd_plaza: {act: "haggle", at: [150, 222], dir: -1, hours: [[8*60, 14*60]]}, rd_mercado: {act: "haggle", at: [170, 362], dir: -1}},
-      gonggong: {rd_plaza: {act: "doze", at: [206, 446]}, rd_station: {act: "doze", at: [260, 494]}, rd_jardin: {act: "doze", at: [380, 604]}},
-      marcus: {rd_bridge: {act: "photo", at: [300, 120]}, rd_old: {act: "photo", at: [124, 130]}, rd_banos: {act: "photo", at: [110, 330]}},
-      angelina: {rd_plaza: {act: "notes", at: [440, 248], dir: -1}, rd_bridge: {act: "notes", at: [300, 520]}, rd_cafe: {act: "notes", at: [230, 482], dir: -1}}
+      hana: {rd_plaza: {act: "dance", at: [282, 398], hours: [[11*60, 14*60], [18*60, 22*60]]}},
+      theo: {rd_bridge: {act: "sketch", at: [452, 304], dir: -1}, rd_station: {act: "sketch", at: [130, 470], dir: -1}, rd_banos: {act: "sketch", at: [430, 380], dir: -1}},
+      farid: {rd_plaza: {act: "haggle", at: [150, 222], dir: -1, hours: [[8*60, 14*60]]}, rd_mercado: {act: "haggle", at: [170, 362], dir: -1}},
+      mei: {rd_plaza: {act: "doze", at: [206, 446]}, rd_station: {act: "doze", at: [260, 494]}, rd_jardin: {act: "doze", at: [380, 604]}},
+      tomi: {rd_bridge: {act: "photo", at: [300, 120]}, rd_old: {act: "photo", at: [124, 130]}, rd_banos: {act: "photo", at: [110, 330]}},
+      posy: {rd_plaza: {act: "notes", at: [440, 248], dir: -1}, rd_bridge: {act: "notes", at: [300, 520]}, rd_cafe: {act: "notes", at: [230, 482], dir: -1}}
     },
     // a word now and then, and what they say when Mel taps them (on top of their usual chat)
     lines: {
-      mum: ["Listen to that guitar! See? THIS is how fast a guitar should be.", "Everything's so white it hurts my eyes. In a good way.", "Mel, smell that! Orange blossom. Or oranges. Something orange."],
-      dad: ["I've drawn a hundred bridges. This one wins.", "Look at the stonework. Two hundred years old and not a crack.", "Your mum keeps telling me to play faster. I keep telling her: it's not a race."],
-      mama: ["Mine are sweeter. But these ones also not bad.", "Two euros for this? Aiyo. In Honeybrook I give for free.", "Ma Ma never see such a big drop. Hold my hand, can?"],
-      gonggong: ["Look up. Vultures. Very big. Very patient.", "Good bench. Good shade. Gong Gong stay here a while.", "Mmm. Quiet town. I like."],
-      darren: ["Three hundred and something steps down. I lost count at the cat.", "How did they build that bridge without cranes? Forty years, they said. Forty!", "Mel, look at the drop. Don't look at the drop. Okay, look."],
-      marcus: ["Free leg day! These steps are no joke.", "Got the bridge, got the gorge, got Ma Ma haggling. Best photos ever.", "I'm getting a churro. Anyone? Zeh?"],
-      angelina: ["Everyone here talks with their hands. I'm taking notes.", "That couple at the café have been arguing for an hour and they're so happy.", "I could read in that garden all day."],
-      evan: ["so HIGH", "birdies! big birdies!", "pigeons! catch it!", "Mama, hold hand"]
+      hana: ["Listen to that guitar! See? THIS is how fast a guitar should be.", "Everything's so white it hurts my eyes. In a good way.", "Mel, smell that! Orange blossom. Or oranges. Something orange."],
+      theo: ["I've drawn a hundred bridges. This one wins.", "Look at the stonework. Two hundred years old and not a crack.", "Your mum keeps telling me to play faster. I keep telling her: it's not a race."],
+      farid: ["Mine are sweeter. But these ones also not bad.", "Two euros for this? Aiyo. In Honeybrook I give for free.", "Ma Ma never see such a big drop. Hold my hand, can?"],
+      mei: ["Look up. Vultures. Very big. Very patient.", "Good bench. Good shade. Gong Gong stay here a while.", "Mmm. Quiet town. I like."],
+      bo: ["Three hundred and something steps down. I lost count at the cat.", "How did they build that bridge without cranes? Forty years, they said. Forty!", "Mel, look at the drop. Don't look at the drop. Okay, look."],
+      tomi: ["Free leg day! These steps are no joke.", "Got the bridge, got the gorge, got Ma Ma haggling. Best photos ever.", "I'm getting a churro. Anyone? Zeh?"],
+      posy: ["Everyone here talks with their hands. I'm taking notes.", "That couple at the café have been arguing for an hour and they're so happy.", "I could read in that garden all day."]
     },
     // round 116: the interiors (see the playbook: every town gets four or five, through the doors on its screens).
     // door: the outdoor place you go in by; music: each room's own live track (audio.js); party: where the family
@@ -91,7 +90,7 @@ export const TOWNS = {
   //   -----------+----------
   //   kt_river   | kt_temple
   kyoto: {
-    n: "Kyoto", by: "train", fare: 60, free: ["evan"], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
+    n: "Kyoto", by: "train", fare: 60, free: [], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
     screens: ["kt_station", "kt_lane", "kt_temple", "kt_river"], arrive: ["kt_station", [332, 216]], station: "kttrain", music: "kyoto",
     blurb: "An old capital in a bowl of wooded hills: wooden townhouses, stone lanes, paper lanterns, temple bells, moss, maples and the sound of water. A longer ride: trains out until 3pm.",
     arriveLine: "Kyoto! Dark wood and paper lanterns, a tram clanking past, and the bamboo whispering behind the station.",
@@ -102,24 +101,24 @@ export const TOWNS = {
       kt_temple: "The temple hall, the torii gates, the gravel garden and the koi pond. North: up to the lane. West: the river.",
       kt_river: "The river and its turtle stones, the covered market and the willow canal. North: the station. East: over the canal to the temple."},
     spots: {
-      mum: {kt_station: [[220, 360], [300, 520]], kt_lane: [[260, 300], [300, 520]], kt_temple: [[330, 250], [180, 420]], kt_river: [[200, 270], [330, 500]]},
-      dad: {kt_station: [[200, 500], [420, 540]], kt_lane: [[230, 260], [340, 300]], kt_temple: [[420, 470], [260, 240]], kt_river: [[340, 260], [200, 520]]},
-      mama: {kt_station: [[250, 470], [380, 560]], kt_lane: [[200, 330], [280, 560]], kt_temple: [[200, 470], [300, 470]], kt_river: [[160, 260], [320, 480]]},
-      gonggong: {kt_station: [[230, 450], [240, 460]], kt_lane: [[230, 360], [240, 370]], kt_temple: [[200, 460], [210, 470]], kt_river: [[180, 480], [190, 490]]},
-      darren: {kt_station: [[300, 560], [420, 270]], kt_lane: [[160, 300], [300, 400]], kt_temple: [[280, 560], [250, 260]], kt_river: [[220, 230], [300, 250]]},
-      marcus: {kt_station: [[440, 560], [200, 330]], kt_lane: [[330, 520], [270, 230]], kt_temple: [[280, 260], [440, 480]], kt_river: [[380, 520], [140, 240]]},
-      angelina: {kt_station: [[280, 360], [380, 300]], kt_lane: [[300, 330], [200, 580]], kt_temple: [[330, 470], [270, 380]], kt_river: [[240, 500], [300, 280]]}
+      hana: {kt_station: [[220, 360], [300, 520]], kt_lane: [[260, 300], [300, 520]], kt_temple: [[330, 250], [180, 420]], kt_river: [[200, 270], [330, 500]]},
+      theo: {kt_station: [[200, 500], [420, 540]], kt_lane: [[230, 260], [340, 300]], kt_temple: [[420, 470], [260, 240]], kt_river: [[340, 260], [200, 520]]},
+      farid: {kt_station: [[250, 470], [380, 560]], kt_lane: [[200, 330], [280, 560]], kt_temple: [[200, 470], [300, 470]], kt_river: [[160, 260], [320, 480]]},
+      mei: {kt_station: [[230, 450], [240, 460]], kt_lane: [[230, 360], [240, 370]], kt_temple: [[200, 460], [210, 470]], kt_river: [[180, 480], [190, 490]]},
+      bo: {kt_station: [[300, 560], [420, 270]], kt_lane: [[160, 300], [300, 400]], kt_temple: [[280, 560], [250, 260]], kt_river: [[220, 230], [300, 250]]},
+      tomi: {kt_station: [[440, 560], [200, 330]], kt_lane: [[330, 520], [270, 230]], kt_temple: [[280, 260], [440, 480]], kt_river: [[380, 520], [140, 240]]},
+      posy: {kt_station: [[280, 360], [380, 300]], kt_lane: [[300, 330], [200, 580]], kt_temple: [[330, 470], [270, 380]], kt_river: [[240, 500], [300, 280]]}
     },
     // what they do (new animations come in round 3: Mum's parasol, Dad's wheel, Ma Ma's cranes, Gong Gong's Go,
     // Darren's skewers, Marcus's calligraphy, Angelina's fortunes; nothing they did in Ronda)
     acts: {
-      mum: {kt_lane: {act: "parasol", at: [270, 300], dir: -1}, kt_station: {act: "parasol", at: [230, 380]}},
-      dad: {kt_pottery: {act: "wheel", at: [150, 330], dir: 1}},
-      mama: {kt_temple: {act: "cranes", at: [180, 420], dir: 1}, kt_river: {act: "cranes", at: [170, 270], dir: 1}},
-      gonggong: {kt_temple: {act: "go", at: [300, 470], dir: 1}},
-      darren: {kt_market: {act: "skewer", at: [260, 480]}, kt_river: {act: "skewer", at: [330, 250], dir: -1}},
-      marcus: {kt_hall: {act: "brush", at: [400, 520], dir: -1}},
-      angelina: {kt_temple: {act: "fortune", at: [260, 250], dir: 1}, kt_hall: {act: "fortune", at: [120, 470]}}
+      hana: {kt_lane: {act: "parasol", at: [270, 300], dir: -1}, kt_station: {act: "parasol", at: [230, 380]}},
+      theo: {kt_pottery: {act: "wheel", at: [150, 330], dir: 1}},
+      farid: {kt_temple: {act: "cranes", at: [180, 420], dir: 1}, kt_river: {act: "cranes", at: [170, 270], dir: 1}},
+      mei: {kt_temple: {act: "go", at: [300, 470], dir: 1}},
+      bo: {kt_market: {act: "skewer", at: [260, 480]}, kt_river: {act: "skewer", at: [330, 250], dir: -1}},
+      tomi: {kt_hall: {act: "brush", at: [400, 520], dir: -1}},
+      posy: {kt_temple: {act: "fortune", at: [260, 250], dir: 1}, kt_hall: {act: "fortune", at: [120, 470]}}
     },
     // round 122: the five interiors, behind the doors on the lane, the temple and the river
     rooms: {
@@ -135,14 +134,13 @@ export const TOWNS = {
         say: "The pottery: a wheel turning, shelves of cups drying, and the kiln glowing orange at the back."}
     },
     lines: {
-      mum: ["Listen. You can hear the bamboo creaking. Like a boat.", "Everything here is so neat. I want to fold my clothes now. Strange feeling.", "I want a yukata. A blue one. With little white flowers."],
-      dad: ["Look at the joinery on that roof. Not a single nail. Not one.", "That pagoda's been standing here longer than anything I've ever fixed.", "I'd like to try making a cup. A bowl. Anything round."],
-      mama: ["So clean! You can eat off the street. Ma Ma won't. But you can.", "The moss here, so green. Ma Ma's garden never this green. Must be the rain.", "Paper cranes, a thousand, you get a wish. Ma Ma start now."],
-      gonggong: ["Quiet town. Old town. Gong Gong feels young here.", "Koi fish. Very fat. Very lucky.", "Somebody playing Go under that tree. Gong Gong watch only. For now."],
-      darren: ["I've eaten four things on sticks and I'm not stopping.", "There's a vending machine for everything here. Even hot soup. HOT SOUP.", "Mel, how do you say 'another one, please'? Asking for me."],
-      marcus: ["Everyone here bows. I've bowed to a vending machine twice.", "That brush calligraphy looks easy. It is not easy, is it?", "The steps up to that temple: one hundred and twelve. I counted. Zeh, don't."],
-      angelina: ["I drew a fortune. 'Great blessing.' I'm framing it.", "Everyone's so polite I feel loud just breathing.", "The tea house garden has a little waterfall and nobody's even looking at it. I am."],
-      evan: ["tram! ding ding!", "red gates! red gates!", "fishies!", "Mama, the trees are talking"]
+      hana: ["Listen. You can hear the bamboo creaking. Like a boat.", "Everything here is so neat. I want to fold my clothes now. Strange feeling.", "I want a yukata. A blue one. With little white flowers."],
+      theo: ["Look at the joinery on that roof. Not a single nail. Not one.", "That pagoda's been standing here longer than anything I've ever fixed.", "I'd like to try making a cup. A bowl. Anything round."],
+      farid: ["So clean! You can eat off the street. Ma Ma won't. But you can.", "The moss here, so green. Ma Ma's garden never this green. Must be the rain.", "Paper cranes, a thousand, you get a wish. Ma Ma start now."],
+      mei: ["Quiet town. Old town. Gong Gong feels young here.", "Koi fish. Very fat. Very lucky.", "Somebody playing Go under that tree. Gong Gong watch only. For now."],
+      bo: ["I've eaten four things on sticks and I'm not stopping.", "There's a vending machine for everything here. Even hot soup. HOT SOUP.", "Mel, how do you say 'another one, please'? Asking for me."],
+      tomi: ["Everyone here bows. I've bowed to a vending machine twice.", "That brush calligraphy looks easy. It is not easy, is it?", "The steps up to that temple: one hundred and twelve. I counted. Zeh, don't."],
+      posy: ["I drew a fortune. 'Great blessing.' I'm framing it.", "Everyone's so polite I feel loud just breathing.", "The tea house garden has a little waterfall and nobody's even looking at it. I am."]
     },
     say: {
       ktbamboo: "The bamboo grove: thousands of stalks, taller than houses, creaking and knocking together in the wind. The light comes through in green stripes.",
@@ -168,7 +166,7 @@ export const TOWNS = {
   //   -----------+-----------
   //   jj_harbour | jj_village   (the station, at the bottom of the village, where the sea bridge comes in)
   jeju: {
-    n: "Jeju", by: "train", fare: 70, free: ["evan"], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
+    n: "Jeju", by: "train", fare: 70, free: [], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
     screens: ["jj_shore", "jj_farms", "jj_harbour", "jj_village"], arrive: ["jj_village", [396, 584]], station: "jjtrain", music: "jeju",
     // the ferry: tickets at the foreshore jetty (world.js "ferry"), into the harbour; same hours as the train
     ferry: {fare: 50, pier: "jjpier", arrive: ["jj_harbour", [214, 436]], arriveLine: "Jeju! The ferry noses in past two little horse-shaped lighthouses, one red, one white. Gulls, salt, and black rocks everywhere."},
@@ -181,25 +179,25 @@ export const TOWNS = {
       jj_harbour: "The harbour: the ferry home (till 10pm), the horse lighthouses and the market hall. North: the shore. East: the village.",
       jj_village: "The stone village: the café, the dye workshop, the stone grandfathers, and the station at the bottom (trains home till 10pm). North: the farms. West: the harbour."},
     spots: {
-      mum: {jj_shore: [[260, 300], [330, 520]], jj_farms: [[230, 360], [300, 560]], jj_harbour: [[300, 300], [380, 520]], jj_village: [[220, 320], [260, 520]]},
-      dad: {jj_shore: [[300, 260], [420, 460]], jj_farms: [[260, 300], [200, 560]], jj_harbour: [[260, 380], [420, 300]], jj_village: [[200, 230], [300, 420]]},
-      mama: {jj_shore: [[240, 420], [330, 300]], jj_farms: [[180, 320], [240, 420]], jj_harbour: [[330, 250], [300, 480]], jj_village: [[240, 260], [180, 480]]},
-      gonggong: {jj_shore: [[300, 420], [310, 430]], jj_farms: [[270, 470], [280, 480]], jj_harbour: [[280, 520], [290, 530]], jj_village: [[290, 260], [300, 270]]},
-      darren: {jj_shore: [[380, 300], [260, 560]], jj_farms: [[300, 420], [220, 260]], jj_harbour: [[240, 300], [440, 480]], jj_village: [[260, 360], [200, 560]]},
-      marcus: {jj_shore: [[420, 560], [220, 300]], jj_farms: [[300, 260], [200, 480]], jj_harbour: [[440, 300], [260, 560]], jj_village: [[300, 480], [220, 400]]},
-      angelina: {jj_shore: [[440, 300], [280, 360]], jj_farms: [[240, 300], [300, 520]], jj_harbour: [[360, 400], [300, 260]], jj_village: [[240, 440], [300, 300]]}
+      hana: {jj_shore: [[260, 300], [330, 520]], jj_farms: [[230, 360], [300, 560]], jj_harbour: [[300, 300], [380, 520]], jj_village: [[220, 320], [260, 520]]},
+      theo: {jj_shore: [[300, 260], [420, 460]], jj_farms: [[260, 300], [200, 560]], jj_harbour: [[260, 380], [420, 300]], jj_village: [[200, 230], [300, 420]]},
+      farid: {jj_shore: [[240, 420], [330, 300]], jj_farms: [[180, 320], [240, 420]], jj_harbour: [[330, 250], [300, 480]], jj_village: [[240, 260], [180, 480]]},
+      mei: {jj_shore: [[300, 420], [310, 430]], jj_farms: [[270, 470], [280, 480]], jj_harbour: [[280, 520], [290, 530]], jj_village: [[290, 260], [300, 270]]},
+      bo: {jj_shore: [[380, 300], [260, 560]], jj_farms: [[300, 420], [220, 260]], jj_harbour: [[240, 300], [440, 480]], jj_village: [[260, 360], [200, 560]]},
+      tomi: {jj_shore: [[420, 560], [220, 300]], jj_farms: [[300, 260], [200, 480]], jj_harbour: [[440, 300], [260, 560]], jj_village: [[300, 480], [220, 400]]},
+      posy: {jj_shore: [[440, 300], [280, 360]], jj_farms: [[240, 300], [300, 520]], jj_harbour: [[360, 400], [300, 260]], jj_village: [[240, 440], [300, 300]]}
     },
     // what they do (round 129, nothing they did in Ronda or Kyoto): Mum flies a kite, Dad pats the stone grandfather's
     // nose for luck, Ma Ma picks tangerines, Gong Gong mends nets with Mr Kang, Darren builds a wish-tower, Marcus and
     // Angellina ride a tandem along the coast road. (Evan's rock-pool net is core.js, at the rock pools.)
     acts: {
-      mum: {jj_shore: {act: "kite", at: [330, 300], dir: -1}, jj_farms: {act: "kite", at: [300, 380]}},
-      dad: {jj_village: {act: "luck", at: [238, 124], dir: -1}},
-      mama: {jj_farms: {act: "pick", at: [150, 290], dir: -1}, jj_shed: {act: "pick", at: [140, 520]}},
-      gonggong: {jj_harbour: {act: "nets", at: [352, 500], dir: -1}},
-      darren: {jj_farms: {act: "stack", at: [176, 540], dir: -1}},
-      marcus: {jj_shore: {act: "tandem", at: [400, 330], dir: -1}, jj_harbour: {act: "tandem", at: [400, 340], dir: 1}},
-      angelina: {jj_shore: {act: "tandem", at: [440, 336], dir: -1}, jj_harbour: {act: "tandem", at: [440, 346], dir: 1}}
+      hana: {jj_shore: {act: "kite", at: [330, 300], dir: -1}, jj_farms: {act: "kite", at: [300, 380]}},
+      theo: {jj_village: {act: "luck", at: [238, 124], dir: -1}},
+      farid: {jj_farms: {act: "pick", at: [150, 290], dir: -1}, jj_shed: {act: "pick", at: [140, 520]}},
+      mei: {jj_harbour: {act: "nets", at: [352, 500], dir: -1}},
+      bo: {jj_farms: {act: "stack", at: [176, 540], dir: -1}},
+      tomi: {jj_shore: {act: "tandem", at: [400, 330], dir: -1}, jj_harbour: {act: "tandem", at: [400, 340], dir: 1}},
+      posy: {jj_shore: {act: "tandem", at: [440, 336], dir: -1}, jj_harbour: {act: "tandem", at: [440, 346], dir: 1}}
     },
     // round 128: the five interiors, behind the doors on the shore, the farms, the harbour and the village
     rooms: {
@@ -215,14 +213,13 @@ export const TOWNS = {
         say: "The dye workshop: tubs of crushed green persimmon, cloth hung from every beam in every shade from pale green to rust, and Mr Moon with orange hands."}
     },
     lines: {
-      mum: ["The wind here! Hold on to your hat, Mel. Hold on to Evan.", "Black stone walls everywhere, with gaps in them. So the wind goes through and they never fall down. Clever.", "I'd like to see the sunrise from that crater. Not at five in the morning, though."],
-      dad: ["Every one of those walls is dry stone. No mortar. Just balance.", "Look at the rope on those roofs, tied down in a net against the wind.", "The divers are out. Seventy years old, some of them, and they hold their breath for two minutes."],
-      mama: ["Tangerines! Ma Ma want to know how they grow them so sweet.", "So much wind. Good for the washing.", "The divers, all grandmas. Strong grandmas. Ma Ma like this place."],
-      gonggong: ["Fishing boats with lights all along. For the squid, at night.", "The sea here, very blue. Very cold, I think. Gong Gong won't check.", "Old stone, old trees, old men by the harbour. Gong Gong fits in."],
-      darren: ["Everyone's piled little stone towers along the path. One for each wish, apparently.", "I've had a tangerine, a tangerine juice and a tangerine chocolate. Next: tangerine.", "Those ponies are tiny. And very confident."],
-      marcus: ["The crater's a five-thousand-year-old volcano. And they put a café at the bottom.", "Zeh, those ribbons on the posts, blue and orange: that's the trail. Follow the ribbons.", "I could cycle round the whole island. Two hundred and fifty kilometres. I could. I won't."],
-      angelina: ["Everything here is black and orange and blue. It's like it was designed.", "The stone statues have such kind faces. Like grandpas.", "I'm sending a postcard from here to myself. Is that weird? It's not weird."],
-      evan: ["black rocks!", "oranges! oranges!", "windy windy!", "horsies!"]
+      hana: ["The wind here! Hold on to your hat, Mel. Hold on to Evan.", "Black stone walls everywhere, with gaps in them. So the wind goes through and they never fall down. Clever.", "I'd like to see the sunrise from that crater. Not at five in the morning, though."],
+      theo: ["Every one of those walls is dry stone. No mortar. Just balance.", "Look at the rope on those roofs, tied down in a net against the wind.", "The divers are out. Seventy years old, some of them, and they hold their breath for two minutes."],
+      farid: ["Tangerines! Ma Ma want to know how they grow them so sweet.", "So much wind. Good for the washing.", "The divers, all grandmas. Strong grandmas. Ma Ma like this place."],
+      mei: ["Fishing boats with lights all along. For the squid, at night.", "The sea here, very blue. Very cold, I think. Gong Gong won't check.", "Old stone, old trees, old men by the harbour. Gong Gong fits in."],
+      bo: ["Everyone's piled little stone towers along the path. One for each wish, apparently.", "I've had a tangerine, a tangerine juice and a tangerine chocolate. Next: tangerine.", "Those ponies are tiny. And very confident."],
+      tomi: ["The crater's a five-thousand-year-old volcano. And they put a café at the bottom.", "Zeh, those ribbons on the posts, blue and orange: that's the trail. Follow the ribbons.", "I could cycle round the whole island. Two hundred and fifty kilometres. I could. I won't."],
+      posy: ["Everything here is black and orange and blue. It's like it was designed.", "The stone statues have such kind faces. Like grandpas.", "I'm sending a postcard from here to myself. Is that weird? It's not weird."]
     },
     say: {
       jjcone: "Seongsan, the sunrise peak: a crater left by an eruption under the sea, five thousand years ago, now a great green bowl with grass on the rim. People climb it in the dark to watch the sun come up out of the sea.",
@@ -247,7 +244,7 @@ export const TOWNS = {
   //   --------------+---------------
   //   ct_monterosso | ct_manarola
   cinque: {
-    n: "Cinque Terre", by: "train", fare: 80, free: ["evan"], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
+    n: "Cinque Terre", by: "train", fare: 80, free: [], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
     screens: ["ct_vernazza", "ct_corniglia", "ct_monterosso", "ct_manarola"], arrive: ["ct_corniglia", [370, 548]], station: "cttrain", music: "cinque",
     blurb: "Five fishing villages clinging to the cliffs over a very blue sea: houses painted every colour, fishing boats, vineyard terraces, lemon groves, focaccia and pesto. A long ride: trains out until 3pm.",
     arriveLine: "Cinque Terre! The train pops out of a tunnel onto a platform over the sea. Above you, the long brick staircase climbs up to Corniglia, and the air smells of lemons and salt.",
@@ -258,25 +255,25 @@ export const TOWNS = {
       ct_monterosso: "Monterosso: the beach and its umbrellas, the old town, the giant on the rocks, the lemon shop. North: Vernazza. East: Manarola.",
       ct_manarola: "Manarola: the houses on the rock, the boats in the street, the pesto kitchen, the gelateria, the swimming rocks. North: Corniglia. West: Monterosso."},
     spots: {
-      mum: {ct_vernazza: [[300, 300], [360, 460]], ct_corniglia: [[260, 360], [200, 460]], ct_monterosso: [[300, 300], [380, 460]], ct_manarola: [[260, 360], [320, 470]]},
-      dad: {ct_vernazza: [[260, 330], [400, 440]], ct_corniglia: [[300, 330], [220, 420]], ct_monterosso: [[260, 330], [420, 300]], ct_manarola: [[300, 330], [240, 440]]},
-      mama: {ct_vernazza: [[330, 330], [300, 440]], ct_corniglia: [[240, 380], [300, 460]], ct_monterosso: [[330, 280], [260, 360]], ct_manarola: [[280, 380], [330, 460]]},
-      gonggong: {ct_vernazza: [[330, 380], [340, 390]], ct_corniglia: [[260, 420], [270, 430]], ct_monterosso: [[300, 330], [310, 340]], ct_manarola: [[290, 420], [300, 430]]},
-      darren: {ct_vernazza: [[400, 330], [280, 480]], ct_corniglia: [[330, 300], [200, 360]], ct_monterosso: [[420, 330], [280, 300]], ct_manarola: [[330, 300], [260, 470]]},
-      marcus: {ct_vernazza: [[420, 480], [260, 300]], ct_corniglia: [[280, 460], [340, 380]], ct_monterosso: [[440, 300], [260, 380]], ct_manarola: [[420, 480], [260, 330]]},
-      angelina: {ct_vernazza: [[440, 300], [300, 360]], ct_corniglia: [[240, 330], [300, 420]], ct_monterosso: [[300, 400], [360, 300]], ct_manarola: [[440, 330], [300, 360]]}
+      hana: {ct_vernazza: [[300, 300], [360, 460]], ct_corniglia: [[260, 360], [200, 460]], ct_monterosso: [[300, 300], [380, 460]], ct_manarola: [[260, 360], [320, 470]]},
+      theo: {ct_vernazza: [[260, 330], [400, 440]], ct_corniglia: [[300, 330], [220, 420]], ct_monterosso: [[260, 330], [420, 300]], ct_manarola: [[300, 330], [240, 440]]},
+      farid: {ct_vernazza: [[330, 330], [300, 440]], ct_corniglia: [[240, 380], [300, 460]], ct_monterosso: [[330, 280], [260, 360]], ct_manarola: [[280, 380], [330, 460]]},
+      mei: {ct_vernazza: [[330, 380], [340, 390]], ct_corniglia: [[260, 420], [270, 430]], ct_monterosso: [[300, 330], [310, 340]], ct_manarola: [[290, 420], [300, 430]]},
+      bo: {ct_vernazza: [[400, 330], [280, 480]], ct_corniglia: [[330, 300], [200, 360]], ct_monterosso: [[420, 330], [280, 300]], ct_manarola: [[330, 300], [260, 470]]},
+      tomi: {ct_vernazza: [[420, 480], [260, 300]], ct_corniglia: [[280, 460], [340, 380]], ct_monterosso: [[440, 300], [260, 380]], ct_manarola: [[420, 480], [260, 330]]},
+      posy: {ct_vernazza: [[440, 300], [300, 360]], ct_corniglia: [[240, 330], [300, 420]], ct_monterosso: [[300, 400], [360, 300]], ct_manarola: [[440, 330], [300, 360]]}
     },
     // what they do (round 134, nothing they did in Ronda, Kyoto or Jeju): Mum sunbathes on the Manarola rocks, Dad fishes
     // off the Vernazza harbour, Ma Ma knits, Gong Gong plays bocce with Nino, Darren hikes with poles, Marcus rows,
     // Angellina reads under a beach umbrella. (Evan's sandcastle is core.js, on Monterosso beach.)
     acts: {
-      mum: {ct_manarola: {act: "sunbathe", at: [24, 528]}},
-      dad: {ct_vernazza: {act: "fish", at: [214, 392], dir: -1}},
-      mama: {ct_corniglia: {act: "knit", at: [404, 318], dir: -1}, ct_monterosso: {act: "knit", at: [430, 300], dir: -1}},
-      gonggong: {ct_vernazza: {act: "bocce", at: [350, 500], dir: -1}},
-      darren: {ct_corniglia: {act: "poles", at: [196, 400]}, ct_vernazza: {act: "poles", at: [210, 290], dir: -1}},
-      marcus: {ct_monterosso: {act: "row", at: [370, 600], dir: -1, free: true}},
-      angelina: {ct_monterosso: {act: "read", at: [152, 474], dir: -1}}
+      hana: {ct_manarola: {act: "sunbathe", at: [24, 528]}},
+      theo: {ct_vernazza: {act: "fish", at: [214, 392], dir: -1}},
+      farid: {ct_corniglia: {act: "knit", at: [404, 318], dir: -1}, ct_monterosso: {act: "knit", at: [430, 300], dir: -1}},
+      mei: {ct_vernazza: {act: "bocce", at: [350, 500], dir: -1}},
+      bo: {ct_corniglia: {act: "poles", at: [196, 400]}, ct_vernazza: {act: "poles", at: [210, 290], dir: -1}},
+      tomi: {ct_monterosso: {act: "row", at: [370, 600], dir: -1, free: true}},
+      posy: {ct_monterosso: {act: "read", at: [152, 474], dir: -1}}
     },
     // round 132: the five interiors, behind the doors in Vernazza, Corniglia, Monterosso and Manarola
     rooms: {
@@ -292,14 +289,13 @@ export const TOWNS = {
         say: "The lemon shop: crates of lemons, bottles of limoncino glowing yellow, lemon soap, linen with lemons on, painted plates, and tins of anchovies."}
     },
     lines: {
-      mum: ["Every house a different colour, so the fishermen could find theirs from the sea. That's the story.", "I'm going to lie on those rocks and not move until dinner.", "Lemons the size of my fist! Look!"],
-      dad: ["They built those terraces by hand. Thousands of miles of dry stone walls, over a thousand years.", "The tide doesn't come in much here. Good fishing off the wall.", "I'd paint this. If I painted. Which I don't. Any more."],
-      mama: ["The nonnas here sit and knit and watch everybody. Ma Ma understands this completely.", "Basil this big! Ma Ma's basil never this big.", "So many steps. Ma Ma counted, then Ma Ma stopped counting."],
-      gonggong: ["Old men playing bocce. Gong Gong knows this game. Gong Gong is good at this game.", "Quiet in the afternoon. Everybody sleeping. Very civilised.", "The little train goes in a tunnel, out a tunnel, in a tunnel. Gong Gong likes it."],
-      darren: ["The cliff path's a proper hike. Two hours, they said. I said one.", "Focaccia for breakfast. Focaccia for lunch. That's the plan.", "Three hundred and eighty-two steps up from the station. I counted. Mel, don't."],
-      marcus: ["Zeh, they pull the boats right up into the street. Into the STREET.", "I'm renting a rowing boat. How hard can it be. Don't answer that.", "The water's so clear you can see the fish."],
-      angelina: ["I've found the perfect umbrella and I'm never leaving it.", "Everything here tastes of lemon and sunshine.", "The houses look like a box of crayons someone dropped down a cliff."],
-      evan: ["boats! boats!", "the sea is BLUE", "steps steps steps", "ice cream?"]
+      hana: ["Every house a different colour, so the fishermen could find theirs from the sea. That's the story.", "I'm going to lie on those rocks and not move until dinner.", "Lemons the size of my fist! Look!"],
+      theo: ["They built those terraces by hand. Thousands of miles of dry stone walls, over a thousand years.", "The tide doesn't come in much here. Good fishing off the wall.", "I'd paint this. If I painted. Which I don't. Any more."],
+      farid: ["The nonnas here sit and knit and watch everybody. Ma Ma understands this completely.", "Basil this big! Ma Ma's basil never this big.", "So many steps. Ma Ma counted, then Ma Ma stopped counting."],
+      mei: ["Old men playing bocce. Gong Gong knows this game. Gong Gong is good at this game.", "Quiet in the afternoon. Everybody sleeping. Very civilised.", "The little train goes in a tunnel, out a tunnel, in a tunnel. Gong Gong likes it."],
+      bo: ["The cliff path's a proper hike. Two hours, they said. I said one.", "Focaccia for breakfast. Focaccia for lunch. That's the plan.", "Three hundred and eighty-two steps up from the station. I counted. Mel, don't."],
+      tomi: ["Zeh, they pull the boats right up into the street. Into the STREET.", "I'm renting a rowing boat. How hard can it be. Don't answer that.", "The water's so clear you can see the fish."],
+      posy: ["I've found the perfect umbrella and I'm never leaving it.", "Everything here tastes of lemon and sunshine.", "The houses look like a box of crayons someone dropped down a cliff."]
     },
     say: {
       cttower: "The watchtower: a round stone tower on the rocks, built a thousand years ago to watch for pirates. Now it watches for ferries.",
@@ -518,16 +514,16 @@ export const TOWN_GOODS = {
   payoyo: {n: "Payoyo goat's cheese", kind: "ingredient", price: 12, sell: 4, shop: "mercado", art: ["wheel", "#F3E7C8", "#C9A27E"], what: "a mountain goat's cheese from Ronda: payoyo with membrillo at the kitchen"},
   membrillo: {n: "Membrillo", kind: "ingredient", price: 6, sell: 2, shop: "mercado", art: ["bar", "#C8643B"], what: "quince paste from Ronda: with payoyo at the kitchen, a quince bonbon filling"},
   picnic: {n: "Picnic basket", kind: "picnic", price: 18, sell: 0, shop: "mercado", art: ["tote", "#C9A27E", "#E8566C"], what: "bread, cheese, jamón and oranges: spread it out at the Alameda balcony"},
-  churros: {n: "Churros", kind: "gift", to: "family", price: 4, shop: "dulces", art: ["roll", "#E8C48E", "#C98A4A"], say: "Churros! Still warm, and sugary all over. Is there chocolate?", says: {evan: "CHURROS! Dip dip dip!"}},
+  churros: {n: "Churros", kind: "gift", to: "family", price: 4, shop: "dulces", art: ["roll", "#E8C48E", "#C98A4A"], say: "Churros! Still warm, and sugary all over. Is there chocolate?", says: {}},
   yemas: {n: "Yemas del Tajo", kind: "gift", to: "family", price: 8, shop: "dulces", art: ["box", "#F3C24A", "#FFFDF6"], say: "Yemas! Egg yolk and sugar, like little suns. From Ronda?"},
   tartaalm: {n: "Almond cake", kind: "gift", to: "family", price: 10, shop: "dulces", art: ["tart", "#E8C48E", "#FFFDF6"], say: "An almond cake, all the way from Ronda. Kettle on!"},
-  pastas: {n: "Convent biscuits", kind: "gift", to: "family", price: 5, shop: "convento", art: ["disc", "#E8C48E", "#C98A4A"], say: "Biscuits made by nuns! They taste like a hundred years of practice.", says: {evan: "Biscuits from a WALL! Again!"}},
-  abanico: {n: "Painted fan", kind: "gift", to: ["mum", "mama", "angelina"], price: 12, shop: "azulejos", art: ["cloth", "#C2307A", "#F3C969"], say: "A painted fan! Very elegant. Very useful in this heat."},
+  pastas: {n: "Convent biscuits", kind: "gift", to: "family", price: 5, shop: "convento", art: ["disc", "#E8C48E", "#C98A4A"], say: "Biscuits made by nuns! They taste like a hundred years of practice.", says: {}},
+  abanico: {n: "Painted fan", kind: "gift", to: ["hana", "farid", "posy"], price: 12, shop: "azulejos", art: ["cloth", "#C2307A", "#F3C969"], say: "A painted fan! Very elegant. Very useful in this heat."},
   // round 116: Antonio's leather workshop in the old town, everything made in Ubrique, the leather village over the hills
-  cartera: {n: "Leather wallet", kind: "gift", to: ["dad", "darren", "marcus", "gonggong"], price: 24, shop: "cuero", art: ["box", "#8A5A3A", "#C98A4A"], say: "A leather wallet from Ubrique! Smells amazing. Feel those stitches."},
-  bolso: {n: "Leather handbag", kind: "gift", to: ["mum", "mama", "angelina"], price: 60, shop: "cuero", art: ["tote", "#7A3A2A", "#C98A4A"], say: "Oh, Mel. A Ubrique bag! This will last me forever."},
-  cinturon: {n: "Leather belt", kind: "gift", to: ["dad", "darren", "marcus", "gonggong"], price: 30, shop: "cuero", art: ["roll", "#5A3A2A", "#D9A441"], say: "A proper leather belt, hand-stitched. Very smart."},
-  libreta: {n: "Leather notebook", kind: "gift", to: ["angelina", "mum", "darren"], price: 18, shop: "cuero", art: ["box", "#A8754F", "#F3E7C8"], say: "A leather notebook! For lists. And secret lists."},
+  cartera: {n: "Leather wallet", kind: "gift", to: ["theo", "bo", "tomi", "mei"], price: 24, shop: "cuero", art: ["box", "#8A5A3A", "#C98A4A"], say: "A leather wallet from Ubrique! Smells amazing. Feel those stitches."},
+  bolso: {n: "Leather handbag", kind: "gift", to: ["hana", "farid", "posy"], price: 60, shop: "cuero", art: ["tote", "#7A3A2A", "#C98A4A"], say: "Oh, Mel. A Ubrique bag! This will last me forever."},
+  cinturon: {n: "Leather belt", kind: "gift", to: ["theo", "bo", "tomi", "mei"], price: 30, shop: "cuero", art: ["roll", "#5A3A2A", "#D9A441"], say: "A proper leather belt, hand-stitched. Very smart."},
+  libreta: {n: "Leather notebook", kind: "gift", to: ["posy", "hana", "bo"], price: 18, shop: "cuero", art: ["box", "#A8754F", "#F3E7C8"], say: "A leather notebook! For lists. And secret lists."},
   llavero: {n: "Leather keyring", kind: "gift", to: "family", price: 6, shop: "cuero", art: ["disc", "#C98A4A", "#D9A441"], say: "A little leather keyring, with a stamped bridge on it. Sweet!"},
   // round 122: Kyoto's goods. Ingredients go to the Scoop Shack (gelato), the Cocoa Room (bonbon fillings) and the
   // kitchen (Kyoto tapas); the rest are gifts, or keepsakes for a shelf at home
@@ -538,10 +534,10 @@ export const TOWN_GOODS = {
   hojicha: {n: "Hōjicha", kind: "ingredient", price: 5, sell: 2, shop: "kt_tea", art: ["bag", "#8A5A3A", "#C9A27E"], what: "roasted green tea: hōjicha gelato or bonbons"},
   sakura: {n: "Salted sakura blossoms", kind: "ingredient", price: 6, sell: 2, shop: "kt_sweets", art: ["jar", "#F6C7D6", "#F2A0B8"], what: "pickled cherry blossoms: sakura gelato or bonbons"},
   matcha: {n: "Matcha powder", kind: "ingredient", price: 6, sell: 2, shop: "kt_tea", art: ["bag", "#8FB86A", "#5E8A48"], what: "ceremonial matcha from the tea house: gelato, bonbons"},
-  shichimi: {n: "Shichimi spice", kind: "gift", to: ["dad", "gonggong", "darren"], price: 6, shop: "kt_market", art: ["bottle", "#C8432F", "#F3E7C8"], say: "Seven-spice pepper from Kyoto! Everything's getting some of this."},
-  hocho: {n: "Kyoto kitchen knife", kind: "gift", to: ["dad", "mama", "marcus"], price: 40, shop: "kt_market", art: ["roll", "#BFC3CA", "#5A3A2A"], say: "A proper Kyoto knife, folded steel! I'll guard it with my life."},
+  shichimi: {n: "Shichimi spice", kind: "gift", to: ["theo", "mei", "bo"], price: 6, shop: "kt_market", art: ["bottle", "#C8432F", "#F3E7C8"], say: "Seven-spice pepper from Kyoto! Everything's getting some of this."},
+  hocho: {n: "Kyoto kitchen knife", kind: "gift", to: ["theo", "farid", "tomi"], price: 40, shop: "kt_market", art: ["roll", "#BFC3CA", "#5A3A2A"], say: "A proper Kyoto knife, folded steel! I'll guard it with my life."},
   wagashibox: {n: "Box of wagashi", kind: "gift", to: "family", price: 8, shop: "kt_sweets", art: ["box", "#F6C7D6", "#9CC27E"], say: "Little sweets shaped like flowers! Too pretty to eat. Almost."},
-  furoshiki: {n: "Furoshiki cloth", kind: "gift", to: ["mum", "mama", "angelina"], price: 9, shop: "ktyukata", art: ["cloth", "#3E5E7A", "#F3C969"], say: "A furoshiki! For wrapping presents, or my lunch. Or both."},
+  furoshiki: {n: "Furoshiki cloth", kind: "gift", to: ["hana", "farid", "posy"], price: 9, shop: "ktyukata", art: ["cloth", "#3E5E7A", "#F3C969"], say: "A furoshiki! For wrapping presents, or my lunch. Or both."},
   sensu: {n: "Folding fan", kind: "gift", to: "family", price: 11, shop: "ktyukata", art: ["cloth", "#F3ECDD", "#C8432F"], say: "A folding fan with cranes on it. Very elegant."},
   k_chawan: {n: "Tea bowl", kind: "keepsake", price: 20, shop: "kt_tea", art: ["disc", "#5E7A4A", "#C9A27E"], line: "A rough, beautiful tea bowl from the tea house in Kyoto. Made to be held in two hands."},
   k_tetsubin: {n: "Cast-iron teapot", kind: "keepsake", price: 30, shop: "kt_tea", art: ["jar", "#3A3430", "#5A4636"], line: "A heavy cast-iron teapot from Kyoto, bumpy like a hailstone. It keeps tea hot for an hour."},
@@ -552,19 +548,19 @@ export const TOWN_GOODS = {
   k_mycup: {n: "Your Kyoto teacup", kind: "keepsake", price: 0, art: ["disc", "#3E5E7A", "#C9A27E"], line: "A teacup you threw on the wheel and glazed yourself at the pottery in Kyoto. A little wonky. Perfect."},
   k_dadcup: {n: "Dad's lopsided cup", kind: "keepsake", price: 0, art: ["disc", "#8A6A52", "#C9A27E"], line: "Dad's teacup from the Kyoto pottery. It leans. He says it's 'expressive'."},
   // round 118: shopping corners: spices and ceramics at the market, postcards and fans at Doña Carmen's
-  azafran: {n: "Saffron", kind: "gift", to: ["mama", "mum", "gonggong"], price: 12, shop: "especias", art: ["bag", "#C8343A", "#F3C24A"], say: "Real saffron! Worth more than gold, gram for gram. Paella this weekend?"},
-  pimenton: {n: "Smoked paprika", kind: "gift", to: ["dad", "gonggong", "darren", "marcus"], price: 6, shop: "especias", art: ["box", "#B5443A", "#F3E7C8"], say: "Smoked paprika in a little tin. Everything I cook is going to taste of Spain now."},
+  azafran: {n: "Saffron", kind: "gift", to: ["farid", "hana", "mei"], price: 12, shop: "especias", art: ["bag", "#C8343A", "#F3C24A"], say: "Real saffron! Worth more than gold, gram for gram. Paella this weekend?"},
+  pimenton: {n: "Smoked paprika", kind: "gift", to: ["theo", "mei", "bo", "tomi"], price: 6, shop: "especias", art: ["box", "#B5443A", "#F3E7C8"], say: "Smoked paprika in a little tin. Everything I cook is going to taste of Spain now."},
   especiero: {n: "Spice tin set", kind: "gift", to: "family", price: 10, shop: "especias", art: ["box", "#D9A441", "#8A5A3A"], say: "Little spice tins, all labelled in Spanish! So pretty on the shelf."},
   cuenco: {n: "Painted bowl", kind: "gift", to: "family", price: 14, shop: "ceramica", art: ["disc", "#3E6BAE", "#F3C969"], say: "A hand-painted bowl, blue and yellow like the tiles! For olives. Or for looking at."},
-  aceitera: {n: "Olive dish", kind: "gift", to: ["mama", "gonggong", "mum"], price: 9, shop: "ceramica", art: ["disc", "#5E8A48", "#F3ECDD"], say: "A little dish with a pit for the stones. Ma Ma approves of practical things."},
-  jarra: {n: "Little jug", kind: "gift", to: ["mum", "angelina", "mama"], price: 11, shop: "ceramica", art: ["bottle", "#C8643B", "#F3ECDD"], say: "A painted jug! For flowers from the garden."},
+  aceitera: {n: "Olive dish", kind: "gift", to: ["farid", "mei", "hana"], price: 9, shop: "ceramica", art: ["disc", "#5E8A48", "#F3ECDD"], say: "A little dish with a pit for the stones. Ma Ma approves of practical things."},
+  jarra: {n: "Little jug", kind: "gift", to: ["hana", "posy", "farid"], price: 11, shop: "ceramica", art: ["bottle", "#C8643B", "#F3ECDD"], say: "A painted jug! For flowers from the garden."},
   postal: {n: "Postcard of the bridge", kind: "gift", to: "family", price: 2, shop: "postales", art: ["box", "#7FB8E8", "#FFFDF6"], say: "A postcard of Puente Nuevo! Did you write on the back? You did. Aww."},
   iman: {n: "Ronda fridge magnet", kind: "gift", to: "family", price: 3, shop: "postales", art: ["disc", "#FBF7EE", "#C8643B"], say: "A little white house with a red roof, for the fridge. It's going right in the middle."},
-  encaje: {n: "Lace fan", kind: "gift", to: ["mum", "mama", "angelina"], price: 14, shop: "postales", art: ["cloth", "#FFFDF6", "#3A3430"], say: "A black lace fan! So elegant. I feel like a flamenco dancer already."},
+  encaje: {n: "Lace fan", kind: "gift", to: ["hana", "farid", "posy"], price: 14, shop: "postales", art: ["cloth", "#FFFDF6", "#3A3430"], say: "A black lace fan! So elegant. I feel like a flamenco dancer already."},
   // touches: Rocío's carnation for Evan (free), and the tiles Mel (and Evan) paint at Lucía's (keepsakes)
   clavel: {n: "A red carnation", kind: "gift", to: "family", price: 0, art: ["disc", "#D8343A", "#5E8A48"], say: "A carnation from Ronda! Evan gave it to you? Oh, that boy."},
   etile: {n: "Evan's painted tile", kind: "keepsake", price: 0, art: ["tile", "#7FB8E8", "#F3C969"], line: "Blue thumbprints, a yellow smudge and a lot of love. Painted by Evan at Lucía's in Ronda."},
-  corcho: {n: "Cork coasters", kind: "gift", to: ["dad", "darren", "gonggong", "marcus"], price: 9, shop: "azulejos", art: ["disc", "#B98A5A", "#8A6A52"], say: "Cork from the cork oaks! Light as anything."}
+  corcho: {n: "Cork coasters", kind: "gift", to: ["theo", "bo", "mei", "tomi"], price: 9, shop: "azulejos", art: ["disc", "#B98A5A", "#8A6A52"], say: "Cork from the cork oaks! Light as anything."}
 };
 // Lucía's painted tiles: collect all eight and they become a tiled bench by the pond at home. Some only in season.
 export const TILES = {
@@ -601,12 +597,12 @@ Object.assign(TOWN_GOODS, {
   abalone: {n: "Abalone", kind: "ingredient", price: 10, sell: 6, shop: "jj_haenyeo", art: ["disc", "#8A9A8A", "#C9B8C8"], what: "brought up by the divers: abalone with garlic butter at the kitchen"},
   j_tewak: {n: "Diver's float", kind: "keepsake", price: 10, shop: "jj_haenyeo", art: ["disc", "#F08A2E", "#3A3430"], line: "An orange diving float (tewak) from the divers' house in Jeju. The divers rest on them between dives, and tie their nets underneath."},
   j_shell: {n: "Sea snail shell", kind: "keepsake", price: 0, art: ["disc", "#E6D3B8", "#B98A5A"], line: "A spiral sea snail shell from the divers in Jeju. Halmang Kim gave it to Evan. Hold it to your ear."},
-  j_box: {n: "A box of tangerines", kind: "gift", to: ["mama", "gonggong", "mum", "dad"], price: 10, shop: "jj_shed", art: ["box", "#C9A27E", "#F29A2E"], say: "A whole box of Jeju tangerines! The leaves still on. These will be gone by Tuesday."},
-  j_jam: {n: "Tangerine marmalade", kind: "gift", to: ["mama", "dad", "darren"], price: 6, shop: "jj_shed", art: ["jar", "#F29A2E", "#FFFDF6"], say: "Tangerine marmalade! On toast. On everything."},
-  j_tea: {n: "Green tea from the slopes", kind: "gift", to: ["mama", "gonggong", "angelina"], price: 9, shop: "jj_cafe", art: ["box", "#5E8A48", "#F3ECDD"], say: "Green tea from the fields under Hallasan. Gong Gong will make it properly."},
+  j_box: {n: "A box of tangerines", kind: "gift", to: ["farid", "mei", "hana", "theo"], price: 10, shop: "jj_shed", art: ["box", "#C9A27E", "#F29A2E"], say: "A whole box of Jeju tangerines! The leaves still on. These will be gone by Tuesday."},
+  j_jam: {n: "Tangerine marmalade", kind: "gift", to: ["farid", "theo", "bo"], price: 6, shop: "jj_shed", art: ["jar", "#F29A2E", "#FFFDF6"], say: "Tangerine marmalade! On toast. On everything."},
+  j_tea: {n: "Green tea from the slopes", kind: "gift", to: ["farid", "mei", "posy"], price: 9, shop: "jj_cafe", art: ["box", "#5E8A48", "#F3ECDD"], say: "Green tea from the fields under Hallasan. Gong Gong will make it properly."},
   j_cake: {n: "Tangerine cake", kind: "gift", to: "family", price: 7, shop: "jj_cafe", art: ["box", "#F3D9A8", "#F29A2E"], say: "A tangerine pound cake from the stone-house café. Still a little warm."},
-  j_tote: {n: "Persimmon-dyed tote", kind: "gift", to: ["mum", "angelina", "mama"], price: 18, shop: "jj_dye", art: ["tote", "#B26A36", "#D9A66A"], say: "A tote bag dyed with green persimmons! It smells like sunshine."},
-  j_shirt: {n: "Galot shirt", kind: "gift", to: ["dad", "gonggong", "marcus"], price: 24, shop: "jj_dye", art: ["cloth", "#9E5A2E", "#C9874A"], say: "A galot shirt, the old Jeju farmers' shirt dyed with persimmons. Cool in summer, and it never shows the dirt."},
+  j_tote: {n: "Persimmon-dyed tote", kind: "gift", to: ["hana", "posy", "farid"], price: 18, shop: "jj_dye", art: ["tote", "#B26A36", "#D9A66A"], say: "A tote bag dyed with green persimmons! It smells like sunshine."},
+  j_shirt: {n: "Galot shirt", kind: "gift", to: ["theo", "mei", "tomi"], price: 24, shop: "jj_dye", art: ["cloth", "#9E5A2E", "#C9874A"], say: "A galot shirt, the old Jeju farmers' shirt dyed with persimmons. Cool in summer, and it never shows the dirt."},
   j_scarf: {n: "Your persimmon scarf", kind: "keepsake", price: 0, art: ["cloth", "#9E5A2E", "#D9A66A"], line: "The scarf you dyed with green persimmons at Mr Moon's workshop in Jeju, darkened in the sun on your own washing line."}
 });
 Object.assign(KEEP_LINES, {j_magnet: "A tiny stone grandfather holding a tangerine, from Jeju.", j_tote: "A tote bag dyed with green persimmons in Jeju.", j_shirt: "A galot shirt, dyed with persimmons in Jeju."});
@@ -623,12 +619,12 @@ Object.assign(TOWN_GOODS, {
   pinenuts: {n: "Pine nuts", kind: "ingredient", price: 6, sell: 3, shop: "ct_pesto", art: ["jar", "#F3E7C8", "#C9A27E"], what: "for pesto (yours, in the loft, once Nonna Pina's shown you) and pine nut gelato"},
   pesto: {n: "Jar of pesto", kind: "ingredient", price: 8, sell: 7, shop: "ct_pesto", art: ["jar", "#5E8A3A", "#F3E7C8"], what: "trofie with pesto at the kitchen"},
   c_mortar: {n: "Little marble mortar", kind: "keepsake", price: 18, shop: "ct_pesto", art: ["disc", "#E6E2DA", "#8A8478"], line: "A little white marble mortar and a wooden pestle, from Nonna Pina's kitchen in Manarola. Pesto's made by hand or not at all."},
-  c_sciac: {n: "Bottle of Sciacchetrà", kind: "gift", to: ["dad", "gonggong", "mum", "darren"], price: 40, shop: "ct_cantina", art: ["bottle", "#C98A2E", "#5A3A2E"], say: "Sciacchetrà! The sweet wine from the dried grapes. A tiny glass after dinner. Just a tiny one."},
-  c_white: {n: "Cinque Terre white", kind: "gift", to: ["dad", "mum", "marcus", "angelina"], price: 14, shop: "ct_cantina", art: ["bottle", "#E8E0A0", "#4E7A5A"], say: "Wine from the terraces! Grown on a cliff, carried down by hand. You can taste the sea."},
-  c_limoncino: {n: "Limoncino", kind: "gift", to: ["mum", "mama", "angelina", "darren"], price: 20, shop: "ct_limoni", art: ["bottle", "#F3D34A", "#FFFDF6"], say: "Limoncino from Monterosso! Ice cold, in a tiny glass. It tastes like sunshine."},
+  c_sciac: {n: "Bottle of Sciacchetrà", kind: "gift", to: ["theo", "mei", "hana", "bo"], price: 40, shop: "ct_cantina", art: ["bottle", "#C98A2E", "#5A3A2E"], say: "Sciacchetrà! The sweet wine from the dried grapes. A tiny glass after dinner. Just a tiny one."},
+  c_white: {n: "Cinque Terre white", kind: "gift", to: ["theo", "hana", "tomi", "posy"], price: 14, shop: "ct_cantina", art: ["bottle", "#E8E0A0", "#4E7A5A"], say: "Wine from the terraces! Grown on a cliff, carried down by hand. You can taste the sea."},
+  c_limoncino: {n: "Limoncino", kind: "gift", to: ["hana", "farid", "posy", "bo"], price: 20, shop: "ct_limoni", art: ["bottle", "#F3D34A", "#FFFDF6"], say: "Limoncino from Monterosso! Ice cold, in a tiny glass. It tastes like sunshine."},
   c_soap: {n: "Lemon soap", kind: "gift", to: "family", price: 5, shop: "ct_limoni", art: ["box", "#F3E7A0", "#F3D34A"], say: "Lemon soap! The whole bathroom smells like Italy now."},
-  c_linen: {n: "Linen tea towel", kind: "gift", to: ["mum", "mama", "dad"], price: 8, shop: "ct_limoni", art: ["cloth", "#FFFDF6", "#F3D34A"], say: "A linen tea towel with lemons on it. Too nice to dry dishes with. I'll dry dishes with it."},
-  c_anchovy: {n: "Monterosso anchovies in oil", kind: "gift", to: ["dad", "gonggong", "marcus"], price: 16, shop: "ct_limoni", art: ["box", "#9FC3D9", "#C9A27E"], say: "Monterosso anchovies! The best in Italy, they say. On toast, with butter."},
+  c_linen: {n: "Linen tea towel", kind: "gift", to: ["hana", "farid", "theo"], price: 8, shop: "ct_limoni", art: ["cloth", "#FFFDF6", "#F3D34A"], say: "A linen tea towel with lemons on it. Too nice to dry dishes with. I'll dry dishes with it."},
+  c_anchovy: {n: "Monterosso anchovies in oil", kind: "gift", to: ["theo", "mei", "tomi"], price: 16, shop: "ct_limoni", art: ["box", "#9FC3D9", "#C9A27E"], say: "Monterosso anchovies! The best in Italy, they say. On toast, with butter."},
   // round 192: tucked into Jason's letters now and then (never sold)
   c_jpoem: {n: "A poem from Jason", kind: "keepsake", price: 0, art: ["tile", "#FFFDF6", "#2E3A5A"], line: "A poem in Jason's neat black hand, on paper from the stationer by the harbour, folded twice. Something about the houses going pink at six o'clock. It rhymes 'harbour' with 'arbour', and he's very pleased about it."},
   c_plate: {n: "Ceramic lemon plate", kind: "keepsake", price: 12, shop: "ct_limoni", art: ["disc", "#3E6BAE", "#F3D34A"], line: "A hand-painted plate from Monterosso, blue and yellow, with lemons and leaves all round the rim."},
@@ -646,7 +642,7 @@ Object.keys(PAINT.colours).forEach(c => Object.keys(PAINT.patterns).forEach(p =>
 // Round 123: the nerikiri sweets Mel makes with Mr Tanaka in Kyoto (gifts), one shape for each season
 [["sakura", "cherry blossom", "#F6C7D6"], ["ajisai", "hydrangea", "#B9A8E0"], ["momiji", "maple leaf", "#E0782E"], ["tsubaki", "camellia", "#C8432F"]].forEach(([k, n, col]) => {
   TOWN_GOODS["nk_" + k] = {n: `Nerikiri: ${n}`, kind: "gift", to: "family", price: 0, art: ["disc", col, "#FFFDF6"], say: `A little sweet shaped like a ${n}! You made this? Too beautiful to eat. I'll eat it anyway.`}; });
-TOWN_GOODS.tsukemono = {n: "Fumiko's pickles", kind: "gift", to: ["mama", "gonggong", "dad"], price: 7, shop: "kt_market", art: ["jar", "#C9B04A", "#8E5A6E"], say: "Kyoto pickles! Purple ones, yellow ones... Ma Ma approves."};
+TOWN_GOODS.tsukemono = {n: "Fumiko's pickles", kind: "gift", to: ["farid", "mei", "theo"], price: 7, shop: "kt_market", art: ["jar", "#C9B04A", "#8E5A6E"], say: "Kyoto pickles! Purple ones, yellow ones... Ma Ma approves."};
 // The tapas bar: order a little plate on the terrace and it's yours to cook at home (kitchen.js TAPAS, learn: true)
 export const TASTINGS = {
   salmorejo: {price: 5, line: "Salmorejo: cold, thick, tomato and bread and olive oil, with egg and jamón on top. Like eating summer with a spoon."},
