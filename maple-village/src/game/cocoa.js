@@ -270,7 +270,7 @@ export function cocoaTick(F, opts = {}){
   for (let at = from + 60000; at <= t; at += 60000) {
     const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     out.mins++; out.done = finish(c, at) || out.done;
-    if (c.plan.on && opts.hand !== false && handOn(day, hm)) handStep(F, c, at, out);
+    if (c.plan.on && opts.hand !== false && (handOn(day, hm) || openOn(day, hm, ccUp(c, "assistant")))) handStep(F, c, at, out);   // round 227: and while the shop's open, Amara keeps the line going between customers
     if (ccUp(c, "tree") && at - (c.treeAt || at) >= TREE_EVERY) { c.treeAt = at; c.beans++; out.tree = (out.tree || 0) + 1; }
     if (ccUp(c, "supply") && hm >= 9*60 && c.supplyDay !== day && c.choc.dark >= SEND) { c.supplyDay = day; c.choc.dark -= SEND; const sc = scoopState(F); sc.fridge.housechoc = (sc.fridge.housechoc || 0) + TO_FRIDGE; out.supply = (out.supply || 0) + TO_FRIDGE; }
     if (ccUp(c, "workshop") && hm === 16*60 && new Date(day + "T00:00:00Z").getUTCDay() === 6 && c.workDay !== day) { c.workDay = day; const fee = WORKSHOP*WORKSHOP_FEE, s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0}; s.workshop = fee; s.coins += fee; out.coins += fee; out.workshop = fee; }
@@ -434,7 +434,7 @@ export function upsPanel(F){
 export function planPanel(F, st = {}){
   const c = cocoaState(F), p = c.plan;
   const step = (a, k, v, label) => `<div class="row gprices"><span>${label}</span><span class="gstep"><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="-1" aria-label="Less">−</button><b>${v}</b><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="1" aria-label="More">+</button></span></div>`;
-  let h = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line on his shifts (Monday to Saturday, 9:30 to 4:30; he studies in the evenings)${st.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
+  let h = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line on his shifts (Monday to Saturday, 9:30 to 4:30; he studies in the evenings), and Amara keeps it going between customers till closing${st.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
   h += `<div class="actions"><button class="btn small ${p.on ? "alt" : "primary"}" data-cc="plan" data-k="on">${p.on ? "Pause Mateo" : "Mateo, back to work"}</button></div>`;
   h += Object.entries(KINDS).map(([k, d]) => step("keep", k, c.keep[k], `${dot(d.col)} Keep for bonbons: ${d.n.split(" ")[0].toLowerCase()} <small class="muted">(${c.res[k]} there)</small>`)).join("");
   h += `<div class="row gprices"><span>Auto-buy beans</span><button class="btn small ${p.buy ? "primary" : "alt"}" data-cc="plan" data-k="buy" aria-pressed="${p.buy}">${p.buy ? "On" : "Off"}</button></div>`;

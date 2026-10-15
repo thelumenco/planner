@@ -17,6 +17,7 @@ import { esc, dayKey } from "../util.js";
 import { ITEMS } from "../data/items.js";
 import { icon } from "../art/icons.js";
 import { FLOWERS } from "../data/orchard.js";
+import { PRESS_MAX } from "./mill.js";
 
 export const CRAFT = {steep: 6*3600e3, cure: 24*3600e3, lotion: 3600e3, jars: 3, rack: 3, oilPer: 2, soapPer: 6, lotionPer: 3, balm: 3600e3, balmPer: 4, lipoil: 24*3600e3, lipoilPer: 3, rollers: 2, waxPer: 2};
 export const HERB = {
@@ -127,8 +128,9 @@ export function toBasket(F, herb, n = 99){ const c = craftState(F), k = Math.min
 export const PRESSER = {from: 14*60, to: 17*60 + 30}, SHOPKEEP = {from: 10*60, to: 17*60, closed: [1]};
 export function inesStep(F, m, v, t = Date.now()){
   const c = craftState(F), did = {};
-  if (m.press && m.press.by === "ines" && m.press.start + m.press.dur <= t) { c.basket.oliveoil = (c.basket.oliveoil || 0) + m.press.n; m.made = (m.made || 0) + m.press.n; did.pressed = m.press.n; m.press = null; }
-  if (!m.press && (v.oliveCrate || 0) >= 3) { const n = Math.min(4, Math.floor(v.oliveCrate/3)); v.oliveCrate -= n*3; m.press = {start: t, dur: 3600e3, n, by: "ines"}; did.started = n; }
+  // round 227: he bottles every finished pressing, Mel's too, and carries the bottles up to the basket
+  if (m.press && m.press.start + m.press.dur <= t) { c.basket.oliveoil = (c.basket.oliveoil || 0) + m.press.n; m.made = (m.made || 0) + m.press.n; did.pressed = m.press.n; m.press = null; }
+  if (!m.press && (v.oliveCrate || 0) >= 3) { const n = Math.min(PRESS_MAX, Math.floor(v.oliveCrate/3)); v.oliveCrate -= n*3; m.press = {start: t, dur: 3600e3, n, by: "ines"}; did.started = n; }
   return did;
 }
 // what sells, and how fast: the Mill Shop all day while Hazel's in; before that, a little from the wine shop's shelf

@@ -1,13 +1,13 @@
 // The old mill (round 110): the windmill on the cottage lane, opened up as an olive mill (a big goal, goals.js).
 // Inside: the stone basin where the millstone crushes the olives, the press with its stack of round mats, clay jars
 // along the wall. Three jars of olives make one bottle of olive oil; a pressing takes an hour (set it and walk away),
-// up to four bottles at a time. Olives come from Mel's backpack first, then the olive crate the vineyard hands fill.
+// up to twelve bottles at a time (four until round 227). Olives come from Mel's backpack first, then the olive crate the vineyard hands fill.
 // State: F.mill = {press: {start, dur, n} | null, made}
 import { H } from "../util.js";
 import { icon } from "../art/icons.js";
 import { vineState } from "./vineyard.js";
 
-export const JARS_PER_BOTTLE = 3, PRESS_MAX = 4, PRESS_DUR = 1*H;
+export const JARS_PER_BOTTLE = 3, PRESS_MAX = 12, PRESS_DUR = 1*H;
 // The mill's story (round 120), on the old photograph by the door: built for flour, kept turning for luck, and an
 // olive tree planted beside it by a Spanish railwayman from a village near Ronda, who always said it would press olives one day.
 export function millStory(F){
@@ -43,7 +43,7 @@ export function millPanel(F){
   h += `<p class="muted">${icon("olives", 16)} Olives: ${(F.inv && F.inv.olives) || 0} in your backpack${v.oliveCrate ? `, ${v.oliveCrate} in the vineyard crate` : ""}.${m.made ? ` Bottles pressed so far: ${m.made}.` : ""}</p>`;
   if (m.press) h += left ? `<p>Pressing ${m.press.n} bottle${m.press.n > 1 ? "s" : ""}: ready in ${mins(left)}.</p><span class="clbar"><i style="width:${Math.round(100*(1 - left/m.press.dur))}%"></i></span>`
     : `<p><b>The oil's ready!</b></p><div class="actions"><button class="btn primary" data-mill="collect">Bottle it (${m.press.n})</button></div>`;
-  else h += can ? `<div class="actions">${[1, can].filter((n, i, a) => a.indexOf(n) === i).map(n => `<button class="btn ${n === can ? "primary" : "alt"}" data-mill="press" data-n="${n}">Press ${n} bottle${n > 1 ? "s" : ""} (${n*JARS_PER_BOTTLE} jars)</button>`).join("")}</div>`
+  else h += can ? `<div class="actions">${[1, Math.min(4, can), can].filter((n, i, a) => a.indexOf(n) === i).map(n => `<button class="btn ${n === can ? "primary" : "alt"}" data-mill="press" data-n="${n}">Press ${n} bottle${n > 1 ? "s" : ""} (${n*JARS_PER_BOTTLE} jars)</button>`).join("")}</div>`
     : `<p class="muted">Not enough olives for a bottle yet. Your olive tree (and the grove, from the vineyard stall) give jars every six hours; Elena sells them at the Sunday market too.</p>`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }

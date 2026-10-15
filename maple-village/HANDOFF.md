@@ -2572,3 +2572,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - `game/trips.js` `ferryTowns()`; the ferry ticket panel has a chip per ferry town (`data-ftown`, core.js `ferryTown`) and shows `sees(month)` (Puffin Isle's seal pups / puffins) before you buy.
 - core.js townSpot: the ferry pier check comes before the station check, but in a boat town only on a ferry trip (the pier is also the boat's mooring). The Hokkaido scroll marks the season on a ferry arrival too.
 - Test "The boat towns by ferry (round 226)". (The auto seeder sows from seeds in the backpack; it never buys any.)
+
+## Round 227 (Mel): bigger press, Tomi bottles everything, the chocolate line keeps going
+- `game/mill.js` PRESS_MAX 4 to 12 (press buttons: 1, 4, all you can). `millcraft.js` `inesStep`: Tomi (at the mill 10 to 5, Mon to Sat) bottles EVERY finished pressing, Mel's too, into the upstairs basket, and presses up to PRESS_MAX from the olive crate.
+- `game/cocoa.js` `cocoaTick`: the kitchen line (`handStep`: temper, grind, roast, mould) runs on Mateo's shifts AND whenever the shop's open (Amara, 11 to 8, Tue to Sun; Mondays too with the assistant), so evening pots don't sit at the grinder.
+- Test "The press and the chocolate line keep going (round 227)".

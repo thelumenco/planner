@@ -4631,6 +4631,21 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 
+// Round 227 (Mel): a bigger press, Tomi bottles every pressing (Mel's too), and the Cocoa Room's line keeps going
+// after Mateo's shift while the shop's open
+{
+  console.log("\nThe press and the chocolate line keep going (round 227)");
+  const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), ml = await import(new URL("../src/game/mill.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url));
+  { const F = {inv: {}, craft: {}, mill: {}, vine: {oliveCrate: 40}}, m = ml.millState(F), v = F.vine;
+    check(ml.PRESS_MAX === 12 && /12 bottles of oil/.test(ml.startPress(F, 12)) && m.press.n === 12 && v.oliveCrate === 4, "the press takes up to twelve bottles a pressing (36 jars of olives)");
+    const d = mc.inesStep(F, m, v, Date.now() + 3601e3);
+    check(d.pressed === 12 && F.craft.basket.oliveoil === 12 && d.started === 1 && v.oliveCrate === 1, "Tomi bottles Mel's own pressing when it's done and carries the twelve bottles upstairs, then presses what's left in the crate"); }
+  { const run = (iso, mins) => { const base = Date.parse(iso); globalThis.__mapleOffset = base - Date.now(); const F = {coins: 1000, cocoa: {beans: 0, ground: "dark", keep: {milk: 0, dark: 0, white: 0}, at: base - mins*60000}}; cc.cocoaTick(F, {}); globalThis.__mapleOffset = 0; return F.cocoa; };
+    const wedEve = run("2026-10-14T10:00:00Z", 1), monEve = run("2026-10-12T10:00:00Z", 1);   // 6pm in Singapore
+    check(!wedEve.ground && wedEve.choc.dark + wedEve.res.dark + wedEve.bars.dark === 30, "6pm on a Wednesday: Mateo's gone home, but the shop's open and Amara tempers the finished pot (and moulds it into bars)");
+    check(monEve.ground === "dark", "6pm on a Monday (shop shut, Mateo gone): the pot waits for the morning"); }
+}
+
 {
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
