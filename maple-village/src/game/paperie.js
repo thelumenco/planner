@@ -36,7 +36,7 @@ export const ADDS = {
 };
 export const BATCH = 6, SOAK = 2, SCRAP_PRICE = 3, SOAK_MIN = 15, PRESS_MIN = 5, DRY_MS = 864e5, LINE = 4, SCRAP_CAP = 12, BASE = 5;
 const M = 60000;
-const now = () => Date.now() + (globalThis.__mapleOffset || 0);
+const now = () => Date.now() + (globalThis.__hbOffset || 0);
 
 export const sheetId = (col, add) => `pp_${col}_${add}`;
 export const sheetName = (col, add) => add === "seeds" ? `Seeded ${COLOURS[col].n.toLowerCase()} paper` : `${COLOURS[col].n} handmade paper${add === "none" ? "" : " " + ADDS[add].word}`;

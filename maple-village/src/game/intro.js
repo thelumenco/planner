@@ -56,5 +56,5 @@ export function openIntro(o = {}){
   draw();
 }
 export const introOpen = () => at >= 0;
-// dev: jump straight to one screen (window.__mapleIntro(i))
+// dev: jump straight to one screen (window.__hbIntro(i))
 export function introAt(i, o = {}){ openIntro(o); at = Math.max(0, Math.min(SCREENS.length - 1, i)); draw(); }

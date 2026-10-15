@@ -1,5 +1,5 @@
 // The player's clothes, drawn by one generator so the everyday look (look.js) and tailor-made clothes match.
-// clothesArt({top, bottom, body}) returns SVG markup for each part of the #mel figure (index.html):
+// clothesArt({top, bottom, body}) returns SVG markup for each part of the #hero figure (index.html):
 //   defs (patterns), legL/legR (trouser legs), hips (shorts/trousers seat, a skirt, or a dress's skirt),
 //   armL/armR (sleeves), torso (top or dress bodice, neckline, collar, buttons, pockets).
 // Units are the figure's: feet at y 0, hips y -23..-14, arms y -34..-20.5, torso y -36..-22.4 (up to the chin).

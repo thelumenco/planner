@@ -1,7 +1,7 @@
 // The field: an open meadow north of Farid's orchard and west of the town square, with a lake (two swans), a picnic
 // spot, a little football pitch and benches. The lake's river runs out south-east and on into the orchard's top
 // right corner, then east into the river at home.
-import { ink, sgHM } from "../util.js";
+import { ink, localHM } from "../util.js";
 import { eventNow, STALL_SPOTS, STAGE, XMAS_TREE, xmasOn, GROTTO_AT, grottoNow } from "../game/tours.js";
 import { treeLit } from "../game/xmas.js";
 import { sk, tapeLabel, tree, flowers, artCtx, skyWash } from "./scenes.js";
@@ -150,7 +150,7 @@ export function fieldArt(){
     ${sk(`<path d="M86 452 l58 -6 l8 26 l-58 6z" style="fill:#E8566C"/>${[0, 1, 2].map(i => `<path d="M${96 + i*18} ${451 - i*2} l8 26" style="stroke:#FFFDF6" stroke-width="4"/>`).join("")}<rect x="156" y="452" width="24" height="16" rx="3" style="fill:#C9A27E"/><path d="M158 452 q10 -12 20 0" style="fill:none"/>`,
       `<path d="M86 452 l58 -6 l8 26 l-58 6z"/><rect x="156" y="452" width="24" height="16" rx="3"/><path d="M158 452 q10 -12 20 0"/>`)}
     ${tapeLabel(130, 508, "Picnic spot", "var(--blush)", 11)}</g>`;
-  const ev0 = eventNow(artCtx().day(), sgHM()), night = !!ev0 && ev0.kind === "night";
+  const ev0 = eventNow(artCtx().day(), localHM()), night = !!ev0 && ev0.kind === "night";
   const pitch = xmasOn(artCtx().day()) ? "" : `<g data-place="pitch" aria-label="Football pitch"><ellipse class="hov" cx="150" cy="590" rx="80" ry="12" style="fill:var(--butter)"/>
     <g ${W} fill="none" opacity=".75"><rect x="66" y="530" width="168" height="56" rx="4" style="stroke:#FFFDF6" stroke-width="2.4"/><path d="M150 530 v56" style="stroke:#FFFDF6" stroke-width="2"/><circle cx="150" cy="558" r="10" style="stroke:#FFFDF6" stroke-width="2"/></g>
     ${sk(`<circle cx="176" cy="566" r="5" style="fill:#FFFDF6"/>`, `<path d="M62 544 v28 h-10 v-28z M238 544 v28 h10 v-28z"/><circle cx="176" cy="566" r="5"/><path d="M174 563 l3 2 l-1 3" opacity=".6"/>`)}
@@ -168,19 +168,19 @@ export function fieldArt(){
   const toFarm = `<g data-place="toFarmN" aria-label="Path to Wildflower Farm"><ellipse class="hov" cx="366" cy="40" rx="26" ry="20" style="fill:var(--butter)"/>
     ${sk(`<rect x="348" y="12" width="6" height="40" style="fill:var(--wood)"/><rect x="378" y="12" width="6" height="40" style="fill:var(--wood)"/><path d="M344 16 q22 -14 44 0 v6 q-22 -12 -44 0z" style="fill:#E7C6E8"/>`,
       `<rect x="348" y="12" width="6" height="40"/><rect x="378" y="12" width="6" height="40"/><path d="M344 16 q22 -14 44 0 v6 q-22 -12 -44 0z"/>`)}
-    ${eventNow(artCtx().day(), sgHM()) ? "" : tapeLabel(366, 70, "Wildflower Farm", "#E7C6E8", 10)}</g>`;   // (no label on market days: the stalls fill the top row)
+    ${eventNow(artCtx().day(), localHM()) ? "" : tapeLabel(366, 70, "Wildflower Farm", "#E7C6E8", 10)}</g>`;   // (no label on market days: the stalls fill the top row)
   const toOrchard = `<g data-place="toOrchardN" aria-label="Path to the orchard"><ellipse class="hov" cx="260" cy="622" rx="28" ry="16" style="fill:var(--butter)"/>
     ${sk(`<rect x="240" y="594" width="6" height="42" style="fill:var(--wood)"/><rect x="274" y="594" width="6" height="42" style="fill:var(--wood)"/><path d="M236 598 q24 -16 48 0 v6 q-24 -14 -48 0z" style="fill:#9CC27E"/>`,
       `<rect x="240" y="594" width="6" height="42"/><rect x="274" y="594" width="6" height="42"/><path d="M236 598 q24 -16 48 0 v6 q-24 -14 -48 0z"/>`)}
     ${tapeLabel(332, 614, "Orchard", "var(--sage)", 11)}</g>`;
   // market and fair days: stalls in a row along the top under the bunting, a second picnic blanket, kites at the fair
-  const ev = eventNow(artCtx().day(), sgHM());
-  const xm = ev && ev.kind === "xmas", season = xmasOn(artCtx().day()), lit = season && treeLit(artCtx().day(), sgHM(), artCtx().F && artCtx().F());
-  const xtree = season ? xmasTree(lit) + grotto(grottoNow(artCtx().day(), sgHM())) : "";   // round 172: up all season, lit from half past five till eleven
+  const ev = eventNow(artCtx().day(), localHM());
+  const xm = ev && ev.kind === "xmas", season = xmasOn(artCtx().day()), lit = season && treeLit(artCtx().day(), localHM(), artCtx().F && artCtx().F());
+  const xtree = season ? xmasTree(lit) + grotto(grottoNow(artCtx().day(), localHM())) : "";   // round 172: up all season, lit from half past five till eleven
   const event = ev ? (ev.kind === "night" || xm ? fairyLights() : bunting) + (xm ? lanterns(true) : "") + ev.stalls.map(s => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + (ev.kind === "night" ? stage() : xm ? "" : blanket2() + (ev.kind === "fair" ? kites : ""))
     + tapeLabel(260, 30, ev.name, "var(--butter)", 12) : "";
   // the evening light (as on every outdoor screen), under the market so the fairy lights glow
-  const dark = skyWash(sgHM());
+  const dark = skyWash(localHM());
   return lampDefs + ground + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic + pitch + lawn + xtree + toTown + toFarm + toOrchard + event
     + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
 }

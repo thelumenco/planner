@@ -3,7 +3,7 @@
 // a round blue crater lake, old timber towns with tin verandahs, and mist lying in the hollows in the mornings.
 // Calm on purpose: detail round the edges, a clear middle. The places are in data/tablelands.js. (Helpers shared
 // with the Vines: art/bellbird-vines.js.)
-import { sgHM } from "../util.js";
+import { localHM } from "../util.js";
 import { sk } from "./scenes.js";
 import { lampDefs } from "./village-extras.js";
 import { bbPlace as place, bbGate as gate, bbShed as shed, bbFence as fence, bbVan as myVan, bbChair as chair, bbTable as table, bbFlowers as flowers } from "./bellbird-vines.js";
@@ -11,8 +11,8 @@ import { bbPlace as place, bbGate as gate, bbShed as shed, bbFence as fence, bbV
 const C = {rain: "#6E9A5A", rain2: "#5E8A4E", rain3: "#4A7240", canopy: "#3E6A3E", canopy2: "#557F48", grass: "#9CC47A", grass2: "#8AB86A", earth: "#B8644A", earth2: "#9A5038",
   lake: "#3E86AE", lake2: "#5E9EC4", rock: "#7A766A", rock2: "#5E5A50", mist: "#F2F6F4", ink: "#2F2B28", cream: "#F3EAD6", timber: "#B98A5E", timber2: "#8A6A52"};
 const g = s => `<g pointer-events="none">${s}</g>`;
-const morning = () => sgHM() < 10*60;
-const sunny = () => { const h = sgHM(); return h >= 9*60 && h < 15*60; };
+const morning = () => localHM() < 10*60;
+const sunny = () => { const h = localHM(); return h >= 9*60 && h < 15*60; };
 // mist lying in the hollows before ten
 const mist = (pts = [[120, 200, 160], [380, 320, 180], [220, 520, 200]]) => morning() ? g(`<g filter="url(#wash)">${pts.map(([x, y, w]) => `<ellipse cx="${x}" cy="${y}" rx="${w}" ry="${w*.18}" fill="${C.mist}" opacity=".5"/>`).join("")}</g>`) : "";
 const ground = (col = C.rain, col2 = C.rain2) => `<rect width="520" height="640" style="fill:${col}"/><g filter="url(#wash)" opacity=".55"><ellipse cx="140" cy="460" rx="170" ry="90" style="fill:${col2}"/><ellipse cx="400" cy="560" rx="150" ry="70" style="fill:${col2}"/></g>`;

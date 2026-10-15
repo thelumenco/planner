@@ -64,9 +64,9 @@
 .ch.sup .bob,.npc.act-sup .bob{animation:supbob 2.4s ease-in-out infinite alternate}
 @keyframes supbob{from{transform:translateY(-.5px) rotate(-1deg)}to{transform:translateY(1.5px) rotate(1deg)}}
 /* exercise: Hana leading her class on the exercise lawn, the class (and the player) following along */
-.ch.npc.act-exercise:not(.walk) .armL,.ch.npc.act-lead:not(.walk) .armL,#mel.exercise .armL{animation:exL .7s ease-in-out infinite alternate}
-.ch.npc.act-exercise:not(.walk) .armR,.ch.npc.act-lead:not(.walk) .armR,#mel.exercise .armR{animation:exR .7s ease-in-out infinite alternate}
-.ch.npc.act-exercise:not(.walk) .bob,.ch.npc.act-lead:not(.walk) .bob,#mel.exercise .bob{animation:exB .7s ease-in-out infinite alternate}
+.ch.npc.act-exercise:not(.walk) .armL,.ch.npc.act-lead:not(.walk) .armL,#hero.exercise .armL{animation:exL .7s ease-in-out infinite alternate}
+.ch.npc.act-exercise:not(.walk) .armR,.ch.npc.act-lead:not(.walk) .armR,#hero.exercise .armR{animation:exR .7s ease-in-out infinite alternate}
+.ch.npc.act-exercise:not(.walk) .bob,.ch.npc.act-lead:not(.walk) .bob,#hero.exercise .bob{animation:exB .7s ease-in-out infinite alternate}
 @keyframes exL{from{transform:rotate(20deg)}to{transform:rotate(155deg)}}
 @keyframes exR{from{transform:rotate(-20deg)}to{transform:rotate(-155deg)}}
 @keyframes exB{from{transform:translateY(0)}to{transform:translateY(-3px)}}
@@ -74,19 +74,19 @@
 .npc.act-game:not(.walk) .legL,.npc.act-game:not(.walk) .legR{transform:scaleY(.4)}
 .npc.act-game:not(.walk) > g{transform:translateY(7px)}
 .ch.npc.act-game:not(.walk) .armL,.ch.npc.act-game:not(.walk) .armR{animation:typeA .3s ease-in-out infinite alternate}
-@media (prefers-reduced-motion:reduce){.ch.sup .bob,.npc.act-sup .bob,.ch.npc.act-exercise .armL,.ch.npc.act-exercise .armR,.ch.npc.act-lead .armL,.ch.npc.act-lead .armR,#mel.exercise .armL,#mel.exercise .armR,.ch.npc.act-exercise .bob,.ch.npc.act-lead .bob,#mel.exercise .bob,.ch.npc.act-game .armL,.ch.npc.act-game .armR{animation:none}}
+@media (prefers-reduced-motion:reduce){.ch.sup .bob,.npc.act-sup .bob,.ch.npc.act-exercise .armL,.ch.npc.act-exercise .armR,.ch.npc.act-lead .armL,.ch.npc.act-lead .armR,#hero.exercise .armL,#hero.exercise .armR,.ch.npc.act-exercise .bob,.ch.npc.act-lead .bob,#hero.exercise .bob,.ch.npc.act-game .armL,.ch.npc.act-game .armR{animation:none}}
 /* the dolphin cruise boat: bobbing at the jetty; out on a cruise it sails up the coast and back (about 45 s) */
 .map .moored{animation:dbob 2.4s ease-in-out infinite}
 .map .cruising{animation:cruise 45s ease-in-out forwards}
 @keyframes cruise{0%{transform:translate(0,0)}25%{transform:translate(30px,-170px)}50%{transform:translate(10px,-330px)}75%{transform:translate(34px,-150px)}100%{transform:translate(0,0)}}
 @media (prefers-reduced-motion:reduce){.map .moored,.map .cruising{animation:none}}
 /* how the player gets about once they own them: the scooter under their feet, the car round them (garage, game/goals.js) */
-.rideScoot,.rideCar,.rideBike,.rideTrolley{display:none}#mel.trolley .rideTrolley{display:inline}#mel.biking .rideBike{display:inline}
-.bikeWheel{transform-box:fill-box;transform-origin:50% 50%}#mel.biking .bikeWheel,.npc.walk .bikeWheel{animation:bspin .5s linear infinite}@keyframes bspin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){#mel.biking .bikeWheel,.npc.walk .bikeWheel{animation:none}}
-#mel.scoot .rideScoot,#mel.drive .rideCar{display:inline}
-#mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
-#mel.drive .legL,#mel.drive .legR{visibility:hidden}
+.rideScoot,.rideCar,.rideBike,.rideTrolley{display:none}#hero.trolley .rideTrolley{display:inline}#hero.biking .rideBike{display:inline}
+.bikeWheel{transform-box:fill-box;transform-origin:50% 50%}#hero.biking .bikeWheel,.npc.walk .bikeWheel{animation:bspin .5s linear infinite}@keyframes bspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#hero.biking .bikeWheel,.npc.walk .bikeWheel{animation:none}}
+#hero.scoot .rideScoot,#hero.drive .rideCar{display:inline}
+#hero.scoot .legL,#hero.scoot .legR,#hero.scoot .armL,#hero.scoot .armR{animation:none !important}
+#hero.drive .legL,#hero.drive .legR{visibility:hidden}
 
 .storycue{display:none}.npc.story .storycue{display:inline}.npc.story .storycue > g{animation:cuebob 1.6s ease-in-out infinite}@keyframes cuebob{50%{transform:translateY(-3px)}}@media (prefers-reduced-motion:reduce){.npc.story .storycue > g{animation:none}}
 /* round 107, Ronda: Manolo's strumming, Hana dancing, Farid haggling, Mei dozing behind her paper, sketching */

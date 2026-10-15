@@ -22,7 +22,7 @@ const dolphin = (x, y, dur, begin) => { const kt = "0;.55;.62;.7;.78;.84;1";
     <g ${W}><path d="M-14 2 C-8 -8 8 -10 16 -2 C10 -2 4 0 -2 4 C-6 6 -12 6 -14 2Z" style="fill:#7C93A8"/><path d="M0 -7 l4 -7 l2 7z" style="fill:#7C93A8"/></g></g></g>`; };
 
 // the local time of day, in minutes (the neon and the fairy lights come on in the evening)
-const hmNow = () => { const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + LOC()); return d.getUTCHours()*60 + d.getUTCMinutes(); };
+const hmNow = () => { const d = new Date(Date.now() + (globalThis.__hbOffset || 0) + LOC()); return d.getUTCHours()*60 + d.getUTCMinutes(); };
 const lit = (on, off) => { const m = hmNow(); return m >= on || m < off; };
 // upgrades: the honesty freezer by the door, the delivery bike, the neon cone, the deck's striped awning and fairy lights
 const neon = on => `<g pointer-events="none" class="${on ? "nglow" : ""}">${on ? `<path d="M338 226 l9 26 l9 -26 M336 226 a11 10 0 0 1 22 0" fill="none" style="stroke:#FF8FC0" stroke-width="7" opacity=".35" stroke-linecap="round"/>` : ""}

@@ -559,8 +559,8 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 @media (max-width:420px){.tpage{grid-template-columns:96px 1fr}}
 
 /* the courtyard: sitting on the bench, pigeons pecking (and flapping off when tapped) */
-#mel.sit .legL,#mel.sit .legR,.npc.act-sit:not(.walk) .legL,.npc.act-sit:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
-#mel.sit > .flip > g,.npc.act-sit:not(.walk) > g{transform:translateY(7px)}
+#hero.sit .legL,#hero.sit .legR,.npc.act-sit:not(.walk) .legL,.npc.act-sit:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.4)}
+#hero.sit > .flip > g,.npc.act-sit:not(.walk) > g{transform:translateY(7px)}
 .pigeon .phead{transform-box:fill-box;transform-origin:20% 90%;animation:peck 2.4s ease-in-out infinite;animation-delay:inherit}
 .pigeon{animation:pstroll 9s ease-in-out infinite}
 @keyframes peck{0%,55%,100%{transform:rotate(0)}65%,75%{transform:rotate(38deg) translate(1px,3px)}70%{transform:rotate(30deg) translate(1px,2px)}}
@@ -930,7 +930,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ppbatch{display:flex;justify-content:center;margin:2px 0 6px}
 .qlist.nbrs .hearts{margin:0;gap:2px}
 .sltext{width:100%;font:inherit;font-size:.85rem;padding:8px;border:1.4px solid #E4DDD2;border-radius:6px;background:#FFFDF7;margin:6px 0 4px}
-/* phase 4: your look (game/look.js applyLook): hair styles switched by classes on #mel (and the previews); the clothes
+/* phase 4: your look (game/look.js applyLook): hair styles switched by classes on #hero (and the previews); the clothes
    themselves are drawn by art/clothes.js into the .cl* groups */
 .me .hLong,.me .hBob,.me .hBun,.me .hCurl{display:none}
 .me:not(.hs-pony) .pony,.me:not(.hs-pony) .usual{display:none}

@@ -69,10 +69,10 @@ export function putWine(F, v, shelfId){ const st = stallState(F), b = v.shelf.fi
   b.n--; const w = st.wine[shelfId] = st.wine[shelfId] || {name: b.name, type: b.type, price: b.price, n: 0}; w.n++; return 1; }
 export function takeWine(F, v, shelfId){ const st = stallState(F), w = st.wine[shelfId]; if (!w || !w.n) return 0; const b = v.shelf.find(x => x.id === shelfId), k = w.n;
   if (b) b.n += k; else v.shelf.push({id: shelfId, name: w.name, type: w.type, n: k, price: w.price, open: 0}); delete st.wine[shelfId]; return k; }
-// one minute of the market: mode "mel" (you're behind it), "hazel" (minding it), "tin" (the honesty tin) -> coins
+// one minute of the market: mode "hero" (you're behind it), "hazel" (minding it), "tin" (the honesty tin) -> coins
 export function stallSellMinute(F, day, mode){
   const st = stallState(F), ids = Object.keys(st.goods).filter(id => st.goods[id] > 0 && ITEMS[id]), wines = Object.keys(st.wine).filter(id => st.wine[id].n > 0);
-  if (!ids.length && !wines.length) return 0; const p = mode === "mel" ? .1 : mode === "hazel" ? .05 : .02; if (Math.random() >= p) return 0;
+  if (!ids.length && !wines.length) return 0; const p = mode === "hero" ? .1 : mode === "hazel" ? .05 : .02; if (Math.random() >= p) return 0;
   const all = [...ids.map(id => ["g", id]), ...wines.map(id => ["w", id])], [k, id] = all[Math.floor(Math.random()*all.length)];
   let coins; if (k === "g") { coins = worth(id); st.goods[id]--; if (!st.goods[id]) delete st.goods[id]; } else { coins = st.wine[id].price; st.wine[id].n--; if (!st.wine[id].n) delete st.wine[id]; }
   const s = xmasState(F).sold[day] = xmasState(F).sold[day] || {n: 0, coins: 0}; s.n++; s.coins += coins; return coins; }

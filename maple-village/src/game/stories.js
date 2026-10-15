@@ -44,16 +44,16 @@ function eligible(F, id, day){
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 // Ronda's locals tell theirs on a day trip, quest or no quest (you're on holiday); the two-a-day limit still holds
-const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason"];   // Ronda's and Kyoto's, and Ornella in Cinque Terre
+const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "ornella"];   // Ronda's and Kyoto's, and Ornella in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
   if (!isLocal(id)) return eligible(F, id, day);   // a villager in Honeybrook: whenever their hearts allow, a chapter a day
-  if (id === "jason") return eligible(F, id, day);   // Ornella (your pen pal) tells hers whenever you visit, a chapter a day, outside the two-a-day limit
+  if (id === "ornella") return eligible(F, id, day);   // Ornella (your pen pal) tells hers whenever you visit, a chapter a day, outside the two-a-day limit
   if (boostedStory(F, id, day)) return eligible(F, id, day);   // their request was finished today: their next chapter's ready, outside the two-a-day limit
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;
-  const s = storyState(F), told = Object.keys(s.day).filter(x => s.day[x] === day && x !== "jason").length, left = TELLERS_PER_DAY - told;
+  const s = storyState(F), told = Object.keys(s.day).filter(x => s.day[x] === day && x !== "ornella").length, left = TELLERS_PER_DAY - told;
   if (left <= 0) return null;
   const r = eligible(F, id, day); if (!r) return null;
-  const today = Object.keys(STORIES).filter(x => x !== "jason" && (F.storyDay === day || LOCALS.includes(x)) && eligible(F, x, day)).sort((a, b) => order(day, a) - order(day, b)).slice(0, left);
+  const today = Object.keys(STORIES).filter(x => x !== "ornella" && (F.storyDay === day || LOCALS.includes(x)) && eligible(F, x, day)).sort((a, b) => order(day, a) - order(day, b)).slice(0, left);
   return today.includes(id) ? r : null;
 }
 // the chapter's rewards, applied once when it's told; addInv adds to the backpack; -> a line for the flash, or ""

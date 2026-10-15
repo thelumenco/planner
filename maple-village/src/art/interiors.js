@@ -23,7 +23,7 @@ const SHELLS = {
     ${skirting}${plant(70, 600, 1.1)}${plant(474, 610, .9)}`,
 
   // Bo's workshop: wide planks with sawdust, a pegboard of tools, a factory window, crates.
-  chord: () => `<rect width="520" height="640" style="fill:#E2CDAA"/>
+  carpentry: () => `<rect width="520" height="640" style="fill:#E2CDAA"/>
     <g opacity=".5" style="stroke:#C9AE86" stroke-width="1.2">${rows(9, i => `<path d="M${i*60 + 20} 150 V640"/>`)}${rows(18, i => `<path d="M${(i*67) % 520 + 20} ${170 + (i % 9)*52} h-18"/>`)}</g>
     <g opacity=".5" style="fill:#F3E2C2">${rows(14, i => `<circle cx="${(i*83 + 37) % 480 + 20}" cy="${(i*131) % 420 + 190}" r="${2 + (i % 3)}"/>`)}</g>
     ${wallBase("#E9F0E2", "var(--sage)")}
@@ -37,7 +37,7 @@ const SHELLS = {
       `<rect x="446" y="394" width="40" height="34"/><path d="M446 394 l40 34 M486 394 l-40 34" opacity=".5"/><rect x="454" y="366" width="30" height="28"/><path d="M454 380 h30" opacity=".5"/>`)}`,
 
   // The library: herringbone floor, built-in bookcases on the back wall, a round rug.
-  fresh: () => `<rect width="520" height="640" style="fill:#E7CFAC"/>
+  library: () => `<rect width="520" height="640" style="fill:#E7CFAC"/>
     <g opacity=".45" style="stroke:#CDAE84" stroke-width="1.1">${rows(13, r => rows(14, c => `<path d="M${c*40 + (r % 2)*20} ${160 + r*38} l20 19 ${c % 2 ? "" : "m0 0 l20 -19"}"/>`))}</g>
     <g filter="url(#wob)" opacity=".8"><ellipse cx="260" cy="420" rx="150" ry="62" style="fill:var(--peach)" opacity=".55"/><ellipse cx="260" cy="420" rx="150" ry="62" fill="none" style="stroke:var(--line)" stroke-width="1.3"/><ellipse cx="260" cy="420" rx="132" ry="50" fill="none" style="stroke:var(--line)" stroke-width="1" stroke-dasharray="4 6"/></g>
     ${wallBase("#F6E8DC", "var(--peach)")}
@@ -60,7 +60,7 @@ const SHELLS = {
     ${sk(`<path d="M374 268 l42 -34 l5 6 l-42 34z" style="fill:#7E6CB8"/><rect x="414" y="226" width="10" height="14" rx="2" transform="rotate(-39 419 233)" style="fill:#5E4E98"/><circle cx="396" cy="258" r="3" style="fill:#D9A93A"/>`,
       `<path d="M374 268 l42 -34 l5 6 l-42 34z"/><path d="M396 258 l-14 44 M396 258 l14 44 M396 258 v46"/><circle cx="396" cy="258" r="3"/>`)}`,
 
-  chico: () => `<rect width="520" height="640" style="fill:#F2E2D8"/>
+  haberdash: () => `<rect width="520" height="640" style="fill:#F2E2D8"/>
     <g opacity=".4" style="stroke:#E2C9BB" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>
     <g filter="url(#wob)"><ellipse cx="260" cy="420" rx="120" ry="60" style="fill:var(--butter)" opacity=".7"/>${[100, 80, 60, 40].map((rx, i) => `<ellipse cx="260" cy="420" rx="${rx}" ry="${rx/2}" fill="none" style="stroke:${["var(--rose)", "var(--sage)", "var(--peri)", "var(--rose)"][i]}" stroke-width="5" opacity=".7"/>`).join("")}<ellipse cx="260" cy="420" rx="120" ry="60" fill="none" style="stroke:var(--line)" stroke-width="1.2"/></g>
     ${wallBase("#F7E3E6", "var(--blush)")}
@@ -70,7 +70,7 @@ const SHELLS = {
     ${skirting}${plant(52, 430, 1)}${plant(478, 430, .85)}`,
 
   // Juniper's house: a dusky lavender room, a starry ceiling band, a round window with the moon in it, a rug
-  luna: () => `<rect width="520" height="640" style="fill:#E6E0F2"/>
+  tailor: () => `<rect width="520" height="640" style="fill:#E6E0F2"/>
     <g opacity=".4" style="stroke:#D2C8E6" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>
     <g filter="url(#wob)"><ellipse cx="260" cy="430" rx="120" ry="58" style="fill:#C3CDEE" opacity=".7"/></g>
     ${wallBase("#EEE9F8", "#B9A6E8")}
@@ -79,7 +79,7 @@ const SHELLS = {
     ${skirting}${plant(52, 430, 1)}${plant(478, 430, .85)}`,
 
   // Mr Okada's house: morning light. Pale wood floor, a peach wall with a sunrise window, a low shelf of plants
-  ohayo: () => `<rect width="520" height="640" style="fill:#F3E6D2"/>
+  okadahouse: () => `<rect width="520" height="640" style="fill:#F3E6D2"/>
     <g opacity=".45" style="stroke:#E2CCAE" stroke-width="1.1">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}</g>
     <g filter="url(#wob)"><rect x="160" y="380" width="200" height="90" rx="8" style="fill:#FBE3C8" opacity=".8"/></g>
     ${wallBase("#FFF4E6", "#F2A65A")}
@@ -128,7 +128,7 @@ const SHELLS = {
     ${skirting}`; },
 
   // the guest room: a soft green room with a floral-dot wallpaper, a striped rug, and a window over the garden
-  kidroom: () => `<rect width="520" height="640" style="fill:#DCE6D4"/>
+  guestroom: () => `<rect width="520" height="640" style="fill:#DCE6D4"/>
     <g style="fill:#C8D8BC" opacity=".8">${rows(9, r => rows(14, i => `<circle cx="${i*38 + (r % 2)*19 + 10}" cy="${178 + r*52}" r="2.2"/>`))}</g>
     <rect y="150" width="520" height="8" style="fill:#B9CFA8" opacity=".7"/>
     ${sk(`<rect x="196" y="438" width="170" height="104" rx="8" style="fill:#F4EBDD"/>${rows(5, i => `<rect x="196" y="${448 + i*20}" width="170" height="8" style="fill:#C9A3E0" opacity=".45"/>`)}`,

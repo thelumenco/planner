@@ -1,5 +1,5 @@
 // How you look (phase 4 of the public edition): chosen when you start, changeable later from the wardrobe.
-// The player figure is the #mel drawing in index.html; applyLook() sets its colours (CSS variables) and switches its
+// The player figure is the #hero drawing in index.html; applyLook() sets its colours (CSS variables) and switches its
 // parts on and off with classes, so the same call dresses the figure on the map and the preview on the setup screen.
 // State: F.me.look = {body, skin, hair, style, top, bottom, legs}
 import { clothesArt } from "../art/clothes.js";
@@ -25,7 +25,7 @@ export function lookOf(F){
     top: ok(L.top, TOPS) ? L.top : base.top, bottom: ok(L.bottom, BOTTOMS) ? L.bottom : base.bottom, legs: ok(L.legs, LEGS) ? L.legs : base.legs};
 }
 
-// dress a #mel-shaped figure: colours (CSS variables), hair style and body classes, then the clothes themselves from
+// dress a #hero-shaped figure: colours (CSS variables), hair style and body classes, then the clothes themselves from
 // art/clothes.js: your everyday top and bottoms from the look, or anything tailor-made you're wearing (worn: {top,
 // bottom}, from tailor.js wornSpec; a dress is a top that brings its own skirt)
 export function applyLook(el, look, worn = {}){

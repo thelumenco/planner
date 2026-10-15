@@ -6,8 +6,8 @@ const hm = s => { const [h, m] = s.split(":").map(Number); return h*60 + (m || 0
 const at = (from, to, scene, where, plan, opts) => Object.assign({from: hm(from), to: hm(to), scene, plan}, Array.isArray(where[0]) ? {wander: where} : {at: where}, opts || {});
 
 // in the guest room: asleep under the patchwork quilt, then up and pottering
-const NIGHT = [at("0:00", "7:00", "kidroom", [176, 330], "Asleep in the guest room", {act: "doze", night: true}),
-  at("22:30", "24:00", "kidroom", [176, 330], "Asleep in the guest room", {act: "doze", night: true})];
+const NIGHT = [at("0:00", "7:00", "guestroom", [176, 330], "Asleep in the guest room", {act: "doze", night: true}),
+  at("22:30", "24:00", "guestroom", [176, 330], "Asleep in the guest room", {act: "doze", night: true})];
 
 export const GUEST_DAYS = {
   // day one: off the morning train, a look round, settling in
@@ -15,7 +15,7 @@ export const GUEST_DAYS = {
     at("10:30", "11:15", "hlane", [[300, 300], [250, 300], [200, 320]], "Off the 10:30 train at Honeybrook station"),
     at("11:15", "12:30", "market", [[200, 470], [320, 480], [260, 500]], "A look round Hana's market"),
     at("12:30", "14:00", "bay", [[180, 420], [262, 380]], "Lunch on the deck at the bay"),
-    at("14:00", "15:30", "kidroom", [[300, 460], [200, 420]], "Unpacking in the guest room"),
+    at("14:00", "15:30", "guestroom", [[300, 460], [200, 420]], "Unpacking in the guest room"),
     at("15:30", "17:30", "orchard", [[160, 330], [260, 420], [360, 510]], "A wander round the orchard with Farid"),
     at("17:30", "19:00", "base", [[230, 350], [360, 556]], "Sitting out in your garden"),
     at("19:00", "21:00", "wineshop", [[300, 500], [227, 518]], "Supper at the wine shop"),
@@ -38,14 +38,14 @@ export const GUEST_DAYS = {
     at("9:30", "11:00", "village", [[362, 372], [330, 380], [300, 214]], "Postcards on a bench in the square"),
     at("11:00", "12:30", "flowers", [[160, 300], [160, 380], [260, 380]], "Picking a posy with Mei"),
     at("12:30", "14:00", "market", [[200, 470], [320, 480]], "Honey toast at Hana's market"),
-    at("14:00", "16:00", "kidroom", [[300, 460], [200, 420]], "A nap and a book in the guest room"),
+    at("14:00", "16:00", "guestroom", [[300, 460], [200, 420]], "A nap and a book in the guest room"),
     at("16:00", "18:00", "lane", [[262, 600], [200, 560], [320, 580]], "Poking round Makers' Lane"),
     at("18:00", "21:00", "wineshop", [[300, 500], [227, 518]], "A long supper at the wine shop"),
     at("21:00", "22:30", "base", [[230, 350], [360, 556]], "Stars from your garden"),
     ...NIGHT],
   // the last morning: breakfast, a present to take home, the 11 o'clock train
   leave: [
-    at("0:00", "7:00", "kidroom", [176, 330], "Asleep in the guest room", {act: "doze", night: true}),
+    at("0:00", "7:00", "guestroom", [176, 330], "Asleep in the guest room", {act: "doze", night: true}),
     at("7:00", "9:00", "home", [[300, 460], [200, 330]], "A last breakfast at yours"),
     at("9:00", "10:30", "village", [[362, 372], [226, 420]], "Shopping for something to take home"),
     at("10:30", "11:00", "hlane", [[300, 300], [250, 300]], "The 11 o'clock train home")]
@@ -55,7 +55,7 @@ export const ARRIVE = hm("10:30"), LEAVE = hm("11:00");
 // what a guest says while they're here, by where they are (any guest), and a few by where they're from
 export const GUEST_LINES = {
   any: ["I could get used to this.", "Everyone here says hello. Everyone!", "Thank you for having me. Really.", "I've written four postcards already.", "Your pet has adopted me. I think."],
-  kidroom: ["The quilt is perfect. I slept like a stone.", "I've put my things in the top drawer. Is that all right?", "There's a sprig of lavender on the pillow. You thought of everything."],
+  guestroom: ["The quilt is perfect. I slept like a stone.", "I've put my things in the top drawer. Is that all right?", "There's a sprig of lavender on the pillow. You thought of everything."],
   home: ["Your kitchen smells of toast. Good sign.", "More tea? I'll make it. I know where the cups are now.", "Deal me in. I warn you, I'm ruthless at cards."],
   base: ["What a garden. Did you plant all this?", "Look at that sky.", "Listen. Nothing but birds."],
   market: ["Hana gave me a free dumpling. And a hug.", "I want one of everything.", "Honey toast. I see why people talk about it."],

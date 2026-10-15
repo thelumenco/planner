@@ -14,7 +14,7 @@
 //                a neon cone sign (busier evenings), a delivery bike (Tomo pedals ice creams round to your friends
 //                from anywhere), and the chocolate dip station: a little room off the shop with dips and toppings,
 //                each bought separately, for dipped cones and waffles
-import { esc, dayKey, sgHM, hash, LOC } from "../util.js";
+import { esc, dayKey, localHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
 import { TREES, FLOWERS } from "../data/orchard.js";
@@ -23,7 +23,7 @@ export const OPEN = 10*60, CLOSE = 20*60, TUB = 20;
 // the churner: every tub (a new flavour's first, or another of a known one) blends and then freezes before it's ready,
 // an hour in all; it holds two batches at once (s.churn: [{id, done, isNew}])
 export const CHURN_MIN = 60, CHURNS = 2;
-const clock = () => Date.now() + (globalThis.__mapleOffset || 0);
+const clock = () => Date.now() + (globalThis.__hbOffset || 0);
 export const churnFull = s => s.churn.length >= CHURNS;
 export const churnLeft = b => { const m = Math.max(0, Math.ceil((b.done - clock())/60000)); return m >= 60 ? `${Math.floor(m/60)}h ${m % 60}m` : `${m} min`; };
 // batches whose time is up go into the freezer (and the display, if it's arranged and has room) -> the recipes done
@@ -253,7 +253,7 @@ function saleMinute(s, day, hm, opts){
 }
 // catch up minute by minute since the last tick (at most two days): the kitchen, then the counter
 export function scoopTick(F, opts = {}){
-  const s = scoopState(F), now = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now, now - 864e5);
+  const s = scoopState(F), now = Date.now() + (globalThis.__hbOffset || 0), from = Math.max(s.at || now, now - 864e5);
   if (s.batch) { s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB; s.batch = null; }   // a batch Tomo had on the go (from when he still cooked)
   const out = {coins: 0, n: 0, mins: 0, box: 0, churned: finishChurn(s, now)};
   for (let at = from + 60000; at <= now; at += 60000) {
@@ -363,7 +363,7 @@ export function dipBarPanel(F, st){
 }
 // the delivery bike: pick a flavour and a type, then who it's for (st.who: [[id, name]] from the game)
 export function deliverPanel(F, st){
-  const s = scoopState(F), tubs = tubList(s), hm = sgHM();
+  const s = scoopState(F), tubs = tubList(s), hm = localHM();
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Delivery bike</h2><p class="sub">Ice creams, chocolates, tapas: Tomo pedals it round in the cool box, and a thank-you note comes back to your mailbox.</p>`;
   if (!hasUp(s, "bike")) return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(UPGRADES.bike.n)}</h2><p class="sub">${esc(UPGRADES.bike.line)}</p><div class="actions">${buyBtn(F, UPGRADES.bike.price, 'data-gbuy="bike"')}</div>` + shut;
   if (!riderOn(hm)) return h + `<p class="muted">${hm >= 13*60 && hm < 13*60 + 45 ? "Tomo's on his lunch break till 1:45." : "The bike's parked up for the night. Deliveries go out 10am to 10pm."}</p>` + shut;
@@ -376,7 +376,7 @@ export function deliverPanel(F, st){
   return h + `<div class="actions"><button class="btn alt small" data-gvback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function counterPanel(F, st){
-  const s = scoopState(F), hm = sgHM(), t = s.sold[dayKey()] || {n: 0, coins: 0}, tubs = onDisplay(s);
+  const s = scoopState(F), hm = localHM(), t = s.sold[dayKey()] || {n: 0, coins: 0}, tubs = onDisplay(s);
   let h = st.cart ? `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)} cart</h2><p class="sub">At the night market till 10pm, scooping from tubs already made (no batches at the market, just serving).${st.keeper ? " Tomo's minding it." : " Tomo's off wandering: it's on an honesty tin."} ${t.cart ? `Sold tonight: ${t.cart} (${t.cartCoins} ${coin()}).` : "Nothing sold yet tonight."} Stay and scoop, and more people stop.</p>`
     : `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t.n ? `Sold today: ${t.n} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Sofia's behind the counter." : ""}</p>`;
   if (st.cart && !tubs.length) return h + `<p class="muted">Nothing to scoop: the shop's display is empty tonight.</p>` + shut;
@@ -550,7 +550,7 @@ export const riderOn = hm => deliveryHours(hm) && !(hm >= 13*60 && hm < 13*60 + 
 // round 152 ("the mint bike is like permanently outside the shop"): after each order Tomo's out on the bike for
 // twenty minutes, and it's gone from beside the shop (a little chalkboard says so)
 export const BIKE_TRIP = 20*60000;
-export const bikeAway = (s, t = Date.now() + (globalThis.__mapleOffset || 0)) => !!(s && s.bikeOut && t - s.bikeOut >= 0 && t - s.bikeOut < BIKE_TRIP);
+export const bikeAway = (s, t = Date.now() + (globalThis.__hbOffset || 0)) => !!(s && s.bikeOut && t - s.bikeOut >= 0 && t - s.bikeOut < BIKE_TRIP);
 function deliverMinute(s, day, hm){
   if (!hasUp(s, "bike") || !openNow(hm) || !deliveryHours(hm) || Math.random() >= DELIVERY.scoop) return null;
   const stocked = onDisplay(s); if (!stocked.length) return null;

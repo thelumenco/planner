@@ -8,7 +8,7 @@
 // the grilled fish small plate, or a treat for the pet), and in the journal: how many, and the biggest.
 // A golden koi isn't kept: it goes in the home pond, where it stays (up to three).
 // State in F.fish = {rod, reel, bait, baitDay, caught: {id: {n, best}}, koi, log: [{id, cm, day}]}.
-import { esc, dayKey, sgHM } from "../util.js";
+import { esc, dayKey, localHM } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
 import { rainyOn } from "../art/village-extras.js";
@@ -22,7 +22,7 @@ export const SPOTS = {
   bay: {scene: "bay", n: "Sunset fishing at the bay", place: "fishbay", line: "Friday evening, the sun going down over the sea, and the fish coming up to feed.", open: (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 5 && hm >= 17*60 && hm < 20*60}
 };
 export const spotIn = scene => Object.keys(SPOTS).find(k => SPOTS[k].scene === scene) || null;
-export const spotOpen = (spot, day = dayKey(), hm = sgHM()) => !SPOTS[spot].open || SPOTS[spot].open(day, hm);
+export const spotOpen = (spot, day = dayKey(), hm = localHM()) => !SPOTS[spot].open || SPOTS[spot].open(day, hm);
 // when: "day" 7am-6pm, "dawn" 5-10am, "dusk" 6-8pm, "night" 7pm-6am; rain: only on a rainy day
 // item: what goes in the backpack (null: journal only). hard 1-5 narrows the green zone.
 export const FISH = {
@@ -53,7 +53,7 @@ export const FISH = {
 };
 // crayfish come out at night or in the rain
 const OK_WHEN = {day: m => m >= 7*60 && m < 18*60, dawn: m => m >= 5*60 && m < 10*60, dusk: m => m >= 18*60 && m < 20*60, night: m => m >= 19*60 || m < 6*60};
-export function canBite(id, day = dayKey(), hm = sgHM()){
+export function canBite(id, day = dayKey(), hm = localHM()){
   const f = FISH[id]; if (f.when && !OK_WHEN[f.when](hm)) return false; if (f.rain && !rainyOn(day)) return false;
   if (id === "crayfish" && !(OK_WHEN.night(hm) || rainyOn(day))) return false;
   return true;
@@ -79,7 +79,7 @@ export function buyRod(F){ const s = fishState(F); if (s.rod || F.coins < ROD) r
 export function buyReel(F){ const s = fishState(F); if (!s.rod || s.reel || F.coins < REEL) return false; F.coins -= REEL; s.reel = 1; return true; }
 
 // pick what's biting (weighted), with rng for tests
-export function pickFish(spot, day = dayKey(), hm = sgHM(), rng = Math.random){
+export function pickFish(spot, day = dayKey(), hm = localHM(), rng = Math.random){
   const ids = fishHere(spot, day, hm), tot = ids.reduce((a, id) => a + FISH[id].w, 0); let r = rng()*tot;
   for (const id of ids) { r -= FISH[id].w; if (r <= 0) return id; } return ids[ids.length - 1];
 }
@@ -93,7 +93,7 @@ export const inZone = (z, p) => Math.abs(p - z.at) <= z.width/2;
 export const BITE_MIN = 2000, BITE_MAX = 6000, ESCAPE = 3500;
 export function cast(F, spot, rng = Math.random){
   const s = fishState(F); if (!s.rod) return "rod"; if (s.bait <= 0) return "bait"; if (!spotOpen(spot)) return "closed";
-  s.bait--; const fish = pickFish(spot, dayKey(), sgHM(), rng);
+  s.bait--; const fish = pickFish(spot, dayKey(), localHM(), rng);
   return {spot, fish, bite: Date.now() + BITE_MIN + rng()*(BITE_MAX - BITE_MIN), zone: zoneFor(fish, s.reel, rng()), t0: null};
 }
 // land it -> {id, cm, isNew, best, item} (it's in the journal and the backpack)

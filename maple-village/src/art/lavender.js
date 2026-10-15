@@ -2,7 +2,7 @@
 // walls, terracotta roofs, blue shutters, dark cypresses, grey-green olives and wild thyme, long purple stripes of
 // lavender, sunflowers, a green river under an old stone bridge, and a golden evening light (a sunset on Chapel Hill).
 // Calm on purpose: detail round the edges, a clear middle. The places are in data/lavender.js.
-import { sgHM } from "../util.js";
+import { localHM } from "../util.js";
 import { sk } from "./scenes.js";
 import { lampDefs } from "./village-extras.js";
 import { paperOwned } from "./paperie-room.js";
@@ -11,7 +11,7 @@ import { bbPlace as place, bbGate as gate, bbShed as shed, bbFence as fence, bbV
 const C = {lav: "#9A7CC8", lav2: "#B79BDC", lav3: "#7E62B0", stone: "#E8D9B8", stone2: "#D9C49A", terra: "#C8643B", shutter: "#7FA8C8", cypress: "#3E5A3A", olive: "#9AA88A", dry: "#D9CC8A",
   dry2: "#CBBE7A", sun: "#F3C93A", sun2: "#C88A2A", river: "#6E9E8A", river2: "#8CB8A4", ink: "#2F2B28", cobble: "#D6C8A8"};
 const g = s => `<g pointer-events="none">${s}</g>`;
-const evening = () => sgHM() >= 17*60 + 30;
+const evening = () => localHM() >= 17*60 + 30;
 const ground = (col = C.dry, col2 = C.dry2) => `<rect width="520" height="640" style="fill:${col}"/><g filter="url(#wash)" opacity=".55"><ellipse cx="140" cy="460" rx="170" ry="90" style="fill:${col2}"/><ellipse cx="400" cy="560" rx="150" ry="70" style="fill:${col2}"/></g>`;
 const lane = (d, w = 26, a = "#E8DCC0", b = "#D2C29E") => `<g filter="url(#wob)" pointer-events="none"><path d="${d}" fill="none" style="stroke:${b}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" style="stroke:${a}" stroke-width="${w - 8}" stroke-linecap="round" stroke-linejoin="round"/></g>`;
 const hills = (sky = "#E8EEF2", far = "#C9C4A0") => g(`<rect width="520" height="170" fill="${evening() ? "#F6C98A" : sky}"/>${evening() ? `<circle cx="400" cy="90" r="26" fill="#F39A4A" opacity=".85"/>` : ""}<path d="M0 120 Q100 86 210 104 T420 92 T520 100 V170 H0z" fill="${far}"/><path d="M0 146 Q130 120 260 134 T520 128 V170 H0z" fill="#B9B98A"/>`);

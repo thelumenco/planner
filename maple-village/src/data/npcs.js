@@ -56,8 +56,8 @@ export const NPCS = [
     intro: "Welcome to the library! I'm Juniper. I love a good semicolon; I also write poetry, but that's a secret. One book recommendation a week, guaranteed.",
     look: {skin: "#C99A78", hair: "#2B2320", hairStyle: "bob", top: "#B9D2A6", bottom: "#3F4A6B", extra: "glasses"},
     routine: [slot("7:20", "7:42", "hlane", [250, 150], {dow: [2], dir: 1}), slot("7:00", "8:00", "hwoods", WOODS_RIDE, {dow: [1, 3, 5], look: BIKE}), slot("9:00", "11:00", "hwoods", WOODS_RIDE, {dow: [6], look: BIKE}), slot("15:30", "16:30", "lane", LANE, {dow: [1, 2, 3, 4, 5]}),
-      slot("18:30", "20:00", "wineshop", [453, 512], {act: "sit"}), slot("8:30", "13:00", "fresh", [[160, 300], [330, 300], [240, 330]]), slot("13:00", "15:30", "fresh", [356, 330]),
-      slot("15:30", "16:00", "trophy", [292, 590], {act: "sit"}), slot("16:00", "18:00", "fresh", [[90, 330], [180, 330], [140, 312]])],
+      slot("18:30", "20:00", "wineshop", [453, 512], {act: "sit"}), slot("8:30", "13:00", "library", [[160, 300], [330, 300], [240, 330]]), slot("13:00", "15:30", "library", [356, 330]),
+      slot("15:30", "16:00", "trophy", [292, 590], {act: "sit"}), slot("16:00", "18:00", "library", [[90, 330], [180, 330], [140, 312]])],
     lines: ["This week's pick: anything with a map in the front.", "A semicolon is a pause that believes in you.", "Shh… the nook is in reading hour. Join me?",
       "Every first draft is allowed to be terrible. That's the rule.", "I shelve by feeling, not by alphabet. Don't tell anyone."],
     react: {writing: "Ooh, a writing quest. Messy first, lovely later.", quests3: "Three chapters done today. Metaphorically."}
@@ -67,7 +67,7 @@ export const NPCS = [
     intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
     look: {skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap"},
     routine: [slot("12:30", "13:30", "bay", [[180, 420], [240, 430], [300, 420]], {dow: [3, 5]}), slot("8:00", "10:00", "hwoods", WOODS_RIDE, {dow: [6], look: BIKE}), slot("12:30", "13:30", "lane", LANE, {dow: [2, 4]}),
-      slot("18:30", "20:00", "wineshop", [227, 518], {act: "sit", dow: [0, 1, 3, 4, 5]}), slot("8:00", "12:30", "chord", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566]),
+      slot("18:30", "20:00", "wineshop", [227, 518], {act: "sit", dow: [0, 1, 3, 4, 5]}), slot("8:00", "12:30", "carpentry", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566]),
       slot("13:30", "18:00", "village", [[170, 300], [400, 280], [300, 450], [150, 520], [440, 560]])],
     lines: ["I built those trellis posts for Wilf, back in the day. They've leaned a bit since. We'll fix them.", "*hums a tune* Fixed the market's wobbly leg this morning.", "Measure twice, cut once. Or just cut and laugh.", "The workshop smells like sawdust and big ideas.",
       "Shipping is just building, but braver.", "Need a shelf? I always need a shelf."],
@@ -721,13 +721,13 @@ export const NPCS = [
     lines: ["Close to the little ball. That's all. That's the whole game. It takes a lifetime.", "Sixty years in this piazza. I've seen everything. Twice.", "Your friend with the flowers! Ha! She's good. Too good. I'll beat her tomorrow.", "Siesta is not lazy. Siesta is wisdom."],
     away: "Nino's home for lunch and a sleep."
   },
-  // Ornella (id "jason"): a Vernazza local the player meets on the trip and can keep as a pen pal. Seventy-two, a
+  // Ornella (id "ornella"): a Vernazza local the player meets on the trip and can keep as a pen pal. Seventy-two, a
   // retired ferry captain (thirty-one years bringing the coast ferry into the harbour), now "on shore leave,
   // indefinitely". Lives on the second floor of the yellow house by the harbour. Brisk, salty, warm and funny; a
   // little verse in her notebook every morning, the Corniglia steps, a swim at Monterosso whatever the weather, and
   // the sunset on the harbour wall with Dario, her old deckhand. White hair in a bun, a navy jumper, a captain's cap.
   {
-    id: "jason", local: "cinque", pitch: 1.0, name: "Ornella", job: "Retired ferry captain. Writes verses at the café, swims every day",
+    id: "ornella", local: "cinque", pitch: 1.0, name: "Ornella", job: "Retired ferry captain. Writes verses at the café, swims every day",
     intro: "Ornella. Thirty-one years I brought the ferry into this harbour, and not once did I scrape the paint. You came by train? A pity. The sea is the proper front door. I'm in the yellow house by the harbour, second floor, geraniums. Wave when you pass. I'll be watching the boats anyway.",
     look: {skin: "#E8C2A0", hair: "#E6E2DA", hairStyle: "bun", top: "#2E3A5A", sleeves: "#2E3A5A", bottom: "#F3E7C8", hat: "cap"},
     routine: [slot("8:00", "10:30", "ct_vernazza", [332, 296], {act: "poem", dir: -1}), slot("10:30", "12:30", "ct_corniglia", [[372, 420], [300, 460], [400, 380]]),
@@ -751,10 +751,10 @@ export const NPCS = [
       sit: ["Watch the lights come on in the houses, one by one, like boats coming home.", "Dario says a sunset is just science. I say so is a good engine, and he loves those.", "Stay a while. The last train's at ten. I know the timetable by heart."]},
     away: "Ornella's upstairs. Her balcony door is open, and a radio's reading out the shipping forecast."
   },
-  // Dario (id "luca"): Vernazza's boat mechanic, in his late twenties; once Ornella's deckhand on the ferry. Cheerful,
+  // Dario (id "dario"): Vernazza's boat mechanic, in his late twenties; once Ornella's deckhand on the ferry. Cheerful,
   // chatty, learning English from old films and collecting idioms (which he gets nearly right). Another pen pal.
   {
-    id: "luca", local: "cinque", pitch: 0.8, name: "Dario", job: "Mends the fishing boats' engines in Vernazza. Collects English idioms",
+    id: "dario", local: "cinque", pitch: 0.8, name: "Dario", job: "Mends the fishing boats' engines in Vernazza. Collects English idioms",
     intro: "Ciao! Dario. I fix the engines on the boats. You speak English? Fantastic. I am learning. Ornella says I speak like an old film. Anyway, nice to meet you: it's a piece of pie! No. Cake. A piece of cake. You see? Learning.",
     look: {skin: "#C99A78", hair: "#1E1A18", hairStyle: "curly", top: "#C9483A", bottom: "#3E5E7A"},
     routine: [slot("8:00", "13:00", "ct_vernazza", [[200, 440], [180, 470], [230, 450]]), slot("15:00", "18:00", "ct_vernazza", [[200, 440], [230, 450]]), slot("18:00", "21:45", "ct_vernazza", [246, 420], {act: "sit", dir: -1})],
@@ -886,9 +886,9 @@ export const NPCS = [
     id: "ada", pitch: 1.1, name: "Ada", job: "Runs the haberdashery on Makers' Lane",
     intro: "Ada. Haberdasher. Fabric by the piece, buttons by the card, and advice for nothing. Gingham's half the reason I get up in the morning.",
     look: {skin: "#F2D3BC", hair: "#D9D4CC", hairStyle: "bun", top: "#C98AA8", bottom: "#4F5A6A", extra: "glasses"},
-    routine: [slot("9:30", "17:30", "chico", [[400, 500], [260, 420], [420, 300]], {dow: [1, 2, 3, 4, 5, 6]}), slot("7:30", "9:00", "village", [[362, 372], [340, 380]], {dow: [1, 2, 3, 4, 5, 6]}),
+    routine: [slot("9:30", "17:30", "haberdash", [[400, 500], [260, 420], [420, 300]], {dow: [1, 2, 3, 4, 5, 6]}), slot("7:30", "9:00", "village", [[362, 372], [340, 380]], {dow: [1, 2, 3, 4, 5, 6]}),
       slot("10:00", "12:00", "market", [[200, 470], [320, 480]], {dow: [0]}), slot("14:00", "16:00", "flowers", [[160, 300], [260, 380]], {dow: [0]}),
-      slot("17:30", "19:00", "lane", [[262, 400], [200, 380], [330, 390]]), slot("19:00", "22:00", "chico", [130, 500], {act: "sit"})],
+      slot("17:30", "19:00", "lane", [[262, 400], [200, 380], [330, 390]]), slot("19:00", "22:00", "haberdash", [130, 500], {act: "sit"})],
     lines: ["Linen creases. That's how you know it's linen.", "Every button in that jar has a story. Most of them are about coats.", "Gingham never goes out of fashion. It never came in, either. It just stayed.",
       "Measure twice. Then ask me, and I'll measure a third time.", "Idris next door makes the clothes. I make the decisions about the fabric."],
     away: "Ada's shut the haberdashery for the day. The window display's still lit."
@@ -897,9 +897,9 @@ export const NPCS = [
     id: "idris", pitch: 0.8, name: "Idris", job: "The tailor on Makers' Lane",
     intro: "Idris. Tailor. I make things that fit. Bring me fabric from Ada next door, tell me what you'd like, and come back tomorrow.",
     look: {skin: "#8D5B3E", hair: "#1E1A18", hairStyle: "short", top: "#3E4A5C", bottom: "#2F2B28", extra: "tie"},
-    routine: [slot("9:30", "17:30", "luna", [[400, 500], [130, 500], [260, 430]], {dow: [1, 2, 3, 4, 5, 6]}), slot("7:00", "8:30", "hwoods", [[100, 330], [200, 318], [300, 300]], {dow: [1, 2, 3, 4, 5, 6]}),
+    routine: [slot("9:30", "17:30", "tailor", [[400, 500], [130, 500], [260, 430]], {dow: [1, 2, 3, 4, 5, 6]}), slot("7:00", "8:30", "hwoods", [[100, 330], [200, 318], [300, 300]], {dow: [1, 2, 3, 4, 5, 6]}),
       slot("11:00", "13:00", "bay", [[180, 420], [240, 430]], {dow: [0]}), slot("15:00", "17:00", "village", [[362, 372], [226, 420]], {dow: [0]}),
-      slot("17:30", "18:30", "village", [[362, 372], [330, 380]]), slot("18:30", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [5, 6]}), slot("19:00", "22:00", "luna", [130, 500], {act: "sit"})],
+      slot("17:30", "18:30", "village", [[362, 372], [330, 380]]), slot("18:30", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [5, 6]}), slot("19:00", "22:00", "tailor", [130, 500], {act: "sit"})],
     lines: ["A good hem is invisible. That's the whole point of it.", "I don't hurry. Clothes can tell.", "Stand up straight. No, that's very good. I was talking to the mannequin.",
       "Buttons first, then the buttonholes. Never the other way round.", "Ada chooses the fabric. I just do what it tells me."],
     away: "Idris has put the needle down for the day. Back at half past nine."
@@ -912,7 +912,7 @@ export const NPCS = [
   ...MILL_PEOPLE   // round 154: the mill's own day-trippers (data/mill-people.js)
 ];
 // Bo and Mr Okada live on Makers' Lane: you'll find them at home in the evening, and Mr Okada before his early walk too.
-const HOMES = {bo: [["chord", 1200, 1290]], okada: [["ohayo", 360, 435], ["ohayo", 1260, 1320]]};
+const HOMES = {bo: [["carpentry", 1200, 1290]], okada: [["okadahouse", 360, 435], ["okadahouse", 1260, 1320]]};
 // Auntie Lin and Juniper share the green cottage by the flower-farm gate on the foreshore: evenings at home
 { const n = NPCS.find(x => x.id === "lin"); if (n) n.routine.push(slot("19:00", "22:50", "linjun", [130, 520], {act: "sit"}), slot("22:50", "23:00", "linjun", [470, 352])); }
 { const n = NPCS.find(x => x.id === "juniper"); if (n) n.routine.push(slot("20:00", "22:50", "linjun", [420, 300], {act: "sit"}), slot("22:50", "23:00", "linjun", [470, 360])); }

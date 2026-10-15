@@ -211,7 +211,7 @@ export const xmasOn = day => { const md = day.slice(5); return md >= "11-20" && 
 export const XMAS_FROM = 17*60, XMAS_TO = 21*60, XMAS_LIT = 17*60 + 30, XMAS_TREE = [184, 600];
 export const XMAS = [{id: "farid", at: 0, short: "Wreaths", n: "Farid's wreaths and winter flowers", items: ["xm_wreath", "xm_bouquet", "xm_mistletoe"], col: "#4F7A4A", line: "Holly from the orchard hedge, ivy from the back fence. I make every one by hand!"},
   {id: "hana", at: 1, short: "Gingerbread", n: "Hana's gingerbread and ornaments", items: ["xm_ginger", "xm_bauble", "xm_star", "xm_angel"], col: "#C8432F", line: "Gingerbread people, iced this afternoon. And ornaments for your tree!"},
-  {id: "mel", at: 2, kind: "mine", short: "Your stall", n: "Your stall", items: [], col: "#8E2C48", line: ""},
+  {id: "hero", at: 2, kind: "mine", short: "Your stall", n: "Your stall", items: [], col: "#8E2C48", line: ""},
   {id: "celeste", at: 3, kind: "mulled", short: "Mulled wine", n: "Mulled wine", items: [], col: "#7A1F3D", line: "Mind, it's hot! Cinnamon on top?"},
   {id: "hiro", at: 4, short: "Wooden toys", n: "Wooden toys", items: ["xm_train", "xm_horse", "xm_yoyo", "xm_ark"], col: "#7FB8E8", line: "Every one carved and painted in my workshop. No batteries, ever."},
   {id: "dev", at: 5, short: "Chestnuts", n: "Roast chestnuts", items: [], treats: ["xm_chestnut"], col: "#8A5A3A", line: "Hot chestnuts! Mind your fingers, they're straight off the coals."},

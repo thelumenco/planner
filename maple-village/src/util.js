@@ -1,12 +1,12 @@
 // Shared helpers: time (the player's own timezone), DOM, maths.
 export const H = 3600e3, M = 60e3, W = 520, HH = 640;
 // Wall clock for day/time-of-day logic. The dev stub can shift it (?time=15:30); timers always use real Date.now().
-export const now = () => Date.now() + (globalThis.__mapleOffset || 0);
+export const now = () => Date.now() + (globalThis.__hbOffset || 0);
 // The player's timezone offset in ms. Day and time-of-day maths shifts a timestamp by this and reads the UTC fields,
 // so "new Date(ms + LOC())" with getUTCHours()/toISOString() gives the local clock and date.
 export const LOC = () => -new Date().getTimezoneOffset()*M;
 export const dayKey = () => new Date(now() + LOC()).toISOString().slice(0,10); // the local date, turns over at midnight
-export const sgHM = () => { const d = new Date(now() + LOC()); return d.getUTCHours()*60 + d.getUTCMinutes(); };   // local minutes since midnight
+export const localHM = () => { const d = new Date(now() + LOC()); return d.getUTCHours()*60 + d.getUTCMinutes(); };   // local minutes since midnight
 export const prevDay = k => new Date(Date.parse(k+"T00:00:00Z") - 864e5).toISOString().slice(0,10);
 export const $ = id => document.getElementById(id);
 export const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));

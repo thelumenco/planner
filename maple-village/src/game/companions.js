@@ -78,7 +78,7 @@ export const PETS = {
 };
 // where a pet can live, and the open floor spots it sits on there (it picks one when it moves in)
 export const PET_HOMES = {
-  home: {n: "Home (the living room)", spots: [[160, 520], [370, 520], [330, 330]], indoor: true}, kidroom: {n: "The guest room", spots: [[160, 520], [360, 500]], indoor: true},
+  home: {n: "Home (the living room)", spots: [[160, 520], [370, 520], [330, 330]], indoor: true}, guestroom: {n: "The guest room", spots: [[160, 520], [360, 500]], indoor: true},
   room: {n: "Your room", spots: [[300, 560], [200, 300]], indoor: true}, garage: {n: "The garage", spots: [[220, 380], [330, 560]], indoor: true},
   cottage: {n: "Farid and Mei's cottage", spots: [[180, 470], [360, 470]], indoor: true}, hanatheo: {n: "Hana and Theo's", spots: [[200, 470], [380, 500]], indoor: true},
   tomiposy: {n: "Tomi and Posy's", spots: [[200, 420], [380, 560]], indoor: true}, scoopshop: {n: "The Scoop Shack", spots: [[140, 450], [420, 440]], indoor: true},

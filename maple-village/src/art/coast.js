@@ -2,7 +2,7 @@
 // deep blue-green water with white surf lines, honey-gold limestone cliffs, pale sand, wind-bent heath, Norfolk
 // pines along the esplanade, weatherboard shops with striped awnings. Calm on purpose: detail round the edges, a
 // clear middle. The places are in data/coast.js. (Helpers shared with the Vines: art/bellbird-vines.js.)
-import { dayKey, sgHM } from "../util.js";
+import { dayKey, localHM } from "../util.js";
 import { sk } from "./scenes.js";
 import { lampDefs } from "./village-extras.js";
 import { BBC as V, bbLab as lab, bbPlace as place, bbGate as gate, bbGum as gum, bbShed as shed, bbTrack as track, bbFence as fence, bbVan as myVan, bbKombi as kombi, bbCaravan as caravan, bbChair as chair, bbTable as table, bbKoala as koala, bbFlowers as flowers } from "./bellbird-vines.js";
@@ -10,7 +10,7 @@ import { BBC as V, bbLab as lab, bbPlace as place, bbGate as gate, bbGum as gum,
 const C = {sea: "#4F93B4", sea2: "#6FAFC8", sea3: "#3E7E9E", foam: "#FFFDF6", sand: "#EAD7A8", sand2: "#DEC690", cliff: "#D9A85E", cliff2: "#C08A48", heath: "#9DAA78", heath2: "#B5B98A",
   grass: "#C9D19A", grass2: "#BCC48A", pine: "#4E6E52", fern: "#5E8A4E", fern2: "#7AA25E", ash: "#E2DCCB", ink: "#2F2B28", red: "#C8432F"};
 const g = s => `<g pointer-events="none">${s}</g>`;
-const evening = () => sgHM() >= 18*60;
+const evening = () => localHM() >= 18*60;
 // the sea: a band (any shape) with white surf lines and a glint or two
 const sea = (d, foam = []) => g(sk(`<path d="${d}" style="fill:${C.sea}"/>`, ``) + foam.map(([x, y, w]) => `<path d="M${x} ${y} q${w/4} -5 ${w/2} 0 t${w/2} 0" fill="none" stroke="${C.foam}" stroke-width="2" stroke-linecap="round" opacity=".85"/>`).join(""));
 const surfLine = (y, x1 = 0, x2 = 520) => g(`<path d="M${x1} ${y} ${Array.from({length: Math.ceil((x2 - x1)/40)}, (_, i) => `q10 -6 20 0 t20 0`).join(" ")}" fill="none" stroke="${C.foam}" stroke-width="3" stroke-linecap="round" opacity=".9"/>`);

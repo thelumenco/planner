@@ -31,7 +31,7 @@
 // at stall place 9 on the field: tours.js MARKET, shown once it's bought).
 // The shop is open 11am to 8pm, Tuesday to Sunday. Amara serves at the counter; customers buy bars off the wall (more
 // often while the player's serving too). Takings go straight to the player. The player can have a bar or take one to give.
-import { esc, dayKey, sgHM, hash, LOC } from "../util.js";
+import { esc, dayKey, localHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
 import { mouldPath, shellRibs } from "../art/moulds.js";
 import { INGR, farmShelf, scoopState, hasUp, takeBack, bikeOwned, DELIVERY, deliveryHours } from "./scoop.js";
@@ -42,7 +42,7 @@ export const OPEN = 11*60, CLOSE = 20*60, ROAST_MIN = 10, GRIND_MIN = 120, POT =
 export const KINDS = {milk: {n: "Milk chocolate", col: "#8A5A3A"}, dark: {n: "Dark chocolate", col: "#4A2E22"}, white: {n: "White chocolate", col: "#F3E7C9"}};
 export const BAR_ID = k => "bar_" + k;
 export const HAND = {1: [9*60 + 30, 16*60 + 30], 2: [9*60 + 30, 16*60 + 30], 3: [9*60 + 30, 16*60 + 30], 4: [9*60 + 30, 16*60 + 30], 5: [9*60 + 30, 16*60 + 30], 6: [9*60 + 30, 16*60 + 30]}, WALL = 40;   // Mateo's shifts by weekday; he stops moulding a kind at 40 bars on the wall
-const now = () => Date.now() + (globalThis.__mapleOffset || 0);
+const now = () => Date.now() + (globalThis.__hbOffset || 0);
 export const openOn = (day, hm, mon) => (mon || new Date(day + "T00:00:00Z").getUTCDay() !== 1) && hm >= OPEN && hm < CLOSE;
 export const CC_UPS = {
   window: {n: "Window display", price: 300, line: "A proper window: tiered stands of bonbons, a chocolate sculpture, little lights. More passers-by come in (about a fifth busier)."},
@@ -334,7 +334,7 @@ export function takeBar(F, kind, give){ const c = cocoaState(F); if (!(c.bars[ki
 const coin = () => icon("coin", 13), shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 const dot = c => `<span class="gdot" style="background:${c}"></span>`;
 export function counterPanel(F, st){
-  const c = cocoaState(F), day = dayKey(), hm = sgHM(), t = c.sold[day] || {n: 0, coins: 0};
+  const c = cocoaState(F), day = dayKey(), hm = localHM(), t = c.sold[day] || {n: 0, coins: 0};
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${st.xmas ? "The Christmas market stall, under a garland: gift boxes stacked high. Open till 9pm. " : st.cart ? "The farmers market cart. " : ""}${st.xmas ? "" : openOn(day, hm, ccUp(c, "assistant")) ? "Open till 8pm." : `Closed: open 11am to 8pm, ${ccUp(c, "assistant") ? "every day" : "Tuesday to Sunday"}.`} ${t.n || t.bonbons ? `Sold today: ${t.n} bar${t.n === 1 ? "" : "s"}${t.bonbons ? ` and ${t.bonbons} bonbon${t.bonbons === 1 ? "" : "s"}` : ""} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Amara's behind the counter." : ""}</p>`;
   h += `<ul class="hlist wlist">${Object.entries(KINDS).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n} bars</b><small>${c.bars[k]} on the wall · ${c.prices.bar} ${coin()} each</small></span><span class="orbtns"><button class="btn small primary" data-cc="eat" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>Have one</button><button class="btn small alt" data-cc="give" data-k="${k}" ${c.bars[k] ? "" : "disabled"}>To give</button></span></li>`).join("")}</ul>`;
   h += `<div class="row gprices"><span>Price of a bar</span><span class="gstep"><button class="btn small alt" data-cc="price" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bar}</b><button class="btn small alt" data-cc="price" data-n="1" aria-label="Dearer">+</button></span></div>`;

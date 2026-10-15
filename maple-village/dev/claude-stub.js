@@ -1,5 +1,5 @@
 // Local stand-in for the claude.ai artifact runtime (window.claude.use), dev builds only.
-window.__mapleDevStub = true;   // dev only: lets test scripts jump between scenes
+window.__hbDevStub = true;   // dev only: lets test scripts jump between scenes
 // db: documents in localStorage under "stub:<path>", live onSnapshot. user: id "me". downloads: remembers the last save.
 // URL options:
 //   ?dblag=ms     delay the first database snapshot (like a slow phone connection)
@@ -15,7 +15,7 @@ window.__mapleDevStub = true;   // dev only: lets test scripts jump between scen
     const sg = new Date(Date.now() - new Date().getTimezoneOffset() * 60e3);
     const [Y, Mo, D] = q.get("date") ? q.get("date").split("-").map(Number) : [sg.getUTCFullYear(), sg.getUTCMonth() + 1, sg.getUTCDate()];
     const want = Date.UTC(Y, Mo - 1, D, h, m || 0);
-    window.__mapleOffset = want - sg.getTime();
+    window.__hbOffset = want - sg.getTime();
   }
   const listeners = {};
   // the real db hands out frozen snapshots; freeze here too so code that edits one in place fails in tests

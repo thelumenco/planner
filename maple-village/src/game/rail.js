@@ -2,7 +2,7 @@
 // through the bay and Wildflower Farm to Honeybrook station on the cottage lane, and on east into the hill (and back).
 // The timetable is only on the platform board (not the village calendar). Each train stops at Honeybrook for two
 // minutes at its time; on the way it passes the farm a minute or two either side, and the bay a minute further out.
-import { dayKey, sgHM, LOC } from "../util.js";
+import { dayKey, localHM, LOC } from "../util.js";
 
 export const TRAINS = [
   {id: "milk", t: 7*60 + 40, dir: "w", n: "The milk train", to: "to the city", line: "Churns of milk and crates of honey from the farm, off to the city."},
@@ -21,18 +21,18 @@ const WINDOWS = {
   bay: {e: [[-3, "pass"]], w: [[4, "pass"]]},
   hwoods: {e: [[3, "pass"]], w: [[-2, "pass"]]}   // round 103: on east into the tunnel under the hill (and back out)
 };
-const secs = () => { const d = new Date(Date.now() + (globalThis.__mapleOffset || 0) + LOC()); return d.getUTCSeconds() + d.getUTCMilliseconds()/1000; };
+const secs = () => { const d = new Date(Date.now() + (globalThis.__hbOffset || 0) + LOC()); return d.getUTCSeconds() + d.getUTCMilliseconds()/1000; };
 // the train on a screen right now: {id, dir, mode, elapsed (seconds into its minute; dwell counts both minutes)} or null
-export function trainHere(scene, day = dayKey(), hm = sgHM()){
+export function trainHere(scene, day = dayKey(), hm = localHM()){
   const w = WINDOWS[scene]; if (!w) return null;
   for (const t of trainsOn(day)) for (const [k, mode] of w[t.dir]) if (hm === t.t + k) return {...t, mode, elapsed: secs() + (mode === "dwell" ? (k - 0)*60 : 0)};
   return null;
 }
-export const trainKey = scene => { const t = trainHere(scene); return t ? `${t.id}:${t.mode}:${t.mode === "dwell" ? "" : sgHM()}` : ""; };
-export const nextTrain = (day = dayKey(), hm = sgHM()) => trainsOn(day).find(t => t.t + 2 >= hm) || null;
+export const trainKey = scene => { const t = trainHere(scene); return t ? `${t.id}:${t.mode}:${t.mode === "dwell" ? "" : localHM()}` : ""; };
+export const nextTrain = (day = dayKey(), hm = localHM()) => trainsOn(day).find(t => t.t + 2 >= hm) || null;
 export const fmt = m => `${Math.floor(m/60) % 12 || 12}:${String(m % 60).padStart(2, "0")}${m < 12*60 ? "am" : "pm"}`;
 
-export function timetablePanel(day = dayKey(), hm = sgHM(), tickets = false){
+export function timetablePanel(day = dayKey(), hm = localHM(), tickets = false){
   const nx = nextTrain(day, hm);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Honeybrook</h2><p class="sub">Trains today. Every one stops here for two minutes.${nx ? ` Next: ${nx.n.toLowerCase()} at ${fmt(nx.t)}.` : " That's the last one gone for today."}</p>`;
   h += `<ul class="hlist wlist">${trainsOn(day).map(t => `<li class="${nx && t.id === nx.id ? "now" : ""}"><span class="wtxt"><b>${fmt(t.t)} · ${t.n} ${t.to}</b><small>${t.line}</small></span></li>`).join("")}</ul>`;

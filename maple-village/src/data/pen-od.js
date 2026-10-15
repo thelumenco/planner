@@ -1,9 +1,9 @@
-// Ornella's and Dario's letters (round 192): the two Vernazza pen pals. Ornella (id "jason"), the retired ferry
+// Ornella's and Dario's letters (round 192): the two Vernazza pen pals. Ornella (id "ornella"), the retired ferry
 // captain, writes long letters (`own`: her gift lines are whole sentences, no "Thank you for the…" put in front;
-// `open`, two of her `news`, and a `ps`): brisk, salty, warm, a sea log with jokes. Dario (id "luca"), the boat
+// `open`, two of her `news`, and a `ps`): brisk, salty, warm, a sea log with jokes. Dario (id "dario"), the boat
 // mechanic, writes short ones, cheerful, with his English idioms. Keep them both joyful, always.
-export const PEN_JL = {
-  jason: {own: true, dear: "My dear friend,",
+export const PEN_OD = {
+  ornella: {own: true, dear: "My dear friend,",
     sign: "Fair winds, from the yellow house by the harbour,\nOrnella",
     open: [
       "Your letter came aboard on Tuesday, and I'm answering it the same afternoon; a captain never leaves a signal unacknowledged, and I see no reason to change the habit just because I've come ashore.",
@@ -32,7 +32,7 @@ export const PEN_JL = {
       "P.S. The last train is at ten. I know the timetable by heart, should you ever need reminding."
     ],
     back: "c_jpoem", backNote: "I have folded a verse in with this; it is about the harbour lights coming on, and it rhymes 'starboard' with 'cupboard', for which I refuse to apologise."},
-  luca: {sign: "Ciao ciao, Dario",
+  dario: {sign: "Ciao ciao, Dario",
     food: "Ornella said we would share it. We did share it. She had more. She was my captain, so this is the rule. Also it was delicious.",
     drink: "We drank it on the harbour wall with the sunset. Ornella made a speech. The speech was longer than the bottle. Time flies when you're having fun!",
     made: "Ornella took it upstairs and says it is hers now. I am allowed to visit it.",

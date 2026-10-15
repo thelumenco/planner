@@ -5,7 +5,7 @@ import { petify } from "../art/pets.js";
 import { personArt, letterArt, rainGearFor } from "../art/people.js";
 import { rainyOn } from "../art/village-extras.js";
 import { OUTDOOR } from "../data/world.js";
-import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey, LOC } from "../util.js";
+import { localHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey, LOC } from "../util.js";
 import { lunchSlot } from "./lunch.js";
 import { occasionSlot } from "./occasions.js";
 import { toursOn, visitsOn, eventOn, keepersOn, TOURISTS, NIGHT_TOURISTS } from "./tours.js";
@@ -23,7 +23,7 @@ import { townOf, townRoom } from "../data/towns.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
-let api = null, storyT = null;             // see core: scene(), bounds(), mel, F(), S(), save(), facts(), bubble(), openMail(), unreadMail(), gift()
+let api = null, storyT = null;             // see core: scene(), bounds(), hero, F(), S(), save(), facts(), bubble(), openMail(), unreadMail(), gift()
 let courier = null;         // the messenger currently on screen
 let sayer = null, sayT = null;
 const greeted = new Set();  // messengers say hello once, then just tag along quietly
@@ -44,7 +44,7 @@ function supSlot(def){
 const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
 const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw === 6, owned = Object.assign({}, (api && api.F().fam && api.F().fam.owned) || {}, (api && api.F().goals) || {}, ...Object.keys((api && api.F().cocoa && api.F().cocoa.up) || {}).map(k => ({["cc_" + k]: 1})));   // things bought for the family, big goals, Cocoa Room upgrades (cc_<k>)
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
-const routineNow = def => routineAt(def, dayKey(), sgHM());
+const routineNow = def => routineAt(def, dayKey(), localHM());
 export function slotAt(def, day, t, live){
   return (api && guestSlot(api.F(), def.id, day, t)) || (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || lunchSlot(def.id, day, t, terraceBuilt()) || occasionSlot(def.id, day, t, terraceBuilt()) || millSlot(def.id, day, t, millShopOpen(), MILL_VISITORS, []) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || (cellarBuilt() && discoSlot(def.id, day, t)) || movieSlot(def.id, day, t) || bayMarketSlot(def.id, day, t) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
     || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || iceOk(shopSlot(def.id, day, t), def, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || letSlot(def.id, day, t) || routineAt(def, day, t);
@@ -72,14 +72,14 @@ const cellarBuilt = () => !!(api && api.F().goals && api.F().goals.cellar);   //
 // that saves the game clears it, so a change still shows at once.
 let slotCache = {}, slotKey = "";
 export const clearSlots = () => { slotCache = {}; slotKey = ""; };
-const slotNow = def => { const sup = api && api.sup && api.sup(), k = `${dayKey()}|${sgHM()}|${api ? api.scene() : ""}|${sup ? sup.from : ""}`;
+const slotNow = def => { const sup = api && api.sup && api.sup(), k = `${dayKey()}|${localHM()}|${api ? api.scene() : ""}|${sup ? sup.from : ""}`;
   if (k !== slotKey) { slotCache = {}; slotKey = k; }
-  return def.id in slotCache ? slotCache[def.id] : (slotCache[def.id] = slotAt(def, dayKey(), sgHM(), true)); };
+  return def.id in slotCache ? slotCache[def.id] : (slotCache[def.id] = slotAt(def, dayKey(), localHM(), true)); };
 export const whereIs = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); return s ? s.scene : null; };
 // where they are right now, with a point to walk to (their own spot, or the first stop of their stroll), or null
 export const whereAt = id => { const d = NPCS.find(n => n.id === id), s = d && slotNow(d); if (!s) return null; const e = ents[id], p = e ? [e.x, e.y] : s.at || (s.wander || [])[0]; return p ? {scene: s.scene, x: p[0], y: p[1]} : null; };
 export const npcPos = id => ents[id] ? {x: ents[id].x, y: ents[id].y} : null;
-export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.mel.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
+export function npcSay(id, text){ const e = ents[id]; if (!e) return false; e.dir = api.hero.x < e.x ? -1 : 1; say(e, text, 4500); api.sfx && api.sfx("babble", e.def.pitch || 1); return true; }
 const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: "rod", guitar: "guitar", sketch: "sketchbook", photo: "camera", notes: "notebook", doze: "newspaper",
   parasol: "parasol", wheel: "claycup", cranes: "crane", go: "goboard", skewer: "skewer", brush: "brush", fortune: "fortune",
   kite: "kite", pick: "tbasket", nets: "net", stack: "stone",
@@ -143,14 +143,14 @@ function tickVillager(def, dt){
     if (was && slot.follow) route(e, p[0], p[1]);   // on a day trip: round things to the next spot
     else if (was) { e.tx = p[0]; e.ty = p[1]; e.path = []; }   // straight across the open field (stalls sit above the walkable area)
     // on a day trip the family come in with the player (from just behind her) and stroll over to their favourite spot
-    else if (slot.follow && api.mel) { const b = api.bounds(); e.x = clamp(api.mel.x + rnd(-30, 30), b[0], b[2]); e.y = clamp(api.mel.y + rnd(6, 26), b[1], b[3]); if (slot.free) { e.tx = p[0]; e.ty = p[1]; e.path = []; } else route(e, p[0], p[1]); }   // (free: rowing out to sea, straight off the beach)
+    else if (slot.follow && api.hero) { const b = api.bounds(); e.x = clamp(api.hero.x + rnd(-30, 30), b[0], b[2]); e.y = clamp(api.hero.y + rnd(6, 26), b[1], b[3]); if (slot.free) { e.tx = p[0]; e.ty = p[1]; e.path = []; } else route(e, p[0], p[1]); }   // (free: rowing out to sea, straight off the beach)
   }
   // Now and then a neighbour near the player says hello (each at most every few minutes).
-  const near = Math.hypot(e.x - api.mel.x, e.y - api.mel.y) < 110;
+  const near = Math.hypot(e.x - api.hero.x, e.y - api.hero.y) < 110;
   // a story chapter ready to tell (stories.js): the little "…" over their head
   if (!e.cueAt || Date.now() - e.cueAt > 2000) { e.cueAt = Date.now(); e.story = !!(api.storyReady && api.storyReady(def.id)); e.node.classList.toggle("story", e.story); }
   if (near && !sayer && Date.now() - (e.helloAt || 0) > 4*60e3 && Math.random() < dt*.08) {
-    e.helloAt = Date.now(); if (!e.act) e.dir = api.mel.x < e.x ? -1 : 1;
+    e.helloAt = Date.now(); if (!e.act) e.dir = api.hero.x < e.x ? -1 : 1;
     const tl = (slot.trip && townLine(api.F(), def.id, scene)) || (slot.guest && [guestLine(api.F(), def.id, scene)]);
     say(e, e.story ? pick(["Hello! Got a minute?", "Oh, I wanted to tell you something.", "Have you got a moment?"]) : tl && Math.random() < .7 ? pick(tl) : pick(def.hellos || hellos()), tl ? 4200 : 2600); api.sfx && api.sfx("babble", def.pitch || 1);
   }
@@ -172,12 +172,12 @@ function tickVillager(def, dt){
   e.node.classList.toggle("run", def.kid && e.moving);
 }
 
-const hellos = () => { const t = sgHM(); return [t < 720 ? "Morning!" : t < 1080 ? "Afternoon!" : "Evening!", "Hi!", "Hello there!", "Hiya!"]; };
+const hellos = () => { const t = localHM(); return [t < 720 ? "Morning!" : t < 1080 ? "Afternoon!" : "Evening!", "Hi!", "Hello there!", "Hiya!"]; };
 /* ---------- messengers ---------- */
 function tickCourier(dt){
-  const scene = api.scene(), mel = api.mel;
+  const scene = api.scene(), hero = api.hero;
   if (courier && courier.scene !== scene) { drop(courier.id); courier = null; }
-  if (scene === "home" || scene === "room" || scene === "kidroom" || scene === "office" || scene === "garage" || townOf(scene)) return;   // (and nobody posts letters to Ronda)   // only family inside the house (and nobody in the player's room); notes wait until the player steps out
+  if (scene === "home" || scene === "room" || scene === "guestroom" || scene === "office" || scene === "garage" || townOf(scene)) return;   // (and nobody posts letters to Ronda)   // only family inside the house (and nobody in the player's room); notes wait until the player steps out
   // the note she's carrying was replaced or read elsewhere (e.g. fresh mail arrived just after the page opened)
   if (courier && courier.state !== "leaving" && !api.unreadMail().some(m => m.id === courier.item.id)) { drop(courier.id); courier = null; }
   if (!courier) {
@@ -185,15 +185,15 @@ function tickCourier(dt){
     // reading it does Rosa come and find her there. Everyone else delivers wherever the player is.
     const item = api.unreadMail().find(m => m.from !== "crier" || scene === "village"); if (!item) return;
     const ag = AGENTS[item.from] || AGENTS.postie;
-    const start = outdoors(scene) ? (mel.x < 260 ? [540, 330] : [-20, 330]) : [260, 640];
+    const start = outdoors(scene) ? (hero.x < 260 ? [540, 330] : [-20, 330]) : [260, 640];
     const id = "agent-" + item.id;
-    courier = ents[id] = {id, kind: "agent", item, ag, scene, state: "coming", x: start[0], y: start[1], tx: mel.x, ty: mel.y, dir: 1, moving: true, wait: 0, node: makeNode(id, ag.look, false, true)};
+    courier = ents[id] = {id, kind: "agent", item, ag, scene, state: "coming", x: start[0], y: start[1], tx: hero.x, ty: hero.y, dir: 1, moving: true, wait: 0, node: makeNode(id, ag.look, false, true)};
   }
   const c = courier;
   if (c.state === "coming" || c.state === "waiting") {
-    const side = mel.x > 260 ? -1 : 1;
+    const side = hero.x > 260 ? -1 : 1;
     // stand beside the player, on whichever side isn't inside something (the well, a stall)
-    let [gx, gy] = [[side*44, 2], [-side*44, 2], [side*30, 26], [-side*30, 26], [0, 34]].map(([dx, dy]) => [mel.x + dx, mel.y + dy]).find(([x, y]) => !outdoors(scene) || !blocked(scene, x, y)) || [mel.x + side*44, mel.y + 2];
+    let [gx, gy] = [[side*44, 2], [-side*44, 2], [side*30, 26], [-side*30, 26], [0, 34]].map(([dx, dy]) => [hero.x + dx, hero.y + dy]).find(([x, y]) => !outdoors(scene) || !blocked(scene, x, y)) || [hero.x + side*44, hero.y + 2];
     if (scene === "shore") gx = Math.max(gx, 196);   // the player's out paddling: wait at the water's edge
     if (!c.goal || Math.hypot(c.goal[0] - gx, c.goal[1] - gy) > 18) route(c, gx, gy);   // re-route only when the player has moved
     const arrived = walk(c, 150, dt);
@@ -230,7 +230,7 @@ export function tapNpc(id){
   if (e.kind === "agent") { api.openMail(e.item); return; }
   const def = e.def, F = api.F(), S = api.S();
   F.met = F.met || {}; S.npcSaid = S.npcSaid || {};
-  if (!e.act) e.dir = api.mel.x < e.x ? -1 : 1;
+  if (!e.act) e.dir = api.hero.x < e.x ? -1 : 1;
   api.chatted && api.chatted(def.name);
   if (!F.met[id]) {
     F.met[id] = true; say(e, def.intro, 7000);
@@ -261,7 +261,7 @@ export function tickNpcs(dt){
   });
   const el = $("npcSay");
   // Next to the player, the pet's bubble owns the space above, so a neighbour's bubble drops below their feet.
-  if (sayer && !el.hidden) api.bubble(el, sayer.x, sayer.y, sayer.kind === "npc" && sayer.def.kid ? 44 : 70, Math.hypot(sayer.x - api.mel.x, sayer.y - api.mel.y) < 90);
+  if (sayer && !el.hidden) api.bubble(el, sayer.x, sayer.y, sayer.kind === "npc" && sayer.def.kid ? 44 : 70, Math.hypot(sayer.x - api.hero.x, sayer.y - api.hero.y) < 90);
 }
 export const npcActors = () => Object.values(ents).map(e => [e.node, e]);
 export function resetScene(){ Object.keys(ents).forEach(drop); courier = null; }

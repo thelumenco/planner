@@ -45,7 +45,7 @@ export function chordWorkshop(){
     <rect x="40" y="214" width="16" height="16"/><path d="M48 214 v16 M40 222 h16"/><rect x="114" y="214" width="16" height="16"/><path d="M122 214 v16 M114 222 h16"/>
     <circle cx="142" cy="246" r="6"/><circle cx="146" cy="256" r="6"/><circle cx="136" cy="256" r="6"/><circle cx="142" cy="246" r="2"/>
     <g transform="translate(85 208)"><circle r="5"/><circle r="1.6"/>${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<path d="M0 -5 v-2.4" transform="rotate(${a})"/>`).join("")}</g>`;
-  return wrap("chord", "Bo's workshop", "var(--sage)", 85, 260, 60, art, lines);
+  return wrap("carpentry", "Bo's workshop", "var(--sage)", 85, 260, 60, art, lines);
 }
 
 // The library: stone hall, round tower with a cone roof, arched door and windows, open-book sign.
@@ -66,7 +66,7 @@ export function library(){
     <path d="M412 248 v-26 a7 7 0 0 1 14 0 v26z M419 215 v33 M464 248 v-26 a7 7 0 0 1 14 0 v26z M471 215 v33"/>
     <path d="M389 218 v-14 a4 4 0 0 1 8 0 v14z"/>
     <path d="M435 212 q5 -3 10 0 q5 -3 10 0 v9 q-5 -3 -10 0 q-5 -3 -10 0z M445 212 v9"/><path d="M440 206 v6 M450 206 v6" opacity=".7"/>`;
-  return wrap("fresh", "Library", "var(--peach)", 435, 260, 58, art, lines);
+  return wrap("library", "Library", "var(--peach)", 435, 260, 58, art, lines);
 }
 
 // Ada's haberdashery (Auntie Lin's cottage, once): rounded thatch roof, round door, round windows with flower boxes,
@@ -88,7 +88,7 @@ export function chicoCottage(){
     <circle cx="52" cy="474" r="8"/><path d="M44 474 h16 M52 466 v16" opacity=".6"/><circle cx="118" cy="474" r="8"/><path d="M110 474 h16 M118 466 v16" opacity=".6"/>
     <rect x="42" y="484" width="20" height="6" rx="2"/><rect x="108" y="484" width="20" height="6" rx="2"/>
     <rect x="79" y="420" width="12" height="3" rx="1"/><rect x="80" y="423" width="10" height="9"/><rect x="79" y="432" width="12" height="3" rx="1"/><path d="M80 426 l10 -2 M80 429 l10 -2" opacity=".5"/>`;
-  return wrap("chico", "Haberdashery", "var(--blush)", 85, 500, 58, art, lines);
+  return wrap("haberdash", "Haberdashery", "var(--blush)", 85, 500, 58, art, lines);
 }
 
 // Idris the tailor's (Juniper's little observatory, once): lavender walls, the domed roof now a thimble with dimples, a
@@ -107,7 +107,7 @@ export function lunaHouse(){
     <circle cx="186" cy="426" r="10"/><circle cx="183" cy="423" r="1.4"/><circle cx="189" cy="423" r="1.4"/><circle cx="183" cy="429" r="1.4"/><circle cx="189" cy="429" r="1.4"/>
     <path d="M148 520 v-22 a12 12 0 0 1 24 0 v22"/><circle cx="166" cy="510" r="1.4"/>
     <circle cx="128" cy="484" r="9"/><path d="M119 484 h18 M128 475 v18" opacity=".6"/><circle cx="194" cy="484" r="9"/><path d="M185 484 h18 M194 475 v18" opacity=".6"/>`;
-  return wrap("luna", "The tailor's", "var(--peri)", 160, 520, 60, art, lines);
+  return wrap("tailor", "The tailor's", "var(--peri)", 160, 520, 60, art, lines);
 }
 
 // Mr Okada's house: a morning house (he's up with the sun). Warm cream walls under a peach tiled roof with upturned eaves, a big rising sun on
@@ -125,7 +125,7 @@ export function ohayoHouse(){
     <rect x="344" y="482" width="36" height="38"/><path d="M362 482 v38 M344 496 h36 M356 482 v14 M368 482 v14"/>
     <rect x="320" y="474" width="16" height="16"/><path d="M328 474 v16 M320 482 h16"/><rect x="388" y="474" width="16" height="16"/><path d="M396 474 v16 M388 482 h16"/>
     <rect x="392" y="508" width="26" height="5" rx="1"/><path d="M395 513 v6 M415 513 v6"/>`;
-  return wrap("ohayo", "Mr Okada's", "var(--peach)", 362, 520, 60, art, lines);
+  return wrap("okadahouse", "Mr Okada's", "var(--peach)", 362, 520, 60, art, lines);
 }
 
 // Post office: flat roof with a cornice, POST sign board, striped awning over the door, postbox.

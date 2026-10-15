@@ -17,12 +17,12 @@ import { PEN_LV } from "../data/pen-lv.js";
 import { PEN_BB } from "../data/pen-bb.js";
 import { PEN_CR } from "../data/pen-cr.js";
 import { PEN_TL } from "../data/pen-tl.js";
-import { PEN_JL } from "../data/pen-jl.js";
+import { PEN_OD } from "../data/pen-od.js";
 import { PEN_RK } from "../data/pen-rk.js";
 import { PEN_JC } from "../data/pen-jc.js";
 
 const D = 24*60*60*1000;
-export const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_JL, ...PEN_RK, ...PEN_JC};   // round 192: Ronda, Kyoto, Jeju, Cinque Terre   // round 191: the Coast Road and the Tablelands
+export const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_OD, ...PEN_RK, ...PEN_JC};   // round 192: Ronda, Kyoto, Jeju, Cinque Terre   // round 191: the Coast Road and the Tablelands
 export const REGIONS = {bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre"};
 // what a parcel costs to post, and how many days the reply takes (a letter's free)
 export const POSTAGE = {bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8};

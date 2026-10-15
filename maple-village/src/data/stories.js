@@ -159,8 +159,8 @@ export const STORIES = {
     {lines: ["My great-grandfather's moulds make most of our sweets. But there is one I make only one day a year: the first snow.", "White, round, a little cold. My father taught me on the day he retired."]},
     {lines: ["Four generations in this shop, and now my daughter wants to make chocolate wagashi. Chocolate! My father would faint.", "...I tried one. It was very good. Don't tell her."]}
   ],
-  // Ornella (id "jason"): the retired ferry captain in Vernazza; told on a trip day, one a day
-  jason: [
+  // Ornella (id "ornella"): the retired ferry captain in Vernazza; told on a trip day, one a day
+  ornella: [
     {lines: ["The first ferry I ever captained, I was twenty-nine and the only woman in the harbour office. The old men took bets on how long I'd last.", "Thirty-one years. I outlasted the bets, the old men, and two ferries."]},
     {lines: ["Thirty-one years on the ferry, and now I'm on shore leave. Every morning I climb Corniglia's steps and count them out loud.", "People pretend not to know me. Let them. At my age, every step is a little flag on a summit."]},
     {lines: ["You've heard me boast about the ferry. Here's the night I'm proudest of: the big storm, eleven years ago.", "The engine died outside the harbour mouth. A boy of sixteen went down into the engine room with a torch in his teeth.", "He got it going again, then was sick in a bucket. That was Dario. I made him my engineer on the spot."]},

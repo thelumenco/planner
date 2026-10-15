@@ -9,7 +9,7 @@
 // lavender or orchard blossom, turn and turn about); milk becomes yoghurt in the crocks straight away; and the cheese
 // press makes a named wheel (suggested names, like the wines) that ages on a shelf in the cave (6 shelves): fresh goat's
 // cheese in a day, farmhouse cheddar in four, Honeybrook blue in six. A ripe wheel is cut into wedges for the backpack.
-import { esc, dayKey, sgHM, hash, LOC } from "../util.js";
+import { esc, dayKey, localHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
 import { stormyOn } from "../art/village-extras.js";
@@ -39,7 +39,7 @@ export const levelOf = h => LEVELS.reduce((l, x, i) => h.trust >= x.at ? i : l, 
 // trust for a bit of help -> the new level's index if this tipped the player into it (the unlocks come with it)
 export function gainTrust(F, n){ const h = hfState(F), before = levelOf(h); h.trust += n; const after = levelOf(h); if (after > before) { if (after >= 1 && !h.myHive) h.myHive = {t: clock(), name: "Honey Meadow"}; return after; } return null; }
 export const STAND = {milk: 3, goatmilk: 4, honey: 6, egg: 3};
-const clock = () => Date.now() + (globalThis.__mapleOffset || 0);
+const clock = () => Date.now() + (globalThis.__hbOffset || 0);
 const yesterday = day => new Date(Date.parse(day + "T00:00:00Z") - 864e5).toISOString().slice(0, 10);
 
 export function hfState(F){
@@ -64,7 +64,7 @@ export function swarmCheck(F){ const h = hfState(F), t = clock(), gone = [];
   h.hives.forEach((t0, i) => { if (beeTime(t0) >= (HIVE_DAYS + SWARM_DAYS)*DAY) { h.hives[i] = t; gone.push(i + 1); } });
   if (h.myHive && beeTime(h.myHive.t) >= (HIVE_DAYS + SWARM_DAYS)*DAY) { h.myHive.t = t; gone.push(h.myHive.name); }
   h.swarms += gone.length; return gone; }
-export const milkingNow = (hm = sgHM()) => hm >= MILK_FROM && hm < MILK_TO;
+export const milkingNow = (hm = localHM()) => hm >= MILK_FROM && hm < MILK_TO;
 export const wellFed = (h, id, day = dayKey()) => h.fed[id] === day || h.fed[id] === yesterday(day);
 const recent = (d, day) => d === day || d === yesterday(day);
 export const herdOf = id => COWS.some(a => a.id === id) ? "cows" : "goats";

@@ -11,11 +11,11 @@ export const VILLAGE = {
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
   bank:   {scene:"village", name:"Bank", short:"the bank", door:[380,178], mark:[380,46]},
   // Makers' Lane: Bo's workshop (he lives upstairs) and three villagers' homes (the ids are the old building names)
-  chord:  {scene:"lane", name:"Bo's workshop", short:"Bo's workshop", door:[145,272], mark:[145,150]},
-  fresh:  {scene:"village", name:"Library", short:"the library", door:[85,368], mark:[95,256]},
-  chico:  {scene:"lane", name:"Ada's haberdashery", short:"the haberdashery", door:[380,282], mark:[380,170]},
-  luna:   {scene:"lane", name:"Idris the tailor's", short:"the tailor's", door:[160,520], mark:[160,380]},
-  ohayo:  {scene:"lane", name:"Mr Okada's house", short:"Mr Okada's house", door:[362,520], mark:[362,380]},
+  carpentry:  {scene:"lane", name:"Bo's workshop", short:"Bo's workshop", door:[145,272], mark:[145,150]},
+  library:  {scene:"village", name:"Library", short:"the library", door:[85,368], mark:[95,256]},
+  haberdash:  {scene:"lane", name:"Ada's haberdashery", short:"the haberdashery", door:[380,282], mark:[380,170]},
+  tailor:   {scene:"lane", name:"Idris the tailor's", short:"the tailor's", door:[160,520], mark:[160,380]},
+  okadahouse:  {scene:"lane", name:"Mr Okada's house", short:"Mr Okada's house", door:[362,520], mark:[362,380]},
   post:   {scene:"village", name:"Post office", short:"the post office", door:[435,502], mark:[435,386]},
   market: {scene:"village", name:"Market", short:"the market", door:[362,350], mark:[362,290]},
   board:  {scene:"village", name:"Quest board", door:[260,338], spot:true, line:"All of today's quests, in one place."},
@@ -185,7 +185,7 @@ export const outdoorOf = s => OUTDOOR.includes(s) ? s : INNER[s] ? outdoorOf(INN
 // own door (on the opposite wall), where they walk to leave.
 export const INNER = {
   room: {parent: "home", door: [64, 340], arrive: [456, 400], exit: [486, 410]},
-  kidroom: {parent: "home", door: [456, 512], arrive: [70, 420], exit: [34, 410]},
+  guestroom: {parent: "home", door: [456, 512], arrive: [70, 420], exit: [34, 410]},
   trophy: {parent: "hall", door: [64, 372], arrive: [456, 400], exit: [486, 410]},
   // the wine shop's kitchen, through the door on its east wall; its own way out is the mat at the bottom
   kitchen: {parent: "wineshop", door: [462, 390], arrive: [260, 560], exit: [260, 606]},
@@ -217,29 +217,29 @@ export const ROOMS = {
     ["whiteboard","Whiteboard","B","whiteboard",null,"Fresh marker, blank board."],
     ["shelf","Bookshelf","A","shelf",null,"Village records, going back a hundred years."],
     ["clients","Visitors' table","E","table",null,"Leaflets about the village, and a bowl of mints."]]},
-  chord: {name:"Bo's workshop", wall:"#E9F0E2", trim:"var(--sage)", pos:{A:[130,218], B:[370,446], C:[420,262], D:[120,540]}, stations:[
+  carpentry: {name:"Bo's workshop", wall:"#E9F0E2", trim:"var(--sage)", pos:{A:[130,218], B:[370,446], C:[420,262], D:[120,540]}, stations:[
     ["bench","Workbench","A","bench",null,"Bo's tools, all in a row. Mind the sawdust."],
     ["press","Old press","B","press",null,"An old printing press Bo's restoring. Slowly."],
     ["wall","Pinboard","C","cork",null,"Sketches of shelves, stools and one very ambitious treehouse."],
     ["laptop","Bo's desk","D","writedesk",null,"Bo's desk, under a pile of plans. His flat's up the stairs."]]},
-  fresh: {name:"Library", wall:"#F6E8DC", trim:"var(--peach)", pos:{A:[110,540], B:[410,540], C:[420,250], D:[260,420], E:[100,262]}, stations:[
+  library: {name:"Library", wall:"#F6E8DC", trim:"var(--peach)", pos:{A:[110,540], B:[410,540], C:[420,250], D:[260,420], E:[100,262]}, stations:[
     ["desk","Writing desk","A","desk",null,"Pen, paper, quiet."],
     ["typewriter","Typewriter","B","typewriter",null,"Clack clack. Words incoming."],
     ["nook","Reading nook","C","nook",null,"Comfy chair, good lamp."],
     ["digest","Bookcase","E","bookcase",null,"Juniper's favourites, shelved by feeling, not alphabet."]]},
   // Ada's haberdashery (sewing.js, tailor.js): bolts of fabric, the button jar, and the cutting counter where you buy
-  chico: {name:"Ada's haberdashery", wall:"#F7E3E6", trim:"var(--blush)", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320]}, stations:[
+  haberdash: {name:"Ada's haberdashery", wall:"#F7E3E6", trim:"var(--blush)", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320]}, stations:[
     ["habcounter","Counter","A","counter",null,"Ada's counter: a brass ruler set into the wood, and the till."],
     ["bolts","Fabric bolts","B","shelf",null,"Bolts of cotton, linen, denim, wool and silk, every colour of the lane."],
     ["buttonjar","Button jar","C","craft",null,"A jar of buttons the size of a goldfish bowl. Ada knows every one."],
     ["habtable","Cutting table","D","table",null,"Where Ada cuts your pieces, with scissors older than the lane."]]},
   // Idris the tailor's: his cutting table, the rail of finished pieces, a sewing machine and a mirror
-  luna: {name:"Idris the tailor's", wall:"#EEE9F8", trim:"#B9A6E8", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320]}, stations:[
+  tailor: {name:"Idris the tailor's", wall:"#EEE9F8", trim:"#B9A6E8", pos:{A:[400,530], B:[420,262], C:[130,530], D:[130,320]}, stations:[
     ["tailtable","Cutting table","A","table",null,"Pattern paper, pins and tailor's chalk. Tell Idris what you'd like."],
     ["rail","Clothes rail","B","wardrobe",null,"Finished pieces in tissue paper, waiting to be collected."],
     ["sewing","Sewing machine","C","craft",null,"An old black sewing machine with gold lettering. It purrs."],
     ["mirror","Long mirror","D","shelf",null,"A long mirror in a wooden frame. You look very well, says Idris."]]},
-  ohayo: {name:"Mr Okada's house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], R:[110,262]}, stations:[
+  okadahouse: {name:"Mr Okada's house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], R:[110,262]}, stations:[
     ["laptop","Sorting desk","A","writedesk",null,"Pebbles, sorted by colour. Then by size. Then by colour again."],
     ["shelf","Plant shelf","B","craft",null,"A lot of plants, all watered at six sharp."],
     ["sofa","Cosy sofa","C","sofa",null,"For the morning paper and a pot of tea."],
@@ -259,7 +259,7 @@ export const ROOMS = {
     ["kitchen","Kitchen","B","kitchen",/cook|meal|lunch|dinner|bake|grocer|prep/,"Something smells good."],
     ["sofa","Sofa","C","sofa",/read|rest|journal|meditat|book|nap/,"Soft cushions, deep breaths."],
     ["mydoor","My room","R","sidedoor",null,"Your room. Just you.",0],
-    ["kiddoor","Guest room","K","kiddoor",null,"The guest room. Clean sheets, always.",0],
+    ["guestdoor","Guest room","K","guestdoor",null,"The guest room. Clean sheets, always.",0],
     ["officedoor","Home office","O","officedoor",null,"The home office: your desk, a spare desk and the treadmill.",0],
     ["gdoor","Garage","Q","garagedoor",null,"Through to the garage.",0],
     ["fridge","Fridge","H","fridge",null,"The fridge: what we have, and the shopping list."],
@@ -282,8 +282,8 @@ export const ROOMS = {
     ["jars","Emotion shelf","J","jarshelf",null,"Feelings, kept safe in jars.",-78]]},
   // The guest room, through the east door of the house: friends from your travels stay here (game/guests.js).
   // The guest book on the desk invites them and shows the day's plan while they're here.
-  kidroom: {name:"The guest room", wall:"#DCE6D4", trim:"#9CAA6A", noBoard:true, pos:{A:[160,290], B:[430,262], E:[292,250], D:[420,560], C:[110,592]}, stations:[
-    ["gbed","Guest bed","A","grannybed",null,"Clean sheets, a patchwork quilt and a sprig of lavender on the pillow."],
+  guestroom: {name:"The guest room", wall:"#DCE6D4", trim:"#9CAA6A", noBoard:true, pos:{A:[160,290], B:[430,262], E:[292,250], D:[420,560], C:[110,592]}, stations:[
+    ["gbed","Guest bed","A","cottagebed",null,"Clean sheets, a patchwork quilt and a sprig of lavender on the pillow."],
     ["gbook","Guest book","B","writedesk",null,"The guest book: who's coming to stay, and what they're up to."],
     ["gwindow","Window","E","curtwindow",null,"A window over the garden. Your guests always say it's the best view in the house.",20],
     ["gwardrobe","Wardrobe","D","wardrobe",null,"Spare hangers, a spare blanket and a spare umbrella. Guests forget umbrellas.",22],
@@ -449,7 +449,7 @@ export const ROOMS = {
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };
 // the pet's basket sits beside your bed, wherever the bed is
-export const MAPLE_BED = [ROOMS.room.pos.A[0] + 110, ROOMS.room.pos.A[1] + 6];
+export const PET_BED = [ROOMS.room.pos.A[0] + 110, ROOMS.room.pos.A[1] + 6];
 export function stationsOf(scene){
   const r = ROOMS[scene]; if (!r) return [];
   return r.stations.map(([id, name, slot, kind, re, line, dy]) => { const p = (r.pos && r.pos[slot]) || POS[slot];

@@ -3,7 +3,7 @@
 // days of meals a chick grows into a hen and a bunny into a rabbit. A grown hen eats three meals a day (breakfast
 // before noon, lunch till 5pm, dinner after) and lays an egg in the backpack after each one.
 // Nobody ever gets ill or leaves: a hungry animal just looks a little sorry for itself until it's fed.
-import { dayKey, prevDay, esc, sgHM } from "../util.js";
+import { dayKey, prevDay, esc, localHM } from "../util.js";
 import { icon } from "../art/icons.js";
 import { sk, tapeLabel } from "../art/scenes.js";
 
@@ -35,7 +35,7 @@ export const isGrown = a => (a.feeds || 0) >= GROW;
 export const label = a => isGrown(a) ? KINDS[a.kind].grown : KINDS[a.kind].n;
 // a grown hen's meals: 0 breakfast, 1 lunch, 2 dinner
 export const MEALS = ["breakfast", "lunch", "dinner"];
-const mealNow = () => { const m = sgHM(); return m < 12*60 ? 0 : m < 17*60 ? 1 : 2; };
+const mealNow = () => { const m = localHM(); return m < 12*60 ? 0 : m < 17*60 ? 1 : 2; };
 const henMeals = a => a.kind === "chick" && isGrown(a);
 export const fedToday = a => henMeals(a) ? a.fedDay === dayKey() && a.fedMeal === mealNow() : a.fedDay === dayKey();
 // with the clover meadow, yesterday's meal still counts (hens still come for every meal: that's where the eggs come from)

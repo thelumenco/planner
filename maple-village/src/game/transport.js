@@ -7,7 +7,7 @@
 //     quick way from the woods to the orchard (the foreshore stop is one gate from the flower farm, the lake stop one from
 //     the orchard).
 // State: F.bike = {until, col} while a bike is out.
-import { esc, now, sgHM } from "../util.js";
+import { esc, now, localHM } from "../util.js";
 import { icon } from "../art/icons.js";
 
 export const BIKE_FEE = 5, BIKE_MINS = 60;
@@ -41,7 +41,7 @@ export const STOPS = {
   taxishore: {scene: "shore", n: "The foreshore", at: [214, 168], line: "the foreshore (one gate from Mei's flower farm)"}
 };
 export const TAXI_FEE = 4, TAXI_FROM = 7*60, TAXI_TO = 21*60;
-export const taxiRunning = (hm = sgHM()) => hm >= TAXI_FROM && hm < TAXI_TO;
+export const taxiRunning = (hm = localHM()) => hm >= TAXI_FROM && hm < TAXI_TO;
 export const stopIn = scene => Object.keys(STOPS).find(k => STOPS[k].scene === scene) || null;
 export function taxiPanel(F, from){
   const here = STOPS[from], on = taxiRunning();

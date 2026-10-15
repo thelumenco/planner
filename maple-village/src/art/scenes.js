@@ -3,8 +3,8 @@ import { paintSVG, framesNow } from "../game/gallery.js";   // round 197: each p
 // SVG scene builders: village, interiors, garden. Generated strings, hand-drawn look via #wob / #marker / #wash.
 // Scene builders read live game state through the `G` context set by core (setArtContext).
 import { mouldPath } from "./moulds.js";
-import { ink, sgHM, dayKey, LOC } from "../util.js";
-import { VILLAGE, ROOMS, stationsOf, MAPLE_BED } from "../data/world.js";
+import { ink, localHM, dayKey, LOC } from "../util.js";
+import { VILLAGE, ROOMS, stationsOf, PET_BED } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
 import { iconAt } from "./icons.js";
@@ -57,7 +57,7 @@ export function villageArt(){
   const D = VILLAGE;
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="120" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="420" cy="420" rx="100" ry="60" style="fill:var(--grass2)"/><ellipse cx="200" cy="560" rx="80" ry="40" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M250 300 C226 250 ${D.hall.door[0]} 236 ${D.hall.door[0]} ${D.hall.door[1]} M276 298 C300 250 ${D.bank.door[0]} 232 ${D.bank.door[0]} ${D.bank.door[1]} M220 320 C180 330 120 350 ${D.fresh.door[0]} ${D.fresh.door[1]} M260 322 C200 380 120 430 ${D.news.door[0]} ${D.news.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M290 316 C350 290 400 250 ${D.toLane.door[0]} ${D.toLane.door[1]} M260 322 L260 ${D.toBase.door[1]} M260 540 C290 560 310 570 ${D.bench.door[0]} ${D.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
+    <g filter="url(#wob)"><path d="M250 300 C226 250 ${D.hall.door[0]} 236 ${D.hall.door[0]} ${D.hall.door[1]} M276 298 C300 250 ${D.bank.door[0]} 232 ${D.bank.door[0]} ${D.bank.door[1]} M220 320 C180 330 120 350 ${D.library.door[0]} ${D.library.door[1]} M260 322 C200 380 120 430 ${D.news.door[0]} ${D.news.door[1]} M260 322 C320 380 410 420 ${D.post.door[0]} ${D.post.door[1]} M290 316 C350 290 400 250 ${D.toLane.door[0]} ${D.toLane.door[1]} M260 322 L260 ${D.toBase.door[1]} M260 540 C290 560 310 570 ${D.bench.door[0]} ${D.bench.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="24" stroke-linecap="round"/>
       <ellipse cx="260" cy="326" rx="70" ry="40" style="fill:var(--path)"/><ellipse cx="260" cy="326" rx="70" ry="40" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[30,262,"#EFA3A6"],[44,270,"#F3C969"],[60,214,"#C3CDEE"],[300,214,"#EFA3A6"],[488,270,"#F3C969"],[300,448,"#EFA3A6"],[214,450,"#C3CDEE"],[470,540,"#C3CDEE"],[20,430,"#F3C969"],[505,380,"#EFA3A6"]])}
     ${tree(26,96,1.05)}${tree(494,96,1.05)}${tree(24,350,.9)}${tree(498,330,.9)}${tree(504,520,.85)}${tree(190,470,.8)}${tree(330,470,.8)}
@@ -190,7 +190,7 @@ export function baseArt(){
   const toolArt = (tools.compost ? sk(`<path d="M192 452 h24 l-3 22 h-18z" style="fill:var(--wood)"/><path d="M196 451 c3 -6 13 -6 16 0" style="fill:var(--moss)"/>`, `<path d="M192 452 h24 l-3 22 h-18z M195 460 h18"/>`) : "")
     + (tools.can ? sk(`<rect x="466" y="262" width="14" height="11" rx="2" style="fill:#9CC3E0"/>`, `<rect x="466" y="262" width="14" height="11" rx="2"/><path d="M480 266 l7 -5 M468 262 c0 -5 9 -5 9 0"/>`) : "")
     + (tools.sprinkler ? sk(`<circle cx="108" cy="438" r="4" style="fill:var(--stone)"/>`, `<circle cx="108" cy="438" r="4"/><path d="M108 434 v-4"/><path class="ripple" d="M96 426 q12 -10 24 0" opacity=".7"/>`) : "");
-  return lampDefs + ground + BASE_LAMPS.map(([x, y]) => streetLamp(x, y)).join("") + places + potsIn("base") + runArt(G.F()) + famArt + treehouse + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : skyWash(sgHM()));
+  return lampDefs + ground + BASE_LAMPS.map(([x, y]) => streetLamp(x, y)).join("") + places + potsIn("base") + runArt(G.F()) + famArt + treehouse + toolArt + upgradesArt(G.F().totalQuests || 0, "base") + pondLanterns(G.lanterns()) + (G.dusk() ? duskArt() : skyWash(localHM()));
 }
 const BASE_LAMPS = [[192, 380], [328, 380]];
 // A street lamp lit at night, drawn above the dusk wash so it really shines: a warm pool on the ground, a halo
@@ -212,7 +212,7 @@ export const skyWash = m => { const c = skyColour(Math.floor(m/5)*5); return c =
 function duskArt(){
   const win = (x, y, w, h) => `<rect class="glow" x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="#FFD98A"/><rect x="${x - 8}" y="${y - 8}" width="${w + 16}" height="${h + 16}" rx="10" fill="#FFD98A" opacity=".18"/>`;
   const stars = [[30, 14], [96, 22], [176, 10], [330, 18], [420, 12], [500, 22], [250, 8]].map(([x, y]) => `<circle class="twinkle" cx="${x}" cy="${y}" r="1.6" fill="#FFF3C4"/>`).join("");
-  return `${skyWash(sgHM())}
+  return `${skyWash(localHM())}
     <defs><radialGradient id="lampn"><stop offset="0" stop-color="#FFD98A" stop-opacity=".7"/><stop offset=".5" stop-color="#FFC66B" stop-opacity=".28"/><stop offset="1" stop-color="#FFC66B" stop-opacity="0"/></radialGradient></defs>
     <g pointer-events="none">${BASE_LAMPS.map(([x, y]) => litLamp(x, y)).join("")}${stars}${win(217, 234, 20, 18)}${win(283, 234, 20, 18)}${win(448, 230, 12, 10)}
       <circle cx="276" cy="602" r="36" fill="#FFB65C" opacity=".28"/>
@@ -232,7 +232,7 @@ export function laneArt(){
   const D = VILLAGE;
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="140" cy="420" rx="110" ry="60" style="fill:var(--grass2)"/><ellipse cx="420" cy="520" rx="90" ry="50" style="fill:var(--grass2)"/></g>
-    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D.chico.door[0]} ${D.chico.door[1]} M150 336 L${D.chord.door[0]} ${D.chord.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D.luna.door[0]} ${D.luna.door[1]} M262 420 C300 470 340 500 ${D.ohayo.door[0]} ${D.ohayo.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M20 330 C120 334 200 340 262 344 C330 346 380 320 ${D.haberdash.door[0]} ${D.haberdash.door[1]} M150 336 L${D.carpentry.door[0]} ${D.carpentry.door[1]} M262 344 L262 640 M262 420 C230 470 190 500 ${D.tailor.door[0]} ${D.tailor.door[1]} M262 420 C300 470 340 500 ${D.okadahouse.door[0]} ${D.okadahouse.door[1]}" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[40,200,"#EFA3A6"],[60,214,"#F3C969"],[480,330,"#C3CDEE"],[300,420,"#EFA3A6"],[200,600,"#F3C969"],[90,560,"#C3CDEE"],[460,600,"#EFA3A6"],[330,250,"#F3C969"]])}
     ${tree(70,120,1)}${tree(220,80,.9)}${tree(490,110,1)}${tree(40,620,.95)}${tree(490,620,.9)}${tree(470,430,.85)}${tree(60,440,.9)}`;
   const gate = `<g data-place="toTownE" aria-label="Gate to the town square"><ellipse class="hov" cx="22" cy="330" rx="24" ry="30" style="fill:var(--butter)"/>
@@ -334,7 +334,7 @@ export function furn(kind, x, y){
     case "nook": return sk(`<path d="M${x-40} ${y} v-34 q0 -22 22 -22 h20 q22 0 22 22 v34z" style="fill:var(--peach)"/><rect x="${x-30}" y="${y-30}" width="44" height="18" rx="6" style="fill:var(--cream)"/><circle cx="${x+44}" cy="${y-70}" r="12" style="fill:var(--butter)"/>`,
       `<path d="M${x-40} ${y} v-34 q0 -22 22 -22 h20 q22 0 22 22 v34z"/><rect x="${x-30}" y="${y-30}" width="44" height="18" rx="6"/><path d="M${x+44} ${y-58} v58 M${x+36} ${y} h16"/><path d="M${x+32} ${y-70} h24 l-4 -12 h-16z"/>`);
     // Farid and Mei's cottage: a bed with a crocheted blanket, the TV on its stand, the kitchenette, and the tea table
-    case "grannybed": return sk(`<rect x="${x-50}" y="${y-60}" width="100" height="60" rx="4" style="fill:#8B5E3C"/><rect x="${x-46}" y="${y-56}" width="92" height="22" rx="6" style="fill:#FFFDF6"/><rect x="${x-46}" y="${y-36}" width="92" height="32" rx="4" style="fill:#E8B4C0"/>${[0, 1, 2, 3, 4].map(i => `<circle cx="${x-36 + i*18}" cy="${y-20}" r="5" style="fill:#F3C969"/>`).join("")}`,
+    case "cottagebed": return sk(`<rect x="${x-50}" y="${y-60}" width="100" height="60" rx="4" style="fill:#8B5E3C"/><rect x="${x-46}" y="${y-56}" width="92" height="22" rx="6" style="fill:#FFFDF6"/><rect x="${x-46}" y="${y-36}" width="92" height="32" rx="4" style="fill:#E8B4C0"/>${[0, 1, 2, 3, 4].map(i => `<circle cx="${x-36 + i*18}" cy="${y-20}" r="5" style="fill:#F3C969"/>`).join("")}`,
       `<rect x="${x-50}" y="${y-60}" width="100" height="60" rx="4"/><rect x="${x-46}" y="${y-56}" width="92" height="22" rx="6"/><rect x="${x-46}" y="${y-36}" width="92" height="32" rx="4"/><path d="M${x-46} ${y-28} h92 M${x-46} ${y-12} h92" opacity=".4"/>`);
     case "tv": return sk(`<rect x="${x-40}" y="${y-28}" width="80" height="28" rx="2" style="fill:#8B5E3C"/><rect x="${x-34}" y="${y-74}" width="68" height="44" rx="4" style="fill:#3E4A43"/><rect x="${x-29}" y="${y-69}" width="58" height="34" rx="2" style="fill:#9CC3E0"/><path d="M${x-29} ${y-46} q14 -10 29 -2 t29 -4 v17 h-58z" style="fill:#9CC27E"/>`,
       `<rect x="${x-40}" y="${y-28}" width="80" height="28" rx="2"/><rect x="${x-34}" y="${y-74}" width="68" height="44" rx="4"/><rect x="${x-29}" y="${y-69}" width="58" height="34" rx="2"/><path d="M${x-14} ${y-74} l-8 -10 M${x+14} ${y-74} l8 -10"/><path d="M${x-40} ${y-14} h80" opacity=".4"/>`);
@@ -371,7 +371,7 @@ export function furn(kind, x, y){
     // a bedroom door (the friends' houses): on the west or east wall depending on where it stands, with a little
     // heart sign; from 11pm to the morning a "shh" sign hangs on it
     case "bedroomdoor": { const left = x < 260, d = left ? `M${x-40} ${y-108} L${x-12} ${y-96} L${x-12} ${y+4} L${x-40} ${y+14}z` : `M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z`,
-        sx = left ? x - 26 : x + 26, m = (new Date(Date.now() + (globalThis.__mapleOffset || 0) + LOC())).getUTCHours(), night = m >= 23 || m < 6;
+        sx = left ? x - 26 : x + 26, m = (new Date(Date.now() + (globalThis.__hbOffset || 0) + LOC())).getUTCHours(), night = m >= 23 || m < 6;
       return sk(`<path d="${d}" style="fill:#E8B4C0"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2" style="fill:#FFFDF6"/>` : `<path d="M${sx} ${y - 58} c-4 -6 -10 -2 -6 3 l6 5 l6 -5 c4 -5 -2 -9 -6 -3z" style="fill:#E8566C"/>`}`,
         `<path d="${d}"/><circle cx="${left ? x - 17 : x + 17}" cy="${y - 42}" r="1.8"/>${night ? `<rect x="${sx - 10}" y="${y - 70}" width="20" height="12" rx="2"/><path d="M${sx - 6} ${y - 64} h12" opacity=".6"/>` : ""}`); }
     // the home office door on the living room's west wall, below yours
@@ -527,7 +527,7 @@ export function furn(kind, x, y){
       `<rect x="${x-46}" y="${y-22}" width="92" height="22" rx="3"/>${[-30, 0, 30].map(dx => `<path d="M${x+dx-11} ${y-22} q-2 -18 11 -20 q13 2 11 20z"/>`).join("")}`);
     case "hfpress": return sk(`<rect x="${x-34}" y="${y-18}" width="68" height="18" rx="2" style="fill:#B98A5A"/><rect x="${x-26}" y="${y-60}" width="6" height="44" style="fill:#8A6A52"/><rect x="${x+20}" y="${y-60}" width="6" height="44" style="fill:#8A6A52"/><rect x="${x-30}" y="${y-64}" width="60" height="8" style="fill:#8A6A52"/><path d="M${x} ${y-56} v14" style="stroke:#6B5A4A" stroke-width="4"/><rect x="${x-16}" y="${y-42}" width="32" height="20" rx="4" style="fill:#F6EBC8"/><circle cx="${x}" cy="${y-68}" r="7" style="fill:none;stroke:#6B5A4A" stroke-width="3"/>`,
       `<rect x="${x-34}" y="${y-18}" width="68" height="18" rx="2"/><rect x="${x-30}" y="${y-64}" width="60" height="8"/><rect x="${x-16}" y="${y-42}" width="32" height="20" rx="4"/>`);
-    case "cheesecave": { const h = (G.F ? (G.F().hfarm || {}).cave : null) || [], cols = {fresh: "#FFF8EC", cheddar: "#F3C969", blue: "#DCE3E8"};
+    case "cheesecave": { const h = (G.F ? (G.F().hfarm || {}).cave : null) || [], cols = {library: "#FFF8EC", cheddar: "#F3C969", blue: "#DCE3E8"};
       return sk(`<path d="M${x-56} ${y} V${y-60} a56 40 0 0 1 112 0 V${y}z" style="fill:#8A8278"/><path d="M${x-44} ${y} V${y-56} a44 32 0 0 1 88 0 V${y}z" style="fill:#4A4440"/>${[0, 1].map(r => `<rect x="${x-40}" y="${y-48 + r*24}" width="80" height="4" style="fill:#8A6A52"/>`).join("")}
         ${Array.from({length: 6}, (_, i) => h[i] ? `<ellipse cx="${x-26 + (i % 3)*26}" cy="${y-52 + Math.floor(i/3)*24}" rx="10" ry="5" style="fill:${cols[h[i].kind] || "#F3C969"}"/>` : "").join("")}`,
         `<path d="M${x-56} ${y} V${y-60} a56 40 0 0 1 112 0 V${y}"/><path d="M${x-44} ${y} V${y-56} a44 32 0 0 1 88 0 V${y}"/>`); }
@@ -617,7 +617,7 @@ export function furn(kind, x, y){
         <path d="M${x} ${y-12} c-5 -7 -14 -1 -8 5 l8 8 l8 -8 c6 -6 -3 -12 -8 -5z" style="fill:var(--rose)"/>`,
         `<rect x="${x-52}" y="${y-118}" width="104" height="96" rx="4"/><rect x="${x-46}" y="${y-112}" width="92" height="84" rx="2"/>${spots.slice(0, Math.min(8, n)).map(([dx, dy]) => `<circle cx="${x+dx+10}" cy="${y+dy+2}" r="1.6"/>`).join("")}
         <path d="M${x} ${y-12} c-5 -7 -14 -1 -8 5 l8 8 l8 -8 c6 -6 -3 -12 -8 -5z"/>`); }
-    case "kiddoor": return sk(`<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z" style="fill:#F7D35A"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z" style="fill:#FFFDF6"/><path d="M${x+21} ${y-62} q2 -9 9 -10 q4 0 3 4 q-2 2 -4 1 l1 5z" style="fill:#7BB37A"/>`,
+    case "guestdoor": return sk(`<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z" style="fill:#F7D35A"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z" style="fill:#FFFDF6"/><path d="M${x+21} ${y-62} q2 -9 9 -10 q4 0 3 4 q-2 2 -4 1 l1 5z" style="fill:#7BB37A"/>`,
       `<path d="M${x+40} ${y-108} L${x+12} ${y-96} L${x+12} ${y+4} L${x+40} ${y+14}z"/><circle cx="${x+17}" cy="${y-42}" r="1.8"/><path d="M${x+36} ${y-80} l-20 6 v14 l20 -6z"/><path d="M${x+21} ${y-62} q2 -9 9 -10 q4 0 3 4 q-2 2 -4 1 l1 5z"/>`);
     case "carbed": { const k = G.kid ? G.kid() : {}, sl = !!k.sleep;
       return sk(`<rect x="${x-62}" y="${y-92}" width="118" height="22" rx="8" style="fill:#FFFDF6"/><ellipse cx="${x-44}" cy="${y-90}" rx="18" ry="9" style="fill:#DCEBF6"/>
@@ -726,7 +726,7 @@ function ccCounterUps(x, y){
     `<rect x="${x-94}" y="${y-84}" width="20" height="32" rx="3"/><rect x="${x-90}" y="${y-78}" width="12" height="8" rx="1.5"/><path class="smoke" d="M${x-84} ${y-88} q-3 -5 0 -10 M${x-80} ${y-88} q3 -5 0 -10" opacity=".6"/>`);
   if (up.fountain) h += sk(`<path d="M${x+72} ${y-52} l-8 -4 h40 l-8 4z" style="fill:#B9BFC6"/><path d="M${x+66} ${y-58} q18 6 36 0 v-4 h-36z" style="fill:#6B4430"/><rect x="${x+82}" y="${y-92}" width="4" height="34" style="fill:#B9BFC6"/><path d="M${x+72} ${y-74} q12 5 24 0 v-3 h-24z" style="fill:#6B4430"/><path d="M${x+77} ${y-88} q7 3 14 0 v-2 h-14z" style="fill:#6B4430"/><path d="M${x+78} ${y-74} q-2 6 -4 14 M${x+90} ${y-74} q2 6 4 14" style="stroke:#4A2E22;fill:none" stroke-width="2.4"/>`,
     `<path d="M${x+66} ${y-58} q18 6 36 0 v-4 h-36z M${x+72} ${y-74} q12 5 24 0 v-3 h-24z M${x+77} ${y-88} q7 3 14 0 v-2 h-14z"/><path d="M${x+84} ${y-92} v34"/>`);
-  const day = G.day ? G.day() : "", hm = sgHM();
+  const day = G.day ? G.day() : "", hm = localHM();
   if (up.workshop && day && new Date(day + "T00:00:00Z").getUTCDay() === 6 && hm >= 14*60 && hm < 16*60)   // the Saturday bonbon workshop: trays, piping bags and a bowl on each table
     h += [130, 270, 410].map(tx => sk(`<rect x="${tx-16}" y="${y+150}" width="20" height="10" rx="2" style="fill:#FFFDF6"/>${[0, 1, 2].map(k => `<circle cx="${tx-11 + k*5}" cy="${y+155}" r="2" style="fill:${["#4A2E22", "#C2505F", "#8A5A3A"][k]}"/>`).join("")}<path d="M${tx+8} ${y+158} l8 -10 l3 3z" style="fill:#F3E7C9"/><ellipse cx="${tx+2}" cy="${y+146}" rx="6" ry="3" style="fill:#8A5A3A"/>`,
       `<rect x="${tx-16}" y="${y+150}" width="20" height="10" rx="2"/><path d="M${tx+8} ${y+158} l8 -10 l3 3z"/><ellipse cx="${tx+2}" cy="${y+146}" rx="6" ry="3"/>`)).join("") + `<text x="${x}" y="${y+120}" text-anchor="middle" font-family="Klee One,serif" font-size="9" font-weight="600" fill="#6B4430" pointer-events="none">Bonbon workshop today, 2 to 4</text>`;
@@ -769,7 +769,7 @@ export function roomArt(id){
     const nm = s.kind === "millcrate" ? "" : s.kind === "pedestal" ? ((G.ped && G.ped(s.x, s.y)) || {}).label || "" : s.kind === "vaultjar" ? (() => { const j = G.vault && G.vault(s.x); return j ? j.label : "Empty"; })() : s.name;
     h += `<g data-spot="${s.id}" aria-label="${s.name || (nm ? "Trophy: " + nm : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm ? (s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm, "var(--card)") : s.kind === "gallerywall" ? tapeLabel(s.x, s.y - 108, nm, "var(--card)", 11) : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm.length > 10 ? nm.slice(0, 9) + "…" : nm, "var(--card)", 9.5) : (s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm.length > 15 ? nm.slice(0, 14).trim() + "…" : nm, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm.length > 24 ? nm.slice(0, 23) + "…" : nm, "var(--card)"))) : ""}</g>`;
   });
-  if (id === "kidroom") {
+  if (id === "guestroom") {
     // the door back to the house on the west wall
     h += `<g data-exit="1" class="kidexit" aria-label="Back to the house"><ellipse class="hov" cx="34" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>
       ${sk(`<path d="M0 346 L28 358 L28 456 L0 466z" style="fill:#F7D35A"/>`, `<path d="M0 346 L28 358 L28 456 L0 466z"/><circle cx="23" cy="410" r="1.8"/>`)}
@@ -791,7 +791,7 @@ export function roomArt(id){
     // the pet's bed (it sleeps in it while you're in here), the door back to the house on the east wall, and night
     const sl = G.S && G.S().sleep;
     const cosy = !!(G.F().decor || {}).bed;   // the market's "cosy bed" upgrades the pet basket: plush rim, cushion and a heart
-    const [mx, my] = MAPLE_BED;
+    const [mx, my] = PET_BED;
     h += cosy ? sk(`<ellipse cx="${mx}" cy="${my}" rx="36" ry="16" style="fill:var(--rose)"/><ellipse cx="${mx}" cy="${my + -3}" rx="25" ry="10" style="fill:#FFFDF6"/><ellipse cx="${mx - 12}" cy="${my + -6}" rx="9" ry="5" style="fill:var(--peri)"/><path d="M${mx + 20} ${my - 18} c-3 -4 -8 0 -5 3 l5 4 l5 -4 c3 -3 -2 -7 -5 -3z" style="fill:var(--rose)"/>`, `<ellipse cx="${mx}" cy="${my}" rx="36" ry="16"/><ellipse cx="${mx}" cy="${my + -3}" rx="25" ry="10"/><ellipse cx="${mx - 12}" cy="${my + -6}" rx="9" ry="5"/>`)
       : sk(`<ellipse cx="${mx}" cy="${my}" rx="30" ry="13" style="fill:var(--peach)"/><ellipse cx="${mx}" cy="${my + -2}" rx="20" ry="8" style="fill:var(--cream)"/>`, `<ellipse cx="${mx}" cy="${my}" rx="30" ry="13"/><ellipse cx="${mx}" cy="${my + -2}" rx="20" ry="8"/>`);
     h += `<g data-exit="1" aria-label="Back to the house"><ellipse class="hov" cx="486" cy="452" rx="34" ry="10" style="fill:var(--butter)"/>

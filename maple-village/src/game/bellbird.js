@@ -6,7 +6,7 @@
 // the start). A stamp in the passport for every stop.
 // State: F.trip = {town: stop, day, party, from, by: "van"} (the trip system's, trips.js); F.bellbird = {stamps:
 // {stop: day}, legs: n}.
-import { esc, dayKey, sgHM } from "../util.js";
+import { esc, dayKey, localHM } from "../util.js";
 import { icon } from "../art/icons.js";
 import { TOWNS } from "../data/towns.js";
 import { BB_MAPS, BB_ROADS, BB_SOON, REGION_N, REGIONS } from "../data/bellbird.js";
@@ -22,9 +22,9 @@ export const fuelFor = (from, to, party) => legs(from, to)*(LEG + party.length);
 // what's on your map: the stops you've been to, and those a road away (Valley Gate from the start)
 export function known(F){ const st = bbState(F).stamps, seen = new Set(["bv_gate", ...Object.keys(st)]); Object.keys(st).forEach(s => nbrs(s).forEach(n => { if (n !== "home") seen.add(n); })); return STOPS.filter(s => seen.has(s)); }
 export const stamped = (F, stop) => !!bbState(F).stamps[stop];
-export const canSet = (hm = sgHM()) => hm >= 7*60 && hm < 18*60;
+export const canSet = (hm = localHM()) => hm >= 7*60 && hm < 18*60;
 // set off from home -> the stop, or null
-export function setOff(F, stop, party, hm = sgHM(), ownsVan = true){
+export function setOff(F, stop, party, hm = localHM(), ownsVan = true){
   party = tripFriends(F).filter(id => party.includes(id)).slice(0, VAN_SEATS - 1);
   if (!ownsVan || !TOWNS[stop] || !canSet(hm) || tripOn(F) || !known(F).includes(stop)) return null;
   const cost = fuelFor("home", stop, party); if (F.coins < cost) return null;
@@ -32,7 +32,7 @@ export function setOff(F, stop, party, hm = sgHM(), ownsVan = true){
   stamp(F, stop); bbState(F).legs = (bbState(F).legs || 0) + legs("home", stop); return {cost, stop};
 }
 // drive on from one stop to another -> {cost, stop, first}, or null
-export function driveOn(F, stop, hm = sgHM()){
+export function driveOn(F, stop, hm = localHM()){
   const t = tripOn(F); if (!t || t.by !== "van" || !TOWNS[stop] || stop === t.town || !known(F).includes(stop) || hm >= TOWNS[stop].backTo) return null;
   const cost = fuelFor(t.town, stop, t.party); if (F.coins < cost) return null;
   F.coins -= cost; const n = legs(t.town, stop); t.town = stop; const first = stamp(F, stop); bbState(F).legs = (bbState(F).legs || 0) + n; return {cost, stop, first};
@@ -68,7 +68,7 @@ function mapSvg(F, at, region = "vines"){
 }
 // the map panel: at home (pick who's coming, then a stop), or at a stop (drive on, or home)
 export function mapPanel(F, o = {}){
-  const t = tripOn(F), at = t && t.by === "van" ? t.town : null, hm = o.hm != null ? o.hm : sgHM(), st = bbState(F);
+  const t = tripOn(F), at = t && t.by === "van" ? t.town : null, hm = o.hm != null ? o.hm : localHM(), st = bbState(F);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Bellbird Valley</h2><p class="sub">${at ? `Parked at ${esc(TOWNS[at].n)}. Drive on, or head home.` : "The road map on the dashboard. The valley's an hour down the road: vines, kangaroos, balloons and berries."} Stamps: ${Object.keys(st.stamps).length} of ${STOPS.length}.</p>`;
   const regions = regionsKnown(F), region = regions.includes(o.region) ? o.region : at ? regionOf(at) : "vines", inR = id => regionOf(id) === region;
   if (regions.length > 1) h += `<div class="gchips bbtabs">${REGIONS.filter(r => regions.includes(r)).map(r => `<button class="gchip${r === region ? " on" : ""}" data-bvregion="${r}" aria-pressed="${r === region}">${esc(REGION_N[r])}</button>`).join("")}</div>`;

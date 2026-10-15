@@ -13,7 +13,7 @@ import { rLab as lab, rG as g, rSpot as spot, rHov as hovE, rExit as exit, rFloo
 let getF = () => null;
 export const setPaperArtF = fn => { getF = fn; };
 export const paperOwned = () => { const F = getF(); return !!(F && F.goals && F.goals.paperie); };
-const now = () => Date.now() + (globalThis.__mapleOffset || 0);
+const now = () => Date.now() + (globalThis.__hbOffset || 0);
 const O = `stroke="#3a2e28" stroke-width=".6"`;
 const ADDCOL = {lavender: "#8E6CC0", rose: "#E36A86", petals: "#F3C969", tea: "#6E4A2E", gold: "#E0A83A", seeds: "#5A4632"};
 

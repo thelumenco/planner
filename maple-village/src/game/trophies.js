@@ -10,7 +10,7 @@ const fmt = n => Number(n).toLocaleString("en-GB");
 export const LOOKS = {
   quests: {shape: "cup", col: "#E8B84A", emblem: "star"}, favours: {shape: "rosette", col: "#5B8FD6", emblem: "check"},
   water: {shape: "medal", col: "#7FB8E8", emblem: "drop"}, steps: {shape: "medal", col: "#F2A65A", emblem: "shoe"},
-  maple: {shape: "plaque", col: "#EE8B3A", emblem: "fox"}, friends: {shape: "plaque", col: "#F4A0B5", emblem: "heart"},
+  chum: {shape: "plaque", col: "#EE8B3A", emblem: "fox"}, friends: {shape: "plaque", col: "#F4A0B5", emblem: "heart"},
   harvest: {shape: "cup", col: "#7BB37A", emblem: "sprout"}, journal: {shape: "star", col: "#C9A3E8", emblem: "book"}
 };
 const TH = {quests: [10, 25, 50, 100, 250, 500, 1000, 2500], favours: [5, 10, 25, 50, 100], friends: [1, 3, 5, 10], harvest: [10, 50, 100, 250, 500], journal: [10, 50, 100, 250], streak: [7, 14]};
@@ -28,7 +28,7 @@ export function reached(c){
   const wS = streak(h => (h.water || 0) >= (c.water || 2000)), sS = streak(h => (h.steps || 0) >= (c.steps || 5000));
   TH.streak.filter(t => wS >= t).forEach(t => add("water", "water-" + t, t, `${t} days of your water goal in a row`, `Your water goal, ${t} days running.`, t + "d"));
   TH.streak.filter(t => sS >= t).forEach(t => add("steps", "steps-" + t, t, `${t} days of your step goal in a row`, `Your step goal or more, ${t} days running.`, t + "d"));
-  (c.levels || []).forEach((l, i) => { if (i > 0 && i <= c.levelIndex) add("maple", "maple-" + i, i, `Friendship: ${l.name}`, `Your pet's friendship reached "${l.name}".`, "Lv" + i); });
+  (c.levels || []).forEach((l, i) => { if (i > 0 && i <= c.levelIndex) add("chum", "chum-" + i, i, `Friendship: ${l.name}`, `Your pet's friendship reached "${l.name}".`, "Lv" + i); });
   TH.harvest.filter(t => (c.F.harvestTotal || 0) >= t).forEach(t => add("harvest", "harvest-" + t, t, `${t} harvests`, `${t} crops picked from the garden.`, String(t)));
   TH.journal.filter(t => c.journal >= t).forEach(t => add("journal", "journal-" + t, t, `${t} journal pages`, `${t} pages written in your journal.`, String(t)));
   return out;

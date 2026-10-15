@@ -250,9 +250,9 @@ details[open] summary::after{content:"–"}
 .ch.walk .pony{animation-duration:.6s}
 @keyframes pony{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(8deg)}}
 .mtail{transform-box:fill-box;transform-origin:0% 80%;animation:pony 2.2s ease-in-out infinite}
-#mmaple .curl{display:none}
-#mmaple.sleep .stand{display:none}#mmaple.sleep .curl{display:inline}
-#mmaple.hop .bob{animation:mhop .45s ease 3}
+#mchum .curl{display:none}
+#mchum.sleep .stand{display:none}#mchum.sleep .curl{display:inline}
+#mchum.hop .bob{animation:mhop .45s ease 3}
 @keyframes mhop{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 .qmark{animation:qbob 1.1s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
 @keyframes qbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}

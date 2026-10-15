@@ -46,7 +46,7 @@ function draw(){
   const box = document.getElementById("setup"); if (!box) return;
   const keep = document.activeElement && document.activeElement.id;
   box.querySelector(".sucard").innerHTML = page();
-  if (st.page === "look") { const fig = document.getElementById("mel"), g = document.getElementById("suFig");
+  if (st.page === "look") { const fig = document.getElementById("hero"), g = document.getElementById("suFig");
     if (fig && g) { const c = fig.cloneNode(true); c.removeAttribute("id"); c.querySelectorAll("[id]").forEach(e => e.removeAttribute("id")); c.removeAttribute("transform"); c.setAttribute("class", "ch me"); c.removeAttribute("style"); g.replaceChildren(c); applyLook(c, st.look); } }
   if (keep) { const e = document.getElementById(keep); if (e) { e.focus(); if (e.setSelectionRange) e.setSelectionRange(e.value.length, e.value.length); } }
 }

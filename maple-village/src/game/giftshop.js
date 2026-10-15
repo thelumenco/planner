@@ -52,9 +52,9 @@ export function takeBottle(F, v, shelfId){
 }
 export function registerBottles(F){ for (const [id, b] of Object.entries((F.giftshop || {}).bottles || {})) ITEMS[id] = {n: `A bottle of ${b.name}`, kind: "gift", to: ["hana", "theo", "bo", "tomi", "posy", "mei"], price: b.price,
   ico: "wine_" + (["red", "rose", "white", "sparkling"].includes(b.type) ? b.type : "red"), say: `Your own ${b.name}! We'll open it this weekend.`, wine: true}; }
-// one minute of trade: mode "mel" (the player at the till), "keeper" (Posy's in), else shut -> coins
+// one minute of trade: mode "hero" (the player at the till), "keeper" (Posy's in), else shut -> coins
 export function giftSellMinute(F, day, hm, mode, o){
-  if (!mode) return 0; const p = mode === "mel" ? .08 : .05; if (Math.random() >= p) return 0;
+  if (!mode) return 0; const p = mode === "hero" ? .08 : .05; if (Math.random() >= p) return 0;
   const g = giftState(F);
   if (g.wrapped.length && Math.random() < (pairSeason(day) ? .3 : .12)) {   // a wrapped gift off the table
     const id = g.wrapped.shift(), coins = (ITEMS[id] || {price: 6}).price, t = g.sold[day] = g.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; t.wrap = (t.wrap || 0) + 1; return coins;

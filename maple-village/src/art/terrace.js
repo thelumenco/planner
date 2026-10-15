@@ -5,7 +5,7 @@
 // six chairs either side. Beyond the balustrade: lavender in rows, cypresses, olive trees, a stone farmhouse, and
 // hills going blue. On Sundays from 11:30 the table's laid (plates, glasses, bread, jugs of lavender, bottles); the
 // rest of the week it's a jug of lavender and folded napkins. Calm on purpose: the edges are busy, the middle clear.
-import { dayKey, sgHM } from "../util.js";
+import { dayKey, localHM } from "../util.js";
 import { sk, tapeLabel } from "./scenes.js";
 import { occasionOn, occasionNow, mothersDay, WED } from "../game/occasions.js";
 
@@ -64,7 +64,7 @@ function terraceLights(hm){
     ${rattan(150, 300)}${rattan(370, 300)}${floorLantern(110, 470)}${floorLantern(430, 600)}</g>`;
 }
 export function terraceArt(F = {}){
-  const day = dayKey(), hm = sgHM(), sunday = new Date(day + "T00:00:00Z").getUTCDay() === 0, evening = hm >= 18*60 || hm < 6*60, occ = occasionOn(day);
+  const day = dayKey(), hm = localHM(), sunday = new Date(day + "T00:00:00Z").getUTCDay() === 0, evening = hm >= 18*60 || hm < 6*60, occ = occasionOn(day);
   // laid for Sunday lunch, the wedding breakfast, Valentine's and Christmas
   const laid = (sunday && hm >= 11*60 + 30 && hm < 15*60 + 30) || (occ === "wedding" && hm >= 14*60 + 30 && hm < 19*60) || (occ === "valentine" && hm >= 17*60 + 30) || (occ === "christmas" && hm >= 11*60 + 30 && hm < 16*60 + 30);
   // the view: sky, hills going blue, rows of lavender, cypresses and olives, a stone farmhouse with blue shutters

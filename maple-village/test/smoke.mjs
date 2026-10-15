@@ -28,7 +28,7 @@ const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM 
 // Pages are tracked so a section that throws before its page.close() doesn't leave its page open for the rest of the
 // run (dozens of leaked pages once crashed the browser near the end): each new section closes any left over.
 const openPages = new Set();
-{ const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); openPages.add(pg); pg.on("close", () => openPages.delete(pg)); if (!resume) await pg.addInitScript(() => { window.__mapleNoResume = true; }); return pg; }; }
+{ const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); openPages.add(pg); pg.on("close", () => openPages.delete(pg)); if (!resume) await pg.addInitScript(() => { window.__hbNoResume = true; }); return pg; }; }
 const errors = [];
 // a save where the seven friends the older tests rely on are at five hearts (presents sent round need 3, trips 5)
 const closeFriends = page => page.addInitScript(() => { const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
@@ -38,7 +38,7 @@ const ONLY = (process.env.ONLY || "").toLowerCase().split("|").map(x => x.trim()
 const want = title => { const on = !ONLY.length || ONLY.some(o => title.toLowerCase().includes(o)); if (on) for (const pg of openPages) pg.close().catch(() => {}); return on; };
 // closeness is hearts: set some villagers' hearts in the live save (the old seven at five, by default)
 const SEVEN = ["bo", "farid", "hana", "mei", "posy", "theo", "tomi"];
-const befriend = (page, ids = SEVEN, n = 5) => page.evaluate(([ids, n]) => { const g = window.__mapleGame, f = g.F(); f.board = f.board || {}; f.board.hearts = f.board.hearts || {}; ids.forEach(id => { f.board.hearts[id] = n; }); g.save(); g.render(); }, [ids, n]);
+const befriend = (page, ids = SEVEN, n = 5) => page.evaluate(([ids, n]) => { const g = window.__hbGame, f = g.F(); f.board = f.board || {}; f.board.hearts = f.board.hearts || {}; ids.forEach(id => { f.board.hearts[id] = n; }); g.save(); g.render(); }, [ids, n]);
 const check = (cond, msg) => { if (!cond) { errors.push("FAIL: " + msg); console.log("  ✗ " + msg); } else console.log("  ✓ " + msg); };
 
 if (want("core loop")) for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop", width: 1280, height: 900 }]) {
@@ -81,7 +81,7 @@ if (want("core loop")) for (const vp of [{ name: "phone", width: 390, height: 84
   await page.fill("#nbTrack", "1000"); await page.click('#notebook [data-nb="wset"]');
   await page.waitForFunction(() => /^1L/.test(document.getElementById("waterNote").textContent), null, { timeout: 3000 }).catch(() => {});
   check(await page.locator("#waterNote").textContent().then(t => /^1L/.test(t)), "water total can be typed in");
-  await page.click('[data-track="water"]'); await page.fill("#nbTrack", "1250"); await page.evaluate(() => window.__mapleScene && window.__mapleScene("base")); await page.waitForTimeout(600);
+  await page.click('[data-track="water"]'); await page.fill("#nbTrack", "1250"); await page.evaluate(() => window.__hbScene && window.__hbScene("base")); await page.waitForTimeout(600);
   check(await page.locator("#nbTrack").inputValue().catch(() => "") === "1250", "a half-typed water total survives the game redrawing round it");
   await page.click('#notebook [data-nb="wset"]').catch(() => {}); await page.waitForTimeout(300);
   await page.click('[data-track="steps"]');
@@ -113,7 +113,7 @@ if (want("core loop")) for (const vp of [{ name: "phone", width: 390, height: 84
   check(await page.locator("#panel").isHidden(), "closing the board returns to the map");
   await page.click('[data-open="friend"]');
   check(await page.locator('#friendView [data-ftab="where"][aria-selected="true"]').count() === 1 && await page.locator("#friendView details.whowhere").count() > 0, "the heart panel opens on who's where, in tabs");
-  await page.click('#friendView [data-ftab="maple"]');
+  await page.click('#friendView [data-ftab="chum"]');
   check(await page.locator("#friendView .hearts .ico").count() === 5, "friendship has its own corner icon and drawn hearts");
   await page.click("#pclose");
 
@@ -179,16 +179,16 @@ if (want("\nvillage requests")) try {
   page.on("pageerror", e => errors.push(`requests pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=10:15&date=2026-10-14");
   await page.waitForTimeout(1500);
-  const r = await page.evaluate(() => window.__mapleGame.F().board.reqs[0]);
+  const r = await page.evaluate(() => window.__hbGame.F().board.reqs[0]);
   check(!!r && r.n > 0, "a request is pinned up on a new game's first morning");
-  await page.evaluate(([id, n]) => window.__mapleGame.give(id, n), [r.item, r.n]);
+  await page.evaluate(([id, n]) => window.__hbGame.give(id, n), [r.item, r.n]);
   await page.click('[data-open="quests"]'); await page.waitForTimeout(300);
   check(await page.locator(`#reqList [data-find="${r.who}"]`).textContent().then(t => /hand over/.test(t)), "with the things in the backpack, the board offers to hand it over");
-  const c0 = await page.evaluate(() => window.__mapleGame.F().coins);
+  const c0 = await page.evaluate(() => window.__hbGame.F().coins);
   await page.locator(`#reqList [data-find="${r.who}"]`).click();
   await page.waitForSelector("#journal [data-say]", { timeout: 30000 });
   await page.click("#journal [data-say] >> nth=0"); await page.waitForTimeout(500);
-  const after = await page.evaluate(() => { const F = window.__mapleGame.F(); return {coins: F.coins, hearts: F.board.hearts, reqs: F.board.reqs.map(x => x.who)}; });
+  const after = await page.evaluate(() => { const F = window.__hbGame.F(); return {coins: F.coins, hearts: F.board.hearts, reqs: F.board.reqs.map(x => x.who)}; });
   check(after.coins === c0 + r.n*r.each && after.hearts[r.who] === 1 && !after.reqs.includes(r.who), `walking over and handing it to ${r.name} pays ${r.n*r.each} coins and a heart`);
   await page.click('[data-open="friend"]'); await page.click('#friendView [data-ftab="neighbours"]'); await page.waitForTimeout(200);
   check(await page.locator("#friendView .nbrs li").first().textContent().then(t => t.includes(r.name)), "Neighbours lists them first, with their heart");
@@ -262,7 +262,7 @@ if (want("\ngifts for friends")) try {
   await page.click('#ctx [data-shop="family"]');
   for (const id of ["sandpit", "truck", "headphones", "hammock", "icecream", "kopi"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(150); }
   check(await page.locator('#ctx .item[data-id="hammock"]').textContent().then(t => /at home/.test(t)), "keepsakes are bought once and go home");
-  check(await page.evaluate(() => { const o = window.__mapleGame.F().fam.owned; return o.truck && o.sandpit && o.headphones && o.hammock; }), "the tin truck, the sandpit, Bo's headphones and the hammock are all kept");
+  check(await page.evaluate(() => { const o = window.__hbGame.F().fam.owned; return o.truck && o.sandpit && o.headphones && o.hammock; }), "the tin truck, the sandpit, Bo's headphones and the hammock are all kept");
   await page.click('#ctx [data-close]').catch(() => {}); await page.waitForTimeout(300);
   // a present for anyone (the ice cream) can go to any friend at three hearts or more: nobody yet
   await page.click('[data-open="bag"]');
@@ -275,8 +275,8 @@ if (want("\ngifts for friends")) try {
   check(await page.locator('#bag [data-giveto="hana"]').textContent().then(t => /here/.test(t)) && await page.locator('#bag [data-giveto="bo"]').textContent().then(t => /send it/.test(t)), "tapping a gift opens a chooser: who it suits, and whether they're here or it gets sent");
   check(await page.locator('#bag [data-giveto]').evaluateAll(n => n.map(x => x.dataset.giveto).filter(Boolean).join()) === "celeste,bo,hana,okada", "ice cream can go to any friend at three hearts or more, the ones you know best first");
   await page.click('#bag [data-giveto="hana"]'); await page.waitForTimeout(300);
-  check(await page.evaluate(() => { const f = window.__mapleGame.F(); return !f.inv.icecream && f.fam.gifts.hana === 1 && !(f.thanks || []).length; }), "Hana gets her ice cream in person, right at the market");
-  check(await page.evaluate(() => { const b = window.__mapleGame.F().board; return b.hearts.hana === 3 && b.giftPts.hana === 1; }), "a present for anyone is half a heart (nobody's favourite)");
+  check(await page.evaluate(() => { const f = window.__hbGame.F(); return !f.inv.icecream && f.fam.gifts.hana === 1 && !(f.thanks || []).length; }), "Hana gets her ice cream in person, right at the market");
+  check(await page.evaluate(() => { const b = window.__hbGame.F().board; return b.hearts.hana === 3 && b.giftPts.hana === 1; }), "a present for anyone is half a heart (nobody's favourite)");
   await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05"); await page.waitForTimeout(900);   // back home: Bo's at his workshop
   await page.click('[data-open="bag"]');
   await page.click('#bag .item[data-id="kopi"]');
@@ -376,42 +376,42 @@ if (want("\nthe guest room")) try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`guest room pageerror: ${e.message}`));
   const go = async q => { await page.goto(url + q); await page.waitForTimeout(1200); };
-  const here = sc => page.evaluate(async sc => { window.__mapleScene(sc); await new Promise(r => setTimeout(r, 900)); return [...document.querySelectorAll("#actors .npc[data-npc]")].map(n => n.dataset.npc); }, sc);
+  const here = sc => page.evaluate(async sc => { window.__hbScene(sc); await new Promise(r => setTimeout(r, 900)); return [...document.querySelectorAll("#actors .npc[data-npc]")].map(n => n.dataset.npc); }, sc);
   const openBook = async () => { await page.evaluate(() => { const g = document.querySelector('#world [data-spot="gbook"]'); g.dispatchEvent(new MouseEvent("click", {bubbles: true})); g.dispatchEvent(new PointerEvent("pointerdown", {bubbles: true})); g.dispatchEvent(new PointerEvent("pointerup", {bubbles: true})); });
     await page.waitForFunction(() => /The guest book/.test(document.querySelector("#ctx").textContent), null, { timeout: 15000 }); };
   await go("?reset=1&seed=1&nosample=1&date=2026-10-14&time=16:00");
   await page.locator('#world [data-place="home"]').dispatchEvent("click");
   await page.waitForFunction(() => /Home/.test(document.querySelector("#sceneName").textContent) && !/base/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  check(await page.locator('#world [data-spot="kiddoor"]').count() === 1, "the house has a door to the guest room on the right");
-  await page.locator('#world [data-spot="kiddoor"]').dispatchEvent("click");
+  check(await page.locator('#world [data-spot="guestdoor"]').count() === 1, "the house has a door to the guest room on the right");
+  await page.locator('#world [data-spot="guestdoor"]').dispatchEvent("click");
   await page.waitForFunction(() => /guest room/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(800);
   check(await page.locator("#world [data-spot]").evaluateAll(n => ["gbed", "gbook", "gwardrobe", "gshelf"].every(k => n.some(x => x.dataset.spot === k))), "the guest room: a bed, the guest book on the desk, a wardrobe and a bookshelf");
   await openBook();
   check(/Nobody to invite yet/.test(await page.locator("#ctx").textContent()), "with an empty address book there's nobody to invite yet");
-  await page.evaluate(() => { const F = window.__mapleGame.F(); F.met = {...(F.met || {}), jason: true}; F.book = {ids: {jason: "2026-10-01"}, sent: []}; window.__mapleGame.render(); });
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.met = {...(F.met || {}), ornella: true}; F.book = {ids: {ornella: "2026-10-01"}, sent: []}; window.__hbGame.render(); });
   await page.waitForTimeout(400); await openBook().catch(() => {});
-  check(await page.locator('#ctx [data-guest="ask:jason"]').textContent().then(t => /Ornella/.test(t) && /Cinque Terre/.test(t)), "the guest book offers everyone in the address book (Ornella, from Cinque Terre)");
-  await page.click('#ctx [data-guest="ask:jason"]'); await page.waitForTimeout(500);
-  check(await page.evaluate(() => JSON.stringify(window.__mapleGame.F().guest)) === JSON.stringify({id: "jason", day: "2026-10-15", asked: "2026-10-14"}) && /coming tomorrow on the 10:30 train, for 3 days/.test(await page.locator("#ctx").textContent()), "invited: she's coming tomorrow on the 10:30 train, for three days");
+  check(await page.locator('#ctx [data-guest="ask:ornella"]').textContent().then(t => /Ornella/.test(t) && /Cinque Terre/.test(t)), "the guest book offers everyone in the address book (Ornella, from Cinque Terre)");
+  await page.click('#ctx [data-guest="ask:ornella"]'); await page.waitForTimeout(500);
+  check(await page.evaluate(() => JSON.stringify(window.__hbGame.F().guest)) === JSON.stringify({id: "ornella", day: "2026-10-15", asked: "2026-10-14"}) && /coming tomorrow on the 10:30 train, for 3 days/.test(await page.locator("#ctx").textContent()), "invited: she's coming tomorrow on the 10:30 train, for three days");
   check(await page.locator('#ctx [data-guest="cancel"]').count() === 1, "until then it can be put off");
-  check(!(await here("kidroom")).includes("jason"), "nobody in the guest room the evening before");
+  check(!(await here("guestroom")).includes("ornella"), "nobody in the guest room the evening before");
   await go("?seed=1&nosample=1&date=2026-10-15&time=10:45");
-  check((await here("hlane")).includes("jason"), "the next morning she's off the 10:30 train at Honeybrook station");
+  check((await here("hlane")).includes("ornella"), "the next morning she's off the 10:30 train at Honeybrook station");
   await page.click('[data-open="friend"]'); await page.waitForTimeout(400);
   check(await page.locator("#friendView").textContent().then(t => /Staying with you\s*Ornella/.test(t)), "Who's where lists her first, under Staying with you");
   await page.click("#pclose");
   await go("?seed=1&nosample=1&date=2026-10-15&time=23:00");
-  check((await here("kidroom")).includes("jason"), "at night she's asleep in the guest room");
+  check((await here("guestroom")).includes("ornella"), "at night she's asleep in the guest room");
   await go("?seed=1&nosample=1&date=2026-10-16&time=14:30");
-  await page.evaluate(() => window.__mapleScene("kidroom")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("guestroom")); await page.waitForTimeout(900);
   await openBook();
   check(await page.locator("#ctx").textContent().then(t => /Ornella is staying/.test(t) && /Day 2 of 3/.test(t) && /Today's plan/.test(t)), "the guest book shows today's plan while she's here (day 2 of 3)");
-  check(await page.evaluate(() => window.__mapleGame.F().guestLog.jason.includes("2026-10-15")), "and she's signed the book");
+  check(await page.evaluate(() => window.__hbGame.F().guestLog.ornella.includes("2026-10-15")), "and she's signed the book");
   await go("?seed=1&nosample=1&date=2026-10-17&time=12:00");
-  check(!(await here("hlane")).includes("jason") && !(await here("kidroom")).includes("jason"), "after the 11 o'clock train on the third day she's gone");
-  check(!(await page.evaluate(() => window.__mapleGame.mail().unread)).some(m => /^guest-/.test(m)), "no thank-you letter yet on the day she goes");
+  check(!(await here("hlane")).includes("ornella") && !(await here("guestroom")).includes("ornella"), "after the 11 o'clock train on the third day she's gone");
+  check(!(await page.evaluate(() => window.__hbGame.mail().unread)).some(m => /^guest-/.test(m)), "no thank-you letter yet on the day she goes");
   await go("?seed=1&nosample=1&date=2026-10-18&time=10:00");
-  check((await page.evaluate(() => window.__mapleGame.mail().unread)).includes("guest-jason-2026-10-15"), "the morning after, her thank-you letter arrives");
+  check((await page.evaluate(() => window.__hbGame.mail().unread)).includes("guest-ornella-2026-10-15"), "the morning after, her thank-you letter arrives");
   await page.click('[data-open="friend"]'); await page.waitForTimeout(400);
   check(!/Staying with you/.test(await page.locator("#friendView").textContent()), "and she's off Who's where");
   await page.click("#pclose");
@@ -419,8 +419,8 @@ if (want("\nthe guest room")) try {
   check(/Thank you from Ornella/.test(await page.locator("#mailView").textContent()), "headed Thank you from Ornella");
   await page.click('[data-open="mail"]').catch(() => {});
   const GU = await import(pathToFileURL(join(root, "src/game/guests.js")).href);
-  const G = {guest: {id: "jason", day: "2026-10-15", asked: "2026-10-14"}};
-  check(!GU.canInvite(G, "2026-10-16") && GU.canInvite(G, "2026-10-18") && !GU.cancel(G, "2026-10-15") && GU.cancel({guest: {id: "jason", day: "2026-10-15"}}, "2026-10-14"), "one guest at a time; a booking can be put off only before the day");
+  const G = {guest: {id: "ornella", day: "2026-10-15", asked: "2026-10-14"}};
+  check(!GU.canInvite(G, "2026-10-16") && GU.canInvite(G, "2026-10-18") && !GU.cancel(G, "2026-10-15") && GU.cancel({guest: {id: "ornella", day: "2026-10-15"}}, "2026-10-14"), "one guest at a time; a booking can be put off only before the day");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nthe setup card")) try {
@@ -430,49 +430,49 @@ if (want("\nthe setup card")) try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`setup pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&time=10:00"); await page.waitForTimeout(1200);
-  check(await page.locator("#setup").isHidden().catch(() => true) && await page.evaluate(() => { const F = window.__mapleGame.F(); return F.pet === "fox" && F.name === "Ember" && F.me && F.me.name === ""; }), "dev builds skip the setup card: a fox called Ember, and no name yet");
+  check(await page.locator("#setup").isHidden().catch(() => true) && await page.evaluate(() => { const F = window.__hbGame.F(); return F.pet === "fox" && F.name === "Ember" && F.me && F.me.name === ""; }), "dev builds skip the setup card: a fox called Ember, and no name yet");
   await page.goto(url + "?reset=1&setup=1&time=10:00"); await page.waitForTimeout(1600);
   check(await page.locator("#intro").isVisible() && await page.locator('#intro [data-in="skip"]').count() === 1, "a new game opens on the story, which can be skipped");
   await page.click('#intro [data-in="skip"]'); await page.waitForTimeout(800);
-  check(await page.locator("#setup").isVisible() && await page.evaluate(() => window.__mapleGame.F().introSeen === true), "then the setup card (and the story's marked as seen)");
+  check(await page.locator("#setup").isVisible() && await page.evaluate(() => window.__hbGame.F().introSeen === true), "then the setup card (and the story's marked as seen)");
   await page.fill("#suName", "Robin"); await page.click('[data-su="go:look"]'); await page.waitForTimeout(300);
   await page.click('[data-su="body:man"]'); await page.click('[data-su="go:pet"]'); await page.waitForTimeout(300);
   await page.click('[data-su="pet:capybara"]'); await page.waitForTimeout(300); await page.click('[data-su="done"]'); await page.waitForTimeout(1500);
-  const me = await page.evaluate(() => { const F = window.__mapleGame.F(); return {name: F.me && F.me.name, pet: F.pet, pname: F.name}; });
+  const me = await page.evaluate(() => { const F = window.__hbGame.F(); return {name: F.me && F.me.name, pet: F.pet, pname: F.name}; });
   check(me.name === "Robin" && me.pet === "capybara" && me.pname === "Mochi", `a name, a look and a pet: ${me.name}, with a capybara called ${me.pname}`);
-  check(await page.locator("#setup").isHidden().catch(() => true) && await page.locator("#mmaple").evaluate(e => e.innerHTML.length > 50), "the card closes and the capybara follows you about");
+  check(await page.locator("#setup").isHidden().catch(() => true) && await page.locator("#mchum").evaluate(e => e.innerHTML.length > 50), "the card closes and the capybara follows you about");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nAda's haberdashery and Idris the tailor")) try {
-  // Sewing (game/tailor.js, data/sewing.js, F.sew): fabric and buttons from Ada (scene "chico"), a design made up by Idris
-  // (scene "luna") for his fee, ready the next morning from nine, then worn from the wardrobe
+  // Sewing (game/tailor.js, data/sewing.js, F.sew): fabric and buttons from Ada (scene "haberdash"), a design made up by Idris
+  // (scene "tailor") for his fee, ready the next morning from nine, then worn from the wardrobe
   console.log("\nAda's haberdashery and Idris the tailor");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`sewing pageerror: ${e.message}`));
   const tap = sel => page.evaluate(s => document.querySelector(s).dispatchEvent(new MouseEvent("click", {bubbles: true})), sel);
-  const coins = () => page.evaluate(() => window.__mapleGame.F().coins);
+  const coins = () => page.evaluate(() => window.__hbGame.F().coins);
   await page.goto(url + "?reset=1&seed=1&nosample=1&date=2026-10-19&time=10:00"); await page.waitForTimeout(1000);
-  await page.evaluate(() => { window.__mapleGame.F().coins = 300; window.__mapleScene("chico"); }); await page.waitForTimeout(900);
+  await page.evaluate(() => { window.__hbGame.F().coins = 300; window.__hbScene("haberdash"); }); await page.waitForTimeout(900);
   await tap('#world [data-spot="habcounter"]'); await page.waitForSelector('#ctx [data-sew="buy:4"]', { timeout: 15000 });
   await page.click('[data-sew="pat:gingham"]'); await page.click('[data-sew="col:#E8566C"]'); await page.click('[data-sew="buy:4"]'); await page.waitForTimeout(300);
   await page.click('[data-sew="tab:buttons"]'); await page.click('[data-sew="btn:shell"]'); await page.waitForTimeout(300);
   await page.click('[data-sew="tab:basket"]'); await page.waitForTimeout(300);
   check(await page.locator("#ctx").innerText().then(t => /gingham cotton × 4/i.test(t) && /Shell buttons × 1/.test(t)) && await coins() < 300, "at Ada's: four pieces of gingham and a card of shell buttons in the sewing basket");
-  await page.evaluate(() => window.__mapleScene("luna")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("tailor")); await page.waitForTimeout(900);
   await tap('#world [data-spot="tailtable"]'); await page.waitForSelector('#ctx [data-sew="kind:dress"]', { timeout: 15000 });
   await page.click('[data-sew="kind:dress"]'); await page.click('[data-sew="sleeves:puff"]'); await page.click('[data-sew="neck:collar"]'); await page.click('[data-sew="buttons:shell"]'); await page.click('[data-sew="pockets:1"]'); await page.waitForTimeout(400);
   check(await page.locator("#ctx .tlprev").count() === 1, "at Idris's table: a dress designed, with a preview");
   const c0 = await coins(); await page.click('[data-sew="order"]'); await page.waitForTimeout(600);
   check(await coins() === c0 - 40 && /Tomorrow from nine/.test(await page.locator("#ctx").innerText()), "ordered: only his fee comes off (40), and it's ready tomorrow from nine");
   await page.goto(url + "?seed=1&nosample=1&date=2026-10-20&time=10:00"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("luna")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("tailor")); await page.waitForTimeout(900);
   await tap('#world [data-spot="rail"]'); await page.waitForSelector('#ctx [data-sew="collect"]', { timeout: 15000 });
   await page.click('[data-sew="collect"]'); await page.waitForTimeout(600);
-  check(await page.evaluate(() => window.__mapleGame.F().sew.clothes.map(c => c.name).join()) === "Poppy gingham cotton dress", "the next morning the dress is on the rail to collect");
-  await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(900);
+  check(await page.evaluate(() => window.__hbGame.F().sew.clothes.map(c => c.name).join()) === "Poppy gingham cotton dress", "the next morning the dress is on the rail to collect");
+  await page.evaluate(() => window.__hbScene("room")); await page.waitForTimeout(900);
   await tap('#world [data-spot="wardrobe"]'); await page.waitForSelector("#ctx [data-wear]", { timeout: 15000 });
   await page.locator("#ctx [data-wear]").first().click(); await page.waitForTimeout(800);
-  check(await page.evaluate(() => !!window.__mapleGame.F().sew.wear.dress) && await page.locator("#mel .clTorso").evaluate(e => e.innerHTML.length > 50), "worn from the wardrobe: you're in your new dress");
+  check(await page.evaluate(() => !!window.__hbGame.F().sew.wear.dress) && await page.locator("#hero .clTorso").evaluate(e => e.innerHTML.length > 50), "worn from the wardrobe: you're in your new dress");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nmy routines")) try {
@@ -546,7 +546,7 @@ if (want("\ntrophy room")) try {
   check((await page.locator("#ctx .tpage h3").first().textContent()) === name && await page.locator("#ctx .tpage svg").count() >= 1, "a trophy can go into the trophy book: a page with a polaroid and the story");
   await page.click("#pclose"); await page.waitForTimeout(200);
   await page.locator('#world [data-spot="bench"]').dispatchEvent("click"); await page.waitForTimeout(2500);
-  check(await page.evaluate(() => document.getElementById("mel").classList.contains("sit")), "you can sit on the bench");
+  check(await page.evaluate(() => document.getElementById("hero").classList.contains("sit")), "you can sit on the bench");
   check(await page.locator("#world [data-pigeon]").count() >= 2 && await page.locator('#world [data-spot="fountain"]').count() === 1, "with a fountain and pigeons pecking about");
   await page.screenshot({ path: join(shots, "courtyard.png") });
   await page.close();
@@ -610,7 +610,7 @@ if (want("\ntasting room")) try {
   await page.click('#bag [data-kit="potato"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.kitchen.larder.potato === 2 && !f.inv.potato; }), "and arrive in the larder");
   await page.keyboard.press("Escape");
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="kdoor"]').dispatchEvent("click");
   await page.waitForFunction(() => /kitchen/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 15000 });
   check(await page.locator('#world [data-spot="oven"], #world [data-spot="larder"], #world [data-spot="stove"], #world [data-spot="press"]').count() === 4, "a door in the wine shop leads to the kitchen: oven, larder, stove and cheese press");
@@ -638,7 +638,7 @@ if (want("\ntasting room")) try {
   await page.goto(url + "?seed=1&time=18:00&dinnerpatch=1"); await page.waitForTimeout(4200);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.staffNote && f.vine.staffNote.plates === 6 && !(f.vine.tapasList || []).some(t => t.plates) && f.kitchen.larder.olives >= 1; }), "leftover tapas go to the staff for dinner, and they leave thanks in the larder");
   // Hana's deli shelf and the goat
-  await page.evaluate(() => window.__mapleScene("market")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("market")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="stall"]').dispatchEvent("click").catch(() => {}); await page.waitForTimeout(600);
   await page.click('#ctx [data-shop="deli"]').catch(() => {}); await page.waitForTimeout(300);
   check(await page.locator('#ctx .item[data-id="flour"], #ctx .item[data-id="cheese"], #ctx .item[data-id="olives"]').count() === 3, "Hana's market has a deli shelf: flour, cheese, olives");
@@ -650,11 +650,11 @@ if (want("\ntasting room")) try {
   check(await page.locator('#ctx .item[data-id="goat"]').count() === 1, "and goats in the Animals tab");
   // a grown goat gives milk when fed; the olive tree is bought at the vineyard stall
   await page.goto(url + "?seed=1&time=18:00&goatpatch=1"); await page.waitForTimeout(1200);
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(700);
   await page.locator('#world [data-place="run"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-feed]', { timeout: 15000 }); await page.click('#ctx [data-feed]'); await page.waitForTimeout(400);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).inv.goatmilk === 1), "a grown goat gives a bottle of goat's milk when fed");
-  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("vineyard")); await page.waitForTimeout(700);
   await page.locator('#world [data-place="vinestall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vybuy="olive"]', { timeout: 15000 });
   await page.click('#ctx [data-vybuy="olive"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => !!JSON.parse(localStorage.getItem("fox.fox")).vine.olive), "an olive tree can be bought and planted by the path");
@@ -750,14 +750,14 @@ if (want("\nstaff, names and the tasting room tables")) try {
   check(!!st.k.oven && !!st.k.press, "Pilar puts bread in the oven and milk in the cheese press");
   check(st.v.tapasList[0] && st.v.tapasList[0].id === "tortilla" && st.v.tapasList[0].plates === 6, "she picks the dearest tapas the larder can make (tortilla) and cooks a batch");
   check(st.v.menu.bread > 0 && st.v.menu.olives > 0, "and cooks small plates from what's left");
-  await page.evaluate(() => window.__mapleScene("kitchen")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("kitchen")); await page.waitForTimeout(800);
   check(await page.locator('#actors [data-npc="pilar"]').count() === 1, "Pilar is in the kitchen on her shift");
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click");
   await page.waitForSelector("#ctx .klog li", { timeout: 15000 });
   check(/oven|press|tortilla/i.test(await page.locator("#ctx .klog").textContent()), "the stove card lists what she's done");
   await page.screenshot({ path: join(shots, "kitchen-pilar.png") });
   await page.click('#ctx [data-close]');
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="wcounter"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-vyhelp="cook"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-vyhelp]').count() === 5 && await page.locator('#ctx [data-vyhelp="fetch"]').isChecked() === false, "the staff card at the counter has a tick for each helper (fetching from the backpack is off to start)");
@@ -767,16 +767,16 @@ if (want("\nstaff, names and the tasting room tables")) try {
   check(/Hill &amp; Willow|Hill & Willow/.test(await page.locator("#sceneName").textContent()), "the wine shop can be renamed");
   await page.screenshot({ path: join(shots, "staff-card.png") });
   await page.click('#ctx [data-close]');
-  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("vineyard")); await page.waitForTimeout(700);
   check(/Bay Hill Vines/.test(await page.locator("#sceneName").textContent()) && /Hill &amp; Willow|Hill & Willow/.test(await page.locator("#sceneArt").innerHTML()), "and the vineyard too, with the new names on the map");
   await page.goto(url + "?seed=1&time=19:05&date=2026-10-08"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="farid"].act-sit').count() === 1 && await page.locator('#actors [data-npc="mei"].act-sit').count() === 1 && await page.locator("#actors .act-sit").count() >= 4, "after work Farid and Mei come in for a tasting too");
   await page.goto(url + "?seed=1&time=13:20&date=2026-10-07"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1200);
   check(await page.locator("#actors .act-sit").evaluateAll(n => n.filter(x => ["aiko", "ben", "clara", "dev", "rosa", "bastien", "grace", "hiro"].includes(x.dataset.npc)).length) === 2, "out-of-towners drop in for a lunchtime tasting");
   await page.goto(url + "?seed=1&time=19:45&date=2026-10-05"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1500);
   const seated = await page.locator('#actors .act-sit').count();
   check(seated > 0 && await page.locator("#tableware svg").count() >= seated, "diners in the tasting room have wine and food on their tables");
   check(await page.evaluate(n => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.today.glasses >= n && v.shelf.length > 0; }, seated), "everyone who sits down orders a glass, poured from an opened bottle");
@@ -789,7 +789,7 @@ if (want("\nlane to vineyard path")) try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`lanepath pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=10:30"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(600);
+  await page.evaluate(() => window.__hbScene("lane")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="toVineL"]').dispatchEvent("click");
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(await page.locator('#world [data-place="toLaneV"]').count() === 1, "the path at the bottom of Makers' Lane leads down to the vineyard");
@@ -809,7 +809,7 @@ if (want("\nhens: three meals, three eggs")) try {
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
   await page.goto(url + "?reset=1&seed=1&time=18:00&date=2026-10-07"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=18:00&date=2026-10-07&henpatch=1"); await page.waitForTimeout(1200);
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(700);
   await page.locator('#world [data-place="run"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-feed]', { timeout: 15000 });
   check(/hungry/.test(await page.locator("#ctx .pets").textContent()), "a hen fed at breakfast is hungry again by dinner");
@@ -863,12 +863,12 @@ if (want("\nthe orchard")) try {
   await page.waitForFunction(() => /flower farm/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(await page.locator('#world [data-bed]').count() === 12 && await page.locator('#world [data-bush]').count() === 4, "the flower farm has twelve beds and four bushes");
   check(await page.locator('#actors [data-npc="mei"]').count() === 1, "and Mei is there watering this morning");
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="wshelf"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-vyfruit="apple"]', { timeout: 15000 }); await page.click('#ctx [data-vyfruit="apple"]'); await page.waitForTimeout(200);
   check(await fox().then(f => f.vine.fruit.apple >= 1 && !f.inv.apple), "fruit goes into the wine shop's fruit crate to sell");
   await page.goto(url + "?seed=1&time=15:30&date=2026-10-07"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("cottage")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("cottage")); await page.waitForTimeout(900);
   check(await page.locator('#actors [data-npc="farid"]').count() === 1 && /Farid and Mei's cottage/.test(await page.locator("#sceneName").textContent()), "Farid's home in the cottage he shares with Mei at teatime");
   const c0 = (await fox()).coins;
   await page.locator('#world [data-spot="tea"]').dispatchEvent("click");
@@ -892,7 +892,7 @@ if (want("\norchard tours")) try {
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
   await page.goto(url + "?reset=1&seed=1&time=10:20&date=2026-10-10"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:20&date=2026-10-10&tourpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("orchard")); await page.waitForTimeout(1200);
   const ids = await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   check(ids.filter(x => ["hana", "okada", "juniper", "bo", "lin", "pip", "opal", "theo"].includes(x)).length >= 1 && ids.filter(x => ["aiko", "ben", "clara", "dev", "elena", "felix", "grace", "hiro"].includes(x)).length >= 1 && ids.some(x => ["farid", "mei"].includes(x)), "a Saturday morning tour: a guide with a mix of villagers and out-of-towners in the orchard");
   check(await page.locator('#actors [data-npc="farid"]').count() + await page.locator('#actors .act-guide').count() >= 1, "Farid works the orchard (or is leading the tour)");
@@ -903,11 +903,11 @@ if (want("\norchard tours")) try {
   await page.goto(url + "?seed=1&time=11:05&date=2026-10-10"); await page.waitForTimeout(2500);
   check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.tin >= 12 && o.tin % 4 === 0 && o.toursPaid.done.includes(0); }), "when a tour finishes, its visitors pay 4 coins each into the orchard's tin");
   await page.goto(url + "?seed=1&time=18:00&date=2026-10-08"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("orchard")); await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="bo"].act-guide').count() === 1, "on Thursday evenings Bo leads a farm tour");
-  await page.evaluate(() => window.__mapleScene("flowers")); await page.waitForTimeout(400);
+  await page.evaluate(() => window.__hbScene("flowers")); await page.waitForTimeout(400);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-08"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("flowers")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("flowers")); await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="mei"]').count() === 1, "Mei looks after the flower farm");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
@@ -921,7 +921,7 @@ if (want("\nthe field, and gifts for Farid and Mei")) try {
     f.coins = 100; localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
   await page.goto(url + "?reset=1&seed=1&time=16:10&date=2026-10-09"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=16:10&date=2026-10-09&giftpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(600);
+  await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(600);
   check(await page.locator('#world [data-place="toField"]').count() === 1, "the town square has a path west to the field");
   await page.locator('#world [data-place="toField"]').dispatchEvent("click");
   await page.waitForFunction(() => /field/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(900);
@@ -929,17 +929,17 @@ if (want("\nthe field, and gifts for Farid and Mei")) try {
   await page.locator('#world [data-place="lake"]').dispatchEvent("click"); await page.waitForTimeout(4500);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.today") || "{}").swans === "2026-10-09" || /swan/i.test(document.querySelector("#speech").textContent)), "the swans can be fed");
   await page.click('[data-open="bag"]').catch(() => {}); await page.keyboard.press("Escape");
-  await page.evaluate(() => window.__mapleScene("market")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("market")); await page.waitForTimeout(800);
   await page.waitForSelector('#ctx [data-shop="family"]', { timeout: 20000 }); await page.click('#ctx [data-shop="family"]');
   check(await page.locator('#ctx .item[data-id="mooncake"]').count() === 1 && await page.locator('#ctx .item[data-id="birdsnest"]').count() === 1, "Hana sells nyonya kueh, bird's nest, chicken essence, and mooncakes in autumn");
   check(!/ for /.test(await page.locator('#ctx .item[data-id="kuehlapis"]').textContent()) && await page.locator('#ctx .item[data-id="protbar"]').count() === 1 && await page.locator('#ctx .item[data-id="bubbletea"]').count() === 1,
     "kueh, a protein bar and bubble tea on the Gifts tab, none of them only for one person");
   await page.click('#ctx .item[data-id="ondeh"]'); await page.waitForTimeout(200);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1000);
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="ondeh"]'); await page.click('#bag [data-giveto].primary'); await page.waitForTimeout(400);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return !f.inv.ondeh && ((f.fam.gifts.farid || 0) + (f.fam.gifts.mei || 0)) === 1; }), "the ondeh-ondeh goes to Farid or Mei (whoever's here)");
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-07"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(600);
+  await page.evaluate(() => window.__hbScene("orchard")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="toFieldO"]').dispatchEvent("click");
   await page.waitForFunction(() => /field/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "and the field is up the path from the top of the orchard");
@@ -958,11 +958,11 @@ if (want("\nplayground families, farmers market, field fair")) try {
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
   const kids = ["lily", "max", "noah", "zara", "ollie", "ava"];
   await page.goto(url + "?reset=1&seed=1&time=10:40&date=2026-10-10"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("vineyard")); await page.waitForTimeout(1200);
   check(await page.locator("#actors .npc").evaluateAll((n, k) => n.filter(x => k.includes(x.dataset.npc)).length, kids) >= 3 && await page.locator('#world [data-place="pround"]').count() === 1, "on a Saturday morning visiting families' kids fill the playground, roundabout and all");
   await page.goto(url + "?seed=1&time=12:55&date=2026-10-11&mktpatch=1"); await page.waitForTimeout(2500);
   check(await page.evaluate(() => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return !v.shelf[0] || v.shelf[0].n < 40; }), "on a Sunday morning the market stall sells bottles off the wine shop's own shelves");
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1200);
   check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.stock.apple + o.stock["stem:rose"] < 80 && o.tin > 0; }), "Farid's market stall sells fruit and flowers off the farm shop's own shelves, into the orchard's tin");
   check(await page.locator('#world [data-place^="mstall"]').count() === 9 && await page.locator('#actors [data-npc="ines"]').count() === 1 && await page.locator('#actors [data-npc="farid"]').count() === 1, "the Sunday farmers market: eight stalls along the top (and Noor's adoption corner), our wine stall with Ines and Farid's fruit and flowers");
   check(await page.locator('#world [data-place="mstall0"]').evaluate(g => g.getBBox().y < 170), "the market stalls stand along the top of the field");
@@ -1002,7 +1002,7 @@ if (want("\nplayground families, farmers market, field fair")) try {
   for (const [st, id] of [["mstall5", "soap_lav"], ["mstall6", "paleale"]]) { await page.locator(`#world [data-place="${st}"]`).dispatchEvent("click"); await page.waitForSelector(`#ctx .item[data-id="${id}"]`, { timeout: 15000 }); await page.click('#ctx [data-close]'); }
   check(true, "Grace's handmade soap stall and Ben's craft beer stall");
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-31"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1200);
   check(/Field fair/.test(await page.locator("#sceneArt").textContent()) && await page.locator('#world [data-place^="mstall"]').count() === 5, "on the last Saturday of the month the field fair is on: kites, face painting, lemonade, snacks");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
@@ -1018,10 +1018,10 @@ if (want("\nthe foreshore: Hana and Theo, Tomi and Posy")) try {
     f.inv = f.inv || {}; f.inv.paleale = 1; localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   await page.goto(url + "?reset=1&seed=1&time=07:30&date=2026-10-06"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(600);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(600);
   check(await page.locator('#world [data-place="toShoreF"]').count() === 1 && await page.locator('#world [data-place="exlawn"]').count() === 1, "the field has a gate west to the foreshore, and the exercise lawn");
   await page.goto(url + "?seed=1&time=07:30&date=2026-10-06&shorepatch=1"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="hanatheo"]').count() === 1 && await page.locator('#world [data-place="tomiposy"]').count() === 1 && await page.locator('#world [data-place="suprack"]').count() === 1
     && await page.locator('#world [data-place="toFieldS"]').count() === 1 && await page.locator('#world [data-place="toFlowersS"]').count() === 1, "the foreshore: Hana and Theo's house, Tomi and Posy's, the paddleboards, gates to the field and the flower farm");
   check(await ids().then(a => a.includes("hana") && a.includes("theo")), "early on a Tuesday Hana's out for her walk and Theo's sketching on the sand");
@@ -1031,24 +1031,24 @@ if (want("\nthe foreshore: Hana and Theo, Tomi and Posy")) try {
   await page.locator('#world [data-place="suprack"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="play"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-sup="base"]').count() === 1, "the paddleboards offer a paddle about, or a paddle home");
   await page.click('#ctx [data-sup="play"]'); await page.waitForTimeout(4000);
-  check(await page.locator("#mel.sup").count() === 1 && await page.locator('#actors [data-npc="hana"].act-sup, #actors [data-npc="theo"].act-sup').count() === 2, "a paddle together: you take a board out and Hana and Theo paddle out too");
+  check(await page.locator("#hero.sup").count() === 1 && await page.locator('#actors [data-npc="hana"].act-sup, #actors [data-npc="theo"].act-sup').count() === 2, "a paddle together: you take a board out and Hana and Theo paddle out too");
   await page.goto(url + "?seed=1&time=16:30&date=2026-10-10"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(1500);
   check(await page.locator('#actors [data-npc="tomi"].act-sup').count() === 1, "on weekend afternoons Tomi goes paddleboarding");
   await page.goto(url + "?seed=1&time=20:00&date=2026-10-06"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("hanatheo")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("hanatheo")); await page.waitForTimeout(1200);
   check(await ids().then(a => a.includes("theo")) && ["piano", "bass", "easel", "mat"].length === await page.locator("#world [data-spot]").evaluateAll(n => n.filter(x => ["piano", "bass", "easel", "mat"].includes(x.dataset.spot)).length), "inside Hana and Theo's: Theo at the piano, his double bass and easel, Hana's mat");
   await page.goto(url + "?seed=1&time=20:00&date=2026-10-05"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("tomiposy")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("tomiposy")); await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="tomi"].act-game').count() === 1 && await ids().then(a => a.includes("posy")), "evenings at Tomi and Posy's: Tomi gaming on the sofa, Posy beside him");
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-05"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("vineyard")); await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="tomi"].act-farm').count() === 1, "on weekdays Tomi lends a hand in the vineyard (until the old mill's press is going)");
   await page.goto(url + "?seed=1&time=08:20&date=2026-10-06"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1200);
   check(await page.locator('#actors [data-npc="hana"].act-lead').count() === 1 && await page.locator("#actors .act-exercise").count() === 3, "Hana leads her class on the exercise lawn at 8, three villagers joining in");
   const c0 = (await ffox()).coins; await page.locator('#world [data-place="exlawn"]').dispatchEvent("click"); await page.waitForTimeout(8500);
-  check(await page.locator("#mel.exercise").count() === 1 && (await ffox()).coins === c0 + 2, "you can join Hana's class (a couple of coins, once a day)");
+  check(await page.locator("#hero.exercise").count() === 1 && (await ffox()).coins === c0 + 2, "you can join Hana's class (a couple of coins, once a day)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\ndining tables and who's where")) try {
@@ -1060,38 +1060,38 @@ if (want("\ndining tables and who's where")) try {
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   const fam = ["bo", "farid", "mei", "hana", "theo", "tomi", "posy"];
   await page.goto(url + "?reset=1&seed=1&time=21:00&date=2026-10-07"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("cottage")); await page.waitForTimeout(2500);
+  await page.evaluate(() => window.__hbScene("cottage")); await page.waitForTimeout(2500);
   check(await ids().then(a => a.includes("farid") && a.includes("mei") && !a.includes("hana") && !a.includes("tomi")), "a Wednesday evening at Farid and Mei's: just the two of them at home, back from the wine shop (no supper crowd)");
   await page.locator('#world [data-spot="dine"]').dispatchEvent("click"); await page.waitForTimeout(2500);
-  check(await page.locator("#mel.sit").count() === 1, "tap the dining table and you sit down");
-  for (const h of ["home", "hanatheo", "tomiposy"]) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(500);
+  check(await page.locator("#hero.sit").count() === 1, "tap the dining table and you sit down");
+  for (const h of ["home", "hanatheo", "tomiposy"]) { await page.evaluate(h => window.__hbScene(h), h); await page.waitForTimeout(500);
     check(await page.locator('#world [data-spot="dine"]').count() === 1, `there's a dining table at ${h}`); }
   await page.goto(url + "?seed=1&time=20:30&date=2026-10-07"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("linjun")); await page.waitForTimeout(2000);
+  await page.evaluate(() => window.__hbScene("linjun")); await page.waitForTimeout(2000);
   check(await ids().then(a => a.includes("lin") && a.includes("juniper")), "Lin and Juniper's cottage on the foreshore: both home in the evening");
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-07"); await page.waitForTimeout(800);
-  await page.evaluate(() => { const F = window.__mapleGame.F(); F.board = F.board || {}; F.board.hearts = Object.assign(F.board.hearts || {}, {juniper: 5, bo: 3}); window.__mapleGame.render(); });
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.board = F.board || {}; F.board.hearts = Object.assign(F.board.hearts || {}, {juniper: 5, bo: 3}); window.__hbGame.render(); });
   await page.click('[data-open="friend"]'); await page.waitForTimeout(400);
   check(await page.locator("details.whowhere").count() >= 18 && /^Juniper/.test((await page.locator("details.whowhere summary b").first().textContent()).trim()) && !/Close friends|supper/i.test(await page.locator("#friendBody").textContent()), "who's where today: everyone's day, the people you know best first");
   await page.click('[data-open="friend"]').catch(() => {});
   await page.goto(url + "?seed=1&time=14:30&date=2026-10-05"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("lane")); await page.waitForTimeout(1200);
   check(await ids().then(a => a.includes("okada")), "villagers wander Makers' Lane too (Mr Okada, Monday afternoon)");
   await page.goto(url + "?seed=1&time=18:45&date=2026-10-09"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1200);
   check(await ids().then(a => a.includes("tomi") && a.includes("posy")), "Tomi and Posy come to the wine shop on Friday evenings");
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1200);
   check(await ids().then(a => a.includes("farid")) && await page.locator('#actors [data-npc="tomi"].act-footy').count() === 1, "at the Sunday farmers market: Farid at his stall, Tomi playing football");
   await page.goto(url + "?seed=1&time=20:00&date=2026-10-06"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1500);
   check(await page.locator('#actors [data-npc="tomi"].act-sit').count() === 1 && await page.locator('#actors [data-npc="posy"].act-sit').count() === 1, "Tuesday is date night: Tomi and Posy at a tasting table in the wine shop");
   { const { NPCS } = await import(pathToFileURL(join(root, "src/data/npcs.js")).href), said = n => [n.intro, n.away, ...(n.hellos || []), ...(n.lines || []), ...Object.values(n.actLines || {}).flat()].filter(x => typeof x === "string");
     const seven = ["hana", "theo", "farid", "mei", "tomi", "posy", "bo"].map(id => NPCS.find(n => n.id === id));
     check(seven.every(Boolean) && !seven.flatMap(said).some(l => /darling|\bZeh\b|Ah Gong|Ah Ma\b|sayang|\bEvan\b|\bMel\b/.test(l)), "the seven friends talk like friends: no pet names or family titles in their lines"); }
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto(url + "?seed=1&time=21:00&date=2026-10-06"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(1000);
   check(await page.evaluate(() => !!document.querySelector("#sceneArt rect.dusk")) && await page.evaluate(() => getComputedStyle(document.getElementById("world")).getPropertyValue("--sea").trim().toUpperCase() === "#8FC1DE"), "after dark the sea goes dark with the dusk (and dark mode doesn't stack on it)");
   await page.emulateMedia({ colorScheme: "light" });
   await page.close();
@@ -1107,11 +1107,11 @@ if (want("\nbig goals")) try {
     f.coins = 13000; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-06"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-06&richpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("home")); await page.waitForTimeout(800);
   check(await page.locator('#world [data-spot="officedoor"]').count() === 1 && await page.locator('#world [data-spot="gdoor"]').count() === 1 && await page.locator('#world [data-spot="desk"]').count() === 0, "the living room has doors to the home office (left) and the garage (right); the desks have moved out");
   await page.locator('#world [data-spot="officedoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
   check(await page.locator('#world [data-spot="desk"], #world [data-spot="office"], #world [data-spot="treadmill"]').count() === 3, "the home office: your desk, the spare desk and the treadmill");
-  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("home")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="gdoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
   check(await page.locator('#world [data-spot="laundry"]').count() === 1 && await page.locator('#world [data-spot="cupboard"]').count() === 1, "the garage holds the laundry corner and the cleaning cupboard");
   check(await page.locator('#world [data-spot="car"]').count() === 1, "through the garage door: room for a scooter and a car");
@@ -1120,27 +1120,27 @@ if (want("\nbig goals")) try {
   check(await gf().then(f => f.goals.scooter && f.ride === "scooter"), "a scooter, kept in the garage");
   await page.click('#ctx [data-goal="car"]'); await page.waitForTimeout(400);
   check(await gf().then(f => f.goals.car && f.ride === "car" && f.coins === 13000 - 800 - 3500), "and a cream convertible");
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(600);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click"); await page.waitForTimeout(250);
-  check(await page.locator("#mel.drive").count() === 1, "outdoors you drive the convertible between places");
+  check(await page.locator("#hero.drive").count() === 1, "outdoors you drive the convertible between places");
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 30000 });   // let the drive arrive before jumping elsewhere
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="cdoor"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="cellar"]', { timeout: 15000 });
   await page.click('#ctx [data-goal="cellar"]'); await page.waitForTimeout(400);
   await page.locator('#world [data-spot="cdoor"]').dispatchEvent("click"); await page.waitForTimeout(2500);
   check(await page.locator('#world [data-spot="flight"]').count() === 1 && await gf().then(f => f.goals.cellar), "the cellar door extension: through the wine shop's west wall to the tasting bar");
-  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(800);
   await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="boat"]', { timeout: 15000 });
   await page.click('#ctx [data-goal="boat"]'); await page.waitForTimeout(400);
   await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForTimeout(4000);
-  check(await page.locator("#world .cruising").count() === 1 && await page.evaluate(() => getComputedStyle(document.getElementById("mel")).visibility === "hidden"), "the dolphin cruise boat: everyone aboard and off up the coast");
+  check(await page.locator("#world .cruising").count() === 1 && await page.evaluate(() => getComputedStyle(document.getElementById("hero")).visibility === "hidden"), "the dolphin cruise boat: everyone aboard and off up the coast");
   // the monthly wine club in the cellar door: the first Friday of the month, 6 to 9pm
   await page.addInitScript(() => { if (!/clubpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     f.vine = f.vine || {}; f.vine.shelf = [{id: "c1", name: "Club Red", type: "red", n: 40, price: 18, open: 0}]; f.vine.lastTick = Date.now() - 100*60e3; f.vine.box = 0;
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?seed=1&time=19:40&date=2026-11-06&clubpatch=1"); await page.waitForTimeout(2500);
   check(await gf().then(f => f.vine.shelf[0].n < 40 && f.vine.box > 0), "the wine club buys bottles and glasses off the shop's shelves");
-  await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("cellar")); await page.waitForTimeout(1500);
   check(await page.locator("#actors .npc").count() >= 6, "the wine club gathers in the cellar door");
   await page.locator('#world [data-spot="flight"]').dispatchEvent("click"); await page.waitForTimeout(2500);
   check(/hosting the wine club/.test(await page.locator("#speech").textContent()), "you host the club at the tasting bar");
@@ -1153,20 +1153,20 @@ if (want("\npaddling between home and the foreshore")) try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`paddle pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(1000);
   check(await page.locator('#world [data-place="homejetty"]').count() === 1, "a little jetty with paddleboards on the river at home");
   await page.locator('#world [data-place="homejetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 15000 });
   await page.click('#ctx [data-sup="shore"]');
   await page.waitForFunction(() => document.querySelector('#world [data-place="suprack"]'), null, { timeout: 15000 }); await page.waitForTimeout(1200);
-  check(await page.evaluate(() => { const r = document.getElementById("mel").getBoundingClientRect(), j = document.querySelector('#world [data-place="suprack"]').getBoundingClientRect(); return Math.abs(r.x - j.x) < 120 && Math.abs(r.y - j.y) < 160; }),
+  check(await page.evaluate(() => { const r = document.getElementById("hero").getBoundingClientRect(), j = document.querySelector('#world [data-place="suprack"]').getBoundingClientRect(); return Math.abs(r.x - j.x) < 120 && Math.abs(r.y - j.y) < 160; }),
     "paddle to the foreshore: you step off by the paddleboards there");
   await page.locator('#world [data-place="suprack"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="base"]', { timeout: 15000 });
   await page.click('#ctx [data-sup="base"]');
   await page.waitForFunction(() => document.querySelector('#world [data-place="homejetty"]'), null, { timeout: 15000 }); await page.waitForTimeout(1200);
-  check(await page.evaluate(() => { const r = document.getElementById("mel").getBoundingClientRect(), j = document.querySelector('#world [data-place="homejetty"]').getBoundingClientRect(); return Math.abs(r.x - j.x) < 120 && Math.abs(r.y - j.y) < 160; }),
+  check(await page.evaluate(() => { const r = document.getElementById("hero").getBoundingClientRect(), j = document.querySelector('#world [data-place="homejetty"]').getBoundingClientRect(); return Math.abs(r.x - j.x) < 120 && Math.abs(r.y - j.y) < 160; }),
     "and paddle home: straight back, standing by the little jetty");
   await page.goto(url + "?seed=1&time=23:00&date=2026-10-14"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(1000);
   await page.locator('#world [data-place="homejetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 15000 });
   await page.click('#ctx [data-sup="shore"]');
   const dark = await page.waitForFunction(() => /Too dark/.test(document.querySelector("#speech").textContent), null, { timeout: 5000 }).then(() => true, () => false);
@@ -1194,12 +1194,12 @@ if (want("\nthe Scoop Shack")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-10"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-10&scooppatch=stock"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(600);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(600);
   check(await page.locator('#world [data-place="toBay"]').count() === 1, "the foreshore's boardwalk goes north to the bay");
-  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("bay")); await page.waitForTimeout(800);
   check(await page.locator('#world [data-place="scoopshop"]').count() === 1 && await page.locator('#world [data-place="deck"]').count() === 1 && await page.locator('#world [data-place="reno"]').count() === 1,
     "the bay: the Scoop Shack, its deck, and a shopfront under renovation");
-  await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("scoopkitchen")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="gfridge"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gfill^="bag:mango"]', { timeout: 15000 });
   for (const id of ["mango", "milk", "strawberry"]) { await page.click(`#ctx [data-gfill="bag:${id}:99"]`); await page.waitForTimeout(200); }
   check(await fox().then(f => f.scoop.fridge.mango === 4 && f.scoop.fridge.milk === 4 && !f.inv.mango), "the fridge is stocked from the backpack");
@@ -1216,7 +1216,7 @@ if (want("\nthe Scoop Shack")) try {
   check(await page.locator("#ctx [data-gmix]").isDisabled(), "with the churner full, nothing else can be mixed for now");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=12:05&date=2026-10-10"); await page.waitForTimeout(1500);
-  await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("scoopkitchen")); await page.waitForTimeout(800);
   check(await fox().then(f => !f.scoop.churn.length && f.scoop.tubs[r1.id] > 10 && f.scoop.tubs[f.scoop.recipes[1].id] > 10), "an hour later both are frozen: a tub of each, in the display (customers are already buying)");
   const before = await fox().then(f => f.scoop.tubs[r1.id]);
   await page.locator('#world [data-spot="gboard"]').dispatchEvent("click"); await page.waitForSelector(`#ctx [data-gmake="${r1.id}"]`, { timeout: 15000 });
@@ -1229,9 +1229,9 @@ if (want("\nthe Scoop Shack")) try {
   check(await fox().then(f => f.scoop.churn.length === 2), "or at the mixing bench, picking a flavour you already know");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=13:10&date=2026-10-10"); await page.waitForTimeout(1500);
-  await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("scoopkitchen")); await page.waitForTimeout(800);
   check(await fox().then(f => !f.scoop.churn.length && f.scoop.tubs[r1.id] >= before + 25), "an hour on, two more tubs are ready");
-  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("scoopshop")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gpick]", { timeout: 15000 });
   await page.locator("#ctx [data-gpick]").first().click(); await page.waitForTimeout(200);
   await page.click("#ctx [data-geat]"); await page.waitForTimeout(500);
@@ -1245,12 +1245,12 @@ if (want("\nthe Scoop Shack")) try {
   check(await page.locator('#bag [data-giveto="hana"]').count() === 1 && await page.locator('#bag [data-giveto="tomi"]').count() === 1, "it can be given like a gift, to anyone you know well (Tomi too, though dairy earns no heart from him)");
   await page.click('[data-open="bag"]').catch(() => {});
   // the display: take a flavour off (customers can't buy it then), put it back, and swap one in when all 8 slots are full
-  await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("scoopkitchen")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="gfreezer"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gdisp]", { timeout: 15000 });
   const sorbet = await fox().then(f => f.scoop.recipes[1].id);
   await page.click(`#ctx [data-gdisp="${sorbet}"]`); await page.waitForTimeout(300);
   check(await fox().then(f => Array.isArray(f.scoop.display) && !f.scoop.display.includes(sorbet) && f.scoop.display.length === 1), "a flavour can be taken off the display (it waits in the freezer)");
-  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("scoopshop")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gpick]", { timeout: 15000 });
   check(await page.locator("#ctx [data-gpick]").count() === 1, "and the counter only offers what's in the display");
   await page.click('#ctx [data-gview="freezer"]'); await page.waitForSelector(`#ctx [data-gdisp="${sorbet}"]`, { timeout: 15000 });
@@ -1258,7 +1258,7 @@ if (want("\nthe Scoop Shack")) try {
   check(await fox().then(f => f.scoop.display.includes(sorbet)), "put it back out, straight from the counter");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-10&scooppatch=full"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("scoopkitchen")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="gfreezer"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gdisp="f8"]', { timeout: 15000 });
   await page.click('#ctx [data-gdisp="f8"]'); await page.waitForSelector('#ctx [data-gswapout="f2"]', { timeout: 15000 });
   await page.click('#ctx [data-gswapout="f2"]'); await page.waitForTimeout(300);
@@ -1291,22 +1291,22 @@ if (want("\nthe Cocoa Room")) try {
   const at = async (t, q = "") => { await page.goto(url + `?seed=1&time=${t}&date=2026-10-10${q}`); await page.waitForTimeout(900); };
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-10"); await page.waitForTimeout(800);
   await at("12:00", "&ccpatch=coins");
-  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("bay")); await page.waitForTimeout(700);
   await page.locator('#world [data-place="reno"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="cocoa"]', { timeout: 20000 });
   await page.click('#ctx [data-goal="cocoa"]'); await page.waitForTimeout(500);
   check(await fox().then(f => f.goals.cocoa && f.coins === 1000) && await page.locator('#world [data-place="cocoa"]').count() === 1 && await page.locator('#world [data-place="reno"]').count() === 0, "the old shopfront becomes the Cocoa Room for 1000 coins");
   const tap = async (spot, sel) => { await page.locator(`#world [data-spot="${spot}"]`).dispatchEvent("click"); await page.waitForSelector(sel, { timeout: 15000 }); };
-  await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
   await tap("sacks", '#ctx [data-cc="beans"][data-n="3"]'); await page.click('#ctx [data-cc="beans"][data-n="3"]'); await page.waitForTimeout(300);
   await page.click("#ctx [data-close]");
   await tap("roaster", '#ctx [data-cc="roast"]'); await page.click('#ctx [data-cc="roast"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.beans === 2 && f.cocoa.roast && f.coins === 925), "three sacks of beans (75 coins), one in the roaster");
-  await at("12:15"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await at("12:15"); await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
   await tap("grinder", '#ctx [data-cc="grind"][data-k="dark"]'); await page.click('#ctx [data-cc="grind"][data-k="dark"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.roasted === 0 && f.cocoa.grind && f.cocoa.grind.kind === "dark"), "ten minutes later the beans are roasted, and go in the grinder as dark chocolate");
-  await at("13:00"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await at("13:00"); await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
   check(await fox().then(f => f.cocoa.grind && !f.cocoa.ground), "an hour on, it's still grinding (two hours)");
-  await at("14:20"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await at("14:20"); await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
   await tap("slab", '#ctx [data-cc="temper"]'); await page.click('#ctx [data-cc="temper"]'); await page.waitForTimeout(300);
   await page.click("#ctx [data-close]");
   await tap("moulds", '#ctx [data-cc="mould"][data-k="dark"]'); await page.click('#ctx [data-cc="mould"][data-k="dark"]'); await page.waitForTimeout(300);
@@ -1324,7 +1324,7 @@ if (want("\nthe Cocoa Room")) try {
   const bb = await fox().then(f => f.cocoa);
   check(bb.bonbons.length === 2 && Object.values(bb.trays).every(n => n === 12) && bb.choc.dark === 8 && !bb.pantry.honey, `two new bonbons, a tray of twelve each (${bb.bonbons.map(b => b.name).join(", ")})`);
   await page.click("#ctx [data-close]");
-  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("cocoa")); await page.waitForTimeout(800);
   check(await page.locator('#world [data-spot="barwall"]').count() === 1 && await page.locator('#world [data-spot="ckdoor"]').count() === 1, "the shop front: the bar wall, the counter, the kitchen door");
   await tap("ccounter", '#ctx [data-cc="give"][data-k="dark"]'); await page.click('#ctx [data-cc="give"][data-k="dark"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.bar_dark === 1), "a dark chocolate bar to give (dairy-free, so even for Tomi)");
@@ -1341,9 +1341,9 @@ if (want("\nthe Cocoa Room")) try {
   await page.click("#ctx [data-close]").catch(() => {});
   await at("16:00", "&ccpatch=rewind"); await page.waitForTimeout(1500);
   check(await fox().then(f => Object.values(f.cocoa.sold || {}).reduce((a, d) => a + d.n, 0) > 0 && Object.values(f.cocoa.sold || {}).reduce((a, d) => a + (d.bonbons || 0), 0) > 0), "customers buy bars off the wall and bonbons from the case while it's open (the takings come to you)");
-  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("cocoa")); await page.waitForTimeout(1500);
   check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("amara"), "Amara's behind the counter");
-  await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(1500);
   check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("mateo"), "Mateo, the kitchen hand, is in the kitchen");
   // Mateo runs the bar line on his own: two days of shifts, from no beans at all
   await at("18:30", "&ccpatch=mateo"); await page.waitForTimeout(1500);
@@ -1351,13 +1351,13 @@ if (want("\nthe Cocoa Room")) try {
   check(mt.c.res.milk === 30 && mt.c.res.dark === 30 && mt.c.res.white === 0, `he fills the bonbon shelf first, to your targets (milk ${mt.c.res.milk}, dark ${mt.c.res.dark})`);
   check(mt.c.made >= 30 && Object.values(mt.c.bars).reduce((a, n) => a + n, 0) + Object.values(mt.c.sold).reduce((a, d) => a + d.n, 0) > 0, `then moulds the rest into bars (${mt.c.made} made), never touching the shelf`);
   check(mt.c.bought >= 4 && mt.coins >= 200, `and buys his own beans with auto-buy (${mt.c.bought} sacks), keeping you above your coin floor`);
-  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("cocoa")); await page.waitForTimeout(700);
   await tap("ccounter", '#ctx [data-cc="keep"][data-k="white"][data-n="1"]'); await page.click('#ctx [data-cc="keep"][data-k="white"][data-n="1"]'); await page.waitForTimeout(300);
   await page.click('#ctx [data-cc="plan"][data-k="buy"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.keep.white === 6 && f.cocoa.plan.buy === false), "the kitchen plan at the counter: a bonbon shelf target per chocolate, and auto-buy on or off");
   await page.click("#ctx [data-close]").catch(() => {});
   // around the village: house chocolate for the Scoop Shack, wine fillings and pairing boxes, festival specials, the wine club
-  await at("18:40", "&ccpatch=links"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await at("18:40", "&ccpatch=links"); await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
   await tap("moulds", '#ctx [data-cc="scoop"][data-k="fridge"]'); await page.click('#ctx [data-cc="scoop"][data-k="fridge"]'); await page.waitForTimeout(300);
   await page.click('#ctx [data-cc="scoop"][data-k="dip"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.scoop.fridge.housechoc === 5 && f.scoop.houseDips === 20 && f.scoop.dips.house && f.cocoa.choc.dark === 20), "dark chocolate goes to the Scoop Shack: Cocoa Room chocolate for the gelato fridge, house-made dark for the dip station");
@@ -1369,26 +1369,26 @@ if (want("\nthe Cocoa Room")) try {
   const wb = await fox().then(f => f.cocoa.bonbons.find(b => b.fills.includes("wine_red")));
   check(!!wb, `a wine bonbon (${wb && wb.name})`);
   await page.click("#ctx [data-close]").catch(() => {});
-  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("cocoa")); await page.waitForTimeout(700);
   await tap("ccounter", '#ctx [data-cc="pkopen"][data-k="pair:wtest"]'); await page.click('#ctx [data-cc="pkopen"][data-k="pair:wtest"]'); await page.waitForTimeout(300);
   await page.click('#ctx [data-cc="pkfill"]'); await page.waitForTimeout(150); await page.click('#ctx [data-cc="pkgo"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.pairbox === 1 && f.vine.shelf[0].n === 1), "a wine pairing box: a bottle and four bonbons, to give");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=12:00&date=2026-11-05&ccpatch=fest"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
   await tap("bonbon", '#ctx [data-cc="special"]');
   check(/Deepavali special/i.test(await page.locator("#ctx").innerText()), "around Deepavali the bonbon table offers its festival special");
   await page.click('#ctx [data-cc="special"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.specials.sp_spiced === 6), "six spiced chocolate boxes made");
   await page.click("#ctx [data-close]").catch(() => {});
-  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("cocoa")); await page.waitForTimeout(700);
   await tap("ccounter", '#ctx [data-cc="takesp"][data-k="sp_spiced"]'); await page.click('#ctx [data-cc="takesp"][data-k="sp_spiced"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.sp_spiced === 1 && f.cocoa.specials.sp_spiced <= 5), "and one to give");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=21:05&date=2026-11-06&ccpatch=club"); await page.waitForTimeout(1500);
   check(await fox().then(f => (f.cocoa.sold["2026-11-06"] || {}).club > 0), "wine club night: members buy chocolates at the cellar door");
   // the upgrades catalogue: all ten, then what they do
-  await at("12:00", "&ccpatch=ups"); await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(700);
+  await at("12:00", "&ccpatch=ups"); await page.evaluate(() => window.__hbScene("cocoa")); await page.waitForTimeout(700);
   await tap("ccounter", '#ctx [data-cc="ups"]'); await page.click('#ctx [data-cc="ups"]'); await page.waitForSelector('#ctx [data-cc="buyup"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-cc="buyup"]').count() === 15, "the Cocoa Room's catalogue lists fifteen upgrades (four of them bonbon moulds)");
   for (let i = 0; i < 11; i++) { const b = page.locator('#ctx [data-cc="buyup"]').first(); if (!(await b.count())) break; await b.click(); await page.waitForTimeout(250); }
@@ -1399,33 +1399,33 @@ if (want("\nthe Cocoa Room")) try {
   check(await fox().then(f => (f.inv.box16 || 0) + (f.inv.box16d || 0) === 1), "the gift wrapping station packs a grand box of 16");
   check(await page.locator("#fore").innerHTML().then(h => /q18 6 36 0/.test(h)), "a chocolate fountain on the counter");
   await page.click("#ctx [data-close]").catch(() => {});
-  await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
   await tap("grinder", '#ctx [data-cc="grind"][data-k="dark"]'); await page.click('#ctx [data-cc="grind"][data-k="dark"]'); await page.waitForTimeout(300);
   await page.click('#ctx [data-cc="grind"][data-k="milk"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.grind && f.cocoa.grind2 && f.cocoa.grind.kind === "dark" && f.cocoa.grind2.kind === "milk"), "two grinders: two pots grinding at once");
   await page.click("#ctx [data-close]").catch(() => {});
   // Saturday afternoon: the workshop pays, the cacao tree sends a sack, the supply deal stocks the Scoop Shack
-  const t0 = await page.evaluate(() => Date.now() + (window.__mapleOffset || globalThis.__mapleOffset || 0));
+  const t0 = await page.evaluate(() => Date.now() + (window.__hbOffset || globalThis.__hbOffset || 0));
   await at("16:30", `&ccpatch=upsrun&t0=${t0}`); await page.waitForTimeout(1500);
   const up = await fox();
   check((up.cocoa.sold["2026-10-10"] || {}).workshop === 48, "Saturday's bonbon workshop: six makers, 48 coins");
   check(up.cocoa.beans >= 1, "the cacao tree at the orchard sends a sack of beans");
   check((up.scoop.fridge.housechoc || 0) >= 5, "the supply deal sends dark chocolate to the Scoop Shack's fridge");
-  await at("15:00"); await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1800);
+  await at("15:00"); await page.evaluate(() => window.__hbScene("cocoa")); await page.waitForTimeout(1800);
   const ws = await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   check(ws.filter(id => !["amara", "lila", "mateo"].includes(id)).length >= 4 && /Bonbon workshop/.test(await page.locator("#fore").textContent()), `Saturday's workshop class at the tables (${ws.join(", ")})`);
-  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("orchard")); await page.waitForTimeout(900);
   check(/Cacao tree/.test(await page.locator("#sceneArt").textContent()), "the cacao tree grows in the orchard");
   await page.locator('#world [data-place="cacao"]').dispatchEvent("click"); await page.waitForTimeout(1500);
   check(/next in about/.test(await page.locator("#say").textContent().catch(() => "") + await page.locator("body").textContent()), "walk up to the cacao tree: when the next sack is due");
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-12"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("cocoa")); await page.waitForTimeout(1500);
   check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("lila"), "with a second assistant the shop opens on Mondays: Lila's behind the counter");
   await page.goto(url + "?seed=1&time=19:00&date=2026-10-13"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="mstall9"]').count() === 0, "no chocolate cart at the night market (that's the Scoop Shack's evening)");
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-11"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="mstall9"]').count() === 1 && (await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("mateo"), "the Cocoa Room cart at the Sunday farmers market, with Mateo");
   await page.locator('#world [data-place="mstall9"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 });
   check(/farmers market cart/.test(await page.locator("#ctx").innerText()), "and you can serve from it");
@@ -1443,9 +1443,9 @@ if (want("\nWildflower Farm")) try {
     f.coins = 50; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=08:00&date=2026-10-07"); await page.waitForTimeout(900);
   await page.goto(url + "?seed=1&time=08:00&date=2026-10-07&hfpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("bay")); await page.waitForTimeout(700);
   check(await page.locator('#world [data-place="toFarmB"]').count() === 1, "a gate on the bay's east side leads to Wildflower Farm");
-  await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(1800);
+  await page.evaluate(() => window.__hbScene("hfarm")); await page.waitForTimeout(1800);
   check(/Wildflower Farm/.test(await page.locator("#sceneName").textContent()) && await page.locator('#world [data-place="farmhouse"], #world [data-place="barn"], #world [data-place="hives"], #world [data-place="cows"], #world [data-place="goats"], #world [data-place="fstand"]').count() === 6,
     "the farm: farmhouse, barn, beehives, cow and goat paddocks, farm stand");
   const who = await npcs(); check(who.includes("felix") && who.includes("elena"), `Felix and Elena are out working (${who.join(", ")})`);
@@ -1468,7 +1468,7 @@ if (want("\nWildflower Farm")) try {
   check(await fox().then(f => f.inv.egg === 1 && f.coins === c0 - 3), "the farm stand sells eggs (3 coins)");
   await page.click("#ctx [data-close]").catch(() => {});
   // inside the barn: the extractor, the yoghurt crocks, the cheese press and the cave
-  await page.evaluate(() => window.__mapleScene("barn")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("barn")); await page.waitForTimeout(900);
   const spot = async (s, sel) => { await page.locator(`#world [data-spot="${s}"]`).dispatchEvent("click"); await page.waitForSelector(sel, { timeout: 15000 }); };
   check(await page.locator('#world [data-spot="extractor"], #world [data-spot="crock"], #world [data-spot="press"], #world [data-spot="cave"]').count() === 4, "the barn: honey extractor, yoghurt crocks, cheese press and cheese cave");
   await spot("extractor", '#ctx [data-hf="spin"]'); await page.click('#ctx [data-hf="spin"]'); await page.waitForTimeout(300);
@@ -1485,12 +1485,12 @@ if (want("\nWildflower Farm")) try {
   check(await fox().then(f => f.inv.milk === 2), "it takes three milk");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("barn")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("barn")); await page.waitForTimeout(900);
   await spot("cave", '#ctx [data-hf="wheel"]'); await page.click('#ctx [data-hf="wheel"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.chz_cheddar === 5 && !f.hfarm.cave.length), "five days on it's ripe, but never turned: a rustic cheddar, five wedges");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=14:00&date=2026-10-07"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hfarm")); await page.waitForTimeout(900);
   await tap("goats", '#ctx [data-hf="milkall"]');
   check(await page.locator('#ctx [data-hf="milkall"]').isDisabled(), "milking is mornings only");
   await page.close();
@@ -1503,14 +1503,14 @@ if (want("\nfarm life")) try {
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { const m = /flpatch=(\w+)/.exec(location.search); if (!m) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     const q = new URLSearchParams(location.search), qt = (q.get("time") || "").padStart(5, "0");   // the game's clock (?date&time), not the real one: the real time of day mustn't matter
-    const h = f.hfarm = f.hfarm || {}, now = q.get("date") && q.get("time") ? Date.parse(`${q.get("date")}T${qt}:00+08:00`) : Date.now() + (globalThis.__mapleOffset || 0);
+    const h = f.hfarm = f.hfarm || {}, now = q.get("date") && q.get("time") ? Date.parse(`${q.get("date")}T${qt}:00+08:00`) : Date.now() + (globalThis.__hbOffset || 0);
     if (m[1] === "start") { h.since = "2026-10-01"; f.inv = {...(f.inv || {}), egg: 3}; }
     if (m[1] === "trust") { h.trust = 38; }
     if (m[1] === "swarm") { h.hives = [now - 6*864e5, now, now, now, now]; }
     if (m[1] === "wheel") { h.cave = [{kind: "cheddar", name: "Test Cheddar", start: now - 5*864e5, done: now - 3600e3, turns: 4}]; }
     if (m[1] === "partner") { h.trust = 205; f.inv = {...(f.inv || {}), chz_cheddar: 3, milk: 3}; h.at = now - 6*3600e3; }
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
-  const go = async (t, d, q = "") => { await page.goto(url + `?seed=1&time=${t}&date=${d}${q}`); await page.waitForTimeout(900); await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(1200); };
+  const go = async (t, d, q = "") => { await page.goto(url + `?seed=1&time=${t}&date=${d}${q}`); await page.waitForTimeout(900); await page.evaluate(() => window.__hbScene("hfarm")); await page.waitForTimeout(1200); };
   const tap = async (place, sel) => { await page.locator(`#world [data-place="${place}"]`).dispatchEvent("click"); await page.waitForSelector(sel, { timeout: 15000 }); };
   await page.goto(url + "?reset=1&seed=1&time=07:00&date=2026-10-07"); await page.waitForTimeout(800);
   await go("07:00", "2026-10-07", "&flpatch=start");
@@ -1542,17 +1542,17 @@ if (want("\nfarm life")) try {
   await go("08:00", "2026-10-10", "&flpatch=swarm"); await page.waitForTimeout(21000);
   check(await fox().then(f => f.hfarm.swarms >= 1), "a full hive left too long swarms");
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-10&flpatch=wheel"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("barn")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("barn")); await page.waitForTimeout(900);
   await page.locator('#world [data-spot="cave"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hf="wheel"]', { timeout: 15000 });
   await page.click('#ctx [data-hf="wheel"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.chz_cheddar_ex === 6), "a wheel turned faithfully comes out excellent");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.goto(url + "?seed=1&time=14:00&date=2026-10-10&flpatch=partner"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("barn")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("barn")); await page.waitForTimeout(900);
   await page.locator('#world [data-spot="press"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hf="ckind"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-hf="ckind"]').count() === 6, "an apprentice and up: Elena's taught brie, halloumi and smoked");
   await page.click("#ctx [data-close]").catch(() => {});
-  await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hfarm")); await page.waitForTimeout(900);
   await tap("fstand", '#ctx [data-hf="shelf"]'); await page.click('#ctx [data-hf="shelf"][data-k="chz_cheddar"][data-n="99"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.hfarm.shelf.chz_cheddar === 3 && !f.inv.chz_cheddar), "a partner has their own shelf at the farm stand");
   await page.close();
@@ -1563,7 +1563,7 @@ if (want("\nHoneybrook station")) try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`lane pageerror: ${e.message}`));
   const npcs = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
-  const go = async (t, d, sc) => { await page.goto(url + `?seed=1&time=${t}&date=${d}`); await page.waitForTimeout(900); await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(1600); };
+  const go = async (t, d, sc) => { await page.goto(url + `?seed=1&time=${t}&date=${d}`); await page.waitForTimeout(900); await page.evaluate(s => window.__hbScene(s), sc); await page.waitForTimeout(1600); };
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
   await go("12:00", "2026-10-07", "hfarm");
   check(await page.locator('#world [data-place="hfEast"]').count() === 1, "the farm's east gate leads on to the cottage lane");
@@ -1606,7 +1606,7 @@ if (want("\nthe campervan")) try {
     f.coins = 4000; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&vanpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hlane")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="vanspot"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="van"]', { timeout: 15000 });
   await page.click('#ctx [data-goal="van"]'); await page.waitForTimeout(500);
   check(await fox().then(f => f.goals.van && f.coins === 200) && await page.locator('#world [data-place="van"]').count() === 1 && await page.locator('#world [data-place="vanspot"]').count() === 0, "the campervan (3800 coins), parked at its spot on the lane");
@@ -1638,12 +1638,12 @@ if (want("\nkeepsakes and pets")) try {
     f.inv = {...(f.inv || {}), k_conelamp: 1, pet_puppy: 1, cuenco: 1, iman: 1}; f.coins = 100;
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1500);
   await page.locator('#world [data-place="mstall8"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="pet_kitten"]', { timeout: 15000 });
   check(await page.locator('#ctx .item[data-id^="pet_"]').count() >= 3, "Noor's adoption corner at the Sunday market has pets looking for homes");
   await page.click('#ctx [data-close]').catch(() => {});
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-10&petpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("scoopshop")); await page.waitForTimeout(700);
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="k_conelamp"]'); await page.waitForSelector('#ctx [data-keepat="scoop1"]', { timeout: 15000 });
   await page.click('#ctx [data-keepat="scoop1"]'); await page.waitForTimeout(500);
   check(await fox().then(f => f.keeps && f.keeps.scoop1 === "k_conelamp" && !f.inv.k_conelamp) && await page.locator('#world [data-keep="scoop1"]').count() === 1, "a keepsake goes on a shelf in the Scoop Shack");
@@ -1660,16 +1660,16 @@ if (want("\nkeepsakes and pets")) try {
   await page.click('#bag [data-keepit]'); await page.waitForSelector('#ctx [data-keepat="fridge"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-keepat="scoop1"]').count() === 0, "the fridge magnet only goes on the fridge");
   await page.click('#ctx [data-keepat="fridge"]'); await page.waitForTimeout(400);
-  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("home")); await page.waitForTimeout(900);
   check(await fox().then(f => f.keeps.fridge === "iman") && await page.locator('#world [data-keep="fridge"]').count() === 1, "and there it is on the fridge at home");
-  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("home")); await page.waitForTimeout(900);
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="pet_puppy"]'); await page.waitForSelector('#ctx [data-adoptfor="farid"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-adoptfor]').evaluateAll(n => n.map(x => x.dataset.adoptfor).sort().join()) === "bo,farid,hana,mei,posy,theo,tomi", "a pet can go to any of the seven friends");
   await page.click('#ctx [data-adoptfor="farid"]'); await page.waitForSelector('#ctx [data-adoptat="orchard"]', { timeout: 15000 });
   check(await page.locator('#ctx [data-adoptat="room"]').count() === 1 && await page.locator('#ctx [data-adoptat="field"]').count() === 1, "adopting a puppy: it can live at home, in a building or outdoors");
   await page.click('#ctx [data-adoptat="orchard"]'); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=12:30&date=2026-10-10"); await page.waitForTimeout(900);   // Farid's lunch under the trees
-  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("orchard")); await page.waitForTimeout(1200);
   const pet = await fox().then(f => (f.companions || [])[0]);
   check(pet && pet.owner === "farid" && pet.scene === "orchard" && pet.kind === "puppy" && await page.locator('#world [data-pet]').count() === 1, `the puppy is Farid's now and lives in the orchard (${pet && pet.name})`);
   await page.locator('#world [data-pet]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-petdo="pat"]', { timeout: 15000 });
@@ -1701,9 +1701,9 @@ if (want("\nScoop Shack upgrades")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-10"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-10&uppatch=stock"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("bay")); await page.waitForTimeout(700);
   check(await page.locator('#world [data-place="hfreezer"]').count() === 0 && await page.locator('#world [data-place="dbike"]').count() === 0, "before any upgrades, no honesty freezer or bike on the bay");
-  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("scoopshop")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="gupgrades"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gbuy]", { timeout: 15000 });
   check(await page.locator("#ctx [data-gbuy]").count() === 5, "the catalogue in the shop lists five upgrades");
   for (const k of ["honesty", "awning", "neon", "bike", "dip"]) { await page.evaluate(() => { document.querySelector("#ctx [data-close]")?.click(); });
@@ -1713,7 +1713,7 @@ if (want("\nScoop Shack upgrades")) try {
   await page.click("#ctx [data-close]").catch(() => {});
   await page.locator('#world [data-spot="gddoor"]').dispatchEvent("click"); await page.waitForSelector('#world [data-spot="gdipbar"]', { timeout: 15000 }).catch(() => {});
   check(await page.locator('#world [data-spot="gdipbar"]').count() === 1 && await page.locator('#world [data-spot="gtops"]').count() === 1, "the dip station's door opens into its own room");
-  await page.evaluate(() => window.__mapleScene("scoopdip")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("scoopdip")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="gtops"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gtopbuy="coconut"]', { timeout: 15000 }); await page.click('#ctx [data-gtopbuy="coconut"]'); await page.waitForTimeout(300);
   await page.click("#ctx [data-close]");
   await page.locator('#world [data-spot="gpots"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gdipbuy="dark"]', { timeout: 15000 }); await page.click('#ctx [data-gdipbuy="dark"]'); await page.waitForTimeout(300);
@@ -1736,7 +1736,7 @@ if (want("\nScoop Shack upgrades")) try {
   const box = await fox().then(f => f.scoop.box);
   check(await fox().then(f => (f.scoop.sold["2026-10-13"] || {}).cart > 0), "the cart sells at Tuesday's night market (the takings come to you)");
   check(box > 0, `the honesty freezer sold while the shop was shut (${box} coins in its box)`);
-  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__hbScene("bay")); await page.waitForTimeout(700);
   check(await page.locator('#world [data-place="hfreezer"]').count() === 1 && await page.locator('#world [data-place="dbike"]').count() === 1 && await page.locator("#sceneArt .nightcopy circle").count() > 5, "the freezer and bike are on the bay, and the fairy lights glow at night");
   const c0 = await fox().then(f => f.coins);
   await page.locator('#world [data-place="hfreezer"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gcollect]", { timeout: 15000 }); await page.click("#ctx [data-gcollect]"); await page.waitForTimeout(300);
@@ -1757,18 +1757,18 @@ if (want("\ningredients")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=09:00&date=2026-10-07"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=09:00&date=2026-10-07&ingrpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("market")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("market")); await page.waitForTimeout(800);
   await page.waitForSelector('#ctx [data-shop="deli"]', { timeout: 20000 }); await page.click('#ctx [data-shop="deli"]'); await page.waitForTimeout(300);
   check(await page.locator('#ctx .item[data-id="chocolate"]').count() === 1 && await page.locator('#ctx .item[data-id="pandan"]').count() === 1 && await page.locator('#ctx .item[data-id="milk"]').count() === 1,
     "Hana's deli stocks gelato staples: chocolate, vanilla, pistachios, pandan, milk and more");
-  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("vineyard")); await page.waitForTimeout(800);
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vy="takegr"]', { timeout: 15000 });
   await page.click('#ctx [data-vy="takegr"][data-k="red"][data-n="1"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.grape_red === 1 && f.vine.grapes.red === 2), "grapes wait in the vineyard's crates; take a bunch for the ice cream shop");
   await page.click('#ctx [data-vy="putgr"][data-k="red"]'); await page.waitForTimeout(300);
   check(await fox().then(f => !f.inv.grape_red && f.vine.grapes.red === 3), "or put them back for wine");
   await page.click("#ctx [data-close]").catch(() => {});
-  await page.evaluate(() => window.__mapleScene("kitchen")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("kitchen")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="larder"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="take"]', { timeout: 15000 });
   await page.click('#ctx [data-k="take"][data-id="fish"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.fish >= 1 && !(f.kitchen.larder.fish)), "anything in the wine shop's larder can be taken back to the backpack");
@@ -1784,7 +1784,7 @@ if (want("\naccessories in the wardrobe")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-06"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-06&accpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("room")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("room")); await page.waitForTimeout(800);
   check(await page.locator("#melBow").isVisible() && await page.locator("#melPj").isVisible(), "you're wearing your velvet bow, and your silk pyjamas in your room");
   await page.locator('#world [data-spot="wardrobe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-acc="me_bow"]', { timeout: 15000 });
   check(await page.locator("#ctx [data-acc]").count() === 2, "the wardrobe lists the accessories you own");
@@ -1799,7 +1799,7 @@ if (want("\nsunset and dusk")) try {
   console.log("\nsunset and dusk");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`sky pageerror: ${e.message}`));
-  const wash = async (t, sc) => { await page.goto(url + `?reset=1&seed=1&time=${t}&date=2026-10-14`); await page.waitForTimeout(700); await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(600);
+  const wash = async (t, sc) => { await page.goto(url + `?reset=1&seed=1&time=${t}&date=2026-10-14`); await page.waitForTimeout(700); await page.evaluate(s => window.__hbScene(s), sc); await page.waitForTimeout(600);
     return page.evaluate(() => { const r = document.querySelector("#sceneArt rect.dusk"); return r ? r.getAttribute("fill") : null; }); };
   check(await wash("12:00", "village") === null, "no wash in the daytime");
   const sun = await wash("18:45", "village"), dusk1 = await wash("19:30", "base"), dusk2 = await wash("19:30", "shore");
@@ -1821,7 +1821,7 @@ if (want("\nthe night market")) try {
     f.coins = 100; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=19:30&date=2026-10-13"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=19:30&date=2026-10-13&coinpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(2500);
   const here = await ids();
   check(["yun", "jae", "mina", "tomas", "sora", "lior", "wen", "kai"].every(n => here.includes(n)), "Tuesday evening: eight out-of-town traders at their stalls");
   check(here.filter(n => ["noa", "jun", "bea", "omar", "lucy", "tae", "ivy", "rafe"].includes(n)).length >= 4, "and tourists out shopping");
@@ -1845,23 +1845,23 @@ if (want("\nthe night market")) try {
   await page.click('#ctx [data-close]').catch(() => {});
   check(await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].length) > 0 && await page.evaluate(() => !document.querySelector('[data-track="jazz"]')), "the duo isn't a record on the record player");
   await page.goto(url + "?seed=1&time=17:40&date=2026-10-13"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2000);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(2000);
   check((await ids()).includes("yun") && await page.locator('#world [data-place="jazzhat"]').count() === 1, "the night market's already on at 5:40pm (it opens at 5:30)");
   { // the stalls rotate their goods: another night market, another mix (the signature item stays)
     const offers = [];
     for (const d of ["2026-10-15", "2026-10-20", "2026-10-22"]) {
       await page.goto(url + `?seed=1&time=19:30&date=${d}`); await page.waitForTimeout(800);
-      await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
+      await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1200);
       await page.locator('#world [data-place="mstall0"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="friedchicken"]', { timeout: 15000 });
       offers.push((await page.locator("#ctx .item[data-id]").evaluateAll(n => n.map(x => x.dataset.id))).join(","));
       await page.click('#ctx [data-close]').catch(() => {}); }
     check(new Set([yunToday.join(","), ...offers]).size >= 3, "the stalls rotate what they sell from one market to the next (fried chicken always)");
   }
   await page.goto(url + "?seed=1&time=19:30&date=2026-10-12"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1500);
   check(!(await ids()).includes("yun") && await page.locator('#world [data-place="jazzhat"]').count() === 0, "no night market on a Monday");
   await page.goto(url + "?seed=1&time=18:45&date=2026-10-13"); await page.waitForTimeout(800);
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1500);
   check((await ids()).includes("juniper"), "the wine shop's evening regulars still drop in (Juniper at 6:45 on a night market Tuesday)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
@@ -1873,11 +1873,11 @@ if (want("\nbedroom doors")) try {
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   const pairs = {cottage: ["farid", "mei"], hanatheo: ["hana", "theo"], tomiposy: ["tomi", "posy"]};
   await page.goto(url + "?reset=1&seed=1&time=22:55&date=2026-10-13"); await page.waitForTimeout(800);
-  for (const [h, two] of Object.entries(pairs)) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(1500);
+  for (const [h, two] of Object.entries(pairs)) { await page.evaluate(h => window.__hbScene(h), h); await page.waitForTimeout(1500);
     check(await page.locator('#world [data-spot="bedroom"]').count() === 1 && await ids().then(a => two.every(f => a.includes(f))), `${h} has a bedroom door, and ${two.join(" and ")} are at it just before 11pm`); }
-  check(await page.evaluate(() => { window.__mapleScene("cottage"); return true; }) && await page.locator('#world [data-spot="mbed"]').count() === 0, "no bed in the cottage's main room");
+  check(await page.evaluate(() => { window.__hbScene("cottage"); return true; }) && await page.locator('#world [data-spot="mbed"]').count() === 0, "no bed in the cottage's main room");
   await page.goto(url + "?seed=1&time=23:30&date=2026-10-13"); await page.waitForTimeout(800);
-  for (const [h, two] of Object.entries(pairs)) { await page.evaluate(h => window.__mapleScene(h), h); await page.waitForTimeout(1200);
+  for (const [h, two] of Object.entries(pairs)) { await page.evaluate(h => window.__hbScene(h), h); await page.waitForTimeout(1200);
     check(await ids().then(a => !two.some(f => a.includes(f))), `after 11pm ${two.join(" and ")} are behind the bedroom door`); }
   await page.locator('#world [data-spot="bedroom"]').dispatchEvent("click"); await page.waitForFunction(() => /asleep/.test(document.querySelector("#speech").textContent), null, { timeout: 15000 }).catch(() => {});
   check(/fast asleep/.test(await page.locator("#speech").textContent()), "knocking at night: they're fast asleep");
@@ -1889,14 +1889,14 @@ if (want("\nrainy days")) try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`rain pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-12"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => { const r = document.getElementById("rain"); return !r.hidden && r.classList.contains("light"); }), "a light shower in October (not just the wet season)");
   check(await page.locator("#melRain .brolly").count() === 1, "you're under your brolly");
-  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(2500);
+  await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(2500);
   const gear = await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].map(n => n.querySelector(".brolly") ? "b:" + n.querySelector(".brolly > path:nth-of-type(3)").getAttribute("style") : n.querySelector(".rcoat") ? "c:" + n.querySelector(".rcoat").getAttribute("style") : ""));
   check(gear.length > 0 && gear.every(Boolean) && new Set(gear).size > 1, "everyone in town has a brolly or a raincoat, not all the same");
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-07"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => document.getElementById("rain").hidden) && await page.locator("#melRain .brolly, #actors .brolly").count() === 0, "and on a dry day the brollies are put away");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
@@ -1910,7 +1910,7 @@ if (want("\nfishing")) try {
     f.coins = 500; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&fishpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(900);
   check(await page.locator('#world [data-place="fishriver"]').count() === 1, "a fishing spot on the home river");
   await page.locator('#world [data-place="fishriver"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-fish="rod"]', { timeout: 15000 });
   await page.click('#ctx [data-fish="rod"]'); await page.waitForTimeout(300);
@@ -1943,7 +1943,7 @@ if (want("\nmore uses, more tapas")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&kitpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("kitchen")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("kitchen")); await page.waitForTimeout(900);
   await page.locator('#world [data-spot="press"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="press"]', { timeout: 15000 });
   check(/cow's or goat's/.test(await page.locator("#ctx").textContent()) && await page.locator('#ctx [data-k="press"]').isEnabled(), "the cheese press takes goat's milk");
   await page.locator('#ctx [data-close]').first().click();
@@ -1969,13 +1969,13 @@ if (want("\nflowers, eggs and bouquet orders")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=12:30&date=2026-10-07"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=12:30&date=2026-10-07&p4patch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="run"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-treat]', { timeout: 20000 });
   await page.click('#ctx [data-treat]'); await page.waitForTimeout(300);
   const eggs0 = await fox().then(f => f.inv.egg || 0);
   await page.locator('#ctx [data-feed]').first().click(); await page.waitForTimeout(300);
   check(await fox().then(f => !f.inv.sunflower && f.pets.treat === "2026-10-07" && (f.inv.egg || 0) === eggs0 + 2), "a garden sunflower's seeds for the hens: two eggs a meal today");
-  await page.evaluate(() => window.__mapleScene("kitchen")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("kitchen")); await page.waitForTimeout(900);
   await page.locator('#world [data-spot="larder"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="syrup"]', { timeout: 15000 });
   await page.click('#ctx [data-k="syrup"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.syrup === 2 && !f.kitchen.larder.tulip), "three garden tulips make two bottles of petal syrup");
@@ -1984,7 +1984,7 @@ if (want("\nflowers, eggs and bouquet orders")) try {
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-dish="posset"]', { timeout: 15000 });
   await page.click('#ctx [data-dish="posset"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.vine.menu.posset === 4), "petal syrup, milk and a lemon make a lemon and petal posset");
-  await page.evaluate(() => window.__mapleScene("orchard")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("orchard")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="farmshop"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-or="order"]', { timeout: 20000 }).catch(() => {});
   const c0 = await fox().then(f => f.coins);
@@ -2005,7 +2005,7 @@ if (want("\nHoneybrook Woods, bikes and the river taxi")) try {
     f.coins = 100; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-10"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-10&woodpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hlane")); await page.waitForTimeout(900);
   check(await page.locator('#world [data-place="toWoodsL"]').count() === 1 && await page.locator('#world [data-place="bikesst"]').count() === 1, "the cottage lane has a gate east into the woods, and bike hire by the station");
   await page.locator('#world [data-place="toWoodsL"]').dispatchEvent("click");
   await page.waitForFunction(() => /Woods/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
@@ -2016,11 +2016,11 @@ if (want("\nHoneybrook Woods, bikes and the river taxi")) try {
   check(await fox().then(f => f.inv.mushroom === 3 && f.woods.forageDay === "2026-10-10"), "foraging in autumn: three wild mushrooms, once a day");
   await page.locator('#world [data-place="bikeswoods"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bike="hire"]', { timeout: 15000 });
   await page.click('#ctx [data-bike="hire"]'); await page.waitForTimeout(300);
-  { const gameNow = await page.evaluate(() => Date.now() + (globalThis.__mapleOffset || 0));   // the game's clock, not the real one
+  { const gameNow = await page.evaluate(() => Date.now() + (globalThis.__hbOffset || 0));   // the game's clock, not the real one
     check(await fox().then(f => f.coins === 95 && f.bike && f.bike.until > gameNow), "a hire bike: 5 coins for an hour"); }
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-place="lookout"]').dispatchEvent("click"); await page.waitForTimeout(400);
-  check(await page.locator("#mel.biking").count() === 1, "you ride it (faster than walking, slower than the scooter)");
+  check(await page.locator("#hero.biking").count() === 1, "you ride it (faster than walking, slower than the scooter)");
   await page.waitForTimeout(3500);
   await page.locator('#world [data-place="taxiwoods"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-taxi]', { timeout: 15000 });
   check(await page.locator('#ctx [data-taxi]').count() === 4, "the river taxi stops: Makers' Lane, home, the lake and the foreshore");
@@ -2028,18 +2028,18 @@ if (want("\nHoneybrook Woods, bikes and the river taxi")) try {
   check(await page.locator(".taxiride").count() === 1, "a little ride down the river on the launch");
   await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 15000 });
   check(await fox().then(f => f.coins === 91), "and off at the foreshore, one gate from the flower farm (4 coins)");
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="homejetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-taxiopen]', { timeout: 15000 });
   await page.click('#ctx [data-taxiopen]'); await page.waitForTimeout(300);
   check(await page.locator('#ctx [data-taxi]').count() === 4 && await page.locator('#world [data-place="taxihome"]').count() === 0, "at home the river taxi stops at the little jetty (no separate stop): paddle or take the taxi");
   await page.locator('#ctx [data-close]').first().click();
-  await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("lane")); await page.waitForTimeout(900);
   check(await page.locator('#world [data-place="toWoodsM"]').count() === 1 && await page.locator('#world [data-place="taxilane"]').count() === 1, "Makers' Lane: the river comes down from the woods, with a taxi stop and a path up the hill");
   await page.goto(url + "?seed=1&time=7:00&date=2026-10-07"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2000);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(2000);
   check(await page.locator('#actors .npc[data-npc="mei"].act-fish').count() === 1, "Mei's fishing at the lake early on a Wednesday");
   await page.goto(url + "?seed=1&time=21:30&date=2026-10-07"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("honeysuckle")); await page.waitForTimeout(2000);
+  await page.evaluate(() => window.__hbScene("honeysuckle")); await page.waitForTimeout(2000);
   check(await ids().then(a => a.includes("mateo") && a.includes("lila")), "Mateo and Lila are home in Honeysuckle in the evening");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
@@ -2057,10 +2057,10 @@ if (want("\nstories, and friends out at the fairs")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&storypatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(2800);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(2800);
   check(await page.locator('#actors .npc[data-npc="celeste"].story').count() === 0, "not enough hearts yet: no story chapter");
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-07&storypatch=1&quest=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(2800);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(2800);
   check(await page.locator('#actors .npc[data-npc="celeste"].story').count() === 1, "three hearts and her request done today: Celeste has a chapter ready (the little … over her head)");
   await page.locator('#actors .npc[data-npc="celeste"]').dispatchEvent("click"); await page.waitForTimeout(600);
   check(/smelled chocolate again/.test(await page.locator("#npcSay").textContent()), "she tells it in her bubbles: the old chocolatier was her family's");
@@ -2075,10 +2075,10 @@ if (want("\nstories, and friends out at the fairs")) try {
     check(r0 === 2 && ready().length === 0, "on a trip, at most two locals tell a chapter a day (four could; two do)"); }
   // friends at the night market (Tuesday) and the fair (the last Saturday)
   await page.goto(url + "?seed=1&time=18:45&date=2026-10-06"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(2500);
   check(await ids().then(a => ["farid", "mei", "tomi", "posy"].every(x => a.includes(x))), "Tuesday's night market: Farid, Mei, Tomi and Posy are there");
   await page.goto(url + "?seed=1&time=11:30&date=2026-10-31"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(2500);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(2500);
   check(await ids().then(a => ["hana", "theo", "farid", "mei"].every(x => a.includes(x))), "the field fair: Hana, Theo, Farid and Mei are there in the morning");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
@@ -2089,13 +2089,13 @@ if (want("\npicking up where you left off")) try {
   page.on("pageerror", e => errors.push(`resume pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-07"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("hwoods")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("hwoods")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="lookout"]').dispatchEvent("click"); await page.waitForTimeout(3500);
   await page.goto(url + "?seed=1&time=12:30&date=2026-10-07"); await page.waitForTimeout(1500);
   check(/Woods/.test(await page.locator("#sceneName").textContent()), "reopening the same day: back in Honeybrook Woods, where you left off");
   await page.goto(url + "?seed=1&time=9:00&date=2026-10-08"); await page.waitForTimeout(1500);
   check(/Home/.test(await page.locator("#sceneName").textContent()), "a new day: you wake up at home");
-  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(800);
   await page.locator('#world [data-place="market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-shop="seeds"]', { timeout: 20000 });
   await page.click('#ctx [data-shop="seeds"]'); await page.waitForTimeout(300);
   check(await page.locator('#ctx .item[data-id="tulip_seed"]').count() === 1 && await page.locator('#ctx .item[data-id="sunflower_seed"]').count() === 1, "in autumn the seed shelf has tulip bulbs and sunflower seeds");
@@ -2125,7 +2125,7 @@ if (want("\na day trip to Kyoto")) try {
     f.coins = 300; f.board = f.board || {}; f.board.hearts = Object.assign(f.board.hearts || {}, {mei: 5, juniper: 5, bo: 4}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-11-12&ktcoins=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hlane")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
   await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-ttown="kyoto"]', { timeout: 15000 });
   await page.click('#ctx [data-ttown="kyoto"]'); await page.waitForTimeout(300);
@@ -2144,7 +2144,7 @@ if (want("\na day trip to Kyoto")) try {
   // round 122-124: the yukata shop, the five rooms and their activities, the stamp book
   await page.locator('#world [data-place="ktyukata"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-kt="yukata:indigo"]', { timeout: 15000 });
   await page.click('#ctx [data-kt="yukata:indigo"]'); await page.waitForTimeout(500);
-  check(await fox().then(f => f.kyoto.yukata && f.kyoto.yukata.col === "indigo" && f.coins === 165) && await page.locator("#mel .clTorso").evaluate(e => e.innerHTML.length > 50), "a yukata for the day (15 coins): you're in indigo");
+  check(await fox().then(f => f.kyoto.yukata && f.kyoto.yukata.col === "indigo" && f.coins === 165) && await page.locator("#hero .clTorso").evaluate(e => e.innerHTML.length > 50), "a yukata for the day (15 coins): you're in indigo");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   await page.locator('#world [data-place="ktToLane"]').dispatchEvent("click");
   await page.waitForFunction(() => /Higashiyama/.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 }); await page.waitForTimeout(1000);
@@ -2158,22 +2158,22 @@ if (want("\na day trip to Kyoto")) try {
   check(await fox().then(f => f.kyoto.teas === 1 && f.coins === 155), "then turn the bowl and bow (10 coins)");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   for (const [room, spot, who] of [["kt_sweets", "kt_sweets", "tanaka"], ["kt_pottery", "kt_pottery", "ishida"], ["kt_hall", "kt_hall", "joshin"], ["kt_market", "kt_market", "fumiko"]]) {
-    await page.evaluate(r => window.__mapleScene(r), room); await page.waitForTimeout(1300);
+    await page.evaluate(r => window.__hbScene(r), room); await page.waitForTimeout(1300);
     check(await ids().then(a => a.includes(who)) && await page.locator(`#world [data-rdspot="${spot}"]`).count() === 1, `${room}: ${who} is there, and there's something to do`);
   }
-  await page.evaluate(() => window.__mapleScene("kt_sweets")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("kt_sweets")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="kt_sweets"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-kt="shape:momiji"]', { timeout: 15000 });
   await page.click('#ctx [data-kt="shape:momiji"]'); for (const s of [0, 2, 1, 2, 3]) await page.click(`#ctx [data-kt="step:${s}"]`).catch(() => {});
   await page.click('#ctx [data-kt="neri"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.nk_momiji === 1), "a nerikiri maple leaf, made with Mr Tanaka, boxed up as a gift");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
-  await page.evaluate(() => window.__mapleScene("kt_hall")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("kt_hall")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="kt_hall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-kt="sit"]', { timeout: 15000 });
   check(/stamp book/i.test(await page.locator("#ctx").innerText()), "the temple hall: sit with Jōshin, draw a fortune, and see the stamp book");
   await page.click('#ctx [data-kt="fortune"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.kyoto.fortunes === 1), "a fortune slip (1 coin)");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
-  await page.evaluate(() => window.__mapleScene("kt_station")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("kt_station")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="kttrain"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-triphome]", { timeout: 15000 });
   await page.click("#ctx [data-triphome]");
   await page.waitForFunction(() => /Honeybrook station/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
@@ -2223,7 +2223,7 @@ if (want("\na day trip to Ronda")) try {
     f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-11"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-11&tripcoins=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hlane")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
   await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-tpick="farid"]', { timeout: 15000 });
   check(await page.locator("#ctx [data-tpick]").count() === 7 && /40/.test(await page.locator("#ctx").innerText()), "the ticket window: Ronda, 40 coins a person, pick from your seven friends");
@@ -2286,18 +2286,18 @@ if (want("\na day trip to Ronda")) try {
   await page.waitForTimeout(1500);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-11"); await page.waitForTimeout(1800);
   check(/plaza/.test(await scn()) && await ids().then(a => a.includes("farid")), "reopening mid-trip: back in Ronda's plaza, with your friends");
-  await page.evaluate(() => window.__mapleScene("rd_banos")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("rd_banos")); await page.waitForTimeout(1500);
   check(await ids().then(a => a.includes("amina")) && await page.locator('#world [data-rdspot="banos"]').count() === 1, "the Arab baths: Amina showing people round, under the star skylights");
-  await page.evaluate(() => window.__mapleScene("rd_cuero")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("rd_cuero")); await page.waitForTimeout(1500);
   check(await ids().then(a => a.includes("antonio")), "the leather workshop: Antonio stitching at his bench");
   await page.locator('#world [data-rdspot="cuero"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="bolso"]', { timeout: 15000 });
   check(await page.locator("#ctx [data-rbuy]").count() === 5, "Ubrique leather to buy: a wallet, a handbag, a belt, a notebook and a keyring");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
-  await page.evaluate(() => window.__mapleScene("rd_jardin")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("rd_jardin")); await page.waitForTimeout(1500);
   check(await ids().then(a => a.includes("joaquin") && a.includes("mei")) && await page.locator('#world [data-rdspot="jardin"]').count() === 1, "the Moorish garden: Joaquín watering, and Mei found a bench");
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1500);
   check(await ids().then(a => !a.includes("farid") && !a.includes("mei")), "back in Honeybrook, Farid and Mei aren't at the market: they're in Ronda with you");
-  await page.evaluate(() => window.__mapleScene("rd_station")); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("rd_station")); await page.waitForTimeout(1000);
   await page.locator('#world [data-place="rdtrain"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-triphome]", { timeout: 15000 });
   await page.click("#ctx [data-triphome]");
   await page.waitForFunction(() => /Honeybrook station/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
@@ -2305,13 +2305,13 @@ if (want("\na day trip to Ronda")) try {
   await page.addInitScript(() => { if (!/benchpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     f.ronda = Object.assign(f.ronda || {}, {bench: true}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?seed=1&time=10:50&date=2026-10-11&benchpatch=1"); await page.waitForTimeout(1200);
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(1000);
   check(await page.locator("#world .tilebench").count() === 1, "with all eight tiles, the tiled bench stands by the pond at home");
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1500);
   check(await ids().then(a => a.includes("farid")), "and Farid's back at his market stall");
   // the last train, and the window closing for the day
   await page.goto(url + "?seed=1&time=17:00&date=2026-10-12&tripcoins=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hlane")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
   await page.click('#ctx [data-tickets]'); await page.waitForSelector("#ctx [data-trip]", { timeout: 15000 }); await page.click("#ctx [data-trip]");
   await page.waitForFunction(() => /Ronda/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
@@ -2319,7 +2319,7 @@ if (want("\na day trip to Ronda")) try {
   await page.waitForFunction(() => /Honeybrook station/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }).catch(() => {});
   check(/Honeybrook station/.test(await scn()) && await fox().then(f => f.trip.done), "10pm: the last train home from Ronda");
   await page.goto(url + "?seed=1&time=18:30&date=2026-10-13"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hlane")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
   await page.click('#ctx [data-tickets]'); await page.waitForTimeout(400);
   check(await page.locator("#ctx [data-trip]").count() === 0 && /last train to Ronda gone/.test(await page.locator("#ctx").innerText()), "after 6pm there are no more trains out to Ronda");
@@ -2340,7 +2340,7 @@ if (want("\nJeju, by ferry and by train")) try {
     f.coins = 300; f.board = f.board || {}; f.board.hearts = Object.assign(f.board.hearts || {}, {mei: 5, juniper: 5, bo: 4}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-11-12&jjcoins=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-trip="jeju"][data-by="ferry"]', { timeout: 15000 });
   await page.click('#ctx [data-tpick="farid"]');
   check(/100/.test(await page.locator("#ctx [data-trip]").textContent()) && /ferry to Jeju/i.test(await page.locator("#ctx h2").textContent()), "the ferry stop at the end of the jetty: you and Farid to Jeju, 100 coins");
@@ -2355,12 +2355,12 @@ if (want("\nJeju, by ferry and by train")) try {
     await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
     check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("farid")), `through the gate to Jeju's ${want} (Farid follows)`);
   }
-  await page.evaluate(() => window.__mapleScene("jj_village")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("jj_village")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="jjtrain"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="train"]', { timeout: 15000 });
   await page.click('#ctx [data-triphome="train"]');
   await page.waitForFunction(() => !/Jeju/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
   check(await fox().then(f => f.trip.done) && /station|lane/i.test(await page.locator("#sceneName").textContent()), "or home on the train over the sea bridge, whichever way you came");
-  await page.evaluate(() => window.__mapleScene("hwoods")); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("hwoods")); await page.waitForTimeout(1000);
   await page.locator('#world [data-place="wishtower"]').dispatchEvent("click"); await page.waitForTimeout(2600);
   const w1 = await fox().then(f => f.wish && f.wish.n);
   await page.locator('#world [data-place="wishtower"]').dispatchEvent("click"); await page.waitForTimeout(800);
@@ -2397,7 +2397,7 @@ if (want("\nJeju's rooms, people and things to do")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=13:00&date=2026-11-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=13:00&date=2026-11-12&jjtrip=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("jj_shore")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("jj_shore")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="jjhaenyeo"]').dispatchEvent("click");
   await page.waitForFunction(() => /divers/.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 }); await page.waitForTimeout(4800);
   check(await ids().then(a => a.includes("halmang") && a.includes("seoyeon")), "inside the divers' house: Halmang Kim and Seo-yeon");
@@ -2410,40 +2410,40 @@ if (want("\nJeju's rooms, people and things to do")) try {
   check(await fox().then(f => f.inv.abalone === 1 && f.jeju.dives === 1), "the breath song in the browser: dive, come up whistling, an abalone from Halmang");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   for (const [room, who] of [["jj_shed", "takeshi"], ["jj_cafe", "haeun"], ["jj_market", "miok"], ["jj_dye", "jaewon"]]) {
-    await page.evaluate(r => window.__mapleScene(r), room); await page.waitForTimeout(1300);
+    await page.evaluate(r => window.__hbScene(r), room); await page.waitForTimeout(1300);
     check(await ids().then(a => a.includes(who)) && await page.locator(`#world [data-rdspot="${room}"]`).count() === 1, `${room}: ${who} is there, and there's something to do`);
   }
-  await page.evaluate(() => window.__mapleScene("jj_shed")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("jj_shed")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="jj_shed"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="sort"]', { timeout: 15000 });
   await page.click('#ctx [data-jj="sort"]'); await page.waitForTimeout(300);
   for (let i = 0; i < 8; i++) { const size = await page.locator("#ctx .jjtang").getAttribute("data-size"); await page.click(`#ctx [data-jj="crate:${size}"]`); await page.waitForTimeout(120); }
   check(await fox().then(f => f.inv.tangerine === 4), "sorting with Mr Ko's crates: all eight right, four tangerines");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
-  await page.evaluate(() => window.__mapleScene("jj_cafe")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("jj_cafe")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="jj_cafe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="cafe:ade"]', { timeout: 15000 });
   await page.click('#ctx [data-jj="cafe:ade"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.coins === 295 && f.jeju.treats === 1), "a hallabong ade at the café (5)");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
-  await page.evaluate(() => window.__mapleScene("jj_market")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("jj_market")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="jj_market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="j_magnet"]', { timeout: 15000 });
   await page.click('#ctx [data-rbuy="j_magnet"]'); await page.waitForTimeout(300); await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   await page.locator('#world [data-rdspot="jjpost"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="post:me"]', { timeout: 15000 });
   await page.click('#ctx [data-jj="post:me"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.j_magnet === 1 && f.coins === 290 && f.jeju.post.length === 1), "the market: a Jeju fridge magnet (3), and a postcard in the slow-post box (2)");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
-  await page.evaluate(() => window.__mapleScene("jj_dye")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("jj_dye")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="jj_dye"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-jj="dyego"]', { timeout: 15000 });
   await page.click('#ctx [data-jj="dyego"]'); for (const st of [0, 1, 2, 3]) await page.click(`#ctx [data-jj="dstep:${st}"]`);
   await page.click('#ctx [data-jj="dyedone"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.jeju.dye && f.jeju.dye.from === "2026-11-12" && f.coins === 278), "dyeing with Mr Moon: crush, soak, wring, sun (12), and the scarf comes home to dry");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
-  await page.evaluate(() => window.__mapleScene("jj_harbour")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("jj_harbour")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="jjpier"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="ferry"]', { timeout: 15000 });
   await page.click('#ctx [data-triphome="ferry"]');
   await page.waitForFunction(() => !/Jeju/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
   check(await fox().then(f => f.trip.done && f.jeju.sapling) && /foreshore|shore/i.test(await page.locator("#sceneName").textContent()), "home on the ferry to the foreshore jetty, and Farid's brought a tangerine sapling for the orchard");
   await page.goto(url + "?seed=1&time=10:00&date=2026-11-15"); await page.waitForTimeout(1200);
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="dyecloth"]').dispatchEvent("click"); await page.waitForTimeout(3500);
   check(await fox().then(f => f.inv.j_scarf === 1 && !f.jeju.dye), "three days later, the scarf's a deep rust on the washing line at home, and it's a keepsake now");
   await page.close();
@@ -2488,14 +2488,14 @@ if (want("\nCinque Terre: the five villages (well, four)")) try {
       "the 28 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
-  { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "jason"), L = np.NPCS.find(n => n.id === "luca");
+  { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "ornella"), L = np.NPCS.find(n => n.id === "dario");
     check(J && J.name === "Ornella" && L && L.name === "Dario" && J.local === "cinque" && !J.tourist && J.routine.some(sl => sl.scene === "ct_vernazza" && sl.act === "poem") && J.routine.some(sl => sl.act === "sit" && sl.from >= 18*60) && L && L.routine.some(sl => sl.act === "sit" && sl.from >= 18*60) && tw.TOWN_PLACES.ctjason.scene === "ct_vernazza",
       "Ornella lives in Vernazza (the yellow house by the harbour): a verse at the café in the morning, the sunset on the harbour with Dario");
-    const F = {met: {jason: true}, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+    const F = {met: {ornella: true}, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
     F.story = {heard: {}, day: {carmen: "2026-10-12", rafael: "2026-10-12"}, log: [], flags: {}};
-    const first = st.tellStory(F, "jason", add, "2026-10-12"), again = st.storyReady(F, "jason", "2026-10-12");
-    ["2026-10-13", "2026-10-14", "2026-10-15"].forEach(d => st.tellStory(F, "jason", add, d));
-    check(first && /ferry/.test(first.lines.join(" ")) && !again && F.inv.s_poem === 1 && F.story.heard.jason === 4, "Ornella tells her stories a chapter a day whenever you visit (even after two others that day), and the fourth is a poem for you to keep"); }
+    const first = st.tellStory(F, "ornella", add, "2026-10-12"), again = st.storyReady(F, "ornella", "2026-10-12");
+    ["2026-10-13", "2026-10-14", "2026-10-15"].forEach(d => st.tellStory(F, "ornella", add, d));
+    check(first && /ferry/.test(first.lines.join(" ")) && !again && F.inv.s_poem === 1 && F.story.heard.ornella === 4, "Ornella tells her stories a chapter a day whenever you visit (even after two others that day), and the fourth is a poem for you to keep"); }
   check(cp.KEEP_SPOTS.fridge3 && cp.KEEP_SPOTS.fridge3.only === "magnet" && tw.TOWN_GOODS.c_magnet.magnet && ["c_boat", "c_plate", "c_mortar"].every(k => tw.TOWN_GOODS[k].kind === "keepsake"), "keepsakes (the boat model, the lemon plate, the mortar) and a third magnet spot on the fridge");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nCinque Terre, by train")) try {
@@ -2509,7 +2509,7 @@ if (want("\nCinque Terre, by train")) try {
     f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&ctcoins=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hlane")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
   await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-ttown="cinque"]', { timeout: 15000 });
   await page.click('#ctx [data-ttown="cinque"]'); await page.waitForTimeout(300);
@@ -2532,7 +2532,7 @@ if (want("\nCinque Terre, by train")) try {
   await page.click('#ctx [data-ct="harvestdone"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.cinque.raisin && f.inv.grape_white === 3), "up the terraces on the monorail, every ripe bunch picked: Signor Bruno shows you raisin wine and gives you three bunches");
   await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
-  await page.evaluate(() => window.__mapleScene("ct_manarola")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("ct_manarola")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="ctpesto"]').dispatchEvent("click");
   await page.waitForFunction(() => /pesto/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 25000 }); await page.waitForTimeout(1500);
   check(await ids().then(a => a.includes("nonnapina") && a.includes("marta")), "inside the pesto kitchen: Nonna Pina, and Marta with the basil");
@@ -2542,27 +2542,27 @@ if (want("\nCinque Terre, by train")) try {
   await page.click('#ctx [data-ct="pestodone"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.inv.pesto === 2 && f.cinque.pestoLesson && f.coins === 134), "pesto in the marble mortar, in the right order: two jars (6) and Nonna Pina's secret");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
-  await page.evaluate(() => window.__mapleScene("ct_manarola")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("ct_manarola")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="ctboats"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ct="hull:green"]', { timeout: 15000 });
   await page.click('#ctx [data-ct="hull:green"]'); await page.click('#ctx [data-ct="stripe:yellow"]'); await page.click('#ctx [data-ct="bname:Stella"]'); await page.click('#ctx [data-ct="paint"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.cinque.boat && f.cinque.boat.hull === "green" && f.cinque.boat.name === "Stella" && f.inv.c_boat === 1), "painting a boat in the street: fisherman's green, a yellow stripe, \"Stella\" on the bow, and a model to keep");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   for (const [room, who] of [["ct_focacceria", "ilaria"], ["ct_cantina", "carla"], ["ct_gelato", "gianni"], ["ct_limoni", "franca"]]) {
-    await page.evaluate(r => window.__mapleScene(r), room); await page.waitForTimeout(1300);
+    await page.evaluate(r => window.__hbScene(r), room); await page.waitForTimeout(1300);
     check(await ids().then(a => a.includes(who)) && await page.locator(`#world [data-rdspot="${room}"]`).count() === 1, `${room}: ${who} is there, and there's something to do`);
   }
   await page.locator('#world [data-rdspot="ct_limoni"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="c_magnet"]', { timeout: 15000 });
   await page.click('#ctx [data-rbuy="c_magnet"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.c_magnet === 1 && f.coins === 131), "the lemon shop: a Cinque Terre fridge magnet (3)");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
-  await page.evaluate(() => window.__mapleScene("ct_corniglia")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("ct_corniglia")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="cttrain"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="train"]', { timeout: 15000 });
   await page.click('#ctx [data-triphome="train"]');
   await page.waitForFunction(() => !/Cinque Terre/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
   check(await fox().then(f => f.trip.done), "home on the train from Corniglia");
-  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(1200);
   check(await page.locator("#sceneArt").evaluate(e => e.innerHTML.includes("#2E7A5A")), "the painted boat (green, like the one in Manarola) is pulled up on the foreshore sand");
-  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("vineyard")); await page.waitForTimeout(1000);
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-loft]', { timeout: 15000 });
   await page.click('#ctx [data-loft]'); await page.waitForSelector('#ctx [data-lf="start:rack"]', { timeout: 15000 });
   check(/drying loft/i.test(await page.locator("#ctx h2").textContent()) && await page.locator('#ctx [data-lf="start:rack"]').isDisabled(), "up the ladder in the barrel shed: the drying loft (three bunches isn't enough for the racks yet)");
@@ -2577,10 +2577,10 @@ if (want("\nthe kite and the farm brush (round 130 fixes)")) try {
     f.inv = {...(f.inv || {}), kite: 1, brush: 1, chz_cheddar: 1, chz_brie_ex: 1, honey_lav: 1}; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-10"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-10&kitebrush=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(900);
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="kite"]'); await page.waitForTimeout(600);
   check(await fox().then(f => f.inv.kite === 1), "using the kite away from the field doesn't use it up (it stays in the backpack)");
-  await page.evaluate(() => window.__mapleScene("hfarm")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("hfarm")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="farmhouse"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hf="req"]', { timeout: 20000 });
   check(/Still to brush: Daisy, Buttercup and Mochi/.test(await page.locator("#ctx").innerText()) && await page.locator('#ctx [data-hf="req"]').isDisabled(), "Felix's ask says what's still to do while the button's greyed out");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
@@ -2590,7 +2590,7 @@ if (want("\nthe kite and the farm brush (round 130 fixes)")) try {
   await page.locator('#world [data-place="farmhouse"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hf="req"]:not([disabled])', { timeout: 20000 });
   await page.click('#ctx [data-hf="req"]'); await page.waitForTimeout(500);
   check(await fox().then(f => f.hfarm.reqDone === "2026-10-10"), "and then you can tell Felix it's done");
-  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(800);
   await page.locator('#world [data-place="market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-shop="sell"]', { timeout: 20000 });
   await page.click('#ctx [data-shop="sell"]'); await page.waitForSelector('#ctx .item[data-id="chz_cheddar"]', { timeout: 15000 });
   const c0 = await fox().then(f => f.coins);
@@ -2608,10 +2608,10 @@ if (want("\nthe ice cream trolley, and the delivery bike's orders")) try {
     check(r && r.items.length && r.items.every(([f]) => f === "cup" || f === "cone") && F.coins === r.coins && again === null, "tap someone and they buy a cup or a cone (never floats or waffles), once a day each, and the coins come to you");
     const back = sc.returnTrolley(F); check(back.back === 25 - r.items.length && back.n === r.items.length, "wheel it back in time and what's left goes back in the freezer");
     sc.loadTrolley(F, ["c"]); s.trolley.at -= 3*3600e3; check(sc.trolleyMelted(s) && sc.trolleySell(F, "theo", "2026-10-12", {}) === null && sc.returnTrolley(F).melted === 10, "after two hours the ice packs give up: no more sales, and the leftovers melt");
-    s.up.bike = 1; s.display = ["d"]; s.at = wall("2026-10-12T04:00:00Z") - 60e3; const off = globalThis.__mapleOffset; globalThis.__mapleOffset = wall("2026-10-12T04:00:00Z") - Date.now();
-    Math.random = () => .001; const out = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+    s.up.bike = 1; s.display = ["d"]; s.at = wall("2026-10-12T04:00:00Z") - 60e3; const off = globalThis.__hbOffset; globalThis.__hbOffset = wall("2026-10-12T04:00:00Z") - Date.now();
+    Math.random = () => .001; const out = sc.scoopTick(F); Math.random = rnd; globalThis.__hbOffset = off;
     check(out.orders && out.orders[0].shop === "scoop" && /^a (cup|cone) of /.test(out.orders[0].what) && out.orders[0].coins >= sc.DELIVERY.fee + 1, "with the bike, villagers order a cup or a cone from wherever they are (shop price + a delivery fee)");
-    s.at = wall("2026-10-12T14:30:00Z") - 60e3; globalThis.__mapleOffset = wall("2026-10-12T14:30:00Z") - Date.now(); Math.random = () => .001; const late = sc.scoopTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+    s.at = wall("2026-10-12T14:30:00Z") - 60e3; globalThis.__hbOffset = wall("2026-10-12T14:30:00Z") - Date.now(); Math.random = () => .001; const late = sc.scoopTick(F); Math.random = rnd; globalThis.__hbOffset = off;
     check(!(late && late.orders && late.orders.length) && sc.deliveryHours(21*60 + 59) && !sc.deliveryHours(22*60) && !sc.deliveryHours(9*60 + 59) && sc.riderOn(20*60) && !sc.riderOn(13*60 + 10), "delivery orders run 10am to 10pm (late-night suppers), and none come in after"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`trolley pageerror: ${e.message}`));
@@ -2621,20 +2621,20 @@ if (want("\nthe ice cream trolley, and the delivery bike's orders")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=14:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=14:00&date=2026-10-12&trpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("scoopshop")); await page.waitForTimeout(800);
   await page.locator('#world [data-spot="gcounter"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gview="trolley"]', { timeout: 15000 });
   await page.click('#ctx [data-gview="trolley"]'); await page.waitForSelector('#ctx [data-gtsel]', { timeout: 15000 });
   await page.click('#ctx [data-gtsel="mango+milk"]'); await page.click('#ctx [data-gtsel="pandan"]'); await page.click('#ctx [data-gtrolley="go"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.scoop.trolley && f.scoop.trolley.tubs["mango+milk"] === 10 && f.scoop.trolley.tubs.pandan === 10 && f.scoop.tubs.pandan === 30), "at the counter: load the trolley with two flavours, ten scoops each");
-  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1500);
-  check(await page.locator("#mel").evaluate(e => e.classList.contains("trolley")), "out in the square, you're pushing the little pink trolley");
+  await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(1500);
+  check(await page.locator("#hero").evaluate(e => e.classList.contains("trolley")), "out in the square, you're pushing the little pink trolley");
   const who = await page.locator("#actors .npc:not([data-npc^=\"agent\"])").first().getAttribute("data-npc");
   await page.locator(`#actors .npc[data-npc="${who}"]`).dispatchEvent("click"); await page.waitForTimeout(600);
   check(await fox().then(f => f.scoop.asked && f.scoop.asked.ids.includes(who)), `tap someone (${who}) and you offer them an ice cream`);
-  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(2000);
+  await page.evaluate(() => window.__hbScene("scoopshop")); await page.waitForTimeout(2000);
   check(await fox().then(f => !f.scoop.trolley && f.scoop.tubs.pandan + f.scoop.tubs["mango+milk"] >= 60), "wheel it back into the shop and it's put away, the unsold scoops back in the freezer");
-  await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1200);
-  await page.evaluate(() => window.__mapleOrder()); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbOrder()); await page.waitForTimeout(800);
   const rode = await page.locator("#actors .rideby .bikeArt").count(); await page.waitForTimeout(7000);
   check(rode === 1 && await page.locator("#actors .rideby").count() === 0, "an order goes out while you're in the square: Tomo pedals past on the mint bike with the cool box, and is gone");
   await page.close();
@@ -2655,7 +2655,7 @@ if (want("\nthe bike takes bonbons and tapas too, and every shop says its taking
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-12&bspatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("bay")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="dbike"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-gvother="bar:milk"]', { timeout: 15000 });
   await page.click('#ctx [data-gvother="bar:milk"]'); await page.waitForSelector('#ctx [data-gvto="hana"]', { timeout: 15000 }); await page.click('#ctx [data-gvto="hana"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.cocoa.bars.milk === 2 && f.thanks.some(t => t.who === "hana" && t.item === "bar_milk")), "from the delivery bike: a milk chocolate bar off the Cocoa Room's wall, pedalled round to Hana (a thank-you note to come)");
@@ -2679,11 +2679,11 @@ if (want("\nSaturday disco night at the cellar door")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=21:00&date=2026-10-10"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=21:00&date=2026-10-10&dcpatch=1"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(2500);
+  await page.evaluate(() => window.__hbScene("cellar")); await page.waitForTimeout(2500);
   const dancers = await page.locator("#actors .npc").evaluateAll(n => n.filter(x => /act-(dance|boogie|armsup|twirl|shuffle|point)\b/.test(x.getAttribute("class"))).length);
   check(await page.locator("#sceneArt .disco .dball").count() === 1 && dancers >= 12, `the glitter ball's out and the floor's packed (${dancers} dancing)`);
   await page.goto(url + "?seed=1&time=17:00&date=2026-10-10"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("cellar")); await page.waitForTimeout(1500);
   check(await page.locator("#sceneArt .disco").count() === 0, "before 8 the cellar's its usual calm self");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
@@ -2734,7 +2734,7 @@ if (want("\nthe greenhouse, herbs and gambas")) try {
     f.plots = f.plots || []; f.plots[0] = {crop: "tomato", seed: "tomato_seed", plantedAt: Date.now() - 7*3600e3, wateredAt: Date.now() - 7*3600e3, bonus: 0}; f.plots[1] = null; f.plots[2] = null; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:30&date=2026-10-14"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-14&ghcoins=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("farm")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("farm")); await page.waitForTimeout(900);
   await page.locator('#world [data-gh="door"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="greenhouse"]', { timeout: 15000 });
   await page.click('#ctx [data-goal="greenhouse"]'); await page.waitForTimeout(800);
   await page.locator('#world [data-gh="door"]').dispatchEvent("click");
@@ -2748,7 +2748,7 @@ if (want("\nthe greenhouse, herbs and gambas")) try {
   await page.click('#ctx [data-gh="pplant"][data-id="basil_seed"]'); await page.waitForTimeout(400);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.gh.pots[0] && f.gh.pots[0].crop === "basil"; }) && await page.locator('#world [data-ghpot="0"]').getAttribute("aria-label").then(l => /Basil/.test(l)), "basil planted in the first herb pot");
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.inv.tomato === 4 && f.plots[0] && f.plots[0].crop === "tomato" && f.inv.tomato_seed === 1; }), "the auto harvester brought the ripe tomatoes in (fertiliser: four), and the seeder sowed the plot again");
-  await page.evaluate(() => window.__mapleScene("farm")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("farm")); await page.waitForTimeout(900);
   await page.locator('#world [data-plot="1"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="tomato_seed"]', { timeout: 15000 });
   await page.click('#ctx .item[data-id="tomato_seed"]'); await page.waitForTimeout(400);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.plots[1] && f.plots[1].crop === "tomato" && !f.inv.tomato_seed; }), "with the auto seeder, one tap sows every empty plot it has seeds for");
@@ -2784,7 +2784,7 @@ if (want("\nthe old mill and the olive grove")) try {
     f.coins = 800; f.inv = Object.assign(f.inv || {}, {olives: 7}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-14&millp=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hlane")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="windmill"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="mill"]', { timeout: 20000 });
   await page.click('#ctx [data-goal="mill"]'); await page.waitForTimeout(600); await page.click("#ctx [data-close]").catch(() => {});
   await page.locator('#world [data-place="windmill"]').dispatchEvent("click");
@@ -2818,21 +2818,21 @@ if (want("\nFriday evenings: aperitivo, Sal's van, kites")) try {
     f.inv = Object.assign(f.inv || {}, {kite: 1}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=15:30&date=2026-10-16"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=15:30&date=2026-10-16&kitep=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="kitefly"]').dispatchEvent("click"); await page.waitForSelector("#world .kitefly", { timeout: 20000 }).catch(() => {});
   check(await page.locator("#world .kitefly").count() === 1, "a kite of your own, flying over the field");
   await page.goto(url + "?seed=1&time=19:40&date=2026-10-16"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("bay")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="fishvan"]').count() === 1 && await page.locator('#world [data-place="bonfire"]').count() === 0, "Friday night at the bay: Sal's van (and no bonfire on the beach)");
-  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="bonfire"]').count() === 0 && await page.locator('#actors .npc.act-guitar').count() === 0, "and no bonfire at home on a Friday night");
   await page.goto(url + "?seed=1&time=17:30&date=2026-10-16"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1200);
   check(await page.locator('#world [data-place^="bm"]').count() === 3 && await page.locator('#world [data-place="kites"]').count() === 1, "half past five on a Friday: the little market's up on the field");
-  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("bay")); await page.waitForTimeout(1000);
   check(await page.locator('#world [data-place^="bm"]').count() === 0, "and the bay stays quiet");
   await page.goto(url + "?seed=1&time=20:00&date=2026-10-30"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="screen"]').count() === 1 && await page.locator('#actors .npc[data-npc="hana"]').count() === 1, "the last Friday: movie night on the field, Hana on a blanket");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
@@ -2890,16 +2890,16 @@ if (want("\nBellbird Valley: the Vines (rounds 141-144)")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=09:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=09:00&date=2026-10-12&bbv=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("van")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("van")); await page.waitForTimeout(900);
   await page.locator('#world [data-spot="vmap"]').dispatchEvent("click"); await page.waitForSelector("#ctx .bbmap", { timeout: 20000 });
   await page.click('#ctx [data-bvpick="farid"]'); await page.click('#ctx [data-bvgo="bv_gate"]'); await page.waitForTimeout(4500);
   check(await fox().then(f => f.trip && f.trip.town === "bv_gate" && f.coins === 293), "off in the van to Valley Gate");
-  await page.evaluate(() => window.__mapleScene("bv_store")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbScene("bv_store")); await page.waitForTimeout(1200);
   check(await page.locator('#actors .npc[data-npc="mrsdunn"]').count() === 1, "Mrs Dunn behind the counter at the store");
   await page.locator('#world [data-rdspot="bv_store"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="wattleseed"]', { timeout: 20000 });
   await page.click('#ctx [data-rbuy="wattleseed"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.inv.wattleseed === 1), "a jar of wattleseed from Mrs Dunn's shelves");
-  await page.evaluate(() => window.__mapleScene("bv_opshop")); await page.waitForTimeout(6000);
+  await page.evaluate(() => window.__hbScene("bv_opshop")); await page.waitForTimeout(6000);
   check(await page.locator('#actors .npc[data-npc="farid"].act-rummage').count() === 1, "Farid rummaging in the op shop");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
@@ -2948,9 +2948,9 @@ if (want("\nThe Coast Road (rounds 148-150)")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&crv=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("cw_beach")); await page.waitForTimeout(7000);
+  await page.evaluate(() => window.__hbScene("cw_beach")); await page.waitForTimeout(7000);
   check(await page.locator('#actors .npc[data-npc="tomi"].act-bodyboard').count() === 1 && await page.locator('#actors .npc[data-npc="hana"].act-yoga').count() === 1 && await page.locator('#actors .npc[data-npc="crjet"]').count() === 1, "Breakwater: Tomi with his bodyboard, Hana's beach yoga, and Jet teaching");
-  await page.evaluate(() => window.__mapleScene("bv_surfshop")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("bv_surfshop")); await page.waitForTimeout(900);
   await page.locator('#world [data-rdspot="bv_surfshop"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bba="open:surf"]', { timeout: 20000 });
   await page.click('#ctx [data-bba="open:surf"]'); await page.click('#ctx [data-bba="surf"]'); await page.waitForTimeout(300);
   for (let w = 0; w < 5; w++) { for (let i = 0; i < 3; i++) await page.click('#ctx [data-bba="spaddle"]'); await page.click('#ctx [data-bba="popup"]'); }
@@ -3014,15 +3014,15 @@ if (want("\nThe Tablelands (rounds 157-160)")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&tlv=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("tf_top")); await page.waitForTimeout(7000);
+  await page.evaluate(() => window.__hbScene("tf_top")); await page.waitForTimeout(7000);
   check(await page.locator('#actors .npc[data-npc="mei"].act-flask').count() === 1 && await page.locator('#world [data-place="bvtview"]').count() === 1, "Misty Falls: Mei with her thermos at the lookout");
-  await page.evaluate(() => window.__mapleScene("tf_pool")); await page.waitForTimeout(6000);
+  await page.evaluate(() => window.__hbScene("tf_pool")); await page.waitForTimeout(6000);
   check(await page.locator('#actors .npc[data-npc="tomi"].act-wade').count() === 1 && await page.locator('#actors .npc[data-npc="tlkirra"]').count() === 1, "the swimming hole: Tomi wading by the falls, and Kirra the ranger");
   await page.locator('#world [data-place="bvtfalls"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bba="tl:swimin"]', { timeout: 20000 });
   await page.click('#ctx [data-bba="tl:swimin"]'); for (const k of ["falls", "float", "veil", "out"]) await page.click(`#ctx [data-bba="tl:swim.${k}"]`);
   await page.click('#ctx [data-bba="tl:swimdone"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.bellbird.tl && f.bellbird.tl.swims === 1), "a swim in the falls, all the way through");
-  await page.evaluate(() => window.__mapleScene("bv_tcafe")); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("bv_tcafe")); await page.waitForTimeout(900);
   await page.locator('#world [data-rdspot="bv_tcafe"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="b_rosella"]', { timeout: 20000 });
   await page.click('#ctx [data-rbuy="b_rosella"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.b_rosella === 1 && f.coins === 294), "the Range Café: a jar of rosella jam to take home");
@@ -3081,13 +3081,28 @@ if (want("\nThe Lavender Hills (rounds 161-164)")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&lvv=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("hv_rows")); await page.waitForTimeout(7000);
+  await page.evaluate(() => window.__hbScene("hv_rows")); await page.waitForTimeout(7000);
   check(await page.locator('#actors .npc[data-npc="hana"].act-armful').count() === 1 && await page.locator('#actors .npc[data-npc="bo"].act-bee').count() === 1 && await page.locator('#actors .npc[data-npc="lvemile"]').count() === 1, "Lavender Ridge: Hana with an armful of lavender, a bee after Bo, and Émile in the rows");
   await page.locator('#world [data-place="bvhrows"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bba="lv:cutgo"]', { timeout: 20000 });
   await page.click('#ctx [data-bba="lv:cutgo"]'); await page.waitForTimeout(200);
   for (let i = 0; i < 6; i++) { const b = page.locator(`#ctx [data-bba="lv:cut.${i}"]`); if (await b.count() && /deep purple/.test(await page.locator("#ctx li").nth(i).innerText())) await b.click(); }
   await page.click('#ctx [data-bba="lv:cutdone"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.bq_lavender === 2 && f.bellbird.lv.cut === "2026-10-12"), "the lavender harvest with Émile, two bunches to take home");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nan old save, from before the names changed")) try {
+  console.log("\nan old save, from before the names changed");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`oldsave pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/oldsave=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.board = f.board || {}; f.board.hearts = {jason: 3, bo: 2}; f.story = {heard: {jason: 1}, day: {}}; f.guestLog = {luca: ["2026-09-01"]};
+    f.trophies = [{id: "maple-1", fam: "maple", n: 1, label: "Friendship", at: 1, book: false}]; f.where = {scene: "kidroom", x: 200, y: 400, day: "2026-10-14"};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:30&date=2026-10-14&oldsave=1"); await page.waitForTimeout(2000);
+  const f = await page.evaluate(() => window.__hbGame.F());
+  check(f.board.hearts.ornella === 3 && !("jason" in f.board.hearts) && f.story.heard.ornella === 1 && f.guestLog.dario && f.trophies[0].id === "chum-1", "old villager ids, hearts, stories and trophies carry over to the new names");
+  check(await page.evaluate(() => window.__hbGame.F().where.scene) === "guestroom", "and a game saved in the guest room's old name picks up in the guest room");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nyour own goals and bedtime, and Tomi's dairy")) try {
@@ -3139,7 +3154,7 @@ if (want("\nThe terrace and the Sunday long lunch (round 146)")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=12:40&date=2026-10-11"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=12:40&date=2026-10-11&terr=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1000);
   await page.locator('#world [data-spot="tdoor"]').dispatchEvent("click"); await page.waitForFunction(() => /terrace/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(2500);
   check(await page.locator("#world .billow").count() === 3 && await page.locator("#world .tcurtain").count() === 4, "out through the glass doors: canvas sails billowing, curtains swaying");
@@ -3217,15 +3232,15 @@ if (want("\nMulled wine, and the mill workshop and shop (round 153)")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=15:00&date=2026-10-13"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=15:00&date=2026-10-13&mcw=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("mill")); await page.waitForTimeout(3500);
+  await page.evaluate(() => window.__hbScene("mill")); await page.waitForTimeout(3500);
   check(await page.locator('#actors .npc[data-npc="tomi"]').count() === 1 && await page.locator('#world [data-millspot="stairs"]').count() === 1, "Tomi at the press; wooden stairs up");
   await page.locator('#world [data-millspot="stairs"]').dispatchEvent("click"); await page.waitForFunction(() => /upstairs/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(800);
   check(await page.locator('#world [data-millspot="bench"]').count() === 1 && await page.locator('#world [data-millspot="tasting"]').count() === 1 && await page.locator('#world [data-millspot="workshop"]').count() === 1, "upstairs: the workbench, the tasting table and the workshop corner");
-  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-spot="mcrate"]').count() === 1, "till the Mill Shop opens, a crate from the mill sits by the wine shop's counter");
   await page.locator('#world [data-spot="mcrate"]').dispatchEvent("click"); await page.waitForFunction(() => /From the mill/.test(document.querySelector("#ctx").textContent), null, { timeout: 20000 }).catch(() => {});
   check(/From the mill/.test(await page.locator("#ctx").textContent()), "tap the crate: what's in it and what's sold today");
-  await page.evaluate(() => window.__mapleScene("millup")); await page.waitForTimeout(2500);
+  await page.evaluate(() => window.__hbScene("millup")); await page.waitForTimeout(2500);
   { const bb = await page.locator('#world [data-millspot="bench"]').boundingBox(), hit = await page.evaluate(([x, y]) => !!document.elementFromPoint(x, y)?.closest('[data-millspot="bench"]'), [Math.min(bb.x + bb.width/2, page.viewportSize().width - 20), bb.y + bb.height/2]);
     check(hit, "a tap anywhere on the workbench lands on it, not the floor between its legs"); }
   await page.locator('#world [data-millspot="bench"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-mc="add:rosemary"]', { timeout: 20000 });
@@ -3269,7 +3284,7 @@ if (want("\nThe terrace's week: weddings, trivia, sip and paint, and the special
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=19:20&date=2026-10-14"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=19:20&date=2026-10-14&tw=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("terrace")); await page.waitForTimeout(5000);
+  await page.evaluate(() => window.__hbScene("terrace")); await page.waitForTimeout(5000);
   check(await page.locator('#actors .npc[data-npc="amara"].act-point').count() === 1 && await page.locator('#actors .npc[data-npc="bo"].act-sit').count() === 1 && await page.locator('#world [data-tspot="screen"]').count() === 1, "Wednesday night: Amara on the microphone, teams at the table, the screen up");
   check(await page.locator("#sceneArt rect.dusk").count() === 1 && await page.locator("#sceneArt .nglow").count() >= 8, "the terrace gets the evening light like everywhere outdoors, and its fairy lights, rattan lamps and candles glow");
   await page.locator('#world [data-tspot="screen"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-trv^="join"]', { timeout: 20000 });
@@ -3324,7 +3339,7 @@ if (want("\nStorage at home: the fridge and the garage shelf (round 166)")) try 
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=15:00&date=2026-10-13"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=15:00&date=2026-10-13&stg=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("home")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("home")); await page.waitForTimeout(1500);
   await page.locator('#world [data-spot="fridge"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-st="putall"]', { timeout: 20000 });
   check(await page.locator('#ctx [data-ftab="stored"][aria-selected="true"]').count() === 1, "the fridge opens on what's stored");
   await page.click('#ctx [data-ftab="shoplist"]'); await page.waitForTimeout(200);
@@ -3340,7 +3355,7 @@ if (want("\nStorage at home: the fridge and the garage shelf (round 166)")) try 
   await page.click('#ctx [data-st="putall"]'); await page.waitForTimeout(300);
   await page.click('#ctx [data-st="send"][data-id="raspberry"][data-to="scoop"]'); await page.waitForTimeout(300);
   check(await fox().then(f => !f.inv.raspberry && f.inv.balloon === 1 && f.scoop.fridge.raspberry === 5 && !f.storage.fridge.raspberry), "in the browser: raspberries into the fridge, then off to the Scoop Shack");
-  await page.evaluate(() => window.__mapleScene("garage")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("garage")); await page.waitForTimeout(1500);
   await page.locator('#world [data-spot="gshelf"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-st="put"][data-id="balloon"]', { timeout: 20000 });
   await page.click('#ctx [data-st="put"][data-id="balloon"]'); await page.waitForTimeout(300);
   check(await fox().then(f => !f.inv.balloon && f.storage.shelf.balloon === 1), "the garage shelf takes the rest");
@@ -3362,7 +3377,7 @@ if (want("\nThe Christmas market and hampers (rounds 172-174)")) try {
     check(xm.putOut(F, "chz_cheddar") === 2 && xm.putOut(F, "honey_lav") === 3 && xm.putWine(F, v, "w") === 1 && v.shelf[0].n === 2 && xm.putOut(F, "mc_x") === 0, "your stall: your cheeses, honey and a bottle off the shelves (and only things you've made)");
     check([..."abc"].every(() => true) && xm.worth("chz_cheddar") <= it.ITEMS.chz_cheddar.price && xm.worth("honey_lav") <= it.ITEMS.honey_lav.price, "everything sells at no more than it costs to buy");
     xm.putOut(F, "bar_dark"); xm.putOut(F, "honey"); F.inv.box4 = 1; F.inv.honeycomb = 1; check(xm.putOut(F, "box4") === 1 && xm.putOut(F, "honeycomb") === 0, "six kinds at most on the stall");
-    const real = Math.random; Math.random = () => .01; const got = xm.stallSellMinute(F, "2026-11-25", "mel"); Math.random = () => .07; const tin = xm.stallSellMinute(F, "2026-11-25", "tin"); Math.random = real;
+    const real = Math.random; Math.random = () => .01; const got = xm.stallSellMinute(F, "2026-11-25", "hero"); Math.random = () => .07; const tin = xm.stallSellMinute(F, "2026-11-25", "tin"); Math.random = real;
     check(got > 0 && tin === 0 && F.xmas.sold["2026-11-25"].n === 1, "it sells faster with you behind it than on the honesty tin");
     check(xm.takeWine(F, v, "w") === 1 && v.shelf[0].n === 3 && xm.takeBack(F, "honey_lav") === 3 && F.inv.honey_lav === 3, "unsold things go back"); }
   { const F = {inv: {honey_lav: 2, chz_cheddar: 1, bar_dark: 1}, coins: 20}, v = {shelf: [{id: "w", name: "Red", type: "red", n: 2, price: 18}]};
@@ -3392,7 +3407,7 @@ if (want("\nThe Christmas market and hampers (rounds 172-174)")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=17:29&date=2026-11-20"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=17:29&date=2026-11-20&xmc=1"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(3000);
+  await page.evaluate(() => window.__hbScene("field")); await page.waitForTimeout(3000);
   check(await page.locator('#world [data-place^="mstall"]').count() >= 7 && await page.locator('#world [data-place="xtree"]').count() === 1 && await page.locator('#world [data-place="xgrotto"]').count() === 1, "the Christmas market on the field: stalls, the tree, the grotto");
   await page.waitForTimeout(9000);
   check(await fox().then(f => f.xmas && f.xmas.lit && f.xmas.lit["2026"]), "the first night, the village counts the tree's lights on");
@@ -3400,7 +3415,7 @@ if (want("\nThe Christmas market and hampers (rounds 172-174)")) try {
   const c0 = await fox().then(f => f.coins); await page.click('#ctx [data-xtreat="xm_chestnut"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.coins === c0 - 3), "a cone of roast chestnuts, eaten on the spot");
   await page.goto(url + "?seed=1&time=15:00&date=2026-11-25"); await page.waitForTimeout(1000);
-  await page.evaluate(() => window.__mapleScene("post")); await page.waitForTimeout(2000);
+  await page.evaluate(() => window.__hbScene("post")); await page.waitForTimeout(2000);
   await page.locator('#world [data-spot="hampers"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-xh="start:small"]', { timeout: 20000 }).catch(() => {});
   check(await page.locator('#ctx [data-xh="start:big"]').count() === 1, "Penny's hamper table at the post office, in the season");
   await page.close();
@@ -3456,11 +3471,11 @@ if (want("\nThe Cocoa Room's vending machine (round 182)")) try {
   console.log("\nThe Cocoa Room's vending machine (round 182)");
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 500, goals: {cocoa: 1}}, c = cc.cocoaState(F);
   c.bars.dark = 10; c.plan.on = false; check(cc.buyCcUp(F, "vending") && F.coins === 100, "the vending machine, 400 coins from the catalogue");
-  const off = globalThis.__mapleOffset, rnd = Math.random, mon = wall("2026-10-12T04:00:00Z");   // Monday noon: the shop's shut
-  c.at = mon - 30*60e3; globalThis.__mapleOffset = mon - Date.now(); Math.random = () => .005; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+  const off = globalThis.__hbOffset, rnd = Math.random, mon = wall("2026-10-12T04:00:00Z");   // Monday noon: the shop's shut
+  c.at = mon - 30*60e3; globalThis.__hbOffset = mon - Date.now(); Math.random = () => .005; cc.cocoaTick(F); Math.random = rnd; globalThis.__hbOffset = off;
   check(c.bars.dark < 10 && c.vend === (10 - c.bars.dark)*c.prices.bar && F.coins === 100, `shut on Monday: bars sell from the machine at the full price, and the coins wait in it (${10 - c.bars.dark} sold, ${c.vend} coins)`);
   const box = c.vend; check(cc.emptyVending(F) === box && F.coins === 100 + box && !c.vend, "empty it at the counter");
-  const late = wall("2026-10-12T15:30:00Z"); c.at = late - 20*60e3; globalThis.__mapleOffset = late - Date.now(); Math.random = () => .005; const b0 = c.bars.dark; cc.cocoaTick(F); Math.random = rnd; globalThis.__mapleOffset = off;
+  const late = wall("2026-10-12T15:30:00Z"); c.at = late - 20*60e3; globalThis.__hbOffset = late - Date.now(); Math.random = () => .005; const b0 = c.bars.dark; cc.cocoaTick(F); Math.random = rnd; globalThis.__hbOffset = off;
   check(c.bars.dark === b0, "nothing after 11 at night");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe paperie in Montrose (round 183)")) try {
@@ -3489,14 +3504,14 @@ if (want("\nThe paperie in Montrose (round 183)")) try {
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-13"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-13&pppatch=buy"); await page.waitForTimeout(900);
-  await page.evaluate(() => window.__mapleScene("hm_lanes")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("hm_lanes")); await page.waitForTimeout(800);
   check(await page.locator('#world [data-place="bvhpaper"]').count() === 1 && /À VENDRE/.test(await page.locator("#world").innerHTML()), "Montrose's lanes: the shop with the green door, À VENDRE");
-  await page.evaluate(() => window.__mapleScene("bv_hpaper")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("bv_hpaper")); await page.waitForTimeout(800);
   await page.locator('#world [data-rdspot="pp_buy"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="paperie"]', {timeout: 15000});
   await page.click('#ctx [data-goal="paperie"]'); await page.waitForTimeout(800);
   const f1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   check(f1.goals.paperie && f1.coins === 500 && f1.paperie.scraps === 4, "buy it at the board: 1,500 coins, and a first box of scraps from home");
-  await page.evaluate(() => window.__mapleScene("bv_hpaper")); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__hbScene("bv_hpaper")); await page.waitForTimeout(800);
   check(await page.locator('#world [data-rdspot^="pp_"]').count() === 9, "inside: the scrap bin, tub, vat, add-in jars, press, drying line, shelves, till and ribbon rack");
   await page.locator('#world [data-rdspot="pp_scrap"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pp="tear"]', {timeout: 15000});
   await page.click('#ctx [data-pp="tear"]'); await page.waitForTimeout(500);
@@ -3601,7 +3616,7 @@ if (want("\nThe address book: post gifts and letters to people met on trips (rou
   await import(new URL("../src/game/ronda.js", import.meta.url)); const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
   const T = Date.UTC(2026, 9, 14, 3), D = 864e5;
   const F = {coins: 10, inv: {box4: 2}, met: {lvemile: true, lvpainter: true, hana: true}};
-  check(bk.canAdd(F, "lvemile") && !bk.canAdd(F, "lvpainter") && !bk.canAdd(F, "hana") && !bk.canAdd(F, "lvmargaux") && bk.canAdd({met: {jason: true}}, "jason"), "only people met on a trip, not day-trippers, not village folk (Ornella and Dario too, round 192)");
+  check(bk.canAdd(F, "lvemile") && !bk.canAdd(F, "lvpainter") && !bk.canAdd(F, "hana") && !bk.canAdd(F, "lvmargaux") && bk.canAdd({met: {ornella: true}}, "ornella"), "only people met on a trip, not day-trippers, not village folk (Ornella and Dario too, round 192)");
   check(bk.addable(F).join() === "lvemile" && bk.addContact(F, "lvemile", "2026-10-14") && bk.contacts(F).join() === "lvemile" && !bk.addable(F).length, "added to the book when you want");
   check(!!bk.postTo(F, "lvemile", {}, T).err && !bk.postTo(F, "lvemile", {open: "Thinking of you"}, T).err && F.coins === 10, "a letter needs a few words, and it's free");
   const e = bk.postTo(F, "lvemile", {item: "box4"}, T);
@@ -3619,7 +3634,7 @@ if (want("\nThe address book: post gifts and letters to people met on trips (rou
   check(vans.every(p => bk.PEN[p.id]), "round 191: every campervan local and neighbour has a voice of their own (" + vans.length + ")");
   const abroad = (await import(new URL("../src/data/npcs.js", import.meta.url))).NPCS.filter(p => ["ronda", "kyoto", "jeju", "cinque"].includes(p.local) && !p.tourist);
   check(abroad.every(p => bk.PEN[p.id]), "round 192: and everyone in Ronda, Kyoto, Jeju and Cinque Terre too (" + abroad.length + ")");
-  const J = {coins: 20, inv: {box4: 1}, met: {jason: true}}; bk.addContact(J, "jason", "d"); const je = bk.postTo(J, "jason", {item: "box4"}, T), jb = bk.replyBody(je);
+  const J = {coins: 20, inv: {box4: 1}, met: {ornella: true}}; bk.addContact(J, "ornella", "d"); const je = bk.postTo(J, "ornella", {item: "box4"}, T), jb = bk.replyBody(je);
   check(!je.err && je.at === T + 3*D && /^My dear friend,/.test(jb) && jb.includes("yellow house by the harbour") && !/\bMel\b|Jason|Luca/.test(jb) && /\nP\.S\. /.test(jb) && jb.split("\n\n").length >= 6 && /;/.test(jb), "Ornella writes back at length, semicolons and all, with a P.S. (and calls you friend)");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nEvery two-filling bonbon has a name (round 194: mint and pear crashed the bonbon table)")) try {
@@ -3645,7 +3660,7 @@ if (want("\nThe gift shop's gallery wall and makers' shelf (round 196)")) try {
   check(gal.sellMade(F, "mk_spoon") === 2 && gal.makersState(F).stock.mk_spoon === 2 && gal.makersState(F).week.bo === 9, "a spoon sells: you keep about a fifth (2 of 9), Bo the rest");
   check(gal.buyMade(F, "mk_cards") && F.coins === 44 && F.inv.mk_cards === 1 && it.ITEMS.mk_cards.kind === "gift", "you buy Auntie Lin's cards at the full price, to give");
   check(gal.stockUp(F, "2026-10-20") === 0 && gal.stockUp(F, "2026-10-26") > 0 && gal.forSale(F).length === 3, "the painters and makers come back the next Monday");
-  let sold = 0; for (let k = 0; k < 4000; k++) { const g2 = {coins: 0, inv: {}, goals: {giftshop: 1}}; gal.stockUp(g2, mon); if (gs.giftSellMinute(g2, mon, 600, "mel", {store: {}, v: {shelf: []}, cocoa: null, onDisplay: () => []}) === gal.TOKEN) sold++; }
+  let sold = 0; for (let k = 0; k < 4000; k++) { const g2 = {coins: 0, inv: {}, goals: {giftshop: 1}}; gal.stockUp(g2, mon); if (gs.giftSellMinute(g2, mon, 600, "hero", {store: {}, v: {shelf: []}, cocoa: null, onDisplay: () => []}) === gal.TOKEN) sold++; }
   check(sold > 0 && sold < 400, "shoppers buy a painting now and then, not often (" + sold + " in 4000 busy minutes)");
   const bk = await import(new URL("../src/game/contacts.js", import.meta.url)), ms = new Set(Object.values(gal.PAINTERS).flatMap(p => p.works.map(w => w[4])));
   check(ms.size === Object.values(gal.PAINTERS).reduce((a, p) => a + p.works.length, 0) && [...ms].every(m => gal.paintSVG(0, 0, 38, 48, {m, c1: "#000", c2: "#fff"}).length > 80), "round 197: every painting has its own picture (" + ms.size + ")");
@@ -3669,7 +3684,7 @@ if (want("\nFrom our travels: friends send boxes for the gift shop (round 198)")
   F.coins = 1; check(bk.travelTick(F, T + 30*D).skip.length === 1 && F.giftshop.travel[item] === 2*bk.BOX, "no coins, no box that week (nothing owed)");
   check(gal.takeTravel(F, item) && F.inv[item] === 1 && F.giftshop.travel[item] === 2*bk.BOX - 1, "you can take one off the shelf to give");
   let made = 0; const G = {coins: 0, inv: {}, goals: {giftshop: 1}, giftshop: {travel: {[item]: 500}}};
-  for (let k = 0; k < 2000; k++) { const c = gs.giftSellMinute(G, "2026-10-21", 600, "mel", {store: {}, v: {shelf: []}, cocoa: null, onDisplay: () => []}); if (c === it.ITEMS[item].price) made++; }
+  for (let k = 0; k < 2000; k++) { const c = gs.giftSellMinute(G, "2026-10-21", 600, "hero", {store: {}, v: {shelf: []}, cocoa: null, onDisplay: () => []}); if (c === it.ITEMS[item].price) made++; }
   check(made > 0 && G.giftshop.travel[item] === 500 - made, "shoppers buy them at Madame Roux's own price (" + made + " sold)");
   check(bk.stopLine(F, who) && !bk.lines(F).length && !bk.offersOpen(F, T + 40*D).length, "and you can stop the boxes whenever you like");
   const G2 = {coins: 0, met: {}, goals: {}}; G2.met[who] = true; bk.addContact(G2, who, "d"); [0, 1, 2].forEach(k => bk.postTo(G2, who, {open: "Hi"}, T + k));
