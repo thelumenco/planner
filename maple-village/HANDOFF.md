@@ -2566,3 +2566,9 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - **Kitchen:** hk_milk, hk_melon, kingcrab, unikura, kombu; specials `crabhotpot` 17, `kaisendon` 18, `misobuttercorn` 15 (43 trip specials). Scoop INGR Hokkaido milk, Yubari melon (hk_milk is not a bonbon filling). Fridge magnet `fridge9`.
 - **Family acts:** Mum `footbath`, Dad `crableg`, Ma Ma `unitray`, Gong Gong `onseneggs`, Darren `skis`, Marcus `softserve`, Angellina `musicbox`.
 - **Tests:** "Hokkaido by boat (rounds 222 to 225)"; specials count 43.
+
+## Round 226: the boat towns by ferry too (Mel)
+- `data/towns.js` (end): Saltwick, Portovenere, Puffin Isle, Bali and Hokkaido get `ferry: {fare, pier (= boat.pier), arrive (= boat.arrive), arriveLine, blurb, sees}`; fares a person (Evan free): Saltwick 12, Puffin Isle 16, Portovenere 28, Bali 45, Hokkaido 45 (dearer than your own boat's fuel for a family). Boat-town hours (out 8 to 2, last ferry home 7pm).
+- `game/trips.js` `ferryTowns()`; the ferry ticket panel has a chip per ferry town (`data-ftown`, core.js `ferryTown`) and shows `sees(month)` (Puffin Isle's seal pups / puffins) before you buy.
+- core.js townSpot: the ferry pier check comes before the station check, but in a boat town only on a ferry trip (the pier is also the boat's mooring). The Hokkaido scroll marks the season on a ferry arrival too.
+- Test "The boat towns by ferry (round 226)". (The auto seeder sows from seeds in the backpack; it never buys any.)

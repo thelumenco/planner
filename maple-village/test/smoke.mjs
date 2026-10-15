@@ -4605,6 +4605,32 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 
+// Round 226: the boat towns by ferry too (no boat needed): Puffin Isle from the jetty, told what's there, home by ferry
+{
+  console.log("\nThe boat towns by ferry (round 226)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`boat-town ferry pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/fypatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 300;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-16&fypatch=1"); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftown="puffin"]', { timeout: 15000 });
+  check(await page.locator("#ctx [data-ftown]").count() === 6, "the ferry board at the jetty: Jeju and all five boat towns");
+  await page.click('#ctx [data-ftown="puffin"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-tpick="mama"]'); await page.click('#ctx [data-tpick="evan"]'); await page.waitForTimeout(200);
+  const t = await page.locator("#ctx").innerText();
+  check(/seal pups/i.test(t) && /32/.test(await page.locator('#ctx [data-trip="puffin"][data-by="ferry"]').textContent()), "the ferry to Puffin Isle says what's there (seal pups now): you and Ma Ma 32 coins, Evan free");
+  await page.click('#ctx [data-trip="puffin"]'); await page.waitForTimeout(12000);
+  let f = await gf();
+  check(f.trip.town === "puffin" && f.trip.by === "ferry" && f.coins === 268 && /Haven/i.test(await page.locator("#sceneName").innerText()), "off the ferry at Puffin Isle's jetty, no boat of your own needed");
+  await page.locator('#world [data-place="piboat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="ferry"]', { timeout: 15000 });
+  await page.click('#ctx [data-triphome="ferry"]'); await page.waitForTimeout(12000);
+  check((await gf()).trip.done && /foreshore|shore/i.test(await page.locator("#sceneName").innerText()), "and the ferry home to the foreshore jetty");
+  await page.close();
+}
+
 {
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));

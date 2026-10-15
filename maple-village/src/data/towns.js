@@ -667,3 +667,10 @@ export const TASTINGS = {
   payoyo: {price: 6, line: "Payoyo with membrillo: salty goat's cheese and sweet quince paste. The waiter says it's how grandmothers do it."},
   naranjas: {price: 4, line: "Orange salad: Seville oranges, black olives, olive oil and a pinch of salt. Sweet, bitter, salty. Who knew?"}
 };
+
+// round 226 (Mel): the boat towns by ferry too, from the foreshore jetty, for a fare a person (Evan free); the ferry
+// ties up where your own boat would, keeps the boat towns' hours (out 8 to 2, last ferry home 7pm), and costs more
+// than your own boat's fuel for a family
+const FERRY_FARE = {saltwick: 12, porto: 28, puffin: 16, bali: 45, hokkaido: 45};
+Object.entries(FERRY_FARE).forEach(([k, fare]) => { const t = TOWNS[k]; if (!t || !t.boat || t.ferry) return;
+  t.ferry = {fare, pier: t.boat.pier, arrive: t.boat.arrive, arriveLine: t.arriveLine, blurb: t.boat.blurb || t.blurb, sees: t.boat.sees}; });

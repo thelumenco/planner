@@ -356,7 +356,7 @@ let ghBed = null, millOpen = false, lastMill = "";   // round 110: the olive pre
 let rondaView = null;   // round 107: a Ronda shop (ronda.js): "mercado", "tapas", "dulces", "convento", "azulejos"
 let woodsView = null;   // round 103: "ranger", "bike" or a river taxi stop id (transport.js, woods.js)
 let fishSpot = null, fishSt = {}, fishT = null;   // fishing: which spot Mel is at, and the cast in progress (fishing.js)
-let railOpen = false, lastTrain = "", tripPick = [], tripTown = "ronda", boatTown = null, swView = null, swSt = {}, pvView = null, pvSt = {}, piView = null, piSt = {}, baView = null, baSt = {}, hkView = null, hkSt = {};   // round 207: Saltwick Harbour's panels   // the timetable board on Honeybrook's platform
+let railOpen = false, lastTrain = "", tripPick = [], tripTown = "ronda", ferryTown = "jeju", boatTown = null, swView = null, swSt = {}, pvView = null, pvSt = {}, piView = null, piSt = {}, baView = null, baSt = {}, hkView = null, hkSt = {};   // round 207: Saltwick Harbour's panels   // the timetable board on Honeybrook's platform
 let lastFarm = 0;
 // the farm's clock: Mel's shelf at the farm stand sells, and a hive left full too long swarms
 function farmNow(){
@@ -1728,7 +1728,7 @@ function ctx(){
   else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van"), region: bvRegion});
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
   else if (railOpen === "boat" && scene === "shore") h = sailPanel(F, tripPick, boatTown, sgHM(), {rough: stormyOn(dayKey()), month: +dayKey().slice(5, 7)});   // round 205: your own boat
-  else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, "jeju", sgHM(), "ferry");   // round 127: the Jeju ferry from the jetty
+  else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, ferryTown, sgHM(), "ferry");   // round 127: the Jeju ferry from the jetty (round 226: and the boat towns)
   else if (railOpen && scene === "hlane") h = timetablePanel(dayKey(), sgHM(), true);
   else if (railOpen && townOf(scene)) h = homePanel(F, townOf(scene), sgHM(), railOpen === "ferry" || railOpen === "boat" ? railOpen : "train");
   else if (kyotoView && townOf(scene) === "kyoto") h = kyotoPanel(F, kyotoView, {...ktSt, evan: inParty(F, "evan") && !evanNight()});
@@ -1954,6 +1954,7 @@ function ctx(){
   c.querySelectorAll("[data-bvregion]").forEach(b => b.onclick = () => { bvRegion = b.dataset.bvregion; sfx("paper", true); ctx(); });
   c.querySelectorAll("[data-bvpass]").forEach(b => b.onclick = () => { bvView = "passport"; sfx("paper", true); ctx(); });
   c.querySelectorAll("[data-ttown]").forEach(b => b.onclick = () => { tripTown = b.dataset.ttown; sfx("tap"); ctx(); });
+  c.querySelectorAll("[data-ftown]").forEach(b => b.onclick = () => { ferryTown = b.dataset.ftown; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-tpick]").forEach(b => b.onclick = () => { const id = b.dataset.tpick; tripPick = tripPick.includes(id) ? tripPick.filter(x => x !== id) : railOpen === "boat" && tripPick.length >= BOAT_SEATS - 1 ? tripPick : [...tripPick, id]; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-btown]").forEach(b => b.onclick = () => { boatTown = b.dataset.btown; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-cruise]").forEach(b => b.onclick = () => { railOpen = false; tripPick = []; ctx(); startCruise(); });
@@ -2604,7 +2605,7 @@ function startTrip(town, by = "train"){
   const ride = own ? (tx, h, then) => boatRide(tx, false, then, town) : boat ? ferryRide : trainRide;
   ride(own ? `Casting off for ${r.town.n}!` : boat ? `All aboard the ferry for ${r.town.n}!` : `All aboard for ${r.town.n}!`, boat ? false : town, () => { if (town === "ronda") rondaVisit(F); setScene(land[0], land[1]);
     if (town === "jeju" && sgHM() < 8*60) setTimeout(() => speak("And look: the sun's just coming up out of the sea behind Seongsan, turning the crater gold. Worth the early start.", 6000), 8000);   // round 129: the early boat
-    if (own && town === "hokkaido") hkScroll(scrollSeason(dayKey()), 9500);   // round 225: a mark on the seasons scroll for this season
+    if ((own || boat) && town === "hokkaido") hkScroll(scrollSeason(dayKey()), 9500);   // round 225: a mark on the seasons scroll for this season
     if (own) { setTimeout(() => speak(`${r.town.boat.arriveLine || r.town.arriveLine}${t.party.length ? ` ${partyList(t)} climb${t.party.length > 1 ? "" : "s"} out onto the quay behind you.` : ""} Sail home before dark: 7pm at the latest.`, 6500), 900); }
     else setTimeout(() => speak(`${(boat && r.town.ferry.arriveLine) || r.town.arriveLine || `${r.town.n}! Whitewashed walls, orange trees and a sky so blue it hums.`}${t.party.length ? ` ${partyList(t)} pile${t.party.length > 1 ? "" : "s"} off the ${boat ? "ferry" : "train"} behind you.` : ""} The last ${boat ? "ferry" : "train"} home is at 10pm.`, 6500), 900);
     if (inParty(F, "evan")) setTimeout(() => evanSays(pick(r.town.evanArrive || ["Mama, it's SO sunny!", "Big birdies in the sky!", "Are we in Spain? Is this Spain?"])), 3200); });
@@ -2865,8 +2866,8 @@ function townSpot(id){
   if (id === "bvswing") { speak(T.say[id] || "The rope swing: a fat rope with a knot at the bottom, hanging off a river red gum over the swimming hole.", 4000); sfx("chime"); gainXp(1);
     setTimeout(() => { speak(pick(["You grab the rope, run, and swing out over the water... and let go. SPLASH. It's freezing! It's wonderful!", "Out, out, out over the river, and back again. You chicken out of letting go. Next time.", "You swing, let go at the very top, and hit the water with a whoop that sends the cockatoos up."]), 6000); mprop("sparkle", mel.x + 30, mel.y - 40, 1400); }, 1800);
     if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["MY turn! hold me, Mama!", "WHEEEEEE!", "again! AGAIN!"])), 4200); save(); render(); return; }
+  if (T.ferry && id === T.ferry.pier && (T.by !== "boat" || (tripOn(F) || {}).by === "ferry")) { railOpen = "ferry"; sfx("paper", true); render(); return; }   // Jeju (and the boat towns, round 226): the ferry home
   if (id === T.station) { railOpen = true; sfx("paper", true); render(); return; }
-  if (T.ferry && id === T.ferry.pier) { railOpen = "ferry"; sfx("paper", true); render(); return; }   // Jeju: the ferry home
   const room = roomBehind(town, id);   // round 116: the tapas bar, the café, the market, the baths and the garden have insides
   if (room) { sfx("paper", true); setScene(room, [260, 560]); setTimeout(() => speak(T.rooms[room].say, 5000), 700); if (town === "kyoto") setTimeout(() => stampHere(room), 5800);
     // a touch (round 134): Beppe gives Evan a warm heel of focaccia (once a day)
