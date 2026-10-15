@@ -31221,7 +31221,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const sg = new Date(at7 + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm11 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
       out.mins++;
       out.done = finish(c, at7) || out.done;
-      if (c.plan.on && opts.hand !== false && handOn(day, hm11)) handStep(F2, c, at7, out);
+      if (c.plan.on && opts.hand !== false && (handOn(day, hm11) || openOn(day, hm11, ccUp(c, "assistant")))) handStep(F2, c, at7, out);
       if (ccUp(c, "tree") && at7 - (c.treeAt || at7) >= TREE_EVERY) {
         c.treeAt = at7;
         c.beans++;
@@ -31485,7 +31485,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function planPanel(F2, st6 = {}) {
     const c = cocoaState(F2), p = c.plan;
     const step4 = (a, k, v, label2) => `<div class="row gprices"><span>${label2}</span><span class="gstep"><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="-1" aria-label="Less">−</button><b>${v}</b><button class="btn small alt" data-cc="${a}" data-k="${k}" data-n="1" aria-label="More">+</button></span></div>`;
-    let h3 = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line on his shifts (Monday to Saturday, 9:30 to 4:30; he studies in the evenings)${st6.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
+    let h3 = `<p class="eyebrow" style="margin:14px 0 6px">Kitchen plan</p><p class="muted">${p.on ? `Mateo runs the bar line on his shifts (Monday to Saturday, 9:30 to 4:30; he studies in the evenings), and Amara keeps it going between customers till closing${st6.hand ? " (he's in the kitchen now)" : ""}. The bonbon shelf fills first and he never moulds it into bars.` : "Mateo's paused: the kitchen only runs when you work it."}</p>`;
     h3 += `<div class="actions"><button class="btn small ${p.on ? "alt" : "primary"}" data-cc="plan" data-k="on">${p.on ? "Pause Mateo" : "Mateo, back to work"}</button></div>`;
     h3 += Object.entries(KINDS2).map(([k, d]) => step4("keep", k, c.keep[k], `${dot2(d.col)} Keep for bonbons: ${d.n.split(" ")[0].toLowerCase()} <small class="muted">(${c.res[k]} there)</small>`)).join("");
     h3 += `<div class="row gprices"><span>Auto-buy beans</span><button class="btn small ${p.buy ? "primary" : "alt"}" data-cc="plan" data-k="buy" aria-pressed="${p.buy}">${p.buy ? "On" : "Off"}</button></div>`;
@@ -31839,6 +31839,66 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <p class="muted">${t2.n ? `Sold today: ${t2.n}, for ${t2.coins} coins (${["bonbon", "bar", "mill", "wine", "pair", "wrap", "art", "made", "travel"].filter((k) => t2[k]).map((k) => `${t2[k]} ${{ bonbon: "bonbon boxes", bar: "bars", mill: "from the mill", wine: "bottles", pair: "pairing boxes", wrap: "wrapped gifts", art: "paintings", made: "from the makers", travel: "from your travels" }[k]}`).join(", ")}).` : "Nothing sold yet today."} Everything here is shared stock: the Cocoa Room's display case and bar wall, the mill's shelves, the wine shop's bottles.</p>` + shut9;
   }
 
+  // src/game/mill.js
+  var JARS_PER_BOTTLE = 3;
+  var PRESS_MAX = 12;
+  var PRESS_DUR = 1 * H;
+  function millStory(F2) {
+    const m = millState(F2);
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>The old photograph</h2><p class="sub">A brown, curling photograph in a frame by the door: the windmill with its sails new and white, a man in a flat cap leaning on the doorpost, and a young olive tree in a pot at his feet. On the back, in pencil: <i>Tomás, 1912</i>.</p>
+    <p>The mill was built in 1887 to grind Honeybrook's wheat, back when every loaf in the village started here. When the railway came in 1912, so did flour by the sack, and the millstone went quiet. The sails kept turning anyway. Nobody had the heart to stop them.</p>
+    <p>The railway brought Tomás too: a track-layer from a white village in the hills near Ronda, with an olive cutting from his grandfather's tree wrapped in a wet handkerchief in his coat pocket. He planted it beside the mill, said olives and windmills were old friends where he came from, and told anyone who'd listen that one day this mill would press olives.</p>
+    <p>His initials are still carved in the beam over the press: <b>T.R. 1912</b>. ${m.made ? `It took a hundred and some years, but it does now: ${m.made} bottle${m.made > 1 ? "s" : ""} of your oil so far.` : "It took a hundred and some years. Your first pressing will prove him right."}</p>
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function millState(F2) {
+    F2.mill = F2.mill || {};
+    const m = F2.mill;
+    if (!("press" in m)) m.press = null;
+    m.made = m.made || 0;
+    return m;
+  }
+  var pressLeft = (m) => m.press ? Math.max(0, m.press.start + m.press.dur - Date.now()) : 0;
+  var olivesHave = (F2) => (F2.inv && F2.inv.olives || 0) + (vineState(F2).oliveCrate || 0);
+  function startPress(F2, n) {
+    const m = millState(F2);
+    if (m.press) return null;
+    n = Math.min(PRESS_MAX, n, Math.floor(olivesHave(F2) / JARS_PER_BOTTLE));
+    if (n < 1) return null;
+    let need2 = n * JARS_PER_BOTTLE;
+    const v = vineState(F2);
+    const fromBag = Math.min(need2, F2.inv && F2.inv.olives || 0);
+    if (fromBag) {
+      F2.inv.olives -= fromBag;
+      if (F2.inv.olives <= 0) delete F2.inv.olives;
+      need2 -= fromBag;
+    }
+    if (need2) v.oliveCrate -= need2;
+    m.press = { start: Date.now(), dur: PRESS_DUR, n };
+    return `${n * JARS_PER_BOTTLE} jars of olives under the millstone. ${n} bottle${n > 1 ? "s" : ""} of oil in about an hour.`;
+  }
+  function collectOil(F2, addInv2) {
+    const m = millState(F2);
+    if (!m.press || pressLeft(m)) return null;
+    const n = m.press.n;
+    m.press = null;
+    m.made += n;
+    addInv2("oliveoil", n);
+    return `${n} bottle${n > 1 ? "s" : ""} of your own olive oil, green-gold and peppery. Into your backpack.`;
+  }
+  var mins = (ms) => {
+    const m = Math.max(1, Math.ceil(ms / 6e4));
+    return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
+  };
+  function millPanel(F2) {
+    const m = millState(F2), have2 = olivesHave(F2), can = Math.min(PRESS_MAX, Math.floor(have2 / JARS_PER_BOTTLE)), left7 = pressLeft(m), v = vineState(F2);
+    let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The olive press</h2><p class="sub">Three jars of olives make a bottle of olive oil: crushed under the millstone, pressed between the mats. Up to ${PRESS_MAX} bottles a pressing, about an hour.</p>`;
+    h3 += `<p class="muted">${icon("olives", 16)} Olives: ${F2.inv && F2.inv.olives || 0} in your backpack${v.oliveCrate ? `, ${v.oliveCrate} in the vineyard crate` : ""}.${m.made ? ` Bottles pressed so far: ${m.made}.` : ""}</p>`;
+    if (m.press) h3 += left7 ? `<p>Pressing ${m.press.n} bottle${m.press.n > 1 ? "s" : ""}: ready in ${mins(left7)}.</p><span class="clbar"><i style="width:${Math.round(100 * (1 - left7 / m.press.dur))}%"></i></span>` : `<p><b>The oil's ready!</b></p><div class="actions"><button class="btn primary" data-mill="collect">Bottle it (${m.press.n})</button></div>`;
+    else h3 += can ? `<div class="actions">${[1, Math.min(4, can), can].filter((n, i, a) => a.indexOf(n) === i).map((n) => `<button class="btn ${n === can ? "primary" : "alt"}" data-mill="press" data-n="${n}">Press ${n} bottle${n > 1 ? "s" : ""} (${n * JARS_PER_BOTTLE} jars)</button>`).join("")}</div>` : `<p class="muted">Not enough olives for a bottle yet. Your olive tree (and the grove, from the vineyard stall) give jars every six hours; Elena sells them at the Sunday market too.</p>`;
+    return h3 + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+
   // src/game/millcraft.js
   var CRAFT = { steep: 6 * 36e5, cure: 24 * 36e5, lotion: 36e5, jars: 3, rack: 3, oilPer: 2, soapPer: 6, lotionPer: 3, balm: 36e5, balmPer: 4, lipoil: 24 * 36e5, lipoilPer: 3, rollers: 2, waxPer: 2 };
   var HERB = {
@@ -32108,14 +32168,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var SHOPKEEP = { from: 10 * 60, to: 17 * 60, closed: [1] };
   function inesStep(F2, m, v, t2 = Date.now()) {
     const c = craftState(F2), did = {};
-    if (m.press && m.press.by === "ines" && m.press.start + m.press.dur <= t2) {
+    if (m.press && m.press.start + m.press.dur <= t2) {
       c.basket.oliveoil = (c.basket.oliveoil || 0) + m.press.n;
       m.made = (m.made || 0) + m.press.n;
       did.pressed = m.press.n;
       m.press = null;
     }
     if (!m.press && (v.oliveCrate || 0) >= 3) {
-      const n = Math.min(4, Math.floor(v.oliveCrate / 3));
+      const n = Math.min(PRESS_MAX, Math.floor(v.oliveCrate / 3));
       v.oliveCrate -= n * 3;
       m.press = { start: t2, dur: 36e5, n, by: "ines" };
       did.started = n;
@@ -32156,7 +32216,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return h3 + shut10;
   }
   var dots2 = (adds) => `<span class="mullsw">${adds.map((a) => `<i style="background:${HERB[a].col}"></i>`).join("")}</span>`;
-  var mins = (ms) => {
+  var mins2 = (ms) => {
     const m = Math.max(1, Math.ceil(ms / 6e4));
     return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
   };
@@ -32165,7 +32225,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The workbench</h2><div class="tabs" role="tablist">${[["oil", "Oils"], ["soap", "Soaps"], ["lotion", "Lotions"], ["balm", "Lip balms"], ["lipoil", "Lip oils"], ["shelves", "Shelves"], ["basket", "Basket"]].map(([k, n]) => `<button role="tab" data-mc="tab:${k}" aria-selected="${k === tab}">${n}</button>`).join("")}</div>`;
     const jobs = (list10, what) => list10.map((j) => {
       const r = c.recipes.find((x) => x.id === j.id) || { name: "?" };
-      return `<li><span class="wtxt"><b>${esc(r.name)}</b><small>${what} · ready in ${mins(left4(j))}</small></span></li>`;
+      return `<li><span class="wtxt"><b>${esc(r.name)}</b><small>${what} · ready in ${mins2(left4(j))}</small></span></li>`;
     }).join("");
     if (tab === "shelves") {
       const ids = Object.keys(c.store);
@@ -34260,66 +34320,6 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var FILMS = ["The Lighthouse Cat", "A Picnic for Badger", "The Kite That Flew to Sea", "Lantern Festival", "Grandma's Bakery", "The Little Red Train", "Moon over the Harbour", "The Snail Who Raced", "Fox and the Fireflies", "The Orchard Mystery", "Bicycle Summer", "Snow on the Vineyard"];
   var filmOf = (day) => FILMS[(+day.slice(5, 7) + +day.slice(0, 4)) % FILMS.length];
   if (!ITEMS.popcorn) ITEMS.popcorn = { n: "Popcorn", ico: "popcorn", kind: "gift", to: "family", price: 3, say: "Popcorn! Salty and sweet, the best kind." };
-
-  // src/game/mill.js
-  var JARS_PER_BOTTLE = 3;
-  var PRESS_MAX = 4;
-  var PRESS_DUR = 1 * H;
-  function millStory(F2) {
-    const m = millState(F2);
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>The old photograph</h2><p class="sub">A brown, curling photograph in a frame by the door: the windmill with its sails new and white, a man in a flat cap leaning on the doorpost, and a young olive tree in a pot at his feet. On the back, in pencil: <i>Tomás, 1912</i>.</p>
-    <p>The mill was built in 1887 to grind Honeybrook's wheat, back when every loaf in the village started here. When the railway came in 1912, so did flour by the sack, and the millstone went quiet. The sails kept turning anyway. Nobody had the heart to stop them.</p>
-    <p>The railway brought Tomás too: a track-layer from a white village in the hills near Ronda, with an olive cutting from his grandfather's tree wrapped in a wet handkerchief in his coat pocket. He planted it beside the mill, said olives and windmills were old friends where he came from, and told anyone who'd listen that one day this mill would press olives.</p>
-    <p>His initials are still carved in the beam over the press: <b>T.R. 1912</b>. ${m.made ? `It took a hundred and some years, but it does now: ${m.made} bottle${m.made > 1 ? "s" : ""} of your oil so far.` : "It took a hundred and some years. Your first pressing will prove him right."}</p>
-    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
-  }
-  function millState(F2) {
-    F2.mill = F2.mill || {};
-    const m = F2.mill;
-    if (!("press" in m)) m.press = null;
-    m.made = m.made || 0;
-    return m;
-  }
-  var pressLeft = (m) => m.press ? Math.max(0, m.press.start + m.press.dur - Date.now()) : 0;
-  var olivesHave = (F2) => (F2.inv && F2.inv.olives || 0) + (vineState(F2).oliveCrate || 0);
-  function startPress(F2, n) {
-    const m = millState(F2);
-    if (m.press) return null;
-    n = Math.min(PRESS_MAX, n, Math.floor(olivesHave(F2) / JARS_PER_BOTTLE));
-    if (n < 1) return null;
-    let need2 = n * JARS_PER_BOTTLE;
-    const v = vineState(F2);
-    const fromBag = Math.min(need2, F2.inv && F2.inv.olives || 0);
-    if (fromBag) {
-      F2.inv.olives -= fromBag;
-      if (F2.inv.olives <= 0) delete F2.inv.olives;
-      need2 -= fromBag;
-    }
-    if (need2) v.oliveCrate -= need2;
-    m.press = { start: Date.now(), dur: PRESS_DUR, n };
-    return `${n * JARS_PER_BOTTLE} jars of olives under the millstone. ${n} bottle${n > 1 ? "s" : ""} of oil in about an hour.`;
-  }
-  function collectOil(F2, addInv2) {
-    const m = millState(F2);
-    if (!m.press || pressLeft(m)) return null;
-    const n = m.press.n;
-    m.press = null;
-    m.made += n;
-    addInv2("oliveoil", n);
-    return `${n} bottle${n > 1 ? "s" : ""} of your own olive oil, green-gold and peppery. Into your backpack.`;
-  }
-  var mins2 = (ms) => {
-    const m = Math.max(1, Math.ceil(ms / 6e4));
-    return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
-  };
-  function millPanel(F2) {
-    const m = millState(F2), have2 = olivesHave(F2), can = Math.min(PRESS_MAX, Math.floor(have2 / JARS_PER_BOTTLE)), left7 = pressLeft(m), v = vineState(F2);
-    let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The olive press</h2><p class="sub">Three jars of olives make a bottle of olive oil: crushed under the millstone, pressed between the mats. Up to ${PRESS_MAX} bottles a pressing, about an hour.</p>`;
-    h3 += `<p class="muted">${icon("olives", 16)} Olives: ${F2.inv && F2.inv.olives || 0} in your backpack${v.oliveCrate ? `, ${v.oliveCrate} in the vineyard crate` : ""}.${m.made ? ` Bottles pressed so far: ${m.made}.` : ""}</p>`;
-    if (m.press) h3 += left7 ? `<p>Pressing ${m.press.n} bottle${m.press.n > 1 ? "s" : ""}: ready in ${mins2(left7)}.</p><span class="clbar"><i style="width:${Math.round(100 * (1 - left7 / m.press.dur))}%"></i></span>` : `<p><b>The oil's ready!</b></p><div class="actions"><button class="btn primary" data-mill="collect">Bottle it (${m.press.n})</button></div>`;
-    else h3 += can ? `<div class="actions">${[1, can].filter((n, i, a) => a.indexOf(n) === i).map((n) => `<button class="btn ${n === can ? "primary" : "alt"}" data-mill="press" data-n="${n}">Press ${n} bottle${n > 1 ? "s" : ""} (${n * JARS_PER_BOTTLE} jars)</button>`).join("")}</div>` : `<p class="muted">Not enough olives for a bottle yet. Your olive tree (and the grove, from the vineyard stall) give jars every six hours; Elena sells them at the Sunday market too.</p>`;
-    return h3 + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
-  }
 
   // src/game/greenhouse.js
   var GH_BEDS = 6;
