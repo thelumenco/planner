@@ -169,3 +169,13 @@ setup card, whose last question ("Who's waiting on the porch?") is the pet. Your
 are always in shadow, since you haven't chosen how you look yet. Skippable; "Watch the story again" in Settings.
 Eight villagers have a line about Wilf. Singapore is allowed in the story's two files only (leak-check.mjs ALLOW).
 Dev builds skip it unless the page has ?intro=1; window.__mapleIntro(i) opens one screen.
+
+## Planned: a Honeybrook wiki (after the public launch)
+Like the Stardew Valley wiki: a companion site players can browse for the full villager stories (every chapter, by
+heart level), each villager's favourite gifts, where to buy or grow things, schedules, events, day-trip towns and
+their shops, recipes, and the little secrets. A cheat sheet for anyone who wants one; the game itself never needs
+it. Right now nobody can know a villager's favourites without it. Reference so far: FAVOURITES.md (generated from
+the game data). Before the wiki, the favourites themselves want balancing: the seven villagers who took the family's
+places each have 80 to 140 favourite presents (everything bought on trips was made for them), while the other twenty
+have a handful of crops at most and several have none at all. Plan: each villager gets a short hand-picked list of
+loves (around six to ten), and every other present is a nice gift (half a heart).
