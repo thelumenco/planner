@@ -155,9 +155,10 @@ export const PI_BOUNDS = {
   pi_warden: [30, 250, 490, 600], pi_lamp: [30, 250, 490, 600], pi_kitchen: [30, 250, 490, 600], pi_studio: [30, 250, 490, 600], pi_tearoom: [30, 250, 490, 600]
 };
 export const PI_OBST = {
-  // the sea and the rocks either side of the cove, the cove and the jetty, Dai's lobster pots, the warden's hut and its
-  // water butt, the rabbit warren, the bracken and the old walls in the bottom corners, the signpost
-  pi_haven: [[0, 0, 164, 198], [164, 0, 384, 116], [384, 0, 520, 190], [300, 116, 346, 144], [40, 206, 170, 316], [340, 400, 472, 466], [0, 540, 124, 640], [404, 548, 520, 640], [0, 198, 30, 300], [196, 288, 208, 306]],
+  // the sea and the rocks either side of the cove, the cove and the jetty, Dai's lobster pots, the puffin burrows on the
+  // east clifftop, the warden's hut and its water butt, the rabbit warren, the bracken and the old walls in the bottom
+  // corners, the west cliff, the signpost
+  pi_haven: [[0, 0, 164, 198], [164, 0, 384, 116], [384, 0, 520, 190], [200, 116, 248, 150], [404, 192, 520, 258], [40, 206, 170, 316], [340, 400, 472, 466], [0, 540, 124, 640], [404, 548, 520, 640], [0, 198, 30, 300], [196, 288, 208, 306]],
   // the sea along the top, the cliffs and the Wick, the burrow slope behind the rope, the east cliffs, the bench, the
   // boulders, the bracken and the old wall in the bottom corners
   pi_wick: [[0, 0, 520, 64], [186, 56, 520, 236], [196, 236, 520, 324], [480, 324, 520, 640], [124, 200, 176, 220], [66, 450, 96, 470], [0, 560, 134, 640], [392, 566, 520, 640], [0, 64, 40, 300]],
