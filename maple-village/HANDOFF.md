@@ -2582,3 +2582,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - core.js `bikeRow(bounds)`: Tomo's ride-by picks the row nearest just below Mel with a clear stretch at least 280 wide (checked at y, y-14, y+4 against `rideBlocked`), and rides only along that stretch (npcs.js `rideBy(..., xr)`, fading in and out when it stops short of the screen edge); no clear row, no ride-by.
 - paths.js `rideBlocked`: the walking obstacles plus bike-only ones for screens without walking obstacles (`RIDE.bay`: the sea, the deck, the Scoop Shack, the shopfront under renovation, the trees). On the foreshore the walkable bounds keep him off the sea.
 - Test: in "the ice cream trolley, and the delivery bike's orders", shore and bay checks.
+
+## Round 229 (Mel: "I'm stuck here on mobile", Mel above the gift shop's back wall)
+- core.js `unstick()` (every frame, indoor rooms with an INNER arrive point only; not while sitting or paddling): if Mel is well outside the room's walkable bounds (30px sideways/below, 40px above), she's put back at the room's arrive point by the door. Covers a stale saved spot (F.where) or a sync from another device.
+- Test "Never stuck outside a room (round 229)" (opens with resume on).

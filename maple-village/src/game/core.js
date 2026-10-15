@@ -4283,6 +4283,14 @@ function bubbleAt(el, ex, ey, off, forceBelow){
   const below = (forceBelow && roomBelow) || py - bh - 10 < cam.top - 6; el.classList.toggle("below", below);
   el.style.top = (below ? (ey + 8)*sc + cam.oy + 10 : py - 10) + "px";
 }
+// round 229 (Mel: "I'm stuck here on mobile", above the gift shop's back wall): if Mel is ever well outside the
+// screen's walkable ground (a stale saved spot, a sync from another device), put her back inside by the door
+function unstick(){
+  if (sup || mel.sitting || typeof paddling !== "undefined" && paddling || !INNER[scene] || !INNER[scene].arrive || scene === "kidroom") return;   // indoors only: outside, paddleboards and boats go past the edges on purpose
+  const b = bounds(), out = mel.x < b[0] - 30 || mel.x > b[2] + 30 || mel.y < b[1] - 40 || mel.y > b[3] + 30; if (!out) return;
+  const a = INNER[scene].arrive;
+  mel.x = mel.tx = a[0]; mel.y = mel.ty = a[1]; mel.path = []; route = []; maple.x = maple.tx = a[0] - 22; maple.y = maple.ty = a[1] + 2; cam.snap = true;
+}
 let last = performance.now();
 function frame(now){
   const dt = Math.min(.05, (now - last)/1000); last = now;
@@ -4294,6 +4302,7 @@ function frame(now){
     if (outside() && blocked(scene, nx, ny)) { if (!blocked(scene, nx, mel.y)) ny = mel.y; else if (!blocked(scene, mel.x, ny)) nx = mel.x; else { nx = mel.x; ny = mel.y; } }
     mel.tx = nx; mel.ty = ny;
   }
+  unstick();
   const arrived = stepTo(mel, (keys.size ? 190 : 220)*(outside() && !sup && !townOf(scene) ? rideSpeed(F) : 1), dt);   // the scooter and car (big goals) are faster
   if (arrived && !keys.size && mel.path && mel.path.length) { const n = mel.path.shift(); mel.tx = n[0]; mel.ty = n[1]; mel.moving = true; }
   else if (arrived && !keys.size && (mel.wasMoving || mel.force)) {

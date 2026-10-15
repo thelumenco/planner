@@ -4653,6 +4653,22 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(monEve.ground === "dark", "6pm on a Monday (shop shut, Mateo gone): the pot waits for the morning"); }
 }
 
+// Round 229 (Mel: "I'm stuck here on mobile"): Mel saved outside a room's floor (above the gift shop's back wall) is
+// put back inside by the door when the game opens
+{
+  console.log("\nNever stuck outside a room (round 229)");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, resume: true });
+  page.on("pageerror", e => errors.push(`unstick pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/stuckpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.goals = {...(f.goals || {}), giftshop: 1}; f.where = {scene: "giftshop", x: -8, y: -24, day: "2026-10-14"};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-14&stuckpatch=1"); await page.waitForTimeout(2500);
+  const at = await page.evaluate(() => { const m = document.querySelector("#mel").getAttribute("transform").match(/translate\(([-\d.]+)[ ,]+([-\d.]+)\)/); return [+m[1], +m[2]]; });
+  check(/gift shop/i.test(await page.locator("#sceneName").innerText()) && at[0] > 300 && at[1] > 300, `back in the gift shop, Mel's put inside by the door, not stuck above the wall (${at.map(Math.round)})`);
+  await page.close();
+}
+
 {
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
