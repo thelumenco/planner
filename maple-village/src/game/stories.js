@@ -36,7 +36,7 @@ function eligible(F, id, day){
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 // Ronda's locals tell theirs on a day trip, quest or no quest (Mel's on holiday); the two-a-day limit still holds
-const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "pvrosa", "ilario", "bianca", "morwenna", "pifinn", "piivy"];   // Ronda's, Kyoto's, Saltwick's, Portovenere's and Puffin Isle's, and Jason in Cinque Terre
+const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "pvrosa", "ilario", "bianca", "morwenna", "pifinn", "piivy", "bawayan", "bamade", "baketut"];   // Ronda's, Kyoto's, Saltwick's, Portovenere's, Puffin Isle's and Bali's, and Jason in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
   if (id === "jason") return eligible(F, id, day);   // Jason (Mel's friend) tells his whenever she visits, a chapter a day, outside the two-a-day limit
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;
@@ -77,7 +77,14 @@ const REWARDS = {
   pialmanac: (F, addInv) => { addInv("pi_almanac", 1); return "Morwenna's island almanac, with her tide notes pencilled in"; },
   pipostcard: (F, addInv) => { addInv("pi_postcard", 1); return "a puffin-stamp postcard from Finn, with Captain Pebbles' logbook entry on the back"; },
   pipuffin: (F, addInv) => { addInv("pi_puffin", 1); return "a knitted puffin from Finn, to celebrate Little Pebble fledging (he's named it)"; },
-  pisuncatcher: (F, addInv) => { addInv("pi_suncatcher", 1); return "a sea-glass suncatcher from Ivy, a twin of the red one in the lamp room (a keepsake)"; }
+  pisuncatcher: (F, addInv) => { addInv("pi_suncatcher", 1); return "a sea-glass suncatcher from Ivy, a twin of the red one in the lamp room (a keepsake)"; },
+  // Bali's locals
+  basarong: (F, addInv) => { addInv("ba_sarong", 1); return "a sarong from Ibu Wayan, for the temple festival (wear a sash with it)"; },
+  bavanilla: (F, addInv) => { addInv("ba_vanilla", 3); return "three Bali vanilla pods from Kadek's vine, pollinated by hand"; },
+  bacoffee: (F, addInv) => { addInv("ba_coffee", 1); return "a bag of Kintamani coffee from Made's uncle, for late rehearsals"; },
+  bakite: (F, addInv) => { addInv("ba_kite", 1); return "a Balinese kite with a hummer, from the gamelan boys on the beach"; },
+  basilverear: (F, addInv) => { addInv("ba_silverear", 1); return "a pair of Ketut's silver filigree earrings, made from his mistake flowers"; },
+  bagaruda: (F, addInv) => { addInv("ba_garuda", 1); return "a little carved Garuda from Gede's wedding, for good luck (a keepsake)"; }
 };
 // flags that change the game: the koi tip, Farid's pastries on the menu
 export function applyFlags(F){

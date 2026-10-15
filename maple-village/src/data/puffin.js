@@ -133,7 +133,7 @@ export const PI_PLACES = {
   piboathouse: {scene: "pi_point", name: "Ivy's boathouse", door: [96, 528], spot: true, mark: [96, 460], line: "Ivy's boathouse studio."},
   pipools: {scene: "pi_point", name: "The rock pools", door: [356, 470], spot: true, mark: [400, 530], line: "The rock pools."},
   piglass: {scene: "pi_point", name: "The sea-glass cove", door: [236, 534], spot: true, mark: [240, 570], line: "The sea-glass cove."},
-  piseals: {scene: "pi_point", name: "The seal beach", door: [378, 370], spot: true, mark: [440, 360], line: "The seal beach."},
+  piseals: {scene: "pi_point", name: "The seal beach", door: [360, 372], spot: true, mark: [420, 380], line: "The seal beach."},
   piToWickN: {scene: "pi_point", name: "The coast path", door: [200, 40], spot: true, bridge: "pi_wick", mark: [200, 90], line: "North along the coast path to the Wick."},
   piToFarmW: {scene: "pi_point", name: "The lighthouse lane", door: [20, 330], spot: true, bridge: "pi_farm", mark: [70, 310], line: "West along the lane to the old farm."}
 };
@@ -165,7 +165,7 @@ export const PI_OBST = {
   pi_farm: [[20, 56, 240, 204], [282, 56, 488, 214], [40, 372, 222, 478], [0, 574, 520, 640], [438, 498, 480, 528], [200, 160, 240, 204], [470, 140, 520, 280]],
   // the sea down the east side and along the bottom, the lighthouse and its wall, the keeper's cottage, the seal beach,
   // the rock pools, the sea-glass cove, the boathouse, the gorse, the washing line posts
-  pi_point: [[460, 0, 520, 640], [0, 588, 520, 640], [362, 26, 436, 236], [226, 110, 356, 226], [398, 272, 520, 462], [336, 482, 520, 640], [166, 552, 330, 640], [34, 410, 158, 516], [0, 26, 120, 200], [130, 150, 136, 214]],
+  pi_point: [[460, 0, 520, 640], [0, 588, 520, 640], [362, 26, 436, 236], [226, 110, 356, 226], [376, 264, 520, 466], [336, 482, 520, 640], [166, 552, 330, 640], [34, 410, 158, 516], [0, 26, 120, 200], [130, 150, 136, 214]],
   ...PI_ROOM_OBST
 };
 export const PI_NAMES = {pi_haven: "Puffin Isle: North Haven", pi_wick: "Puffin Isle: the Wick", pi_farm: "Puffin Isle: the Old Farm", pi_point: "Puffin Isle: Lighthouse Point"};
