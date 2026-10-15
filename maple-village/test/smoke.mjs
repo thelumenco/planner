@@ -3084,8 +3084,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
-    check(sp.length === 34 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
-      "the 34 dishes from the trips (rounds 207 and 211: and Saltwick's and Portovenere's three each) are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(sp.length === 37 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 37 dishes from the trips (rounds 207, 211 and 215: Saltwick's, Portovenere's and Puffin Isle's three each) are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "jason"), L = np.NPCS.find(n => n.id === "luca");
@@ -4440,6 +4440,59 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await go("pv_castle"); await place("pvcastle"); await place("pvfigs"); await go("pv_point"); await place("pvgrotto"); await go("pv_harbour"); await place("pvpalmaria"); await go("pv_mussels"); await spot("pvropes");
   f = await gf();
   check(Object.keys(f.porto.lines).length === 6 && f.inv.pv_notebook === 1, "six lines from six corners of town: the poet's notebook");
+  await page.close();
+}
+
+// Rounds 214 to 217: Puffin Isle by boat: told what's on the island before setting off (seal pups in October), the four
+// screens, the bird count, the lens, a suncatcher, sea glass for the jar
+{
+  console.log("\nPuffin Isle by boat (rounds 214 to 217)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`puffin isle pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/pipatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 500; f.goals = {...(f.goals || {}), boat: 1};
+    f.puffin = {glass: {white: 1, green: 1, brown: 1, blue: 1, aqua: 1, purple: 1}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const go = async sc => { await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(1500); };
+  const spot = async id => { await page.locator(`#world [data-rdspot="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(2500); };
+  const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(7000); };
+  const name = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-16&pipatch=1"); await page.waitForTimeout(1500);
+  await go("shore"); await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-btown="puffin"]', { timeout: 15000 });
+  await page.click('#ctx [data-btown="puffin"]'); await page.waitForTimeout(300);
+  const sail = await page.locator("#ctx").innerText();
+  check(/Fuel 14/.test(sail) && /seal pups/i.test(sail) && /April/.test(sail), "before setting off for Puffin Isle in October, the boat says what's there: seal pups now, puffins back in April");
+  await page.click('#ctx [data-tpick="evan"]'); await page.waitForTimeout(100); await page.click('#ctx [data-trip="puffin"]'); await page.waitForTimeout(9000);
+  check(await page.locator('#world [data-place="piboat"]').count() === 1 && /Haven/i.test(await name()), "you tie up at the stone jetty in North Haven");
+  check(/Wick/i.test(await (async () => { await place("piToWick"); return name(); })()), "east to the Wick, the seabird cliffs");
+  check(/Point|Lighthouse/i.test(await (async () => { await place("piToPoint"); return name(); })()) && await page.locator('#world [data-place="piglass"]').count() === 1, "south to Lighthouse Point: the lighthouse, the keeper's cottage, the boathouse, the sea-glass cove");
+  check(/Farm/i.test(await (async () => { await place("piToFarmW"); return name(); })()), "west to the old farm");
+  check(/Haven/i.test(await (async () => { await place("piToHavenN"); return name(); })()), "and north back to the haven");
+  // sea glass: the seventh colour (red, the rarest) completes the jar; three finds a day
+  await go("pi_point"); await page.evaluate(() => { Math.random = () => 0.999; }); await place("piglass");
+  let f = await gf();
+  check(f.puffin.glass.red === 1 && f.inv.pi_glassjar === 1, "a piece of ruby-red sea glass on the cove, the last colour: the jar of sea glass to keep");
+  await place("piglass"); await place("piglass"); await place("piglass");
+  check((await gf()).puffin.glassToday === 3, "only three finds a day: the sea brings more tomorrow");
+  // the bird count with Finn (seal pups in October)
+  await go("pi_warden"); await spot("picount"); await page.click('#ctx [data-pi="count"]'); await page.waitForTimeout(300);
+  for (let k = 0; k < 8; k++) { const t = await page.locator("#ctx p b, #ctx p[style]").last().innerText(); await page.click(`#ctx [data-pi="${/!$/.test(t.trim()) ? "click" : "let"}"]`); await page.waitForTimeout(120); }
+  await page.click('#ctx [data-pi="countdone"]'); await page.waitForTimeout(800);
+  f = await gf();
+  check(f.puffin.counts.length === 1 && f.puffin.counts[0].season === "seals", "the bird count at Finn's window: in October it's the seal pups on the beach, and your tally in the logbook");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // the lens with Morwenna
+  await go("pi_lamp"); await spot("pipolish"); await page.click('#ctx [data-pi="lens"]'); await page.waitForTimeout(300);
+  for (let k = 0; k < 4; k++) { await page.click(`#ctx [data-pi="panel:${k}"]`); await page.waitForTimeout(120); }
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-pi="wind"]'); await page.waitForTimeout(120); }
+  await page.click('#ctx [data-pi="lensdone"]'); await page.waitForTimeout(800);
+  check((await gf()).puffin.lens === 1, "polishing the great lens with Morwenna and winding the clockwork");
+  // a suncatcher at Ivy's bench
+  await go("pi_studio"); await spot("pisuncatcher"); await page.click('#ctx [data-pi="sun"]'); await page.waitForTimeout(300);
+  for (const k of ["red", "green", "blue", "aqua", "white"]) { await page.click(`#ctx [data-pi="glass:${k}"]`); await page.waitForTimeout(120); }
+  await page.click('#ctx [data-pi="sundone"]'); await page.waitForTimeout(800);
+  check((await gf()).inv.pi_suncatcher === 1, "a sea-glass suncatcher made at Ivy's bench, to keep");
   await page.close();
 }
 

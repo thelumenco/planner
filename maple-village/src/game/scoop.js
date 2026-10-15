@@ -60,6 +60,7 @@ export const INGR = {
     // from Bellbird Valley (round 142)
   seasalt: ["Saltwick sea salt", "Sea Salt", "#E8ECEE"], dulse: ["Dulse seaweed", "Seaweed", "#8A3A4A"],   // from Saltwick Harbour (round 207)
   chestnutflour: ["Chestnut flour", "Chestnut", "#A8754F"], capers: ["Salted capers", "Caper", "#7A8A4A"], fennelseed: ["Wild fennel seeds", "Fennel", "#A8B86A"],   // from Portovenere (round 211)
+  seabuckthorn: ["Sea buckthorn", "Sea Buckthorn", "#F28C28"], pi_honey: ["Island thyme honey", "Thyme Honey", "#E3B04B"],   // from Puffin Isle (round 215)
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
   yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)

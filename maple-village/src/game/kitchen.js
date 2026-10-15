@@ -47,7 +47,9 @@ export const GOODS = {
   // round 207: from Saltwick Harbour's fish market
   lobster: ["lobster", "lobsters"], crab_brown: ["brown crab", "brown crabs"], onion: ["sweet onion", "sweet onions"], seasalt: ["jar of sea salt", "jars of sea salt"], dulse: ["bag of dulse", "bags of dulse"],
   // round 211: from Portovenere
-  mussels: ["bag of mussels", "bags of mussels"], chestnutflour: ["bag of chestnut flour", "bags of chestnut flour"], capers: ["jar of salted capers", "jars of salted capers"], fennelseed: ["jar of wild fennel seeds", "jars of wild fennel seeds"]};
+  mussels: ["bag of mussels", "bags of mussels"], chestnutflour: ["bag of chestnut flour", "bags of chestnut flour"], capers: ["jar of salted capers", "jars of salted capers"], fennelseed: ["jar of wild fennel seeds", "jars of wild fennel seeds"],
+  // round 215: from Puffin Isle
+  seabuckthorn: ["jar of sea buckthorn berries", "jars of sea buckthorn berries"], samphire: ["bunch of rock samphire", "bunches of rock samphire"], pi_honey: ["jar of island thyme honey", "jars of island thyme honey"]};
 export const GROUP_ICON = {farmcheese: "chz_cheddar", halloumi: "chz_halloumi", bluecheese: "chz_blue", cheddar: "chz_cheddar", honey: "honey", petals: "tulip"};
 // Wildflower Farm's cheeses (chz_*) come in as themselves: any of them does for "cheese" in a recipe, and the farm
 // cheese board wants one; goat's milk does for milk (the press, the crema). See ALT.
@@ -138,6 +140,9 @@ Object.assign(TAPAS, {swlobster: {n: "Lobster with garlic butter", need: {lobste
 // round 211: Portovenere's (Rosa's stuffed mussels; castagnaccio, the chestnut cake; spaghetti with capers)
 Object.assign(TAPAS, {muscoli: {n: "Muscoli ripieni (stuffed mussels)", need: {mussels: 2, loaf: 1, egg: 1}, price: 16}, castagnaccio: {n: "Castagnaccio (chestnut cake)", need: {chestnutflour: 1, rosemary: 1, oliveoil: 1}, price: 15},
   capperi: {n: "Spaghetti with capers and tomato", need: {flour: 1, capers: 1, tomato: 2}, price: 15}});
+// round 215: Puffin Isle's (from Bryn's tearoom: sea buckthorn off the cliffs, rock samphire off the rocks, thyme honey from the hives)
+Object.assign(TAPAS, {buckthorn: {n: "Sea buckthorn tart", need: {seabuckthorn: 1, flour: 1, egg: 1}, price: 15}, samphirefritters: {n: "Samphire fritters", need: {samphire: 1, flour: 1, egg: 1}, price: 15},
+  honeycake: {n: "Thyme honey cake", need: {pi_honey: 1, flour: 1, egg: 1, thyme: 1}, price: 16}});
 // round 158: the Tablelands' (macadamias and finger limes from Nutwood Farm; prawns from the sea; honey from the farm)
 Object.assign(TAPAS, {macslice: {n: "Macadamia honey slice", need: {macadamia: 2, honey: 1, flour: 1}, price: 12}, flprawns: {n: "Prawns with finger lime", need: {shrimp: 3, fingerlime: 1, loaf: 1}, price: 13},
   lamington: {n: "Lamingtons", need: {flour: 1, egg: 1, coconut: 1}, price: 11}});
@@ -352,9 +357,10 @@ export const SPECIALS = {salmorejo: ["ronda", 17], ajoblanco: ["ronda", 17], cro
   macslice: ["tablelands", 15], flprawns: ["tablelands", 16], lamington: ["tablelands", 14],
   madeleines: ["lavender", 15], chevretart: ["lavender", 16], ratatouille: ["lavender", 15],
   swlobster: ["saltwick", 17], crabcroq: ["saltwick", 16], yorkies: ["saltwick", 15],
-  muscoli: ["porto", 16], castagnaccio: ["porto", 15], capperi: ["porto", 15]};
+  muscoli: ["porto", 16], castagnaccio: ["porto", 15], capperi: ["porto", 15],
+  buckthorn: ["puffin", 15], samphirefritters: ["puffin", 15], honeycake: ["puffin", 16]};
 Object.entries(SPECIALS).forEach(([id, [town, price]]) => Object.assign(TAPAS[id], {special: town, price}));
-export const TOWN_NAME = {ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", saltwick: "Saltwick Harbour", porto: "Portovenere"};
+export const TOWN_NAME = {ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", saltwick: "Saltwick Harbour", porto: "Portovenere", puffin: "Puffin Isle"};
 export const beenTo = (F, town) => town === "lavender" ? !!(F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).some(s => /^bv_(lavender|hilltown|perfume|honey|bridge|chapel)$/.test(s))) : town === "tablelands" ? !!(F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).some(s => /^bv_(falls|crater|town|dairy|nuts|gold)$/.test(s))) : town === "coast" ? !!(F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).some(s => /^bv_(breakwater|lighthouse|gully|harbour|sisters|cove)$/.test(s))) : !!((F.towns && F.towns[town]) || F[town]);   // (the Coast Road: once she's stamped a stop there)   // (F.towns from round 132; a town's own state for earlier trips)
 // where each ingredient comes from, shown on the recipe cards (Mel: "where do I get almonds? squid?")
 export const SOURCE = {
@@ -372,4 +378,4 @@ export const SOURCE = {
   almond: "Ronda's market", sevilla: "Ronda's market", jamon: "Ronda's market", payoyo: "Ronda's market", membrillo: "Ronda's market",
   yuzu: "Kyoto's market", miso: "Kyoto's market", tofu: "Kyoto's market", mochi: "Kyoto's market",
   tangerine: "Jeju (or your own tangerine tree)", hallabong: "Jeju's market", omija: "Jeju's market", blackpork: "Jeju's market", abalone: "Jeju's divers' house",
-  goldensyrup: "Bellbird Valley's general store", wattleseed: "Bellbird Valley's general store", scallop: "the co-op at Fisher's Harbour (the Coast Road)", lobster: "Nan Storr's fish market (Saltwick Harbour)", crab_brown: "Nan Storr's fish market (Saltwick Harbour)", onion: "Nan Storr's fish market (Saltwick Harbour)", seasalt: "Nan Storr's fish market (Saltwick Harbour)", dulse: "Nan Storr's fish market (Saltwick Harbour)", mussels: "Rosa's mussel co-op (Portovenere)", chestnutflour: "the bar on the quay (Portovenere)", capers: "the bar on the quay (Portovenere)", fennelseed: "the bar on the quay (Portovenere)", macadamia: "the cracking shed at Nutwood Farm (the Tablelands)", fingerlime: "the packing shed at Nutwood Farm (the Tablelands)", honey_sun: "the honey house at Sunflower Hill (the Lavender Hills)", honey_cream: "your hives (cream a jar at the honey hut)", euchoney: "the farm shed at Bellbird Valley", coconut: "Hana's deli shelf at the market", honey_lav: "your hives at Wildflower Farm (with the lavender out)", chz_fresh: "Elena's cheese cave (fresh goat's cheese)", raspberry: "your garden (canes from the market, once you've been to Bellbird Valley) or the berry farm"};
+  goldensyrup: "Bellbird Valley's general store", wattleseed: "Bellbird Valley's general store", scallop: "the co-op at Fisher's Harbour (the Coast Road)", lobster: "Nan Storr's fish market (Saltwick Harbour)", crab_brown: "Nan Storr's fish market (Saltwick Harbour)", onion: "Nan Storr's fish market (Saltwick Harbour)", seasalt: "Nan Storr's fish market (Saltwick Harbour)", dulse: "Nan Storr's fish market (Saltwick Harbour)", mussels: "Rosa's mussel co-op (Portovenere)", chestnutflour: "the bar on the quay (Portovenere)", capers: "the bar on the quay (Portovenere)", fennelseed: "the bar on the quay (Portovenere)", seabuckthorn: "Bryn's farm tearoom (Puffin Isle)", samphire: "Bryn's farm tearoom (Puffin Isle)", pi_honey: "Bryn's farm tearoom (Puffin Isle)", macadamia: "the cracking shed at Nutwood Farm (the Tablelands)", fingerlime: "the packing shed at Nutwood Farm (the Tablelands)", honey_sun: "the honey house at Sunflower Hill (the Lavender Hills)", honey_cream: "your hives (cream a jar at the honey hut)", euchoney: "the farm shed at Bellbird Valley", coconut: "Hana's deli shelf at the market", honey_lav: "your hives at Wildflower Farm (with the lavender out)", chz_fresh: "Elena's cheese cave (fresh goat's cheese)", raspberry: "your garden (canes from the market, once you've been to Bellbird Valley) or the berry farm"};
