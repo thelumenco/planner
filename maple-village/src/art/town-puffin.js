@@ -357,7 +357,7 @@ function pointScreen(){
   // the seal beach: a pebbly cove under the lighthouse; pups in autumn, a seal or two bobbing in summer
   const beachD = "M468 268 Q392 288 380 360 Q374 432 462 466 Q452 446 448 420 Q444 390 446 360 Q448 320 458 296z";
   const sealsHere = s === "seals" ? seal(426, 318, .95, -1) + pup(414, 362, 1.45, -1, 0) + pup(412, 412, 1.35, 1, 1) + pup(434, 446, 1.15, -1, 2) + sealHead(476, 360, 1, 0) + sealHead(490, 420, .9, 1)
-    : s === "winter" ? "" : sealHead(482, 380, 1, 0) + sealHead(492, 470, .85, 1);
+    : s === "winter" ? "" : seal(422, 372, .9, 1) + sealHead(482, 380, 1, 0) + sealHead(492, 470, .85, 1);
   const seals = place("piseals", 360, 372, 26, 9, "The seal beach", NP(sk(`<path d="${beachD}" fill="${C.pebble}"/>`, `<path d="${beachD}"/>`) + shoreRock("M468 266 Q390 286 378 360 Q372 434 460 470", 7) + `<path d="M458 296 Q448 320 446 360 Q444 390 448 420 Q452 446 462 460" stroke="${C.foam}" stroke-width="2.4" fill="none" opacity=".85"><animate attributeName="opacity" values=".9;.35;.9" dur="4.4s" repeatCount="indefinite"/></path>` + Array.from({length: 24}, (_, k) => `<ellipse cx="${f1(394 + rnd(k + 5)*46)}" cy="${f1(300 + rnd(k + 33)*150)}" rx="1.6" ry="1.1" fill="${["#A9A396", "#8E897E"][k % 2]}"/>`).join("") + sealsHere), "Seal beach", 340, 396, "#BFE0DA");
   // the rock pools: a shelf of grey rock with pools in it: anemones, a starfish, a crab, samphire in the cracks
   const pools = place("pipools", 356, 470, 26, 9, "The rock pools", NP(sk(`<path d="M340 488 Q380 476 440 480 Q478 488 480 530 Q486 580 466 600 Q400 608 346 600 Q332 560 340 488z" fill="${C.rock3}"/>`, `<path d="M340 488 Q380 476 440 480 Q478 488 480 530 Q486 580 466 600 Q400 608 346 600 Q332 560 340 488z"/>`)

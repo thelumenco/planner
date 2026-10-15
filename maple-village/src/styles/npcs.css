@@ -408,3 +408,59 @@
 @keyframes glassA{from{transform:rotate(-156deg)}to{transform:rotate(-164deg)}}@keyframes glassI{from{transform:rotate(4deg)}to{transform:rotate(-4deg)}}
 @keyframes glintS{0%,30%,100%{transform:scale(.3);opacity:0}50%{transform:scale(1.1);opacity:1}70%{transform:scale(.9);opacity:.7}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-garland .armR,.ch.npc .threadf,.ch.npc.act-waddle .armR,.ch.npc.act-waddle .armL,.ch.npc.act-waddle .flip > g,.ch.npc.act-waddle .legL,.ch.npc.act-waddle .legR,.ch.npc.act-forage .armR,.ch.npc.act-forage .bob,.ch.npc.act-forage .inhand,.ch.npc.act-forage .sprig,.ch.npc.act-brass .armR,.ch.npc.act-brass .inhand,.ch.npc .rag,.ch.npc.act-coilrope .armR,.ch.npc.act-coilrope .inhand,.ch.npc.act-sealwatch .legR,.ch.npc.act-seaglass .armR,.ch.npc.act-seaglass .inhand{animation:none}.ch.npc.act-garland .armR{transform:rotate(-118deg)}.ch.npc.act-waddle .armR{transform:rotate(-38deg) scaleY(.8)}.ch.npc.act-waddle .armL{transform:rotate(38deg) scaleY(.8)}.ch.npc.act-forage .armR{transform:rotate(-12deg)}.ch.npc.act-forage .inhand{transform:rotate(23deg)}.ch.npc.act-brass .armR{transform:rotate(-79deg)}.ch.npc.act-coilrope .armR{transform:rotate(-60deg)}.ch.npc.act-seaglass .armR{transform:rotate(-160deg)}.ch.npc .shine,.ch.npc .glint{animation:none;opacity:1}}
+
+/* a day out in Bali (never done anywhere before): Mum sways to the gamelan with a frangipani behind her ear and soft hands,
+   Dad sips from a green coconut with his eyes shut, Ma Ma walks proud on the spot with a basket of fruit on her head, Gong
+   Gong dozes cross-legged in the bale under his caping, Darren bends to plant rice seedlings knee-deep in the paddy, Marcus
+   keeps very still with a macaque on his head, Angellina practises Legong hands (fingers fluttering, eyes darting).
+   (.inhandl: like .inhand, for the left arm, round the left shoulder) */
+.ch.npc.act-flowerear:not(.walk) .flip > g{transform-origin:0 0;animation:fearS 2.8s ease-in-out infinite alternate}
+.ch.npc.act-flowerear:not(.walk) .armR,.ch.npc.act-flowerear:not(.walk) .inhand{animation:fearR 1.4s ease-in-out infinite alternate}
+.ch.npc.act-flowerear:not(.walk) .armL,.ch.npc.act-flowerear:not(.walk) .inhandl{animation:fearL 1.4s ease-in-out infinite alternate}
+@keyframes fearS{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+@keyframes fearR{from{transform:rotate(-38deg)}to{transform:rotate(-54deg)}}@keyframes fearL{from{transform:rotate(54deg)}to{transform:rotate(38deg)}}
+.ch.npc.act-coconut:not(.walk) .armR{animation:cocoA 4.4s ease-in-out infinite}
+.ch.npc.act-coconut:not(.walk) .inhand{animation:cocoI 4.4s ease-in-out infinite}
+.ch.npc.act-coconut:not(.walk) .flip > g{transform-origin:0 0;animation:cocoT 4.4s ease-in-out infinite}
+.ch.npc .bliss{opacity:0}.ch.npc.act-coconut:not(.walk) .bliss{animation:blissH 4.4s ease-out infinite}
+@keyframes cocoA{0%,55%,100%{transform:rotate(-131deg)}66%,86%{transform:rotate(-137deg)}}@keyframes cocoI{0%,55%,100%{transform:rotate(4deg)}66%,86%{transform:rotate(-2deg)}}
+@keyframes cocoT{0%,55%,100%{transform:rotate(0)}66%,86%{transform:rotate(-3deg)}}
+@keyframes blissH{0%,70%{opacity:0;transform:translateY(3px)}80%{opacity:1}100%{opacity:0;transform:translateY(-5px)}}
+.ch.npc.act-headbasket:not(.walk) .armR{transform:rotate(-170deg)}
+.ch.npc.act-headbasket:not(.walk) .armL{animation:hbArm 2.4s ease-in-out infinite alternate}
+.ch.npc.act-headbasket:not(.walk) .legL{animation:hbLeg 2.4s ease-in-out infinite}.ch.npc.act-headbasket:not(.walk) .legR{animation:hbLeg 2.4s ease-in-out infinite -1.2s}
+.ch.npc.act-headbasket:not(.walk) .flip > g{transform-origin:0 0;animation:hbSway 2.4s ease-in-out infinite}
+@keyframes hbArm{from{transform:rotate(14deg)}to{transform:rotate(-10deg)}}
+@keyframes hbLeg{0%,50%,100%{transform:translateY(0)}25%{transform:translateY(-2px)}}
+@keyframes hbSway{0%,100%{transform:translateX(-.6px) rotate(-2deg)}50%{transform:translateX(.6px) rotate(2deg)}}
+.ch.npc.act-bale:not(.walk) .legL,.ch.npc.act-bale:not(.walk) .legR{display:none}.ch.npc.walk .xlegs{display:none}
+.ch.npc.act-bale:not(.walk) .bob{transform:translateY(11px)}
+.ch.npc.act-bale:not(.walk) .flip > g > ellipse{transform:scaleX(1.5)}
+.ch.npc.act-bale:not(.walk) .armR{transform:rotate(-24deg)}.ch.npc.act-bale:not(.walk) .armL{transform:rotate(24deg)}
+.ch.npc.act-bale:not(.walk) .bhead{transform-box:fill-box;transform-origin:50% 100%;animation:baleNod 6s ease-in-out infinite}
+@keyframes baleNod{0%,30%,100%{transform:rotate(0)}55%,72%{transform:rotate(10deg)}76%{transform:rotate(1deg)}82%{transform:rotate(5deg)}}
+.ch.npc.walk .paddy{display:none}
+.ch.npc.act-plant:not(.walk) .bob{animation:plantB 3.4s ease-in-out infinite}
+.ch.npc.act-plant:not(.walk) .armR,.ch.npc.act-plant:not(.walk) .inhand{animation:plantA 3.4s ease-in-out infinite}
+.ch.npc.act-plant:not(.walk) .armL,.ch.npc.act-plant:not(.walk) .inhandl{transform:rotate(-34deg)}
+.ch.npc .prip{opacity:0}.ch.npc.act-plant:not(.walk) .prip{transform-box:fill-box;transform-origin:50% 50%;animation:pripR 3.4s ease-out infinite}
+@keyframes plantB{0%,20%,90%,100%{transform:rotate(4deg)}42%,64%{transform:rotate(23deg)}}
+@keyframes plantA{0%,20%,90%,100%{transform:rotate(-24deg)}42%,64%{transform:rotate(-24deg)}50%,56%{transform:rotate(-20deg)}}
+@keyframes pripR{0%,48%{opacity:0;transform:scale(.4)}56%{opacity:1;transform:scale(.7)}90%,100%{opacity:0;transform:scale(1.4)}}
+.ch.npc.act-monkeyhead:not(.walk) .armR{transform:rotate(-26deg)}.ch.npc.act-monkeyhead:not(.walk) .armL{transform:rotate(26deg)}
+.ch.npc .mqh{animation:mqLook 5.2s ease-in-out infinite}
+.ch.npc .mqa{animation:mqScr 7s ease-in-out infinite}
+.ch.npc .sweat{opacity:0;animation:sweatD 5.2s ease-in infinite}
+@keyframes mqLook{0%,18%,48%,62%,100%{transform:rotate(0)}24%,40%{transform:rotate(-22deg)}70%,86%{transform:rotate(18deg) translateX(.6px)}}
+@keyframes mqScr{0%,52%,90%,100%{transform:rotate(0)}58%,66%,74%,82%{transform:rotate(-128deg)}62%,70%,78%{transform:rotate(-108deg)}}
+@keyframes sweatD{0%,60%{opacity:0;transform:translateY(0)}68%{opacity:1}100%{opacity:0;transform:translateY(5px)}}
+.ch.npc.act-legong:not(.walk) .armR{transform:rotate(-110deg)}.ch.npc.act-legong:not(.walk) .armL{transform:rotate(110deg)}
+.ch.npc.act-legong:not(.walk) .legL,.ch.npc.act-legong:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.86)}
+.ch.npc.act-legong:not(.walk) .bob{transform:translateY(2px)}
+.ch.npc.act-legong:not(.walk) .bhead{animation:legongH 2.4s ease-in-out infinite}
+.ch.npc .fing{animation:fingF .22s ease-in-out infinite alternate}
+.ch.npc .dart{animation:dartE 2.4s steps(1) infinite}
+@keyframes legongH{0%,20%,100%{transform:translateX(0)}28%,44%{transform:translateX(1.8px)}52%,68%{transform:translateX(-1.8px)}76%{transform:translateX(0)}}
+@keyframes fingF{from{transform:rotate(-12deg)}to{transform:rotate(10deg)}}
+@keyframes dartE{0%,20%{transform:translateX(0)}28%,44%{transform:translateX(.9px)}52%,68%{transform:translateX(-.9px)}76%,100%{transform:translateX(0)}}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-flowerear .flip > g,.ch.npc.act-flowerear .armR,.ch.npc.act-flowerear .inhand,.ch.npc.act-flowerear .armL,.ch.npc.act-flowerear .inhandl,.ch.npc.act-coconut .armR,.ch.npc.act-coconut .inhand,.ch.npc.act-coconut .flip > g,.ch.npc .bliss,.ch.npc.act-headbasket .armL,.ch.npc.act-headbasket .legL,.ch.npc.act-headbasket .legR,.ch.npc.act-headbasket .flip > g,.ch.npc.act-bale .bhead,.ch.npc.act-plant .bob,.ch.npc.act-plant .armR,.ch.npc.act-plant .inhand,.ch.npc .prip,.ch.npc .mqh,.ch.npc .mqa,.ch.npc .sweat,.ch.npc.act-legong .bhead,.ch.npc .fing,.ch.npc .dart{animation:none}.ch.npc.act-flowerear .armR,.ch.npc.act-flowerear .inhand{transform:rotate(-46deg)}.ch.npc.act-flowerear .armL,.ch.npc.act-flowerear .inhandl{transform:rotate(46deg)}.ch.npc.act-coconut .armR{transform:rotate(-135deg)}.ch.npc.act-plant .bob{transform:rotate(14deg)}.ch.npc.act-plant .armR,.ch.npc.act-plant .inhand{transform:rotate(-24deg)}.ch.npc .bliss,.ch.npc .sweat{opacity:0}}

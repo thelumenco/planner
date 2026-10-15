@@ -26,6 +26,10 @@ const board = k => `<ellipse cx="0" cy="${-1*k}" rx="${22*k}" ry="${3.6*k}" styl
 const paddle = k => `<path d="M${12*k} ${-30*k} l${5*k} ${32*k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16*k} ${-2*k} l${2*k} ${8*k} l${3*k} ${-1*k} l${-2*k} ${-8*k}z" ${S("#7FB8E8")}/>`;
 const cap = (c, y, r) => `<path d="M${-r-.2} ${y+1} c-1 -9 4 -14 ${r} -14 c6 0 ${r+1} 4 ${r} 14 c-3 -4 -8 -5 -12 -4 c-3 0 -6 2 -8 4z" ${S(c)}/>`;
 
+// (Bali) eyes shut: skin over the open eyes and a contented curve; and a limb or straw: an outlined stroke
+const shut = (look, k) => [-1, 1].map(d => `<ellipse cx="${d*3.7*k}" cy="${-44*k}" rx="${1.7*k}" ry="${2.1*k}" ${S(look.skin)} stroke="none"/><path d="M${(d*3.7 - 1.6)*k} ${-44.2*k} q${1.6*k} ${1.4*k} ${3.2*k} 0" fill="none" stroke-width="${.9*k}"/>`).join("");
+const limb = (d, col, w) => `<path d="${d}" fill="none" stroke-width="${w + 1.6}" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--line)"/><path d="${d}" fill="none" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" style="stroke:${col}"/>`;
+
 function extra(kind, look, k){
   const y = -46*k, r = 10.6*k;
   switch (kind){
@@ -211,6 +215,64 @@ function extra(kind, look, k){
     // a chip of green sea glass held up high to the sun, turning, with a glint and a few rays
     case "glasslight": return `<g class="inhand" style="transform-origin:${9.9*k}px ${-34*k}px"><path d="M${12.6*k} ${-49*k} l${2.4*k} ${-2.6*k} l${3.4*k} ${.4*k} l${.8*k} ${3*k} l${-2.6*k} ${2.4*k} l${-3.2*k} ${-.6*k}z" style="fill:#5FC9B0" fill-opacity=".9" stroke-width="${.8*k}"/><path d="M${14.2*k} ${-49.8*k} l${1.4*k} ${-1.2*k}" fill="none" stroke-width="${.8*k}" style="stroke:#E6FFF6"/><circle cx="${14*k}" cy="${-45.4*k}" r="${2.1*k}" ${S(look.skin)}/>`
       + `<g class="glint"><path d="M${19.4*k} ${-55.4*k} l${.8*k} ${-2.6*k} l${.8*k} ${2.6*k} l${2.6*k} ${.8*k} l${-2.6*k} ${.8*k} l${-.8*k} ${2.6*k} l${-.8*k} ${-2.6*k} l${-2.6*k} ${-.8*k}z" style="fill:#FFF6C8" stroke-width="${.5*k}"/><path d="M${11*k} ${-54*k} l${-1.6*k} ${-1.6*k} M${15.6*k} ${-56.4*k} v${-2.4*k} M${21.4*k} ${-49*k} h${2.4*k}" fill="none" stroke-width="${.8*k}" stroke-linecap="round" style="stroke:#F3C969"/></g></g>`;
+    // a day out in Bali (never done anywhere before): Mum's frangipani behind her ear (and her soft gamelan hands), Dad's
+    // green coconut with a straw, Ma Ma's basket of fruit on her head, Gong Gong's caping (rice-farmer's hat) as he dozes
+    // cross-legged in the bale, Darren knee-deep in a paddy with a bundle of rice seedlings, the macaque on Marcus's head,
+    // Angellina's Legong hands. (Helpers: shut eyes drawn over the open ones; a skin forearm with an outline.)
+    case "frangipani": { const petal = (cx, cy, s) => [0, 1, 2, 3, 4].map(i => { const a = i*72 - 90, rad = a*Math.PI/180;
+        return `<ellipse cx="${cx + Math.cos(rad)*2.3*s}" cy="${cy + Math.sin(rad)*2.3*s}" rx="${2.5*s}" ry="${1.5*s}" transform="rotate(${a} ${cx + Math.cos(rad)*2.3*s} ${cy + Math.sin(rad)*2.3*s})" style="fill:#FFFDF6" stroke-width="${.55*k}"/>`; }).join("")
+        + [0, 1, 2, 3, 4].map(i => { const rad = (i*72 - 90)*Math.PI/180; return `<circle cx="${cx + Math.cos(rad)*1.2*s}" cy="${cy + Math.sin(rad)*1.2*s}" r="${.9*s}" style="fill:#F6CF4A" stroke="none"/>`; }).join("")
+        + `<circle cx="${cx}" cy="${cy}" r="${.8*s}" style="fill:#E8A43A" stroke="none"/>`;
+      return `<path d="M${8*k} ${-50.6*k} q${4*k} ${-4.4*k} ${8.4*k} ${-2.4*k} q${-3.6*k} ${3.4*k} ${-8.4*k} ${2.4*k}z" style="fill:#5E8A3E" stroke-width="${.6*k}"/>` + petal(10.2*k, -49*k, k); }
+    case "softhands": { const soft = d => `<circle cx="${d*9.9*k}" cy="${-20.4*k}" r="${2.1*k}" ${S(look.skin)}/>${limb(`M${d*10.4*k} ${-18.6*k} q${d*2.2*k} ${1.4*k} ${d*3.4*k} ${-1.6*k}`, look.skin, 1.2*k)}${limb(`M${d*9*k} ${-18.6*k} q${d*1.2*k} ${1.8*k} ${d*2.8*k} ${.6*k}`, look.skin, 1.1*k)}`;
+      return `<g class="inhand" style="transform-origin:${9.9*k}px ${-34*k}px">${soft(1)}</g><g class="inhandl" style="transform-origin:${-9.9*k}px ${-34*k}px">${soft(-1)}</g>`; }
+    // (on the head) a green coconut held up to his mouth on a bendy straw, eyes shut in bliss; the arm is posed at -135deg
+    case "coconutdrink": return shut(look, k)
+      + `<g class="inhand" style="transform-origin:${9.9*k}px ${-34*k}px">${limb(`M${17*k} ${-49*k} L${9*k} ${-46*k} L${3*k} ${-41*k}`, "#F6A8C4", 1.3*k)}`
+      + `<ellipse cx="${19.6*k}" cy="${-47*k}" rx="${5.4*k}" ry="${5.8*k}" style="fill:#6FA84A" stroke-width="${.9*k}"/><path d="M${15.8*k} ${-50.4*k} q${3.6*k} ${-3*k} ${7.6*k} 0 q${-3.8*k} ${2*k} ${-7.6*k} 0z" style="fill:#F3EFD8" stroke-width="${.6*k}"/><path d="M${22.6*k} ${-46*k} q${.8*k} ${2.6*k} ${-.4*k} ${4.4*k}" fill="none" stroke-width="${.7*k}" style="stroke:#A8D07A"/>`
+      + `<circle cx="${19*k}" cy="${-42.6*k}" r="${2.2*k}" ${S(look.skin)}/></g>`
+      + `<g class="bliss"><path d="M${-13*k} ${-60*k} c${-1.4*k} ${-1.6*k} ${-3.4*k} 0 ${-1.6*k} ${1.8*k} l${1.6*k} ${1.6*k} l${1.6*k} ${-1.6*k} c${1.8*k} ${-1.8*k} ${-.2*k} ${-3.4*k} ${-1.6*k} ${-1.8*k}z" style="fill:#E8739A" stroke-width="${.6*k}"/></g>`;
+    // (on the head, instead of a hat) a woven basket of fruit on a little cloth ring; the right hand (arm at -170deg) steadies it
+    case "basketonhead": return `<ellipse cx="0" cy="${-57*k}" rx="${6.4*k}" ry="${1.7*k}" style="fill:#E8566C" stroke-width="${.7*k}"/>`
+      + `<path d="M${-5*k} ${-66*k} q${-3*k} ${-5*k} ${-1*k} ${-8*k} M${-2*k} ${-66*k} q${1*k} ${-5*k} ${4*k} ${-6.4*k}" fill="none" stroke-width="${1.4*k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`
+      + `<ellipse cx="${-5*k}" cy="${-66.4*k}" rx="${4.6*k}" ry="${3.2*k}" style="fill:#F2A23A" stroke-width="${.7*k}"/><path d="M${-7.4*k} ${-67.6*k} q${1.6*k} ${-1*k} ${3*k} ${-.6*k}" fill="none" stroke-width="${.6*k}" style="stroke:#FFD98A"/>`
+      + `<path d="M${2*k} ${-66.6*k} q${4*k} ${-5*k} ${9*k} ${-2.6*k} q${-4*k} ${-.6*k} ${-7.6*k} ${3.4*k}z" style="fill:#F3D34A" stroke-width="${.7*k}"/>`
+      + `<circle cx="${1.2*k}" cy="${-67.4*k}" r="${2.9*k}" style="fill:#D8432F" stroke-width="${.7*k}"/>${[0, 60, 120, 180, 240, 300].map(a => { const rad = a*Math.PI/180; return `<path d="M${1.2*k + Math.cos(rad)*2.9*k} ${-67.4*k + Math.sin(rad)*2.9*k} l${Math.cos(rad)*1.2*k} ${Math.sin(rad)*1.2*k}" fill="none" stroke-width="${.7*k}" style="stroke:#5E9A3A"/>`; }).join("")}`
+      + `<circle cx="${7.4*k}" cy="${-66*k}" r="${2.6*k}" style="fill:#8A5A3A" stroke-width="${.7*k}"/>`
+      + `<path d="M${-11.4*k} ${-65.4*k} h${22.8*k} l${-2.8*k} ${8*k} h${-17.2*k}z" style="fill:#C9A06A" stroke-width="${.9*k}"/><path d="M${-10.6*k} ${-62.6*k} h${21.2*k} M${-9.8*k} ${-60*k} h${19.6*k}" fill="none" stroke-width="${.6*k}" style="stroke:#8A6A42"/>${[-7, -3.5, 0, 3.5, 7].map(x => `<path d="M${x*k} ${-65*k} l${-.4*k} ${7.6*k}" fill="none" stroke-width="${.5*k}" style="stroke:#8A6A42"/>`).join("")}`
+      + `<rect x="${-12*k}" y="${-66.6*k}" width="${24*k}" height="${2*k}" rx="${1*k}" style="fill:#B8894E" stroke-width="${.8*k}"/>`
+      + `<g class="inhand" style="transform-origin:${9.9*k}px ${-34*k}px">${limb(`M${12.2*k} ${-47*k} L${11.4*k} ${-57.4*k}`, look.skin, 4.2*k)}<circle cx="${11.2*k}" cy="${-58.4*k}" r="${2.2*k}" ${S(look.skin)}/></g>`;
+    // (on the head, instead of a hat) a conical caping, eyes shut, and a "z" now and then
+    case "ricehat": return shut(look, k) + `<path d="M${-19*k} ${-51*k} L0 ${-66*k} L${19*k} ${-51*k} Q0 ${-47.4*k} ${-19*k} ${-51*k}z" style="fill:#E6CB8A" stroke-width="${1*k}"/>`
+      + [-10, -4, 3, 10].map(x => `<path d="M0 ${-65*k} L${x*k} ${-49.6*k}" fill="none" stroke-width="${.55*k}" style="stroke:#B8955A"/>`).join("")
+      + `<path d="M${-13.6*k} ${-55*k} Q0 ${-52.4*k} ${13.6*k} ${-55*k}" fill="none" stroke-width="${.7*k}" style="stroke:#B8955A"/><circle cx="0" cy="${-66*k}" r="${.9*k}" style="fill:#8A6A42" stroke="none"/>`
+      + `<g class="zzz"><text x="${15*k}" y="${-60*k}" font-size="${7*k}" font-weight="700" stroke="none" style="fill:var(--line)">z</text><text x="${20*k}" y="${-67*k}" font-size="${5*k}" font-weight="700" stroke="none" style="fill:var(--line);animation-delay:-1.5s">z</text></g>`;
+    // sitting cross-legged (the real legs are hidden, npcs.css; drawn for the body sunk by 11px), hands on his knees
+    case "crosslegs": { const G = -11, shin = look.shorts ? look.skin : look.bottom;
+      return `<g class="xlegs"><rect x="${-11*k}" y="${-17*k}" width="${22*k}" height="${17*k + G}" rx="${2.6*k}" ${S(look.bottom)}/>`
+        + `${limb(`M${-14*k} ${G - 2.4*k} L${8*k} ${G - 5.6*k}`, shin, 4.8*k)}${limb(`M${14*k} ${G - 2.4*k} L${-8*k} ${G - 5.6*k}`, shin, 4.8*k)}`
+        + `<ellipse cx="${-15.4*k}" cy="${G - 2.2*k}" rx="${2.8*k}" ry="${1.9*k}" style="fill:var(--sock)"/><ellipse cx="${15.4*k}" cy="${G - 2.2*k}" rx="${2.8*k}" ry="${1.9*k}" style="fill:var(--sock)"/></g>`; }
+    // a bundle of rice seedlings in the left hand, one in the right being pushed into the mud (the paddy is in personArt)
+    case "seedlings": { const sprout = (x, y, n, s) => Array.from({length: n}, (_, i) => `<path d="M${x*k} ${y*k} q${(i - (n - 1)/2)*.8*s*k} ${-4*s*k} ${(i - (n - 1)/2)*2*s*k} ${-8*s*k}" fill="none" stroke-width="${1.1*k}" stroke-linecap="round" style="stroke:${i % 2 ? "#7CB84A" : "#5E9A3A"}"/>`).join("");
+      return `<g class="inhandl" style="transform-origin:${-9.9*k}px ${-34*k}px">${sprout(-9.9, -21, 5, 1.1)}<path d="M${-11.6*k} ${-19.6*k} l${.6*k} ${3.4*k} M${-9.9*k} ${-19.6*k} v${3.8*k} M${-8.2*k} ${-19.6*k} l${-.6*k} ${3.4*k}" fill="none" stroke-width="${.8*k}" style="stroke:#8A6A42"/><circle cx="${-9.9*k}" cy="${-20.4*k}" r="${2.3*k}" ${S(look.skin)}/><path d="M${-12*k} ${-22.6*k} h${4.2*k}" fill="none" stroke-width="${1*k}" style="stroke:#C9A06A"/></g>`
+        + `<g class="inhand" style="transform-origin:${9.9*k}px ${-34*k}px">${sprout(9.9, -20, 3, .8)}<path d="M${9.9*k} ${-19*k} v${4.6*k}" fill="none" stroke-width="${.8*k}" style="stroke:#8A6A42"/><circle cx="${9.9*k}" cy="${-20.4*k}" r="${2.2*k}" ${S(look.skin)}/></g>`; }
+    // (on the head, instead of a hat) a little grey-brown macaque, tail hanging down; now and then it scratches or looks about
+    case "macaque": { const fur = "#8C7A62";
+      return `<path d="M${-3.4*k} ${-58.4*k} C${-11*k} ${-59*k} ${-13.4*k} ${-53*k} ${-12.6*k} ${-45*k} q${.2*k} ${2.4*k} ${1.8*k} ${3*k}" fill="none" stroke-width="${2.6*k}" stroke-linecap="round" style="stroke:var(--line)"/><path d="M${-3.4*k} ${-58.4*k} C${-11*k} ${-59*k} ${-13.4*k} ${-53*k} ${-12.6*k} ${-45*k} q${.2*k} ${2.4*k} ${1.8*k} ${3*k}" fill="none" stroke-width="${1.5*k}" stroke-linecap="round" style="stroke:${fur}"/>`
+        + `<ellipse cx="0" cy="${-61.4*k}" rx="${5.2*k}" ry="${4.8*k}" style="fill:${fur}" stroke-width="${.9*k}"/><ellipse cx="${-3.4*k}" cy="${-57.6*k}" rx="${2.8*k}" ry="${1.6*k}" style="fill:${fur}" stroke-width="${.8*k}"/><ellipse cx="${3.6*k}" cy="${-57.6*k}" rx="${2.8*k}" ry="${1.6*k}" style="fill:${fur}" stroke-width="${.8*k}"/>`
+        + `<g class="mqh" style="transform-origin:${.6*k}px ${-64.6*k}px"><circle cx="${-2.4*k}" cy="${-68.6*k}" r="${1.4*k}" style="fill:#E3A994" stroke-width="${.6*k}"/><circle cx="${4.6*k}" cy="${-68.6*k}" r="${1.4*k}" style="fill:#E3A994" stroke-width="${.6*k}"/><circle cx="${1.1*k}" cy="${-68.4*k}" r="${4*k}" style="fill:${fur}" stroke-width="${.9*k}"/><path d="M${-1.6*k} ${-71.2*k} q${2.6*k} ${-2.2*k} ${5.4*k} 0" fill="none" stroke-width="${.8*k}" style="stroke:#6A5A44"/>`
+        + `<ellipse cx="${1.6*k}" cy="${-67.4*k}" rx="${2.6*k}" ry="${2.5*k}" style="fill:#E3A994" stroke-width="${.5*k}"/><circle cx="${.6*k}" cy="${-68*k}" r="${.6*k}" style="fill:#14110F" stroke="none"/><circle cx="${2.8*k}" cy="${-68*k}" r="${.6*k}" style="fill:#14110F" stroke="none"/><path d="M${1*k} ${-66*k} q${.7*k} ${.5*k} ${1.4*k} 0" fill="none" stroke-width="${.5*k}"/></g>`
+        + `<g class="mqa" style="transform-origin:${3.4*k}px ${-62.6*k}px">${limb(`M${3.4*k} ${-62.6*k} L${5.6*k} ${-58.8*k}`, fur, 1.8*k)}</g>`
+        + `<g class="sweat"><path d="M${-11.4*k} ${-50*k} q${-1.4*k} ${2.2*k} 0 ${2.8*k} q${1.4*k} ${-.6*k} 0 ${-2.8*k}z" style="fill:#9ED0F0" stroke-width="${.5*k}"/></g>`; }
+    // (on the head) wide Legong eyes, the pupils darting side to side (the head slides too, in .bhead)
+    case "legongeyes": return [-1, 1].map(d => `<ellipse cx="${d*3.8*k}" cy="${-44*k}" rx="${2*k}" ry="${1.9*k}" style="fill:#FFFDF6" stroke-width="${.6*k}"/>`).join("")
+      + `<g class="dart">${[-1, 1].map(d => `<circle cx="${d*3.8*k}" cy="${-44*k}" r="${1.1*k}" style="fill:#14110F" stroke="none"/>`).join("")}</g>`
+      + [-1, 1].map(d => `<path d="M${(d*3.8 - 2.2)*k} ${-47.2*k} q${2.2*k} ${-1.4*k} ${4.4*k} 0" fill="none" stroke-width="${.7*k}"/>`).join("");
+    // elbows up (the arms posed at +-110deg), forearms up, hands flexed back with the fingers spread and fluttering
+    case "legonghands": { const hand = d => { const ex = d*22.6*k, ey = -38.6*k, hx = d*21.4*k, hy = -48*k;
+        return limb(`M${ex} ${ey} L${hx} ${hy}`, look.skin, 4*k) + [[.25, -1], [.7, -.75], [1, -.3], [1, .15]].map(([fx, fy], i) => `<g class="fing" style="transform-origin:${hx}px ${hy}px;animation-delay:${-i*.09}s">${limb(`M${hx} ${hy} l${d*fx*4.2*k} ${fy*4.2*k}`, look.skin, 1.1*k)}</g>`).join("")
+          + limb(`M${hx} ${hy} l${-d*1.6*k} ${-2*k}`, look.skin, 1.1*k) + `<circle cx="${hx}" cy="${hy}" r="${2*k}" ${S(look.skin)}/>`; };
+      return `<g class="inhand" style="transform-origin:${9.9*k}px ${-34*k}px">${hand(1)}</g><g class="inhandl" style="transform-origin:${-9.9*k}px ${-34*k}px">${hand(-1)}</g>`; }
     case "lantern": return `<path d="M${12*k} ${-24*k} v${-4*k}" fill="none"/><rect x="${9*k}" y="${-24*k}" width="${7*k}" height="${9*k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5*k}" cy="${-19.5*k}" r="${1.8*k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
   }
   return "";
@@ -273,10 +335,14 @@ export function personArt(look, kid){
   const legH = 13*k, legY = -15*k, lw = 5*k;
   const rain = look.rain, coat = rain && rain.kind === "coat";
   // (Portovenere: a swimming cap, headscarf or snorkel mask takes the place of a hat; a mask or goggles of specs)
-  const capped = ["swimcap", "headscarf", "snorkelmask"].includes(look.extra), masked = look.extra === "snorkelmask" || look.extra === "swimcap";
+  const capped = ["swimcap", "headscarf", "snorkelmask", "basketonhead", "ricehat", "macaque"].includes(look.extra), masked = look.extra === "snorkelmask" || look.extra === "swimcap";
   // (Puffin Island: lying on his front the body turns flat but the head (in .bhead) stays upright, npcs.css; Ma Ma's
   // samphire patch sits on the ground outside .bob, so it stays put while she bends down to it)
-  const belly = look.extra === "bellyflat";
+  const belly = look.extra === "bellyflat" || ["ricehat", "legonghands"].includes(look.extra);
+  // (Bali: Mum's soft hands, Gong Gong's crossed legs and Angellina's wide eyes go with their props; Gong Gong nods off and
+  // Angellina's head slides side to side in .bhead; Darren's paddy is drawn over his shins, outside .bob, so it stays put)
+  const bodyx = {frangipani: "softhands", ricehat: "crosslegs"}[look.extra], headx = {legonghands: "legongeyes"}[look.extra];
+  const paddy = look.extra === "seedlings" ? `<g class="paddy" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><path d="M${-23*k} ${-5*k} Q${-23*k} ${-9*k} ${-17*k} ${-9*k} H${17*k} Q${23*k} ${-9*k} ${23*k} ${-5*k} V${2.4*k} Q0 ${5*k} ${-23*k} ${2.4*k}z" style="fill:#8DB8A2" fill-opacity=".96"/><path d="M${-16*k} ${-7*k} h${9*k} M${6*k} ${-6.4*k} h${8*k}" fill="none" stroke-width="${.8*k}" style="stroke:#D6ECE2"/>${[-18, -12, 16].map(x => [-1, 0, 1].map(i => `<path d="M${x*k} ${-8.4*k} q${i*.6*k} ${-2.6*k} ${i*1.8*k} ${-5*k}" fill="none" stroke-width="${1*k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")).join("")}<g class="prip"><ellipse cx="${19.6*k}" cy="${-8.6*k}" rx="${3*k}" ry="${.9*k}" fill="none" stroke-width="${.7*k}" style="stroke:#E6F4EE"/><ellipse cx="${19.6*k}" cy="${-8.6*k}" rx="${5.4*k}" ry="${1.5*k}" fill="none" stroke-width="${.6*k}" style="stroke:#E6F4EE"/></g></g>` : "";
   const patch = look.extra === "samphirebag" ? `<g style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><path d="M${15*k} ${.6*k} q${1*k} ${-4.6*k} ${6*k} ${-5*k} q${6*k} ${-.4*k} ${8*k} ${5*k}z" style="fill:#9A948A"/>${[17.6, 20, 22.4, 24.8, 27].map((x, i) => `<path d="M${x*k} ${-3*k} l${(i - 2)*.6*k} ${(-6 - (i % 2)*2.4)*k} M${(x + (i - 2)*.3)*k} ${(-6 - (i % 2))*k} l${(i < 2 ? -1.4 : 1.4)*k} ${-1.4*k}" fill="none" stroke-width="${1.3*k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")}</g>` : "";
   const shoe = coat ? rain.b : "var(--sock)", sleeve = x => coat ? `<rect x="${x}" y="${-34*k}" width="${4.2*k}" height="${11*k}" rx="2" ${S(rain.a)}/>` : "";
   return `<g class="flip"><g filter="url(#wob)">
@@ -293,7 +359,7 @@ export function personArt(look, kid){
       <path d="M${-8.6*k} ${-37*k} q${8.6*k} ${-2.4*k} ${17.2*k} 0 l${1.4*k} ${23*k} h${-20*k}z" ${S(look.dress || look.top)}/>
       ${look.batik && !coat ? batik(look.batik, k) : ""}${look.palms && !coat ? palms(k) : ""}
       ${coat ? coatArt(rain, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book", "hanger", "remote", "cuppa", "footy", "wineglass", "juggle", "fan", "flats", "roobag", "shopbag", "tongs", "skim", "cards", "mallow", "bodyboard", "yogamat", "telescope", "easel", "macrocam", "clicker", "chipbox", "prawnbag", "shellpail", "driftwood", "parrot", "quoit", "postcard", "thermos", "wadewater", "ducks", "frisbee", "lollybag", "milkpail", "fencerail", "branch", "nutstone", "goldpan", "guardflag", "sarsbottle", "armful", "beebuzz", "baguette", "accordion", "sniffstrip", "atomiser", "beeveil", "bigflower", "ring", "rug", "candlelit", "kid", "sarnie", "lobsterheld", "tidebook", "pennant", "ghostbook", "crabbucket", "guidebook", "handsback", "splash", "quillpad", "thriftchain", "samphirebag", "brasscloth", "ropecoil", "glasslight"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book", "hanger", "remote", "cuppa", "footy", "wineglass", "juggle", "fan", "flats", "roobag", "shopbag", "tongs", "skim", "cards", "mallow", "bodyboard", "yogamat", "telescope", "easel", "macrocam", "clicker", "chipbox", "prawnbag", "shellpail", "driftwood", "parrot", "quoit", "postcard", "thermos", "wadewater", "ducks", "frisbee", "lollybag", "milkpail", "fencerail", "branch", "nutstone", "goldpan", "guardflag", "sarsbottle", "armful", "beebuzz", "baguette", "accordion", "sniffstrip", "atomiser", "beeveil", "bigflower", "ring", "rug", "candlelit", "kid", "sarnie", "lobsterheld", "tidebook", "pennant", "ghostbook", "crabbucket", "guidebook", "handsback", "splash", "quillpad", "thriftchain", "samphirebag", "brasscloth", "ropecoil", "glasslight", "seedlings", "legonghands"].includes(look.extra) ? extra(look.extra, look, k) : ""}${bodyx ? extra(bodyx, look, k) : ""}
       ${belly ? `<g class="bhead">` : ""}
       ${(look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe") && look.extra !== "swimcap" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46*k}" r="${10.6*k}" ${S(look.skin)}/>
@@ -304,7 +370,7 @@ export function personArt(look, kid){
       <ellipse cx="${6.4*k}" cy="${-40.6*k}" rx="${2*k}" ry="${1.2*k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
       <path d="M${-1.6*k} ${-40.4*k} q${1.6*k} ${1.4*k} ${3.2*k} 0" fill="none" stroke-width="1"/>
       ${look.hairStyle === "bobfringe" ? fringe(look.hair, -46*k, 10.6*k, k) : ""}
-      ${["glasses", "cap", "sunhat", "helmet", "binocs", "crownw", "handmirror", "capheld", "swimcap", "headscarf", "snorkelmask", "puffinwalk"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["glasses", "cap", "sunhat", "helmet", "binocs", "crownw", "handmirror", "capheld", "swimcap", "headscarf", "snorkelmask", "puffinwalk", "frangipani", "coconutdrink", "basketonhead", "ricehat", "macaque"].includes(look.extra) ? extra(look.extra, look, k) : ""}${headx ? extra(headx, look, k) : ""}
       ${look.specs && !masked ? extra("specs", look, k) : ""}
       ${look.hat && !coat && !capped ? extra(look.hat, look, k) : ""}
       ${coat ? hoodArt(rain, k) : ""}
@@ -313,7 +379,7 @@ export function personArt(look, kid){
       ${look.board ? paddle(k) : ""}
       ${rain && rain.kind === "brolly" ? brollyArt(rain, k) : ""}
       ${look.headphones ? `<path d="M${-11*k} ${-46*k} a${11*k} ${12*k} 0 0 1 ${22*k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5*k}" y="${-49*k}" width="${4.5*k}" height="${7*k}" rx="2" style="fill:var(--peri)"/><rect x="${9*k}" y="${-49*k}" width="${4.5*k}" height="${7*k}" rx="2" style="fill:var(--peri)"/>` : ""}
-    </g>
+    </g>${paddy}
   </g></g>`;
 }
 

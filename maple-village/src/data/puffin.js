@@ -39,7 +39,7 @@ export function seasonSay(id, day){
     : "The cliffs in winter: empty ledges, spray flying up the Wick, and the wind straight off the sea. The puffins will be back in April.";
   if (id === "piseals") return s === "seals" ? "The seal beach: white fluffy pups lying on the pebbles like dropped pillows, and their mothers watching from the shallows. Keep back and keep quiet."
     : s === "winter" ? "The seal beach, empty now. The pups have moulted grey and gone to sea. Big waves rolling the pebbles up and down."
-    : "The seal beach: a couple of grey seals bobbing in the shallows, watching you with big dark eyes. The pups come in the autumn.";
+    : "The seal beach: one grey seal snoozing on the pebbles, and a couple more bobbing in the shallows, watching you with big dark eyes. The pups come in the autumn.";
   if (id === "pirabbits" && s === "winter") return "The rabbit warren, nibbled down to a lawn. The rabbits are out all winter, ears flat against the wind.";
   if (id === "pigarden" && s === "winter") return "The walled garden asleep for the winter: kale, leeks, and a robin on the spade handle.";
   return null;
@@ -162,8 +162,9 @@ export const PI_OBST = {
   // the sea along the top, the cliffs and the Wick, the burrow slope behind the rope, the east cliffs, the bench, the
   // boulders, the bracken and the old wall in the bottom corners
   pi_wick: [[0, 0, 520, 64], [186, 56, 520, 236], [196, 236, 520, 324], [480, 324, 520, 640], [124, 200, 176, 220], [66, 450, 96, 470], [0, 560, 134, 640], [392, 566, 520, 640], [0, 64, 40, 300]],
-  // the farmhouse, the walled garden, the pond, the sea along the bottom, the hawthorn, the woodpile, the beehives
-  pi_farm: [[20, 56, 240, 204], [282, 56, 488, 214], [40, 372, 222, 478], [0, 574, 520, 640], [438, 498, 480, 528], [200, 160, 240, 204], [470, 140, 520, 280]],
+  // the farmhouse, the walled garden, the pond, the sea along the bottom and round the west corner, the hawthorn, the
+  // woodpile, the gorse hedge down the east side
+  pi_farm: [[20, 56, 240, 204], [282, 56, 488, 214], [40, 372, 222, 478], [0, 574, 520, 640], [0, 470, 36, 580], [438, 498, 480, 528], [200, 160, 240, 204], [470, 140, 520, 280]],
   // the sea down the east side and along the bottom, the lighthouse and its wall, the keeper's cottage, the seal beach,
   // the rock pools, the sea-glass cove, the boathouse, the gorse, the washing line posts
   pi_point: [[460, 0, 520, 640], [0, 588, 520, 640], [362, 26, 436, 236], [226, 110, 356, 226], [376, 264, 520, 466], [336, 482, 520, 640], [166, 552, 330, 640], [34, 410, 158, 516], [0, 26, 120, 200], [130, 150, 136, 214]],
