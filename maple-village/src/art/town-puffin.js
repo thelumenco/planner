@@ -120,7 +120,7 @@ const surf = (pts) => NP(pts.map(([x, y, d], i) => `<g><path d="M${x - 16} ${y} 
 // a rocky shoreline: a thick band of grey rock with lichen, following a path
 const shoreRock = (d, w = 16) => NP(`<g filter="url(#wob)"><path d="${d}" fill="none" stroke="${C.rock2}" stroke-width="${w + 4}" stroke-linejoin="round" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${C.rock}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${C.rock3}" stroke-width="${w*.35}" stroke-dasharray="6 9" transform="translate(0 -3)"/><path d="${d}" fill="none" stroke="${C.lichen}" stroke-width="2.6" stroke-dasharray="2 23" stroke-linecap="round" transform="translate(0 -4)"/></g>`);
 // a trodden path through the turf
-const trail = (d, w = 24) => NP(`<g filter="url(#wob)"><path d="${d}" fill="none" stroke="${C.path}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/><path d="${d}" fill="none" stroke="${C.path2}" stroke-width="${w*.6}" stroke-linecap="round" stroke-linejoin="round"/></g>`);
+const trail = (d, w = 30) => NP(`<g filter="url(#wob)"><path d="${d}" fill="none" stroke="${C.path}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/><path d="${d}" fill="none" stroke="${C.path2}" stroke-width="${w*.6}" stroke-linecap="round" stroke-linejoin="round"/></g>`);
 const turfGround = (col = C.turf) => `<rect width="520" height="640" style="fill:${col}"/><g filter="url(#wash)" opacity=".55" pointer-events="none"><ellipse cx="160" cy="420" rx="150" ry="90" fill="${C.turf2}"/><ellipse cx="380" cy="300" rx="130" ry="80" fill="${C.turf2}"/><ellipse cx="300" cy="560" rx="160" ry="60" fill="${C.turf3}" opacity=".6"/></g>`;
 const bench = (x, y, col = C.wood) => NP(sk(`<rect x="${x - 18}" y="${y - 10}" width="36" height="4" style="fill:${col}"/><rect x="${x - 18}" y="${y - 18}" width="36" height="4" style="fill:${col}"/><path d="M${x - 15} ${y - 6} v8 M${x + 15} ${y - 6} v8" style="stroke:${C.wood2}" stroke-width="2"/>`, ""));
 // your own boat (the same boat as at home: white hull, blue stripe, red flag), bobbing
@@ -176,7 +176,7 @@ function havenScreen(){
     + `<path d="M282 160 V230 M282 160 v-4 M282 186 v-4 M282 210 v-4 M282 230 v-4" stroke="${C.wood}" stroke-width="2"/><path d="M282 158 Q284 172 282 184 Q284 196 282 208 Q284 220 282 228" stroke="#C9B88A" stroke-width="1.4" fill="none"/>`
     + (pf ? puffin(234, 196, .74, 1, 6) + burrow(228, 206, .8) + puffin(298, 214, .74, -1, 7, {fish: true}) + burrow(306, 222, .8) : "") + thrift(230, 172, .8, 0) + thrift(296, 176, .8, 1)), "Cove path", 330, 196, "#BFE0DA");
   // the warden's hut: grey stone, slate roof, a green door, a sightings board, binoculars on the windowsill
-  const board = `<rect x="58" y="268" width="28" height="30" fill="#2E4A3A" stroke="${C.wood}" stroke-width="2"/>${[0, 1, 2, 3].map(k => `<path d="M62 ${276 + k*6} h${10 + (k % 2)*6}" stroke="#E8ECE4" stroke-width=".8"/><path d="M76 ${276 + k*6} h${3 + k}" stroke="#E8ECE4" stroke-width=".8" stroke-dasharray="1 1.2"/>`).join("")}<text x="72" y="266" text-anchor="middle" font-family="Klee One,serif" font-size="5.4" fill="${C.ink}">SIGHTINGS</text>`;
+  const board = `<rect x="58" y="268" width="28" height="30" fill="#2E4A3A" stroke="${C.wood}" stroke-width="2"/>${[0, 1, 2].map(k => `<path d="M62 ${282 + k*6} h${10 + (k % 2)*6}" stroke="#E8ECE4" stroke-width=".8"/><path d="M76 ${282 + k*6} h${3 + k}" stroke="#E8ECE4" stroke-width=".8" stroke-dasharray="1 1.2"/>`).join("")}<text x="72" y="276" text-anchor="middle" font-family="Klee One,serif" font-size="4.6" fill="#E8ECE4">TODAY</text>`;
   const hut = place("piwarden", 104, 326, 26, 9, "The warden's hut", NP(cottage(52, 312, 108, 58, 40, {wall: "#C4C0B6", roof: C.slate,
       extra: `${Array.from({length: 5}, (_, k) => `<path d="M52 ${264 + k*11} H160" stroke="#A9A49A" stroke-width=".6"/>`).join("")}<path d="M94 312 V284 Q104 274 114 284 V312z" fill="#3E6447"/><circle cx="110" cy="298" r="1.2" fill="#E3C26A"/>${win(124, 270, 22, 16, "#E8E4DA")}<path d="M128 284 h6 a2.4 2.4 0 1 1 0 .1 M140 284 h-2" stroke="#1F1F22" stroke-width="2.4"/><rect x="88" y="258" width="32" height="9" rx="1" fill="#FFFDF6" stroke="${C.ink}" stroke-width=".6"/><text x="104" y="264.6" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="6" fill="${C.ink}">WARDEN</text>${board}`,
       lines: `<path d="M94 312 V284 Q104 274 114 284 V312"/>`})
@@ -212,12 +212,14 @@ function wickScreen(){
   const faceD = "M186 72 Q300 64 520 66 V158 Q430 160 340 164 Q262 170 200 186 Q190 130 186 72z";
   const face = NP(`<path d="M180 48 Q300 44 520 46 V72 Q300 66 186 76z" fill="${C.turf3}"/>` + sk(`<path d="${faceD}" fill="${C.rock}"/><path d="M186 72 Q300 64 520 66 V80 Q300 76 188 86z" fill="${C.rock3}"/><path d="M340 164 Q430 160 520 158 V140 Q430 144 340 150 Q262 156 200 176 V186 Q262 170 340 164z" fill="${C.rock2}"/>`, `<path d="${faceD}"/>`)
     + [[230, 80, 186], [270, 74, 172], [330, 74, 166], [380, 72, 162], [440, 70, 160], [490, 70, 158]].map(([x, y1, y2]) => `<path d="M${x} ${y1} q-6 ${(y2 - y1)/2} 2 ${y2 - y1}" stroke="${C.rock2}" stroke-width="1" fill="none"/>`).join(""));
-  const ledges = [[200, 520, 98], [210, 520, 116], [214, 520, 134]];
-  const ledgeArt = NP(ledges.map(([x1, x2, y], k) => `<path d="M${x1 + k*6} ${y} H${x2}" stroke="${C.rock4}" stroke-width="3"/><path d="M${x1 + k*6} ${y + 2} H${x2}" stroke="${C.rock2}" stroke-width="1"/>`
-    + (pf || late ? Array.from({length: 14}, (_, j) => `<path d="M${f1(x1 + 20 + j*22 + rnd(j + k*10)*8)} ${y + 2} v${f1(6 + rnd(j*3 + k)*8)}" stroke="#F4F1EA" stroke-width="${f1(1.4 + rnd(j)*1.6)}" opacity=".7" stroke-linecap="round"/>`).join("") : "")).join("")
-    + (pf ? ledges.map(([x1, x2, y], k) => { let out = ""; for (let x = x1 + 16 + k*6; x < x2 - 8; x += 7.4) { const r = rnd(x*.3 + k*17); if (r < .14) continue; out += auk(x, y, .78, r > .72, r > .4 ? 1 : -1); } return out; }).join("")
-      : late ? ledges.map(([x1, , y], k) => [0, 1, 2].map(j => auk(x1 + 60 + j*90 + k*30, y, .78, j === 1)).join("")).join("")
-      : s === "seals" ? `<g transform="translate(300 116)">${puffinless()}</g>` : ""));
+  // the ledges: short broken shelves across the face, whitewashed below with droppings in the nesting season
+  const ledges = [[204, 258, 94], [280, 350, 96], [372, 430, 93], [452, 516, 95], [214, 300, 113], [322, 392, 115], [410, 470, 112], [486, 518, 114],
+    [222, 268, 131], [290, 356, 133], [378, 446, 130], [466, 516, 132], [236, 300, 148], [330, 400, 150], [430, 500, 147]];
+  const ledgeArt = NP(ledges.map(([x1, x2, y], k) => `<path d="M${x1} ${y} Q${(x1 + x2)/2} ${y - 1.6} ${x2} ${y + .6}" stroke="${C.rock4}" stroke-width="3.2" stroke-linecap="round" fill="none"/><path d="M${x1 + 2} ${y + 2.4} H${x2 - 2}" stroke="${C.rock2}" stroke-width="1.2"/>`
+    + (pf || late ? Array.from({length: Math.floor((x2 - x1)/14)}, (_, j) => `<path d="M${f1(x1 + 6 + j*14 + rnd(j + k*10)*6)} ${y + 3} q${f1(rnd(j*7 + k)*2 - 1)} ${f1(4 + rnd(j*3 + k)*7)} 0 ${f1(5 + rnd(j*3 + k)*8)}" stroke="#F4F1EA" stroke-width="${f1(.8 + rnd(j + k)*.9)}" opacity="${pf ? .6 : .35}" stroke-linecap="round" fill="none"/>`).join("") : "")).join("")
+    + (pf ? ledges.map(([x1, x2, y], k) => { let out = ""; for (let x = x1 + 5; x < x2 - 3; x += 7.2) { const r = rnd(x*.37 + k*17); if (r < .1) continue; out += auk(x, y, .72, r > .74, r > .42 ? 1 : -1); } return out; }).join("")
+      : late ? [ledges[1], ledges[6], ledges[9]].map(([x1, , y], k) => [0, 1].map(j => auk(x1 + 14 + j*16, y, .72, (j + k) % 2 === 1)).join("")).join("")
+      : s === "seals" ? [ledges[2], ledges[5], ledges[13]].map(([x1, , y]) => `<g transform="translate(${x1 + 20} ${y})">${fulmar()}</g>`).join("") : ""));
   // the Wick itself: the deep cleft of sea between the two sides, foam at the foot of the cliff
   const wick = water("M200 186 Q262 170 340 164 Q430 160 520 158 V238 Q440 236 360 230 Q270 222 200 186z", s === "winter" ? C.winter : C.deep)
     + waves([[260, 190], [330, 182], [400, 196], [470, 186], [440, 216], [360, 210]]) + NP(`<path d="M206 186 Q262 172 340 166 Q430 162 520 160" fill="none" stroke="${C.foam}" stroke-width="2.4" opacity=".8"/>`)
@@ -247,7 +249,7 @@ function wickScreen(){
   const cliffs = place("picliffs", 320, 346, 34, 10, "The seabird cliffs and the puffin burrows", "", "Seabird cliffs", 300, 372, "#BFE0DA");
   // the rope line: low posts and a sagging rope along the top of the slope, a little warden's sign
   const rope = place("piropeline", 440, 352, 30, 9, "The rope line along the burrows", NP(sk(Array.from({length: 9}, (_, k) => `<rect x="${200 + k*36}" y="${318}" width="4" height="16" fill="${C.wood}"/>`).join("")
-      + `<rect x="462" y="294" width="3" height="40" fill="${C.wood}"/><rect x="440" y="284" width="48" height="22" rx="2" fill="#FFFDF6"/>`, `<rect x="440" y="284" width="48" height="22" rx="2"/>`)
+      + `<rect x="462" y="294" width="3" height="40" fill="${C.wood}"/><rect x="430" y="282" width="68" height="24" rx="2" fill="#FFFDF6"/>`, `<rect x="430" y="282" width="68" height="24" rx="2"/>`)
     + `<path d="${Array.from({length: 8}, (_, k) => `M${202 + k*36} 322 Q${220 + k*36} 330 ${238 + k*36} 322`).join(" ")}" stroke="#D8C08A" stroke-width="1.6" fill="none"/>`
     + `<text x="464" y="293" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="5.4" fill="${C.ink}">PUFFINS NESTING</text><text x="464" y="301.4" text-anchor="middle" font-family="Klee One,serif" font-size="5" fill="${C.ink}">behind the rope, please</text>`), "Rope line", 440, 376, "#F2C9B4");
   // the west headland: rock at the corner, sea pinks, the bench right at the edge looking down the Wick
@@ -267,10 +269,8 @@ function wickScreen(){
     + gate("piToHaven", 20, 410, "North Haven", 80, 440, "West along the clifftop to North Haven", "#BFE0DA")
     + gate("piToPoint", 300, 612, "Lighthouse Point", 196, 616, "South along the coast path to Lighthouse Point");
 }
-// in autumn a few fulmars sit on the ledges: grey and white, a stubby bill
-function puffinless(){
-  return [-60, 30, 120].map((x, k) => `<g transform="translate(${x} ${k === 1 ? 18 : 0})"><ellipse cx="0" cy="-5" rx="5" ry="4.4" fill="#FBFAF5"/><ellipse cx="-2" cy="-6" rx="4" ry="2.6" fill="#B9C2C6"/><circle cx="3" cy="-9" r="2.8" fill="#FBFAF5"/><circle cx="3.8" cy="-9.4" r=".6" fill="#1A1A1A"/><path d="M5.4 -9.4 l2.4 .8 l-2.4 .6z" fill="#C9B46A"/></g>`).join("");
-}
+// in autumn a fulmar or two sit on the ledges: grey and white, a stubby tube-nosed bill
+const fulmar = () => `<ellipse cx="0" cy="-4.6" rx="5" ry="4.2" fill="#FBFAF5"/><ellipse cx="-2" cy="-5.4" rx="4" ry="2.4" fill="#B9C2C6"/><circle cx="3" cy="-8.6" r="2.7" fill="#FBFAF5"/><circle cx="3.8" cy="-9" r=".6" fill="#1A1A1A"/><path d="M5.4 -9 l2.4 .8 l-2.4 .6z" fill="#C9B46A"/>`;
 
 /* ---------- pi_farm: the old farm ---------- */
 function farmScreen(){
@@ -280,7 +280,7 @@ function farmScreen(){
   const sea = water("M0 480 Q16 520 50 552 Q110 584 200 582 Q320 580 420 584 Q480 586 520 584 V640 H0z", seaCol()) + shoreRock("M0 476 Q18 520 52 550 Q110 578 200 576 Q320 574 420 578 Q480 580 520 578", 14)
     + waves([[60, 606], [180, 620], [300, 604], [420, 620], [480, 600]]) + (s === "winter" ? surf([[90, 580, 0], [300, 582, 1.2], [460, 584, 2.2]]) : "") + (s === "puffins" ? NP(swimmer(250, 614, .7, 1, 0) + swimmer(266, 620, .7, -1, 1)) : "");
   // the track down from the haven, the lane out east to the lighthouse, and little paths to the doors
-  const paths = trail("M260 0 V130 Q260 250 262 300 Q300 330 400 330 Q470 330 520 330") + trail("M262 236 Q200 230 130 222", 18) + trail("M262 240 Q330 236 385 228", 18) + trail("M262 300 Q220 380 150 470", 14) + trail("M300 320 Q330 400 360 440", 14);
+  const paths = trail("M260 0 V130 Q260 250 262 300 Q300 330 400 330 Q470 330 520 330") + trail("M262 236 Q200 230 130 222", 18) + trail("M262 240 Q330 236 385 228", 18) + trail("M262 300 Q236 400 214 466 Q190 496 130 494", 16) + trail("M300 320 Q330 400 360 440", 16);
   // the old farmhouse: long, low and whitewashed, a slate roof, a chimney at each end; Bryn's tearoom
   const house = place("pitearoom", 130, 216, 26, 9, "Bryn's tearoom in the old farmhouse", NP(cottage(30, 202, 196, 74, 56, {
       extra: `<path d="M120 202 V176 Q130 166 140 176 V202z" fill="#2F4A5E"/><circle cx="136" cy="190" r="1.2" fill="#E3C26A"/>${win(48, 150)}${win(84, 150)}${win(160, 150)}${win(196, 150)}
@@ -324,7 +324,7 @@ function farmScreen(){
     + rabbit(300, 520, .85, 1, 1, true) + rabbit(440, 380, .8, -1, 2) + rabbit(80, 330, .8, 1, 3, true) + bluebells(80, 330, 90, 40, 18, 51)
     + tufts([[70, 260], [180, 270], [330, 280], [430, 270], [200, 520], [270, 440], [470, 450], [400, 560], [80, 540]]) + thrift(30, 470, .9, 1) + thrift(250, 566, .9, 2) + thrift(460, 566, .9, 0);
   return ground + sea + paths + house + garden + hedge + pond + meadowFlowers + meadow + thorn + bits
-    + gate("piToHavenN", 260, 40, "North Haven", 260, 96, "North up the track to North Haven", "#BFE0DA")
+    + gate("piToHavenN", 260, 40, "North Haven", 176, 34, "North up the track to North Haven", "#BFE0DA")
     + gate("piToPointE", 500, 330, "Lighthouse", 456, 372, "East along the lane to Lighthouse Point", "#BFE0DA");
 }
 
