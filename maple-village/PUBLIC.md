@@ -179,3 +179,13 @@ the game data). Before the wiki, the favourites themselves want balancing: the s
 places each have 80 to 140 favourite presents (everything bought on trips was made for them), while the other twenty
 have a handful of crops at most and several have none at all. Plan: each villager gets a short hand-picked list of
 loves (around six to ten), and every other present is a nice gift (half a heart).
+
+## Task places (2026-10-15)
+Your own tasks on the quest board each go to a place in the village (src/data/places.js): the post office (email,
+reply, call...), its filing cabinet (forms, tax, booking...) and scales (pay, bill, bank...), the library desk (essay,
+report, study...) and reading nook (read, chapter...), your kitchen, sofa, desk, the laundry corner and cleaning
+cupboard in the garage, the treadmill, Bo's workbench (fix, build...) and the market (groceries, buy...). A specific
+word beats a general one ("write an email" goes to the post office, "write my essay" to the library desk); between
+equals the earlier word wins; no match means your desk. Each task shows its place in a little picker (the player's
+choice sticks) and a "go" that walks you there. Ticking anywhere still works; doing it in its place pays a coin more
+(within the day's ten paid ticks).

@@ -31,6 +31,7 @@ import * as TL from "./tailor.js";
 import { lookOf, applyLook } from "./look.js";
 import { openSetup, setupOpen } from "./setup.js";
 import { openIntro, introOpen, introAt } from "./intro.js";
+import { PLACES, placeOf, placeAt } from "../data/places.js";
 import { SPECIES, speciesOf, petArt, petify } from "../art/pets.js";
 import { sendOptions, takeSend, sendMorePanel } from "./bikesend.js";
 import { rideBy, initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, whereAt, npcSay, npcPos, daySchedule, clearSlots } from "./npcs.js";
@@ -2029,6 +2030,8 @@ function renderBoard(){
   l.innerHTML = QB.taskRows(F);
   l.querySelectorAll("[data-tick]").forEach(b => b.onclick = () => { const t = QB.board(F).tasks.find(x => x.id === b.dataset.tick); if (!t) return; if (QB.isDone(t)) untickMine(t.id); else tickMine(t.id); });
   l.querySelectorAll("[data-tdel]").forEach(b => b.onclick = () => removeMine(b.dataset.tdel));
+  l.querySelectorAll("[data-tplace]").forEach(sl => sl.onchange = () => { if (QB.setPlace(F, sl.dataset.tplace, sl.value)) { sfx("tap"); save(true); } });
+  l.querySelectorAll("[data-tgo]").forEach(b => b.onclick = () => { const t = QB.board(F).tasks.find(x => x.id === b.dataset.tgo); if (t) goToPlace(placeOf(t)); });
   if (f && f.tick) l.querySelector(`[data-tick="${CSS.escape(f.tick)}"]`)?.focus({preventScroll: true});   // keep keyboard focus on the box just ticked
   const r = $("reqList"); r.innerHTML = QB.requestRows(F, haveOf, who => !!whereAt(who));
   r.querySelectorAll("[data-find]").forEach(b => b.onclick = () => findAsker(b.dataset.find));
@@ -2113,8 +2116,20 @@ function walkTo(x, y){
   const pts = outside() || townRoom(scene) ? findPath(scene, [hero.x, hero.y], to, b) : [to];
   const first = pts.shift(); hero.tx = first[0]; hero.ty = first[1]; hero.path = pts;
 }
+// Tasks done in their place (data/places.js): walk there from the board, and the next task for that place ticks off
+// as you arrive, with a coin more than ticking it anywhere else
+function goToPlace(pl){
+  const p = PLACES[pl], sp = p && spotObj(p.scene, p.spot); if (!sp) return;
+  closePanel(); speak(`Off to ${p.n}.`, 2500); go(p.scene, sp.tx, sp.ty, () => arriveSpot(p.spot));
+}
+function doTaskHere(spot){
+  const pl = placeAt(scene, spot), t = pl && QB.taskAt(F, pl); if (!t) return;
+  const paid = QB.paidToday(F) < QB.PAID_PER_DAY; tickMine(t.id);
+  if (paid) { F.coins += 1; S.earned = (S.earned || 0) + 1; }
+  setTimeout(() => speak(`${PLACES[pl].doing}. “${t.title}”: done, right here${paid ? " (and a coin more for coming)" : ""}.`, 5000), 1200); save(true);
+}
 function arriveSpot(id){
-  atSpot = id;
+  atSpot = id; doTaskHere(id);
   if (id === "mydoor") { setScene("room", INNER.room.arrive); return; }
   if (scene === "cottage" && id === "tea") { orView = "tea"; sfx("paper", true); render(); return; }
   if (id === "dine") sitAtTable();

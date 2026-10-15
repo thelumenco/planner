@@ -972,3 +972,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 :root[data-theme="dark"] .inletter{background:#3A3540;color:#F1EBE0}
 .setrow.setpick{flex-wrap:wrap;cursor:default}
 .setpick select{font:inherit;padding:6px 8px;border-radius:10px;border:1.5px solid rgba(120,104,84,.3);background:#FFFDF6;color:#2F2B28}
+/* where a task gets done (data/places.js): a small picker and a "go" under each task */
+.tplace{display:block;margin-top:4px}.panel .qlist .tplace select{font:inherit;font-size:.8rem;width:100%;max-width:100%;box-sizing:border-box;padding:3px 6px;border-radius:8px;border:1px solid rgba(120,104,84,.3);background:#FFFDF6;color:inherit;min-height:0}
+.tgo{font:inherit;font-size:.78rem;margin:4px 0 0;padding:1px 8px;border-radius:10px;border:1px solid rgba(120,104,84,.35);background:#E3F2EC;cursor:pointer}

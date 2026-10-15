@@ -3178,6 +3178,30 @@ if (want("\nThe Lavender Hills (rounds 161-164)")) try {
   check(await fox().then(f => f.inv.bq_lavender === 2 && f.bellbird.lv.cut === "2026-10-12"), "the lavender harvest with Émile, two bunches to take home");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\ntask places")) try {
+  console.log("\ntask places");
+  const PL = await import(new URL("../src/data/places.js", import.meta.url)), QB = await import(new URL("../src/game/quests.js", import.meta.url));
+  const cases = [["Write an email to Sam", "post"], ["Write my essay", "writing"], ["Send invoice", "scales"], ["Do the laundry", "laundry"], ["Pay rent", "scales"], ["Read chapter 3", "reading"],
+    ["Go for a run", "exercise"], ["Fix the shelf", "fixing"], ["Buy groceries", "shopping"], ["Book flights", "cabinet"], ["Water plants", "desk"], ["Cook dinner", "kitchen"]];
+  const bad = cases.filter(([t, p]) => PL.placeFor(t) !== p);
+  check(!bad.length, "tasks go where their words say (" + (bad.map(([t]) => t + " -> " + PL.placeFor(t)).join(", ") || "all " + cases.length + " right") + ")");
+  check(PL.placeFor("Write an email") === "post" && PL.placeFor("Water the plants") === "desk", "a specific word beats a general one (email beats write); no match goes to your desk at home");
+  { const F = {}; const t = QB.addTask(F, "Email the landlord", false); QB.setPlace(F, t.id, "cabinet");
+    check(t.place === "cabinet" && t.placeSet && QB.taskAt(F, "cabinet") === t && !QB.taskAt(F, "post"), "you can send a task somewhere else, and it stays there"); }
+  check(Object.values(PL.PLACES).every(p => p.n && p.scene && p.spot), "every place is a real spot in the village");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`places pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.board = F.board || {}; F.board.tasks = [{id: "tp1", title: "Reply to Sam's email", daily: false, at: 1}]; window.__hbGame.render(); });
+  await page.click('[data-open="quests"]'); await page.waitForSelector('#list [data-tplace="tp1"]', { timeout: 15000 });
+  check(await page.locator('#list [data-tplace="tp1"]').inputValue() === "post", "the board shows where each task goes (Reply to Sam's email: the post office)");
+  const c0 = await page.evaluate(() => window.__hbGame.F().coins);
+  await page.click('#list [data-tgo="tp1"]');
+  await page.waitForFunction(() => { const t = window.__hbGame.F().board.tasks.find(x => x.id === "tp1"); return t && t.doneDay; }, null, { timeout: 40000 });
+  const c1 = await page.evaluate(() => window.__hbGame.F().coins);
+  check(c1 - c0 === 4 && /Post office/i.test(await page.locator("#sceneName").textContent()), "go: you walk to the post office counter and it's done there, with a coin more (+" + (c1 - c0) + ")");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nan old save, from before the names changed")) try {
   console.log("\nan old save, from before the names changed");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

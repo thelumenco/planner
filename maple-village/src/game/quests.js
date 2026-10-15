@@ -13,6 +13,7 @@
 import { esc, dayKey, prevDay, hash } from "../util.js";
 import { ITEMS, CROPS, seasonOf } from "../data/items.js";
 import { NPCS } from "../data/npcs.js";
+import { PLACES, placeFor, placeOf } from "../data/places.js";
 
 export const TASK_PAY = 3, PAID_PER_DAY = 10, MAX_REQ = 3, MAX_HEARTS = 5;
 // closeness is hearts: friends (3+) can be sent presents and Christmas hampers; at 5 they'll come on a day trip
@@ -39,9 +40,13 @@ export const tasksLeft = F => myTasks(F).filter(t => !isDone(t)).length;
 export const paidToday = F => board(F).paid.ids.length;
 export function addTask(F, title, daily){
   title = String(title || "").replace(/\s+/g, " ").trim().slice(0, 120); if (!title) return null;
-  const t = {id: "t" + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36), title, daily: !!daily, at: Date.now()};
+  const t = {id: "t" + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36), title, daily: !!daily, at: Date.now(), place: placeFor(title)};
   board(F).tasks.push(t); return t;
 }
+// the player picks where a task gets done (data/places.js); their choice sticks
+export function setPlace(F, id, place){ const t = board(F).tasks.find(x => x.id === id); if (!t || !PLACES[place]) return null; t.place = place; t.placeSet = true; return t; }
+// the first task still to do at a place
+export const taskAt = (F, place) => myTasks(F).find(t => !isDone(t) && placeOf(t) === place) || null;
 export function removeTask(F, id){
   const b = board(F), i = b.tasks.findIndex(t => t.id === id); if (i < 0) return null;
   const [t] = b.tasks.splice(i, 1); return {t, i};
@@ -192,7 +197,7 @@ export function taskRows(F){
   const list = myTasks(F);
   if (!list.length) return `<li class="empty"><span class="muted">Nothing on your list yet. Add something you'd like to get done today, big or small.</span></li>`;
   return list.map(t => { const dn = isDone(t);
-    return `<li class="task${dn ? " done" : ""}"><button class="tick" data-tick="${esc(t.id)}" aria-pressed="${dn}" aria-label="${dn ? "Not done yet" : "Done"}: ${esc(t.title)}"></button><span><b>${esc(t.title)}</b><small>${t.daily ? "daily" : "one-off"}</small></span><button class="drop" data-tdel="${esc(t.id)}" aria-label="Remove ${esc(t.title)}">remove</button></li>`; }).join("");
+    return `<li class="task${dn ? " done" : ""}"><button class="tick" data-tick="${esc(t.id)}" aria-pressed="${dn}" aria-label="${dn ? "Not done yet" : "Done"}: ${esc(t.title)}"></button><span><b>${esc(t.title)}</b><small>${t.daily ? "daily" : "one-off"}${dn ? "" : ` · <label class="tplace"><span class="sr">Where: </span><select data-tplace="${esc(t.id)}">${Object.entries(PLACES).map(([k, p]) => `<option value="${k}"${k === placeOf(t) ? " selected" : ""}>${esc(p.n.replace(/^(the|your) /, "").replace(/^./, c => c.toUpperCase()))}</option>`).join("")}</select></label><button class="tgo" data-tgo="${esc(t.id)}" aria-label="Walk there">go</button>`}</small></span><button class="drop" data-tdel="${esc(t.id)}" aria-label="Remove ${esc(t.title)}">remove</button></li>`; }).join("");
 }
 export function requestRows(F, have, where){
   const reqs = board(F).reqs;
