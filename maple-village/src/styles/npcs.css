@@ -464,3 +464,44 @@
 @keyframes fingF{from{transform:rotate(-12deg)}to{transform:rotate(10deg)}}
 @keyframes dartE{0%,20%{transform:translateX(0)}28%,44%{transform:translateX(.9px)}52%,68%{transform:translateX(-.9px)}76%,100%{transform:translateX(0)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-flowerear .flip > g,.ch.npc.act-flowerear .armR,.ch.npc.act-flowerear .inhand,.ch.npc.act-flowerear .armL,.ch.npc.act-flowerear .inhandl,.ch.npc.act-coconut .armR,.ch.npc.act-coconut .inhand,.ch.npc.act-coconut .flip > g,.ch.npc .bliss,.ch.npc.act-headbasket .armL,.ch.npc.act-headbasket .legL,.ch.npc.act-headbasket .legR,.ch.npc.act-headbasket .flip > g,.ch.npc.act-bale .bhead,.ch.npc.act-plant .bob,.ch.npc.act-plant .armR,.ch.npc.act-plant .inhand,.ch.npc .prip,.ch.npc .mqh,.ch.npc .mqa,.ch.npc .sweat,.ch.npc.act-legong .bhead,.ch.npc .fing,.ch.npc .dart{animation:none}.ch.npc.act-flowerear .armR,.ch.npc.act-flowerear .inhand{transform:rotate(-46deg)}.ch.npc.act-flowerear .armL,.ch.npc.act-flowerear .inhandl{transform:rotate(46deg)}.ch.npc.act-coconut .armR{transform:rotate(-135deg)}.ch.npc.act-plant .bob{transform:rotate(14deg)}.ch.npc.act-plant .armR,.ch.npc.act-plant .inhand{transform:rotate(-24deg)}.ch.npc .bliss,.ch.npc .sweat{opacity:0}}
+
+/* a day out in Hokkaido (never done anywhere before): Mum sits on the bench at the free foot bath with her feet in the
+   warm water, eyes shut, swaying a little; Dad wrestles a giant king crab leg; Ma Ma peers into a tray of sea urchin,
+   choosing the best; Gong Gong lowers his basket of eggs into the steaming spring and lifts it again; Darren marches on
+   the spot with his skis on his shoulder; Marcus's soft-serve drips while he licks round it; Angellina listens to her
+   music box with her eyes shut, the notes floating up. (Steam rises from the foot bath and the egg spring: .hksteam) */
+.ch.npc.walk .soak,.ch.npc.walk .eggpool{display:none}
+.ch.npc .hksteam{animation:hkSteam 3.3s ease-out infinite}
+@keyframes hkSteam{0%{opacity:0;transform:translateY(2px)}30%{opacity:.8}100%{opacity:0;transform:translateY(-8px)}}
+.ch.npc.act-footbath:not(.walk) .bob{transform:translateY(6px)}
+.ch.npc.act-footbath:not(.walk) .armR{transform:rotate(-16deg)}.ch.npc.act-footbath:not(.walk) .armL{transform:rotate(16deg)}
+.ch.npc.act-footbath:not(.walk) .legL{transform-box:fill-box;transform-origin:50% 0;animation:soakL 3.2s ease-in-out infinite alternate}
+.ch.npc.act-footbath:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;animation:soakL 3.2s ease-in-out infinite alternate-reverse}
+.ch.npc.act-footbath:not(.walk) .bhead{transform-box:fill-box;transform-origin:50% 100%;animation:soakH 5s ease-in-out infinite alternate}
+.ch.npc.act-footbath:not(.walk) .bliss{animation:blissH 5s ease-out infinite}
+.ch.npc.act-footbath:not(.walk) .prip{transform-box:fill-box;transform-origin:50% 50%;animation:pripR 3.2s ease-out infinite}
+@keyframes soakL{from{transform:scaleY(.72) rotate(-5deg)}to{transform:scaleY(.72) rotate(5deg)}}
+@keyframes soakH{from{transform:rotate(-5deg)}to{transform:rotate(4deg)}}
+.ch.npc.act-crableg:not(.walk) .armR{transform:rotate(-62deg)}.ch.npc.act-crableg:not(.walk) .armL{transform:rotate(48deg)}
+.ch.npc.act-crableg:not(.walk) .crableg{animation:crabW 1.6s ease-in-out infinite}
+.ch.npc.act-crableg:not(.walk) .flip > g{transform-origin:0 0;animation:crabT 1.6s ease-in-out infinite}
+@keyframes crabW{0%,100%{transform:rotate(-5deg)}40%{transform:rotate(6deg)}60%{transform:rotate(4deg)}}
+@keyframes crabT{0%,100%{transform:rotate(2deg)}40%{transform:rotate(-3deg)}60%{transform:rotate(-2deg)}}
+.ch.npc.act-unitray:not(.walk) .bhead{transform-box:fill-box;transform-origin:50% 100%;animation:uniPeer 4s ease-in-out infinite}
+@keyframes uniPeer{0%,100%{transform:translateY(0) rotate(0)}30%,46%{transform:translateY(1.6px) rotate(-6deg)}62%,80%{transform:translateY(1.6px) rotate(5deg)}}
+.ch.npc.act-onseneggs:not(.walk) .armR{animation:eggA 4s ease-in-out infinite}
+.ch.npc.act-onseneggs:not(.walk) .inhand{animation:eggI 4s ease-in-out infinite}
+@keyframes eggA{0%,100%{transform:rotate(-40deg)}45%,60%{transform:rotate(-36deg)}}@keyframes eggI{0%,100%{transform:rotate(0)}45%,60%{transform:rotate(4deg)}}
+.ch.npc.act-skis:not(.walk) .armR{transform:rotate(-165deg)}.ch.npc.act-skis:not(.walk) .armL{transform:rotate(8deg)}
+.ch.npc.act-skis:not(.walk) .legL{animation:hbLeg 1.6s ease-in-out infinite}.ch.npc.act-skis:not(.walk) .legR{animation:hbLeg 1.6s ease-in-out infinite -.8s}
+.ch.npc.act-softserve:not(.walk) .armR{animation:softA 3.6s ease-in-out infinite}
+.ch.npc.act-softserve:not(.walk) .inhand{animation:softI 3.6s ease-in-out infinite}
+.ch.npc .lick{opacity:0}.ch.npc.act-softserve:not(.walk) .lick{animation:lickT 3.6s ease-in-out infinite}
+.ch.npc .sdrip{animation:sDrip 2.4s ease-in infinite}
+@keyframes softA{0%,40%,100%{transform:rotate(-128deg)}55%,75%{transform:rotate(-140deg)}}@keyframes softI{0%,40%,100%{transform:rotate(0)}55%,75%{transform:rotate(-4deg)}}
+@keyframes lickT{0%,50%,80%,100%{opacity:0}56%,74%{opacity:1}}
+@keyframes sDrip{0%,30%{opacity:0;transform:translateY(0)}40%{opacity:1}100%{opacity:0;transform:translateY(7px)}}
+.ch.npc.act-musicbox:not(.walk) .bhead{transform-box:fill-box;transform-origin:50% 100%;animation:soakH 2.6s ease-in-out infinite alternate}
+.ch.npc .mnotes g{animation:mNote 3s ease-out infinite}.ch.npc .mnotes g:nth-child(2){animation-delay:-1s}.ch.npc .mnotes g:nth-child(3){animation-delay:-2s}
+@keyframes mNote{0%{opacity:0;transform:translate(0, 3px)}25%{opacity:1}100%{opacity:0;transform:translate(2px, -8px)}}
+@media (prefers-reduced-motion:reduce){.ch.npc .hksteam,.ch.npc.act-footbath .legL,.ch.npc.act-footbath .legR,.ch.npc.act-footbath .bhead,.ch.npc.act-crableg .crableg,.ch.npc.act-crableg .flip > g,.ch.npc.act-unitray .bhead,.ch.npc.act-onseneggs .armR,.ch.npc.act-onseneggs .inhand,.ch.npc.act-skis .legL,.ch.npc.act-skis .legR,.ch.npc.act-softserve .armR,.ch.npc.act-softserve .inhand,.ch.npc .lick,.ch.npc .sdrip,.ch.npc.act-musicbox .bhead,.ch.npc .mnotes g{animation:none}.ch.npc.act-onseneggs .armR{transform:rotate(-40deg)}.ch.npc.act-softserve .armR{transform:rotate(-128deg)}.ch.npc .lick{opacity:0}}
