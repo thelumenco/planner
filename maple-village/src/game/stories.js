@@ -36,7 +36,7 @@ function eligible(F, id, day){
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 // Ronda's locals tell theirs on a day trip, quest or no quest (Mel's on holiday); the two-a-day limit still holds
-const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "rosa", "ilario", "bianca"];   // Ronda's, Kyoto's, Saltwick's and Portovenere's, and Jason in Cinque Terre
+const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "pvrosa", "ilario", "bianca"];   // Ronda's, Kyoto's, Saltwick's and Portovenere's, and Jason in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
   if (id === "jason") return eligible(F, id, day);   // Jason (Mel's friend) tells his whenever she visits, a chapter a day, outside the two-a-day limit
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;

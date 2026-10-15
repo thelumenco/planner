@@ -1,7 +1,7 @@
 // Letter voices for Portovenere's people: how each one writes back when Mel posts them a gift or a letter.
 // (back: things from their own town are registered from the town's goods at runtime, see ronda.js)
 export const PEN_PV = {
-  rosa: {sign: "Rosa (the orange buoys, out past the point)",
+  pvrosa: {sign: "Rosa (the orange buoys, out past the point)",
     food: "I ate it in the boat at six in the morning, out on the ropes, with the sun coming up over Palmaria. Buonissimo. The gulls were very jealous.",
     drink: "It's in the co-op fridge, behind the mussels, with my name on it in big letters. Tonio has been warned. Twice.",
     made: "Made by hand, I can tell. It's on the shelf over the workbench now, out of the splash. Gino asked where he could get one. Nowhere, Gino.",

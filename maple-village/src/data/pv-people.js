@@ -13,7 +13,7 @@ const P = (id, name, job, look, routine, lines, intro, away, more) => ({id, loca
 const at = room => PV_ROOM_STAND[room];
 
 export const PV_PEOPLE = [
-  P("rosa", "Rosa", "Farms mussels on ropes out in the gulf", {skin: "#D8A47E", hair: "#3A2A20", hairStyle: "curly", top: "#3E6B8C", bottom: "#2F2B28", extra: "apron"},
+  P("pvrosa", "Rosa", "Farms mussels on ropes out in the gulf", {skin: "#D8A47E", hair: "#3A2A20", hairStyle: "curly", top: "#3E6B8C", bottom: "#2F2B28", extra: "apron"},
     [slot("8:00", "11:30", "pv_mussels", at("pv_mussels"), {dir: -1}), slot("11:30", "13:00", "pv_harbour", [[260, 480], [320, 500], [220, 520]]), slot("13:00", "14:30", "pv_bar", [[200, 500], [320, 520]]), slot("14:30", "19:00", "pv_mussels", at("pv_mussels"), {dir: -1})],
     ["Out to the ropes at five, back by eight. The gulf is still asleep. I like it like that.", "Those are Franco's mussels. Small. Sad. Don't buy Franco's mussels.", "Muscoli, we say here. Not cozze. Muscoli.", "The water's cold and clean from the open sea. That's the secret. No, I'm not telling you the other secret."],
     "Rosa! I farm the mussels, out there on the ropes. You want the best mussels in the gulf? You found them. You're welcome.", "Rosa's out on the water with her ropes."),

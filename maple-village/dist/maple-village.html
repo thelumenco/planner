@@ -8552,7 +8552,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var at3 = (room4) => PV_ROOM_STAND[room4];
   var PV_PEOPLE = [
     P8(
-      "rosa",
+      "pvrosa",
       "Rosa",
       "Farms mussels on ropes out in the gulf",
       { skin: "#D8A47E", hair: "#3A2A20", hairStyle: "curly", top: "#3E6B8C", bottom: "#2F2B28", extra: "apron" },
@@ -13165,7 +13165,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 
   // src/data/pen-pv.js
   var PEN_PV = {
-    rosa: {
+    pvrosa: {
       sign: "Rosa (the orange buoys, out past the point)",
       food: "I ate it in the boat at six in the morning, out on the ropes, with the sun coming up over Palmaria. Buonissimo. The gulls were very jealous.",
       drink: "It's in the co-op fridge, behind the mussels, with my name on it in big letters. Tonio has been warned. Twice.",
@@ -40061,7 +40061,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     // the whole harbour (a best-ever harvest to end); Ilario's secret under the dust sheet (a portoro swift for his daughter
     // Chiara's wedding, after Rosa's harvest feeds the wedding); Signora Bianca's visitors' book, started by her
     // grandmother Elena in 1922, and the 1931 proposal written in it (Chiara signs under it on her wedding morning)
-    rosa: [
+    pvrosa: [
       { lines: ["Buongiorno! I've been up since four. I row out to my ropes before the sun does. Somebody has to say good morning to the mussels.", "See the orange buoys, out past the point? My ropes. Best mussels in the Gulf of Poets. I'm not boasting. I'm reporting."] },
       { recap: "My ropes on the orange buoys out past the point, I told you. Best mussels in the Gulf. Just reporting.", lines: ["Gino's ropes are the green buoys. Lovely shells, nothing inside. Like a handbag with no purse in it.", "And the Ferrari brothers play their mussels opera on a little radio. They say it helps them grow. It doesn't. It just makes them dramatic."] },
       { recap: "Gino's mussels are a handbag with no purse, I told you, and the Ferrari brothers' are dramatic from all the opera.", lines: ["Two winters ago the libeccio blew for three days. That's our south-west wind. It doesn't knock. It just comes in.", "When it stopped, I rowed out and my ropes were gone. Every one. Twenty years of ropes, off somewhere towards Corsica. I sat in the boat and said some words the mussels shouldn't hear."] },
@@ -40073,7 +40073,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       { recap: "The big thing under the dust sheet is just a project, I said. Nothing to see.", lines: ["This is portoro. Black marble from the island across the strait, with gold veins running through it. There's not much of it left in the world.", "The gold is the hard part. You can't tell the marble where to put its veins. You listen, and you carve round them."] },
       { recap: "Portoro, black with gold veins, I told you. You don't tell the gold where to go. You carve round it.", lines: ["Three hours this morning on one small curve. Tap, tap, tap. My wife says I'm the only man she knows who's patient with stone and impatient with toast.", "My daughter Chiara is getting married in the spring. To a boy from La Spezia who smiles too much. I like him. Don't tell him."] },
       { recap: "My daughter Chiara is getting married in the spring, I told you. To a boy from La Spezia who smiles too much.", lines: ["When Chiara was small she used to sit on the castle wall and count the swifts. She never got past eleven. They're too quick, and she was always laughing.", "The project's nearly done. The last bit is the thinnest. One tap too many and it's a very expensive doorstop.", "No, no peeking. Well. A corner. Gold, see? Now forget you saw it."] },
-      { recap: "Chiara used to count the swifts round the castle and never got past eleven, I told you. And you peeked under my sheet.", needs: ["rosa:5"], lines: ["The wedding was yesterday, on the quay, with Rosa's mussels and the whole town. And the project under the sheet? A swift. Black portoro, wings wide, a gold vein running down each wing like sunlight.", "Chiara saw it and cried, and the boy from La Spezia cried more, and then I cried, and Rosa said we were all ridiculous. Then she cried.", "The offcuts made coasters. Here, one's for you. Put your coffee on it and think of a swift."], reward: "pvcoaster" }
+      { recap: "Chiara used to count the swifts round the castle and never got past eleven, I told you. And you peeked under my sheet.", needs: ["pvrosa:5"], lines: ["The wedding was yesterday, on the quay, with Rosa's mussels and the whole town. And the project under the sheet? A swift. Black portoro, wings wide, a gold vein running down each wing like sunlight.", "Chiara saw it and cried, and the boy from La Spezia cried more, and then I cried, and Rosa said we were all ridiculous. Then she cried.", "The offcuts made coasters. Here, one's for you. Put your coffee on it and think of a swift."], reward: "pvcoaster" }
     ],
     bianca: [
       { lines: ["The church? 'Where the sea meets the sky, and the old stone remembers.' That's mine, not Byron's. Straight down the lane and out to the point, cara.", "People come in for directions and leave with a poem. I don't charge for either. Business is terrible. I'm very happy."] },
@@ -40121,7 +40121,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     for (const c of day + id) h3 = h3 * 31 + c.charCodeAt(0) | 0;
     return Math.abs(h3);
   };
-  var LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "rosa", "ilario", "bianca"];
+  var LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "pvrosa", "ilario", "bianca"];
   function storyReady(F2, id, day = dayKey()) {
     if (id === "jason") return eligible(F2, id, day);
     if (F2.storyDay !== day && !LOCALS.includes(id)) return null;
