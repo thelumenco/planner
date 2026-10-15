@@ -17,6 +17,7 @@ import { esc, dayKey } from "../util.js";
 import { ITEMS } from "../data/items.js";
 import { icon } from "../art/icons.js";
 import { FLOWERS } from "../data/orchard.js";
+import { PRESS_MAX, JARS_PER_BOTTLE } from "./mill.js";
 
 export const CRAFT = {steep: 6*3600e3, cure: 24*3600e3, lotion: 3600e3, jars: 3, rack: 3, oilPer: 2, soapPer: 6, lotionPer: 3, balm: 3600e3, balmPer: 4, lipoil: 24*3600e3, lipoilPer: 3, rollers: 2, waxPer: 2};
 export const HERB = {
@@ -77,7 +78,7 @@ const oilHave = (F, c) => have(F, "oliveoil") + (c.basket.oliveoil || 0) + c.oil
 export const basketable = id => !!HERB[id] || id === "goatmilk" || id === "oliveoil" || id === "beeswax";   // (olive oil goes in with the mill's own bottles, round 175)
 const got = (F, c, id) => have(F, id) + (c.basket[id] || 0);
 const use = (F, c, id, n = 1) => { const a = Math.min(n, have(F, id)); if (a) take(F, id, a); if (n - a) { c.basket[id] -= n - a; if (c.basket[id] <= 0) delete c.basket[id]; } };
-const useOil = (F, c, n, tomi) => { if (tomi) { c.oil -= n; return; } let a = Math.min(n, have(F, "oliveoil")); if (a) take(F, "oliveoil", a); n -= a;
+const useOil = (F, c, n) => { let a = Math.min(n, have(F, "oliveoil")); if (a) take(F, "oliveoil", a); n -= a;
   a = Math.min(n, c.basket.oliveoil || 0); if (a) { c.basket.oliveoil -= a; if (c.basket.oliveoil <= 0) delete c.basket.oliveoil; } c.oil -= n - a; };
 // make something: kind oil|soap|lotion, base (soap: goatmilk|oliveoil), adds from the backpack -> {recipe, fresh, msg}
 // round 187: melt honeycomb down into beeswax -> blocks made
@@ -87,7 +88,7 @@ export function craft(F, kind, base, adds, src = "bag", dye = null){
   if (dye && (!FLOWERS[dye] || !(kind === "balm" || kind === "lipoil"))) dye = null;
   if (!K || !adds.length || adds.length > K.max) return {msg: kind === "lotion" ? "One scent for a lotion." : "One or two things to go in."};
   if (adds.some(a => !((src === "basket" ? c.basket[a] || 0 : got(F, c, a)) > 0))) return {msg: "You're missing something for that."};
-  if (kind === "oil") { if (c.steep.length >= CRAFT.jars) return {msg: "All three steeping jars are full."}; if ((src === "basket" ? c.oil : oilHave(F, c)) < CRAFT.oilPer) return {msg: "You'll need two bottles of olive oil (press some downstairs)."}; useOil(F, c, CRAFT.oilPer, src === "basket"); base = null; }
+  if (kind === "oil") { if (c.steep.length >= CRAFT.jars) return {msg: "All three steeping jars are full."}; if (oilHave(F, c) < CRAFT.oilPer) return {msg: "You'll need two bottles of olive oil (press some downstairs)."}; useOil(F, c, CRAFT.oilPer); base = null; }
   else if (kind === "soap") { if (c.cure.length >= CRAFT.rack) return {msg: "The curing rack's full."}; if (base === "goatmilk" ? got(F, c, "goatmilk") < 2 : oilHave(F, c) < 1) return {msg: base === "goatmilk" ? "You'll need two goat's milk, from Wildflower Farm." : "You'll need a bottle of olive oil."}; if (base === "goatmilk") use(F, c, "goatmilk", 2); else useOil(F, c, 1); }
   else if (kind === "balm") { if (c.balm) return {msg: "There's a tray of balm setting already."}; if (got(F, c, "beeswax") < 1 || oilHave(F, c) < 1) return {msg: "A lip balm needs a block of beeswax (melt down some honeycomb) and a bottle of olive oil."};
     if (dye && !(dyeHave(F, dye) > 0)) return {msg: "No stems of that flower left."}; use(F, c, "beeswax"); useOil(F, c, 1); base = null; }
@@ -127,8 +128,10 @@ export function toBasket(F, herb, n = 99){ const c = craftState(F), k = Math.min
 export const PRESSER = {from: 14*60, to: 17*60 + 30}, SHOPKEEP = {from: 10*60, to: 17*60, closed: [1]};
 export function inesStep(F, m, v, t = Date.now()){
   const c = craftState(F), did = {};
-  if (m.press && m.press.by === "ines" && m.press.start + m.press.dur <= t) { c.basket.oliveoil = (c.basket.oliveoil || 0) + m.press.n; m.made = (m.made || 0) + m.press.n; did.pressed = m.press.n; m.press = null; }
-  if (!m.press && (v.oliveCrate || 0) >= 3) { const n = Math.min(4, Math.floor(v.oliveCrate/3)); v.oliveCrate -= n*3; m.press = {start: t, dur: 3600e3, n, by: "ines"}; did.started = n; }
+  // any finished pressing (his, or one the player left going) is bottled and carried up to the basket, then he presses
+  // the next lot from the grove's crate. He never touches the oil in the backpack or the basket (round 214).
+  if (m.press && m.press.start + m.press.dur <= t) { c.basket.oliveoil = (c.basket.oliveoil || 0) + m.press.n; m.made = (m.made || 0) + m.press.n; did.pressed = m.press.n; m.press = null; }
+  if (!m.press && (v.oliveCrate || 0) >= JARS_PER_BOTTLE) { const n = Math.min(PRESS_MAX, Math.floor(v.oliveCrate/JARS_PER_BOTTLE)); v.oliveCrate -= n*JARS_PER_BOTTLE; m.press = {start: t, dur: 3600e3, n, by: "ines"}; did.started = n; }
   return did;
 }
 // what sells, and how fast: the Mill Shop all day while Hazel's in; before that, a little from the wine shop's shelf
@@ -167,7 +170,7 @@ export function benchPanel(F, st = {}, o = {}){
       <p class="muted">Olive oil in the basket: ${c.basket.oliveoil || 0} bottle${c.basket.oliveoil === 1 ? "" : "s"}${o.ines ? " (Tomi presses the olive crate while he's in, and brings it up)" : ""}.</p>` + shut; }
   if (tab === "basket") { const herbs = [...Object.keys(HERB), "goatmilk", "oliveoil", "beeswax"], inBag = herbs.filter(a => have(F, a)), bn = a => a === "goatmilk" ? "Goat's milk" : a === "oliveoil" ? "Olive oil" : a === "beeswax" ? "Beeswax" : nm(a);   // round 201: beeswax too (it could go in, but had no button)
     return h + `<p class="sub">Anything the bench uses can wait here: herbs, fruit, flowers, honey, goat's milk, olive oil, beeswax. The bench takes from it as well as your backpack. Tomi brings up the oil he presses and leaves it here for you.</p>
-      <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some(a => c.basket[a] > 0) || c.oil > 0 ? `<ul class="hlist wlist">${Object.keys(c.basket).filter(a => c.basket[a] > 0).concat(c.oil > 0 ? ["milloil"] : []).map(a => `<li><span class="wpic">${icon(a === "milloil" ? "oliveoil" : (ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(a === "milloil" ? "The mill's own olive oil" : a === "oliveoil" ? "Your olive oil" : bn(a))}</b><small>${a === "milloil" ? `${c.oil} bottle${c.oil === 1 ? "" : "s"} from Tomi's pressing (he infuses with these)` : a === "oliveoil" ? `${c.basket[a]} bottle${c.basket[a] === 1 ? "" : "s"}, yours and Tomi's pressing` : `${c.basket[a]} in the basket`}</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
+      <p class="eyebrow" style="margin:10px 0 6px">In the basket</p>${Object.keys(c.basket).some(a => c.basket[a] > 0) || c.oil > 0 ? `<ul class="hlist wlist">${Object.keys(c.basket).filter(a => c.basket[a] > 0).concat(c.oil > 0 ? ["milloil"] : []).map(a => `<li><span class="wpic">${icon(a === "milloil" ? "oliveoil" : (ITEMS[a] || {}).ico || a, 28)}</span><span class="wtxt"><b>${esc(a === "milloil" ? "The mill's own olive oil" : a === "oliveoil" ? "Your olive oil" : bn(a))}</b><small>${a === "milloil" ? `${c.oil} bottle${c.oil === 1 ? "" : "s"} from the mill's pressing` : a === "oliveoil" ? `${c.basket[a]} bottle${c.basket[a] === 1 ? "" : "s"}, yours and Tomi's pressing` : `${c.basket[a]} in the basket`}</small></span><span class="orbtns"><button class="btn small alt" data-mc="unbasket:${a}:1">Take 1</button><button class="btn small alt" data-mc="unbasket:${a}:99">All</button></span></li>`).join("")}</ul>` : `<p class="muted">The basket's empty.</p>`}
       <p class="eyebrow" style="margin:10px 0 6px">From your backpack</p>
       ${inBag.length ? `<div class="actions">${inBag.map(a => `<button class="btn small alt" data-mc="basket:${a}">${HERB[a] ? dots([a]) : ""} Put in ${have(F, a)} ${esc(bn(a).toLowerCase())}</button>`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from the orchard and the garden, flowers from Mei's flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut; }
   const ok = HERB_OF(tab), base = st.base || "goatmilk", pick = st.adds || [];

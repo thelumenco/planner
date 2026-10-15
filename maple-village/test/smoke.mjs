@@ -3318,6 +3318,10 @@ if (want("\nMulled wine, and the mill workshop and shop (round 153)")) try {
   { const F = {inv: {rosemary: 2}, craft: {}}, m = {press: null}, v = {oliveCrate: 6}; mc.craftState(F).recipes.push({id: "oil_rosemary", kind: "oil", base: null, adds: ["rosemary"], name: "Rosemary olive oil"}); mc.toBasket(F, "rosemary");
     const a = mc.inesStep(F, m, v), b = mc.inesStep(F, m, v, Date.now() + 3601e3);
     check(a.started === 2 && v.oliveCrate === 0 && b.pressed === 2 && !b.infused && F.craft.basket.oliveoil === 2 && F.craft.basket.rosemary === 2 && !F.craft.steep.length, "Tomi presses the olive crate into bottles and carries them up to the basket, and that's all (round 200)"); }
+  { const F = {inv: {oliveoil: 3}, craft: {basket: {oliveoil: 2, rosemary: 1}}}, m = {press: {start: Date.now() - 2*3600e3, dur: 3600e3, n: 3}}, v = {oliveCrate: 40};
+    const d = mc.inesStep(F, m, v);
+    check(d.pressed === 3 && d.started === 10 && v.oliveCrate === 10 && F.craft.basket.oliveoil === 5 && F.inv.oliveoil === 3 && F.craft.basket.rosemary === 1 && !mc.craftState(F).steep.length,
+      "Tomi bottles any finished pressing (yours too) into the basket, presses up to ten bottles from the grove crate, and leaves your oil alone"); }
   { const F = {craft: {store: {mc_x: 5}}}; it.ITEMS.mc_x = {n: "x", price: 8}; const real = Math.random; Math.random = () => .001;
     const shop = mc.craftSellMinute(F, "2026-10-13", 11*60, "shop"), monday = mc.craftSellMinute(F, "2026-10-12", 11*60, "shop"), ws = mc.craftSellMinute(F, "2026-10-12", 11*60, "wineshop"); Math.random = real;
     check(shop === 8 && monday === 0 && ws === 8 && F.craft.store.mc_x === 3, "the Mill Shop sells all day (shut Mondays); before it opens, the wine shop's mill shelf sells a little"); }

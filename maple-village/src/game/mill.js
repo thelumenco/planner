@@ -1,13 +1,13 @@
 // The old mill (round 110): the windmill on the cottage lane, opened up as an olive mill (a big goal, goals.js).
 // Inside: the stone basin where the millstone crushes the olives, the press with its stack of round mats, clay jars
 // along the wall. Three jars of olives make one bottle of olive oil; a pressing takes an hour (set it and walk away),
-// up to four bottles at a time. Olives come from your backpack first, then the olive crate the vineyard hands fill.
+// up to ten bottles at a time. Olives come from your backpack first, then the olive crate the vineyard hands fill.
 // State: F.mill = {press: {start, dur, n} | null, made}
 import { H } from "../util.js";
 import { icon } from "../art/icons.js";
 import { vineState } from "./vineyard.js";
 
-export const JARS_PER_BOTTLE = 3, PRESS_MAX = 4, PRESS_DUR = 1*H;
+export const JARS_PER_BOTTLE = 3, PRESS_MAX = 10, PRESS_DUR = 1*H;
 // The mill's story (round 120), on the old photograph by the door: built for flour, kept turning for luck, and an
 // olive tree planted beside it by a Spanish railwayman from a village near Ronda, who always said it would press olives one day.
 export function millStory(F){
