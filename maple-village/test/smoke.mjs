@@ -3084,8 +3084,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
-    check(sp.length === 40 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
-      "the 40 dishes from the trips (rounds 207, 211, 215 and 219: Saltwick's, Portovenere's, Puffin Isle's and Bali's three each) are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(sp.length === 43 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 43 dishes from the trips (rounds 207, 211, 215, 219 and 223: Saltwick's, Portovenere's, Puffin Isle's, Bali's and Hokkaido's three each) are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "jason"), L = np.NPCS.find(n => n.id === "luca");
@@ -4544,6 +4544,64 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // the warung
   const c0 = (await gf()).coins; await go("ba_warung"); await spot("ba_warung"); await page.click('#ctx [data-ba="warung:kelapa"]'); await page.waitForTimeout(800);
   check((await gf()).coins === c0 - 2, "a fresh coconut at Nyoman's warung");
+  await page.close();
+}
+
+// Rounds 222 to 225: Hokkaido by boat: the four screens in a ring, a seafood bowl, a glass float, the onsen (the last
+// mark on the seasons scroll), a walk with Ben out of ski season, Kumiko's seeds unlocking new flowers at home
+{
+  console.log("\nHokkaido by boat (rounds 222 to 225)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`hokkaido pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/hkpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 500; f.goals = {...(f.goals || {}), boat: 1};
+    f.hokkaido = {scroll: {spring: "2026-05-01", summer: "2026-07-01", winter: "2026-01-10", ski: "2026-01-10"}, seeds: {}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const go = async sc => { await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(1500); };
+  const spot = async id => { await page.locator(`#world [data-rdspot="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(2500); };
+  const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(7000); };
+  const name = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
+  const hk = async (a, n = 1) => { for (let k = 0; k < n; k++) { await page.click(`#ctx [data-hk="${a}"]`); await page.waitForTimeout(120); } };
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-16&hkpatch=1"); await page.waitForTimeout(1500);
+  await go("shore"); await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-btown="hokkaido"]', { timeout: 15000 });
+  await page.click('#ctx [data-btown="hokkaido"]'); await page.waitForTimeout(300);
+  const sail = await page.locator("#ctx").innerText();
+  check(/Fuel 30/.test(sail) && /birch/i.test(sail), "before setting off for Hokkaido in October, the boat says what's on: golden birches");
+  await page.click('#ctx [data-tpick="evan"]'); await page.waitForTimeout(100); await page.click('#ctx [data-trip="hokkaido"]'); await page.waitForTimeout(12000);
+  check(await page.locator('#world [data-place="hkboat"]').count() === 1 && /market/i.test(await name()), "you tie up by the morning market and the canal");
+  check((await gf()).hokkaido.scroll.autumn, "an autumn visit: a mark on the seasons scroll");
+  check(/Niseko/i.test(await (async () => { await place("hkToNiseko"); return name(); })()), "north to Niseko");
+  check(/flower/i.test(await (async () => { await place("hkToFlowers"); return name(); })()), "east to the flower farm");
+  check(/hot springs/i.test(await (async () => { await place("hkToOnsenN"); return name(); })()), "south to the hot springs valley");
+  check(/market/i.test(await (async () => { await place("hkToMarket"); return name(); })()), "and west back to the market");
+  // a seafood rice bowl at Haruko's counter
+  let c0 = (await gf()).coins; await go("hk_hall"); await spot("hkdon"); await hk("don");
+  for (const t of ["uni", "ikura", "crab"]) await hk("top:" + t);
+  await hk("wasabi:yes"); await hk("dondone"); await page.waitForTimeout(600);
+  check((await gf()).hokkaido.bowls === 1 && (await gf()).coins === c0 - 7, "a seafood rice bowl built at Haruko's counter: sea urchin, salmon roe and king crab");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // a glass float with Kenta
+  await go("hk_glass"); await page.waitForTimeout(1500); await spot("hkblow"); await hk("blowstart"); await hk("gather", 2); await hk("blow", 3); await hk("colour:blue"); await hk("turn", 2); await hk("blowdone"); await page.waitForTimeout(600);
+  check((await gf()).inv.hk_myfloat === 1, "blowing your own glass float with Kenta: a keepsake");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // the onsen, properly: the sixth mark makes the scroll
+  await go("hk_ryokan"); await spot("hkbath"); await hk("bath"); await hk("wash"); await hk("rinse"); await hk("soak", 3); await hk("tea"); await hk("bathdone"); await page.waitForTimeout(5000);
+  let f = await gf();
+  check(f.hokkaido.baths === 1 && f.hokkaido.scroll.bath && f.inv.hk_scroll === 1, "the onsen done properly at Mrs Sato's (wash, rinse, soak, tea): the last mark, and the seasons scroll to keep");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // out of ski season: a walk with Ben
+  await go("hk_lodge"); await spot("hk_lodge");
+  check(await page.locator('#ctx [data-ba="ski"], #ctx [data-hk="ski"]').count() === 0, "no skiing in October: the lifts are resting");
+  await hk("walk:yotei"); await page.waitForTimeout(600);
+  check((await gf()).hokkaido.walks === 1, "a walk with Ben to the Mount Yotei lookout instead");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // seeds for home
+  await go("hk_cafe"); await spot("hkseeds"); await hk("seed:lupin"); await page.waitForTimeout(600);
+  f = await gf();
+  check(f.hokkaido.seeds.lupin && f.hokkaido.rainbow, "lupin seeds from Kumiko's rack, and her tip for rainbow rows");
+  const orch = await import(new URL("../src/data/orchard.js", import.meta.url));
+  check(orch.flowerOpen(f, "lupin") && !orch.flowerOpen(f, "poppy") && orch.flowerOpen({}, "tulip"), "lupins now in Ma Ma's seedling list at home; poppies still need their seeds");
   await page.close();
 }
 

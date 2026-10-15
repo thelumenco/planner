@@ -195,12 +195,12 @@ function marketScreen(){
   // the warehouses on the far side of the canal: grey stone, iron-shuttered windows, black tiled roofs with fish on
   // the ridges, ivy climbing (green, then red in autumn); and the road north between them
   const ivy = (x, y, h) => { const c = {summer: ["#3E7A36", "#5A9A44"], sakura: ["#6EA444", "#8CC05A"], autumn: ["#B83A2A", "#E0703A"]}[se];
-    return c ? NP(`<g filter="url(#wob)">${Array.from({length: 9}, (_, k) => `<ellipse cx="${f1(x + rnd(k + x)*30 - 15)}" cy="${f1(y - rnd(k*3 + x)*h)}" rx="${f1(6 + rnd(k)*5)}" ry="${f1(5 + rnd(k*2)*4)}" fill="${c[k % 2]}"/>`).join("")}</g>`)
+    return c ? NP(`<g filter="url(#wob)">${Array.from({length: 16}, (_, k) => `<ellipse cx="${f1(x + rnd(k + x)*18 - 9)}" cy="${f1(y - 4 - rnd(k*3 + x)*h)}" rx="${f1(3 + rnd(k)*3)}" ry="${f1(2.6 + rnd(k*2)*2.4)}" fill="${c[k % 2]}"/>`).join("")}</g>`)
       : NP(`<path d="M${x} ${y} q-6 -${h*.4} 2 -${h*.6} q6 -${h*.2} -2 -${h*.4} M${x} ${y} q8 -${h*.3} 4 -${h*.7}" fill="none" stroke="#6A5A4A" stroke-width="1"/>`); };
   const shutter = (x, y) => `<rect x="${x}" y="${y}" width="16" height="18" fill="#3E4A48" stroke="var(--line)" stroke-width=".6"/><path d="M${x + 8} ${y} v18" stroke="#2A3230" stroke-width=".8"/><circle cx="${x + 3}" cy="${y + 3}" r=".8" fill="#8A9690"/><circle cx="${x + 13}" cy="${y + 3}" r=".8" fill="#8A9690"/><circle cx="${x + 3}" cy="${y + 15}" r=".8" fill="#8A9690"/><circle cx="${x + 13}" cy="${y + 15}" r=".8" fill="#8A9690"/>`;
   const warehouse = (x1, x2, n) => NP(sk(`<rect x="${x1}" y="40" width="${x2 - x1}" height="72" fill="${C.stone}"/>${courses(x1, 40, x2 - x1, 72, C.stone3, 9, .5, 26)}<rect x="${x1}" y="40" width="${x2 - x1}" height="5" fill="${C.stone2}"/>
     ${[0, 1, 2].map(k => shutter(x1 + 12 + k*(x2 - x1 - 40)/2, 52)).join("")}<rect x="${(x1 + x2)/2 - 14}" y="80" width="28" height="32" fill="#4A4038"/><path d="M${(x1 + x2)/2} 80 v32" stroke="#2E2822" stroke-width="1"/><text x="${(x1 + x2)/2}" y="76" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="8" fill="#F1EADB">${n}</text>`,
-    `<rect x="${x1}" y="40" width="${x2 - x1}" height="72"/>`)) + kawara(x1 + 4, x2 - 4, 42, 34, {fish: true, hip: .1});
+    `<rect x="${x1}" y="40" width="${x2 - x1}" height="72"/>`)) + kawara(x1 + 4, x2 - 4, 42, 34, {hip: .1});
   const sky = NP(`<rect width="520" height="12" fill="${w ? "#DCE4EC" : "#D9E8F0"}"/>`);
   const road = NP(`<rect x="222" y="0" width="76" height="112" fill="${w ? C.snow2 : C.pave}"/>`);
   const warehouses = warehouse(0, 104, "壱") + warehouse(110, 222, "弐") + warehouse(298, 410, "参") + warehouse(416, 520, "四") + ivy(132, 110, 56) + ivy(400, 110, 50)
@@ -243,7 +243,7 @@ function marketScreen(){
   const glassRoof = kawara(340, 516, 264, 46, {hip: .14}) + NP(sk(`<rect x="486" y="200" width="16" height="44" fill="${C.stone2}"/>${courses(486, 200, 16, 44, C.stone3, 8, .6, 16)}`, `<rect x="486" y="200" width="16" height="44"/>`)) + smoke(494, 196, 0)
     + (w ? NP(`<path d="M484 200 q10 -6 20 0z" fill="${C.snow}"/>`) : "");
   const glassSign = `<g pointer-events="none"><path d="M398 268 h56" stroke="${C.iron}" stroke-width="1.4"/><g>${swing(426, 268, 3, 4)}<path d="M406 268 v6 M446 268 v6" stroke="${C.iron}" stroke-width=".8"/><rect x="400" y="274" width="52" height="16" rx="2" fill="#2E3A44" stroke="var(--line)" stroke-width=".8"/><text x="426" y="285.4" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="8" fill="#F4D98A">硝子 Kenta</text></g></g>`;
-  const glass = place("hkglass", 426, 348, 28, 9, "Kenta's glassworks", glassWall + glassRoof + glassSign + ivy(338, 334, 50), "Kenta's glassworks", 426, 368, "#BFE0DA");
+  const glass = place("hkglass", 426, 348, 28, 9, "Kenta's glassworks", glassWall + glassRoof + glassSign, "Kenta's glassworks", 426, 368, "#BFE0DA");
   // the cherry trees: one by the glassworks, one on the quay
   const trees = cherry(498, 392, .82, 3) + cherry(26, 438, .8, 4) + NP(w ? "" : `<g>${[[488, 400], [508, 398], [14, 446], [40, 444]].map(([x, y]) => tuft(x, y, "#8A9A6A")).join("")}</g>`);
   // the harbour: the stone quay along its edge with bollards, the sea (ice floes in winter), the wooden pier, your
@@ -294,23 +294,24 @@ function onsenScreen(){
   // the steaming valley: a sunken basin of ochre, rust, sulphur yellow and white rock, vents and bubbling pools,
   // a zig-zag boardwalk out across it, and the far slopes; the rock is warm, so the snow only lies on the rims
   const rocks = [[260, 60, 70, 40, C.ochre], [400, 50, 80, 36, C.rust], [470, 130, 60, 50, C.ochre], [330, 150, 80, 50, C.rock], [240, 170, 50, 40, C.rust], [420, 200, 70, 30, C.rock2], [300, 90, 40, 30, C.sulphur], [500, 220, 40, 30, C.rust], [220, 100, 30, 40, C.rock]];
-  const valley = NP(`<path d="M196 0 H520 V248 H196z" fill="#C8A274"/><g filter="url(#wash)">${rocks.map(([x, y, rx, ry, c]) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${c}"/>`).join("")}</g>
-    <g filter="url(#wob)">${[[280, 120, 16, 6], [380, 100, 20, 7], [450, 170, 14, 5], [350, 210, 18, 6], [250, 210, 12, 5]].map(([x, y, rx, ry]) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${C.milky}"/><ellipse cx="${x - 3}" cy="${y - 1}" rx="${f1(rx*.6)}" ry="${f1(ry*.5)}" fill="${C.milky2}"/>`).join("")}</g>
+  const vD = "M232 0 H520 V248 H204 Q194 206 210 160 Q222 110 204 66 Q200 24 232 0z";
+  const valley = NP(`<clipPath id="hkVal"><path d="${vD}"/></clipPath><path d="${vD}" fill="#C8A274" stroke="#8A6A48" stroke-width="2"/><g clip-path="url(#hkVal)"><g filter="url(#wash)">${rocks.map(([x, y, rx, ry, c]) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${c}"/>`).join("")}</g>
+    <g filter="url(#wob)">${[[280, 120, 16, 6], [380, 100, 20, 7], [450, 170, 14, 5], [350, 210, 18, 6], [250, 210, 12, 5]].map(([x, y, rx, ry]) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${C.milky}"/><ellipse cx="${x - 3}" cy="${y - 1}" rx="${f1(rx*.6)}" ry="${f1(ry*.5)}" fill="${C.milky2}"/>`).join("")}</g></g>
     ${[[330, 60], [430, 130], [262, 150], [490, 70], [400, 180]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="5" ry="2.6" fill="#5A4436"/><ellipse cx="${x}" cy="${y}" rx="8" ry="3.6" fill="none" stroke="${C.sulphur}" stroke-width="1.6"/>`).join("")}
     ${[[280, 120], [380, 100], [450, 170], [350, 210]].map(([x, y], k) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#FFFFFF"><animate attributeName="r" values="0;3;0" dur="${1.2 + k*.3}s" repeatCount="indefinite"/></circle>`).join("")}`)
-    + NP(`<path d="M196 0 H520 V24 Q440 34 360 22 Q280 14 196 30z" fill="${w ? C.snow : "#7E8A5A"}"/>`) + spruce(230, 22, .6) + spruce(480, 20, .7) + spruce(400, 14, .5);
+    + NP(`<path d="M220 0 H520 V24 Q440 34 360 22 Q280 14 214 30z" fill="${w ? C.snow : "#7E8A5A"}"/>`) + spruce(230, 22, .6) + spruce(480, 20, .7) + spruce(400, 14, .5);
   const walk = NP(sk(`<path d="M292 248 L300 196 L380 160 L392 112 L470 74 L478 30" fill="none" stroke="${C.timber}" stroke-width="12" stroke-linejoin="round"/>`, `<path d="M286 248 L294 194 L374 158 L386 110 L464 72 L472 30 M298 248 L306 198 L386 162 L398 114 L476 76 L484 30" stroke-width="1"/>`)
     + `<path d="M292 248 L300 196 L380 160 L392 112 L470 74 L478 30" fill="none" stroke="${C.timber2}" stroke-width="12" stroke-dasharray="1 4" opacity=".8"/>`);
   const vapour = [[330, 60], [430, 130], [262, 150], [490, 70], [400, 180], [280, 120], [350, 210], [450, 170], [240, 60], [500, 200]].map(([x, y], k) => steam(x, y, k, 1.1 + (k % 3)*.2, 60)).join("");
   // the rim of the valley: a rail of rough logs, snow on the top in winter, and a sign
   const rim = NP(sk(`<rect x="196" y="240" width="324" height="8" fill="${C.timber}"/>${Array.from({length: 12}, (_, k) => `<rect x="${200 + k*27}" y="230" width="4" height="20" fill="${C.timber2}"/>`).join("")}<path d="M196 232 H520" stroke="${C.timber2}" stroke-width="3"/>`, `<path d="M196 232 H520 M196 248 H520"/>`)
-    + (w ? `<path d="M196 238 H520 V242 H196z M196 229 H520 V232 H196z" fill="${C.snow}"/>` : "")) + sign(230, 262, 52, "地獄谷", 8);
-  const vents = place("hkvents", 300, 264, 28, 9, "The steaming valley", valley + walk + vapour + rim, "Steaming valley", 360, 284, "#F6E3B4");
+    + (w ? `<path d="M196 238 H520 V242 H196z M196 229 H520 V232 H196z" fill="${C.snow}"/>` : "")) + sign(236, 244, 52, "地獄谷", 8);
+  const vents = place("hkvents", 300, 264, 28, 9, "The steaming valley", valley + walk + vapour + rim, "Steaming valley", 262, 290, "#F6E3B4");
   // the red oni on his stone plinth: horns, a fierce grin, a tiger-skin wrap and a great iron club
   const oniArt = NP(sk(`<rect x="24" y="306" width="78" height="30" fill="${C.stone}"/>${courses(24, 306, 78, 30, C.stone3, 10, .55, 26)}<rect x="20" y="300" width="86" height="8" fill="${C.stone2}"/>`, `<rect x="24" y="300" width="78" height="36"/>`)
-    + sk(`<path d="M50 300 l-2 -22 h10 l2 22z M66 300 l2 -22 h-10 l-2 22z" fill="${C.red}"/><path d="M44 280 Q42 250 62 246 Q82 250 80 280z" fill="${C.red}"/><path d="M46 278 h32 v6 h-32z" fill="#E8C24A"/><path d="M48 279 l3 4 M56 279 l3 4 M64 279 l3 4 M72 279 l3 4" stroke="${C.black}" stroke-width="1.2"/>
+    + sk(`<path d="M50 300 l-2 -22 h10 l2 22z M66 300 l2 -22 h-10 l-2 22z" fill="${C.red}"/><path d="M42 282 Q40 256 48 250 Q62 243 76 250 Q84 256 82 282z" fill="${C.red}"/><path d="M53 256 q9 5 18 0" stroke="#9A2A22" stroke-width="1" fill="none"/><path d="M44 276 h36 v8 h-36z" fill="#E8C24A"/><path d="M48 279 l3 4 M56 279 l3 4 M64 279 l3 4 M72 279 l3 4" stroke="${C.black}" stroke-width="1.2"/>
       <path d="M44 256 q-12 8 -10 22 M80 256 q10 6 12 -8" stroke="${C.red}" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="62" cy="236" r="13" fill="${C.red}"/><path d="M52 226 l-4 -9 l6 5z M72 226 l4 -9 l-6 5z" fill="#F2E6C8"/><path d="M52 228 q10 -8 20 0" fill="#3A2A22"/>`,
-      `<path d="M44 280 Q42 250 62 246 Q82 250 80 280z"/><circle cx="62" cy="236" r="13"/>`)
+      `<path d="M42 282 Q40 256 48 250 Q62 243 76 250 Q84 256 82 282z"/><circle cx="62" cy="236" r="13"/>`)
     + `<circle cx="57" cy="235" r="2.4" fill="#FFFDF6"/><circle cx="67" cy="235" r="2.4" fill="#FFFDF6"/><circle cx="57.4" cy="235.4" r="1.1" fill="${C.black}"/><circle cx="67.4" cy="235.4" r="1.1" fill="${C.black}"/><path d="M55 242 q7 5 14 0 z" fill="#FFFDF6" stroke="${C.black}" stroke-width=".6"/><path d="M57 242 l1 3 M66 242 l1 3" stroke="${C.black}" stroke-width=".5"/>`
     + `<g>${swing(92, 270, 3, 5)}<path d="M92 274 L98 210" stroke="${C.iron}" stroke-width="5" stroke-linecap="round"/><path d="M95 240 L100 210" stroke="${C.iron}" stroke-width="8" stroke-linecap="round"/>${[218, 226, 234].map(y => `<circle cx="${y === 218 ? 99 : y === 226 ? 98 : 97}" cy="${y}" r="1.6" fill="#8A929A"/>`).join("")}</g>`
     + (w ? `<path d="M50 224 q12 -8 24 0 q-12 -3 -24 0z M20 300 h86 v-4 h-86z" fill="${C.snow}"/>` : ""));
@@ -323,10 +324,10 @@ function onsenScreen(){
     + kawara(332, 524, 384, 18, {ov: 10, hip: .02}) + kawara(338, 520, 334, 44, {hip: .16, fish: false})
     + NP(`<rect x="398" y="292" width="44" height="16" rx="2" fill="#2E2218" stroke="var(--line)" stroke-width=".8"/><text x="420" y="303.6" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="9" fill="#F4E6C8">佐藤旅館</text>`)
     + noren(420, 400, 34, C.navy, "ゆ") + chochin(396, 404, 1, "") + chochin(444, 404, 2, "");
-  const ryokan = place("hkryokan", 420, 452, 28, 9, "Mrs Sato's ryokan", ryArt, "Mrs Sato's ryokan", 420, 472, "#BFE0DA");
+  const ryokan = place("hkryokan", 420, 452, 28, 9, "Mrs Sato's ryokan", ryArt, "Mrs Sato's ryokan", 400, 472, "#BFE0DA");
   // the garden by the ryokan: a stone lantern, a maple and a cherry
   const toro = (x, y) => NP(sk(`<rect x="${x - 3}" y="${y - 16}" width="6" height="16" fill="${C.stone}"/><rect x="${x - 7}" y="${y - 28}" width="14" height="12" fill="${C.stone}"/><rect x="${x - 4}" y="${y - 25}" width="8" height="6" fill="#F4D98A"/><path d="M${x - 11} ${y - 28} L${x} ${y - 36} L${x + 11} ${y - 28}z" fill="${C.stone2}"/>`, `<rect x="${x - 7}" y="${y - 28}" width="14" height="12"/>`) + (w ? `<path d="M${x - 11} ${y - 29} L${x} ${y - 37} L${x + 11} ${y - 29}z" fill="${C.snow}"/>` : ""));
-  const garden = maple(468, 540, 1.1, 3) + toro(426, 520) + cherry(480, 620, 1, 4) + sasa(430, 600, 1.1) + sasa(500, 520, .8);
+  const garden = maple(482, 566, 1, 3) + toro(426, 520) + cherry(480, 620, 1, 4) + sasa(430, 600, 1.1) + sasa(500, 520, .8);
   // the foot bath: a warm milky stream between rocks, a long wooden bench along it, a little sign; steam rising
   const fbArt = NP(sk(`<path d="M28 540 Q120 530 228 544 L228 592 Q120 600 28 588z" fill="${C.stone2}"/>`, `<path d="M28 540 Q120 530 228 544 L228 592 Q120 600 28 588z"/>`)
     + `<path d="M36 548 Q120 540 220 552 L220 584 Q120 590 36 580z" fill="${C.milky}"/><path d="M40 560 Q120 552 216 566" stroke="${C.milky2}" stroke-width="5" fill="none"><animate attributeName="stroke-dashoffset" values="0;-40" dur="3s" repeatCount="indefinite"/></path><path d="M44 572 Q120 566 214 576" stroke="#FFFFFF" stroke-width="1" stroke-dasharray="6 10" fill="none" opacity=".7"><animate attributeName="stroke-dashoffset" values="0;-32" dur="2.4s" repeatCount="indefinite"/></path>`
@@ -340,7 +341,7 @@ function onsenScreen(){
     + sk(`<path d="M270 560 L382 552" stroke="${C.timber}" stroke-width="4"/><path d="M276 560 V620 M376 552 V616" stroke="${C.timber2}" stroke-width="3"/>`, `<path d="M270 560 L382 552"/>`)
     + [300, 326, 352].map((x, k) => `<g>${swing(x, 558, 4, 3 + k*.5, -k)}<path d="M${x} 558 v20" stroke="#8A7050" stroke-width=".8"/><path d="M${x - 8} 578 h16 l-2 8 h-12z" fill="#C8A060" stroke="var(--line)" stroke-width=".6"/>${[-4, 0, 4].map(d => `<ellipse cx="${x + d}" cy="578" rx="2.4" ry="3" fill="#F6EEDC" stroke="#B8A47A" stroke-width=".3"/>`).join("")}</g>`).join("")
     + (w ? `<path d="M266 562 Q326 548 386 562" stroke="${C.snow}" stroke-width="3" fill="none"/>` : "")) + steam(310, 592, 3, .9, 40) + steam(346, 588, 7, .9, 40) + NP(sign(380, 538, 54, "温泉たまご", 7));
-  const eggs = place("hkeggs", 324, 526, 26, 9, "The egg spring", egArt, "Egg spring", 250, 560, "#F6E3B4");
+  const eggs = place("hkeggs", 324, 526, 26, 9, "The egg spring", egArt, "Egg spring", 324, 628, "#F6E3B4");
   // along the bottom: bamboo grass, ferns and a stone or two; old snow in the shade in spring
   const bottom = sasa(30, 626, 1.2) + sasa(90, 630) + sasa(160, 628, 1.1) + sasa(230, 632) + sasa(400, 470, .8) + oldSnow([[40, 610, 30], [160, 240, 26], [470, 470, 20], [200, 620, 24]]);
   const bits = tufts([[150, 300], [260, 330], [300, 480], [180, 470], [110, 400], [360, 470]]) + wildflowers([[120, 290], [170, 380], [280, 360], [330, 300], [200, 450]]);
@@ -362,13 +363,13 @@ function nisekoScreen(){
       + `<g><animateTransform attributeName="transform" type="translate" values="0 0;14 0;0 0" dur="46s" repeatCount="indefinite"/><ellipse cx="${cx - hw*.4}" cy="${base - h*.45}" rx="40" ry="7" fill="#FFFFFF" opacity=".7"/><ellipse cx="${cx + hw*.5}" cy="${base - h*.3}" rx="30" ry="6" fill="#FFFFFF" opacity=".6"/></g>`); };
   const sky = NP(`<rect width="520" height="160" fill="${w ? "#DCE6EF" : se === "autumn" ? "#E3ECEF" : "#CFE4EF"}"/>`) + yotei(360, 146, 170, 124)
     + NP(`<path d="M200 160 Q260 130 330 140 Q420 126 520 136 V160z" fill="${w ? C.snow2 : {spring: "#7E8A5E", sakura: "#6E9A4E", summer: "#4E8A44", autumn: "#B88A3A"}[se]}"/>`)
-    + [[230, 152, .5], [258, 148, .45], [470, 146, .5], [500, 150, .55], [440, 150, .4]].map(([x, y, s]) => spruce(x, y, s)).join("") + [[330, 154, .45], [380, 150, .4], [410, 154, .45]].map(([x, y, s], k) => birch(x, y, s, k)).join("");
+    + [[230, 152, .5], [258, 148, .45], [470, 146, .5], [500, 150, .55], [440, 150, .4]].map(([x, y, s]) => spruce(x, y, s)).join("") + [[330, 154, .45], [380, 150, .4], [410, 154, .45]].map(([x, y, s], k) => birch(x, y, s, k)).join("") + cherry(222, 158, .62, 8) + cherry(506, 160, .7, 9);
   // the ski slope down from the top-left, groomed with corduroy lines in winter (skiers zig-zagging down), green with
   // wildflowers in summer, gold in autumn, with spruce along its edge
-  const slopeD = "M0 0 H210 L210 60 Q190 150 208 236 H96 Q60 200 0 210z";
+  const slopeD = "M0 0 H120 Q182 22 210 74 Q190 150 208 236 H96 Q60 200 0 210z";
   const slopeCol = {winter: "#FAFCFE", spring: "#B4BC88", sakura: "#A6CC74", summer: "#8EC05A", autumn: "#CDB46A"}[se];
   const skier = (d, dur, b, col) => `<g><animateMotion path="${d}" dur="${dur}s" begin="${b}s" repeatCount="indefinite"/><path d="M-5 2 h10" stroke="#3A3A3A" stroke-width="1.2"/><path d="M0 1 v-6" stroke="${col}" stroke-width="3"/><circle cx="0" cy="-7.5" r="2" fill="${col}"/></g>`;
-  const slope = NP(sk(`<path d="${slopeD}" fill="${slopeCol}"/>`, `<path d="M210 60 Q190 150 208 236 M96 236 Q60 200 0 210"/>`)
+  const slope = NP(`<path d="${slopeD}" fill="${slopeCol}"/>` + sk("", `<path d="M120 0 Q182 22 210 74 Q190 150 208 236 M96 236 Q60 200 0 210"/>`)
     + (w ? `<path d="${Array.from({length: 9}, (_, k) => `M${20 + k*20} 0 Q${30 + k*18} 110 ${60 + k*15} 220`).join(" ")}" stroke="#DCE6F0" stroke-width="1" fill="none"/>` + skier("M40 0 Q100 40 50 80 Q10 120 90 160 Q150 190 120 230", 12, 0, "#E0403A") + skier("M150 0 Q90 50 140 100 Q190 150 130 200", 14, -6, "#3E8FC0")
       : `<g opacity=".7">${Array.from({length: 18}, (_, k) => `<circle cx="${f1(20 + rnd(k)*180)}" cy="${f1(20 + rnd(k*3)*200)}" r="1.5" fill="${se === "autumn" ? "#E8A040" : ["#F2D35E", "#FFFFFF", "#B48AD8"][k % 3]}"/>`).join("")}</g>`))
     + spruce(14, 190, .9) + spruce(30, 120, .8) + spruce(16, 50, .7);
@@ -401,13 +402,13 @@ function nisekoScreen(){
   // the sledging hill: a smooth white mound with tracks and bright sledges in winter, a soft green slope in summer
   const hillCol = {winter: "#FAFCFE", spring: "#ABB57E", sakura: "#A1C870", summer: "#8DBF59", autumn: "#C7B266"}[se];
   const sled = (x, y, c) => `<path d="M${x - 9} ${y} h16 q4 0 4 -4 v-2 h-20z" fill="${c}" stroke="var(--line)" stroke-width=".6"/><path d="M${x + 11} ${y - 6} q4 -4 0 -6" stroke="${c}" stroke-width="1.4" fill="none"/>`;
-  const sledArt = NP(sk(`<path d="M-10 640 V540 Q60 500 150 520 Q206 540 222 640z" fill="${hillCol}"/>`, `<path d="M-10 540 Q60 500 150 520 Q206 540 222 640"/>`)
+  const sledArt = NP(`<path d="M-10 640 V540 Q60 500 150 520 Q206 540 222 640z" fill="${hillCol}"/>` + sk("", `<path d="M-10 540 Q60 500 150 520 Q206 540 222 640"/>`)
     + (w ? `<path d="M40 512 Q90 560 170 600 M60 510 Q110 556 190 596" stroke="#C6D4E2" stroke-width="1.4" fill="none"/>` + sled(186, 520, "#E0403A") + sled(206, 528, "#3E8FC0") + sled(176, 534, "#F2C230")
       + `<g><animateMotion path="M50 520 Q100 560 180 604" dur="5s" repeatCount="indefinite"/>${sled(0, 0, "#6FB06A")}</g>`
       : `<g opacity=".8">${Array.from({length: 12}, (_, k) => `<circle cx="${f1(20 + rnd(k + 40)*180)}" cy="${f1(540 + rnd(k*3 + 40)*80)}" r="1.6" fill="${se === "autumn" ? "#E8A040" : ["#F2D35E", "#FFFFFF", "#F08AA0"][k % 3]}"/>`).join("")}</g>`)) + spruce(22, 560, .7);
   const sledPl = place("hksled", 150, 490, 26, 9, "The little sledging hill", sledArt, w ? "Sledging hill" : "Grassy hill", 80, 600, "#F6E3B4");
   // the paths: up from the canal road, across to the field road, to the lodge, the lift and the deck
-  const paths = path("M260 650 Q262 520 262 440 Q300 460 530 470 M262 440 Q300 400 420 396 M262 440 Q200 360 150 300 M262 440 Q280 300 290 206 M262 440 Q190 420 118 410 M262 440 Q200 480 150 490", 40);
+  const paths = path("M260 650 Q262 520 262 440 Q300 460 530 470 M262 440 Q300 400 420 396 M262 440 Q200 360 150 300 M262 440 Q280 300 290 206", 34);
   // the corner trees: maples (red in autumn), a cherry, birches and a spruce
   const corner = maple(360, 590, 1.15, 1) + cherry(440, 600, 1.05, 5) + birch(500, 560, 1, 6) + maple(504, 636, .9, 2) + spruce(340, 640, .8) + birch(388, 640, .8, 7);
   const bits = tufts([[220, 330], [320, 420], [200, 560], [300, 520], [380, 460]]) + wildflowers([[230, 360], [330, 440], [210, 540], [300, 500], [180, 340], [360, 500]]) + oldSnow([[300, 300, 24], [210, 580, 28], [480, 470, 22]]);
@@ -424,7 +425,7 @@ function flowersScreen(){
   const sky = NP(`<rect width="520" height="80" fill="${w ? "#DCE6EF" : "#CFE4EF"}"/><path d="M0 70 L40 40 L70 52 L110 26 L150 48 L190 34 L240 56 L290 30 L330 50 L380 24 L430 46 L470 34 L520 50 V90 H0z" fill="${w ? "#B9C9DA" : "#8FA4B6"}"/><path d="M100 30 L110 26 L122 33 L114 36z M282 34 L290 30 L300 36 L291 38z M370 28 L380 24 L392 31 L382 33z" fill="#FAFCFE"/>`);
   // the stripes: long bands following the hill's curve; poppies, lupins, salvia, marigolds, cosmos and baby's breath in
   // summer; tilled earth and green rows in spring; harvested with the last cosmos in autumn; a smooth snowfield in winter
-  const hillTop = y0 => [[-10, y0 + 10], [80, y0 - 4], [170, y0 - 10], [260, y0 - 4], [340, y0 + 8]];
+  const hillTop = y0 => [[-10, y0 + 10], [80, y0 - 4], [170, y0 - 10], [260, y0 - 4], [350, y0 + 8], [420, y0 + 22]];
   const bandCols = stripes() ? ["#D93A32", "#8A5AC0", "#3E6AC0", "#F2902A", "#F08AB8", "#FAF6F0", "#D93A32", "#8A5AC0"]
     : se === "autumn" ? ["#B88A4A", "#9C7A40", "#F08AB8", "#B88A4A", "#C8A060", "#9C7A40", "#F2902A", "#B88A4A"]
     : se === "winter" ? Array(8).fill(C.snow) : ["#8E6E4E", "#7DAA4E", "#8E6E4E", "#7DAA4E", "#8E6E4E", "#7DAA4E", "#8E6E4E", "#7DAA4E"];
@@ -434,7 +435,8 @@ function flowersScreen(){
   const texture = stripes() ? `<g opacity=".55">${Array.from({length: 140}, (_, k) => { const b = k % 8, x = rnd(k*1.7)*340 - 6, yy = bandY[b] + 4 + rnd(k*2.9)*16 + (Math.cos((x + 10)/120)*-6); return `<circle cx="${f1(x)}" cy="${f1(yy)}" r="${f1(1.2 + rnd(k)*1.2)}" fill="${b === 5 ? "#FFFFFF" : "#FFF3E0"}" opacity="${b === 5 ? .9 : .45}"/>`; }).join("")}</g>`
     : w ? `<g stroke="${C.snow3}" stroke-width="1" fill="none" opacity=".6">${bandY.map(y => `<path d="${smooth(hillTop(y + 12))}"/>`).join("")}</g>`
     : `<g stroke="#5E4A34" stroke-width=".8" fill="none" opacity=".35">${bandY.map(y => `<path d="${smooth(hillTop(y + 8))}"/><path d="${smooth(hillTop(y + 16))}"/>`).join("")}</g>`;
-  const hill = NP(`<path d="${smooth(hillTop(64))} L340 260 L-10 260z" fill="${w ? C.snow : gr2}"/>${bandCols.map((_, k) => band(k)).join("")}${texture}<path d="${smooth(hillTop(64))}" stroke="${w ? C.snow3 : "#5E7A3A"}" stroke-width="1.6" fill="none"/>`)
+  const far = NP(`<path d="M-10 90 Q200 60 530 84 V270 H-10z" fill="${w ? C.snow2 : gr2}"/>`);
+  const hill = NP(`<path d="${smooth(hillTop(64))} L${hillTop(256).reverse().map(([x, y]) => `${f1(x)} ${f1(y)}`).join(" L")}z" fill="${w ? C.snow : gr2}"/>${bandCols.map((_, k) => band(k)).join("")}${texture}<path d="${smooth(hillTop(64))}" stroke="${w ? C.snow3 : "#5E7A3A"}" stroke-width="1.6" fill="none"/>`)
     + [[30, 70], [60, 64], [90, 60], [250, 60], [280, 64]].map(([x, y], k) => k % 2 ? birch(x, y, .45, k) : spruce(x, y, .4)).join("")
     + (w ? crane(150, 210, .8, 1, true, 3) + crane(186, 214, .8, -1, true, 4) : "");
   // a little red barn on the far ridge
@@ -442,7 +444,7 @@ function flowersScreen(){
   const stripesPl = place("hkstripes", 190, 268, 30, 9, w ? "The snowfield, where the stripes bloom in summer" : "The rainbow flower stripes", hill, w ? "The snowfield" : stripes() ? "Flower stripes" : "The stripe fields", 190, 288, "#F2C9B4");
   // the flower hill: a soft grassy dome (the rest of the screen's ground), a mown path up it, and the little bell on
   // its post at the top
-  const flowerHill = NP(sk(`<path d="M330 260 Q330 160 380 120 Q430 90 520 100 V260z" fill="${w ? C.snow : gr}"/>`, `<path d="M330 260 Q330 160 380 120 Q430 90 520 100"/>`)
+  const flowerHill = NP(`<path d="M300 272 Q318 150 380 116 Q440 90 530 96 V272z" fill="${w ? C.snow : gr}"/>` + sk("", `<path d="M300 272 Q318 150 380 116 Q440 90 530 96"/>`)
     + `<path d="M430 270 Q420 210 440 170 Q446 150 440 134" stroke="${w ? "#DCE5EE" : gr2}" stroke-width="14" fill="none" stroke-linecap="round"/>`
     + (w || se === "spring" ? "" : `<g opacity=".85">${Array.from({length: 26}, (_, k) => `<circle cx="${f1(350 + rnd(k + 70)*160)}" cy="${f1(130 + rnd(k*3 + 70)*120)}" r="1.6" fill="${se === "autumn" ? "#E8A040" : ["#F2D35E", "#FFFFFF", "#F08AA0", "#B48AD8"][k % 4]}"/>`).join("")}</g>`));
   const hillPl = place("hkhill", 430, 280, 28, 9, "The flower hill", flowerHill + cherry(508, 250, .8, 6) + oldSnow([[380, 230, 26]]), "Flower hill", 470, 300, "#F6E3B4");
@@ -467,11 +469,11 @@ function flowersScreen(){
   const pondD = "M330 560 Q340 520 400 520 Q470 516 510 540 Q530 580 500 610 Q440 640 380 626 Q330 610 330 560z";
   const meadowCol = w ? C.snow : {spring: "#9AA470", sakura: "#8EB65E", summer: "#7EAE4E", autumn: "#BCA05A"}[se];
   const reeds = pts => NP(pts.map(([x, y], k) => `<g>${swing(x, y, 3, 3 + k % 3, -k)}<path d="M${x} ${y} q-2 -14 -1 -24 M${x + 3} ${y} q2 -12 4 -20 M${x - 3} ${y} q-3 -10 -6 -16" stroke="${w ? "#B8A880" : se === "autumn" ? "#B89A5A" : "#6E9A48"}" stroke-width="1.3" fill="none"/><ellipse cx="${x - 1}" cy="${y - 24}" rx="1.6" ry="4" fill="#7A5A3A"/></g>`).join(""));
-  const meadow = NP(sk(`<path d="M300 466 Q400 456 520 470 V640 H300z" fill="${meadowCol}"/>`, `<path d="M300 466 Q400 456 520 470"/>`)
+  const meadow = NP(`<path d="M300 466 Q400 456 520 470 V640 H300z" fill="${meadowCol}"/>` + sk("", `<path d="M300 466 Q400 456 520 470"/>`)
     + sk(`<path d="${pondD}" fill="${w ? "#B9D2E0" : "#5E9CB0"}"/>`, `<path d="${pondD}"/>`) + (w ? `<path d="M360 560 Q410 540 470 556 Q490 580 450 600 Q400 610 370 590z" fill="#7FAFC4"/>` : `<path d="M350 556 Q400 534 470 548" stroke="#9CCAD6" stroke-width="3" fill="none" opacity=".7"/>`)
     + sk(`${[310, 340, 370, 400, 430, 460, 490].map(x => `<path d="M${x} 486 v-14" stroke="${C.wood}" stroke-width="2.4"/>`).join("")}<path d="M304 476 H516" stroke="${C.wood}" stroke-width="1.6"/>`, ""))
     + reeds([[336, 540], [352, 524], [500, 530], [512, 556], [344, 610], [380, 630]])
-    + (w ? crane(380, 506, 1, 1, true, 0) + crane(420, 510, 1, -1, true, 1) + crane(470, 502, .9, -1, false, 2) + crane(330, 520, .85, 1, true, 2)
+    + (w ? crane(340, 516, .85, 1, true, 2) + crane(392, 508, 1, 1, true, 0) + crane(446, 512, 1, -1, true, 1) + crane(500, 504, .85, -1, false, 3)
       : crane(410, 560, 1, 1, false, 0) + crane(448, 572, .95, -1, false, 1) + crane(470, 500, .85, -1, false, 2));
   const cranes = place("hkcranes", 380, 452, 28, 9, "The crane meadow and the pond", meadow, w ? "Dancing cranes" : "Crane meadow", 440, 620, "#BFE0DA");
   // the bottom-left corner: two cherry trees, a fence and a cart of potted flowers
@@ -480,7 +482,7 @@ function flowersScreen(){
     + (w ? `<path d="M92 568 q20 -6 40 0z" fill="${C.snow}"/>` : [98, 108, 118, 128].map((x, k) => `<circle cx="${x}" cy="564" r="4" fill="${["#D93A32", "#8A5AC0", "#F2902A", "#F08AB8"][k]}"/>`).join("")));
   const paths = path("M-10 480 Q120 470 250 380 Q300 330 430 280 M250 380 Q240 500 240 650 M250 380 Q170 420 92 434 M250 380 Q320 430 380 452 M190 268 Q220 320 250 380", 40);
   const bits = tufts([[220, 320], [300, 340], [180, 500], [280, 450], [210, 560]]) + wildflowers([[200, 330], [320, 380], [170, 480], [290, 500], [230, 440]]) + oldSnow([[200, 500, 24], [300, 300, 20]]);
-  return base + sky + barn + paths + stripesPl + hillPl + bell + cafe + cranes + corner + bits + light()
+  return base + sky + far + barn + paths + stripesPl + hillPl + bell + cafe + cranes + corner + bits + light()
     + gate("hkToNisekoW", 20, 480, "Niseko", 60, 516, "West across the fields to Niseko", "#BFE0DA")
     + gate("hkToOnsenN", 240, 612, "Hot springs", 310, 620, "South down the valley lane to the hot springs", "#F6E3B4");
 }

@@ -63,10 +63,32 @@ export const HK_TOWNS = {
       marcus: {hk_market: [[310, 206], [240, 470]], hk_onsen: [[180, 290], [330, 470]], hk_niseko: [[290, 560], [250, 300]], hk_flowers: [[340, 330], [230, 440]]},
       angelina: {hk_market: [[190, 196], [300, 300]], hk_onsen: [[220, 280], [130, 400]], hk_niseko: [[200, 470], [340, 410]], hk_flowers: [[430, 200], [180, 380]]}
     },
-    // what the family do (round 225; nothing done in any earlier town): filled in by the acts round
-    acts: {},
-    // round 224: five rooms (the market hall, the glassworks, the ryokan, the ski lodge, the farm café): filled in by the rooms round
-    rooms: {},
+    // what the family do (round 225; nothing done in any earlier town): Mum's feet in the hot-spring foot bath, Dad
+    // wrestling a king crab leg, Ma Ma choosing the best tray of sea urchin, Gong Gong cooking onsen eggs in the spring,
+    // Darren with his skis, Marcus losing a race with a soft-serve, Angellina listening to a music box by the canal.
+    // (Evan sledges and makes snow angels, or rolls down the flower hill: core.js.)
+    acts: {
+      mum: {hk_onsen: {act: "footbath", at: [176, 506]}},
+      dad: {hk_market: {act: "crableg", at: [384, 520], dir: -1}},
+      mama: {hk_market: {act: "unitray", at: [330, 500]}},
+      gonggong: {hk_onsen: {act: "onseneggs", at: [300, 524], dir: -1}},
+      darren: {hk_niseko: {act: "skis", at: [240, 320]}},
+      marcus: {hk_flowers: {act: "softserve", at: [222, 452]}},
+      angelina: {hk_market: {act: "musicbox", at: [244, 230]}}
+    },
+    // round 224: five rooms (the market hall, the glassworks, the ryokan, the ski lodge, the farm café)
+    rooms: {
+      hk_hall: {door: "hkhall", n: "The market hall", music: "hk_hall", party: HK_ROOM_PARTY.hk_hall,
+        say: "The market hall: tanks of king crab, wooden trays of sea urchin on ice, salmon roe glowing like jewels, kombu in bundles, and Haruko's counter steaming at the back."},
+      hk_glass: {door: "hkglass", n: "Kenta's glassworks", music: "hk_glass", party: HK_ROOM_PARTY.hk_glass,
+        say: "Kenta's glassworks: an old stone warehouse with a roaring furnace, glass floats in fishing nets, shelves of bright glass, and a corner of music boxes all tinkling at once."},
+      hk_ryokan: {door: "hkryokan", n: "Mrs Sato's ryokan", music: "hk_ryokan", party: HK_ROOM_PARTY.hk_ryokan,
+        say: "Mrs Sato's ryokan: tatami and paper screens, tea on a low table, folded yukata, and through the open screens the stone bath steaming in the garden."},
+      hk_lodge: {door: "hklodge", n: "The ski lodge", music: "hk_lodge", party: HK_ROOM_PARTY.hk_lodge,
+        say: "The ski lodge: timber beams, a big stone fireplace, a rack of skis, boots drying in a row and a window full of Mount Yotei."},
+      hk_cafe: {door: "hkcafe", n: "The farm café", music: "hk_cafe", party: HK_ROOM_PARTY.hk_cafe,
+        say: "Kumiko's farm café: a soft-serve machine humming, melons in a row, jars of pressed flowers, and a rack of seed packets by the door."}
+    },
     lines: {
       mum: ["Feet in the hot spring, snow on the trees, and not a single thing to do. I could stay here all winter.", "Every glass float in that shop catches the light a different colour. I want the green one. And the blue one.", "Cherry blossom over the canal. Mel, take a photo of me under it, and then another one in case I blinked."],
       dad: ["This canal was dug a hundred years ago so the ships could unload straight into the warehouses. Now the warehouses sell glass and music boxes.", "Mount Yotei. They call it Ezo Fuji, because it's nearly a perfect cone. Nearly two thousand metres, and it's a volcano.", "The red-crowned crane was down to about thirty birds once. Farmers fed them through the winters, and now there are well over a thousand. Good people."],
