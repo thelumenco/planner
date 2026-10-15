@@ -3,7 +3,7 @@
 //   The storytellers (stories.js): Ibu Wayan, who has made the village's offerings every morning for sixty years;
 //   Made, who teaches the gamelan; Ketut, the silversmith.
 //   Also: Nyoman, who runs the warung on the beach (and surfs at dawn); Komang at the market; two of Made's players,
-//   Putu and Gede; and visitors: Jess, a surfer, and Lars, doing yoga in Ubud for a month.
+//   Wira and Agus; and visitors: Jess, a surfer, and Lars, doing yoga in Ubud for a month.
 import { BA_ROOM_STAND, BA_PLAYERS } from "./bali-rooms-layout.js";
 const hm = s => { const [h, m] = s.split(":").map(Number); return h*60 + (m || 0); };
 const slot = (from, to, scene, where, opts) => Object.assign({from: hm(from), to: hm(to), scene}, Array.isArray(where[0]) ? {wander: where} : {at: where}, opts || {});
@@ -31,14 +31,14 @@ export const BA_PEOPLE = [
     [slot("8:00", "17:00", "ba_market", at("ba_market"), {dir: -1})],
     ["Smell this vanilla. No, really smell it. You see? Bali vanilla.", "Snake fruit! Scaly outside, sweet inside. Like my husband.", "Sarong for the temple, you need a sash too. I have both. Of course I have both."],
     "Komang! Vanilla, coffee, spices, sarongs, baskets. Anything you want, I have, or my cousin has."),
-  P("baplayer1", "Putu", "Plays the gangsa in Made's gamelan", {skin: "#B9825E", hair: "#1E1A18", hairStyle: "short", top: "#C9483A", bottom: "#2F2B28"},
+  P("baplayer1", "Wira", "Plays the gangsa in Made's gamelan", {skin: "#B9825E", hair: "#1E1A18", hairStyle: "short", top: "#C9483A", bottom: "#2F2B28"},
     [slot("10:00", "12:00", "ba_gamelan", BA_PLAYERS[0], {dir: 1}), slot("15:00", "18:00", "ba_gamelan", BA_PLAYERS[0], {dir: 1}), slot("12:00", "15:00", "ba_ubud", [[240, 460], [300, 480]])],
     ["Faster! Made always says faster.", "I've played since I was seven. My hands dream about it."],
-    "Putu! I play the gangsa. The fast one. The show-off one."),
-  P("baplayer2", "Gede", "Plays the big gong in Made's gamelan", {skin: "#8A5A3A", hair: "#3A3430", hairStyle: "short", top: "#E3C26A", bottom: "#2F2B28"},
+    "Wira! I play the gangsa. The fast one. The show-off one."),
+  P("baplayer2", "Agus", "Plays the big gong in Made's gamelan", {skin: "#8A5A3A", hair: "#3A3430", hairStyle: "short", top: "#E3C26A", bottom: "#2F2B28"},
     [slot("10:00", "12:00", "ba_gamelan", BA_PLAYERS[1], {dir: -1}), slot("15:00", "18:00", "ba_gamelan", BA_PLAYERS[1], {dir: -1}), slot("12:00", "15:00", "ba_beach", [[260, 380], [320, 400]])],
     ["I play the big gong. Once every sixteen beats. Very important. Very relaxing.", "The gong has to be struck at exactly the right moment. No pressure."],
-    "Gede. Big gong. I wait a long time, then BONG. Best job."),
+    "Agus. Big gong. I wait a long time, then BONG. Best job."),
   P("basurfer", "Jess", "On a surf trip", {skin: "#F2D3BC", hair: "#E8C48E", hairStyle: "long", top: "#2F2B28", bottom: "#4F9CC4"},
     [slot("8:00", "11:00", "ba_beach", [[260, 360], [320, 380], [220, 400]]), slot("11:00", "12:30", "ba_warung", [[220, 520], [320, 540]]), slot("12:30", "15:00", "ba_ubud", [[260, 440], [300, 470]])],
     ["Waves were glassy at dawn. Nyoman got the best one. He always does.", "I came for two weeks. That was a year ago.", "Did you know there's a ceremony on the beach tomorrow? Everyone in white. Beautiful."],
