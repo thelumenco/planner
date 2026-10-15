@@ -2529,3 +2529,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - **The poet's notebook:** six lines (`LINES`): castle (`pvcastle`), swifts (`pvfigs`), grotto (`pvgrotto`), church (the choir), ropes (`pvropes`), strait (`pvpalmaria`); all six gives `pv_notebook`. core.js `pvLine`.
 - **Family acts:** Mum `swim` (point), Dad `rampart` (castle), Ma Ma `gossip` (Borgo), Gong Gong `boatwatch` (harbour), Darren `rockjump` (point), Marcus `snorkel` (grotto), Angellina `verse` (poets' bench). Props swimcap, guidebook, headscarf, handsback, splash, snorkelmask, quillpad.
 - **Tests:** "Portovenere by boat (rounds 210 to 213)"; the specials count is 34.
+
+### Noted (Mel, after round 217): Hokkaido instead of Santorini
+- The last two boat towns are now **Bali and Hokkaido** (Santorini dropped before anything was built). Each still gets a full playbook plan for Mel to approve first.
+- Hokkaido must feel unlike Kyoto (already a train town) and unlike the Lavender Hills (lavender is already done), e.g. lean on snow and seasons, the seafood morning market, canals and glassblowing, hot springs, red-crowned cranes.
