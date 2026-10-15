@@ -27,7 +27,7 @@ export const piThrift = day => [5, 6, 7].includes(+String(day).slice(5, 7));
 // what the boat panel says is on the island in a given month (1 to 12)
 const seesMonth = m => m >= 4 && m <= 7 ? "Puffins! Thousands of them on the cliffs and by their burrows, April to early August. Guillemots and razorbills packed onto the ledges too."
   : m === 8 ? "The very end of puffin season: they leave for the open sea around the tenth of August. Catch the last ones early in the month."
-  : m >= 9 ? "The puffins have gone to sea for the winter. Grey seal pups on the beach at the point, white and fluffy, September to December."
+  : m >= 9 ? "The puffins have gone to sea for the winter (they're back in April). Grey seal pups on the beach at the point, white and fluffy, September to December."
   : "Winter: big seas and the island to yourself. Gannets far out, rabbits on the turf. The puffins are back in April.";
 
 // seasonal lines for the places that change: the cliffs and the seal beach (null when the plain say line will do)
@@ -47,7 +47,7 @@ export function seasonSay(id, day){
 
 export const PI_TOWNS = {
   puffin: {
-    n: "Puffin Isle", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (trips.js BOAT_HOME: by boat, home before dark)
+    n: "Puffin Isle", on: true, by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (trips.js BOAT_HOME: by boat, home before dark)
     screens: ["pi_haven", "pi_wick", "pi_farm", "pi_point"], arrive: ["pi_haven", [260, 160]], station: "piboat", music: "puffin",
     boat: {fuel: 14, pier: "piboat", arrive: ["pi_haven", [260, 160]], sight: "puffin",
       blurb: "Out past the headland to the little wild island on the edge of the open sea: cliffs, sea pinks, a lighthouse on the far tip, and nobody living there but the keeper, the warden and a great many birds.",
@@ -71,8 +71,32 @@ export const PI_TOWNS = {
       marcus: {pi_haven: [[260, 460], [140, 380]], pi_wick: [[180, 400], [420, 470]], pi_farm: [[120, 300], [300, 560]], pi_point: [[340, 360], [140, 300]]},
       angelina: {pi_haven: [[350, 370], [200, 560]], pi_wick: [[230, 380], [330, 540]], pi_farm: [[380, 260], [460, 420]], pi_point: [[220, 380], [280, 500]]}
     },
-    acts: {},
-    rooms: {},
+    // what the family do (round 217; nothing done in any earlier town): Mum makes a sea-pink chain lying in the thrift,
+    // Dad does his deadpan puffin waddle, Ma Ma forages samphire by the rock pools, Gong Gong polishes the lighthouse's
+    // brass plaque, Darren coils ropes with Dai at the jetty, Marcus lies flat watching the seals, Angellina holds sea
+    // glass up to the sun. (Evan's thing is the bird count with Finn's clicker, core.js.)
+    acts: {
+      mum: {pi_wick: {act: "garland", at: [210, 420]}},
+      dad: {pi_wick: {act: "waddle", at: [380, 430], dir: -1}},
+      mama: {pi_point: {act: "forage", at: [330, 486], dir: -1}},
+      gonggong: {pi_point: {act: "brass", at: [420, 262], dir: -1}},
+      darren: {pi_haven: {act: "coilrope", at: [304, 152]}},
+      marcus: {pi_point: {act: "sealwatch", at: [330, 384]}},
+      angelina: {pi_point: {act: "seaglass", at: [208, 546]}}
+    },
+    // round 215: five rooms (the warden's hut, the lamp room, the keeper's kitchen, Ivy's boathouse, the farm tearoom)
+    rooms: {
+      pi_warden: {door: "piwarden", n: "The warden's hut", music: "pi_warden", party: PI_ROOM_PARTY.pi_warden,
+        say: "The warden's hut: bird charts on every wall, a telescope at the window, feathers in a cabinet, and the island logbook open on the desk."},
+      pi_lamp: {door: "pilighthouse", n: "The lamp room", music: "pi_lamp", party: PI_ROOM_PARTY.pi_lamp,
+        say: "The lamp room, a hundred and two stairs up: the great glass lens in the middle, brass everywhere, and the sea on every side."},
+      pi_kitchen: {door: "pikeeper", n: "The keeper's kitchen", music: "pi_kitchen", party: PI_ROOM_PARTY.pi_kitchen,
+        say: "The keeper's kitchen: a warm range, blue and white china, Welsh cakes cooling on the rack, and a cat on the windowsill."},
+      pi_studio: {door: "piboathouse", n: "Ivy's boathouse", music: "pi_studio", party: PI_ROOM_PARTY.pi_studio,
+        say: "Ivy's boathouse: an upturned boat for a bench, suncatchers turning in the light, and jars of sea glass glowing in the window."},
+      pi_tearoom: {door: "pitearoom", n: "The farm tearoom", music: "pi_tearoom", party: PI_ROOM_PARTY.pi_tearoom,
+        say: "The farm tearoom: flagstones, long tables, walking boots by the door, a big stove, and Bryn singing over the soup."}
+    },
     lines: {
       mum: ["No cars, no shops, no signal. Just birds and wind. I could stay a week.", "Sea pinks all along the cliff. I'm going to lie down in them and not move.", "Smell that air. That's proper air. You could bottle it."],
       dad: ["Did you know puffins can carry ten fish at once? Crosswise in the beak. Nobody knows how they hold the tenth.", "The lighthouse went automatic in the nineties. The keeper stayed anyway. I respect that.", "Mind the burrows. The whole clifftop is hollow. It's a puffin block of flats under there."],

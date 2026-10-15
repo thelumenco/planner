@@ -500,7 +500,7 @@ function defaultLine(){
   const ph = phase();
   if (scene === "market") return "Shop's open! Have a browse.";
   if (scene === "farm") return readyCount() ? "Something's ready to harvest!" : "Tap a plot to plant or water.";
-  if (townOf(scene)) return `A day in ${TOWNS[townOf(scene)].n}. ${ph === "clean" || ph === "task" ? "Quests will keep till you're home." : "Wander, look, taste."}`;
+  if (townOf(scene)) return `A day ${TOWNS[townOf(scene)].on ? "on" : "in"} ${TOWNS[townOf(scene)].n}. ${ph === "clean" || ph === "task" ? "Quests will keep till you're home." : "Wander, look, taste."}`;
   if (ph === "clean") return atClean() ? (S.wipe ? "Five minutes. Hard stop, promise." : (sgHM() < 720 ? "Morning! Wet wipe first?" : "Hi! Wet wipe first?")) : "To the cleaning cupboard at home!";
   if (ph === "task") { const t = remaining()[0]; return arrivedFor(t) ? (S.firstStep[t.id] ? "You're doing it. I'm watching the clock." : "We're here. Just the first tiny step.") : `Next quest: the ${spotObj(placeOf(t), spotOf(t)).name.toLowerCase()} at ${placeInfo(placeOf(t)).short}.`; }
   if (ph === "break") return "Zzz… break time. Wander, or rest.";
