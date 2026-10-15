@@ -281,16 +281,19 @@ export function daySchedule(id, day){
 }
 // Tomo on the mint delivery bike (round 138): when an order goes out and the player's outdoors in Honeybrook, he pedals
 // across the screen with the cool box on the back, waves, and is gone. Not a villager entity (no taps, no routine).
-export function rideBy(look, y, dir = Math.random() < .5 ? 1 : -1, ms = 6500){
-  const host = $("actors"); if (!host || host.querySelector(".rideby")) return null;
+// Tomo on the delivery bike, riding past along a route (scene coords, from one edge of the screen to the other) that
+// keeps to the paths: core.js plans it round buildings and water with paths.js. ~95 px a second.
+export function rideBy(look, pts){
+  const host = $("actors"); if (!host || host.querySelector(".rideby") || !pts || pts.length < 2) return null;
   const g = document.createElementNS(NS, "g"); g.setAttribute("class", "ch npc walk rideby"); g.setAttribute("pointer-events", "none");
   g.innerHTML = personArt(Object.assign({}, look, {bike: "#7FC8B4", extra: "helmet", hat: null}), false);
-  const box = document.createElementNS(NS, "g"); box.innerHTML = `<g style="stroke:var(--line)" stroke-width="1"><rect x="-24" y="-20" width="13" height="11" rx="2" style="fill:#7FC8B4"/><rect x="-24" y="-20" width="13" height="3" rx="1.5" style="fill:#FFFDF6"/><path d="M-20 -14 l1.5 4 l1.5 -4z" style="fill:#E8C48E"/><circle cx="-18.5" cy="-15" r="1.6" style="fill:#F4C7CF"/></g>`;
+  const box = document.createElementNS(NS, "g"); box.innerHTML = `<g style="stroke:var(--line)" stroke-width="1"><rect x="-24" y="-20" width="13" height="11" rx="2" style="fill:#7FC8B4"/><rect x="-24" y="-20" width="13" height="3" rx="1" style="fill:#FFFDF6"/></g>`;
   g.firstElementChild.appendChild(box.firstElementChild);
   host.appendChild(g);
-  const x0 = dir > 0 ? -50 : 570, x1 = dir > 0 ? 570 : -50, t0 = performance.now();
-  g.firstElementChild.setAttribute("transform", `scale(${dir} 1)`);
-  const step = now => { const k = Math.min(1, (now - t0)/ms), x = x0 + (x1 - x0)*k, bob = Math.sin(k*40)*.6;
-    g.setAttribute("transform", `translate(${x.toFixed(1)} ${(y + bob).toFixed(1)})`); if (k < 1 && g.isConnected) requestAnimationFrame(step); else g.remove(); };
+  const legs = pts.slice(1).map((p, i) => Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1])), total = legs.reduce((a, b) => a + b, 0), ms = total/95*1000, t0 = performance.now();
+  const step = now => { let d = Math.min(1, (now - t0)/ms)*total, i = 0; while (i < legs.length - 1 && d > legs[i]) { d -= legs[i]; i++; }
+    const [ax, ay] = pts[i], [bx, by] = pts[i + 1], k = legs[i] ? Math.min(1, d/legs[i]) : 1, x = ax + (bx - ax)*k, y = ay + (by - ay)*k, bob = Math.sin(now/90)*.6;
+    g.firstElementChild.setAttribute("transform", `scale(${bx >= ax ? 1 : -1} 1)`);
+    g.setAttribute("transform", `translate(${x.toFixed(1)} ${(y + bob).toFixed(1)})`); if (now - t0 < ms && g.isConnected) requestAnimationFrame(step); else g.remove(); };
   requestAnimationFrame(step); return g;
 }

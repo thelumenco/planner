@@ -2458,7 +2458,21 @@ function orderNote(orders, shop, till){
   const where = o.picnic ? ` to a picnic on ${pick(["the field", "the foreshore", "the edge of the woods"])}` : pick([" to their door", " to the town square", " round to the lane", ""]);
   sfx("coin"); flash(`${shop} order: ${who}, ${o.what}${where} (+${o.coins}${till ? " in the honesty box" : ""})`);
   // and Tomo pedals past on the mint bike, if you're outdoors in Honeybrook (round 138)
-  if (outside() && !townOf(scene) && !sup) { const t = NPCS.find(n => n.id === "tomo"), b = bounds(); if (t) rideBy(t.look, Math.max(b[1] + 20, Math.min(b[3] - 10, hero.y + (hero.y + 70 < b[3] ? 70 : -60)))); }
+  if (outside() && !townOf(scene) && !sup) { const t = NPCS.find(n => n.id === "tomo"); if (t) { const r = bikeRoute(); if (r) rideBy(t.look, r); } }
+}
+// Tomo's way across this screen: in at one side, out at the other, round the buildings and never through the water
+// (the walkable ground, as for everyone: paths.js), near where you're standing. null if there's no clear way across.
+function bikeRoute(){
+  const b = bounds(), dir = Math.random() < .5 ? 1 : -1, ok = p => p[0] >= b[0] && p[0] <= b[2] && p[1] >= b[1] && p[1] <= b[3] && !blocked(scene, p[0], p[1]);
+  const ys = [hero.y + 70, hero.y - 60, hero.y + 30, hero.y - 30, ...[.85, .7, .55, .4, .25].map(f => b[1] + (b[3] - b[1])*f)].map(y => Math.round(Math.max(b[1] + 20, Math.min(b[3] - 10, y))));
+  for (const y of ys) {
+    const a = [dir > 0 ? b[0] + 4 : b[2] - 4, y], z = [dir > 0 ? b[2] - 4 : b[0] + 4, y]; if (!ok(a) || !ok(z)) continue;
+    const pts = [a, ...findPath(scene, a, z, b)];
+    // every step of the way on open ground (findPath gives a straight line when it can't find a way round)
+    const clearAll = pts.slice(1).every((p, i) => { const q = pts[i], n = Math.ceil(Math.hypot(p[0] - q[0], p[1] - q[1])/8); for (let k = 0; k <= n; k++) if (!ok([q[0] + (p[0] - q[0])*k/n, q[1] + (p[1] - q[1])*k/n])) return false; return true; });
+    if (clearAll) return [[a[0] - dir*60, a[1]], ...pts, [z[0] + dir*60, z[1]]];
+  }
+  return null;
 }
 // the ice cream trolley (round 137): put it away (unsold scoops back in the freezer, unless they've melted)
 function trolleyHome(){ const r = returnTrolley(F); if (!r) return; sfx(r.melted ? "paper" : "chime");
