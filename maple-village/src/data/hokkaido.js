@@ -56,11 +56,11 @@ export const HK_TOWNS = {
       hk_flowers: "The flower farm: the rainbow stripes, the farm café, the flower hill with its little bell at the top, and the crane meadow by the pond. West: across the fields to Niseko. South: down the valley lane to the hot springs."},
     spots: {
       mum: {hk_market: [[220, 400], [330, 460]], hk_onsen: [[200, 400], [250, 470]], hk_niseko: [[240, 420], [300, 330]], hk_flowers: [[220, 330], [300, 420]]},
-      dad: {hk_market: [[260, 220], [380, 400]], hk_onsen: [[250, 290], [300, 380]], hk_niseko: [[290, 230], [220, 520]], hk_flowers: [[160, 300], [360, 380]]},
+      dad: {hk_market: [[260, 220], [380, 400]], hk_onsen: [[250, 290], [300, 380]], hk_niseko: [[290, 230], [220, 520]], hk_flowers: [[210, 300], [360, 380]]},
       mama: {hk_market: [[340, 500], [130, 380]], hk_onsen: [[160, 470], [200, 330]], hk_niseko: [[200, 360], [330, 450]], hk_flowers: [[260, 300], [180, 520]]},
-      gonggong: {hk_market: [[100, 210], [110, 214]], hk_onsen: [[290, 500], [300, 506]], hk_niseko: [[160, 470], [170, 474]], hk_flowers: [[300, 470], [310, 474]]},
+      gonggong: {hk_market: [[70, 200], [80, 204]], hk_onsen: [[290, 500], [300, 506]], hk_niseko: [[160, 470], [170, 474]], hk_flowers: [[280, 450], [288, 455]]},
       darren: {hk_market: [[440, 520], [300, 360]], hk_onsen: [[360, 280], [230, 540]], hk_niseko: [[160, 320], [380, 470]], hk_flowers: [[120, 460], [400, 300]]},
-      marcus: {hk_market: [[400, 220], [240, 470]], hk_onsen: [[180, 290], [330, 470]], hk_niseko: [[320, 560], [250, 300]], hk_flowers: [[340, 330], [230, 440]]},
+      marcus: {hk_market: [[310, 206], [240, 470]], hk_onsen: [[180, 290], [330, 470]], hk_niseko: [[290, 560], [250, 300]], hk_flowers: [[340, 330], [230, 440]]},
       angelina: {hk_market: [[190, 196], [300, 300]], hk_onsen: [[220, 280], [130, 400]], hk_niseko: [[200, 470], [340, 410]], hk_flowers: [[430, 200], [180, 380]]}
     },
     // what the family do (round 225; nothing done in any earlier town): filled in by the acts round
