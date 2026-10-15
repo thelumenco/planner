@@ -15,7 +15,7 @@ import { initNotebook, openTask, openMail, openDigest, openTracker, closeNoteboo
 import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama, subtaskInSunsama } from "./sunsama.js";
 import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx, TRACKS, setTrack, currentTrack, setLive } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
-import { findPath, blocked } from "./paths.js";
+import { findPath, blocked, rideBlocked } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
 import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML, ohayoHellos, reactionsPanel, helloPanel } from "./feeds.js";
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, setFridgeTab, hestiaCounts, importHestia, chatLastDone, lastDueCount, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
@@ -3038,6 +3038,19 @@ const evanHere = () => scene === "kidroom" || (townOf(scene) && inParty(F, "evan
 // family dinner nights: Evan's at the table wherever dinner is (then home to bed)
 const evanAtDinner = () => { const d = dinnerNow(dayKey(), sgHM()); return !!d && scene === d.host; };
 function outside(){ return OUTDOOR.includes(scene); }
+// Tomo's bike (round 228, Mel: "Tomo cycles across buildings and even water"): a row with a long clear stretch (no
+// buildings, ponds, decks or water), nearest just below Mel, ridden only along that stretch (fading in and out where
+// it stops short of the screen's edge, at the water or a wall); null if there's none (then he doesn't ride past)
+function bikeRow(b){
+  const want = mel.y + (mel.y + 70 < b[3] ? 70 : -60), rows = [];
+  for (let y = b[1] + 20; y <= b[3] - 10; y += 6) rows.push(y);
+  rows.sort((p, q) => Math.abs(p - want) - Math.abs(q - want));
+  const free = (x, y) => !rideBlocked(scene, x, y) && !rideBlocked(scene, x, y - 14) && !rideBlocked(scene, x, y + 4);
+  for (const y of rows) { let best = null, run = null;
+    for (let x = b[0]; x <= b[2] + 6; x += 6) { if (x <= b[2] && free(x, y)) { run = run || [x, x]; run[1] = x; } else if (run) { if (!best || run[1] - run[0] > best[1] - best[0]) best = run; run = null; } }
+    if (best && best[1] - best[0] >= 280) return {y, x0: best[0], x1: best[1]}; }
+  return null;
+}
 const bounds = () => TOWN_BOUNDS[scene] ? TOWN_BOUNDS[scene] : scene === "van" ? [182, 210, 338, 612] : scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : (scene === "lane" || scene === "vineyard" || scene === "orchard" || scene === "flowers") ? [14, 140, W - 14, HH - 14] : scene === "field" ? [14, 150, W - 14, HH - 14] : scene === "shore" ? [186, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
 
 function setScene(id, at){
@@ -3466,7 +3479,7 @@ function orderNote(orders, shop, till){
   const where = o.picnic ? ` to a picnic on ${pick(["the field", "the foreshore", "the edge of the woods"])}` : pick([" to their door", " to the town square", " round to the lane", ""]);
   sfx("coin"); flash(`${shop} order: ${who}, ${o.what}${where} (+${o.coins}${till ? " in the honesty box" : ""})`);
   // and Tomo pedals past on the mint bike, if Mel's outdoors in Honeybrook (round 138)
-  if (outside() && !townOf(scene) && !sup) { const t = NPCS.find(n => n.id === "tomo"), b = bounds(); if (t) rideBy(t.look, Math.max(b[1] + 20, Math.min(b[3] - 10, mel.y + (mel.y + 70 < b[3] ? 70 : -60)))); }
+  if (outside() && !townOf(scene) && !sup) { const t = NPCS.find(n => n.id === "tomo"), r = bikeRow(bounds()); if (t && r) rideBy(t.look, r.y, undefined, 6500, [r.x0 <= 20 ? -50 : r.x0, r.x1 >= W - 20 ? 570 : r.x1]); }
 }
 // the ice cream trolley (round 137): put it away (unsold scoops back in the freezer, unless they've melted)
 function trolleyHome(){ const r = returnTrolley(F); if (!r) return; sfx(r.melted ? "paper" : "chime");

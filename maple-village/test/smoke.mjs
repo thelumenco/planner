@@ -3236,6 +3236,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleOrder()); await page.waitForTimeout(800);
   const rode = await page.locator("#actors .rideby .bikeArt").count(); await page.waitForTimeout(7000);
   check(rode === 1 && await page.locator("#actors .rideby").count() === 0, "an order goes out while Mel's in the square: Tomo pedals past on the mint bike with the cool box, and is gone");
+  // round 228 (Mel): never over the water or through a building: on the foreshore he keeps to the sand and paths
+  // (the sea's left of x 186), and at the bay he keeps off the deck, the shops and the sea
+  for (const [sc, ok] of [["shore", (x, y) => x >= 170], ["bay", (x, y) => x >= 150 && !(x > 104 && x < 248 && y > 308 && y < 428) && !(x > 296 && x < 480 && y > 60 && y < 304) && !(x > 312 && x < 480 && y > 380 && y < 520)]]) {
+    await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(1500); await page.evaluate(() => window.__mapleOrder()); await page.waitForTimeout(200);
+    const pts = []; for (let k = 0; k < 14; k++) { pts.push(await page.evaluate(() => { const g = document.querySelector("#actors .rideby"); if (!g) return null; const m = g.getAttribute("transform").match(/translate\(([-\d.]+) ([-\d.]+)\)/); return [+m[1], +m[2], +(g.style.opacity || 1)]; })); await page.waitForTimeout(450); }
+    const seen = pts.filter(p => p && p[2] > .1 && p[0] > -20 && p[0] < 540);
+    check(seen.length >= 3 && seen.every(([x, y]) => ok(x, y)), `${sc}: Tomo rides along a clear row, not over the water or through buildings (${seen.length} sightings)`); await page.waitForTimeout(2000); }
   await page.close();
 }
 {

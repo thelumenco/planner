@@ -21,6 +21,10 @@ Object.assign(OBST, TOWN_OBST);   // the towns' screens (towns.js)
 const PAD = 5, STEP = 24;
 const inside = (x, y, r, p) => x > r[0] - p && x < r[2] + p && y > r[1] - p && y < r[3] + p;
 export const blocked = (scene, x, y) => (OBST[scene] || []).some(r => inside(x, y, r, 0));
+// round 228: extra things Tomo's delivery bike mustn't ride through (screens with no walking obstacles of their own):
+// the bay's sea, the deck, the Scoop Shack and the shopfront next door, the trees
+const RIDE = {bay: [[0, 0, 156, 640], [104, 308, 248, 428], [296, 60, 474, 304], [312, 380, 480, 520], [270, 60, 330, 150], [470, 60, 520, 150], [370, 556, 520, 640]]};
+export const rideBlocked = (scene, x, y) => blocked(scene, x, y) || (RIDE[scene] || []).some(r => inside(x, y, r, 0));
 
 // Obstacles that already contain an end point (a door tucked against a wall) don't count for that segment.
 function clear(obs, a, b){

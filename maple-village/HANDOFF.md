@@ -2577,3 +2577,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - `game/mill.js` PRESS_MAX 4 to 12 (press buttons: 1, 4, all you can). `millcraft.js` `inesStep`: Tomi (at the mill 10 to 5, Mon to Sat) bottles EVERY finished pressing, Mel's too, into the upstairs basket, and presses up to PRESS_MAX from the olive crate.
 - `game/cocoa.js` `cocoaTick`: the kitchen line (`handStep`: temper, grind, roast, mould) runs on Mateo's shifts AND whenever the shop's open (Amara, 11 to 8, Tue to Sun; Mondays too with the assistant), so evening pots don't sit at the grinder.
 - Test "The press and the chocolate line keep going (round 227)".
+
+## Round 228 (Mel: "Tomo cycles across buildings and even water")
+- core.js `bikeRow(bounds)`: Tomo's ride-by picks the row nearest just below Mel with a clear stretch at least 280 wide (checked at y, y-14, y+4 against `rideBlocked`), and rides only along that stretch (npcs.js `rideBy(..., xr)`, fading in and out when it stops short of the screen edge); no clear row, no ride-by.
+- paths.js `rideBlocked`: the walking obstacles plus bike-only ones for screens without walking obstacles (`RIDE.bay`: the sea, the deck, the Scoop Shack, the shopfront under renovation, the trees). On the foreshore the walkable bounds keep him off the sea.
+- Test: in "the ice cream trolley, and the delivery bike's orders", shore and bay checks.
