@@ -29,7 +29,9 @@ function bedBody(id, stage, g){
   if (stage === "faded") return soil + xs.map(x => `<path d="M${x} -1 q2 -8 6 -6" fill="none" style="stroke:#A88A5A"/>`).join("");
   const h = stage === "growing" ? 5 + 10*(g || 0) : 20;
   const stems = xs.map((x, k) => `<path d="M${x} -1 v${-h - (k % 2)*3}" fill="none" style="stroke:var(--moss2)"/><ellipse cx="${x - 3}" cy="${-h*.45}" rx="3" ry="1.6" style="fill:var(--moss)"/>`).join("");
-  const heads = stage === "ripe" ? xs.map((x, k) => `<circle cx="${x}" cy="${-h - (k % 2)*3 - 2}" r="5.2" style="fill:${c}"/><circle cx="${x}" cy="${-h - (k % 2)*3 - 2}" r="1.9" style="fill:#FFF0B8"/>`).join("")
+  const spike = (FLOWERS[id] || {}).spike;   // lupins and salvia: a spire of little flowers
+  const heads = stage === "ripe" && spike ? xs.map((x, k) => [0, 1, 2, 3].map(j => `<circle cx="${x}" cy="${-h - (k % 2)*3 - 1 - j*3.6}" r="${2.8 - j*.4}" style="fill:${c}"/>`).join("")).join("")
+    : stage === "ripe" ? xs.map((x, k) => `<circle cx="${x}" cy="${-h - (k % 2)*3 - 2}" r="5.2" style="fill:${c}"/><circle cx="${x}" cy="${-h - (k % 2)*3 - 2}" r="1.9" style="fill:${id === "poppy" ? "#2F2B28" : "#FFF0B8"}"/>`).join("")
     : stage === "budding" ? xs.map((x, k) => `<ellipse cx="${x}" cy="${-h - (k % 2)*3 - 1}" rx="2" ry="3" style="fill:var(--moss)"/><path d="M${x - 1} ${-h - (k % 2)*3 - 3} h2" style="stroke:${c}"/>`).join("") : "";
   return soil + stems + heads;
 }

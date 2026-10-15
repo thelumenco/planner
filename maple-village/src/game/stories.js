@@ -36,7 +36,7 @@ function eligible(F, id, day){
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 // Ronda's locals tell theirs on a day trip, quest or no quest (Mel's on holiday); the two-a-day limit still holds
-const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "pvrosa", "ilario", "bianca", "morwenna", "pifinn", "piivy", "bawayan", "bamade", "baketut"];   // Ronda's, Kyoto's, Saltwick's, Portovenere's, Puffin Isle's and Bali's, and Jason in Cinque Terre
+const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "pvrosa", "ilario", "bianca", "morwenna", "pifinn", "piivy", "bawayan", "bamade", "baketut", "hkharuko", "hkkenta", "hksato"];   // Ronda's, Kyoto's, Saltwick's, Portovenere's, Puffin Isle's, Bali's and Hokkaido's, and Jason in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
   if (id === "jason") return eligible(F, id, day);   // Jason (Mel's friend) tells his whenever she visits, a chapter a day, outside the two-a-day limit
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;
@@ -84,7 +84,14 @@ const REWARDS = {
   bacoffee: (F, addInv) => { addInv("ba_coffee", 1); return "a bag of Kintamani coffee from Made's uncle, for late rehearsals"; },
   bakite: (F, addInv) => { addInv("ba_kite", 1); return "a Balinese kite with a hummer, from the gamelan boys on the beach"; },
   basilverear: (F, addInv) => { addInv("ba_silverear", 1); return "a pair of Ketut's silver filigree earrings, made from his mistake flowers"; },
-  bagaruda: (F, addInv) => { addInv("ba_garuda", 1); return "a little carved Garuda from Gede's wedding, for good luck (a keepsake)"; }
+  bagaruda: (F, addInv) => { addInv("ba_garuda", 1); return "a little carved Garuda from Gede's wedding, for good luck (a keepsake)"; },
+  // Hokkaido's locals
+  hkuni: (F, addInv) => { addInv("unikura", 1); return "a tray of sea urchin and salmon roe from Haruko's counter"; },
+  hkcrab: (F, addInv) => { addInv("kingcrab", 2); return "two packs of king crab legs from Haruko's fortieth year breakfast (Takeshi brought far too much)"; },
+  hkfloat: (F, addInv) => { addInv("hk_float", 1); return "one of Kenta's glass floats, made the way his grandfather made them (a keepsake)"; },
+  hkmusicbox: (F, addInv) => { addInv("hk_musicbox", 1); return "a glass music box from Kenta that plays the old herring song"; },
+  hksalts: (F, addInv) => { addInv("hk_bathsalts", 1); return "a jar of Mrs Sato's bath salts, from the ryokan's own spring"; },
+  hkyukata: (F, addInv) => { addInv("hk_yukata", 1); return "a cotton yukata from Mrs Sato, chosen for you by Yui"; }
 };
 // flags that change the game: the koi tip, Farid's pastries on the menu
 export function applyFlags(F){

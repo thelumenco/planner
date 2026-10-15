@@ -43,8 +43,15 @@ export const FLOWERS = {
   lavender:   {n: "Lavender", one: "lavender", bush: true, seasons: ["spring", "summer"], price: 18, col: "#9C8CD9"},
   hydrangea:  {n: "Hydrangeas", one: "hydrangea", bush: true, seasons: ["summer"], price: 20, col: "#8FB3E8"},
   heather:    {n: "Heather", one: "heather", bush: true, seasons: ["autumn", "winter"], price: 18, col: "#C98AB8"},
-  camellia:   {n: "Camellias", one: "camellia", bush: true, seasons: ["winter"], price: 22, col: "#F08AA0"}
+  camellia:   {n: "Camellias", one: "camellia", bush: true, seasons: ["winter"], price: 22, col: "#F08AA0"},
+  // round 224: seeds from Kumiko's flower farm in Hokkaido (F.hokkaido.seeds), for rainbow stripes at home; not for gelato
+  poppy:      {n: "Poppies", one: "poppy", seasons: ["summer"], price: 7, col: "#E8473C", unlock: "hokkaido", noscoop: true},
+  lupin:      {n: "Lupins", one: "lupin", seasons: ["spring", "summer"], price: 7, col: "#8A6AD0", unlock: "hokkaido", noscoop: true, spike: true},
+  salvia:     {n: "Salvia", one: "salvia", seasons: ["summer", "autumn"], price: 7, col: "#4F6FD0", unlock: "hokkaido", noscoop: true, spike: true},
+  marigold:   {n: "Marigolds", one: "marigold", seasons: ["summer", "autumn"], price: 6, col: "#F29A2E", unlock: "hokkaido", noscoop: true}
 };
+// a flower that has to be unlocked first (Hokkaido's seeds: F.hokkaido.seeds[id])
+export const flowerOpen = (F, id) => !FLOWERS[id].unlock || !!(F && F.hokkaido && F.hokkaido.seeds && F.hokkaido.seeds[id]);
 export const STEM_PRICE = 2, BOUQUET_PRICE = 8, POT_PRICE = 10;
 export const BED_YIELD = 3, BUSH_YIELD = 4;
 

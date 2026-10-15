@@ -62,11 +62,12 @@ export const INGR = {
   chestnutflour: ["Chestnut flour", "Chestnut", "#A8754F"], capers: ["Salted capers", "Caper", "#7A8A4A"], fennelseed: ["Wild fennel seeds", "Fennel", "#A8B86A"],   // from Portovenere (round 211)
   seabuckthorn: ["Sea buckthorn", "Sea Buckthorn", "#F28C28"], pi_honey: ["Island thyme honey", "Thyme Honey", "#E3B04B"],   // from Puffin Isle (round 215)
   ba_vanilla: ["Bali vanilla", "Bali Vanilla", "#F3E7C8"], lemongrass: ["Lemongrass", "Lemongrass", "#D9E8A8"], kaffir: ["Kaffir lime leaf", "Kaffir Lime", "#B9D98A"], salak: ["Snake fruit", "Snake Fruit", "#F3D9A8"],   // from Bali (round 219)
+  hk_milk: ["Hokkaido milk", "Hokkaido Milk", "#FFFDF4"], hk_melon: ["Yubari melon", "Yubari Melon", "#F6A85A"],   // from Hokkaido (round 223)
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
   yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
   ...Object.fromEntries(Object.values(TREES).map(t => [t.fruit, [t.fruit[0].toUpperCase() + t.fruit.slice(1), t.fruit[0].toUpperCase() + t.fruit.slice(1), FRUIT_COL[t.fruit] || "#F3C969"]])),
-  ...Object.fromEntries(Object.entries(FLOWERS).map(([id, f]) => ["fl_" + id, [f.n, f.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f.col || "#F4C7CF"]]))
+  ...Object.fromEntries(Object.entries(FLOWERS).filter(([, f]) => !f.noscoop).map(([id, f]) => ["fl_" + id, [f.n, f.n.replace(/s$/, "").replace(/ie$/, "y").replace("Sweet pea", "Sweet Pea"), f.col || "#F4C7CF"]]))
 };
 export const isIngr = id => id in INGR;
 export const isDairy = ings => ings.includes("milk") || ings.includes("goatmilk") || ings.includes("yoghurt");   // milk or goat's milk makes it a gelato
