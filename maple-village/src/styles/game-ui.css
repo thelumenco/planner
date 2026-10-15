@@ -975,3 +975,27 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 /* where a task gets done (data/places.js): a small picker and a "go" under each task */
 .tplace{display:block;margin-top:4px}.panel .qlist .tplace select{font:inherit;font-size:.8rem;width:100%;max-width:100%;box-sizing:border-box;padding:3px 6px;border-radius:8px;border:1px solid rgba(120,104,84,.3);background:#FFFDF6;color:inherit;min-height:0}
 .tgo{font:inherit;font-size:.78rem;margin:4px 0 0;padding:1px 8px;border-radius:10px;border:1px solid rgba(120,104,84,.35);background:#E3F2EC;cursor:pointer}
+/* the welcome screen and save slots (game/title.js) */
+.welcomebox{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));background:#F3E6CC}
+.welcomebox[hidden]{display:none}
+.ttcard{width:min(560px,100%);max-height:100%;overflow:auto;background:var(--card,#FFFDF6);border-radius:18px;box-shadow:0 10px 40px rgba(60,40,20,.2);animation:infade .6s ease both}
+.ttpicbox{line-height:0;border-bottom:1.5px solid var(--line,#3b3530)}
+.ttpic{width:100%;height:auto;aspect-ratio:400/240;display:block;border-radius:18px 18px 0 0}
+.ttbody{padding:14px 20px 20px}
+.tttitle{font:600 clamp(2.2rem,9vw,2.9rem)/1.05 "Klee One",serif;margin:.1em 0 0}
+.ttsub{margin:.3em 0 1em;color:var(--soft,#6E6258)}
+.ttgo{width:100%;margin:0 0 14px;font-size:1.05rem;padding:12px}
+.ttslots{display:flex;flex-direction:column;gap:8px;margin:6px 0 10px}
+.ttslot{display:flex;align-items:center;gap:8px;border:1.5px solid rgba(120,104,84,.25);border-radius:14px;background:#FFFDF6;padding:8px 10px;text-align:left;font:inherit;color:inherit}
+.ttslot.on{border-color:#5E9A86;background:#F2FAF6}
+.ttslot.empty{flex-direction:column;align-items:flex-start;cursor:pointer;border-style:dashed}
+.ttslot.ask{flex-direction:column;align-items:stretch;background:#FBF1E8}
+.ttslot.ask p{margin:0 0 6px}
+.ttplay{flex:1;display:flex;align-items:center;gap:10px;background:none;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer;padding:0;min-width:0}
+.ttplay span{display:flex;flex-direction:column;min-width:0}
+.ttslot small{color:var(--soft,#6E6258)}
+.ttn{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft,#6E6258)}
+.ttx{font:inherit;font-size:.78rem;background:none;border:0;color:var(--soft,#6E6258);text-decoration:underline dotted;cursor:pointer}
+.ttdel{background:#E8566C;color:#fff;border-color:#C8435A}
+:root[data-theme="dark"] .welcomebox{background:#2A2630}
+:root[data-theme="dark"] .ttcard,:root[data-theme="dark"] .ttslot{background:#2E2A33;color:#F1EBE0}

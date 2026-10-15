@@ -189,3 +189,12 @@ word beats a general one ("write an email" goes to the post office, "write my es
 equals the earlier word wins; no match means your desk. Each task shows its place in a little picker (the player's
 choice sticks) and a "go" that walks you there. Ticking anywhere still works; doing it in its place pays a coin more
 (within the day's ten paid ticks).
+
+## Phase 5: the welcome screen and three save slots (done, 2026-10-15)
+The game opens on a welcome screen (game/title.js, picture in art/title.js): Honeybrook at golden hour, "Continue with
+<name>", three slot cards (name and pet, day, coins, closest friend's hearts, when last played; or "New game"), a
+delete that asks first, and "Watch the story". Silent: the music starts in the village. Settings has "Back to the
+title screen". Saves (game/slots.js): the game always plays from the fox.* keys; a slot not being played is kept
+whole under hb.slot.N (sound and zoom stay per device); switching puts the playing slot away, takes the chosen one
+out and reloads straight into it. A save from before slots is slot 1. Dev builds skip the welcome screen unless
+?title=1. Phase 6 (Firebase) will keep each slot in the cloud.

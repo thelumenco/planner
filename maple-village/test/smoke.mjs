@@ -3178,6 +3178,27 @@ if (want("\nThe Lavender Hills (rounds 161-164)")) try {
   check(await fox().then(f => f.inv.bq_lavender === 2 && f.bellbird.lv.cut === "2026-10-12"), "the lavender harvest with Émile, two bunches to take home");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nthe welcome screen and save slots")) try {
+  console.log("\nthe welcome screen and save slots");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`slots pageerror: ${e.message}`));
+  const name = () => page.evaluate(() => (window.__hbGame.F().me || {}).name), cards = async () => (await page.locator(".ttslot").allTextContents()).map(t => t.replace(/\s+/g, " "));
+  await page.goto(url + "?reset=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(1000);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.me.name = "Robin"; F.coins = 42; window.__hbGame.give("tulip_seed", 1); }); await page.waitForTimeout(500);
+  await page.goto(url + "?title=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(1500);
+  check(await page.locator("#welcome:not([hidden])").count() === 1 && /Continue with Robin/.test(await page.locator(".ttgo").textContent()) && /Robin and Ember.*42 coins/.test((await cards())[0]), "the welcome screen: Continue, and a game saved before slots existed is slot 1");
+  await page.click('[data-tt="play:2"]'); await page.waitForTimeout(2500);
+  check(await page.locator("#welcome:not([hidden])").count() === 0 && await name() === "", "a new game in slot 2 starts fresh");
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.me.name = "Sky"; window.__hbGame.give("tulip_seed", 1); }); await page.waitForTimeout(500);
+  await page.goto(url + "?title=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(1500);
+  const c = await cards(); check(/Robin/.test(c[0]) && /Sky/.test(c[1]) && /New game/.test(c[2]), "three slots: Robin, Sky and an empty one");
+  await page.click('[data-tt="play:1"]'); await page.waitForTimeout(2500);
+  check(await name() === "Robin" && await page.evaluate(() => window.__hbGame.F().coins) === 42, "back to slot 1: Robin's game, just as it was");
+  await page.goto(url + "?title=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(1500);
+  await page.click('[data-tt="ask:2"]'); await page.click('[data-tt="wipe:2"]'); await page.waitForTimeout(400);
+  check(/New game/.test((await cards())[1]) && /Robin/.test((await cards())[0]), "deleting a slot asks first, and leaves the others alone");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\ntask places")) try {
   console.log("\ntask places");
   const PL = await import(new URL("../src/data/places.js", import.meta.url)), QB = await import(new URL("../src/game/quests.js", import.meta.url));

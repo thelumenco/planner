@@ -31,6 +31,7 @@ import * as TL from "./tailor.js";
 import { lookOf, applyLook } from "./look.js";
 import { openSetup, setupOpen } from "./setup.js";
 import { openIntro, introOpen, introAt } from "./intro.js";
+import { openTitle, titleOpen } from "./title.js";
 import { PLACES, placeOf, placeAt } from "../data/places.js";
 import { SPECIES, speciesOf, petArt, petify } from "../art/pets.js";
 import { sendOptions, takeSend, sendMorePanel } from "./bikesend.js";
@@ -173,7 +174,9 @@ let guestView = false, habView = false, habSt = {}, tailView = false, tailSt = {
 // opening (from a blank or stale copy in this browser) would overwrite the real save: phone and laptop each keep their
 // own browser copy, and the Claude app can clear it between visits.
 const loadedAt = {today: S.updatedAt || 0, fox: F.updatedAt || 0}, synced = {today: false, fox: false};
+let leaving = false;   // switching save slots: nothing more gets written before the page reloads
 function persist(which){
+  if (leaving) return;
   const obj = which === "today" ? S : F;
   obj.updatedAt = Date.now();
   try { localStorage.setItem("fox."+which, JSON.stringify(obj)); } catch {}
@@ -3170,6 +3173,7 @@ $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
 $("setVol").oninput = e => setMusicVol(+e.target.value);
 $("setTest").onclick = () => { unlockAudio(); setTimeout(() => { alarm(); $("setTestNote").textContent = audioRunning() ? "Sound is on. If you heard nothing, check the volume and the silent switch." : "Your browser is still blocking sound. Tap anywhere on the map, then try again."; }, 120); };
+$("setTitle").onclick = () => { closePanel(); save(); flushSaves(); showTitle(); };
 $("setStory").onclick = () => { closePanel(); openIntro({replay: true, trainArt: () => trainRideArt(false), sfx}); };
 $("setQuiet").onchange = e => { F.quietEvening = e.target.checked; save(true); };
 $("setSfx").onchange = e => { setSfx(e.target.checked); if (e.target.checked) sfx("coin"); };
@@ -3190,7 +3194,16 @@ setGhTools(() => F.tools || {});
 // wake up at home as usual). F.where is kept by save().
 { const w = !globalThis.__hbNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["guestroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F));
   if (ok) { scene = w.scene; hero.x = hero.tx = w.x; hero.y = hero.ty = w.y; hero.path = []; chum.x = chum.tx = w.x - 22; chum.y = chum.ty = w.y + 2; } }
-dressPet(); needSetup();
+dressPet();
+// Phase 5: the welcome screen first (dev builds skip it unless ?title=1), then the game, or the story and the setup
+// card for a new one. After switching slots the page reloads straight into the game.
+function showTitle(){
+  openTitle({play: () => needSetup(), save: () => { save(); flushSaves(); },
+    reload: skip => { leaving = true; try { if (skip) sessionStorage.setItem("hb.skipTitle", "1"); } catch {} location.reload(); },
+    story: () => openIntro({replay: true, trainArt: () => trainRideArt(false), sfx})});
+}
+{ let skip = false; try { skip = !!sessionStorage.getItem("hb.skipTitle"); sessionStorage.removeItem("hb.skipTitle"); } catch {}
+  if (skip || (window.__hbDevStub && !/[?&]title=1/.test(location.search))) needSetup(); else showTitle(); }
 render(true);
 if (F.gift) setTimeout(() => speak("A welcome gift! Seeds are in your backpack 🌷", 5000), 1200);
 requestAnimationFrame(frame);
