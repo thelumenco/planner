@@ -1,7 +1,7 @@
 // More things to buy at the market stalls: each stall keeps a signature item (the first in its tours.js list) and
 // rotates a few more from its pool, so no two market days offer quite the same things (core.js stallItems).
 // Every good is a gift. art: [icon shape, colour, second colour] drawn by icons.js (marketIcon). Nothing with dairy
-// goes to Tomi (lactose intolerant), so dairy things name who they suit instead of "family" (any friend).
+// goes to Tomi (lactose intolerant), so dairy things name who they suit instead of "family" (any friend at three hearts or more).
 const NOM = ["bo", "farid", "mei", "hana", "theo", "posy"];   // everyone but Tomi
 const G = (n, to, price, tab, say, art, says) => ({n, kind: "gift", to, price, tab, say, art, ...(says ? {says} : {})});
 export const GOODS = {

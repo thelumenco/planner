@@ -10,7 +10,7 @@ import { esc, dayKey, sgHM } from "../util.js";
 import { icon } from "../art/icons.js";
 import { TOWNS } from "../data/towns.js";
 import { BB_MAPS, BB_ROADS, BB_SOON, REGION_N, REGIONS } from "../data/bellbird.js";
-import { FAMILY, nameOf, tripOn } from "./trips.js";
+import { tripFriends, NOBODY, nameOf, tripOn } from "./trips.js";
 
 export const VAN_SEATS = 5, LEG = 6;
 export const STOPS = Object.keys(TOWNS).filter(id => TOWNS[id].by === "van");
@@ -25,7 +25,7 @@ export const stamped = (F, stop) => !!bbState(F).stamps[stop];
 export const canSet = (hm = sgHM()) => hm >= 7*60 && hm < 18*60;
 // set off from home -> the stop, or null
 export function setOff(F, stop, party, hm = sgHM(), ownsVan = true){
-  party = FAMILY.filter(id => party.includes(id)).slice(0, VAN_SEATS - 1);
+  party = tripFriends(F).filter(id => party.includes(id)).slice(0, VAN_SEATS - 1);
   if (!ownsVan || !TOWNS[stop] || !canSet(hm) || tripOn(F) || !known(F).includes(stop)) return null;
   const cost = fuelFor("home", stop, party); if (F.coins < cost) return null;
   F.coins -= cost; F.trip = {town: stop, day: dayKey(), party, from: hm, by: "van"}; F.towns = {...(F.towns || {}), bellbird: (F.towns && F.towns.bellbird) || dayKey()};
@@ -76,8 +76,8 @@ export function mapPanel(F, o = {}){
   if (!at) {
     if (t) return h + `<p class="muted">You're already out on a day trip today.</p>` + shut;
     if (!o.ownsVan) return h + shut;
-    const pick = (o.pick || []).filter(id => FAMILY.includes(id)).slice(0, VAN_SEATS - 1);
-    h += `<p class="eyebrow" style="margin:10px 0 6px">Who's coming? (${pick.length + 1} of ${VAN_SEATS} seats, you included)</p><div class="gchips">${FAMILY.map(id => `<button class="gchip${pick.includes(id) ? " on" : ""}" data-bvpick="${id}" aria-pressed="${pick.includes(id)}" ${!pick.includes(id) && pick.length >= VAN_SEATS - 1 ? "disabled" : ""}>${esc(nameOf(id))}</button>`).join("")}</div>`;
+    const who = tripFriends(F), pick = (o.pick || []).filter(id => who.includes(id)).slice(0, VAN_SEATS - 1);
+    h += `<p class="eyebrow" style="margin:10px 0 6px">Who's coming? (${pick.length + 1} of ${VAN_SEATS} seats, you included)</p>${who.length ? "" : `<p class="muted">${NOBODY}</p>`}<div class="gchips">${who.map(id => `<button class="gchip${pick.includes(id) ? " on" : ""}" data-bvpick="${id}" aria-pressed="${pick.includes(id)}" ${!pick.includes(id) && pick.length >= VAN_SEATS - 1 ? "disabled" : ""}>${esc(nameOf(id))}</button>`).join("")}</div>`;
     if (!canSet(hm)) return h + `<p class="muted">Too ${hm < 7*60 ? "early" : "late"} to set off: day trips leave between 7am and 6pm (and you're home by 10).</p>` + shut;
     h += `<p class="eyebrow" style="margin:12px 0 6px">Where to?</p><div class="actions bbgo">${known(F).filter(inR).map(s => { const c = fuelFor("home", s, pick); return `<button class="btn small ${F.coins >= c ? "primary" : "alt"}" data-bvgo="${s}" ${F.coins >= c ? "" : "disabled"}>${esc(TOWNS[s].n)} · ${c} ${coin()}</button>`; }).join("")}</div><p class="muted">Fuel: ${LEG} coins a leg, plus 1 for each grown-up passenger. Home by ${fmt(TOWNS.bv_gate.backTo)}.</p>`;
     return h + shut;

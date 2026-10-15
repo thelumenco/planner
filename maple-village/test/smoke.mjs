@@ -30,8 +30,15 @@ const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM 
 const openPages = new Set();
 { const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); openPages.add(pg); pg.on("close", () => openPages.delete(pg)); if (!resume) await pg.addInitScript(() => { window.__mapleNoResume = true; }); return pg; }; }
 const errors = [];
+// a save where the seven friends the older tests rely on are at five hearts (presents sent round need 3, trips 5)
+const closeFriends = page => page.addInitScript(() => { const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+  f.board = f.board || {}; const h = f.board.hearts = f.board.hearts || {}; ["hana", "theo", "farid", "mei", "tomi", "posy", "bo"].forEach(id => { if (!(h[id] >= 5)) h[id] = 5; });
+  const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
 const ONLY = (process.env.ONLY || "").toLowerCase().split("|").map(x => x.trim()).filter(Boolean);
 const want = title => { const on = !ONLY.length || ONLY.some(o => title.toLowerCase().includes(o)); if (on) for (const pg of openPages) pg.close().catch(() => {}); return on; };
+// closeness is hearts: set some villagers' hearts in the live save (the old seven at five, by default)
+const SEVEN = ["bo", "farid", "hana", "mei", "posy", "theo", "tomi"];
+const befriend = (page, ids = SEVEN, n = 5) => page.evaluate(([ids, n]) => { const g = window.__mapleGame, f = g.F(); f.board = f.board || {}; f.board.hearts = f.board.hearts || {}; ids.forEach(id => { f.board.hearts[id] = n; }); g.save(); g.render(); }, [ids, n]);
 const check = (cond, msg) => { if (!cond) { errors.push("FAIL: " + msg); console.log("  ✗ " + msg); } else console.log("  ✓ " + msg); };
 
 if (want("core loop")) for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop", width: 1280, height: 900 }]) {
@@ -257,13 +264,19 @@ if (want("\ngifts for friends")) try {
   check(await page.locator('#ctx .item[data-id="hammock"]').textContent().then(t => /at home/.test(t)), "keepsakes are bought once and go home");
   check(await page.evaluate(() => { const o = window.__mapleGame.F().fam.owned; return o.truck && o.sandpit && o.headphones && o.hammock; }), "the tin truck, the sandpit, Bo's headphones and the hammock are all kept");
   await page.click('#ctx [data-close]').catch(() => {}); await page.waitForTimeout(300);
-  // Hana keeps the market: the ice cream (it suits any friend) goes to her in person
+  // a present for anyone (the ice cream) can go to any friend at three hearts or more: nobody yet
   await page.click('[data-open="bag"]');
   await page.click('#bag .item[data-id="icecream"]');
+  check(await page.locator('#bag [data-giveto]').evaluateAll(n => n.map(x => x.dataset.giveto).filter(Boolean).join()) === "" && /Nobody's at three hearts yet/.test(await page.locator("#bag").textContent()), "with nobody at three hearts the chooser says so, and points to giving in person");
+  await page.click('#bag [data-giveto=""]'); await page.waitForTimeout(200);
+  await befriend(page, ["hana", "bo", "okada"], 3); await befriend(page, ["celeste"], 4); await befriend(page, ["juniper"], 2);
+  // Hana keeps the market: the ice cream goes to her in person
+  await page.click('#bag .item[data-id="icecream"]');
   check(await page.locator('#bag [data-giveto="hana"]').textContent().then(t => /here/.test(t)) && await page.locator('#bag [data-giveto="bo"]').textContent().then(t => /send it/.test(t)), "tapping a gift opens a chooser: who it suits, and whether they're here or it gets sent");
-  check(await page.locator('#bag [data-giveto]').evaluateAll(n => n.map(x => x.dataset.giveto).filter(Boolean).sort().join()) === "bo,farid,hana,mei,posy,theo,tomi", "ice cream suits any of the seven friends");
+  check(await page.locator('#bag [data-giveto]').evaluateAll(n => n.map(x => x.dataset.giveto).filter(Boolean).join()) === "celeste,bo,hana,okada", "ice cream can go to any friend at three hearts or more, the ones you know best first");
   await page.click('#bag [data-giveto="hana"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = window.__mapleGame.F(); return !f.inv.icecream && f.fam.gifts.hana === 1 && !(f.thanks || []).length; }), "Hana gets her ice cream in person, right at the market");
+  check(await page.evaluate(() => { const b = window.__mapleGame.F().board; return b.hearts.hana === 3 && b.giftPts.hana === 1; }), "a present for anyone is half a heart (nobody's favourite)");
   await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05"); await page.waitForTimeout(900);   // back home: Bo's at his workshop
   await page.click('[data-open="bag"]');
   await page.click('#bag .item[data-id="kopi"]');
@@ -277,6 +290,8 @@ if (want("\ngifts for friends")) try {
   await page.click('[data-open="mail"]'); await page.waitForTimeout(300);
   check(/Thank you from Bo/.test(await page.locator("#mailView").textContent()), "Bo's thank-you note arrives in the mailbox");
   await page.click('[data-open="mail"]').catch(() => {});
+  await page.click('[data-open="friend"]'); await page.click('#friendView [data-ftab="family"]'); await page.waitForTimeout(300);
+  check(/Gifts given: Bo 1 · Hana 1\./.test(await page.locator("#friendView").textContent()), "the Gifts tab lists everyone you've given something to");
   await page.screenshot({ path: join(shots, "gifts-evening.png") });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
@@ -807,6 +822,7 @@ if (want("\nthe orchard")) try {
   // The orchard and flower farm: plant, Farid picks, the farm shop, bouquets and pots, the fruit crate, tea and cake
   console.log("\nthe orchard");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);   // these friends are close enough for presents sent round and day trips
   page.on("pageerror", e => errors.push(`orchard pageerror: ${e.message}`));
   await page.addInitScript(() => { const q = location.search; if (!/orchpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     f.coins = 300; f.orch = f.orch || {}; f.orch.stock = {apple: 3, "stem:mum": 5}; f.orch.tin = 9;
@@ -933,6 +949,7 @@ if (want("\nplayground families, farmers market, field fair")) try {
   // with the wine shop's stall selling off the shop's own shelves, and the field fair on the last Saturday of the month
   console.log("\nplayground families, farmers market, field fair");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);   // these friends are close enough for presents sent round and day trips
   page.on("pageerror", e => errors.push(`market pageerror: ${e.message}`));
   await page.addInitScript(() => { if (!/mktpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     f.coins = 100; f.vine = f.vine || {}; f.vine.shelf = [{id: "m1", name: "Market Red", type: "red", n: 40, price: 18, open: 0}]; f.vine.lastTick = Date.now() - 290*60e3;
@@ -1051,8 +1068,9 @@ if (want("\ndining tables and who's where")) try {
   await page.evaluate(() => window.__mapleScene("linjun")); await page.waitForTimeout(2000);
   check(await ids().then(a => a.includes("lin") && a.includes("juniper")), "Lin and Juniper's cottage on the foreshore: both home in the evening");
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-07"); await page.waitForTimeout(800);
+  await page.evaluate(() => { const F = window.__mapleGame.F(); F.board = F.board || {}; F.board.hearts = Object.assign(F.board.hearts || {}, {juniper: 5, bo: 3}); window.__mapleGame.render(); });
   await page.click('[data-open="friend"]'); await page.waitForTimeout(400);
-  check(await page.locator("details.whowhere").count() >= 18 && /Close friends/.test(await page.locator("#friendBody").textContent()) && !/supper/i.test(await page.locator("#friendBody").textContent()), "who's where today: everyone's day, close friends first");
+  check(await page.locator("details.whowhere").count() >= 18 && /^Juniper/.test((await page.locator("details.whowhere summary b").first().textContent()).trim()) && !/Close friends|supper/i.test(await page.locator("#friendBody").textContent()), "who's where today: everyone's day, the people you know best first");
   await page.click('[data-open="friend"]').catch(() => {});
   await page.goto(url + "?seed=1&time=14:30&date=2026-10-05"); await page.waitForTimeout(800);
   await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(1200);
@@ -1609,6 +1627,7 @@ if (want("\nkeepsakes and pets")) try {
   // Keepsakes on the shelves of your buildings, and pets adopted at the market that live with one of your friends
   console.log("\nkeepsakes and pets");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);   // these friends are close enough for presents sent round and day trips
   page.on("pageerror", e => errors.push(`pets pageerror: ${e.message}`));
   page.on("dialog", d => { errors.push("keepsakes used a browser pop-up"); d.dismiss(); });
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -1669,6 +1688,7 @@ if (want("\nScoop Shack upgrades")) try {
     check(/last 4 scoops/.test(low.join(" ")) && !again.length && /run out/.test(out.join(" ")) && /sold 40 ice creams: 190 coins\. It ran out at 3pm/.test(eve.join(" ")) && !eve2.length,
       "the Scoop Shack says when its display is running low or empty, and tells you the day's takings when it shuts (once)"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);   // these friends are close enough for presents sent round and day trips
   page.on("pageerror", e => { errors.push(`scoopup pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
   page.on("dialog", d => { errors.push("the upgrades used a browser pop-up"); d.dismiss(); });
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -2099,14 +2119,14 @@ if (want("\na day trip to Kyoto")) try {
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   await page.addInitScript(() => { if (!/ktcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+    f.coins = 300; f.board = f.board || {}; f.board.hearts = Object.assign(f.board.hearts || {}, {mei: 5, juniper: 5, bo: 4}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-11-12&ktcoins=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="timetable"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-tickets]', { timeout: 15000 });
   await page.click('#ctx [data-tickets]'); await page.waitForSelector('#ctx [data-ttown="kyoto"]', { timeout: 15000 });
   await page.click('#ctx [data-ttown="kyoto"]'); await page.waitForTimeout(300);
-  check(await page.locator('#ctx [data-tpick]').evaluateAll(n => n.map(x => x.dataset.tpick).sort().join()) === "bo,farid,hana,mei,posy,theo,tomi", "any of the seven friends can come along");
+  check(await page.locator('#ctx [data-tpick]').evaluateAll(n => n.map(x => x.dataset.tpick).sort().join()) === "juniper,mei", "anyone at five hearts can come along (Bo, at four, can't yet)");
   await page.click('#ctx [data-tpick="mei"]');
   check(/120/.test(await page.locator("#ctx [data-trip]").textContent()) && /Kyoto/.test(await page.locator("#ctx h2").textContent()), "the ticket window offers Kyoto: you and Mei, 120 coins");
   await page.click("#ctx [data-trip]");
@@ -2191,6 +2211,7 @@ if (want("\na day trip to Ronda")) try {
     F.story.heard.pilar = 3; F.board = {hearts: {pilar: 5}};
     check(/Carmen/.test((st.storyReady(F, "pilar", "2026-10-12") || {ch: {lines: []}}).ch.lines.join(" ")), "and back home, Pilar has a new chapter about Doña Carmen"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, resume: true });
+  await closeFriends(page);   // these friends are close enough for presents sent round and day trips
   page.on("pageerror", e => errors.push(`ronda pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
@@ -2308,11 +2329,12 @@ if (want("\nJeju, by ferry and by train")) try {
     "Jeju: four screens; the station's in the village (bottom right, not top left like the others) and the ferry comes into the harbour");
   check(J.fare === 70 && J.ferry.fare === 50 && Object.keys(tw.TOWN_PLACES).filter(k => tw.TOWN_PLACES[k].scene && tw.TOWN_PLACES[k].scene.startsWith("jj_")).every(k => k.startsWith("jj")), "70 by train, 50 by ferry; every Jeju place starts with jj");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);   // these friends are close enough for presents sent round and day trips
   page.on("pageerror", e => errors.push(`jeju pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   await page.addInitScript(() => { if (!/jjcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
-    f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+    f.coins = 300; f.board = f.board || {}; f.board.hearts = Object.assign(f.board.hearts || {}, {mei: 5, juniper: 5, bo: 4}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-11-12&jjcoins=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(900);
@@ -2476,6 +2498,7 @@ if (want("\nCinque Terre: the five villages (well, four)")) try {
 if (want("\nCinque Terre, by train")) try {
   console.log("\nCinque Terre, by train");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);   // these friends are close enough for presents sent round and day trips
   page.on("pageerror", e => errors.push(`cinque pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
@@ -2621,6 +2644,7 @@ if (want("\nthe bike takes bonbons and tapas too, and every shop says its taking
     const F = {}; const v = vy.vineState(F); v.today = {day: d, bottles: 2, glasses: 5, plates: 9, coins: 120, deliv: 3};
     check(/sold 2 bottles, 5 glasses and 9 plates: 120 coins, with 3 orders out by bike/.test(vy.wineNews(F, d, 22*60 + 5) || "") && !vy.wineNews(F, d, 23*60), "and the winery at 10"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);   // these friends are close enough for presents sent round and day trips
   page.on("pageerror", e => errors.push(`bikesend pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { if (!/bspatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
@@ -2768,21 +2792,18 @@ if (want("\nthe old mill and the olive grove")) try {
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.mill && f.mill.press && f.mill.press.n === 2 && f.inv.olives === 1 && f.goals.mill; }), "seven jars of olives: two bottles' worth goes under the millstone");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-if (want("\nFriday evenings: aperitivo, the bonfire, Sal's van, kites")) try {
-  console.log("\nFriday evenings: aperitivo, the bonfire, Sal's van, kites");
+if (want("\nFriday evenings: aperitivo, Sal's van, kites")) try {
+  console.log("\nFriday evenings: aperitivo, Sal's van, kites");
   const t = await import(new URL("../src/game/tours.js", import.meta.url)), fr = await import(new URL("../src/game/friday.js", import.meta.url));
   const fri = "2026-10-16", thu = "2026-10-15";
   { const fi = await import(new URL("../src/game/fishing.js", import.meta.url)), w = await import(new URL("../src/data/world.js", import.meta.url));
     check(fi.fishHere("bay", fri, 18*60).includes("mullet") && fi.fishHere("bay", fri, 18*60).includes("sardine") && !fi.fishHere("bay", thu, 18*60).length && !fi.fishHere("bay", fri, 20*60 + 30).length, "sunset fishing at the bay: Fridays 5 to 8, red mullet and sardines");
     const F = {coins: 20, inv: {mullet: 1}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
-    check(!!fr.vanBuy(F, "sardine", add) && F.inv.sardine === 3 && F.coins === 11, "Sal sells three sardines for the grill");
-    check(fr.grillFish(F, fri) === 4 && !F.inv.sardine && !F.inv.mullet && fr.grillFish(F, fri) === null, "the fish go on the bonfire, once a Friday");
+    check(!!fr.vanBuy(F, "sardine", add) && F.inv.sardine === 3 && F.coins === 11 && !fr.grillFish && !t.bonfireSlot, "Sal sells three sardines (and there's no bonfire any more)");
     check(w.nextHop("field", "hfarm") === "hfarm" && w.nextHop("hfarm", "field") === "field", "a path joins the lake field and Wildflower Farm"); }
   check(t.aperitivoNow(fri, 17*60) && !t.aperitivoNow(fri, 19*60 + 5) && !t.aperitivoNow(thu, 17*60), "aperitivo hour: Fridays, 4:30 to 7");
   check(t.tastingSlot("theo", fri, 17*60 + 30) && t.tastingSlot("opal", fri, 17*60), "the tasting room fills up on a Friday afternoon");
-  check(t.bonfireSlot("theo", fri, 19*60 + 30).act === "guitar" && t.bonfireSlot("hana", fri, 20*60).scene === "base" && !t.bonfireSlot("theo", thu, 19*60 + 30) && !t.bonfireSlot("tomi", fri, 19*60 + 10), "the bonfire, 7 to 10 on a Friday: Theo on guitar, Hana on a log, Tomi and Posy from half seven");
   { const F = {coins: 20, inv: {}, history: {"2026-10-12": {q: 2}, "2026-10-14": {q: 3}, "2026-10-08": {q: 9}}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
-    check(fr.weekQuests(F, fri) === 5 && fr.releaseLanterns(F, fri) === 5 && fr.releaseLanterns(F, fri) === null, "five quests this week: five lanterns, released once a Friday");
     check(!!fr.vanBuy(F, "clams", add) && !!fr.vanBuy(F, "worms", add) && F.inv.clams === 1 && F.coins === 10 && F.fish.bait >= 5, "Sal's van sells clams and worms"); }
   check(t.lastFriday("2026-10-30") && !t.lastFriday(fri) && t.movieNow("2026-10-30", 20*60) && t.movieSlot("theo", "2026-10-30", 20*60).scene === "field" && !t.movieSlot("theo", fri, 20*60) && ["hana", "theo", "farid", "mei", "tomi", "posy", "bo"].filter(id => (t.movieSlot(id, "2026-10-30", 20*60) || {}).at && Math.hypot(t.movieSlot(id, "2026-10-30", 20*60).at[0] - t.SCREEN[0], t.movieSlot(id, "2026-10-30", 20*60).at[1] - t.SCREEN[1]) < 120).length <= 2, "movie night: the last Friday of the month, your friends on blankets on the field");
   check(t.bayMarketNow(fri, 17*60) && t.bayKeepers(fri).length === 3 && t.bayMarketSlot(t.bayKeepers(fri)[0], fri, 17*60).scene === "field" && t.bayMarketSlot("hiro", fri, 17*60).scene === "field", "the Friday market on the field: three stalls, and Hiro selling kites");
@@ -2801,10 +2822,7 @@ if (want("\nFriday evenings: aperitivo, the bonfire, Sal's van, kites")) try {
   await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(1500);
   check(await page.locator('#world [data-place="fishvan"]').count() === 1 && await page.locator('#world [data-place="bonfire"]').count() === 0, "Friday night at the bay: Sal's van (and no bonfire on the beach)");
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1500);
-  check(await page.locator('#actors .npc[data-npc="theo"].act-guitar').count() === 1, "and at home, Theo playing guitar by the bonfire");
-  await page.locator('#world [data-place="bonfire"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-fire="lanterns"]', { timeout: 20000 });
-  await page.click('#ctx [data-fire="lanterns"]'); await page.waitForTimeout(600);
-  check(await page.locator("#fxLayer g").count() >= 1, "the week's lanterns lift off over the sea");
+  check(await page.locator('#world [data-place="bonfire"]').count() === 0 && await page.locator('#actors .npc.act-guitar').count() === 0, "and no bonfire at home on a Friday night");
   await page.goto(url + "?seed=1&time=17:30&date=2026-10-16"); await page.waitForTimeout(1000);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
   check(await page.locator('#world [data-place^="bm"]').count() === 3 && await page.locator('#world [data-place="kites"]').count() === 1, "half past five on a Friday: the little market's up on the field");
@@ -2825,7 +2843,7 @@ if (want("\nBellbird Valley: the Vines (rounds 141-144)")) try {
   check(stops.every(id => Object.values(T[id].rooms).every(r => tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[Object.keys(T[id].rooms).find(k => T[id].rooms[k] === r)])), "every room has a door outside and walls inside");
   const allRooms = stops.flatMap(id => Object.keys(T[id].rooms)), mus = new Set([...stops.map(id => T[id].music), ...allRooms.map(r => T[stops.find(id => T[id].rooms[r])].rooms[r].music)]);
   check(mus.size === 24 && new Set(bb.STOPS.flatMap(id => [tw.TOWNS[id].music, ...Object.entries(tw.TOWNS[id].rooms).filter(([k]) => k !== "bv_hpaper").map(([, r]) => r.music)])).size === 96, "24 tunes: one for every stop and every room (96 across the whole valley)");
-  const F0 = {coins: 100, inv: {}}; check(bb.known(F0).join() === "bv_gate" && bb.fuelFor("home", "bv_gate", ["hana"]) === 7 && bb.setOff(F0, "bv_gate", ["hana"], 8*60) && F0.coins === 93 && bb.stamped(F0, "bv_gate"), "the van: only Valley Gate on the map at first; 6 a leg plus 1 a grown-up, and a stamp");
+  const F0 = {coins: 100, inv: {}, board: {hearts: {hana: 5}}}; check(bb.known(F0).join() === "bv_gate" && bb.fuelFor("home", "bv_gate", ["hana"]) === 7 && bb.setOff(F0, "bv_gate", ["hana"], 8*60) && F0.coins === 93 && bb.stamped(F0, "bv_gate"), "the van: only Valley Gate on the map at first; 6 a leg plus 1 a grown-up, and a stamp");
   check(bb.known(F0).includes("bv_lookout") && bb.known(F0).includes("bv_creek") && !bb.known(F0).includes("bv_camp"), "the map reveals the stops a road away");
   // rooms, goods, specials
   const goods = Object.values(tw.TOWN_GOODS).filter(g => /^bv_/.test(g.shop || ""));
@@ -2865,7 +2883,7 @@ if (want("\nBellbird Valley: the Vines (rounds 141-144)")) try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`bellbird pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
-  await page.addInitScript(() => { if (!/bbv=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), van: true}; f.coins = 300;
+  await page.addInitScript(() => { if (!/bbv=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = {...(f.goals || {}), van: true}; f.coins = 300; f.board = f.board || {}; f.board.hearts = Object.assign(f.board.hearts || {}, {farid: 5});
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=09:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=09:00&date=2026-10-12&bbv=1"); await page.waitForTimeout(1000);

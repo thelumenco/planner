@@ -34,7 +34,7 @@ export function takeSend(F, k, today){
 }
 export function sendMorePanel(opts, chosen, who){
   if (chosen) { const o = opts.find(x => x.k === chosen);
-    return `<p class="olabel">${esc(o ? o.n : "")}</p><p class="eyebrow" style="margin:10px 0 6px">Send it to</p><div class="actions">${who.map(([w, n]) => `<button class="btn small alt" data-gvto="${w}">${esc(n)}</button>`).join("")}</div><div class="actions"><button class="btn alt small" data-gvother="">Back</button></div>`; }
+    return `<p class="olabel">${esc(o ? o.n : "")}</p><p class="eyebrow" style="margin:10px 0 6px">Send it to</p>${who.length ? "" : `<p class="muted">Nobody's at three hearts yet. Friends can have something sent round; anyone can be given something in person.</p>`}<div class="actions">${who.map(([w, n]) => `<button class="btn small alt" data-gvto="${w}">${esc(n)}</button>`).join("")}</div><div class="actions"><button class="btn alt small" data-gvother="">Back</button></div>`; }
   if (!opts.length) return "";
   return `<p class="eyebrow" style="margin:14px 0 6px">Or from your other shops</p><ul class="hlist wlist">${opts.map(o => `<li><span class="wtxt"><b>${esc(o.n)}</b><small>${esc(o.sub)}</small></span><button class="btn small primary" data-gvother="${esc(o.k)}">Choose</button></li>`).join("")}</ul>`;
 }

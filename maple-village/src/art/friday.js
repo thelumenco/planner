@@ -1,17 +1,8 @@
-// Friday evenings (round 112): the bonfire (the firepit at home, made bigger on a Friday night), the fishmonger's van; and the kite
-// on the field. Lanterns rising over the sea are drawn by core.js (lanternFlight) when the player releases them.
+// Friday evenings (round 112): the fishmonger's van; and the kite on the field.
 import { ink } from "../util.js";
 import { sk, tapeLabel } from "./scenes.js";
 import { lampGlow } from "./village-extras.js";
 
-// the home firepit already has its stones (scenes.js): this adds the tap target, and on a Friday night the big flames
-export function bonfireArt(x, y, lit){
-
-  const fire = lit ? lampGlow(x, y - 10, 70) + `<g pointer-events="none">${[0, 1, 2].map(i => `<path d="M${x - 12 + i*12} ${y - 2} q${-6 + i*3} -16 ${2 - i} -30 q${8 - i*2} 14 ${4} 30z" style="fill:${["#F28C28", "#F3C969", "#E8566C"][i]};stroke:var(--line)" stroke-width=".8"><animateTransform attributeName="transform" type="scale" values="1 1;1.05 1.12;.96 .94;1 1" dur="${.8 + i*.2}s" repeatCount="indefinite" additive="sum"/></path>`).join("")}
-    ${[0, 1, 2, 3].map(i => `<circle cx="${x - 6 + i*4}" cy="${y - 30}" r="1.4" fill="#F3C969"><animate attributeName="cy" values="${y - 30};${y - 70}" dur="${1.6 + i*.4}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="${1.6 + i*.4}s" repeatCount="indefinite"/></circle>`).join("")}</g>` : "";
-  return `<g data-place="bonfire" aria-label="The bonfire"><ellipse class="hov" cx="${x}" cy="${y}" rx="30" ry="12" style="fill:var(--butter)"/>
-    ${fire}${lit ? tapeLabel(x, y + 22, "Bonfire", "#F3C969", 9) : ""}</g>`;
-}
 export function fishVanArt(x, y){
   return `<g data-place="fishvan" aria-label="The fishmonger's van"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="50" ry="10" style="fill:var(--butter)"/>
     ${sk(`<rect x="${x - 46}" y="${y - 44}" width="92" height="40" rx="8" style="fill:#FFFDF6"/><rect x="${x - 46}" y="${y - 26}" width="92" height="6" style="fill:#3E6BAE"/><path d="M${x - 50} ${y - 48} h80 l-4 10 h-72z" style="fill:#7FB8E8"/>${[0, 1, 2, 3].map(i => `<path d="M${x - 46 + i*20} ${y - 48} h10 l-1 10 h-10z" style="fill:#FFFDF6"/>`).join("")}<rect x="${x + 22}" y="${y - 40}" width="20" height="14" rx="2" style="fill:#BFE0F2"/><circle cx="${x - 26}" cy="${y - 2}" r="7" style="fill:#3A3430"/><circle cx="${x + 26}" cy="${y - 2}" r="7" style="fill:#3A3430"/><rect x="${x - 40}" y="${y - 20}" width="44" height="10" rx="2" style="fill:#DCEFF7"/>${[0, 1, 2].map(i => `<path d="M${x - 36 + i*13} ${y - 15} q4 -3 8 0 q-4 3 -8 0z" style="fill:#9AA9B8"/>`).join("")}`,

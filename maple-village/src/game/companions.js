@@ -3,12 +3,14 @@
 //              the wine shop, home, your room and the Cocoa Room, one in the greenhouse and the
 //              mill, and the home fridge for magnets. Town souvenirs marked keep can go up too. F.keeps = {spot: item id}; putting one where
 //              another stands sends the old one back to the backpack, and a placed one can be taken back down.
-//   pets       adopted at the market's adoption corner (Noor), then given to one of your friends, who looks after
+//   pets       adopted at the market's adoption corner (Noor), then given to a friend (three hearts or more), who looks after
 //              it on the screen you pick. F.companions = [{id, kind, name, owner, scene, spot, since, patDay, playDay}].
 //              Tap a pet to pat it; when its owner is on the same screen they play together (a little xp, once a day).
 import { esc, dayKey, hash } from "../util.js";
 import { ITEMS } from "../data/items.js";
 import { icon } from "../art/icons.js";
+import { NPCS } from "../data/npcs.js";
+import { friendIds, hearts, FRIEND_HEARTS } from "./quests.js";
 
 /* ---------- keepsakes ---------- */
 // shelf spots: [x, y] of the shelf's top edge on the back wall
@@ -85,12 +87,13 @@ export const PET_HOMES = {
   vineyard: {n: "The vineyard", spots: [[200, 560], [330, 570]]}, field: {n: "The field", spots: [[140, 520], [300, 440]]}, shore: {n: "The foreshore", spots: [[250, 470], [210, 300]]},
   bay: {n: "The bay (by the deck)", spots: [[260, 420], [300, 560]]}
 };
-export const OWNER_NAME = {bo: "Bo", farid: "Farid", mei: "Mei", hana: "Hana", theo: "Theo", tomi: "Tomi", posy: "Posy"};
+// who looks after a pet: any villager (the chooser offers friends at three hearts or more)
+export const ownerName = id => (NPCS.find(n => n.id === id) || {name: "a friend"}).name;
 export const companions = F => (F.companions = F.companions || []);
 export const homesFor = kind => Object.keys(PET_HOMES).filter(h => !PETS[kind].indoor || PET_HOMES[h].indoor);
 // adopt: a pet item from the backpack goes to its new owner, living where you chose
 export function adopt(F, item, owner, home){
-  const it = ITEMS[item], kind = it && it.pet; if (!kind || !(F.inv[item] > 0) || !OWNER_NAME[owner] || !homesFor(kind).includes(home)) return null;
+  const it = ITEMS[item], kind = it && it.pet; if (!kind || !(F.inv[item] > 0) || !(NPCS.some(n => n.id === owner) && hearts(F, owner) >= FRIEND_HEARTS) || !homesFor(kind).includes(home)) return null;
   const list = companions(F), taken = list.map(c => c.name), name = PETS[kind].names.find(n => !taken.includes(n)) || PETS[kind].names[0] + " " + (list.length + 1);
   F.inv[item]--; if (!F.inv[item]) delete F.inv[item];
   const used = list.filter(c => c.scene === home).map(c => c.spot), spot = PET_HOMES[home].spots.findIndex((_, i) => !used.includes(i));
@@ -105,16 +108,17 @@ const PLAY = {kitten: ["{o} dangles a ribbon. {p} pounces!", "{p} curls up on {o
   tortoise: ["{o} feeds {p} a strawberry. Very, very slowly, it's gone.", "{p} pokes its head out to see {o}."], duckling: ["{p} waddles after {o} everywhere.", "{o} fills a little dish of water. {p} splashes in it."]};
 const OWNER_SAYS = {bo: ["Who's a good {k}? You are.", "{p} sits on the bench while I work. Measure twice, cut once, {p}."], farid: ["Look at {p}! I baked a little biscuit just for you.", "{p} keeps me company in the orchard. The trees like {p} too."],
   mei: ["{p} and me, two old friends.", "I sing to {p} every morning. {p} listens."], hana: ["{p} came to Zumba with me, love! Well, watched.", "Isn't {p} the sweetest?"], theo: ["I'm sketching {p}. Hold still, {p}!", "{p} has been officially registered. I stamped it myself."],
-  tomi: ["{p} is my new gaming buddy. One more round, {p}?", "Best present ever. Seriously."], posy: ["{p} sits with me while I study.", "I love {p} so much. Thank you!"]};
-export const fill = (s, c) => s.replace(/\{o\}/g, OWNER_NAME[c.owner]).replace(/\{p\}/g, c.name).replace(/\{k\}/g, PETS[c.kind].n);
+  tomi: ["{p} is my new gaming buddy. One more round, {p}?", "Best present ever. Seriously."], posy: ["{p} sits with me while I study.", "I love {p} so much. Thank you!"],
+  any: ["{p} and me, we're getting on famously.", "Isn't {p} lovely? Thank you, really.", "Who's a good {k}? {p} is."]};
+export const fill = (s, c) => s.replace(/\{o\}/g, ownerName(c.owner)).replace(/\{p\}/g, c.name).replace(/\{k\}/g, PETS[c.kind].n);
 export const playLine = c => fill(PLAY[c.kind][hash(c.id + dayKey()) % PLAY[c.kind].length], c);
-export const ownerLine = c => fill(OWNER_SAYS[c.owner][hash(c.id + dayKey() + "o") % OWNER_SAYS[c.owner].length], c);
+export const ownerLine = c => { const l = OWNER_SAYS[c.owner] || OWNER_SAYS.any; return fill(l[hash(c.id + dayKey() + "o") % l.length], c); };
 export function petPanel(F, c, ownerHere){
   if (!c) return "";
   const today = dayKey(), played = c.playDay === today;
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${esc(OWNER_NAME[c.owner])}'s ${esc(PETS[c.kind].n)}, living at ${esc(PET_HOMES[c.scene].n.replace(/ \(.*\)$/, ""))}.${ownerHere ? ` ${esc(OWNER_NAME[c.owner])}'s here too.` : ""}</p>
-    <div class="actions"><button class="btn primary" data-petdo="pat">Give ${esc(c.name)} a pat</button>${ownerHere ? `<button class="btn alt" data-petdo="play" ${played ? "disabled" : ""}>${played ? "Played together today" : `Play with ${esc(OWNER_NAME[c.owner])}`}</button>` : ""}</div>
-    ${ownerHere ? "" : `<p class="muted">When ${esc(OWNER_NAME[c.owner])}'s here too, they can play together.</p>`}
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(c.name)}</h2><p class="sub">${esc(ownerName(c.owner))}'s ${esc(PETS[c.kind].n)}, living at ${esc(PET_HOMES[c.scene].n.replace(/ \(.*\)$/, ""))}.${ownerHere ? ` ${esc(ownerName(c.owner))}'s here too.` : ""}</p>
+    <div class="actions"><button class="btn primary" data-petdo="pat">Give ${esc(c.name)} a pat</button>${ownerHere ? `<button class="btn alt" data-petdo="play" ${played ? "disabled" : ""}>${played ? "Played together today" : `Play with ${esc(ownerName(c.owner))}`}</button>` : ""}</div>
+    ${ownerHere ? "" : `<p class="muted">When ${esc(ownerName(c.owner))}'s here too, they can play together.</p>`}
     <form class="row hadd" data-petname="1"><label class="sr" for="petName">Name</label><input id="petName" maxlength="20" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>
     <label class="sr" for="petHome">Move home</label><select id="petHome" data-pethome="1">${homesFor(c.kind).map(h => `<option value="${h}" ${h === c.scene ? "selected" : ""}>${esc(PET_HOMES[h].n)}</option>`).join("")}</select>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
@@ -123,9 +127,9 @@ export function petPanel(F, c, ownerHere){
 export function adoptPanel(F, item, st){
   const it = ITEMS[item]; if (!it) return "";
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(it.n)}</h2><p class="sub">${esc(it.line)}</p>`;
-  if (!st.owner) return h + `<p class="eyebrow" style="margin:8px 0 6px">Who'll look after it?</p><div class="actions">${Object.keys(OWNER_NAME).map(o => `<button class="btn small alt" data-adoptfor="${o}">${esc(OWNER_NAME[o])}</button>`).join("")}</div>
-    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
-  return h + `<p class="eyebrow" style="margin:8px 0 6px">${esc(OWNER_NAME[st.owner])}'s new ${esc(PETS[it.pet].n)}. Where will it live?</p><div class="vhelp">${homesFor(it.pet).map(hm => `<button class="vhelpi" data-adoptat="${hm}"><span><b>${esc(PET_HOMES[hm].n)}</b></span></button>`).join("")}</div>
+  if (!st.owner) { const who = friendIds(F); return h + `<p class="eyebrow" style="margin:8px 0 6px">Who'll look after it?</p>${who.length ? "" : `<p class="muted">Nobody's at three hearts yet to take a pet on. It can wait in your backpack till someone is.</p>`}<div class="actions">${who.map(o => `<button class="btn small alt" data-adoptfor="${o}">${esc(ownerName(o))}</button>`).join("")}</div>
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
+  return h + `<p class="eyebrow" style="margin:8px 0 6px">${esc(ownerName(st.owner))}'s new ${esc(PETS[it.pet].n)}. Where will it live?</p><div class="vhelp">${homesFor(it.pet).map(hm => `<button class="vhelpi" data-adoptat="${hm}"><span><b>${esc(PET_HOMES[hm].n)}</b></span></button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-adoptback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 // the pets on this screen, sitting on their spots, each bobbing gently
@@ -146,5 +150,5 @@ export function petArt(kind, x, y){
 }
 export function petsIn(F, scene){
   return companions(F).filter(c => c.scene === scene && PETS[c.kind]).map(c => { const [x, y] = petAt(c);
-    return `<g data-pet="${c.id}" aria-label="${esc(c.name)}, ${esc(OWNER_NAME[c.owner])}'s ${esc(PETS[c.kind].n)}"><ellipse class="hov" cx="${x}" cy="${y}" rx="16" ry="6" style="fill:var(--butter)"/>${petArt(c.kind, x, y)}</g>`; }).join("");
+    return `<g data-pet="${c.id}" aria-label="${esc(c.name)}, ${esc(ownerName(c.owner))}'s ${esc(PETS[c.kind].n)}"><ellipse class="hov" cx="${x}" cy="${y}" rx="16" ry="6" style="fill:var(--butter)"/>${petArt(c.kind, x, y)}</g>`; }).join("");
 }

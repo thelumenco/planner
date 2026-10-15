@@ -42,8 +42,8 @@ import { hlaneArt } from "../art/hlane.js";
 import { hwoodsArt } from "../art/hwoods.js";
 import { greenhouseArt, GH_BED_AT, GH_POT_AT } from "../art/greenhouse.js";
 import { millArt } from "../art/mill.js";
-import { bonfireArt, fishVanArt, kiteArt, bayStallArt, kiteSellerArt, movieArt } from "../art/friday.js";
-import { vanPanel, vanBuy, VAN_MULT, bonfirePanel, releaseLanterns, grillFish, bayStallGoods, bayKeeperName, filmOf } from "./friday.js";
+import { fishVanArt, kiteArt, bayStallArt, kiteSellerArt, movieArt } from "../art/friday.js";
+import { vanPanel, vanBuy, VAN_MULT, bayStallGoods, bayKeeperName, filmOf } from "./friday.js";
 import { millState, pressLeft, millPanel, startPress, collectOil, millStory } from "./mill.js";
 import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost, setGhTools, herbPotPanel, potPlant, potClip, potDig, ghRipe } from "./greenhouse.js";
 import { rondaArt, trainRideArt } from "../art/town-ronda.js";
@@ -97,6 +97,7 @@ import { bikeArt, taxiBoat, taxiBank, transportArt } from "../art/transport.js";
 import { bikeOn, bikeLeft, hireBike, returnBike, bikeExpired, bikePanel, STOPS as TAXI_STOPS, taxiPanel, takeTaxi } from "./transport.js";
 import { forage, rangerPanel } from "./woods.js";
 import { tellStory, storyReady, storiesHTML, applyFlags as storyFlags, storyState } from "./stories.js";
+import { STORIES } from "../data/stories.js";
 import { fishState, fishPanel, spotIn, SPOTS as FISH_SPOTS, cast as fishCast, land as fishLand, buyRod, buyReel, addBait, markerAt, inZone, ESCAPE as FISH_ESCAPE, FISH, sellCatch, spotOpen } from "./fishing.js";
 import { fishSpotArt, koiArt } from "../art/fishing.js";
 import { timetablePanel, trainKey, trainHere, fmt as railTime } from "./rail.js";
@@ -109,12 +110,12 @@ import { POOLS } from "../data/stall-goods.js";
 import { cocoaNews, cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
   pantryPanel, bonbonPanel, casePanel, onDisplay as ccOnDisplay, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
   sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp, emptyVending, pickAdd, pickFill } from "./cocoa.js";
-import { canKeep, keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, OWNER_NAME, PETS, petAt } from "./companions.js";
+import { canKeep, keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, ownerName, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, skyWash, tapeLabel } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { discoNow, discoOn, DISCO_FROM, aperitivoNow, bonfireNow, vanNow, FIRE, movieNow, bayMarketNow, BAY_STALLS, KITE_SELLER, SCREEN, lastFriday, tourNow, eventNow, eventOn, eventsOn, xmasOn, XMAS_FROM, XMAS_TO, XMAS_LIT, XMAS_TREE, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, DINING, tableSeat, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
+import { discoNow, discoOn, DISCO_FROM, aperitivoNow, vanNow, movieNow, bayMarketNow, BAY_STALLS, KITE_SELLER, SCREEN, lastFriday, tourNow, eventNow, eventOn, eventsOn, xmasOn, XMAS_FROM, XMAS_TO, XMAS_LIT, XMAS_TREE, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, DINING, tableSeat, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), berries:0, earned:0, steps:0, stepMs:0, water:0, crown:false, npcSaid:{}, harvested:0, updatedAt:0});
@@ -263,7 +264,7 @@ const SHED = {
 // whom), and the pet whose card is open
 // the Cocoa Room's open card: "counter", "wall", or a kitchen station ("sacks", "roaster", "grinder", "slab", "moulds")
 let vanView = null, vanSt = {slot: "bedding"};   // the campervan's mood board
-let friView = null, lastFri = "";   // round 112: the bonfire or the fishmonger's van panel; the Friday art key
+let friView = null, lastFri = "";   // round 112: the fishmonger's van panel (or a Friday market stall); the Friday art key
 let xmPick = null;   // round 174: the hamper picked to post
 let ghBed = null, millOpen = false, lastMill = "";   // round 110: the olive press panel, and the mill's art key   // round 109: the greenhouse bed being looked at
 let rondaView = null;   // round 107: a Ronda shop (ronda.js): "mercado", "tapas", "dulces", "convento", "azulejos"
@@ -472,7 +473,7 @@ setInterval(() => {
   if (Date.now() - lastFarm > 20000) farmNow();
   { const l = bikeExpired(F); if (l) { speak(l, 4500); save(); } }
   townTick();
-  { const k = scene === "base" ? `${bonfireNow(dayKey(), sgHM())}` : scene === "bay" ? `${vanNow(dayKey(), sgHM())}${spotOpen("bay")}` : scene === "field" ? `${!!(S.kite && S.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : ""; if (k !== lastFri) { lastFri = k; if (k) drawScene(); } }
+  { const k = scene === "bay" ? `${vanNow(dayKey(), sgHM())}${spotOpen("bay")}` : scene === "field" ? `${!!(S.kite && S.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : ""; if (k !== lastFri) { lastFri = k; if (k) drawScene(); } }
   if (scene === "mill") { const m = millState(F), k = m.press ? (pressLeft(m) ? "on" : "ready") : ""; if (k !== lastMill) { lastMill = k; drawScene(); if (millOpen) ctx(); } }
   if ((outside() || scene === "terrace") && skyKey() !== lastSky) { lastSky = skyKey(); drawScene(); }
   { const tk = outside() ? trainKey(scene) : ""; if (tk !== lastTrain) { lastTrain = tk; drawScene();   // a train coming through: draw it (it runs on from where it is)
@@ -779,7 +780,7 @@ function giveBouquet(id){
   if (!near) { speak("Nobody about to give it to. Go and find a friend!", 3500); return; }
   if (near[1] > 170) { speak(`Walk over to ${near[0].def.name} to give it.`, 3200); return; }
   const who = near[0].def; if (giftedAlready(who.id)) return; addInv(id, -1); if (openView) { openView = null; ctx(); }
-  F.bouquets = F.bouquets || {}; F.bouquets[who.id] = (F.bouquets[who.id] || 0) + 1;
+  F.bouquets = F.bouquets || {}; F.bouquets[who.id] = (F.bouquets[who.id] || 0) + 1; F.fam.gifts[who.id] = (F.fam.gifts[who.id] || 0) + 1;
   npcSay(who.id, pick(BQ_THANKS)); mprop("heart", near[0].x, near[0].y - 50, 1800); sfx("chime"); gainXp(1);
   const h = giftHeart(who.id, id); flash(`${who.name} loved the ${it.n.toLowerCase()}`); if (h) setTimeout(() => speak(h.trim(), 4500), 1600); save(true);
 }
@@ -789,7 +790,7 @@ function bouquetTo(id, w){
   if (giftedAlready(w)) return;
   addInv(id, -1); F.bouquets = F.bouquets || {}; F.bouquets[w] = (F.bouquets[w] || 0) + 1; F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
   { const h = giftHeart(w, id); if (h) setTimeout(() => speak(h.trim(), 4500), 1600); }
-  { const p = npcPos(w); npcSay(w, pick(BQ_THANKS)); if (p) mprop("heart", p.x, p.y - 50, 1800); flash(`${GIFT_NAME[w]} loved the ${it.n.toLowerCase()}`); }
+  { const p = npcPos(w); npcSay(w, pick(BQ_THANKS)); if (p) mprop("heart", p.x, p.y - 50, 1800); flash(`${villagerName(w)} loved the ${it.n.toLowerCase()}`); }
   sfx("chime"); gainXp(1); save(true);
 }
 // Tea and cake with Farid in the orchard cottage, once a day: a few coins, a little xp, and a lot of kindness
@@ -804,14 +805,13 @@ function toKitchen(id){
   const n = sendToKitchen(F, id); if (!n) return;
   sfx("paper", true); speak(`${n} ${(ITEMS[id].n || id).toLowerCase()} off to the kitchen larder at the wine shop.`, 3500); save(true);
 }
-// Gifts for your close friends in the village: they get them in person, wherever they are (or sent round)
+// Gifts for your friends in the village: they get them in person, wherever they are (or sent round)
 let bubbleT = null;
-// Who a gift suits: one friend, Farid and Mei at the orchard cottage ("grands"), any of them ("family"), or a list
-const FOLKS = ["hana", "theo", "farid", "mei", "tomi", "posy", "bo"];
-const GIFT_NAME = Object.fromEntries(FOLKS.map(id => [id, (NPCS.find(n => n.id === id) || {name: id}).name]));
-const giftWho = to => to === "family" ? FOLKS : to === "grands" ? ["farid", "mei"] : Array.isArray(to) ? to : [to];
-// a bouquet can go to any of them (in person, or sent round), or to whoever's standing nearby
-const FAMILY_ALL = FOLKS;
+// Who a gift suits: one friend, Farid and Mei at the orchard cottage ("grands"), any friend at three hearts or more
+// ("family": a present for anyone), or a list. A bouquet goes to any friend too, or to whoever's standing nearby.
+const friends = () => QB.friendIds(F);
+const giftWho = to => to === "family" ? friends() : to === "grands" ? ["farid", "mei"] : Array.isArray(to) ? to : [to];
+const NO_FRIENDS = "Nobody's at three hearts yet, so there's no one to send it to. Walk up to someone and give it to them in person instead.";
 // Ada's and Idris's hours: nine thirty to half past five, every day but Sunday
 const GARMENT_N = k => (TL.GARMENT_NAME[k] || "piece").toLowerCase();
 const sewOpen = () => { const m = sgHM(), d = new Date(dayKey() + "T00:00:00Z").getUTCDay(); return d !== 0 && m >= 9*60 + 30 && m < 17*60 + 30; };
@@ -824,8 +824,9 @@ function tailorPreview(){
 }
 // Gifts and hearts (quests.js giveTo): one gift per villager a day, in person or sent round. A favourite (a crop they'd
 // ask for, or a present that suits them) is worth a heart, anything else half a heart.
-const villagerName = w => (NPCS.find(n => n.id === w) || {}).name || GIFT_NAME[w] || "them";
-const isFav = (w, id) => { const it = ITEMS[id] || {}; return ((QB.ASKERS[w] || {}).likes || []).includes(id) || (it.to != null && giftWho(it.to).includes(w)); };
+const villagerName = w => (NPCS.find(n => n.id === w) || {}).name || "them";
+// (a present for anyone isn't anyone's favourite, unless it's on their list of likes)
+const isFav = (w, id) => { const it = ITEMS[id] || {}; return ((QB.ASKERS[w] || {}).likes || []).includes(id) || (it.to != null && it.to !== "family" && giftWho(it.to).includes(w)); };
 function giftedAlready(w){ if (!QB.giftedToday(F, w)) return false; speak(`You've already given ${villagerName(w)} something today. Save it for tomorrow!`, 4000); return true; }
 function giftHeart(w, id){
   const r = QB.giveTo(F, w, villagerName(w), id, isFav(w, id), addInv); if (!r) return "";
@@ -841,16 +842,16 @@ function giveToVillager(id, w){
   if (!e) { giveMode = null; speak(`${villagerName(w)}'s wandered off. Find them again to give it.`, 3500); bag(); return; }
   if (giftedAlready(w)) { giveMode = null; bag(); return; }
   addInv(id, -1); giveMode = null; if (openView) { openView = null; ctx(); }
-  if (FOLKS.includes(w)) F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
+  F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
   if (it.kind === "bouquet") { F.bouquets = F.bouquets || {}; F.bouquets[w] = (F.bouquets[w] || 0) + 1; }
   const fav = isFav(w, id), line = (it.says && it.says[w]) || (fav ? pick(FAV_THANKS) : it.kind === "bouquet" ? pick(BQ_THANKS) : pick(GIFT_THANKS));
   npcSay(w, line); [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", e.x + (k - 1)*14, e.y - 50 - k*6, 1800), d)); sfx("chime"); gainXp(1);
   const h = giftHeart(w, id); flash(`${villagerName(w)} loved the ${it.n.toLowerCase()}`); if (h) setTimeout(() => speak(h.trim(), 4500), 1600); save(true);
 }
-function nearVillager(){ const n = npcActors().map(([, e]) => e).filter(e => e.kind === "npc" && !FAMILY_ALL.includes(e.def.id)).map(e => [e, Math.hypot(e.x - mel.x, e.y - mel.y)]).sort((a, b) => a[1] - b[1])[0]; return n && n[1] < 170 ? n[0] : null; }
-const recipients = it => it.kind === "bouquet" ? [...FAMILY_ALL, ...(nearVillager() ? ["near"] : [])] : giftWho(it.to);
-const recipName = w => w === "near" ? ((nearVillager() || {}).def || {name: "someone nearby"}).name : GIFT_NAME[w];
-const giftNames = to => to === "grands" ? "Farid or Mei" : to === "family" ? "a friend" : giftWho(to).map(g => GIFT_NAME[g]).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
+function nearVillager(){ const fr = friends(), n = npcActors().map(([, e]) => e).filter(e => e.kind === "npc" && !fr.includes(e.def.id)).map(e => [e, Math.hypot(e.x - mel.x, e.y - mel.y)]).sort((a, b) => a[1] - b[1])[0]; return n && n[1] < 170 ? n[0] : null; }
+const recipients = it => it.kind === "bouquet" ? [...friends(), ...(nearVillager() ? ["near"] : [])] : giftWho(it.to);
+const recipName = w => w === "near" ? ((nearVillager() || {}).def || {name: "someone nearby"}).name : villagerName(w);
+const giftNames = to => to === "grands" ? "Farid or Mei" : to === "family" ? "a friend" : giftWho(to).map(villagerName).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
 // Who's close enough to hand a gift to in person (null if they're not on this screen)
 const giftPos = w => npcPos(w);
 // Tapping a gift in the backpack opens a little chooser of who it suits. Someone here gets it in person; anyone else
@@ -859,19 +860,19 @@ let giftPick = null, postPick = false;
 // round 190: post it to someone in the address book (postage by how far; their reply comes in a day or three)
 const postPickHTML = it => `<p style="margin-top:10px"><b>Post it to…</b></p><div class="actions">${BK.contacts(F).map(id => `<button class="btn small alt" data-postto="${id}" ${F.coins >= BK.postage(id) && !it.gel ? "" : "disabled"}>${esc(BK.person(id).name)}<small> · ${BK.postage(id)} coins</small></button>`).join("")}</div>${it.gel ? `<p class="muted">Ice cream would melt in the post.</p>` : ""}`;
 function giftPickHTML(id){
-  const it = ITEMS[id]; if (!it || !F.inv[id]) return "";
-  return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p><div class="actions">${recipients(it).map(w => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}${canKeep(it) ? `<button class="btn small alt" data-keepit="1">Keep it${it.magnet ? "<small> · for the fridge</small>" : "<small> · on a shelf</small>"}</button>` : ""}${BK.contacts(F).length ? `<button class="btn small alt" data-bypost="1">By post…</button>` : ""}<button class="btn small alt" data-giveto="">Cancel</button></div>${postPick ? postPickHTML(it) : ""}
+  const it = ITEMS[id], who = it && recipients(it); if (!it || !F.inv[id]) return "";
+  return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p>${who.length ? "" : `<p class="muted">${NO_FRIENDS}</p>`}<div class="actions">${who.map(w => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}${canKeep(it) ? `<button class="btn small alt" data-keepit="1">Keep it${it.magnet ? "<small> · for the fridge</small>" : "<small> · on a shelf</small>"}</button>` : ""}${BK.contacts(F).length ? `<button class="btn small alt" data-bypost="1">By post…</button>` : ""}<button class="btn small alt" data-giveto="">Cancel</button></div>${postPick ? postPickHTML(it) : ""}
     <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.${canKeep(it) ? " Or keep it, and put it up somewhere of yours." : ""}</p></div>`;
 }
 function giveTo(id, w){
   giftPick = null; const it = ITEMS[id]; if (!w || !it || !F.inv[id]) { bag(); return; }
   if (w === "near") { giveBouquet(id); bag(); return; }
   if (giftPos(w)) { if (it.kind === "bouquet") bouquetTo(id, w); else giveGift(id, w); bag(); return; }
-  if (it.gel && !hasUp(scoopState(F), "bike")) { speak(`It'd melt on the way! Give it to ${GIFT_NAME[w]} in person, or get the Scoop Shack a delivery bike.`, 4500); bag(); return; }
+  if (it.gel && !hasUp(scoopState(F), "bike")) { speak(`It'd melt on the way! Give it to ${villagerName(w)} in person, or get the Scoop Shack a delivery bike.`, 4500); bag(); return; }
   if (giftedAlready(w)) { bag(); return; }
   addInv(id, -1); F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1); PP.bloomFor(F, id, w); giftHeart(w, id);
   F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
-  sfx("chime"); flash(`Sent to ${GIFT_NAME[w]}`); speak(`Wrapped up and sent to ${GIFT_NAME[w]}. Watch your mailbox for a thank-you note.`, 4500); save(); bag();
+  sfx("chime"); flash(`Sent to ${villagerName(w)}`); speak(`Wrapped up and sent to ${villagerName(w)}. Watch your mailbox for a thank-you note.`, 4500); save(); bag();
 }
 const SIGNOFF = {hana: "Love, Hana x", theo: "Yours sincerely (and gratefully), Theo", farid: "Your friend, Farid", mei: "Mei x", tomi: "Cheers, Tomi", posy: "Posy x", bo: "Bo"};
 const BQ_NOTE = {farid: "They're on the cottage table, next to the cake tin. Mei says they're nearly as nice as hers.", mei: "A flower farmer, given flowers! I put them in my best jug. Nobody ever does that.", hana: "They're on the counter at the market. Three people have asked where they're from.", theo: "I've pressed one in the village register. For the record.",
@@ -884,12 +885,13 @@ function thankNote(t){
   return `${dearMe(F)},\n\n${says ? "Thank you so much!" : `Thank you for the ${it.n.toLowerCase()}!`} ${line}\n\n${SIGNOFF[t.who] || villagerName(t.who)}`;
 }
 // thank-you notes that have arrived (they take about ten minutes to come back)
-const thanksMail = () => (F.thanks || []).filter(t => t.at <= Date.now()).map(t => ({id: t.id, from: "postie", at: t.at, title: `Thank you from ${GIFT_NAME[t.who] || "someone"}`, body: thankNote(t)}));
+const thanksMail = () => (F.thanks || []).filter(t => t.at <= Date.now()).map(t => ({id: t.id, from: "postie", at: t.at, title: `Thank you from ${(NPCS.find(n => n.id === t.who) || {name: "someone"}).name}`, body: thankNote(t)}));
 function giveGift(id, chosen){
   const it = ITEMS[id]; if (!it || !F.inv[id]) return;
   const burst = (x, y) => [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", x + (k - 1)*14, y - 40 - k*6, 1800), d));
   const showMap = () => { if (openView) { openView = null; ctx(); } };
   const who = chosen ? [chosen] : giftWho(it.to);
+  if (!who.length) { speak(NO_FRIENDS, 5000); return; }
   // more than one person it'd suit: hand it to whichever of them is nearest
   let to = it.to, g = null;
   if (who.length > 1 && it.to !== "grands") {
@@ -900,11 +902,11 @@ function giveGift(id, chosen){
   } else if (who.length === 1 && (who[0] === "farid" || who[0] === "mei")) { to = "grands"; g = who[0]; }
   else if (who.length === 1) to = who[0];
   const say = w => (it.says && it.says[w]) || it.say;
-  if (FOLKS.includes(to)) {
-    const p = npcPos(to); if (!p) { speak(`${GIFT_NAME[to]}'s not here. Give it to them in person!`, 3500); return; }
+  if (to !== "grands") {
+    const p = npcPos(to); if (!p) { speak(`${villagerName(to)}'s not here. Give it to them in person!`, 3500); return; }
     if (giftedAlready(to)) return;
     addInv(id, -1); F.fam.gifts[to] = (F.fam.gifts[to] || 0) + 1; PP.bloomFor(F, id, to);
-    showMap(); npcSay(to, say(to)); burst(p.x, p.y - 20); sfx("chime"); flash(`${GIFT_NAME[to]} loved the ${it.n.toLowerCase()}`); gainXp(1);
+    showMap(); npcSay(to, say(to)); burst(p.x, p.y - 20); sfx("chime"); flash(`${villagerName(to)} loved the ${it.n.toLowerCase()}`); gainXp(1);
     { const h = giftHeart(to, id); if (h) setTimeout(() => speak(h.trim(), 4500), 1600); } save(); return;
   }
   if (to === "grands") {
@@ -912,7 +914,7 @@ function giveGift(id, chosen){
     const here = (g ? [g] : ["farid", "mei"]).map(g => [g, npcPos(g)]).filter(([, p]) => p).sort((a, b) => Math.hypot(a[1].x - mel.x, a[1].y - mel.y) - Math.hypot(b[1].x - mel.x, b[1].y - mel.y))[0];
     if (!here) { const w = whereIs("farid"); speak(`Farid and Mei aren't here. ${w === "cottage" ? "They're home in the cottage" : w ? "Farid's out at the " + ({orchard: "orchard", flowers: "flower farm", village: "town square", vineyard: "vineyard", base: "house", field: "field"}[w] || w) : "Try the orchard"}. Give it to them in person!`, 4500); return; }
     const [gp, p] = here; if (giftedAlready(gp)) return; addInv(id, -1); F.fam.gifts[gp] = (F.fam.gifts[gp] || 0) + 1; PP.bloomFor(F, id, "grands");
-    showMap(); npcSay(gp, say(gp)); burst(p.x, p.y - 20); sfx("chime"); flash(`${GIFT_NAME[gp]} loved the ${it.n.toLowerCase()}`);
+    showMap(); npcSay(gp, say(gp)); burst(p.x, p.y - 20); sfx("chime"); flash(`${villagerName(gp)} loved the ${it.n.toLowerCase()}`);
     { const h = giftHeart(gp, id); if (h) setTimeout(() => speak(h.trim(), 4500), 1600); }
   }
   gainXp(1); save();
@@ -1159,8 +1161,7 @@ function ctx(){
   } else if (scene === "millup" && millOpen === "workshop") { h = workshopPanel(F, {on: workshopNow(dayKey(), sgHM()) && owns(F, "millshop"), shop: owns(F, "millshop")});
   } else if ((scene === "mill" || scene === "millup") && millOpen) { h = millOpen === "story" ? millStory(F) : millOpen === "bench" ? millBenchPanel(F, mcSt, {shop: owns(F, "millshop"), ines: owns(F, "mill")}) : millOpen === "shop" ? millShopPanel() : millPanel(F);
   } else if (friView && scene === "field" && (/^bm\d$/.test(friView) || friView === "kites")) { h = bayMarketPanel(friView);
-  } else if (friView && (scene === "bay" || scene === "field" || scene === "base")) { const fam = ["theo", "hana", "mei", "farid", "tomi", "posy", "bo"].filter(isHere).map(n => NPCS.find(d => d.id === n).name);
-    h = friView === "van" ? vanPanel(F) : bonfirePanel(F, fam.length ? `${fam.join(", ").replace(/, ([^,]*)$/, " and $1")} ${fam.length > 1 ? "are" : "is"} round the fire` : "");
+  } else if (friView === "van" && scene === "bay") { h = vanPanel(F);
   } else if (scene === "farm" && selPlot != null) {
     const p = F.plots[selPlot], i = selPlot;
     h = `<span class="tape stripe" aria-hidden="true"></span><h2>Plot ${i + 1}</h2>`;
@@ -1250,16 +1251,6 @@ function ctx(){
     if (id === "sellall") { const g = sellCatch(F, null, VAN_MULT); if (!g) return; sfx("chaching"); speak(`Sal weighs it all up: ${g.coins} coins for ${g.n}. "Good fish, that."`, 4000); }
     else { const l = vanBuy(F, id, addInv); if (!l) return; sfx("chaching"); speak(l, 3000); }
     save(); ctx(); });
-  c.querySelectorAll("[data-fire]").forEach(b => b.onclick = () => {
-    if (b.dataset.fire === "lanterns") { const n = releaseLanterns(F); if (n == null) return; friView = null; ctx(); lanternFlight(Math.max(1, n)); gainXp(Math.min(5, 1 + Math.floor(n/3))); sfx("chime");
-      speak(n ? `${n} paper lantern${n > 1 ? "s" : ""}, one for each quest this week, lifting off over the house. Look at that.` : "One lantern, for getting through the week. It drifts up over the roof.", 7000);
-      ["hana", "theo", "farid"].filter(isHere).slice(0, 1).forEach(id => setTimeout(() => npcSay(id, pick(["Look at all of them! You worked hard this week.", "So pretty. Well done, you.", "Every one of those is something you did."])), 3600));
-      save(); return; }
-    if (b.dataset.fire === "grill") { const n = grillFish(F); if (!n) return; friView = null; ctx(); gainXp(2); hearts(3); sfx("chime");
-      speak(`${n} fish on the grill, a squeeze of lemon, and everyone eating with their fingers. Perfect.`, 6000);
-      const who = ["mei", "theo", "hana", "farid"].filter(isHere)[0]; if (who) setTimeout(() => npcSay(who, pick(["Ah, that's the smell of a Friday.", "Grilled just right. Who taught you that?", "Best sardines this side of the sea!"])), 3600);
-      save(); return; }
-    mel.sitting = true; nodes.mel.classList.add("sit"); friView = null; ctx(); sfx("paper", true); speak(pick(["The fire pops and crackles. Nobody needs to say anything.", "Warm on your face, cool on your back. Friday.", "Sparks going up into the dark. The week's done."]), 4500); });
   c.querySelectorAll("[data-mill]").forEach(b => b.onclick = () => { const l = b.dataset.mill === "press" ? startPress(F, +b.dataset.n) : collectOil(F, addInv);
     if (l) { sfx(b.dataset.mill === "press" ? "crunch" : "chime"); if (b.dataset.mill !== "press") { gainXp(1); act("cheer"); } speak(l, 4500); save(true); } ctx(); });
   c.querySelectorAll("[data-gh]").forEach(b => b.onclick = () => { const i = +b.dataset.i, gh = b.dataset.gh;
@@ -1694,10 +1685,8 @@ function rideTaxi(to){
   const o = document.createElement("div"); o.className = "taxiride"; o.innerHTML = `${taxiBank}<div class="taxiboat">${taxiBoat}</div><p>Down the river to ${esc(s.n.replace(/^The /, "the "))}...</p>`; $("map").appendChild(o);
   setTimeout(() => { o.remove(); setScene(s.scene, s.at); setTimeout(() => speak(`The river taxi drops you at ${s.n}.`, 3500), 700); }, 2600);
 }
-// Friday evenings (round 112): the bonfire at home, the fish van at the bay, and a kite on the field
-const isFri = () => new Date(dayKey() + "T00:00:00Z").getUTCDay() === 5;
+// Friday evenings (round 112): the fish van at the bay, and a kite on the field
 function fridayLayer(sc){
-  if (sc === "base") return bonfireArt(FIRE[0], FIRE[1], bonfireNow(dayKey(), sgHM()));
   if (sc === "bay") return vanNow(dayKey(), sgHM()) ? fishVanArt(330, 600) : "";
   if (sc === "field") return (movieNow(dayKey(), sgHM()) ? movieArt(SCREEN[0], SCREEN[1], filmOf(dayKey())) : "")
     + (bayMarketNow(dayKey(), sgHM()) ? BAY_STALLS.map(([x, y], k) => bayStallArt(k, x, y, `${bayKeeperName(dayKey(), k)}'s stall`)).join("") + kiteSellerArt(KITE_SELLER[0] - 22, KITE_SELLER[1] + 4) : "") + `<g data-place="kitefly" aria-label="Kite flying"><ellipse class="hov" cx="440" cy="334" rx="30" ry="9" style="fill:var(--butter)"/><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.1"><path d="M452 336 v-46" stroke-width="2"/><path d="M452 292 l18 4 l-2 8 l-16 2z" style="fill:#E8913A"/><path d="M458 293 v12 M464 294 v10" style="stroke:#FFFDF6" stroke-width="2"/></g>${tapeLabel(440, 352, "Kite flying", "#DCEBF6", 9)}</g>`
@@ -1716,16 +1705,6 @@ function flyKite(){
   S.kite = {until: Date.now() + 60e3, x: mel.x, y: mel.y}; mel.dir = -1; sfx("whistle"); drawScene(); gainXp(1);
   speak(pick(["Up it goes! The red kite catches the wind.", "Run, run... and up! It's flying.", "The kite tugs on the string like it wants to go to sea."]), 4500);
   save(); render();
-}
-// the week's lanterns: little glowing paper lanterns rising from the fire and drifting up over the house
-function lanternFlight(n){
-  const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("pointer-events", "none");
-  const t0 = $("world").getCurrentTime ? $("world").getCurrentTime() : 0;   // SVG animations count from page load: start them now
-  g.innerHTML = Array.from({length: Math.min(n, 24)}, (_, i) => { const x = FIRE[0] - 20 + (i*37) % 60, dx = -60 - (i*53) % 110, d = 6 + (i % 5);
-    return `<g opacity="0"><rect x="${x - 5}" y="${FIRE[1] - 30}" width="10" height="13" rx="3" fill="#F6C26B" stroke="#3b3530" stroke-width=".8"/><circle cx="${x}" cy="${FIRE[1] - 24}" r="9" fill="url(#lampg)"/>
-      <animateTransform attributeName="transform" type="translate" from="0 0" to="${dx} ${-260 - (i*29) % 160}" dur="${d}s" begin="${(t0 + i*.35).toFixed(2)}s" fill="freeze"/><animate attributeName="opacity" values="0;1;1;0" dur="${d}s" begin="${(t0 + i*.35).toFixed(2)}s" fill="freeze"/></g>`; }).join("");
-  let fx = $("fxLayer"); if (!fx) { fx = document.createElementNS("http://www.w3.org/2000/svg", "g"); fx.id = "fxLayer"; fx.setAttribute("pointer-events", "none"); $("world").appendChild(fx); }   // above everyone
-  fx.appendChild(g); setTimeout(() => g.remove(), 20000);
 }
 // Day trips (trips.js, round 107): tickets at Honeybrook station, the train, a day in the town, the train home.
 const liveNow = () => { if (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM())) return "disco"; if (scene === "terrace") return vineState(F).terrace && dancingNow(dayKey(), sgHM()) ? "disco" : "terrace"; const room = townRoom(scene); if (room) return room.music; const town = townOf(scene); if (town) return TOWNS[town].music; const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null; return ev && ev.kind === "night" ? "jazz" : null; };
@@ -1982,7 +1961,7 @@ function render(redraw){
   const ftabs = [["where", "Who's where"], ["neighbours", "Neighbours"], ["maple", esc(F.name)], ["stories", "Stories"], ["family", "Gifts"]], noHead = h => h.replace(/^\s*<h3 class="ph3">[^<]*<\/h3>/, "");
   $("friendTitle").textContent = {where: "Who's where today", neighbours: "Neighbours", maple: `Friendship with ${F.name}`, stories: "Stories so far", family: "Gifts for friends"}[friendTab];
   const fbody = friendTab === "where" ? noHead(whosWhereHTML()) : friendTab === "neighbours" ? neighboursHTML() : friendTab === "stories" ? noHead(storiesHTML(F, Object.fromEntries(NPCS.map(n => [n.id, n.name]))))
-    : friendTab === "family" ? `<p class="muted">${icon("heart", 14)} Gifts given: ${FOLKS.map(w => `${esc(GIFT_NAME[w])} ${F.fam.gifts[w] || 0}`).join(" · ")}. Treats and keepsakes for friends are in the market's Gifts tab.</p>`
+    : friendTab === "family" ? giftsGivenHTML()
     : `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${Array.from({length: 5}, (_, i) => icon("heart", 22, i < filled ? "" : "faint")).join("")}</p>
     <p class="muted">${esc(F.name)} is your ${LEVELS[L].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>
     <h3 class="ph3">Village upgrades</h3>
@@ -1995,9 +1974,14 @@ function render(redraw){
   if (scene === "base" && paper && S.paperSaid !== paper.id) { S.paperSaid = paper.id; setTimeout(() => speak(`${paperName()} is in the letterbox!`, 4500), 1800); }
   questMark(); journal(); ctx(); bag(); trackers(); mailCard(); refreshNotebook();
 }
-// Neighbours: everyone who asks for favours, with their hearts (five each, from requests handed over; never lost)
+// the Friends panel's Gifts tab: everyone you've given something to, most first
+function giftsGivenHTML(){
+  const g = Object.entries(F.fam.gifts).filter(([w, n]) => n > 0 && NPCS.some(d => d.id === w)).sort((a, b) => b[1] - a[1] || villagerName(a[0]).localeCompare(villagerName(b[0])));
+  return `<p class="muted">${icon("heart", 14)} ${g.length ? `Gifts given: ${g.map(([w, n]) => `${esc(villagerName(w))} ${n}`).join(" · ")}.` : "No gifts given yet."} Treats and keepsakes are in the market's Gifts tab: friends at ${QB.FRIEND_HEARTS} hearts or more can have them sent round, and anyone at all can be given something in person.</p>`;
+}
+// Neighbours: everyone who asks for favours or has a story to tell, with their hearts (five each; never lost)
 function neighboursHTML(){
-  const list = NPCS.filter(n => !n.tourist && !n.local && !n.kid && (QB.ASKERS[n.id] || FOLKS.includes(n.id) || QB.hearts(F, n.id)) && ((F.met || {})[n.id] || QB.hearts(F, n.id))).sort((a, b) => QB.hearts(F, b.id) - QB.hearts(F, a.id) || a.name.localeCompare(b.name));
+  const list = NPCS.filter(n => !n.tourist && !n.local && !n.kid && (QB.ASKERS[n.id] || STORIES[n.id] || QB.hearts(F, n.id)) && ((F.met || {})[n.id] || QB.hearts(F, n.id))).sort((a, b) => QB.hearts(F, b.id) - QB.hearts(F, a.id) || a.name.localeCompare(b.name));
   if (!list.length) return `<p class="muted">Say hello to the villagers, help with their requests on the quest board, and bring them presents (one a day each). Hearts open up their stories.</p>`;
   return `<p class="muted">A heart for every favour, and for a favourite present (anything else, half a heart; one present a day each). Two hearts bring a thank-you letter, four a little gift, five a friend for life. Hearts open up their stories, a chapter at a time.</p><ul class="qlist nbrs">${list.map(n => { const h = QB.hearts(F, n.id), r = QB.requestFrom(F, n.id);
     return `<li><span><b>${esc(n.name)}</b><small>${esc(n.job || "")}${r ? ` · needs ${esc(QB.reqLine(r))} ${esc(QB.dueLine(r))}` : ""}</small></span><span class="hearts" aria-label="${h} of 5 hearts">${Array.from({length: 5}, (_, i) => icon("heart", 16, i < h ? "" : "faint")).join("")}</span></li>`; }).join("")}</ul>`;
@@ -2182,8 +2166,6 @@ function arriveVillageSpot(id){
   if (townOf(scene)) { townSpot(id); return; }
   if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }
   if (id === "olive") { vyView = "olive"; sfx("paper", true); render(); return; }
-  if (id === "bonfire") { if (bonfireNow(dayKey(), sgHM())) { friView = "fire"; sfx("paper", true); ; }
-    else speak(isFri() && sgHM() < 19*60 ? "The bonfire's lit at seven tonight. Everyone's coming." : "Your firepit. On Friday nights your friends come round for a bonfire, 7 to 10.", 4500); render(); return; }
   if (id === "fishvan") { if (vanNow(dayKey(), sgHM())) { friView = "van"; sfx("paper", true); } else speak("Sal's fish van parks here on Friday evenings, five till ten.", 4000); render(); return; }
   if (id === "kitefly") { flyKite(); return; }
   if (/^bm\d$/.test(id) || id === "kites") { if (!bayMarketNow(dayKey(), sgHM())) { speak("The Friday market's packed away. It's on Fridays, 4:30 to 7:15, here on the field.", 4000); render(); return; } friView = id; sfx("paper", true); render(); return; }
@@ -2408,7 +2390,7 @@ function trolleyHome(){ const r = returnTrolley(F); if (!r) return; sfx(r.melted
   speak(`Trolley's back${r.n ? `: ${r.n} sold, ${r.coins} coins` : ""}. ${r.back ? `${r.back} scoop${r.back === 1 ? "" : "s"} back in the freezer.` : r.melted ? `The last ${r.melted} scoop${r.melted === 1 ? "" : "s"} had melted, sadly.` : "Sold out!"}`, 6000); save(); }
 // someone tapped while you're pushing the trolley outdoors in Honeybrook: do they want one? -> true if it was an offer
 function trolleyOffer(id){
-  const def = NPCS.find(n => n.id === id), fam = FAMILY_ALL.includes(id); if (!def && !fam) return false;
+  const def = NPCS.find(n => n.id === id), fam = QB.hearts(F, id) >= QB.FRIEND_HEARTS; if (!def) return false;
   const r = trolleySell(F, id, dayKey(), {kid: (!!(def && def.kid)), family: fam, rainy: rainyOn(dayKey()), season: seasonOf(dayKey()), hm: sgHM()}); if (!r) return false;
   if (r.no) { npcSay(id, pick(["Not today, thanks!", "Ooh, tempting. Maybe later!", "I've just had lunch, sorry!", "Not for me, but it looks lovely."])); save(); return true; }
   const what = r.items.map(([f, n]) => `a ${f} of ${n.replace(/ (Gelato|Sorbet)$/, "").toLowerCase()}`).join(" and ");
@@ -2452,8 +2434,8 @@ function haveIceCream(rid){
   speak(`${r.name}! ${("Find a seat, or take it for a walk along the foreshore.")}`, 5000);
   save(); render();
 }
-// the delivery bike: Tomo pedals one round to someone in the family, and a thank-you note comes back
-const deliverTo = () => FAMILY_ALL.map(w => [w, GIFT_NAME[w]]);
+// the delivery bike: Tomo pedals one round to a friend (three hearts or more), and a thank-you note comes back
+const deliverTo = () => friends().map(w => [w, villagerName(w)]);
 // round 139: the delivery panel also offers bonbons, bars and tapas from the other shops (bikesend.js)
 function deliverMore(h){
   const s = scoopState(F); if (!hasUp(s, "bike") || !riderOn(sgHM()) || scSt.vpick) return h;
@@ -2465,14 +2447,14 @@ function deliverMore(h){
 function deliver(w){
   if (scSt.vother) { const id = takeSend(F, scSt.vother, dayKey()); if (!id) return; const it = ITEMS[id] || {n: "present"};
     F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1); PP.bloomFor(F, id, w); F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
-    scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0); sfx("chime"); flash(`On its way to ${GIFT_NAME[w]}`); speak(`Tomo's pedalling ${/^[aeiou]/i.test(it.n) ? "an" : "a"} ${it.n.toLowerCase()} over to ${GIFT_NAME[w]} in the cool box. Watch your mailbox for a thank-you note.`, 5000);
+    scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0); sfx("chime"); flash(`On its way to ${villagerName(w)}`); speak(`Tomo's pedalling ${/^[aeiou]/i.test(it.n) ? "an" : "a"} ${it.n.toLowerCase()} over to ${villagerName(w)} in the cool box. Watch your mailbox for a thank-you note.`, 5000);
     scSt.vother = null; scView = null; save(); ctx(); render(); return; }
   if (giftedAlready(w)) return;
   const it = takeAway(F, scSt.vpick, FORMATS[scSt.vfmt] ? scSt.vfmt : "cone"); if (!it) return;
   const id = Object.keys(ITEMS).find(k => ITEMS[k] === it);
   addInv(id, -1); F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1; gainXp(1); PP.bloomFor(F, id, w); giftHeart(w, id);
   F.thanks = [...(F.thanks || []), {id: `thanks-${w}-${Date.now()}`, who: w, item: id, at: Date.now() + 10*M}].slice(-30);
-  scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0); sfx("chime"); flash(`On its way to ${GIFT_NAME[w]}`); speak(`Tomo's pedalling a ${it.n.toLowerCase()} over to ${GIFT_NAME[w]} in the cool box. Watch your mailbox for a thank-you note.`, 5000);
+  scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0); sfx("chime"); flash(`On its way to ${villagerName(w)}`); speak(`Tomo's pedalling a ${it.n.toLowerCase()} over to ${villagerName(w)} in the cool box. Watch your mailbox for a thank-you note.`, 5000);
   scSt.vpick = null; scView = null; save(); ctx(); render();
 }
 // The Cocoa Room: beans to bars in the kitchen, bars off the wall at the counter; ticks along like the Scoop Shack
@@ -2619,7 +2601,7 @@ function wireCompanions(c){
   c.querySelectorAll("[data-adoptback]").forEach(b => b.onclick = () => { adoptSt = {}; ctx(); });
   c.querySelectorAll("[data-adoptat]").forEach(b => b.onclick = () => { const item = adoptItem, p = adoptPet(F, item, adoptSt.owner, b.dataset.adoptat); if (!p) return;
     adoptItem = null; adoptSt = {}; F.fam.gifts[p.owner] = (F.fam.gifts[p.owner] || 0) + 1; gainXp(2); sfx("chime"); act("cheer");
-    const where = PET_HOMES[p.scene].n.replace(/ \(.*\)$/, ""), who = OWNER_NAME[p.owner];
+    const where = PET_HOMES[p.scene].n.replace(/ \(.*\)$/, ""), who = ownerName(p.owner);
     if (giftPos(p.owner)) { const line = petFill(`A ${PETS[p.kind].n}! I'm calling it {p}!`, p); npcSay(p.owner, line); }
     else F.thanks = [...(F.thanks || []), {id: `thanks-${p.owner}-${Date.now()}`, who: p.owner, item, at: Date.now() + 10*M}].slice(-30);
     speak(`${p.name} the ${PETS[p.kind].n} is ${who}'s now, and lives at ${where}.${giftPos(p.owner) ? "" : ` ${who}'ll send a thank-you note.`} Tap ${p.name} there to say hello.`, 6000); done(); });
@@ -2777,19 +2759,18 @@ const PLACE_NAME = {greenhouse: "the greenhouse", mill: "the old mill", rd_stati
 const ACT_WORD = {water: "watering", farm: "gardening", sit: "sitting down", game: "gaming", sup: "paddleboarding", guide: "leading a tour", lead: "leading the class",
   exercise: "exercise class", cone: "with an ice cream", cook: "cooking", rest: "in the hammock", repair: "fixing things", type: "busy", play: "playing"};
 const placeName = sc => PLACE_NAME[sc] || (ROOMS[sc] && ROOMS[sc].name) || sc;
-const WHO_FAMILY = ["bo", "farid", "mei", "hana", "theo", "tomi", "posy"];
+// everyone who lives in Honeybrook, the ones you know best first, with their hearts
 function whosWhereHTML(){
   const day = dayKey(), t = sgHM(), hhmm = m => fmtTime(m);
   const row = n => { const sch = daySchedule(n.id, day), cur = sch.find(x => t >= x.from && t < x.to);
     const cls = classOn(day), word = a => a === "lead" && cls ? `leading ${cls.kind}` : a === "exercise" && cls && n.id !== "hana" ? `${cls.kind} with Hana` : ACT_WORD[a];
     const what = x => x.club ? "the wine club at the cellar door" : `${placeName(x.scene)}${x.act && word(x.act) ? ` (${word(x.act)})` : ""}`;
-    return `<details class="whowhere"><summary><b>${esc(n.name)}</b> <small class="muted">${cur ? `now: ${esc(what(cur))}` : "not about just now"}</small></summary>
+    const h = QB.hearts(F, n.id), hs = h ? ` <span class="hearts" aria-label="${h} of ${QB.MAX_HEARTS} hearts">${icon("heart", 11).repeat(h)}</span>` : "";
+    return `<details class="whowhere"><summary><b>${esc(n.name)}</b>${hs} <small class="muted">${cur ? `now: ${esc(what(cur))}` : "not about just now"}</small></summary>
       <ul>${sch.map(x => `<li class="${x === cur ? "now" : ""}"><span>${hhmm(x.from)}–${hhmm(x.to)}</span> ${esc(what(x))}</li>`).join("") || "<li>Not in the village today.</li>"}</ul></details>`; };
-  const fam = WHO_FAMILY.map(id => NPCS.find(n => n.id === id)).filter(Boolean);
-  const town = NPCS.filter(n => !WHO_FAMILY.includes(n.id) && !n.tourist && !n.kid && !n.local);
-  const gid = GU.guestHere(F, day), guest = gid && NPCS.find(n => n.id === gid);
+  const gid = GU.guestHere(F, day), guest = gid && NPCS.find(n => n.id === gid), town = QB.villagers(F).filter(n => n.id !== gid);
   const club = owns(F, "cellar") && wineClubOn(day);
-  return `<h3 class="ph3">Who's where today</h3>${club ? `<p class="muted">Wine club tonight at the cellar door, 6 to 9pm.</p>` : ""}${guest ? `<p class="eyebrow">Staying with you</p>${row(guest)}` : ""}<p class="eyebrow">Close friends</p>${fam.map(row).join("")}<p class="eyebrow" style="margin-top:10px">Around the village</p>${town.map(row).join("")}`;
+  return `<h3 class="ph3">Who's where today</h3>${club ? `<p class="muted">Wine club tonight at the cellar door, 6 to 9pm.</p>` : ""}${guest ? `<p class="eyebrow">Staying with you</p>${row(guest)}` : ""}<p class="eyebrow"${guest ? ' style="margin-top:10px"' : ""}>Around the village</p>${town.map(row).join("")}`;
 }
 // the dining table at a friend's house (or yours): pull out a chair and sit for a bit
 function sitAtTable(){
@@ -2840,7 +2821,7 @@ if (window.__mapleDevStub) window.__mapleIntro = i => introAt(i, {replay: true, 
 if (window.__mapleDevStub) window.__mapleScene = (id, at) => setScene(id, at || (OUTDOOR.includes(id) ? [260, 330] : INNER[id] ? INNER[id].arrive : [260, 596]));
 if (window.__mapleDevStub) window.__mapleOrder = (shop = "The Scoop Shack") => { S.orderAt = 0; scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0); orderNote([{shop: "scoop", coins: 6, what: "a cone of mango"}], shop, false); };   // tests: an order note, and Tomo riding past
 // dev builds only: test scripts read and nudge the save (the quest board tests give the backpack what a request needs)
-if (window.__mapleDevStub) window.__mapleGame = {F: () => F, S: () => S, near: () => { const n = nearestVillager(); return n ? n.def.id + ":" + Math.round(Math.hypot(n.x - mel.x, n.y - mel.y)) : npcActors().map(([, e]) => e.def.id + "@" + Math.round(e.x) + "," + Math.round(e.y) + " mel " + Math.round(mel.x) + "," + Math.round(mel.y)).join(";"); }, give: (id, n) => { addInv(id, n); save(true); }, render: () => render(true), handOver: who => offerHandOver(who), mail: () => ({paper: paperWaiting(), unread: unreadMail().map(m => m.id), atSpot}), items: () => ITEMS};
+if (window.__mapleDevStub) window.__mapleGame = {F: () => F, S: () => S, near: () => { const n = nearestVillager(); return n ? n.def.id + ":" + Math.round(Math.hypot(n.x - mel.x, n.y - mel.y)) : npcActors().map(([, e]) => e.def.id + "@" + Math.round(e.x) + "," + Math.round(e.y) + " mel " + Math.round(mel.x) + "," + Math.round(mel.y)).join(";"); }, give: (id, n) => { addInv(id, n); save(true); }, save: () => { resetNpcs(); save(true); }, render: () => render(true), handOver: who => offerHandOver(who), mail: () => ({paper: paperWaiting(), unread: unreadMail().map(m => m.id), atSpot}), items: () => ITEMS};
 /* ---------- Routine bonuses: 1 coin a checklist step, 5 for finishing a routine (a weekly one's step counts as
    finishing it). Each pays once a day: unticking and re-ticking earns nothing more. ---------- */
 const ROUTINE_STEP = 1, ROUTINE_DONE = 8;

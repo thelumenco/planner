@@ -1,19 +1,18 @@
 // Friday evenings (round 112). Aperitivo hour at the wine shop is in vineyard.js (sellTick) and tours.js (who drops
 // in). Here: the fishmonger's van at the bay (5 to 10pm: worms, clams, lemons; and it buys your catch at half as much
-// again), the week's lanterns at the bonfire at home (one paper lantern for every quest finished this week, released
-// over the house, once a Friday), and flying a kite on the field (any day, once you've bought one).
-import { esc, dayKey, prevDay } from "../util.js";
+// again), and flying a kite on the field (any day, once you've bought one).
+import { esc } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
 import { addBait, CATCH } from "./fishing.js";
 
 export const VAN_GOODS = {worms: {n: "Five worms", price: 6, line: "For the bait tin. Wriggly."}, clams: {n: "Clams", price: 4, line: "For clams with garlic and lemon, at the kitchen."}, lemon: {n: "Lemon", price: 3, line: "For the clams, or a lemon and petal posset."},
-  sardine: {n: "Three sardines", price: 9, line: "Fresh off the boat. Grill them on the bonfire at home."}};
+  sardine: {n: "Three sardines", price: 9, line: "Fresh off the boat. Three make grilled sardines at the kitchen."}};
 export const VAN_MULT = 1.5;
 export function vanBuy(F, id, addInv){
   const g = VAN_GOODS[id]; if (!g || F.coins < g.price) return null; F.coins -= g.price;
   if (id === "worms") { addBait(F, 5); return "Five worms, into the bait tin."; }
-  if (id === "sardine") { addInv("sardine", 3); return "Three sardines, wrapped in paper. For the bonfire tonight."; }
+  if (id === "sardine") { addInv("sardine", 3); return "Three sardines, wrapped in paper. Into your backpack."; }
   addInv(id, 1); return `${g.n === "Clams" ? "A bag of clams" : "A lemon"}, into your backpack.`;
 }
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
@@ -25,27 +24,6 @@ export function vanPanel(F){
   h += `<h3 class="ph3">Sell your catch</h3>` + (have.length ? `<p class="muted">Sal pays half as much again on a Friday.</p><ul class="hlist wlist">${have.map(x => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F.inv[x]}</b><small>${Math.round(ITEMS[x].sell*VAN_MULT*10)/10} coins each</small></span></li>`).join("")}</ul><div class="actions"><button class="btn primary small" data-salvan="sellall">Sell the lot · ${all} ${coin()}</button></div>` : `<p class="muted">Nothing in your backpack to sell. Catch something and come back: Sal pays well on a Friday.</p>`);
   return h + shut;
 }
-// quests finished this week (the last seven days, today included), from F.history
-export function weekQuests(F, day = dayKey()){ let n = 0, d = day; for (let i = 0; i < 7; i++) { n += ((F.history || {})[d] || {}).q || 0; d = prevDay(d); } return n; }
-export const lanternsDone = (F, day = dayKey()) => (F.fri || {}).lanterns === day;
-export function releaseLanterns(F, day = dayKey()){ if (lanternsDone(F, day)) return null; F.fri = Object.assign(F.fri || {}, {lanterns: day}); return weekQuests(F, day); }
-// round 114: grill your fish on the bonfire (sardines from Sal or your own catch, and red mullet), once a Friday
-export const GRILL = ["sardine", "mullet"], GRILL_MAX = 6;
-export const grilledToday = (F, day = dayKey()) => (F.fri || {}).grill === day;
-export const grillable = F => GRILL.reduce((a, id) => a + ((F.inv || {})[id] || 0), 0);
-export function grillFish(F, day = dayKey()){
-  if (grilledToday(F, day) || !grillable(F)) return null;
-  let left = GRILL_MAX, n = 0; GRILL.forEach(id => { const k = Math.min(left, F.inv[id] || 0); if (!k) return; F.inv[id] -= k; if (F.inv[id] <= 0) delete F.inv[id]; left -= k; n += k; });
-  F.fri = Object.assign(F.fri || {}, {grill: day}); return n;
-}
-export function bonfirePanel(F, family){
-  const n = weekQuests(F), done = lanternsDone(F), fish = grillable(F), grilled = grilledToday(F);
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>The bonfire</h2><p class="sub">The firepit at the bottom of the garden, crackling away, the river going dark.${family ? ` ${esc(family)}.` : ""}</p>
-    <p>${done ? "The week's lanterns are already up and away over the house." : n ? `<b>${n} quest${n > 1 ? "s" : ""}</b> finished this week: a paper lantern for each.` : "No quests this week. That's alright: one lantern anyway, for getting through it."}</p>
-    <p class="muted">${grilled ? "The fish are eaten. Just the smell of the grill left, and happy faces." : fish ? `${fish} fish in your backpack for the grill.` : "Nothing to grill. Sal's van at the bay sells sardines, or catch some at sunset."}</p>
-    <div class="actions">${done ? "" : `<button class="btn primary" data-fire="lanterns">Release the week's lanterns</button>`}${!grilled && fish ? `<button class="btn primary" data-fire="grill">Grill the fish</button>` : ""}<button class="btn alt" data-fire="sit">Sit by the fire</button></div>` + shut;
-}
-
 /* ---------- round 113: the Friday market and movie night, on the field (where the Sunday market stands) ---------- */
 import { POOLS, GOODS as STALL_GOODS } from "../data/stall-goods.js";
 import { MARKET, NIGHT, bayKeepers } from "./tours.js";

@@ -344,20 +344,13 @@ export function shoreSlot(id, day, hm){
   return groupFor(day + ":sup", we ? 2 : 1, busy, TOURISTS).includes(id) ? {from, to, scene: "shore", wander: SUP_SEA, act: "sup", free: true} : null;
 }
 
-// Round 112: Friday evenings. Aperitivo hour at the wine shop (4:30 to 7), the fishmonger's van at the bay (5 to 10)
-// and the bonfire (7 to 10) at the firepit at home, with your friends round it.
-export const APERITIVO = [16*60 + 30, 19*60], VAN = [17*60, 22*60], BONFIRE = [19*60, 22*60];
+// Round 112: Friday evenings. Aperitivo hour at the wine shop (4:30 to 7) and the fishmonger's van at the bay (5 to 10).
+export const APERITIVO = [16*60 + 30, 19*60], VAN = [17*60, 22*60];
 const isFri = day => dow(day) === 5;
 export const aperitivoNow = (day, hm) => isFri(day) && hm >= APERITIVO[0] && hm < APERITIVO[1];
 export const vanNow = (day, hm) => isFri(day) && hm >= VAN[0] && hm < VAN[1];
-export const bonfireNow = (day, hm) => isFri(day) && hm >= BONFIRE[0] && hm < BONFIRE[1];
-// the bonfire is the firepit at home (base scene, bottom of the garden)
-export const FIRE = [276, 608];
-// round the fire: along the back and the sides (nobody in front of the flames); Tomi and Posy on the bench
-const LOGS = {theo: [[224, 612], 1], hana: [[242, 584], 1], farid: [[276, 572], 1], mei: [[310, 584], -1], tomi: [[340, 604], -1], posy: [[364, 604], -1]};
-const BONFIRE_FAMILY = {theo: 19*60, hana: 19*60, mei: 19*60, farid: 19*60, tomi: 19*60 + 30, posy: 19*60 + 30};
-// Round 113: movie night on the field, the last Friday of the month, 7:30 to 9:30 (everyone's on the blankets
-// instead of round the bonfire that night); and a little Friday market on the field, 4:30 to 7:15 (a quarter of an hour before the film): three stalls with a
+// Round 113: movie night on the field, the last Friday of the month, 7:30 to 9:30 (everyone's on the
+// blankets); and a little Friday market on the field, 4:30 to 7:15 (a quarter of an hour before the film): three stalls with a
 // different mix every week, and Hiro selling kites on the beach.
 export const MOVIE = [19*60 + 30, 21*60 + 30], BAYMKT = [16*60 + 30, 19*60 + 15];   // the market packs up a quarter of an hour before the film
 export const lastFriday = day => { const dt = new Date(day + "T00:00:00Z"); return dt.getUTCDay() === 5 && new Date(dt.getTime() + 7*864e5).getUTCMonth() !== dt.getUTCMonth(); };
@@ -382,11 +375,6 @@ export function bayMarketSlot(id, day, hm){
   if (id === "hiro") return {from: BAYMKT[0], to: BAYMKT[1], scene: "field", at: KITE_SELLER, dir: -1, act: "kites"};
   const k = bayKeepers(day).indexOf(id); if (k < 0) return null;
   const [x, y] = BAY_STALLS[k]; return {from: BAYMKT[0], to: BAYMKT[1], scene: "field", at: [x + 3, y - 9], dir: 1};
-}
-export function bonfireSlot(id, day, hm){
-  if (!bonfireNow(day, hm) || awayToday(day).includes(id)) return null;
-  const from = BONFIRE_FAMILY[id]; if (from == null || hm < from) return null;
-  const [at, dir] = LOGS[id]; return {from, to: BONFIRE[1], scene: "base", at, act: id === "theo" ? "guitar" : "sit", dir, bonfire: true};
 }
 // where each house's dining table stands: cx = centre, fy = the front edge of the table on the floor; tap it to sit
 // down at the front (the middle chair along the front row, data/dining.js)

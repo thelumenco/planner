@@ -65,7 +65,7 @@ const ING = {trout: ["Rainbow trout", 4, "with almond butter, at the kitchen"], 
   sardine: ["Sardine", 2, "three on the grill, at the kitchen"], mackerel: ["Mackerel", 3, "escabeche with peppers, at the kitchen"],
   seabream: ["Sea bream", 5, "baked with olives, at the kitchen"], squid: ["Squid", 4, "fried calamari, at the kitchen"], octopus: ["Octopus", 6, "pulpo a la gallega, at the kitchen"], shrimp: ["Shrimp", 2, "gambas al ajillo with garlic and olive oil, at the kitchen"],
   anchovy: ["Anchovy", 1, "fried and stuffed at the kitchen, or salted in the loft for weeks of flavour"],
-  mullet: ["Red mullet", 6, "grill it on the bonfire at home, or Sal pays well for it"], tuna: ["Bluefin tuna", 30, "an enormous fish: Sal will pay a fortune"]};
+  mullet: ["Red mullet", 6, "Sal pays well for it on a Friday"], tuna: ["Bluefin tuna", 30, "an enormous fish: Sal will pay a fortune"]};
 Object.entries(ING).forEach(([id, [n, sell, what]]) => { if (!ITEMS[id]) ITEMS[id] = {n, ico: id, kind: "ingredient", sell, what}; });
 
 export const ROD = 80, REEL = 400, BAIT_DAY = 3, BAIT_MAX = 20;

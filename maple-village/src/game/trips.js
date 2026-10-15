@@ -3,14 +3,16 @@
 // while they're away and follow you round the town; everyone else carries on as normal. The trip ends when you
 // come home, at the last train, or when the day changes.
 // State: F.trip = {town, day, party: [ids], from: minutes, done?: true}.
-import { esc, dayKey, sgHM } from "../util.js";
+import { esc, dayKey, sgHM, hash } from "../util.js";
 import { icon } from "../art/icons.js";
 import { TOWNS, townOf } from "../data/towns.js";
 import { NPCS } from "../data/npcs.js";
 import { setAway } from "./tours.js";
+import { friendIds, TRIP_HEARTS } from "./quests.js";
 
-// who can come, in the picker's order: your closest friends in the village
-export const FAMILY = ["hana", "theo", "farid", "mei", "bo", "tomi", "posy"];
+// who can come, in the picker's order: anyone in the village at five hearts, the ones you know best first
+export const tripFriends = F => friendIds(F, TRIP_HEARTS);
+export const NOBODY = "Nobody's close enough to come along yet. Friends at five hearts can join you on a day trip.";
 export const nameOf = id => ((NPCS.find(n => n.id === id) || {}).name || id);
 const fmt = m => `${Math.floor(m/60) % 12 || 12}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m < 12*60 ? "am" : "pm"}`;
 
@@ -25,7 +27,7 @@ export const canLeave = (town, hm = sgHM()) => hm >= TOWNS[town].outFrom && hm <
 export const canReturn = (town, hm = sgHM()) => hm < TOWNS[town].backTo;
 export function buyTrip(F, town, party, hm = sgHM(), by = "train"){
   const t = TOWNS[town]; if (!t || !canLeave(town, hm) || tripOn(F) || (by === "ferry" && !t.ferry)) return null;
-  party = FAMILY.filter(id => party.includes(id)); const cost = fareFor(town, party, by); if (F.coins < cost) return null;
+  party = tripFriends(F).filter(id => party.includes(id)); const cost = fareFor(town, party, by); if (F.coins < cost) return null;
   F.coins -= cost; F.trip = {town, day: dayKey(), party, from: hm, by}; F.towns = {...(F.towns || {}), [town]: F.towns && F.towns[town] || dayKey()};   // F.towns: where you've been (first visit), round 132
   return {cost, town: t, by};
 }
@@ -35,11 +37,15 @@ export function endTrip(F){ if (F.trip && !F.trip.done) F.trip.done = true; }
 // (a getter: the save can be swapped for a fresher copy from the cloud)
 export function initTrips(getF){ setAway(day => { const F = getF(); return F ? awayOn(F, day) : []; }); }
 
+// someone with no spots of their own here (only the first friends to come along have them) borrows a set nobody
+// else in the party is using, so they still keep to the paths
+const borrow = (T, party, id, scene) => { const ks = Object.keys(T.spots || {}).filter(k => T.spots[k][scene]), free = ks.filter(k => !party.includes(k)), pool = free.length ? free : ks;
+  return pool.length ? T.spots[pool[hash(id) % pool.length]][scene] : null; };
 // A party member's slot while the trip's on: wherever the player is in the town (or the station, if they're not there yet),
 // near their favourite spot on that screen. Not in Honeybrook at all, including while the player's on the train.
 export function tripSlot(F, id, day, hm, melScene){
   const t = tripOn(F, day); if (!t || !t.party.includes(id) || hm < t.from) return null;
-  const T = TOWNS[t.town], scene = townOf(melScene) === t.town ? melScene : t.by === "ferry" && T.ferry ? T.ferry.arrive[0] : T.arrive[0], spots = (T.spots[id] || {})[scene] || ((T.rooms || {})[scene] || {}).party;   // (inside, the room's own spots)
+  const T = TOWNS[t.town], scene = townOf(melScene) === t.town ? melScene : t.by === "ferry" && T.ferry ? T.ferry.arrive[0] : T.arrive[0], spots = (T.spots[id] || {})[scene] || ((T.rooms || {})[scene] || {}).party || borrow(T, t.party, id, scene);   // (inside, the room's own spots)
   // at their spot doing their thing (in its hours), else strolling; the slot starts when the act starts or stops,
   // so they walk over (glide) rather than popping
   const a = ((T.acts || {})[id] || {})[scene], w = a && (a.hours ? a.hours.find(([f, e]) => hm >= f && hm < e) : [t.from, T.backTo]);
@@ -47,19 +53,19 @@ export function tripSlot(F, id, day, hm, melScene){
   const ended = a && a.hours ? Math.max(t.from, ...a.hours.map(([, e]) => e).filter(e => e <= hm)) : t.from;
   return {from: ended, to: T.backTo, scene, wander: spots || [[260, 400], [300, 360]], follow: true, glide: true, trip: true};
 }
-// a town line for a family member (tapping them in town, or the odd remark)
+// a town line for a party member (null for anyone without one: they say their usual things) (tapping them in town, or the odd remark)
 export const townLine = (F, id, scene) => { const town = townOf(scene), t = town && TOWNS[town]; return t && t.lines[id] ? t.lines[id] : null; };
 
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 const coin = () => icon("coin", 13);
 // The ticket window (Honeybrook station): where to, and who's coming
 export function ticketPanel(F, pick, town = "ronda", hm = sgHM(), by = "train"){
-  const t = TOWNS[town], party = FAMILY.filter(id => pick.includes(id)), cost = fareFor(town, party, by), open = canLeave(town, hm), on = tripOn(F), boat = by === "ferry", fare = boat ? t.ferry.fare : t.fare, ride = boat ? "ferry" : "train";
+  const t = TOWNS[town], who = tripFriends(F), party = who.filter(id => pick.includes(id)), cost = fareFor(town, party, by), open = canLeave(town, hm), on = tripOn(F), boat = by === "ferry", fare = boat ? t.ferry.fare : t.fare, ride = boat ? "ferry" : "train";
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${boat ? "The ferry" : "Tickets"} to ${esc(t.n)}</h2>${boat ? "" : `<div class="gchips">${Object.entries(TOWNS).filter(([, x]) => x.by !== "van").map(([k, x]) => `<button class="gchip${k === town ? " on" : ""}" data-ttown="${k}" aria-pressed="${k === town}"><span>${esc(x.n)}</span></button>`).join("")}</div>`}<p class="sub">${esc(boat ? "Across the sea to Jeju: a slower crossing than the train over the sea bridge, but there are dolphins. Come home by ferry or by train, whichever you like." : t.blurb)}</p>
     <p class="muted">${fare} ${coin()} return a person. ${boat ? "Ferries" : "Trains"} out ${fmt(t.outFrom)} to ${fmt(t.outTo)}; the last ${ride} home leaves ${esc(t.n)} at ${fmt(t.backTo)}. A day trip: you'll be home tonight.</p>`;
   if (on) return h + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut;
   if (!open) return h + `<p><b>${hm < t.outFrom ? `The first ${ride} to ${esc(t.n)} is at ${fmt(t.outFrom)}.` : `That's the last ${ride} to ${esc(t.n)} gone for today. Tomorrow!`}</b></p>` + shut;
-  h += `<h3 class="ph3">Who's coming?</h3><div class="trippicks">${FAMILY.map(id => `<button class="tpick${party.includes(id) ? " on" : ""}" data-tpick="${id}" aria-pressed="${party.includes(id)}"><b>${esc(nameOf(id))}</b><small>${t.free.includes(id) ? "free" : `${fare} ${coin()}`}</small></button>`).join("")}</div>`;
+  h += `<h3 class="ph3">Who's coming?</h3>${who.length ? "" : `<p class="muted">${NOBODY}</p>`}<div class="trippicks">${who.map(id => `<button class="tpick${party.includes(id) ? " on" : ""}" data-tpick="${id}" aria-pressed="${party.includes(id)}"><b>${esc(nameOf(id))}</b><small>${t.free.includes(id) ? "free" : `${fare} ${coin()}`}</small></button>`).join("")}</div>`;
   h += `<p class="muted">${party.length ? `You${party.map(id => ", " + esc(nameOf(id))).join("").replace(/, ([^,]*)$/, " and $1")}: ${party.filter(id => !t.free.includes(id)).length + 1} ticket${party.filter(id => !t.free.includes(id)).length ? "s" : ""}.` : `Just you (and ${esc(F.name)}, who rides in your bag).`} They'll take the day off from whatever they usually do.</p>`;
   h += `<div class="actions"><button class="btn primary" data-trip="${town}" data-by="${by}" ${F.coins >= cost ? "" : "disabled"}>Buy tickets and go · ${cost} ${coin()}</button></div>`;
   return h + shut;

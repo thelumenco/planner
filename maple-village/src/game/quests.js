@@ -12,8 +12,11 @@
 //   reqs:[{id, who, item, n, each, posted, due}], lastPost, hearts:{who: n}, seen:{item: true}, letters:[...], story:{who: day}}
 import { esc, dayKey, prevDay, hash } from "../util.js";
 import { ITEMS, CROPS, seasonOf } from "../data/items.js";
+import { NPCS } from "../data/npcs.js";
 
 export const TASK_PAY = 3, PAID_PER_DAY = 10, MAX_REQ = 3, MAX_HEARTS = 5;
+// closeness is hearts: friends (3+) can be sent presents and Christmas hampers; at 5 they'll come on a day trip
+export const FRIEND_HEARTS = 3, TRIP_HEARTS = 5;
 const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const addDays = (k, n) => new Date(Date.parse(k + "T00:00:00Z") + n*864e5).toISOString().slice(0, 10);
 const dow = k => new Date(k + "T00:00:00Z").getUTCDay();
@@ -132,6 +135,10 @@ function newRequest(F, people, day, k){
 }
 export const requestFrom = (F, who) => board(F).reqs.find(r => r.who === who) || null;
 export const hearts = (F, who) => Math.min(MAX_HEARTS, board(F).hearts[who] || 0);
+// the people who live in Honeybrook (not visitors, day-trip locals or children), the ones you know best first
+export const villagers = (F, min = 0) => NPCS.filter(n => !n.tourist && !n.local && !n.kid && hearts(F, n.id) >= min)
+  .sort((a, b) => hearts(F, b.id) - hearts(F, a.id) || a.name.localeCompare(b.name));
+export const friendIds = (F, min = FRIEND_HEARTS) => villagers(F, min).map(n => n.id);
 // Hand a request over: the items leave the backpack, coins and a heart come in. -> {coins, hearts, gift?, letter?} or null
 export function handOver(F, who, takeInv, giveInv, day = dayKey()){
   const b = board(F), r = requestFrom(F, who); if (!r || (F.inv[r.item] || 0) < r.n) return null;

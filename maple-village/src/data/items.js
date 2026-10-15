@@ -136,7 +136,7 @@ export const ITEMS = {
   grassjelly:{n:"Grass jelly drink", kind:"gift", to:["mei", "farid", "theo", "hana"], price:3, tab:"night", say:"Grass jelly! Very cooling.",
     says:{farid:"Grass jelly! Very cooling on a hot day.", mei:"Grass jelly! I loved this when I was young."}},
   // Sunday farmers market specials (tab "market": only sold at the market stalls, never at Hana's). Gifts for friends:
-  // to "family" goes to whichever of your friends is nearest; a list names who it suits.
+  // to "family" can go to any friend (three hearts or more); a list names who it suits.
   // says: what each one says (falls back to say)
   honey:{n:"Jar of wildflower honey", kind:"gift", to:"family", price:8, tab:"market", say:"Wildflower honey! Straight from the bees.",
     says:{bo:"Proper honey. That's going in my tea.", farid:"Honey! I'll make honey lemon. And a honey cake. Probably two.", mei:"Raw honey? This one is the real thing.",

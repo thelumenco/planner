@@ -14,7 +14,7 @@ import { openOn as cocoaOpen, OPEN as CC_OPEN, CLOSE as CC_CLOSE } from "./cocoa
 import { keeperOn as giftOpen, GIFT_HOURS } from "./giftshop.js";
 import { millSlot } from "./millcraft.js";
 import { MILL_VISITORS } from "../data/mill-people.js";
-import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dateSlot, clubSlot, discoSlot, scoopSlot, workshopSlot, trainSlot, letSlot, bonfireSlot, movieSlot, bayMarketSlot } from "./tours.js";
+import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dateSlot, clubSlot, discoSlot, scoopSlot, workshopSlot, trainSlot, letSlot, movieSlot, bayMarketSlot } from "./tours.js";
 import { SEA } from "../data/npcs.js";
 import { findPath, blocked } from "./paths.js";
 import { tripSlot, townLine } from "./trips.js";
@@ -46,7 +46,7 @@ const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw 
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 const routineNow = def => routineAt(def, dayKey(), sgHM());
 export function slotAt(def, day, t, live){
-  return (api && guestSlot(api.F(), def.id, day, t)) || (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || lunchSlot(def.id, day, t, terraceBuilt()) || occasionSlot(def.id, day, t, terraceBuilt()) || millSlot(def.id, day, t, millShopOpen(), MILL_VISITORS, []) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || (cellarBuilt() && discoSlot(def.id, day, t)) || movieSlot(def.id, day, t) || bonfireSlot(def.id, day, t) || bayMarketSlot(def.id, day, t) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
+  return (api && guestSlot(api.F(), def.id, day, t)) || (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || lunchSlot(def.id, day, t, terraceBuilt()) || occasionSlot(def.id, day, t, terraceBuilt()) || millSlot(def.id, day, t, millShopOpen(), MILL_VISITORS, []) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || (cellarBuilt() && discoSlot(def.id, day, t)) || movieSlot(def.id, day, t) || bayMarketSlot(def.id, day, t) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
     || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || iceOk(shopSlot(def.id, day, t), def, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || letSlot(def.id, day, t) || routineAt(def, day, t);
 }
 // round 181: shoppers you can see in the Cocoa Room (day tourists) and the gift shop (the night-market folk, by day)

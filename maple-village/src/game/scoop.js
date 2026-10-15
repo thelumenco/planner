@@ -372,7 +372,7 @@ export function deliverPanel(F, st){
   if (!r) return h + `<ul class="hlist wlist">${tubs.map(x => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops${x.dairy ? "" : " · dairy-free"}</small></span><button class="btn small primary" data-gvpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
   const fmt = FORMATS[st.fmt] ? st.fmt : "cone";
   h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p><div class="gchips">${Object.keys(FORMATS).map(f => `<button class="gchip${f === fmt ? " on" : ""}" data-gvfmt="${f}" aria-pressed="${f === fmt}"><span>${FORMATS[f].n}</span></button>`).join("")}</div>`;
-  h += `<p class="eyebrow" style="margin:10px 0 6px">Send it to</p><div class="actions">${(st.who || []).filter(([w]) => !r.dairy || w !== "tomi").map(([w, n]) => `<button class="btn small alt" data-gvto="${w}">${esc(n)}</button>`).join("")}</div>`;
+  h += `<p class="eyebrow" style="margin:10px 0 6px">Send it to</p>${(st.who || []).length ? "" : `<p class="muted">Nobody's at three hearts yet. Friends can have one sent round; anyone can be given one in person.</p>`}<div class="actions">${(st.who || []).filter(([w]) => !r.dairy || w !== "tomi").map(([w, n]) => `<button class="btn small alt" data-gvto="${w}">${esc(n)}</button>`).join("")}</div>`;
   return h + `<div class="actions"><button class="btn alt small" data-gvback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export function counterPanel(F, st){

@@ -9,6 +9,8 @@ import { ITEMS } from "../data/items.js";
 import { XMAS_LIT, xmasOn, carolsNow, grottoOn, grottoNow, lanternWalkNow, GROTTO } from "./tours.js";
 import { hash } from "../util.js";
 import { dearMe } from "./me.js";
+import { villagers, FRIEND_HEARTS } from "./quests.js";
+import { NPCS } from "../data/npcs.js";
 
 export function xmasState(F){ F.xmas = F.xmas || {}; const x = F.xmas; x.lit = x.lit || {}; x.treats = x.treats || 0; return x; }
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
@@ -186,39 +188,48 @@ export function grottoVisit(F, day){
 }
 
 /* ---------- round 174: posting hampers, and orders ---------- */
-// Penny posts a hamper to one of the three households of friends, a villager, or a friend from the campervan trips
-// (once you've met them there). The households write back (ten minutes), villagers (half an hour; now and then they want one for someone else), friends
-// far away the next day, with a postcard and a little something from where they live.
+// Penny posts a hamper to a friend in the village (anyone at three hearts or more, one each), one of the regulars
+// below, or a friend from the campervan trips (once you've met them there). Friends write back in ten minutes,
+// villagers in half an hour (now and then they want one for someone else), friends far away the next day, with a
+// postcard and a little something from where they live.
 export const RECIPS = [
-  {id: "hanatheo", n: "Hana and Theo", kind: "family"}, {id: "mamagg", n: "Farid and Mei", kind: "family"}, {id: "marcusang", n: "Tomi and Posy", kind: "family"},
   {id: "okada", n: "Mr Okada", kind: "village"}, {id: "juniper", n: "Juniper", kind: "village"}, {id: "opal", n: "Opal", kind: "village"}, {id: "celeste", n: "Celeste", kind: "village"}, {id: "lin", n: "Lin", kind: "village"},
   {id: "bvkel", n: "Kel at the Cellar Door", kind: "friend", stop: "bv_cellar", gift: "b_print", sign: "Cheers, Kel", body: i => `G'day!\n\nYour hamper made it all the way to the Cellar Door! The ${i} went down a treat with the team at smoko. I've popped a print of the valley in the post, so you don't forget us.`},
   {id: "crwin", n: "Win at the lighthouse", kind: "friend", stop: "bv_lighthouse", gift: "b_chime", sign: "Warmly, Win", body: i => `Dear friend,\n\nThe postman carried your hamper up the lighthouse steps, puffing all the way. The ${i} is on the tearoom counter for everyone to admire. Here's a little shell wind chime for your window.`},
   {id: "tlkirra", n: "Kirra at Misty Falls", kind: "friend", stop: "bv_falls", gift: "b_seedpod", sign: "Kirra", body: i => `Hey there,\n\nHamper landed at the ranger station! Shared it round at lunch and the ${i} was gone in minutes. Here's a seed pod from the falls track. Plant it somewhere warm.`},
   {id: "lvarnaud", n: "Madame Arnaud at Rosehill", kind: "friend", stop: "bv_perfume", gift: "b_lavbunch", sign: "Avec affection, Madame Arnaud", body: i => `Bonjour, my friend,\n\nYour hamper arrived at Rosehill. The ${i}: magnifique. I send you a bunch of our lavender, dried in the old barn. Put it under your pillow.`}];
-export const recipsFor = F => RECIPS.filter(r => r.kind !== "friend" || !!(F.bellbird && F.bellbird.stamps && F.bellbird.stamps[r.stop]));
-const FAM_NOTE = {
-  hanatheo: (i, hp) => hp.season === "mothers" ? `Dear friend,\n\nA Mother's Day hamper! Lilac ribbon and everything. I mother the whole market, love, so I'll take it. The ${i} is by my bed and Theo's been told it's mine, all mine.\n\nLove, Hana xx (Theo says hello, officially)`
-    : hp.season === "valentine" ? `Dear friend,\n\nA Valentine's hamper for two old married folk! Theo's pretending it was his idea. We had the ${i} with a cup of tea, like teenagers.\n\nLove, Hana and Theo xx`
-    : `Dear friend,\n\nThe hamper came this morning! Theo had the ${i} open before I'd even read the tag, and he's usually such a stickler for procedure. We're saving the rest for Christmas Eve, if he lets us.\n\nLove, Hana and Theo xx`,
-  mamagg: (i, hp) => `Dear friend,\n\nWhat a basket! Mei carried it in like a trophy. I'm keeping the ${i} for tea at three, when everyone comes over. You work too hard, you know. Thank you, truly.\n\nFarid (and Mei, who says thank you too)`,
-  marcusang: (i, hp) => `Hey!\n\nThe ${hp.name} hamper arrived. Posy has claimed the ${i}${hp.items.some(x => /^chz_/.test(x)) ? " (and the cheese, obviously: she says it's for my own good)" : ""}. I've claimed the basket. Thank you, seriously.\n\nTomi and Posy`};
+const close = n => ({id: n.id, n: n.name, kind: "close"});
+// who a hamper can go to: friends first, the ones you know best at the top, then the regulars, then far-off friends
+export const recipsFor = F => { const fr = villagers(F, FRIEND_HEARTS), ids = fr.map(n => n.id);
+  return [...fr.map(close), ...RECIPS.filter(r => r.kind === "village" ? !ids.includes(r.id) : !!(F.bellbird && F.bellbird.stamps && F.bellbird.stamps[r.stop]))]; };
+// (a reply addressed to anyone else, such as a household from an older save, is skipped)
+const recipOf = (F, id) => { const r = recipsFor(F).find(x => x.id === id) || RECIPS.find(x => x.id === id), n = NPCS.find(x => x.id === id && !x.tourist && !x.local && !x.kid);
+  return r || (n ? close(n) : null); };
+const seasonLine = hp => hp.season === "valentine" ? "Happy Valentine's Day!" : hp.season === "mothers" ? "Happy Mother's Day to you, too!" : "Merry Christmas to you and yours!";
+// thank-you notes from friends: a few of their own, and a warm one for anyone else
+const CLOSE_NOTE = {
+  hana: (i, hp) => hp.season === "mothers" ? `Dear friend,\n\nA Mother's Day hamper! Lilac ribbon and everything. I mother the whole market, love, so I'll take it. The ${i} is by my bed and Theo's been told it's mine, all mine.\n\nLove, Hana xx`
+    : hp.season === "valentine" ? `Dear friend,\n\nA Valentine's hamper! Theo's pretending it was his idea. We had the ${i} with a cup of tea, like teenagers.\n\nLove, Hana xx`
+    : `Dear friend,\n\nThe hamper came this morning! Theo had the ${i} open before I'd even read the tag, and he's usually such a stickler for procedure. I'm saving the rest for Christmas Eve, if he lets me.\n\nLove, Hana xx`,
+  farid: (i, hp) => `Dear friend,\n\nWhat a basket! Mei carried it in like a trophy. I'm keeping the ${i} for tea at three, when everyone comes over. You work too hard, you know. Thank you, truly.\n\nFarid`,
+  tomi: (i, hp) => `Hey!\n\nThe ${hp.name} hamper arrived. Posy has claimed the ${i}${hp.items.some(x => /^chz_/.test(x)) ? " (and the cheese, obviously: she says it's for my own good)" : ""}. I've claimed the basket. Thank you, seriously.\n\nTomi`};
+const closeNote = (F, r, i, hp) => CLOSE_NOTE[r.id] ? CLOSE_NOTE[r.id](i, hp) : `${dearMe(F)},\n\nA hamper, all for me! The ${i} is on the kitchen table where I can see it, and I keep smiling at it. Thank you for thinking of me. ${seasonLine(hp)}\n\n${r.n}`;
 const firstName = hp => { const it = hp.items.find(x => typeof x === "string") || hp.items[0]; return (typeof it === "object" ? `bottle of ${it.wine}` : (ITEMS[it] || {n: "treats"}).n).replace(/^(A|An) /, "").toLowerCase(); };
 export function sendHamper(F, id, to, now){
-  const r = RECIPS.find(x => x.id === to), hp = (xmasState(F).hampers || []).find(h => h.id === id); if (!r || !hp || !((F.inv || {})[id] > 0)) return null;
+  const r = recipsFor(F).find(x => x.id === to), hp = (xmasState(F).hampers || []).find(h => h.id === id); if (!r || !hp || !((F.inv || {})[id] > 0)) return null;
   F.inv[id]--; if (F.inv[id] <= 0) delete F.inv[id];
-  const x = xmasState(F), M = 60000, at = now + (r.kind === "family" ? 10*M : r.kind === "village" ? 30*M : 864e5);
+  const x = xmasState(F), M = 60000, at = now + (r.kind === "close" ? 10*M : r.kind === "village" ? 30*M : 864e5);
   x.replies = [...(x.replies || []), {id: `hreply-${to}-${now}`, to, hamper: id, at, order: r.kind === "village" && hash(id + to) % 2 === 0}].slice(-40);
   x.sent = (x.sent || 0) + 1; return {r, hp};
 }
 export function hamperMail(F, now){
-  return (xmasState(F).replies || []).filter(p => p.at <= now).map(p => { const r = RECIPS.find(x => x.id === p.to) || {n: "someone"}, hp = (xmasState(F).hampers || []).find(h => h.id === p.hamper) || {name: "Honeybrook", items: []}, i = firstName(hp);
-    const body = r.kind === "family" ? FAM_NOTE[r.id](i, hp) : r.kind === "friend" ? `${r.body(i)}\n\n${r.sign}` : `${dearMe(F)},\n\nWhat a lovely surprise on my doorstep! The ${i} is already open. ${hp.season === "valentine" ? "Happy Valentine's!" : hp.season === "mothers" ? "Happy Mother's Day to you, too!" : "Merry Christmas to you and yours!"}${p.order ? "\n\nP.S. Could you make one for my sister? I've pinned a note up at the post office." : ""}\n\n${r.n}`;
+  return (xmasState(F).replies || []).filter(p => p.at <= now && recipOf(F, p.to)).map(p => { const r = recipOf(F, p.to), hp = (xmasState(F).hampers || []).find(h => h.id === p.hamper) || {name: "Honeybrook", items: []}, i = firstName(hp);
+    const body = r.kind === "close" ? closeNote(F, r, i, hp) : r.kind === "friend" ? `${r.body(i)}\n\n${r.sign}` : `${dearMe(F)},\n\nWhat a lovely surprise on my doorstep! The ${i} is already open. ${hp.season === "valentine" ? "Happy Valentine's!" : hp.season === "mothers" ? "Happy Mother's Day to you, too!" : "Merry Christmas to you and yours!"}${p.order ? "\n\nP.S. Could you make one for my sister? I've pinned a note up at the post office." : ""}\n\n${r.n}`;
     return {id: p.id, from: "postie", at: p.at, title: r.kind === "friend" ? `A postcard from ${r.n.replace(/ at .*$/, "")}` : `Thank you from ${r.n}`, body}; });
 }
 // arrived replies whose little something (friends) or new order (villagers) hasn't been handed over yet
 export function collectReplies(F, now){ const x = xmasState(F), out = [];
-  (x.replies || []).filter(p => p.at <= now && !p.done).forEach(p => { p.done = true; const r = RECIPS.find(y => y.id === p.to) || {};
+  (x.replies || []).filter(p => p.at <= now && !p.done).forEach(p => { p.done = true; const r = recipOf(F, p.to) || {};
     if (r.gift) { F.inv = F.inv || {}; F.inv[r.gift] = (F.inv[r.gift] || 0) + 1; out.push({gift: r.gift, from: r.n}); }
     if (p.order) { x.orders = [...(x.orders || []), mkOrder(p.id, r.n.replace(/^Mr /, "Mr ") + "'s sister", hash(p.id))]; out.push({order: true, from: r.n}); } });
   return out; }
