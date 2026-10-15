@@ -23,17 +23,18 @@ import { PEN_JC } from "../data/pen-jc.js";
 import { PEN_SW } from "../data/pen-sw.js";
 import { PEN_PV } from "../data/pen-pv.js";
 import { PEN_PI } from "../data/pen-pi.js";
+import { PEN_BA } from "../data/pen-ba.js";
 
 const D = 24*60*60*1000;
-export const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_JL, ...PEN_RK, ...PEN_JC, ...PEN_SW, ...PEN_PV, ...PEN_PI};   // round 208: Saltwick Harbour   // round 192: Ronda, Kyoto, Jeju, Cinque Terre   // round 191: the Coast Road and the Tablelands
-export const REGIONS = {bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", saltwick: "Saltwick Harbour", porto: "Portovenere", puffin: "Puffin Isle"};
+export const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_JL, ...PEN_RK, ...PEN_JC, ...PEN_SW, ...PEN_PV, ...PEN_PI, ...PEN_BA};   // round 208: Saltwick Harbour   // round 192: Ronda, Kyoto, Jeju, Cinque Terre   // round 191: the Coast Road and the Tablelands
+export const REGIONS = {bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", saltwick: "Saltwick Harbour", porto: "Portovenere", puffin: "Puffin Isle", bali: "Bali"};
 // what a parcel costs to post, and how many days the reply takes (a letter's free)
-export const POSTAGE = {bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8, saltwick: 2, porto: 4, puffin: 2};
+export const POSTAGE = {bellbird: 2, coast: 2, tablelands: 4, lavender: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8, saltwick: 2, porto: 4, puffin: 2, bali: 8};
 const DAYS = {2: 1, 4: 2, 8: 3};
 const HELD = [];   // (round 192: Jason and Luca are in, with Mel's blessing)
 const REGION = {};
 [[BB_PEOPLE, "bellbird"], [CR_PEOPLE, "coast"], [TL_PEOPLE, "tablelands"], [LV_PEOPLE, "lavender"]].forEach(([list, r]) => list.forEach(p => { REGION[p.id] = r; }));
-NPCS.forEach(p => { if (["ronda", "kyoto", "jeju", "cinque"].includes(p.local) || ["saltwick", "porto", "puffin"].includes(p.local) && PEN[p.id]) REGION[p.id] = p.local; });   // (Saltwick: the four who write back)
+NPCS.forEach(p => { if (["ronda", "kyoto", "jeju", "cinque"].includes(p.local) || ["saltwick", "porto", "puffin", "bali"].includes(p.local) && PEN[p.id]) REGION[p.id] = p.local; });   // (Saltwick: the four who write back)
 const DEF = {}; NPCS.forEach(p => { if (REGION[p.id]) DEF[p.id] = p; });
 export const person = id => DEF[id];
 export const regionOf = id => REGION[id];

@@ -3084,8 +3084,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
-    check(sp.length === 37 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
-      "the 37 dishes from the trips (rounds 207, 211 and 215: Saltwick's, Portovenere's and Puffin Isle's three each) are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(sp.length === 40 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 40 dishes from the trips (rounds 207, 211, 215 and 219: Saltwick's, Portovenere's, Puffin Isle's and Bali's three each) are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "jason"), L = np.NPCS.find(n => n.id === "luca");
@@ -4493,6 +4493,57 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   for (const k of ["red", "green", "blue", "aqua", "white"]) { await page.click(`#ctx [data-pi="glass:${k}"]`); await page.waitForTimeout(120); }
   await page.click('#ctx [data-pi="sundone"]'); await page.waitForTimeout(800);
   check((await gf()).inv.pi_suncatcher === 1, "a sea-glass suncatcher made at Ivy's bench, to keep");
+  await page.close();
+}
+
+// Rounds 218 to 221: Bali by boat: the four screens in a ring, a canang sari with Ibu Wayan, an offering at a shrine
+// (the sixth makes the Garuda), playing in Made's gamelan, the warung
+{
+  console.log("\nBali by boat (rounds 218 to 221)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`bali pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/bapatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 500; f.goals = {...(f.goals || {}), boat: 1};
+    f.bali = {placed: {bashrine1: "2026-10-01", bashrine2: "2026-10-01", bashrine3: "2026-10-01", bashrine4: "2026-10-01", babanyan: "2026-10-01"}, offerings: 0};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const go = async sc => { await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(1500); };
+  const spot = async id => { await page.locator(`#world [data-rdspot="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(2500); };
+  const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(7000); };
+  const name = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-16&bapatch=1"); await page.waitForTimeout(1500);
+  await go("shore"); await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-btown="bali"]', { timeout: 15000 });
+  await page.click('#ctx [data-btown="bali"]'); await page.waitForTimeout(300);
+  check(/Fuel 30/.test(await page.locator("#ctx").innerText()), "Bali is the longest sail: 30 fuel");
+  await page.click('#ctx [data-tpick="evan"]'); await page.waitForTimeout(100); await page.click('#ctx [data-trip="bali"]'); await page.waitForTimeout(9000);
+  check(await page.locator('#world [data-place="baboat"]').count() === 1 && /Sanur/i.test(await name()), "you come up onto the sand at Sanur among the jukung");
+  check(/terraces/i.test(await (async () => { await place("baToTerraces"); return name(); })()), "west up the coconut track to the rice terraces");
+  check(/temple/i.test(await (async () => { await place("baToTempleS"); return name(); })()), "south down through the paddies to the water temple");
+  check(/Ubud/i.test(await (async () => { await place("baToUbudE"); return name(); })()) && await page.locator('#world [data-place="bamonkeys"]').count() === 1, "east to Ubud: the market, the offerings house, the silver workshop, the banyan, the monkey forest");
+  check(/Sanur/i.test(await (async () => { await place("baToBeach"); return name(); })()), "and north back to the beach");
+  // a canang sari with Ibu Wayan
+  await go("ba_offer"); await spot("bacanang"); await page.click('#ctx [data-ba="canang"]'); await page.waitForTimeout(300);
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-ba="fold"]'); await page.waitForTimeout(120); }
+  await page.click('#ctx [data-ba="flower:red"]'); await page.waitForTimeout(120);
+  check(/Not that one/.test(await page.locator("#ctx").innerText()), "the wrong colour for the east: Ibu Wayan gently moves your hand");
+  for (const c of ["white", "red", "yellow", "blue"]) { await page.click(`#ctx [data-ba="flower:${c}"]`); await page.waitForTimeout(120); }
+  await page.click('#ctx [data-ba="rice"]'); await page.waitForTimeout(120); await page.click('#ctx [data-ba="canangdone"]'); await page.waitForTimeout(800);
+  check((await gf()).bali.offerings === 1, "a canang sari made with Ibu Wayan: white east, red south, yellow west, blue north");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // the sixth shrine: the monkey forest gate; the carved Garuda
+  await go("ba_ubud"); await place("bamonkeys");
+  let f = await gf();
+  check(f.bali.placed.bamonkeys && f.bali.offerings === 0 && f.inv.ba_garuda === 1, "your offering at the monkey forest gate, the sixth shrine: Ibu Wayan's carved Garuda to keep");
+  // the gamelan with Made (he teaches from nine till noon)
+  await go("ba_gamelan"); await page.waitForTimeout(1500); await spot("bagong"); await page.click('#ctx [data-ba="gamelan"]'); await page.waitForTimeout(300);
+  for (const b of ["strike", "rest", "strike", "strike", "rest", "strike", "rest", "gong"]) { await page.click(`#ctx [data-ba="${b}"]`); await page.waitForTimeout(120); }
+  check(/gamelan hands/.test(await page.locator("#ctx").innerText()), "every beat together with the orchestra: \"You have gamelan hands!\"");
+  await page.click('#ctx [data-ba="gamelandone"]'); await page.waitForTimeout(800);
+  check((await gf()).bali.gamelan === 1, "playing in Made's gamelan, ending on the gong");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // the warung
+  const c0 = (await gf()).coins; await go("ba_warung"); await spot("ba_warung"); await page.click('#ctx [data-ba="warung:kelapa"]'); await page.waitForTimeout(800);
+  check((await gf()).coins === c0 - 2, "a fresh coconut at Nyoman's warung");
   await page.close();
 }
 

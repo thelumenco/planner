@@ -60,8 +60,32 @@ export const BA_TOWNS = {
       marcus: {ba_beach: [[260, 260], [420, 530]], ba_ubud: [[304, 548], [340, 380]], ba_terraces: [[420, 320], [290, 440]], ba_temple: [[340, 600], [212, 330]]},
       angelina: {ba_beach: [[340, 270], [100, 520]], ba_ubud: [[90, 300], [230, 560]], ba_terraces: [[180, 290], [210, 600]], ba_temple: [[250, 410], [300, 340]]}
     },
-    acts: {},
-    rooms: {},
+    // what the family do (round 221; nothing done in any earlier town): Mum with a frangipani behind her ear, swaying to
+    // the gamelan; Dad blissful with a green coconut; Ma Ma carrying fruit on her head like the market ladies; Gong Gong
+    // cross-legged in the bamboo pavilion under a rice farmer's hat; Darren knee-deep planting rice; Marcus with a macaque
+    // on his head, trying very hard not to move; Angellina learning Legong hands. (Evan follows the paddy ducks, core.js.)
+    acts: {
+      mum: {ba_temple: {act: "flowerear", at: [230, 400]}},
+      dad: {ba_beach: {act: "coconut", at: [140, 384]}},
+      mama: {ba_ubud: {act: "headbasket", at: [392, 458], dir: -1}},
+      gonggong: {ba_terraces: {act: "bale", at: [96, 304]}},
+      darren: {ba_terraces: {act: "plant", at: [420, 402], dir: -1}},
+      marcus: {ba_ubud: {act: "monkeyhead", at: [330, 500]}},
+      angelina: {ba_temple: {act: "legong", at: [300, 300], dir: -1}}
+    },
+    // round 220: five rooms (the warung, the offerings house, the gamelan pavilion, the silver workshop, the market hall)
+    rooms: {
+      ba_warung: {door: "bawarung", n: "Nyoman's warung", music: "ba_warung", party: BA_ROOM_PARTY.ba_warung,
+        say: "Nyoman's warung: low tables on woven mats, a glass cabinet of nasi campur dishes, a cooler of fresh juices, and the sea just beyond the door."},
+      ba_offer: {door: "baoffer", n: "Ibu Wayan's offerings house", music: "ba_offer", party: BA_ROOM_PARTY.ba_offer,
+        say: "Ibu Wayan's offerings house: palm leaves in bundles, baskets of petals sorted by colour, rows of finished canang sari, and incense curling up past the family shrine."},
+      ba_gamelan: {door: "bagamelan", n: "The gamelan pavilion", music: "ba_gamelan", party: BA_ROOM_PARTY.ba_gamelan,
+        say: "The gamelan pavilion: rows of bronze metallophones, gongs hanging in carved red and gold frames, drums, and the smell of incense and polish."},
+      ba_silver: {door: "basilver", n: "Ketut's silver workshop", music: "ba_silver", party: BA_ROOM_PARTY.ba_silver,
+        say: "Ketut's silver workshop: a bench of tiny tools and a little blue flame, trays of filigree, and cases of silver catching the light."},
+      ba_market: {door: "bamarket", n: "The market hall", music: "ba_market", party: BA_ROOM_PARTY.ba_market,
+        say: "The market hall: pyramids of spice, bundles of vanilla, snake fruit and mangosteens, sarongs in every colour and baskets stacked to the roof."}
+    },
     lines: {
       mum: ["Every single step has a little tray of flowers on it. Somebody made all of those this morning. By hand.", "I'm tucking a frangipani behind my ear and nobody can stop me.", "Listen. That's the gamelan. It sounds like water running over bells."],
       dad: ["The terraces are watered by the subak: one shared system of channels, run by the farmers together for a thousand years. It's on the World Heritage list.", "Those outrigger boats are called jukung. The eyes on the bow are so the boat can see its way home.", "Mount Agung. Over three thousand metres, and the holiest mountain on the island. Every temple faces it."],
