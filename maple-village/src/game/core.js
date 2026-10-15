@@ -71,7 +71,7 @@ import { tablelandsArt } from "../art/tablelands.js";
 import { lavenderArt } from "../art/lavender.js";
 import { lavenderRoomArt } from "../art/lavender-rooms.js";
 import { tablelandsRoomArt } from "../art/tablelands-rooms.js";
-import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } from "./lunch.js";
+import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH, setCloseFriends } from "./lunch.js";
 import { craftState, craft as millCraft, renderWax, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
 import { hamperSeason, xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
 import * as BK from "./contacts.js";
@@ -628,7 +628,7 @@ function weeklyPaper(fri){
   const q = sum("q"), steps = sum("steps"), coins = sum("coins"), harvest = sum("harvest");
   const best = rows.reduce((a, r) => r.q > a.q ? r : a, {q: 0});
   const wDays = rows.filter(r => r.water > 0), avgW = wDays.length ? sum("water")/wDays.length/1000 : 0;
-  const walked = rows.filter(r => r.steps >= STEP_GOAL).length;
+  const walked = rows.filter(r => r.steps >= stepGoal()).length;
   const chats = [...new Set(rows.flatMap(r => r.chats || []))];
   const ups = (F.upgradeLog || []).filter(u => days.includes(u.day)).map(u => (UPGRADES.find(x => x.id === u.id) || {}).name).filter(Boolean);
   let soon = null; for (let i = 1, d = fri; i <= 14; i++) { d = new Date(Date.parse(d + "T00:00:00Z") + 864e5).toISOString().slice(0, 10); const f = festivalOn(d); if (f) { soon = f; break; } }
@@ -645,8 +645,8 @@ function weeklyPaper(fri){
 // 6pm ritual: walk to the pond, one lantern per win, the pet reads them out, then hand over to chat's wind-down.
 function windDown(){
   const wins = QB.myTasks(F).filter(t => QB.isDone(t)).map(t => t.title).slice(0, 8);
-  if (S.steps >= STEP_GOAL) wins.push(`${S.steps.toLocaleString()} steps`);
-  if ((S.waterMl || 0) >= WATER_GOAL) wins.push("Two litres of water");
+  if (S.steps >= stepGoal()) wins.push(`${S.steps.toLocaleString()} steps`);
+  if ((S.waterMl || 0) >= waterGoal()) wins.push(`${(waterGoal()/1000).toLocaleString()} litres of water`);
   if (S.harvested) wins.push(`${S.harvested} harvest${S.harvested > 1 ? "s" : ""}`);
   if (!wins.length) wins.push("Showing up today");
   go("base", VILLAGE.pond.door[0], VILLAGE.pond.door[1], () => {
@@ -811,6 +811,10 @@ let bubbleT = null;
 // ("family": a present for anyone), or a list. A bouquet goes to any friend too, or to whoever's standing nearby.
 const friends = () => QB.friendIds(F);
 const giftWho = to => to === "family" ? friends() : to === "grands" ? ["farid", "mei"] : Array.isArray(to) ? to : [to];
+// Tomi's lactose intolerant: dairy (cheese, milk, butter, milk chocolate, a dairy ice cream) earns no hearts from him
+const DAIRY_IDS = new Set(["milk", "goatmilk", "icecream", "s_toast", "s_nonna"]);
+const isDairy = id => { const it = ITEMS[id] || {}; return !!it.dairy || DAIRY_IDS.has(id) || /^chz_/.test(id); };
+const TOMI_NO = "Oh, that's kind. Dairy and I don't get on, though. I'll pass it to Posy.";
 const NO_FRIENDS = "Nobody's at three hearts yet, so there's no one to send it to. Walk up to someone and give it to them in person instead.";
 // Ada's and Idris's hours: nine thirty to half past five, every day but Sunday
 const GARMENT_N = k => (TL.GARMENT_NAME[k] || "piece").toLowerCase();
@@ -829,7 +833,8 @@ const villagerName = w => (NPCS.find(n => n.id === w) || {}).name || "them";
 const isFav = (w, id) => { const it = ITEMS[id] || {}; return ((QB.ASKERS[w] || {}).likes || []).includes(id) || (it.to != null && it.to !== "family" && giftWho(it.to).includes(w)); };
 function giftedAlready(w){ if (!QB.giftedToday(F, w)) return false; speak(`You've already given ${villagerName(w)} something today. Save it for tomorrow!`, 4000); return true; }
 function giftHeart(w, id){
-  const r = QB.giveTo(F, w, villagerName(w), id, isFav(w, id), addInv); if (!r) return "";
+  const r = QB.giveTo(F, w, villagerName(w), id, w === "tomi" && isDairy(id) ? "none" : isFav(w, id), addInv); if (!r) return "";
+  if (r.none) return ` ${villagerName(w)} can't have dairy, so no heart this time.`;
   return ` ${r.fav ? "A favourite! " : ""}${villagerName(w)}: ${r.hearts}${r.half ? "½" : ""} heart${r.hearts === 1 && !r.half ? "" : "s"}.${r.gift ? " There's a little gift in your letterbox." : r.letter ? " Watch your letterbox." : ""}`;
 }
 // the backpack's "give something" mode: whoever's nearest and in the village (not visitors) gets the next thing tapped
@@ -844,12 +849,13 @@ function giveToVillager(id, w){
   addInv(id, -1); giveMode = null; if (openView) { openView = null; ctx(); }
   F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
   if (it.kind === "bouquet") { F.bouquets = F.bouquets || {}; F.bouquets[w] = (F.bouquets[w] || 0) + 1; }
-  const fav = isFav(w, id), line = (it.says && it.says[w]) || (fav ? pick(FAV_THANKS) : it.kind === "bouquet" ? pick(BQ_THANKS) : pick(GIFT_THANKS));
+  const fav = isFav(w, id), line = w === "tomi" && isDairy(id) ? TOMI_NO : (it.says && it.says[w]) || (fav ? pick(FAV_THANKS) : it.kind === "bouquet" ? pick(BQ_THANKS) : pick(GIFT_THANKS));
   npcSay(w, line); [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", e.x + (k - 1)*14, e.y - 50 - k*6, 1800), d)); sfx("chime"); gainXp(1);
   const h = giftHeart(w, id); flash(`${villagerName(w)} loved the ${it.n.toLowerCase()}`); if (h) setTimeout(() => speak(h.trim(), 4500), 1600); save(true);
 }
 function nearVillager(){ const fr = friends(), n = npcActors().map(([, e]) => e).filter(e => e.kind === "npc" && !fr.includes(e.def.id)).map(e => [e, Math.hypot(e.x - mel.x, e.y - mel.y)]).sort((a, b) => a[1] - b[1])[0]; return n && n[1] < 170 ? n[0] : null; }
-const recipients = it => it.kind === "bouquet" ? [...friends(), ...(nearVillager() ? ["near"] : [])] : giftWho(it.to);
+// anything can go to any friend at three hearts or more (and in person, to anyone at all)
+const recipients = it => it.kind === "bouquet" ? [...friends(), ...(nearVillager() ? ["near"] : [])] : friends();
 const recipName = w => w === "near" ? ((nearVillager() || {}).def || {name: "someone nearby"}).name : villagerName(w);
 const giftNames = to => to === "grands" ? "Farid or Mei" : to === "family" ? "a friend" : giftWho(to).map(villagerName).join(giftWho(to).length > 2 ? ", " : " or ").replace(/, ([^,]*)$/, " or $1");
 // Who's close enough to hand a gift to in person (null if they're not on this screen)
@@ -1013,7 +1019,7 @@ function showPanel(hasCtx, skin){
   const view = openView || (hasCtx ? "ctx" : null), p = $("panel");
   if (p.hidden === !!view) sfx("paper", true);
   p.hidden = !view; $("map").classList.toggle("panel-open", !!view);
-  if (view === "settings") { $("setMusic").checked = sound.music; $("setVol").value = sound.musicVol; $("setSfx").checked = sound.sfx; $("setQuiet").checked = F.quietEvening !== false; $("setBed").checked = F.bedLock !== false; }
+  if (view === "settings") { prefsUI(); $("setMusic").checked = sound.music; $("setVol").value = sound.musicVol; $("setSfx").checked = sound.sfx; $("setQuiet").checked = F.quietEvening !== false; $("setBed").checked = F.bedLock !== false; }
   ["ctx", "questsView", "bagView", "mailView", "friendView", "settingsView"].forEach(id => $(id).hidden = id !== (views[view] || view));
   p.className = "panel " + (view === "quests" ? "cork" : view === "ctx" ? skin : "paper");
   document.querySelectorAll("[data-open]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.open === openView)));
@@ -1147,7 +1153,7 @@ function ctx(){
       const inSeasonNow = id => !ITEMS[id].seasons || ITEMS[id].seasons.includes(season);
       h += Object.keys(ITEMS).filter(id => ITEMS[id].tab === shopTab && inSeasonNow(id) && (!ITEMS[id].needs || owns(F, ITEMS[id].needs)) && (!ITEMS[id].visited || ((F.towns || {})[ITEMS[id].visited])) && (!ITEMS[id].ghOf || !inSeasonNow(ITEMS[id].ghOf))).map(id => {
         const it = ITEMS[id], locked = it.need && S.earned < it.need, owned = it.kind === "keep" ? F.fam.owned[id] : it.kind === "tool" && F.inv[id];
-        const extra = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)} · ${CROPS[it.crop].yield || 1} a harvest` : it.to ? ` · for ${giftNames(it.to)}` : "";
+        const extra = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)} · ${CROPS[it.crop].yield || 1} a harvest` : "";
         if (it.kind === "pet" && KINDS[it.pet]) { const full = roomLeft(F) <= 0; return itemBtn(id, full ? "the run is full" : `<b>${it.price}</b> ${icon("coin", 13)}`, full || F.coins < it.price); }
         return itemBtn(id, locked ? `earn ${it.need} today` : owned ? (it.kind === "keep" ? "at home" : "owned") : `<b>${it.price}</b> ${icon("coin", 13)}${extra}`, locked || owned || F.coins < it.price, F.inv[id] && !owned ? `<span class="cnt">×${F.inv[id]}</span>` : "");
       }).join("");
@@ -1189,7 +1195,7 @@ function ctx(){
       ? `<div class="breathe"><div class="ring" style="animation-delay:-${((Date.now() - breath.start)/1000 % CYCLE).toFixed(2)}s"></div><p class="cue" id="breathCue">Breathe in</p></div><p class="sub" style="text-align:center"><span id="breathLeft"></span> left</p><div class="actions" style="justify-content:center"><button class="btn alt small" data-calm="stop">Stop</button></div>`
       : `<p class="sub">Cushions, ${(F.decor || {}).r_candle ? "a candle, " : ""}one slow breath.</p><p class="eyebrow">Guided breathing</p><div class="actions">${[1, 3, 5].map(m => `<button class="btn ${m === 3 ? "primary" : "alt"} small" data-calm="${m}">${m} min</button>`).join("")}</div>`);
   } else if (journalOpen && scene === "room") {
-    h = journalPanel(false);
+    h = journalPanel();
   } else if (wardOpen && scene === "room") {
     h = wardrobePanel(F);
   } else if (runOpen && scene === "base") {
@@ -1554,7 +1560,7 @@ function bag(){
   const order = ["gift","food","ingredient","feed","flower","use","tool","seed"];
   ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
   $("bag").innerHTML = ids.map(id => { const it = ITEMS[id];
-    const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed your pet" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
+    const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? "give to someone" : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed your pet" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
     // kitchen ingredients can go to the wine shop's larder instead (food can still be fed to the pet)
     const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
     return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");
@@ -1576,14 +1582,18 @@ function bag(){
   $("play").querySelectorAll("[data-play]").forEach(b => b.onclick = () => playFree(b.dataset.play));
 }
 function trackers(){
-  $("waterBoxes").innerHTML = progressBarV((S.waterMl || 0)/WATER_GOAL, "#9CC3E0", 8);
-  $("stepBoxes").innerHTML = progressBarV(S.steps/STEP_GOAL, "var(--sage)", 5);
+  $("waterBoxes").innerHTML = progressBarV((S.waterMl || 0)/waterGoal(), "#9CC3E0", 8);
+  $("stepBoxes").innerHTML = progressBarV(S.steps/stepGoal(), "var(--sage)", 5);
   $("waterNote").textContent = S.waterMl ? `${+(S.waterMl/1000).toFixed(2)}L` : "0L";
   $("stepNote").textContent = S.steps >= 1000 ? `${+(S.steps/1000).toFixed(1)}k` : String(S.steps || 0);
 }
 // Water is kept in ml (goal 2 litres). `water` stays as a glass count (250 ml) because chat reads it.
 // Every glass up to a litre earns a coin; every 1,000 steps earns 2.
-const GLASS = 250, WATER_GOAL = 2000, STEP_GOAL = 5000;
+const GLASS = 250;
+// your own goals and bedtime, chosen in Settings (F.prefs); bed can run past midnight (24*60 + 30 is half past twelve)
+const PREF = {water: 2000, steps: 5000, bed: 23*60 + 45, wake: 6*60};
+const pref = k => (F.prefs && F.prefs[k] != null ? F.prefs[k] : PREF[k]);
+const waterGoal = () => pref("water"), stepGoal = () => pref("steps");
 function setWater(ml){
   ml = clamp(Math.round(ml), 0, 6000); S.waterMl = ml;
   const glasses = Math.floor(ml/GLASS), paid = Math.min(4, S.waterPaid || 0), owed = Math.min(4, glasses);
@@ -1593,8 +1603,8 @@ function setWater(ml){
 function setSteps(v){
   v = Math.max(0, Math.round(v) || 0); S.steps = v; const ms = Math.floor(v/1000);
   if (ms > S.stepMs) { earn(2*(ms - S.stepMs), "steps"); S.stepMs = ms; }
-  speak(v >= STEP_GOAL ? `${v.toLocaleString()}! 5,000 smashed!` : `${v.toLocaleString()}. ${(STEP_GOAL - v).toLocaleString()} to go!`, 5000);
-  act(v >= STEP_GOAL ? "cheer" : "nudge"); save();
+  speak(v >= stepGoal() ? `${v.toLocaleString()}! ${stepGoal().toLocaleString()} smashed!` : `${v.toLocaleString()}. ${(stepGoal() - v).toLocaleString()} to go!`, 5000);
+  act(v >= stepGoal() ? "cheer" : "nudge"); save();
 }
 function questMark(){ $("qmarkWrap").style.display = "none"; }   // the old one-quest-at-a-time marker; the quest board needs no arrow
 function drawScene(){
@@ -1697,7 +1707,7 @@ function fridayLayer(sc){
 function bayMarketPanel(v){
   const kites = v === "kites", k = kites ? -1 : +v.slice(2), items = kites ? ["kite"] : bayStallGoods(dayKey(), k), who = kites ? "Hiro" : bayKeeperName(dayKey(), k);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>${kites ? "Hiro's kites" : `${esc(who)}'s stall`}</h2><p class="sub">${kites ? "\"Red, blue or yellow? They all fly. The breeze off the sea does the rest.\" Fly yours over by the river, at the kite flying spot." : "The Friday market on the field: a different mix every week."}</p>
-    <div class="items shop">${items.map(id => itemBtn(id, `<b>${kites ? ITEMS.kite.price : stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < (kites ? ITEMS.kite.price : stallPrice(id)), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div>
+    <div class="items shop">${items.map(id => itemBtn(id, `<b>${kites ? ITEMS.kite.price : stallPrice(id)}</b> ${icon("coin", 13)}`, F.coins < (kites ? ITEMS.kite.price : stallPrice(id)), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 function flyKite(){
@@ -2358,7 +2368,7 @@ function marketStallPanel(st){
     if (st.id === "elena" && owns(F, "millshop")) h += `<p class="muted">"Your oils are the talk of the market. I send people up the lane to the mill."</p>`;
     if (st.kind === "wine" && (sold.market || Object.keys(craftState(F).store).length)) h += `<p class="muted">A crate from the mill at the end of the stall: oils, soaps and lotions. ${sold.market ? `${sold.market} sold so far.` : ""}</p>`; }
   const items = stallItems(st);
-  if (items.length) h += `<div class="items shop">${items.map(id => itemBtn(id, `<b>${stallPrice(id)}</b> ${icon("coin", 13)}${ITEMS[id].to ? ` · for ${giftNames(ITEMS[id].to)}` : ""}`, F.coins < stallPrice(id), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.${st.produce ? " Handy when the garden's between harvests: it all goes to the kitchen or to your pet." : ""}</p>`;
+  if (items.length) h += `<div class="items shop">${items.map(id => itemBtn(id, `<b>${stallPrice(id)}</b> ${icon("coin", 13)}`, F.coins < stallPrice(id), F.inv[id] ? `<span class="cnt">×${F.inv[id]}</span>` : "")).join("")}</div><p class="muted">You have ${F.coins} coins.${st.produce ? " Handy when the garden's between harvests: it all goes to the kitchen or to your pet." : ""}</p>`;
   if (st.decor) h += `<div class="items shop">${st.decor.map(id => { const d = DECOR[id], own = F.decorOwned[id], on = own && F.decor[d.slot] === d.val;
     return `<button class="item" data-decor="${id}" ${!own && F.coins < d.price ? "disabled" : ""}><span class="e">${icon(d.ico, 34)}</span><span class="n">${esc(d.n)}</span><span class="c">${on ? (d.where === "room" ? "in your room" : "in your home") : own ? "tap to use" : `<b>${d.price}</b> ${icon("coin", 13)}`}</span></button>`; }).join("")}</div><p class="muted">Bought once, kept forever. You have ${F.coins} coins.</p>`;
   h += treatsHTML(st, F.coins);   // round 172: the Christmas market's chestnuts and hot chocolate
@@ -2834,9 +2844,12 @@ function routineCoins(r){
   else mprop("sparkle", mel.x, mel.y - 60);
 }
 
-/* ---------- Bedtime: the pet chivvies at 11 and 11:30; from 11:45pm to 6am the village rests ---------- */
-const nightKey = () => { const m = sgHM(); return m < 6*60 ? prevDay(dayKey()) : dayKey(); };
-const bedNow = () => { const m = sgHM(); return m >= 23*60 + 45 || m < 6*60; };
+/* ---------- Bedtime: wind-down lines for the 45 minutes before bed; from bedtime until you're up, the village rests ---------- */
+// (bedtime and getting-up time are yours to choose in Settings; the defaults are 11:45pm and 6am)
+const clock = m => { m = ((m % 1440) + 1440) % 1440; const h = Math.floor(m/60) % 12 || 12; return `${h}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m < 12*60 ? "am" : "pm"}`; };
+const nightM = () => { const m = sgHM(); return m < pref("wake") ? m + 24*60 : m; };   // minutes since the morning you got up
+const nightKey = () => sgHM() < pref("wake") ? prevDay(dayKey()) : dayKey();
+const bedNow = () => nightM() >= pref("bed");
 function bedtimeTick(){
   const m = sgHM(), nk = nightKey();
   const lock = F.bedLock !== false && bedNow() && F.bedSkip !== nk, el = $("bedLock");
@@ -2844,20 +2857,29 @@ function bedtimeTick(){
     el.hidden = !lock; document.body.classList.toggle("bedlocked", lock);
     if (lock) { route = []; keys.clear(); openView = null; closePanel(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); }
   }
-  if (lock) { const left = ((6*60 - m + 24*60) % (24*60)); $("bedLockLeft").textContent = `Good morning in ${Math.floor(left/60)}h ${left % 60}m.`; }
+  if (lock) { const left = ((pref("wake") - m + 24*60) % (24*60)); $("bedWake").textContent = clock(pref("wake")); $("bedLockLeft").textContent = `Good morning in ${Math.floor(left/60)}h ${left % 60}m.`; }
 }
-// Wind-down, 11pm to bedtime (11:45): a short, calm line about every 30 seconds. No chime, it fades on its own,
+// Wind-down, the 45 minutes before bed: a short, calm line about every 30 seconds. No chime, it fades on its own,
 // and it waits while you're typing or have a panel open.
 const WIND = ["Time to start winding down.", "Teeth, then skincare. No rush.", "Phone on charge, across the room.", "Dim the lights a little.",
   "Let the last thing go. It'll keep till morning.", "A glass of water by the bed.", "Slow breath in. Slower breath out.", "The village is tucking in too.",
   "Nothing else needs you tonight.", "Pyjamas on. Soft and cosy."];
 let windAt = 0, windI = 0;
 setInterval(() => {
-  const m = sgHM(); if (F.bedLock === false || m < 23*60 || m >= 23*60 + 45 || document.hidden) return;
+  const n = nightM(), bed = pref("bed"); if (F.bedLock === false || n < bed - 45 || n >= bed || document.hidden) return;
   if (Date.now() - windAt < 28e3 || openView || !$("panel").hidden || (document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName))) return;
-  windAt = Date.now(); const left = 23*60 + 45 - m;
+  windAt = Date.now(); const left = bed - n;
   speak(left <= 15 ? `${left} minute${left === 1 ? "" : "s"} till bed. ${WIND[windI++ % WIND.length]}` : WIND[windI++ % WIND.length], 6000, true);
 }, 5000);
+// Settings: bedtime and getting up, and your daily water and steps
+const prefOpts = (list, cur, label) => list.map(v => `<option value="${v}"${v === cur ? " selected" : ""}>${label(v)}</option>`).join("");
+function prefsUI(){
+  const range = (a, b, s) => Array.from({length: Math.floor((b - a)/s) + 1}, (_, i) => a + i*s);
+  $("setBedAt").innerHTML = prefOpts(range(21*60, 25*60, 15), pref("bed"), clock); $("setWakeAt").innerHTML = prefOpts(range(5*60, 10*60, 15), pref("wake"), clock);
+  $("setWater").innerHTML = prefOpts(range(1000, 3500, 250), pref("water"), v => `${(v/1000).toLocaleString()} litres`); $("setSteps").innerHTML = prefOpts(range(2000, 15000, 1000), pref("steps"), v => v.toLocaleString());
+  $("setBedTxt").textContent = `Stay in bed from ${clock(pref("bed"))} to ${clock(pref("wake"))} (your pet nudges you 45 minutes before)`;
+}
+[["setBedAt", "bed"], ["setWakeAt", "wake"], ["setWater", "water"], ["setSteps", "steps"]].forEach(([id, k]) => { $(id).onchange = e => { F.prefs = {...(F.prefs || {}), [k]: +e.target.value}; save(true); prefsUI(); bedtimeTick(); }; });
 // (asked inside the card: pop-up confirms are blocked inside the artifact frame, so confirm() always said no)
 const bedAsk = on => { $("bedSure").hidden = !on; $("bedUp").hidden = on; };
 $("bedUp").onclick = () => bedAsk(true);
@@ -2877,7 +2899,7 @@ $("setBed").onchange = e => { F.bedLock = e.target.checked; save(); bedtimeTick(
 ["keydown", "click", "pointerdown"].forEach(t => document.addEventListener(t, ev => { if (document.body.classList.contains("bedlocked") && !ev.target.closest("#bedLock")) { ev.stopPropagation(); ev.preventDefault(); } }, {capture: true}));
 
 /* ---------- Trophies ---------- */
-const trophyCtx = () => ({F, levels: LEVELS, levelIndex: level(), journal: journalCount()});
+const trophyCtx = () => ({F, levels: LEVELS, levelIndex: level(), journal: journalCount(), water: waterGoal(), steps: stepGoal()});
 function checkTrophies(){
   const {fresh, first, moved} = award(F, reached(trophyCtx()));
   if (!fresh.length) return;
@@ -3109,7 +3131,7 @@ $("setQuiet").onchange = e => { F.quietEvening = e.target.checked; save(true); }
 $("setSfx").onchange = e => { setSfx(e.target.checked); if (e.target.checked) sfx("coin"); };
 ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { qnQuietUntil = 0; }, {capture: true, once: true}));
 document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; if (openView === "bag") { giveMode = null; bag(); } ctx(); });   // (the backpack checks who's nearby as it opens)
-initNotebook({windDown, water:() => ({ml: S.waterMl || 0, goal: WATER_GOAL, glass: GLASS}), steps:() => ({n: S.steps, goal: STEP_GOAL}),
+initNotebook({windDown, water:() => ({ml: S.waterMl || 0, goal: waterGoal(), glass: GLASS}), steps:() => ({n: S.steps, goal: stepGoal()}),
   addWater:ml => A.water(ml), setWater, setSteps, paperName, markRead, agentName, onClose:() => render()});
 // the add-a-task form on the quest board
 $("addForm").onsubmit = e => { e.preventDefault(); if (addMine($("addTitle").value, $("addKind").value === "daily")) { $("addTitle").value = ""; $("addTitle").focus(); } };
@@ -3118,6 +3140,7 @@ initNpcs({sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyR
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
 initTrips(() => F);
+setCloseFriends(() => QB.friendIds(F, QB.TRIP_HEARTS));   // Sunday lunch and Christmas lunch: your closest friends
 setGhTools(() => F.tools || {});
 // Pick up where the player left off (round 105): the same game day, back on the screen they closed the game on (a new day, they
 // wake up at home as usual). F.where is kept by save().

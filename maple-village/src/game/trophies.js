@@ -15,7 +15,7 @@ export const LOOKS = {
 };
 const TH = {quests: [10, 25, 50, 100, 250, 500, 1000, 2500], favours: [5, 10, 25, 50, 100], friends: [1, 3, 5, 10], harvest: [10, 50, 100, 250, 500], journal: [10, 50, 100, 250], streak: [7, 14]};
 
-// ctx: {F, levels, levelIndex, journal}
+// ctx: {F, levels, levelIndex, journal, water, steps (your daily goals)}
 // -> every milestone reached so far, as {id, fam, n, label, note, short}
 export function reached(c){
   const out = [], add = (fam, id, n, label, note, short) => out.push({id, fam, n, label, note, short});
@@ -25,9 +25,9 @@ export function reached(c){
   TH.friends.filter(t => best >= t).forEach(t => add("friends", "friends-" + t, t, `${t} best friend${t > 1 ? "s" : ""} in the village`, `${t} villager${t > 1 ? "s" : ""} with all five hearts.`, String(t)));
   const hist = c.F.history || {}, days = Object.keys(hist).sort(), streak = key => { let n = 0, best = 0, prev = null;
     days.forEach(d => { const ok = !!key(hist[d]), next = prev && Date.parse(d) - Date.parse(prev) === 864e5; n = ok ? (next && n > 0 ? n + 1 : 1) : 0; best = Math.max(best, n); prev = d; }); return best; };
-  const wS = streak(h => (h.water || 0) >= 2000), sS = streak(h => (h.steps || 0) >= 5000);
-  TH.streak.filter(t => wS >= t).forEach(t => add("water", "water-" + t, t, `${t} days of 2L water in a row`, `Two litres of water, ${t} days running.`, t + "d"));
-  TH.streak.filter(t => sS >= t).forEach(t => add("steps", "steps-" + t, t, `${t} days of 5,000 steps in a row`, `5,000 steps or more, ${t} days running.`, t + "d"));
+  const wS = streak(h => (h.water || 0) >= (c.water || 2000)), sS = streak(h => (h.steps || 0) >= (c.steps || 5000));
+  TH.streak.filter(t => wS >= t).forEach(t => add("water", "water-" + t, t, `${t} days of your water goal in a row`, `Your water goal, ${t} days running.`, t + "d"));
+  TH.streak.filter(t => sS >= t).forEach(t => add("steps", "steps-" + t, t, `${t} days of your step goal in a row`, `Your step goal or more, ${t} days running.`, t + "d"));
   (c.levels || []).forEach((l, i) => { if (i > 0 && i <= c.levelIndex) add("maple", "maple-" + i, i, `Friendship: ${l.name}`, `Your pet's friendship reached "${l.name}".`, "Lv" + i); });
   TH.harvest.filter(t => (c.F.harvestTotal || 0) >= t).forEach(t => add("harvest", "harvest-" + t, t, `${t} harvests`, `${t} crops picked from the garden.`, String(t)));
   TH.journal.filter(t => c.journal >= t).forEach(t => add("journal", "journal-" + t, t, `${t} journal pages`, `${t} pages written in your journal.`, String(t)));

@@ -154,14 +154,15 @@ export function handOver(F, who, takeInv, giveInv, day = dayKey()){
 // favourite (something they'd ask for, or a gift that suits them) is worth a heart; anything else, half a heart.
 // Hearts from gifts bring the same letters as hearts from requests. -> {fav, hearts, half, gift?, letter?} or null
 export const giftedToday = (F, who, day = dayKey()) => ((board(F).gifted || {})[who]) === day;
+// (fav "none": a kind thought that earns nothing, like dairy for Tomi)
 export function giveTo(F, who, name, item, fav, giveInv, day = dayKey()){
   const b = board(F); b.gifted = b.gifted || {}; b.giftPts = b.giftPts || {};
   if (b.gifted[who] === day) return null;
   b.gifted[who] = day;
-  const before = hearts(F, who); b.giftPts[who] = (b.giftPts[who] || 0) + (fav ? 2 : 1);
+  const before = hearts(F, who); b.giftPts[who] = (b.giftPts[who] || 0) + (fav === "none" ? 0 : fav ? 2 : 1);
   while (b.giftPts[who] >= 2 && (b.hearts[who] || 0) < MAX_HEARTS) { b.giftPts[who] -= 2; b.hearts[who] = (b.hearts[who] || 0) + 1; }
   const now = hearts(F, who); if (now >= MAX_HEARTS) b.giftPts[who] = 0;
-  const out = {fav, hearts: now, half: now < MAX_HEARTS && b.giftPts[who] === 1, giveInv}, r = {who, name, item, n: 1};
+  const out = {fav: fav === true, none: fav === "none", hearts: now, half: now < MAX_HEARTS && b.giftPts[who] === 1, giveInv}, r = {who, name, item, n: 1};
   for (let h = before + 1; h <= now; h++) milestone(F, r, h, out, day);
   delete out.giveInv;
   return out;

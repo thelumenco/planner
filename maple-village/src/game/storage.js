@@ -1,6 +1,6 @@
 // Storage at home (round 166: "can my fridge at home be something that I put stuff into and it holds till I
 // need to transfer it to one of my shops"). Two places, both kept forever (nothing goes off):
-//   the fridge (its "Stored" side; the pantry side stays Hestia's real shopping list): food, ingredients, flowers
+//   the fridge (its "Stored" side; the pantry side is the shopping list): food, ingredients, flowers
 //   the storage shelf in the garage: everything else (soaps and oils from the mill, gifts, keepsakes, seeds...)
 // Things go in from the backpack and come back out to it, or straight to a shop that uses them: Tomo drops them off
 // on the delivery bike, instantly. Each shop's own stocking rules decide what it takes (sending borrows the backpack

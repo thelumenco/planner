@@ -3,7 +3,7 @@
 // Every good is a gift. art: [icon shape, colour, second colour] drawn by icons.js (marketIcon). Nothing with dairy
 // goes to Tomi (lactose intolerant), so dairy things name who they suit instead of "family" (any friend at three hearts or more).
 const NOM = ["bo", "farid", "mei", "hana", "theo", "posy"];   // everyone but Tomi
-const G = (n, to, price, tab, say, art, says) => ({n, kind: "gift", to, price, tab, say, art, ...(says ? {says} : {})});
+const G = (n, to, price, tab, say, art, says) => ({n, kind: "gift", to, price, tab, say, art, ...(says ? {says} : {}), ...(to === NOM ? {dairy: true} : {})});
 export const GOODS = {
   // ---- Sunday farmers market ----
   // Elena: cheese and olives

@@ -970,3 +970,5 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 @media (prefers-reduced-motion:reduce){.incard{animation:none}}
 :root[data-theme="dark"] .incard{background:#2E2A33;color:#F1EBE0}
 :root[data-theme="dark"] .inletter{background:#3A3540;color:#F1EBE0}
+.setrow.setpick{flex-wrap:wrap;cursor:default}
+.setpick select{font:inherit;padding:6px 8px;border-radius:10px;border:1.5px solid rgba(120,104,84,.3);background:#FFFDF6;color:#2F2B28}

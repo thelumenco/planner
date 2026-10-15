@@ -283,13 +283,13 @@ function registerDip(s, id){
   const m = /^gel_dip_(\w+?)_(\w+?)_(\w+?)_(.+)$/.exec(id); if (!m || !FORMATS[m[1]] || !DIPS[m[2]]) return;
   const r = s.recipes.find(x => x.id.replace(/[^a-z0-9]+/g, "-") === m[4]); if (!r) return;
   const top = m[3] === "none" ? null : m[3], dairy = r.dairy || DAIRY_DIP.includes(m[2]);
-  ITEMS[id] = {n: dipName(r, m[1], m[2], top), kind: "gift", to: dairy ? NO_DAIRY : "family", tab: "scoop", ico: "ic_" + m[1], gel: true, dip: true,
+  ITEMS[id] = {n: dipName(r, m[1], m[2], top), kind: "gift", to: dairy ? NO_DAIRY : "family", ...(dairy ? {dairy: true} : {}), tab: "scoop", ico: "ic_" + m[1], gel: true, dip: true,
     say: `Dipped AND topped? You spoil me. ${r.name}, wow.`, says: {tomi: "Dark choc and sorbet, so no tummy trouble. Legend.", farid: "So fancy! I shall eat it slowly and make it last.", theo: "Now that is an ice cream. Hana wants a bite. Officially, she can't have one."}};
 }
 export function registerItems(F){
   const s0 = scoopState(F); s0.dipIds.forEach(id => registerDip(s0, id)); Object.keys(F.inv || {}).filter(k => k.startsWith("gel_dip_")).forEach(id => registerDip(s0, id));
   s0.recipes.forEach(r => Object.keys(FORMATS).forEach(fmt => { const id = giftId(r, fmt);
-    ITEMS[id] = {n: `${r.name} ${FORMATS[fmt].n.toLowerCase()}`, kind: "gift", to: r.dairy ? NO_DAIRY : "family", tab: "scoop", ico: "ic_" + fmt, gel: true,
+    ITEMS[id] = {n: `${r.name} ${FORMATS[fmt].n.toLowerCase()}`, kind: "gift", to: r.dairy ? NO_DAIRY : "family", ...(r.dairy ? {dairy: true} : {}), tab: "scoop", ico: "ic_" + fmt, gel: true,
       say: `Ice cream! ${r.name}? Ooh, I've never had that one.`, says: {tomi: "A sorbet, so no tummy trouble. Nice one.", farid: "Ice cream for me? Oh, so cold! So nice. It would go beautifully with almond cake.", theo: "I am very fond of ice cream. Don't tell Hana."}}; }));
 }
 export function takeAway(F, rid, fmt){

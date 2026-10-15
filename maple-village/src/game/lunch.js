@@ -1,6 +1,6 @@
 // The Sunday long lunch on the terrace (round 146). Once the wine shop has its terrace, every Sunday from 12 to 3
 // one long table on the alfresco terrace fills up with people who've booked: villagers, families up for the day,
-// tourists, now and then a birthday, and one pair of your close friends (a different pair each week). The bookings book
+// tourists, now and then a birthday, and a couple of your closest friends (anyone at five hearts, taking turns). The bookings book
 // (on the lectern by the terrace doors) shows who's coming next Sunday, filling up as
 // the week goes on: so you can stock the shelves to suit. At lunch the tables order whole bottles (a pair gets
 // through about one an hour, and they go for the dearer bottles) and plates from the kitchen; with you out on the
@@ -23,25 +23,28 @@ const PARTIES = [
   {ids: ["jonah", "zara"], from: "A family up for the day"}, {ids: ["mia", "ava", "ollie"], from: "A family up for the day"}
 ];
 const BIRTHDAY = {ids: ["juniper", "bo", "opal", "theo"], birthday: true};
-const FAMILY_TURNS = [{ids: ["farid", "mei"], family: true, at: 13*60 + 15}, {ids: ["hana", "theo"], family: true}, {ids: ["tomi", "posy"], family: true}];
+// your closest friends (five hearts, set by core.js): two of them book each Sunday, taking turns; with nobody that
+// close yet, the visitors fill the table
+let closeFriends = () => [];
+export const setCloseFriends = fn => { closeFriends = fn; };
+export const closeFriendsNow = () => closeFriends();
+const friendsTurn = sunday => { const f = closeFriends(); if (!f.length) return null; const i = (weekNo(sunday)*2) % f.length;
+  const ids = [...new Set([f[i], f[(i + 1) % f.length]])];
+  return {ids, family: true, ...(ids.includes("farid") ? {at: 13*60 + 15} : {})}; };   // (Farid comes once his market stall shuts at one)
 const weekNo = day => Math.floor(Date.parse(day + "T00:00:00Z")/(7*864e5));
 const cache = {};
 // one Sunday's bookings -> [{ids, size, at (arrival minute), family?, birthday?, from?}]
 export function bookingsFor(sunday){
-  if (cache[sunday]) return cache[sunday];
+  const key = sunday + ":" + closeFriends().join(); if (cache[key]) return cache[key];
   const out = [], used = new Set(), take = p => { if (p.ids.some(id => used.has(id))) return false; p.ids.forEach(id => used.add(id)); out.push({...p, size: p.ids.length}); return true; };
-  // round 152: Mother's Day (the second Sunday in May): all your friends, a toast to everyone who mothers us, and the
-  // village's families round the rest of the table
-  const mday = sunday.slice(5, 7) === "05" && +sunday.slice(8) >= 8 && +sunday.slice(8) <= 14;
-  if (mday) take({ids: ["hana", "farid", "theo", "mei", "tomi", "posy", "bo"], family: true, mothers: true});
-  else take(FAMILY_TURNS[weekNo(sunday) % FAMILY_TURNS.length]);
-  if (!mday && hash(sunday + ":bday") % 3 === 0) take(BIRTHDAY);
+  const turn = friendsTurn(sunday); if (turn) take(turn);
+  if (hash(sunday + ":bday") % 3 === 0) take(BIRTHDAY);
   const order = PARTIES.map((p, i) => [hash(sunday + ":" + i), p]).sort((a, b) => a[0] - b[0]).map(([, p]) => p);
   const want = 9 + hash(sunday) % 3;   // nine to eleven seats taken
   for (const p of order) { if (out.reduce((n, b) => n + b.size, 0) + p.ids.length > Math.min(want + 1, LUNCH.seats)) continue; take(p); if (out.reduce((n, b) => n + b.size, 0) >= want) break; }
-  // arrivals between 12 and half past, your friends after
+  // arrivals between 12 and half past
   out.forEach((b, i) => { if (b.at == null) b.at = LUNCH.from + (hash(sunday + ":at" + i) % 3)*15; });
-  return (cache[sunday] = out);
+  return (cache[key] = out);
 }
 // how much of next Sunday's book is filled in by today (Monday a little, Saturday and Sunday all of it)
 export function bookOpen(day = dayKey()){ const sun = nextSunday(day), all = bookingsFor(sun), d = dow(day);
@@ -52,9 +55,9 @@ export const seatsTaken = list => list.reduce((n, b) => n + b.size, 0);
 export const SEATS = [0, 1, 2, 3, 4, 5].flatMap(i => [[214, 334 + i*44, 1], [306, 334 + i*44, -1]]);   // on the chairs (art/terrace.js), facing in
 const seatCache = {};
 export function seating(sunday){
-  if (seatCache[sunday]) return seatCache[sunday];
+  const key = sunday + ":" + closeFriends().join(); if (seatCache[key]) return seatCache[key];
   const out = {}; let k = 0; bookingsFor(sunday).forEach(b => b.ids.forEach(id => { if (k < SEATS.length) out[id] = {seat: SEATS[k++], at: b.at}; }));
-  return (seatCache[sunday] = out);
+  return (seatCache[key] = out);
 }
 // npcs.js: where a booked guest is during lunch (needs the terrace built: opts.terrace)
 export function lunchSlot(id, day, hm, terrace){

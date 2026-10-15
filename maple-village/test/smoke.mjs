@@ -915,6 +915,7 @@ if (want("\nthe field, and gifts for Farid and Mei")) try {
   // The field (lake, swans, picnic, football) between the orchard and town; gifts for Farid and Mei
   console.log("\nthe field, and gifts for Farid and Mei");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);   // these friends are close enough for presents sent round
   page.on("pageerror", e => errors.push(`field pageerror: ${e.message}`));
   await page.addInitScript(() => { if (!/giftpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     f.coins = 100; localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
@@ -931,8 +932,8 @@ if (want("\nthe field, and gifts for Farid and Mei")) try {
   await page.evaluate(() => window.__mapleScene("market")); await page.waitForTimeout(800);
   await page.waitForSelector('#ctx [data-shop="family"]', { timeout: 20000 }); await page.click('#ctx [data-shop="family"]');
   check(await page.locator('#ctx .item[data-id="mooncake"]').count() === 1 && await page.locator('#ctx .item[data-id="birdsnest"]').count() === 1, "Hana sells nyonya kueh, bird's nest, chicken essence, and mooncakes in autumn");
-  check(/Hana or Theo/.test(await page.locator('#ctx .item[data-id="kuehlapis"]').textContent()) && await page.locator('#ctx .item[data-id="protbar"]').count() === 1 && await page.locator('#ctx .item[data-id="bubbletea"]').count() === 1,
-    "the kuehs suit Hana and Theo too, and there are gifts for Tomi (a protein bar) and Posy (bubble tea)");
+  check(!/ for /.test(await page.locator('#ctx .item[data-id="kuehlapis"]').textContent()) && await page.locator('#ctx .item[data-id="protbar"]').count() === 1 && await page.locator('#ctx .item[data-id="bubbletea"]').count() === 1,
+    "kueh, a protein bar and bubble tea on the Gifts tab, none of them only for one person");
   await page.click('#ctx .item[data-id="ondeh"]'); await page.waitForTimeout(200);
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1000);
   await page.click('[data-open="bag"]'); await page.click('#bag .item[data-id="ondeh"]'); await page.click('#bag [data-giveto].primary'); await page.waitForTimeout(400);
@@ -960,7 +961,7 @@ if (want("\nplayground families, farmers market, field fair")) try {
   await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1200);
   check(await page.locator("#actors .npc").evaluateAll((n, k) => n.filter(x => k.includes(x.dataset.npc)).length, kids) >= 3 && await page.locator('#world [data-place="pround"]').count() === 1, "on a Saturday morning visiting families' kids fill the playground, roundabout and all");
   await page.goto(url + "?seed=1&time=12:55&date=2026-10-11&mktpatch=1"); await page.waitForTimeout(2500);
-  check(await page.evaluate(() => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.shelf[0].n < 40; }), "on a Sunday morning the market stall sells bottles off the wine shop's own shelves");
+  check(await page.evaluate(() => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return !v.shelf[0] || v.shelf[0].n < 40; }), "on a Sunday morning the market stall sells bottles off the wine shop's own shelves");
   await page.evaluate(() => window.__mapleScene("field")); await page.waitForTimeout(1200);
   check(await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")).orch; return o.stock.apple + o.stock["stem:rose"] < 80 && o.tin > 0; }), "Farid's market stall sells fruit and flowers off the farm shop's own shelves, into the orchard's tin");
   check(await page.locator('#world [data-place^="mstall"]').count() === 9 && await page.locator('#actors [data-npc="ines"]').count() === 1 && await page.locator('#actors [data-npc="farid"]').count() === 1, "the Sunday farmers market: eight stalls along the top (and Noor's adoption corner), our wine stall with Ines and Farid's fruit and flowers");
@@ -988,7 +989,7 @@ if (want("\nplayground families, farmers market, field fair")) try {
   check(await page.locator('#ctx .item[data-id]').evaluateAll(b => b.map(x => x.dataset.id)).then(ids => ids.length >= 2 && ids.every(id => ["carrot", "corn", "strawberry", "blueberry", "tomato", "potato", "pepper", "pea", "pumpkin", "leek"].includes(id))), "Clara's produce stall sells what's in season, for when the garden's between harvests");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-place="mstall1"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="honey"]', { timeout: 15000 });
-  check(await page.locator('#ctx .item[data-id="beecandle"]').count() === 1 && /for a friend/.test(await page.locator('#ctx .item[data-id="honey"]').textContent()), "Felix's honey stall: honey, honeycomb and beeswax candles, gifts for a friend");
+  check(await page.locator('#ctx .item[data-id="beecandle"]').count() === 1 && await page.locator('#ctx .item[data-id="honey"]').count() === 1, "Felix's honey stall: honey, honeycomb and beeswax candles, to give or keep");
   const m0 = (await mfox()).coins; await page.click('#ctx .item[data-id="honey"]'); await page.waitForTimeout(300);
   check(await mfox().then(f => f.inv.honey === 1 && f.coins === m0 - 8) && await page.locator("#undoBar").isVisible(), "buying honey offers an undo");
   await page.click("#undoBtn"); await page.waitForTimeout(300);
@@ -1010,6 +1011,7 @@ if (want("\nthe foreshore: Hana and Theo, Tomi and Posy")) try {
   // Posy's) and their routines, Hana's exercise class at the field, a paddle together, and gifts
   console.log("\nthe foreshore: Hana and Theo, Tomi and Posy");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);   // Theo's close enough for a present sent round
   page.on("pageerror", e => errors.push(`shore pageerror: ${e.message}`));
   const ffox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   await page.addInitScript(() => { if (!/shorepatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
@@ -1180,6 +1182,7 @@ if (want("\nthe Scoop Shack")) try {
     check(sc.unstockFridge(F, "milk", 2, orch).to === "bag" && F.inv.milk === 2 && F.scoop.fridge.milk === 1 && sc.unstockFridge(F, "fl_rose", 99, orch).to === "farm" && orch.stock["stem:rose"] === 2, "things can come back out of the gelato fridge (flower stems go back to the farm shop's shelf)");
     cc.cocoaState(F).pantry = {honey: 2}; check(cc.unstockPantry(F, "honey", 99, orch).n === 2 && F.inv.honey === 2, "and off the Cocoa Room's fillings shelf"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);   // friends close enough for an ice cream sent round
   page.on("pageerror", e => { errors.push(`scoop pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
   page.on("dialog", d => { errors.push("the Scoop Shack used a browser pop-up"); d.dismiss(); });
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -1239,7 +1242,7 @@ if (want("\nthe Scoop Shack")) try {
   const gid = await fox().then(f => Object.keys(f.inv).find(k => k.startsWith("gel_cone")));
   check(!!gid, "one to take away goes in the backpack");
   await page.click('[data-open="bag"]'); await page.click(`#bag .item[data-id="${gid}"]`); await page.waitForTimeout(300);
-  check(await page.locator('#bag [data-giveto="hana"]').count() === 1 && await page.locator('#bag [data-giveto="tomi"]').count() === 0, "it can be given like a gift (a gelato isn't offered to Tomi: lactose)");
+  check(await page.locator('#bag [data-giveto="hana"]').count() === 1 && await page.locator('#bag [data-giveto="tomi"]').count() === 1, "it can be given like a gift, to anyone you know well (Tomi too, though dairy earns no heart from him)");
   await page.click('[data-open="bag"]').catch(() => {});
   // the display: take a flavour off (customers can't buy it then), put it back, and swap one in when all 8 slots are full
   await page.evaluate(() => window.__mapleScene("scoopkitchen")); await page.waitForTimeout(700);
@@ -3087,12 +3090,33 @@ if (want("\nThe Lavender Hills (rounds 161-164)")) try {
   check(await fox().then(f => f.inv.bq_lavender === 2 && f.bellbird.lv.cut === "2026-10-12"), "the lavender harvest with Émile, two bunches to take home");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nyour own goals and bedtime, and Tomi's dairy")) try {
+  console.log("\nyour own goals and bedtime, and Tomi's dairy");
+  const qb = await import(new URL("../src/game/quests.js", import.meta.url));
+  { const F = {board: {hearts: {tomi: 2}}}; const r = qb.giveTo(F, "tomi", "Tomi", "chz_brie", "none", () => {}, "2026-10-14");
+    check(r && r.none && qb.hearts(F, "tomi") === 2 && !qb.giveTo(F, "tomi", "Tomi", "bar_dark", false, () => {}, "2026-10-14"), "dairy earns Tomi's thanks but no hearts (and it still counts as his gift for the day)"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`prefs pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/prefs=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.prefs = {bed: 22*60, wake: 7*60, water: 1500, steps: 8000}; f.bedLock = true; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=21:00&date=2026-10-14"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=22:30&date=2026-10-14&prefs=1"); await page.waitForTimeout(2500);
+  check(await page.locator("#bedLock").isVisible() && /7am/.test(await page.locator("#bedWake").textContent()), "a 10pm bedtime: tucked in at half past ten, up at 7");
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-15&prefs=1"); await page.waitForTimeout(1500);
+  await page.click('[data-open="settings"]').catch(() => {}); await page.waitForTimeout(500);
+  check(await page.locator("#setWater").inputValue() === "1500" && await page.locator("#setSteps").inputValue() === "8000" && /10pm to 7am/.test(await page.locator("#setBedTxt").textContent()), "Settings show your own water, steps and bedtime");
+  await page.selectOption("#setSteps", "6000"); await page.waitForTimeout(300);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).prefs.steps) === 6000, "and changing one keeps it");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe terrace and the Sunday long lunch (round 146)")) try {
   console.log("\nThe terrace and the Sunday long lunch (round 146)");
   const lu = await import(new URL("../src/game/lunch.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
+  check(!lu.bookingsFor("2026-10-04").some(b => b.family), "with nobody at five hearts yet, the table is all visitors and villagers");
+  lu.setCloseFriends(() => ["hana", "theo", "farid", "mei", "tomi", "posy"]);   // (as if these six were at five hearts)
   const sun = "2026-10-11", ids = new Set(np.NPCS.map(n => n.id)), bk = lu.bookingsFor(sun), seats = lu.seatsTaken(bk);
   check(lu.lunchOn(sun) && !lu.lunchOn("2026-10-12") && lu.nextSunday("2026-10-14") === "2026-10-18" && lu.nextSunday(sun) === sun, "every Sunday; the book shows the coming one");
-  check(seats >= 9 && seats <= lu.LUNCH.seats && bk.filter(b => b.family).length === 1 && bk.every(b => b.ids.every(id => ids.has(id))) && new Set(bk.flatMap(b => b.ids)).size === seats, "nine to twelve booked, one pair of your friends, no one twice");
+  check(seats >= 9 && seats <= lu.LUNCH.seats && bk.filter(b => b.family).length === 1 && bk.every(b => b.ids.every(id => ids.has(id))) && new Set(bk.flatMap(b => b.ids)).size === seats, "nine to twelve booked, two of your closest friends, no one twice");
   const fams = ["2026-10-11", "2026-10-18", "2026-10-25"].map(d => lu.bookingsFor(d).find(b => b.family).ids.join()); check(new Set(fams).size === 3, "a different pair of your friends each week");
   check(lu.bookOpen("2026-10-12").list.length < lu.bookOpen("2026-10-17").list.length && lu.bookOpen("2026-10-17").list.length === lu.bookingsFor("2026-10-18").length, "the book fills up through the week");
   const g = bk.find(b => !b.family), sl = lu.lunchSlot(g.ids[0], sun, 12*60 + 45, true);
@@ -3224,7 +3248,7 @@ if (want("\nThe terrace's week: weddings, trivia, sip and paint, and the special
   const sl = oc.occasionSlot("wd_tom", "2026-10-24", 14*60 + 10, true), dn = oc.occasionSlot("wd_tom", "2026-10-24", 18*60, true);
   check(sl && sl.scene === "terrace" && sl.at[1] === 280 && dn && ["dance", "boogie", "armsup", "twirl", "shuffle"].includes(dn.act) && !oc.occasionSlot("wd_tom", "2026-10-24", 14*60, false), "the couple under the arch at two, everyone dancing after five (and only once there's a terrace)");
   check(oc.occasionSlot("amara", "2026-10-14", 19*60 + 30, true).act === "point" && oc.occasionSlot("theo", "2026-10-15", 14*60 + 30, true).act === "point" && oc.occasionSlot("juniper", "2026-10-15", 14*60 + 30, true).act === "paint", "Amara runs the quiz; Theo teaches the painting");
-  const md = lu.bookingsFor("2027-05-09"); check(md[0].mothers && md[0].ids.includes("hana") && md[0].ids.includes("farid") && lu.seatsTaken(md) <= 12, "Mother's Day: all your friends at the long lunch");
+  const md = lu.bookingsFor("2027-05-09"); check(!md.some(b => b.mothers) && lu.seatsTaken(md) <= 12, "Mother's Day is an ordinary long lunch now");
   const cu = oc.comingUp("2026-10-12"); check(cu.some(e => /wedding of/.test(e.n)) && cu.some(e => e.n === "Trivia night") && cu.every(e => e.day >= "2026-10-12"), "the bookings book: what's coming up");
   // trivia: twenty questions, all with three answers; a perfect score wins the pot
   const qz = oc.quizFor("2026-10-14"); check(qz.length === 5 && qz.every(r => r.qs.length === 4 && r.qs.every(q => q[1].length === 3 && q[2] >= 0 && q[2] < 3)), "trivia: five rounds of four, three answers each");

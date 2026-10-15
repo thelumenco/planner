@@ -248,9 +248,9 @@ export const ROOMS = {
     ["hampers","Hamper table","F","hampertable",null,"Penny's hamper table: baskets, straw and ribbon. Out for Valentine's, Mother's Day and Christmas.",30],
     ["counter","Sorting counter","A","counter",/email|inbox|reply|message|dm|respond/,"Letters in, letters out."],
     ["cabinet","Filing cabinet","B","cabinet",/admin|file|doc|contract|tax|form|organi/,"A place for everything."],
-    ["scales","Stamps & scales","C","scales",/invoice|pay|bill|stripe|account|bank|receipt|expense|price/,"Weigh it, stamp it, send it."],
+    ["scales","Stamps & scales","C","scales",/invoice|pay|bill|account|bank|receipt|expense|price/,"Weigh it, stamp it, send it."],
     ["ledge","Writing ledge","D","desk",/./,"A tidy little ledge for odd jobs."],
-    ["pobox","Post box","E","pobox",null,"Your post box: unread mail from your work inbox."]]},
+    ["pobox","Post box","E","pobox",null,"Your post box: letters, parcels and the odd postcard."]]},
   // the guest room's door is on the east wall (opposite yours), and the basket sits down beside the cleaning
   // cupboard: the walk from the exit to either door stays clear.
   // the living room: the family dining table in the middle, the sofa, kitchen and fridge along the back, and four doors:
@@ -269,7 +269,7 @@ export const ROOMS = {
     ["desk","Home desk","A","desk",/./,"Your own little desk."],
     ["obooks","Bookshelf","K","bookcase",null,"Files, notebooks, and one surviving plant.",34],
     ["office","Spare desk","G","office",null,"The spare desk. A good place for a guest to write postcards."],
-    ["treadmill","Treadmill","F","treadmill",null,"1.2 and go. A gentle walk.",-12]]},
+    ["treadmill","Treadmill","F","treadmill",null,"A gentle walk, going nowhere in particular.",-12]]},
   // Your own room, through the door on the west wall of the house. Just you (and the pet): no quests, no visitors.
   room:  {name:"My room", wall:"#EFE3EE", trim:"var(--blush)", noBoard:true, pos:{A:[262,300], W:[262,206], B:[72,262], E:[62,396], C:[66,500], D:[434,556], J:[260,594], N:[406,132]}, stations:[
     ["routines","My routines","N","routineboard",null,"Your routines, pinned up.",74],
@@ -355,7 +355,7 @@ export const ROOMS = {
     ["books","Bookshelf","K","psychshelf",null,"Posy's psychology books, read for fun, all with sticky notes.",36],
     ["study","Posy's desk","D","studydesk",null,"Posy's desk. Postcards, a sketchbook and highlighters in every colour.",36],
     ["msofa","Sofa","S","sofa",null,"The comfiest sofa on the foreshore.",30],
-    ["dine","Dining table","X","dining:tomiposy",null,"Their glass dining table. Wedding magazines at one end, bank papers at the other.",44]]},
+    ["dine","Dining table","X","dining:tomiposy",null,"Their glass dining table. Wedding magazines at one end, house listings at the other.",44]]},
   // The Scoop Shack on the bay: the gelato counter (the display is drawn over the people, so Sofia stands behind it),
   // the chalkboard menu, tables, and the kitchen door on the west wall
   scoopshop: {name:"The Scoop Shack", wall:"#E3F2EC", trim:"#F2A0B8", noBoard:true, pos:{C:[300,330], M:[465,128], Z:[40,400], T:[340,520], U:[96,262], D:[480,400]}, stations:[
@@ -423,7 +423,7 @@ export const ROOMS = {
   // the garage (a big goal): the workbench, storage, the scooter and the car once they're bought
   garage: {name:"The garage", wall:"#E3E6EA", trim:"#8FA3B8", noBoard:true, pos:{W:[130,250], E:[300,262], K:[436,261], C:[310,480], D:[120,566], S:[440,566]}, stations:[
     ["gbench","Workbench","W","bench",null,"Your tools, all hung up on the wall. Mostly.",34],
-    ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|hestia|dust/,"Hestia's chores live in here."],
+    ["cupboard","Cleaning cupboard","E","cupboard",/clean|tidy|wipe|dust|mop|sweep/,"Mops, a feather duster and a bucket. Chores live in here."],
     ["gshelf","Storage","K","shelf",null,"Boxes labelled 'Christmas', 'camping' and 'misc'.",34],
     ["laundry","Laundry corner","D","laundry",/fold|laundry|clothes|wash|iron/,"Fold, stack, done."],
     ["scooter","Scooter","S","scooterbay",null,"The scooter's spot.",30],

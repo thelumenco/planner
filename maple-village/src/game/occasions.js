@@ -14,7 +14,7 @@
 //     dancing and a countdown), and Mother's Day (the second Sunday in May: the long lunch, a toast to everyone who
 //     mothers us; lunch.js).
 import { esc, dayKey, hash } from "../util.js";
-import { SEATS } from "./lunch.js";
+import { SEATS, closeFriendsNow } from "./lunch.js";
 import { WEDDINGS } from "../data/terrace-people.js";
 
 const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
@@ -47,7 +47,10 @@ const TRIVIA = {master: "amara", teams: [{n: "The Quizzly Bears", ids: ["hana", 
 const PAINT = {teacher: "theo", ids: ["juniper", "wren", "noor", "elena", "felix", "lila"]};
 const EASELS = [[150, 330, -1], [150, 420, -1], [150, 510, -1], [370, 330, 1], [370, 420, 1], [370, 510, 1]];
 const VALENTINE = [["hana", "theo"], ["tomi", "posy"], ["farid", "mei"], ["aiko", "hiro"], ["rosa", "bastien"]];
-const CHRISTMAS = ["farid", "mei", "hana", "theo", "tomi", "posy", "bo"];
+// Christmas Day lunch: your closest friends (five hearts), and villagers on their own for Christmas filling the other seats
+const CHRISTMAS_FILL = ["okada", "lin", "juniper", "opal", "hazel", "celeste", "felix", "elena", "noor", "wren", "ada", "idris"];
+const christmasGuests = day => { const f = closeFriendsNow().slice(0, 7), rest = CHRISTMAS_FILL.filter(id => !f.includes(id)).sort((a, b) => hash(day + a) - hash(day + b));
+  return [...f, ...rest].slice(0, OCC.christmas.guests); };
 const NYE = ["hana", "theo", "tomi", "posy", "bo", "okada", "juniper", "opal", "felix", "elena", "farid", "mei", "celeste"];
 const KNOTS = [[130, 350], [130, 470], [130, 560], [390, 360], [390, 470], [390, 560]];
 const MOVES = ["dance", "boogie", "armsup", "twirl", "shuffle"];
@@ -72,7 +75,7 @@ export function occasionSlot(id, day, hm, terrace){
     const all = [...TRIVIA.teams.flatMap(t => t.ids), ...TRIVIA.mine], i = all.indexOf(id); return i < 0 ? null : slot(seat(i)); }
   if (oc.kind === "paint") { if (id === PAINT.teacher) return slot({at: [260, 276], dir: 1, act: "point"}); const i = PAINT.ids.indexOf(id); return i < 0 ? null : slot({at: [EASELS[i][0], EASELS[i][1]], dir: EASELS[i][2], act: "paint"}); }
   if (oc.kind === "valentine") { const i = VALENTINE.flat().indexOf(id); return i < 0 ? null : slot(seat(i)); }
-  if (oc.kind === "christmas") { const i = CHRISTMAS.indexOf(id); return i < 0 ? null : slot(seat(i)); }
+  if (oc.kind === "christmas") { const i = christmasGuests(day).indexOf(id); return i < 0 ? null : slot(seat(i)); }
   if (oc.kind === "nye") { const i = NYE.indexOf(id); return i < 0 ? null : slot(dancer(id, i, day), [20*60, 24*60 + 30]); }
   return null;
 }

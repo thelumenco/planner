@@ -112,7 +112,7 @@ export function postPanel(F){
 const POST_LINES = {me: "Dear me,\n\nYou're in Jeju as you write this. The wind is enormous and everything smells of tangerines. Remember the divers whistling as they came up? Remember the black stone walls? Go and have a cup of tea. You've earned it.\n\nLove, me (two weeks ago)",
   family: "Dear everyone,\n\nGreetings from Jeju! Black rocks, orange tangerines, green crater, very blue sea. The divers whistle when they come up: FWEEEE. That's how they say hello, so: FWEEEE!\n\nWish you were here. Love, me x"};
 // the postcards that have arrived (core.js adds them to the mailbox)
-export const slowMail = (F, day = dayKey()) => ((F.jeju && F.jeju.post) || []).filter(p => p.at <= day).map(p => ({id: p.id, from: "postie", at: Date.parse(p.at + "T08:00:00+08:00"), title: p.to === "family" ? "A postcard from Jeju (it took its time)" : "A postcard from you, two weeks ago", body: POST_LINES[p.to] || POST_LINES.me}));
+export const slowMail = (F, day = dayKey()) => ((F.jeju && F.jeju.post) || []).filter(p => p.at <= day).map(p => ({id: p.id, from: "postie", at: Date.parse(p.at + "T08:00:00"), title: p.to === "family" ? "A postcard from Jeju (it took its time)" : "A postcard from you, two weeks ago", body: POST_LINES[p.to] || POST_LINES.me}));
 
 /* ---------- dyeing with green persimmons (the dye workshop) ---------- */
 // Four steps in order (Mr Moon puts your hand right if you go wrong). Then the cloth comes home and hangs on your own

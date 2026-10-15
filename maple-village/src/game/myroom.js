@@ -37,11 +37,11 @@ export function addEntry(text, kind){
 export function removeEntry(id){ delEntry(id); }
 function delEntry(id){ J = {entries: J.entries.map(e => e.id === id ? {id, deleted: true, at: Date.now()} : e), updatedAt: Date.now()}; keepJ(); pushJ(); }
 const when = e => new Date(e.at).toLocaleDateString("en-GB", {weekday: "short", day: "numeric", month: "short"});
-export function journalPanel(decompress){
+export function journalPanel(){
   const list = live().slice(0, 12);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>My journal</h2>
-    <p class="sub">${decompress ? "Three quick points from that call or moment. Then let it go." : esc(journalPrompt())}</p>
-    <form id="jForm" class="jform"><label class="sr" for="jText">Journal entry</label><textarea id="jText" rows="6" maxlength="8000" placeholder="${decompress ? "1.\n2.\n3." : "Write anything..."}">${esc(draft)}</textarea>
+    <p class="sub">${esc(journalPrompt())}</p>
+    <form id="jForm" class="jform"><label class="sr" for="jText">Journal entry</label><textarea id="jText" rows="6" maxlength="8000" placeholder="Write anything...">${esc(draft)}</textarea>
     <div class="actions"><button class="btn primary small" type="submit">Keep this page</button></div></form>`;
   if (list.length) h += `<p class="eyebrow" style="margin:14px 0 6px">Earlier pages</p><div class="jlist">${list.map(e => `<details><summary><b>${when(e)}</b> ${esc(plain(e.text).split("\n")[0].slice(0, 70))}</summary><p>${esc(e.text).replace(/\n/g, "<br>")}</p><button class="drop" data-jdel="${esc(e.id)}">tear out</button></details>`).join("")}</div>`;
   return h;
