@@ -52,13 +52,13 @@ export const BA_TOWNS = {
       ba_terraces: "The rice terraces: green stairs down the hillside, the bamboo pavilion, the paddy ducks, the scarecrow with bells and Dewi Sri's shrine. East: the coconut track down to the beach. South: the path through the paddies to the water temple.",
       ba_temple: "The water temple: the split gate, the spring pools and their fountain spouts, the lotus and koi pond, the gamelan pavilion and the temple shrine. North: up through the paddies to the terraces. East: the road to Ubud."},
     spots: {
-      mum: {ba_beach: [[240, 300], [330, 460]], ba_ubud: [[200, 300], [300, 460]], ba_terraces: [[200, 296], [250, 470]], ba_temple: [[230, 300], [300, 400]]},
+      mum: {ba_beach: [[262, 300], [330, 460]], ba_ubud: [[200, 300], [300, 460]], ba_terraces: [[200, 296], [250, 470]], ba_temple: [[230, 300], [300, 400]]},
       dad: {ba_beach: [[180, 470], [380, 380]], ba_ubud: [[150, 320], [260, 330]], ba_terraces: [[360, 280], [270, 560]], ba_temple: [[200, 400], [330, 460]]},
       mama: {ba_beach: [[140, 400], [260, 520]], ba_ubud: [[330, 520], [220, 420]], ba_terraces: [[160, 320], [230, 400]], ba_temple: [[160, 420], [280, 280]]},
-      gonggong: {ba_beach: [[120, 380], [130, 390]], ba_ubud: [[180, 400], [190, 410]], ba_terraces: [[100, 330], [110, 336]], ba_temple: [[110, 400], [120, 410]]},
-      darren: {ba_beach: [[380, 330], [200, 560]], ba_ubud: [[300, 300], [120, 460]], ba_terraces: [[300, 320], [220, 520]], ba_temple: [[330, 330], [250, 560]]},
-      marcus: {ba_beach: [[260, 260], [420, 530]], ba_ubud: [[280, 580], [340, 380]], ba_terraces: [[420, 320], [290, 440]], ba_temple: [[340, 600], [190, 330]]},
-      angelina: {ba_beach: [[340, 270], [100, 520]], ba_ubud: [[90, 300], [230, 560]], ba_terraces: [[40, 300], [210, 600]], ba_temple: [[240, 470], [300, 340]]}
+      gonggong: {ba_beach: [[120, 380], [130, 390]], ba_ubud: [[180, 400], [190, 410]], ba_terraces: [[100, 340], [110, 345]], ba_temple: [[110, 400], [120, 410]]},
+      darren: {ba_beach: [[380, 330], [200, 560]], ba_ubud: [[300, 300], [240, 450]], ba_terraces: [[300, 320], [220, 520]], ba_temple: [[330, 330], [326, 566]]},
+      marcus: {ba_beach: [[260, 260], [420, 530]], ba_ubud: [[304, 548], [340, 380]], ba_terraces: [[420, 320], [290, 440]], ba_temple: [[340, 600], [212, 330]]},
+      angelina: {ba_beach: [[340, 270], [100, 520]], ba_ubud: [[90, 300], [230, 560]], ba_terraces: [[180, 290], [210, 600]], ba_temple: [[250, 410], [300, 340]]}
     },
     acts: {},
     rooms: {},
@@ -116,7 +116,7 @@ export const BA_PLACES = {
   babanyan: {scene: "ba_ubud", name: "The great banyan", door: [212, 520], spot: true, mark: [110, 500], line: "The great banyan tree."},
   bamonkeys: {scene: "ba_ubud", name: "The monkey forest gate", door: [300, 572], spot: true, mark: [300, 540], line: "The gate of the monkey forest."},
   baToBeach: {scene: "ba_ubud", name: "The lane to the beach", door: [290, 40], spot: true, bridge: "ba_beach", mark: [290, 90], line: "North along the lane to the beach."},
-  baToTemple: {scene: "ba_ubud", name: "The village road", door: [20, 410], spot: true, bridge: "ba_temple", mark: [70, 390], line: "West along the village road to the water temple."},
+  baToTemple: {scene: "ba_ubud", name: "The village road", door: [20, 330], spot: true, bridge: "ba_temple", mark: [70, 310], line: "West along the village road to the water temple."},
   // the terraces: the paddies, the pavilion, the ducks, the scarecrow, Dewi Sri's shrine
   bapaddy: {scene: "ba_terraces", name: "The paddies", door: [250, 264], spot: true, mark: [250, 170], line: "The rice paddies."},
   babale: {scene: "ba_terraces", name: "The bamboo pavilion", door: [92, 342], spot: true, mark: [92, 270], line: "The bamboo pavilion."},
@@ -144,7 +144,7 @@ export const BA_BRIDGES = {
 };
 export const BA_ARRIVE = {
   "ba_beach>ba_terraces": [470, 300], "ba_terraces>ba_beach": [50, 470], "ba_beach>ba_ubud": [290, 80], "ba_ubud>ba_beach": [300, 580],
-  "ba_terraces>ba_temple": [260, 80], "ba_temple>ba_terraces": [260, 580], "ba_ubud>ba_temple": [470, 418], "ba_temple>ba_ubud": [50, 410]
+  "ba_terraces>ba_temple": [260, 80], "ba_temple>ba_terraces": [260, 580], "ba_ubud>ba_temple": [470, 418], "ba_temple>ba_ubud": [50, 330]
 };
 // walkable bounds [x1, y1, x2, y2] and obstacles (sea, buildings, paddies, pools, trees)
 export const BA_BOUNDS = {
@@ -153,17 +153,17 @@ export const BA_BOUNDS = {
 };
 export const BA_OBST = {
   // the sea along the top, the warung and its tables, the kite rack, the jukung pulled up on the sand, the beach
-  // shrine, the palms and hibiscus along the bottom either side of the lane, the palm by the warung
-  ba_beach: [[0, 0, 520, 180], [0, 180, 176, 340], [184, 300, 240, 346], [356, 186, 520, 296], [414, 404, 496, 474], [0, 572, 220, 640], [380, 572, 520, 640], [20, 400, 44, 420], [466, 330, 486, 346]],
-  // the offerings house compound, the silver workshop, the market hall, the market shrine, the banyan and its roots,
-  // the monkey forest and the two halves of its gate
-  ba_ubud: [[0, 0, 238, 226], [344, 0, 520, 226], [356, 268, 520, 440], [316, 432, 352, 474], [30, 478, 186, 640], [0, 600, 236, 640], [236, 524, 280, 640], [320, 524, 364, 640], [280, 600, 320, 640], [364, 476, 520, 640]],
+  // shrine, the palms and hibiscus along the bottom either side of the lane, the palm on the sand
+  ba_beach: [[0, 0, 520, 180], [0, 180, 176, 340], [184, 300, 240, 346], [356, 186, 520, 296], [414, 404, 496, 474], [0, 572, 220, 640], [380, 572, 520, 640], [20, 400, 44, 420]],
+  // the offerings house compound, the silver workshop, the market hall, the market shrine, the banyan's trunk and the
+  // ferns round its foot, the two halves of the monkey forest gate and the forest behind, the rooster in his basket
+  ba_ubud: [[0, 0, 238, 226], [344, 0, 520, 226], [356, 268, 520, 440], [316, 432, 352, 474], [40, 450, 180, 590], [0, 580, 236, 640], [236, 524, 280, 640], [320, 524, 364, 640], [280, 600, 320, 640], [364, 476, 520, 640], [14, 230, 48, 264]],
   // the upper terraces, the pavilion, the lower terraces either side of the path down, Dewi Sri's shrine
   ba_terraces: [[0, 0, 520, 246], [28, 268, 154, 330], [0, 352, 204, 640], [318, 352, 520, 640], [318, 340, 352, 376]],
   // the trees outside the temple, the wall and the two halves of the split gate, the gamelan pavilion, the meru and its
   // umbrellas, the spring pools, the koi pond, the frangipani by the east wall
-  ba_temple: [[0, 0, 150, 140], [370, 0, 520, 140], [0, 140, 240, 200], [280, 140, 520, 200], [20, 240, 196, 372], [360, 200, 500, 362], [20, 424, 304, 640], [346, 476, 520, 640], [490, 200, 520, 380]],
+  ba_temple: [[0, 0, 150, 140], [370, 0, 520, 140], [0, 140, 240, 200], [280, 140, 520, 200], [178, 56, 240, 140], [280, 56, 342, 140], [20, 240, 196, 372], [360, 200, 500, 362], [20, 424, 304, 640], [346, 476, 520, 640], [490, 200, 520, 380]],
   ...BA_ROOM_OBST
 };
 export const BA_NAMES = {ba_beach: "Bali: Sanur beach", ba_ubud: "Bali: Ubud", ba_terraces: "Bali: the rice terraces", ba_temple: "Bali: the water temple"};
-export const BA_EVAN = {ba_beach: [[260, 400], [180, 500], [340, 520], [300, 300]], ba_ubud: [[200, 360], [300, 420], [260, 300], [120, 330]], ba_terraces: [[260, 300], [240, 420], [380, 300], [260, 540]], ba_temple: [[260, 300], [220, 420], [310, 380], [280, 500]]};
+export const BA_EVAN = {ba_beach: [[260, 400], [180, 500], [340, 520], [300, 300]], ba_ubud: [[200, 360], [300, 420], [260, 300], [120, 330]], ba_terraces: [[260, 300], [240, 420], [380, 300], [260, 540]], ba_temple: [[260, 300], [220, 420], [310, 380], [322, 452]]};
