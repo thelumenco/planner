@@ -203,6 +203,12 @@ export function tapasAll(F, today){
   return tapasOn(v, today);
 }
 export const tapasToday = (F, today) => tapasAll(F, today)[0] || null;
+// the loves round: three dishes from the villagers' stories box up to take away, a plate at a time off today's batch on
+// the chalkboard: Pilar's mother's salmorejo, Ines's abuela's olive oil cake and Farid's uncle's pastries (each one's
+// love, data/loves.js). Cook a batch, then box one: a gift in the backpack (no sell price: it's for giving)
+export const TAKEAWAY = {salmorejo: "tk_salmorejo", tortaaceite: "tk_tortaaceite", pasteles: "tk_pasteles"};
+export function boxPlate(F, today, id){ const t = tapasAll(F, today).find(x => x.id === id); if (!t || !TAKEAWAY[id] || !(t.plates > 0)) return null;
+  t.plates--; F.inv = F.inv || {}; F.inv[TAKEAWAY[id]] = (F.inv[TAKEAWAY[id]] || 0) + 1; return `A plate of ${TAPAS[id].n.toLowerCase()}, boxed up to take away. It's in your backpack.`; }
 // add a tapas to today's chalkboard (until there are three)
 export function chooseTapas(F, id, today){ const v = vineState(F), list = tapasOn(v, today); if (!TAPAS[id] || !knows(F, id) || !inSeason(id, seasonOf(today)) || list.length >= TAPAS_MAX || list.some(t => t.id === id)) return null;
   v.tapasList = [...(v.tapasList || []).filter(t => t.day === today || t.plates > 0), {day: today, id, plates: 0, cooked: 0}]; return `${TAPAS[id].n} is on today's chalkboard.`; }
@@ -292,7 +298,7 @@ export function stovePanel(F, today){
   const list = tapasAll(F, today), tomorrow = nextDay(today), plan = v.tapasPlan && v.tapasPlan.day === tomorrow ? v.tapasPlan.ids : [];
   { const rq = requestOf(today), R = TAPAS[rq.id]; h += `<p class="krequest">${icon("heart", 16)} <b>${esc(rq.who)}</b> has been craving <b>${esc(R.n.toLowerCase())}</b>. Put it on today's chalkboard and it sells for ${tapasPrice(rq.id, today)} coins a plate instead of ${R.price}.${list.some(t => t.id === rq.id) ? " It's on!" : ""} <small>Needs ${esc(needText(R.need))}.</small></p>`; }
   list.forEach(t => { const T = TAPAS[t.id]; h += `<div class="kdish chosen">${dishArt("tapas:" + t.id, 52)}<span><b>${esc(T.n)}</b><small>${t.plates} plate${t.plates === 1 ? "" : "s"} on the menu · ${tapasPrice(t.id, today)} coins each · needs ${needText(T.need)}</small><span class="kneeds">${needList(k, T.need)}</span></span></div>
-      <div class="actions"><button class="btn primary small" data-k="cooktapas" data-id="${t.id}" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t.cooked ? `<button class="btn alt small" data-k="untapas" data-id="${t.id}">Take it off</button>` : ""}</div>`; });
+      <div class="actions"><button class="btn primary small" data-k="cooktapas" data-id="${t.id}" ${has(k, T.need) ? "" : "disabled"}>Cook a batch (${TAPAS_PLATES} plates)</button>${!t.cooked ? `<button class="btn alt small" data-k="untapas" data-id="${t.id}">Take it off</button>` : ""}${TAKEAWAY[t.id] ? `<button class="btn alt small" data-k="boxplate" data-id="${t.id}" ${t.plates > 0 ? "" : "disabled"}>Box one to take away</button>` : ""}</div>`; });
   if (list.length) h += `<p class="muted">Leftovers at closing time (10pm) go to the staff for dinner.</p>`;
   // two tabs (round 136): Local dishes, and Specials from the trips (each says where it's from)
   const tab = KP.tab === "specials" ? "specials" : "local", tabbed = ids => ids.filter(id => !!TAPAS[id].special === (tab === "specials"));
@@ -322,6 +328,7 @@ export function wireKitchen(root, F, api){
     else if (k === "tapas") line = chooseTapas(F, id, api.today);
     else if (k === "untapas") line = dropTapas(F, id, api.today);
     else if (k === "cooktapas") line = cookTapas(F, api.today, id);
+    else if (k === "boxplate") line = boxPlate(F, api.today, id);
     else if (k === "plantapas") line = planTapas(F, id, nextDay(api.today));
     else if (k === "keep") { const n = setKeep(F, id, +b.dataset.n); api.save(); api.rerender(); return; }
     else if (k === "ktab") { KP.tab = id; api.rerender(); return; }

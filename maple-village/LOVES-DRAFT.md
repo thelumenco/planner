@@ -1,7 +1,10 @@
-# Gift loves: draft (not built)
+# Gift loves: draft (BUILT)
+
+**Built 2026-10-15.** The live table is `src/data/loves.js` (FAVOURITES.md is regenerated from it). The owner approved all
+the open points; how they were settled is under "As built" at the end. The rest of this file is the design as drafted.
 
 Draft design for replacing today's favourites (see FAVOURITES.md) with a short, story-led list of loves per villager.
-Nothing in `src/` has been changed. Every id below was checked against the live `ITEMS` table of the current dev
+When drafted, nothing in `src/` had been changed. Every id below was checked against the live `ITEMS` table of the current dev
 build (`dist/dev.html`), plus the runtime-registered families noted in the rules. Line numbers are as of 2026-10-15.
 
 ## Rules
@@ -693,3 +696,27 @@ Thank-you: "Pistachio. I literally dreamt about this. Last night."
 11. **Gated loves:** Juniper's petal paper needs the Montrose paperie (a 1,500-coin goal); Ada's raspberries need canes
     from Bellbird Valley; Sunday market and night market stalls rotate stock (`stall-goods.js POOLS`), so a few
     everyday loves won't be on sale every week.
+
+---
+
+## As built (2026-10-15)
+
+- `src/data/loves.js` holds every villager's loves; `core.js isFav` only asks it (ASKERS likes and `to` lists no longer count).
+  A story love speaks its own thank-you in person, sent round and in the thank-you note (still one heart).
+- Box contents (1): `cocoa.js packBox` and `packGrand` mint content-keyed ids (`box4_<key>`, `box9d_<key>`...), kept in
+  `F.cocoa.boxes` and registered on load. Celeste's hazelnut and red wine box and Posy's honey heart box are now her
+  combinations (Posy's honey sticks fallback dropped). Plain boxes from old saves still stack, give and sell. Pairing
+  boxes stay one stacking item: the gift shop's wine corner counts and prices them that way, and no love needs their contents.
+- Ice creams carry `ings`, mill crafts `adds`, so the matchers don't parse ids (2). Marco's own-red love (3) not built.
+- One-off rewards (4): Hana sells Postman's toast (Treats, 9) once her chapter 4 is told; the Cocoa Room's bonbon table
+  makes Henri's pralines from the recipe book (6 milk pieces and a hazelnut make 2); the Scoop Shack counter makes Nonna's
+  fior di latte (a bottle of milk makes a cup). Gated by `stories.js storyGiven`, which reads what's been heard. Mr Okada
+  loves Postman's toast (not the honey toast), Celeste Henri's pralines (not loose hazelnuts), Sofia Nonna's cup and any
+  plain milk gelato you make.
+- Gold coins (5): a little tin at the bonbon table all year (6 milk pieces make 3, 5 coins each); Opal loves it and the
+  Chinese New Year box.
+- Kitchen dishes (6): box a plate of salmorejo, olive oil cake or honey and pistachio pastries from the day's batch at the
+  stove (`kitchen.js TAKEAWAY`): story loves for Pilar, Ines and Farid.
+- New items (7): plums (a plum tree, summer and autumn; Farid), fudge (Hana's Gifts tab; Posy), a card of buttons (Ada's
+  Buttons tab; Ada), a rubber stamp (the post office's stamps and scales; Theo). Ink and brushes not built.
+- Hazel, Amara, Lila and Tomo (8): hint lines are in their `npcs.js` lines; their stories are for later.

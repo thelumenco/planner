@@ -22,6 +22,8 @@ export const TREES = {
   apple:     {n: "Apple tree", fruit: "apple", fn: ["apple", "apples"], seasons: ["autumn"], price: 25, yield: 4, sell: 2, col: "#D9433A"},
   pear:      {n: "Pear tree", fruit: "pear", fn: ["pear", "pears"], seasons: ["autumn"], price: 30, yield: 4, sell: 4, col: "#C9D36A"},
   fig:       {n: "Fig tree", fruit: "fig", fn: ["fig", "figs"], seasons: ["autumn"], price: 35, yield: 3, sell: 5, col: "#7A4A6E"},
+  // the loves round: Farid's plums (Wilf traded him a case of red for a crate, every autumn), late summer into autumn
+  plum:      {n: "Plum tree", fruit: "plum", fn: ["plum", "plums"], seasons: ["summer", "autumn"], price: 30, yield: 4, sell: 4, col: "#6E3A6E", bloom: "#F7EEF4"},
   orange:    {n: "Orange tree", fruit: "orange", fn: ["orange", "oranges"], seasons: ["winter"], price: 25, yield: 4, sell: 3, col: "#F08A3C"},
   persimmon: {n: "Persimmon tree", fruit: "persimmon", fn: ["persimmon", "persimmons"], seasons: ["winter"], price: 35, yield: 3, sell: 5, col: "#E8743B"},
   // round 129: Farid brings a sapling home from Jeju (if he went); only then can the orchard grow them (unlock)

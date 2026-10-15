@@ -76,6 +76,10 @@ const REWARDS = {
   seabutton: (F, addInv) => { const b = (F.sew = F.sew || {}).buttons = (F.sew.buttons || {}); b.brass = (b.brass || 0) + 1; return "the sea captain's brass button, in your sewing basket"; },
   oilcake: F => { storyState(F).flags.oilcake = true; applyFlags(F); return "Ines's abuela's olive oil cake, on the tapas menu"; }
 };
+// has the chapter with this reward been told? (reads what's been heard, so saves from before it was asked work too).
+// The loves round: once it has, Hana sells Postman's toast ("toast"), the Cocoa Room makes Henri's pralines ("henri")
+// and the Scoop Shack makes Nonna's fior di latte ("nonna")
+export const storyGiven = (F, reward) => { const s = storyState(F); return Object.entries(STORIES).some(([id, list]) => list.some((ch, k) => ch.reward === reward && (s.heard[id] || 0) > k)); };
 // flags that change the game: the koi tip, Farid's pastries on the menu
 export function applyFlags(F){
   const f = storyState(F).flags;

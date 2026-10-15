@@ -20,14 +20,14 @@ export const STORIES = {
   celeste: [
     {lines: ["You know the building down at the bay, the one that's your Cocoa Room? Before all that, it had a name.", "Marchand & Fille. My grandfather Henri's chocolaterie."]},
     {lines: ["I told you about Marchand & Fille, Grand-père Henri's chocolate shop at the bay. Let me tell you how it began.", "He opened it in 1962. Copper pots, a marble slab, and a queue out the door on Sunday mornings.", "I used to sit under the counter eating the broken bits."]},
-    {lines: ["After Grand-père Henri, the chocolate shop at the bay went to my mother, Margaux.", "That's the 'Fille' in Marchand & Fille: and daughter. She was the best temperer on the whole coast."]},
+    {lines: ["After Grand-père Henri, the chocolate shop at the bay went to my mother, Margaux.", "That's the 'Fille' in Marchand & Fille: and daughter. She was the best temperer on the whole coast.", "Every Christmas she bought calissons from the nougat shop in the hills. Little almond boats."]},
     {lines: ["Maman, Margaux, the best temperer on the coast: when she died, my brothers in Lyon wanted to sell the shop.", "To a developer. Flats, they said. I couldn't run it. And I couldn't sell it.", "So Marchand & Fille just waited. Nine years, boarded up."]},
     {needs: ["cocoa"], lines: ["Grand-père's old shop at the bay, nine years boarded up? Yesterday I walked past and smelled chocolate again. I had to sit down.", "Here: Grand-père Henri's recipe book. It belongs in that kitchen. With you."], reward: "henri"},
     {lines: ["One more thing about Maman, Margaux. She always said wine and chocolate are old friends.", "Ask Marco, up at the vineyard, why. He'll pretend he doesn't know."]}
   ],
   marco: [
     {lines: ["Forty summers on these vines. The first rows I planted with my own two hands, at twenty."]},
-    {needs: ["celeste:6"], lines: ["Celeste sent you, didn't she, asking about wine and chocolate. She means her mother. Margaux Marchand.", "Margaux would bring chocolate up to the vines at harvest. We ate it with the new red, sitting on the barrels."]},
+    {needs: ["celeste:6"], lines: ["Celeste sent you, didn't she, asking about wine and chocolate. She means her mother. Margaux Marchand.", "Margaux would bring chocolate up to the vines at harvest. We ate it with the new red, sitting on the barrels.", "Figs from the old tree by the barrels, too. She always took the ripest."]},
     {lines: ["Margaux Marchand, from the chocolate shop. There's more to that story.", "We were sweethearts, one summer. Then she went to Lyon to train, and I stayed with the vines.", "When she came back she was the 'Fille' at the shop, and I was 'that boy from the vineyard'. Best friends, ever after."]},
     {lines: ["Margaux and me, best friends ever after. So the very first red from these vines, I named it Margaux.", "She laughed until she cried."]},
     {lines: ["That first red I named for Margaux: I kept one bottle. Margaux, 1984.", "It belongs in your cellar, not under my bed. Open it on a good day."], reward: "margaux"}
@@ -40,17 +40,17 @@ export const STORIES = {
     {lines: ["The forty-year letter, for 'H.': I gave it to Hana this morning.", "My hands were shaking more than hers."]},
     {lines: ["Hana's letter, the one I kept in my desk forty years: it was from her father.", "Written before he went to sea and didn't come back. Forty years late.", "She hugged me. Then she gave me toast. I believe that's how Hana says thank you."]},
     // round 122: Sachiko in Kyoto kept his grandmother's tea scoop
-    {needs: ["sachiko:3"], lines: ["This is my grandmother's tea scoop, from her lane in Kyoto. Sachiko kept it? All these years?", "Grandmother taught half the lane. She'd be glad it was you who brought it. Thank you. Truly."]}
+    {needs: ["sachiko:3"], lines: ["This is my grandmother's tea scoop, from her lane in Kyoto. Sachiko kept it? All these years?", "Grandmother taught half the lane. She'd be glad it was you who brought it. Thank you. Truly.", "After every lesson she gave her pupils a sweet from the wagashi shop on the lane."]}
   ],
   hana: [
-    {lines: ["I grew up by the sea, love. My father had a little blue boat.", "He'd bring home fish, and I'd make the toast."]},
+    {lines: ["I grew up by the sea, love. My father had a little blue boat.", "He'd bring home fish, and I'd make the toast.", "I'd come home with my pockets full of sea glass. Green ones were lucky."]},
     {lines: ["My father, with the little blue boat? He went out one winter and didn't come back.", "I was eight."]},
     {needs: ["okada:5"], lines: ["You know my father never came back from the sea. Well. Mr Okada gave me a letter.", "From my father. Forty years in a drawer, and it still smelled of the sea."]},
     {lines: ["My father's letter, the one Mr Okada kept forty years: he wrote that he'd teach me to sail that summer.", "So I've decided I'm going to learn anyway.", "And I made something new. Postman's toast: honey, butter, a pinch of sea salt. Here, first ones are yours."], reward: "toast"}
   ],
   juniper: [
     {lines: ["Can you keep a secret? The poems in the Gazette, signed 'J.'? Don't look at me like that."]},
-    {lines: ["About those Gazette poems signed 'J.'. Still a secret, yes?", "I write them here at the library, before it opens. The building's quietest then. Just me and the radiators."]},
+    {lines: ["About those Gazette poems signed 'J.'. Still a secret, yes?", "I write them here at the library, before it opens. The building's quietest then. Just me and the radiators.", "I'd write them on handmade paper if I could. The kind with petals pressed in."]},
     {needs: ["theo:2"], lines: ["My secret Gazette poems: I think someone's found me out.", "Someone's been leaving pressed flowers in the poetry section. Right where the next poem goes."]},
     {lines: ["The pressed flowers in the poetry section, the ones left where my next poem goes? I know who it is.", "It's Theo. Of course it's Theo. He has a rubber stamp that says 'pressed'."]},
     {lines: ["So Theo knows I'm 'J.' now, and I've gone and agreed to something.", "We're doing a reading at the night market. Lior's making the lanterns. I'm terrified. You'll come?"]},
@@ -61,41 +61,41 @@ export const STORIES = {
     {lines: ["Juniper and I live together now, in the green cottage by the flower-farm gate. People ask how. It started with a library fine.", "Forty years of seed catalogues, never returned. She came round to collect them herself."]},
     {lines: ["That library fine, the one for my forty years of seed catalogues? Juniper didn't take the catalogues back.", "She sat down at my kitchen table and read them all. Then she asked why the tomato pages had poems in the margins."]},
     {lines: ["The poems in the margins of my seed catalogues, the ones Juniper found? I'd written them. Badly. For forty years.", "She didn't laugh. She brought me a notebook. Now I write them there, and she tells me which ones are good. None, mostly."]},
-    {lines: ["When the shops came to Makers' Lane and we both needed somewhere new, Juniper said: one cottage, two armchairs, one teapot.", "I said she'd never cope with my seed trays. She said I'd never cope with her telescope. We were both wrong."]},
+    {lines: ["When the shops came to Makers' Lane and we both needed somewhere new, Juniper said: one cottage, two armchairs, one teapot.", "I said she'd never cope with my seed trays. She said I'd never cope with her telescope. We were both wrong.", "The teapot's for green tea now. Juniper's doing. I've come round to it."]},
     {lines: ["Juniper and I have our evenings in the green cottage: she reads me her poems, I tell her what to plant.", "Here, a packet of my tomato seeds. There's a poem on the back. Don't tell her I wrote it."], reward: "linseeds"}
   ],
   theo: [
-    {lines: ["I keep the village records. Births, weddings, who owns which hedge.", "And the Gazette's poems, the ones signed 'J.', in my album."]},
+    {lines: ["I keep the village records. Births, weddings, who owns which hedge.", "And the Gazette's poems, the ones signed 'J.', in my album.", "Postcards too, for the stamps. Officially for the stamps."]},
     {lines: ["Those Gazette poems signed 'J.', in my album: whoever writes them writes about the well like an old friend.", "I've started leaving them pressed flowers. Is that strange?"]},
     {needs: ["juniper:3"], lines: ["The pressed flowers I was leaving for 'J.'? Juniper caught me at it, in the poetry section.", "I said I was cataloguing. She laughed for a full minute."]},
     {lines: ["Since Juniper caught me with the pressed flowers, we have tea in the trophy room.", "She reads, I stamp. Best part of my day."]},
     {needs: ["juniper:5"], lines: ["Juniper's poetry reading at the night market: it's on a Thursday night. Officially.", "I've reserved the front row. And the second row. For nerves."]}
   ],
   bo: [
-    {lines: ["See that carved sign in the corner of the workshop? 'Marchand & Fille', the old chocolate shop at the bay.", "Made it the year I left school. *hums*"]},
+    {lines: ["See that carved sign in the corner of the workshop? 'Marchand & Fille', the old chocolate shop at the bay.", "Made it the year I left school. *hums*", "Red cedar, that sign. Best wood there is. Smells like a pencil case."]},
     {lines: ["That old 'Marchand & Fille' sign in my workshop: when the chocolate shop closed, Celeste couldn't look at it.", "So I kept it. Oiled it every spring."]},
     {needs: ["cocoa", "celeste:5"], lines: ["The Marchand & Fille sign, the one I've oiled every spring? I've sanded it back.", "It's going up over your Cocoa Room door, if you'll have it."], reward: "sign"},
     {lines: ["Now the old sign's up over your door, other news. My niece Wren's back from the city.", "Ranger, now. I built that cabin in the woods for her gran, you know."]}
   ],
   wren: [
     {lines: ["My gran was the ranger before me. She planted the chestnut tree by the foraging patch."]},
-    {lines: ["Gran, the ranger before me? Uncle Bo built the cabin and the lookout for her.", "I slept up in the lookout every summer."]},
+    {lines: ["Gran, the ranger before me? Uncle Bo built the cabin and the lookout for her.", "I slept up in the lookout every summer.", "From the lookout I'd watch the kingfisher work the pool. Still my favourite bird."]},
     {lines: ["After all those summers in Gran's lookout, I went off to the city. Ten years. Offices.", "I missed the sound of the waterfall every single day."]},
     {needs: ["fish5"], lines: ["Five kinds of fish in your journal? Then you've earned a ranger secret.", "The golden koi on your river come up at dusk, when the water's still.", "Cast slow. Wait longer than feels right."], reward: "koi"}
   ],
   mateo: [
     {lines: ["My abuela Rosario worked at the old chocolate shop at the bay, Marchand & Fille.", "Margaux's tempering girl, at sixteen."]},
-    {lines: ["Abuela Rosario, Margaux's tempering girl at the chocolate shop? She came home smelling of cocoa every day.", "That's why I study food science. I wanted to know why chocolate snaps."]},
+    {lines: ["Abuela Rosario, Margaux's tempering girl at the chocolate shop? She came home smelling of cocoa every day.", "That's why I study food science. I wanted to know why chocolate snaps.", "On Sundays she still makes churros, with chocolate thick enough to stand a spoon in."]},
     {needs: ["cocoa", "celeste:5"], lines: ["Abuela Rosario, who tempered at Marchand & Fille: I told her I work in the same kitchen now, boss.", "She cried. She's coming to visit. She says the marble slab had better still be there."]}
   ],
   opal: [
     {needs: ["cocoa"], lines: ["Can I tell you something, now the old chocolate shop at the bay is yours?", "I've paid the rates on that building for nine years."]},
-    {lines: ["Those nine years I paid the rates on the old chocolate shop: developers kept calling the bank.", "I kept saying 'not for sale'. Technically it was Celeste's brothers' call. Technically."]},
+    {lines: ["Those nine years I paid the rates on the old chocolate shop: developers kept calling the bank.", "I kept saying 'not for sale'. Technically it was Celeste's brothers' call. Technically.", "I still have a key to the place on my keyring. I never used it once."]},
     {lines: ["You're wondering why I paid the rates on Marchand & Fille all those years. Margaux opened my first savings account.", "With a chocolate coin. Some debts aren't on paper."]}
   ],
   felix: [
     {lines: ["My first bees? A swarm that landed in the old apple tree in the orchard.", "I was twenty, terrified, with a cardboard box."]},
-    {lines: ["That swarm from the orchard's apple tree became my first hives. Farid still says it's the orchard's blossom honey, not mine.", "Technically, the bees agree with him."]},
+    {lines: ["That swarm from the orchard's apple tree became my first hives. Farid still says it's the orchard's blossom honey, not mine.", "Technically, the bees agree with him.", "One day I'll taste someone else's honey. Sunflower, maybe. Just to check mine's better."]},
     {needs: ["farid:2"], lines: ["Farid and I, still arguing over whose honey it is? Well. He gave me a pruning tip for the orchard.", "It worked. The orchard's buzzing. Don't tell him I said he was right."]}
   ],
   elena: [
@@ -107,21 +107,21 @@ export const STORIES = {
   tomi: [
     {lines: ["You know Elena, from the farm? We sat two desks apart in the city, before I came home to the mill."]},
     {needs: ["elena:3"], lines: ["Elena and me, two desks apart in the city? She left first. Then me.", "Best thing either of us did. Olives don't send emails."]},
-    {lines: ["Since Elena and I both quit the city, Posy says I should 'explore the feeling'.", "So I'm exploring it. On Saturdays, at Elena's. With a milking stool."]}
+    {lines: ["Since Elena and I both quit the city, Posy says I should 'explore the feeling'.", "So I'm exploring it. On Saturdays, at Elena's. With a milking stool.", "In the city it was oat lattes at my desk. Now it's surf wax and the sea."]}
   ],
   posy: [
-    {lines: ["Tomi at the mill pretends he never misses the city. I've read three books about people like Tomi."]},
+    {lines: ["Tomi at the mill pretends he never misses the city. I've read three books about people like Tomi.", "I still can't pass a tea towel without buying it. Professional habit."]},
     {needs: ["tomi:2"], lines: ["Tomi, who pretends he doesn't miss the city? I gave him some advice.", "You don't have to choose. Press olives in the week, milk goats on a Saturday. That's psychology."]}
   ],
   mei: [
     {lines: ["My mother used to sing to the roses. I thought everybody did."]},
-    {lines: ["My mother, the one who sang to the roses: when she died, I came to the flower farm every day.", "Everyone said the flowers needed me. I think I needed them."]},
+    {lines: ["My mother, the one who sang to the roses: when she died, I came to the flower farm every day.", "Everyone said the flowers needed me. I think I needed them.", "My mother loved proteas too. She said they were the bravest flowers."]},
     {lines: ["I come to the flowers for my mother, you know. Every year on her birthday I take her a bouquet.", "This year… would you bring me one? Any kind."]},
     {needs: ["bouquet"], lines: ["A bouquet for my mother's birthday. You brought one! Tulips were her favourite.", "Thank you. Really."], reward: "bouquet"}
   ],
   noor: [
     {lines: ["I used to run a rescue in the city. Thirty animals, one tiny yard."]},
-    {lines: ["My old rescue in the city, thirty animals in one tiny yard? The landlord sold the building.", "I found homes for every single one. Then I cried for a week."]},
+    {lines: ["My old rescue in the city, thirty animals in one tiny yard? The landlord sold the building.", "I found homes for every single one. Then I cried for a week.", "The first kitten I rehomed, I kept a little cat keyring to remember her."]},
     {needs: ["trust1"], lines: ["Ever since I lost my rescue in the city, I've wanted another. And guess what?", "Elena says there might be room in the barn for a little rescue corner one day. Imagine!"]}
   ],
   pilar: [
@@ -190,25 +190,25 @@ export const STORIES = {
     {lines: ["The fountain beats a van in Sevilla for writing songs, too. Here, this one's new.", "I wrote it about the vultures. It's slow. They're very patient birds."]}
   ],
   sofia: [
-    {lines: ["My nonna had a gelato cart in Napoli. This little book is all her recipes."]},
+    {lines: ["My nonna had a gelato cart in Napoli. This little book is all her recipes.", "She kept limoncino in the freezer too. For emergencies, she said."]},
     {lines: ["Nonna's recipe book, from her gelato cart in Napoli? There's one I can't get right. Her fior di latte.", "It's only milk and sugar, and I keep ruining it."]},
     {needs: ["pilar:3"], lines: ["Nonna's fior di latte, the one I kept ruining? Pilar fixed it! 'Let the milk be milk.'", "Here, taste. Nonna would cry."], reward: "nonna"}
   ],
   farid: [
-    {lines: ["I trained in my uncle's bakery. Up at four, flour in my eyebrows."]},
+    {lines: ["I trained in my uncle's bakery. Up at four, flour in my eyebrows.", "My uncle kept his saffron in a tin by the till. Like money, he said."]},
     {lines: ["After all those four o'clock starts in my uncle's bakery, I came here for one summer of fruit picking.", "That was six summers ago."]},
     {lines: ["My uncle's pastries, from the bakery where I trained? I made them for Pilar, with Felix's honey and the orchard's pistachios.", "She's putting them on the tapas menu!"], reward: "pastry"}
   ],
   // Phase 4: Ada the haberdasher and Idris the tailor, Makers' Lane. Ada's jar of buttons; Idris's first suit.
   ada: [
-    {lines: ["See the button jar on my counter? Every button in it came off something somebody loved.", "My mother started it. She ran a haberdashery by the sea, with a bell over the door."]},
+    {lines: ["See the button jar on my counter? Every button in it came off something somebody loved.", "My mother started it. She ran a haberdashery by the sea, with a bell over the door.", "She sold linen too, the good kind. It creased like it meant it."]},
     {lines: ["The button jar I told you about, my mother's: the oldest one is a brass button off a sea captain's coat.", "She swapped him a whole bolt of serge for it. She said it was the best bargain of her life."]},
     {lines: ["My mother's shop by the sea, the one with the bell? It closed the winter I turned twenty.", "I kept the bell, the scissors and the jar. That's this shop, really. Just further from the sea."]},
     {lines: ["That brass button, the sea captain's, from the bottom of the jar: I want it to go on something you wear.", "Don't argue. Buttons should be worn, not kept. Take it to Idris."], reward: "seabutton"}
   ],
   idris: [
     {lines: ["The first thing I ever made was a suit for my grandfather. I was fourteen. The sleeves were different lengths."]},
-    {lines: ["My grandfather's suit, the one with the odd sleeves: he wore it to every wedding for thirty years.", "He said the short arm was for shaking hands and the long one was for dancing."]},
+    {lines: ["My grandfather's suit, the one with the odd sleeves: he wore it to every wedding for thirty years.", "He said the short arm was for shaking hands and the long one was for dancing.", "He wore it with a leather belt older than me. I polished it every wedding."]},
     {lines: ["After that suit for my grandfather, I went to a tailor in the city to learn properly. Five years of buttonholes.", "Then the lane had an empty house and a door with a step that suited me."]},
     {lines: ["When my grandfather died, that suit with the odd sleeves came back to me. It hangs at the end of my rail.", "I've never taken the sleeves up. Some mistakes should be kept exactly as they are."]}
   ]

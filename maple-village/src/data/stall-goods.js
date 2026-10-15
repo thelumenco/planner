@@ -127,11 +127,25 @@ const P = (n, price, line, art, pet) => ({n, kind: "pet", price, line, art, pet,
 Object.assign(GOODS, {
   s_recipebook: K("Henri's recipe book", 0, "Henri Marchand's chocolate recipes, in faded ink, 1962 onwards.", ["box", "#8A5A3A"]),
   s_label: K("The first Marchand label", 0, "Theo's painting of the Marchand & Fille label: a ribbon and a copper pot.", ["star", "#E8C48E"]),
-  s_praline: G("Henri's hazelnut pralines", "family", 0, null, "Hazelnut pralines, from Henri's own recipe. Melt-in-the-mouth.", ["box", "#C98A4A"]),
-  s_toast: G("Postman's toast", "family", 0, null, "Honey, butter and a pinch of sea salt. Hana's new favourite.", ["loaf", "#E3B04B"]),
+  // (the loves round: once their chapters are told, the pralines are made at the Cocoa Room from Henri's book, Hana
+  // sells Postman's toast on her Treats shelf and the Scoop Shack makes Nonna's fior di latte; `story` is the reward)
+  s_praline: {...G("Henri's hazelnut pralines", "family", 14, null, "Hazelnut pralines, from Henri's own recipe. Melt-in-the-mouth.", ["box", "#C98A4A"]), dairy: true},
+  s_toast: {...G("Postman's toast", "family", 9, "treats", "Honey, butter and a pinch of sea salt. Hana's new favourite.", ["loaf", "#E3B04B"]), story: "toast"},
   s_spoon: K("Tomás's olive-wood spoon", 0, "An olive-wood spoon Tomás Ruiz carved in 1913 from a branch of the tree by the mill. Worn smooth by four generations of soup.", ["roll", "#C9A27E"]),
   s_poem: K("A verse from Ornella", 0, "In a neat hand, on cream paper, from the yellow house by the harbour: 'The harbour lights came on, then all at once. / The farinata cooled; the swallows went to bed. / Some evenings are not lost, they're only long. / Stay longer, stay a little, the water said.'", ["roll", "#FFFDF6"]),
-  s_nonna: G("Nonna's fior di latte", "family", 0, null, "Just milk and sugar, the way Sofia's nonna made it in Napoli.", ["cone", "#FFF6DC"])
+  s_nonna: G("Nonna's fior di latte", "family", 5, null, "Just milk and sugar, the way Sofia's nonna made it in Napoli.", ["cone", "#FFF6DC"])
+});
+// the loves round (data/loves.js): things a villager loves that weren't in the game. Fudge and a little tin of gold
+// coins (Cocoa Room, all year); a card of buttons (Ada's); a rubber stamp (the post office, by the scales); plates to
+// take away from the wine shop kitchen (game/kitchen.js TAKEAWAY), boxed from a batch on the tapas chalkboard
+Object.assign(GOODS, {
+  fudge: {...G("Slab of vanilla fudge", "family", 5, "family", "Fudge! Proper crumbly fudge. One square now, one for later.", ["box", "#F3D9A8", "#C98A4A"]), dairy: true},
+  coin_tin: {...G("Little tin of gold chocolate coins", "family", 5, null, "Gold coins in a little tin! For luck, or for later.", ["disc", "#F3C969", "#C98A4A"]), dairy: true},
+  btncard: G("A card of buttons", "family", 4, null, "A card of buttons! Little ones, all matching. Far too nice to sew on.", ["tile", "#F3EDE4", "#7FB8E8"]),
+  rubberstamp: G("A rubber stamp", "family", 6, null, "A rubber stamp! I'm going to stamp every letter I send.", ["stamp", "#C98A4A", "#C2505F"]),
+  tk_salmorejo: G("Salmorejo, to take away", "family", 11, null, "Salmorejo! Cold and garlicky. I'll have it tonight.", ["bowl", "#E8743B"]),
+  tk_tortaaceite: G("Olive oil cake, to take away", "family", 12, null, "A slice of olive oil cake, wrapped in paper. Still smells of oranges.", ["loaf", "#E3C25A"]),
+  tk_pasteles: G("Honey and pistachio pastries, to take away", "family", 9, null, "Honey and pistachio pastries! Sticky fingers, no regrets.", ["tart", "#A8C98A"])
 });
 Object.assign(GOODS, {
   k_luckycat: K("Lucky cat figurine", 9, "A golden lucky cat, waving for good fortune.", ["plush", "#F3C969"]),

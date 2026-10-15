@@ -33,6 +33,7 @@
 // often while the player's serving too). Takings go straight to the player. The player can have a bar or take one to give.
 import { esc, dayKey, localHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
+import { ITEMS } from "../data/items.js";
 import { mouldPath, shellRibs } from "../art/moulds.js";
 import { INGR, farmShelf, scoopState, hasUp, takeBack, bikeOwned, DELIVERY, deliveryHours } from "./scoop.js";
 import { wineClubNow, xmasOn, XMAS_FROM, XMAS_TO } from "./tours.js";
@@ -178,19 +179,36 @@ export const unstockPantry = (F, id, n, orch) => id.startsWith("wine_") ? null :
 // makes a box Tomi can have too
 export const caseCount = c => onDisplay(c).reduce((a, b) => a + c.trays[b.id], 0);
 // size bonbons from the case: the ones the player chose (sel: {id: n}, round 184), else in turn from each flavour; true if
-// every shell was dark, null if the choice doesn't add up
-function pick(c, size, sel){
+// every shell was dark, null if the choice doesn't add up. took ({id: n}) gets what went in
+function pick(c, size, sel, took = {}){
   if (sel) { const ids = Object.keys(sel).filter(id => sel[id] > 0);
     if (ids.reduce((a, id) => a + sel[id], 0) !== size || ids.some(id => !(c.trays[id] >= sel[id]))) return null;
-    ids.forEach(id => { c.trays[id] -= sel[id]; }); return ids.every(id => (c.bonbons.find(b => b.id === id) || {}).shell === "dark"); }
+    ids.forEach(id => { c.trays[id] -= sel[id]; took[id] = sel[id]; }); return ids.every(id => (c.bonbons.find(b => b.id === id) || {}).shell === "dark"); }
   const shown = onDisplay(c); let i = 0, dark = true;
-  for (let k = 0; k < size; i++) { const b = shown[i % shown.length]; if (!(c.trays[b.id] > 0)) continue; c.trays[b.id]--; if (b.shell !== "dark") dark = false; k++; if (i > 200) break; }
+  for (let k = 0; k < size; i++) { const b = shown[i % shown.length]; if (!(c.trays[b.id] > 0)) continue; c.trays[b.id]--; took[b.id] = (took[b.id] || 0) + 1; if (b.shell !== "dark") dark = false; k++; if (i > 200) break; }
   return dark;
 }
+// the loves round: a packed box remembers what's in it, so a villager can love a particular box (data/loves.js: Celeste's
+// hazelnut and red wine, Posy's honey heart). Same bonbons, same box: the id is keyed by its contents ("box4_<key>",
+// "box4d_<key>"...), its ITEMS entry is the plain box's (box4, from stall-goods.js) plus `boxOf` and `bonbons`. Kept in
+// c.boxes {id: {base, items: [{id, n, shell, fills, shape, name}]}} and registered on load. Boxes packed before this
+// (plain box4, box9d...) stay as they were: they still stack, give and sell, they just don't know their bonbons.
+export const boxBase = id => ((ITEMS[id] || {}).boxOf) || id;
+function mintBox(c, base, took){
+  const items = Object.keys(took).filter(id => took[id] > 0).sort().map(id => { const r = recipeOf(c, id) || {}; return {id, n: took[id], shell: r.shell || "milk", fills: [...(r.fills || [])], shape: r.shape || "dome", name: r.name || "Bonbon"}; });
+  const id = `${base}_${hash(items.map(x => `${x.id}~${x.shape}~${x.n}`).join("|")).toString(36)}`;
+  c.boxes = c.boxes || {}; if (!c.boxes[id]) c.boxes[id] = {base, items}; return id;
+}
+const boxName = (base, items) => { const nm = items.map(x => x.name); return `${ITEMS[base].n} (${nm.length > 2 ? `${nm.slice(0, 2).join(", ")} and ${nm.length - 2} more` : nm.join(" and ")})`; };
+export function registerBoxes(F){ const b = (F.cocoa && F.cocoa.boxes) || {};
+  for (const [id, x] of Object.entries(b)) { if (!ITEMS[x.base]) continue;
+    ITEMS[id] = {...ITEMS[x.base], n: boxName(x.base, x.items), boxOf: x.base, ico: ITEMS[x.base].ico || x.base, bonbons: x.items.map(i => ({shell: i.shell, fills: i.fills, shape: i.shape})),
+      what: x.items.map(i => `${i.name}${i.n > 1 ? ` ×${i.n}` : ""}`).join(", ")}; } }
+function packed(F, c, base, took){ const id = mintBox(c, base, took); registerBoxes(F); F.inv[id] = (F.inv[id] || 0) + 1; return id; }
 export function packBox(F, size, sel){
   const c = cocoaState(F); if (caseCount(c) < size) return null;
-  const d = pick(c, size, sel); if (d === null) return null;
-  const id = `box${size}${d ? "d" : ""}`; F.inv[id] = (F.inv[id] || 0) + 1; return id;
+  const took = {}, d = pick(c, size, sel, took); if (d === null) return null;
+  return packed(F, c, `box${size}${d ? "d" : ""}`, took);
 }
 // round 184 ("why can't I choose the specific bonbons when making a gift box or pairing box?"): the picker.
 // pk = {kind: "box" | "grand" | "pair", size, k (the bottle's shelf id, for a pair), sel: {id: n}}
@@ -238,6 +256,22 @@ export const specialOn = day => { const f = festivalOn(day); return f && SPECIAL
 export function makeSpecial(F){
   const c = cocoaState(F), sp = specialOn(dayKey()); if (!sp || shellChoc(c, sp.kind) < sp.use) return null;
   takeChoc(c, sp.kind, sp.use); c.specials[sp.id] = (c.specials[sp.id] || 0) + sp.make; return sp;
+}
+// the loves round: Henri's hazelnut pralines, from his recipe book (once Celeste's chapter has given it you: st.book,
+// stories.js storyGiven "henri"): 6 pieces of milk chocolate and a hazelnut off the fillings shelf make 2 boxes. And all
+// year, a little tin of gold chocolate coins (Opal's, after Margaux's first chocolate coin): 6 pieces of milk make 3
+export const PRALINES = {use: 6, kind: "milk", fill: "hazelnut", make: 2}, COIN_TINS = {use: 6, kind: "milk", make: 3};
+export const canPralines = c => shellChoc(c, PRALINES.kind) >= PRALINES.use && (c.pantry[PRALINES.fill] || 0) >= 1;
+export function makePralines(F, book){ const c = cocoaState(F); if (!book || !canPralines(c)) return 0;
+  takeChoc(c, PRALINES.kind, PRALINES.use); c.pantry[PRALINES.fill]--; if (c.pantry[PRALINES.fill] <= 0) delete c.pantry[PRALINES.fill];
+  F.inv.s_praline = (F.inv.s_praline || 0) + PRALINES.make; return PRALINES.make; }
+export function makeCoinTins(F){ const c = cocoaState(F); if (shellChoc(c, COIN_TINS.kind) < COIN_TINS.use) return 0; takeChoc(c, COIN_TINS.kind, COIN_TINS.use); F.inv.coin_tin = (F.inv.coin_tin || 0) + COIN_TINS.make; return COIN_TINS.make; }
+function yearRound(c, book){
+  const row = (ico, name, line, btn) => `<li><span class="wpic">${icon(ico, 28)}</span><span class="wtxt"><b>${name}</b><small>${line}</small></span>${btn}</li>`;
+  let h = `<p class="eyebrow" style="margin:12px 0 6px">${book ? "All year, and from Henri's recipe book" : "All year"}</p><ul class="hlist wlist">`
+    + row("coin_tin", "Little tins of gold chocolate coins", `Milk chocolate coins in gold foil, in a red tin. ${COIN_TINS.use} pieces of milk chocolate make ${COIN_TINS.make}, to give.`, `<button class="btn small primary" data-cc="cointin" ${shellChoc(c, COIN_TINS.kind) >= COIN_TINS.use ? "" : "disabled"}>Make ${COIN_TINS.make}</button>`);
+  if (book) h += row("s_praline", "Henri's hazelnut pralines", `His page has a thumbprint on it. ${PRALINES.use} pieces of milk chocolate and a hazelnut from the fillings shelf make ${PRALINES.make} boxes, to give.${(c.pantry.hazelnut || 0) < 1 ? " (No hazelnuts on the shelf: Hana's deli has them.)" : ""}`, `<button class="btn small primary" data-cc="praline" ${canPralines(c) ? "" : "disabled"}>Make ${PRALINES.make}</button>`);
+  return h + `</ul>`;
 }
 export function takeSpecial(F, id){ const c = cocoaState(F); if (!(c.specials[id] > 0)) return false; c.specials[id]--; F.inv[id] = (F.inv[id] || 0) + 1; return true; }
 export function eatBonbon(F, id){ const c = cocoaState(F), b = recipeOf(c, id); if (!b || !(c.trays[id] > 0)) return null; c.trays[id]--; return b; }
@@ -326,7 +360,7 @@ function hotMinute(c, day, hm, opts, out){
 }
 export function haveHot(F){ const c = cocoaState(F), k = ["milk", "dark", "white"].find(x => c.choc[x] > 0); if (!ccUp(c, "hotchoc") || !k) return null; c.choc[k]--; return k; }
 // a grand box of 16 (gift wrapping station): from the case like the others
-export function packGrand(F, sel){ const c = cocoaState(F); if (!ccUp(c, "wrap") || caseCount(c) < BOX16) return null; const d = pick(c, BOX16, sel); if (d === null) return null; const id = d ? "box16d" : "box16"; F.inv[id] = (F.inv[id] || 0) + 1; return id; }
+export function packGrand(F, sel){ const c = cocoaState(F); if (!ccUp(c, "wrap") || caseCount(c) < BOX16) return null; const took = {}, d = pick(c, BOX16, sel, took); if (d === null) return null; return packed(F, c, d ? "box16d" : "box16", took); }
 // a bar for the player: eaten now, or into the backpack to give (a gift item, bar_<kind>)
 export function takeBar(F, kind, give){ const c = cocoaState(F); if (!(c.bars[kind] > 0)) return false; c.bars[kind]--; if (give) F.inv[BAR_ID(kind)] = (F.inv[BAR_ID(kind)] || 0) + 1; return true; }
 
@@ -406,7 +440,7 @@ export function bonbonPanel(F, st){
   const ok = sel.length && canMakeBonbon(c, shell, sel);
   h += `<div class="actions"><button class="btn primary" data-cc="bonbon" ${ok ? "" : "disabled"}>${known ? "Make another tray" : "Make it"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
   if (sel.length && shellChoc(c, shell) < SHELL) h += `<p class="muted">Not enough ${KINDS[shell].n.toLowerCase()}: temper some more first, or raise its bonbon shelf target at the counter so Mateo makes some.</p>`;
-  h += specialCard(c);
+  h += specialCard(c) + yearRound(c, st.book);
   if (c.bonbons.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map(b => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span><button class="btn small alt" data-cc="again" data-k="${esc(b.id)}" ${canMakeBonbon(c, b.shell, b.fills) ? "" : "disabled"}>Another tray</button></li>`).join("")}</ul>`;
   return h;
 }

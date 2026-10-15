@@ -11,6 +11,7 @@ import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel
 import { questBoost } from "./vineyard.js";
 import { wineNews, vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, grovePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
+import { isLove, loveThanks } from "../data/loves.js";
 import { initNotebook, openMail, openTracker, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx, TRACKS, setTrack, currentTrack, setLive } from "./audio.js";
 import { findPath, blocked } from "./paths.js";
@@ -96,7 +97,7 @@ import { tripOn, inParty, buyTrip, endTrip, ticketPanel, homePanel, initTrips, n
 import { bikeArt, taxiBoat, taxiBank, transportArt } from "../art/transport.js";
 import { bikeOn, bikeLeft, hireBike, returnBike, bikeExpired, bikePanel, STOPS as TAXI_STOPS, taxiPanel, takeTaxi } from "./transport.js";
 import { forage, rangerPanel } from "./woods.js";
-import { tellStory, storyReady, storiesHTML, applyFlags as storyFlags, storyState } from "./stories.js";
+import { tellStory, storyReady, storiesHTML, applyFlags as storyFlags, storyState, storyGiven } from "./stories.js";
 import { STORIES } from "../data/stories.js";
 import { fishState, fishPanel, spotIn, SPOTS as FISH_SPOTS, cast as fishCast, land as fishLand, buyRod, buyReel, addBait, markerAt, inZone, ESCAPE as FISH_ESCAPE, FISH, sellCatch, spotOpen } from "./fishing.js";
 import { fishSpotArt, koiArt } from "../art/fishing.js";
@@ -105,11 +106,12 @@ import { moodPanel, vanPick, vanClear, lookLine as vanLookLine } from "./van.js"
 import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, brushNearest, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives,
   extractorPanel, crockPanel, pressPanel as hfPressPanel, cavePanel as hfCavePanel, spinFrames, makeYoghurt, pressCheese, takeWheel, cheeseNames, CHEESES as HF_CHEESES,
   gainTrust, muckOut, latchGate, catchGoat, nameHive, creamHoney, cutComb, turnWheels, finishRequest, stockShelf, hfTick, farmhousePanel, LEVELS as HF_LEVELS, MOODS as HF_MOODS } from "./hfarm.js";
-import { waiterOn, riderOn, scoopState, scoopTick, scoopNews, trolleyPanel, loadTrolley, returnTrolley, trolleySell, trolleyOn, trolleyMelted, TROLLEY, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, unstockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
+import { waiterOn, riderOn, scoopState, scoopTick, scoopNews, trolleyPanel, loadTrolley, returnTrolley, trolleySell, trolleyOn, trolleyMelted, TROLLEY, registerItems, makeNonna, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, unstockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaNews, cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
   pantryPanel, bonbonPanel, casePanel, onDisplay as ccOnDisplay, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
-  sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp, emptyVending, pickAdd, pickFill } from "./cocoa.js";
+  sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, haveHot, packGrand, readyPot, ccUp, emptyVending, pickAdd, pickFill,
+  registerBoxes, makePralines, makeCoinTins } from "./cocoa.js";
 import { canKeep, keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, ownerName, PETS, petAt } from "./companions.js";
 import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpeed } from "./goals.js";
 import { diningTable, skyWash, tapeLabel } from "../art/scenes.js";
@@ -795,7 +797,7 @@ function giveBouquet(id){
   if (near[1] > 170) { speak(`Walk over to ${near[0].def.name} to give it.`, 3200); return; }
   const who = near[0].def; if (giftedAlready(who.id)) return; addInv(id, -1); if (openView) { openView = null; ctx(); }
   F.bouquets = F.bouquets || {}; F.bouquets[who.id] = (F.bouquets[who.id] || 0) + 1; F.fam.gifts[who.id] = (F.fam.gifts[who.id] || 0) + 1;
-  npcSay(who.id, pick(BQ_THANKS)); mprop("heart", near[0].x, near[0].y - 50, 1800); sfx("chime"); gainXp(1);
+  npcSay(who.id, loveThanks(who.id, id) || pick(BQ_THANKS)); mprop("heart", near[0].x, near[0].y - 50, 1800); sfx("chime"); gainXp(1);
   const h = giftHeart(who.id, id); flash(`${who.name} loved the ${it.n.toLowerCase()}`); if (h) setTimeout(() => speak(h.trim(), 4500), 1600); save(true);
 }
 // a bouquet handed to one of your friends who's right here
@@ -804,7 +806,7 @@ function bouquetTo(id, w){
   if (giftedAlready(w)) return;
   addInv(id, -1); F.bouquets = F.bouquets || {}; F.bouquets[w] = (F.bouquets[w] || 0) + 1; F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
   { const h = giftHeart(w, id); if (h) setTimeout(() => speak(h.trim(), 4500), 1600); }
-  { const p = npcPos(w); npcSay(w, pick(BQ_THANKS)); if (p) mprop("heart", p.x, p.y - 50, 1800); flash(`${villagerName(w)} loved the ${it.n.toLowerCase()}`); }
+  { const p = npcPos(w); npcSay(w, loveThanks(w, id) || pick(BQ_THANKS)); if (p) mprop("heart", p.x, p.y - 50, 1800); flash(`${villagerName(w)} loved the ${it.n.toLowerCase()}`); }
   sfx("chime"); gainXp(1); save(true);
 }
 // Tea and cake with Farid in the orchard cottage, once a day: a few coins, a little xp, and a lot of kindness
@@ -840,11 +842,11 @@ function tailorPreview(){
   const c = fig.cloneNode(true); c.removeAttribute("id"); c.querySelectorAll("[id]").forEach(e => e.removeAttribute("id")); c.removeAttribute("transform"); c.removeAttribute("style"); c.setAttribute("class", "ch me");
   g.replaceChildren(c); const d = TL.designOf(F, tailSt); applyLook(c, lookOf(F), d.fab ? {...TL.wornSpec(F), ...TL.specOf(d), ...(TL.specOf(d).top && TL.specOf(d).top.kind === "dress" ? {bottom: null} : {})} : TL.wornSpec(F));
 }
-// Gifts and hearts (quests.js giveTo): one gift per villager a day, in person or sent round. A favourite (a crop they'd
-// ask for, or a present that suits them) is worth a heart, anything else half a heart.
+// Gifts and hearts (quests.js giveTo): one gift per villager a day, in person or sent round. One of their loves
+// (data/loves.js: from their stories, a combination, or an everyday favourite) is worth a heart, anything else half a
+// heart. A story love says its own thank-you (loveThanks), before any line the item has for them (it.says).
 const villagerName = w => (NPCS.find(n => n.id === w) || {}).name || "them";
-// (a present for anyone isn't anyone's favourite, unless it's on their list of likes)
-const isFav = (w, id) => { const it = ITEMS[id] || {}; return ((QB.ASKERS[w] || {}).likes || []).includes(id) || (it.to != null && it.to !== "family" && giftWho(it.to).includes(w)); };
+const isFav = (w, id) => isLove(w, id);
 function giftedAlready(w){ if (!QB.giftedToday(F, w)) return false; speak(`You've already given ${villagerName(w)} something today. Save it for tomorrow!`, 4000); return true; }
 function giftHeart(w, id){
   const r = QB.giveTo(F, w, villagerName(w), id, w === "tomi" && isDairy(id) ? "none" : isFav(w, id), addInv); if (!r) return "";
@@ -863,7 +865,7 @@ function giveToVillager(id, w){
   addInv(id, -1); giveMode = null; if (openView) { openView = null; ctx(); }
   F.fam.gifts[w] = (F.fam.gifts[w] || 0) + 1;
   if (it.kind === "bouquet") { F.bouquets = F.bouquets || {}; F.bouquets[w] = (F.bouquets[w] || 0) + 1; }
-  const fav = isFav(w, id), line = w === "tomi" && isDairy(id) ? TOMI_NO : (it.says && it.says[w]) || (fav ? pick(FAV_THANKS) : it.kind === "bouquet" ? pick(BQ_THANKS) : pick(GIFT_THANKS));
+  const fav = isFav(w, id), line = w === "tomi" && isDairy(id) ? TOMI_NO : loveThanks(w, id) || (it.says && it.says[w]) || (fav ? pick(FAV_THANKS) : it.kind === "bouquet" ? pick(BQ_THANKS) : pick(GIFT_THANKS));
   npcSay(w, line); [0, 250, 500].forEach((d, k) => setTimeout(() => mprop("heart", e.x + (k - 1)*14, e.y - 50 - k*6, 1800), d)); sfx("chime"); gainXp(1);
   const h = giftHeart(w, id); flash(`${villagerName(w)} loved the ${it.n.toLowerCase()}`); if (h) setTimeout(() => speak(h.trim(), 4500), 1600); save(true);
 }
@@ -898,7 +900,7 @@ const SIGNOFF = {hana: "Love, Hana x", theo: "Yours sincerely (and gratefully), 
 const BQ_NOTE = {farid: "They're on the cottage table, next to the cake tin. Mei says they're nearly as nice as hers.", mei: "A flower farmer, given flowers! I put them in my best jug. Nobody ever does that.", hana: "They're on the counter at the market. Three people have asked where they're from.", theo: "I've pressed one in the village register. For the record.",
   tomi: "They're on the windowsill. Posy says I have to change the water. I will.", posy: "They're by the till in the gift shop. Customers keep sniffing them.", bo: "In a jar on the workbench. Sawdust and roses. Not bad."};
 function thankNote(t){
-  const it = ITEMS[t.item] || {n: "present", say: ""}, line = it.kind === "bouquet" ? BQ_NOTE[t.who] || "They're beautiful." : (it.says && it.says[t.who]) || it.say || "";
+  const it = ITEMS[t.item] || {n: "present", say: ""}, line = loveThanks(t.who, t.item) || (it.kind === "bouquet" ? BQ_NOTE[t.who] || "They're beautiful." : (it.says && it.says[t.who]) || it.say || "");
   // name the present once: if their line already says what it is, just say thank you
   const nm = it.n.toLowerCase().replace(/, wrapped in.*$/, "").replace(/^(a|an|the) /, ""), low = (line || "").toLowerCase();
   const says = !!line && (low.includes(nm) || nm.split(/[^a-zé'-]+/).filter(w => w.length >= 4).some(w => low.includes(w.replace(/s$/, ""))));
@@ -921,7 +923,7 @@ function giveGift(id, chosen){
     to = here[0] === "farid" || here[0] === "mei" ? "grands" : here[0]; g = to === "grands" ? here[0] : null;
   } else if (who.length === 1 && (who[0] === "farid" || who[0] === "mei")) { to = "grands"; g = who[0]; }
   else if (who.length === 1) to = who[0];
-  const say = w => (it.says && it.says[w]) || it.say;
+  const say = w => loveThanks(w, id) || (it.says && it.says[w]) || it.say;
   if (to !== "grands") {
     const p = npcPos(to); if (!p) { speak(`${villagerName(to)}'s not here. Give it to them in person!`, 3500); return; }
     if (giftedAlready(to)) return;
@@ -1053,6 +1055,7 @@ function wireStorage(c){
     if (["tab", "mat", "col", "pat"].includes(a)) { habSt[a] = x; sfx("tap"); }
     else if (a === "buy") { const k = `${habSt.mat || "cotton"}:${habSt.col || "#9CC27E"}:${habSt.pat || "plain"}`, c = TL.buyFabric(F, k, +x); if (c) { sfx("chaching"); flash(`${x} piece${x === "1" ? "" : "s"} of ${TL.fabricLabel(k)}`); save(); } }
     else if (a === "btn") { const c = TL.buyButtons(F, x); if (c) { sfx("chaching"); flash(`A card of ${x} buttons`); save(); } }
+    else if (a === "giftcard") buy("btncard");   // the loves round: a card of buttons to give (Ada loves one)
     else if (a === "sell") { const p = TL.sellFabric(F, x); if (p) { sfx("chaching"); flash(`Sold a piece back to Ada: +${p}`); save(); } }
     else if (["kind", "fab", "sleeves", "neck", "length", "buttons"].includes(a)) { tailSt[a] = x; sfx("tap"); }
     else if (a === "pockets") { tailSt.pockets = !!x; sfx("tap"); }
@@ -1083,6 +1086,10 @@ function wireStorage(c){
     else if (a === "send") { const sh = STORE_SHOPS.find(x => x.k === b.dataset.to), k = sendOff(F, where, id, b.dataset.to); if (k) line = `Tomo's on his way: ${k} ${ITEMS[id].n.toLowerCase()} to ${sh.n}.`; else line = `${sh.n[0].toUpperCase() + sh.n.slice(1)} can't take any more of those.`; }
     if (!line) return; sfx(a === "send" ? "chime" : "paper"); flash(line); save(); ctx(); });
 }
+// the loves round: the post office's stamps and scales, with Penny's drawer of rubber stamps (one to give: Theo loves it)
+function stampsPanel(){ const it = ITEMS.rubberstamp, n = F.inv.rubberstamp || 0;
+  return `<span class="tape stripe" aria-hidden="true"></span><h2>Stamps and scales</h2><p class="sub">Weigh it, stamp it, send it. Penny keeps a drawer of rubber stamps behind the scales: "Received with thanks", "Fragile", a little bee. You have ${icon("coin", 16)} ${F.coins}.</p>
+    <div class="items shop">${itemBtn("rubberstamp", `<b>${it.price}</b> ${icon("coin", 13)}`, F.coins < it.price, n ? `<span class="cnt">×${n}</span>` : "")}</div><p class="muted">A rubber stamp to give. It goes in your backpack.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
 function itemBtn(id, label, disabled, extra){
   const it = ITEMS[id];
   return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${icon(it.ico, 34)}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra || ""}</button>`;
@@ -1094,7 +1101,7 @@ function ctx(){
   else if (tailView && scene === "tailor") h = TL.tailorHTML(F, tailSt, sewOpen(), dayKey(), localHM());
   else if (homeView && (scene === "home" || scene === "garage")) h = homeView === "shelf" ? storePanel(F, "shelf", {owns: k => owns(F, k)}) : fridgeHead() + (homeView === "shoplist" ? SL.shopPanelHTML(F, slDraft.showText) : storePanel(F, "fridge", {owns: k => owns(F, k)}));
   else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "trolley" ? trolleyPanel(F, {sel: scSt.tsel || []}) : scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverMore(deliverPanel(F, {pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo()}))
-    : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, {pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt}) : scView === "counter" ? scCounterPanel(F, {pick: scSt.pick, server: isHere("sofia")}) : scView === "menu" ? scMenuPanel(F)
+    : scView === "pots" ? dipPotsPanel(F) : scView === "tops" ? toppingsPanel(F) : scView === "dipbar" ? dipBarPanel(F, {pick: scSt.dpick, dip: scSt.dip, top: scSt.top, fmt: scSt.dfmt}) : scView === "counter" ? scCounterPanel(F, {pick: scSt.pick, server: isHere("sofia"), nonna: storyGiven(F, "nonna")}) : scView === "menu" ? scMenuPanel(F)
     : scView === "fridge" ? fridgePanel(F, orchState(F)) : scView === "bench" ? benchPanel(F, scSt) : scView === "batch" ? recipePanel(F) : freezerPanel(F, {swap: scSt.swap});
   else if (goalView) h = goalView === "garagepick" ? garagePanel(F) : goalView === "jetty" ? jettyPanel(scene, false) : goalPanel(F, goalView);
   else if (fieldView === "xtree" && scene === "field") h = treePanel(F, dayKey(), localHM());
@@ -1132,7 +1139,7 @@ function ctx(){
   else if (hfView && scene === "barn") h = hfView === "extractor" ? extractorPanel(F) : hfView === "crock" ? crockPanel(F) : hfView === "press" ? hfPressPanel(F, hfSt) : hfCavePanel(F);
   else if (hfView && scene === "hfarm") h = hfView === "house" ? farmhousePanel(F, isHere("felix")) : hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
   else if (orView === "pot" && potItem) h = potPanel(F, potItem);
-  else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara"), hand: isHere("mateo"), pk: ccSt.pk}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? ccUpsPanel(F) : ccKitchenPanel(F, ccView);
+  else if (ccView && COCOA_IN.includes(scene)) h = ccView === "counter" ? ccCounterPanel(F, {server: isHere("amara"), hand: isHere("mateo"), pk: ccSt.pk}) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, {...ccSt, book: storyGiven(F, "henri")}) : ccView === "case" ? casePanel(F) : ccView === "ups" ? ccUpsPanel(F) : ccKitchenPanel(F, ccView);
   else if (keepItem && F.inv[keepItem]) h = keepPanel(F, keepItem);
   else if (keepSpot) h = placedPanel(F, keepSpot);
   else if (adoptItem && F.inv[adoptItem]) h = adoptPanel(F, adoptItem, adoptSt);
@@ -1147,6 +1154,7 @@ function ctx(){
   else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
   else if (routOpen && scene === "room") h = routinesPanel();
   else if (fieldView && scene === "giftshop") h = giftPanel(F, fieldView, giftOpts());   // round 178
+  else if (fieldView === "stamps" && scene === "post") h = stampsPanel();   // the loves round
   else if (fieldView === "hampers" && scene === "post") h = hamperPanel(F, vineState(F), {day: dayKey(), pick: xmPick, season: hamperSeason(dayKey()) || "xmas"});   // round 173
   else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar(), newsTab);
   else if (scene === "market" && !shopClosed) {
@@ -1165,7 +1173,7 @@ function ctx(){
       if (shopTab === "seeds") h += `<p class="muted" style="grid-column:1/-1">${SEASONS[season].n} seeds: ${SEASONS[season].line.toLowerCase()}. New ones arrive each season, and anything you've already bought or planted keeps growing.</p>`;
       // greenhouse packets (herbs, and out-of-season seeds) once the greenhouse is built; a seed's greenhouse twin only while the ordinary one is out of season
       const inSeasonNow = id => !ITEMS[id].seasons || ITEMS[id].seasons.includes(season);
-      h += Object.keys(ITEMS).filter(id => ITEMS[id].tab === shopTab && inSeasonNow(id) && (!ITEMS[id].needs || owns(F, ITEMS[id].needs)) && (!ITEMS[id].visited || ((F.towns || {})[ITEMS[id].visited])) && (!ITEMS[id].ghOf || !inSeasonNow(ITEMS[id].ghOf))).map(id => {
+      h += Object.keys(ITEMS).filter(id => ITEMS[id].tab === shopTab && inSeasonNow(id) && (!ITEMS[id].needs || owns(F, ITEMS[id].needs)) && (!ITEMS[id].visited || ((F.towns || {})[ITEMS[id].visited])) && (!ITEMS[id].story || storyGiven(F, ITEMS[id].story)) && (!ITEMS[id].ghOf || !inSeasonNow(ITEMS[id].ghOf))).map(id => {
         const it = ITEMS[id], locked = it.need && S.earned < it.need, owned = it.kind === "keep" ? F.fam.owned[id] : it.kind === "tool" && F.inv[id];
         const extra = it.kind === "seed" ? ` · ${dur(CROPS[it.crop].dur)} · ${CROPS[it.crop].yield || 1} a harvest` : "";
         if (it.kind === "pet" && KINDS[it.pet]) { const full = roomLeft(F) <= 0; return itemBtn(id, full ? "the run is full" : `<b>${it.price}</b> ${icon("coin", 13)}`, full || F.coins < it.price); }
@@ -1526,6 +1534,7 @@ function ctx(){
     else if (scene === "field" && fieldView) { buy(id, stallPrice(id)); ctx(); }   // a market or fair stall
     else if (scene === "field" && friView && (/^bm\d$/.test(friView) || friView === "kites")) { buy(id, friView === "kites" ? ITEMS.kite.price : stallPrice(id)); ctx(); }   // the Friday bay market
     else if (scene === "farm") plant(selPlot, id);
+    else if (scene === "post" && fieldView === "stamps") { buy(id); ctx(); }   // the loves round: a rubber stamp from Penny's drawer
   });
   c.querySelectorAll("[data-farm]").forEach(b => b.onclick = () => b.dataset.farm === "water" ? waterPlot(selPlot) : harvest(selPlot));
   c.querySelectorAll("[data-fair]").forEach(b => b.onclick = () => fairActivity(b.dataset.fair));
@@ -1961,6 +1970,7 @@ function render(redraw){
   registerItems(F);   // each discovered gelato flavour is a gift item (one per type) in the backpack
   registerCraft(F);   // round 153: and each oil, soap and lotion you've worked out at the mill
   registerHampers(F);   // round 173: and each hamper she's packed
+  registerBoxes(F);   // the loves round: and each bonbon box, by what's in it
   registerBottles(F);   // round 188: bottles taken from the gift shop's wine corner
   WR.registerWraps(F);   // round 185: and every gift she's wrapped
   setLive(liveNow());   // the jazz duo at the night market, the guitar in Ronda: live, over the record player
@@ -2140,6 +2150,7 @@ function arriveSpot(id){
   if (id === "wardrobe") { wardOpen = true; sfx("paper", true); render(); return; }
   if (id === "stall") { shopClosed = false; render(); return; }
   if (id === "board" && outside()) { openView = "quests"; speak("The quest board: your tasks, and the village's requests.", 3500); render(); return; }
+  if (scene === "post" && id === "scales") { fieldView = "stamps"; sfx("paper", true); render(); return; }   // the loves round: Penny's drawer of rubber stamps
   if (scene === "post" && id === "hampers") { if (!hamperSeason(dayKey())) { speak("Penny's hamper table comes out three times a year: Valentine's (from the 1st of February), Mother's Day (from the 1st of May) and Christmas (from the 20th of November).", 5000); render(); return; } fieldView = "hampers"; sfx("paper", true); render(); return; }
   if (scene === "home" && id === "fridge") { homeView = "stored"; sfx("tap"); render(); return; }   // what's put away for later (storage.js), and the shopping list
   if (scene === "garage" && id === "cupboard") { speak(pick(["Mops, a bucket and a lot of cloths.", "The cleaning cupboard. Tidy, for once."]), 3000); return; }
@@ -2571,6 +2582,8 @@ function wireCocoa(c){
     else if (a === "pair") { const w = packPairing(F, k); if (!w) return; sfx("paper", true); flash(`Pairing box with ${w}, in your backpack`); speak("A bottle and four bonbons, ribboned together. Tap it in your backpack to choose who it's for.", 4500); }
     else if (a === "special") { const sp = makeSpecial(F); if (!sp) return; sfx("chime"); act("cheer"); gainXp(2); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", hero.x + (i ? 20 : -20), hero.y - 60, 1500), t)); speak(`${sp.make} ${sp.n.toLowerCase()}${sp.make > 1 && !/s$/.test(sp.n) ? "s" : ""} for ${sp.fest}! They'll sell beside the display case.`, 5000); }
     else if (a === "takesp") { if (!takeSpecial(F, k)) return; sfx("chime"); flash(`${ITEMS[k].n} in your backpack`); }
+    else if (a === "cointin") { const m = makeCoinTins(F); if (!m) return; sfx("chime"); flash(`${m} little tins of gold coins in your backpack`); speak("Gold foil, a red tin, a click of the lid. For luck.", 3500); }   // the loves round: all year
+    else if (a === "praline") { const m = makePralines(F, storyGiven(F, "henri")); if (!m) return; sfx("chime"); gainXp(1); flash(`${m} boxes of Henri's hazelnut pralines in your backpack`); speak("Henri's pralines, from his own page in the book. The kitchen smells of toasted hazelnuts.", 4500); }
     else if (a === "eatbb") { const bb = eatBonbon(F, k); if (!bb) return; sfx("chime"); mprop("heart", hero.x, hero.y - 60, 1600); speak(`${bb.name}. Oh, that's good.`, 3500); ; }
     // round 184: choose the bonbons for a box or a pairing box
     else if (a === "pkopen") { ccSt.pk = k.startsWith("pair:") ? {kind: "pair", k: k.slice(5), size: 4, sel: {}} : {kind: k, size: n, sel: {}}; sfx("paper", true); }
@@ -2643,6 +2656,7 @@ function wireScoop(c){
   c.querySelectorAll("[data-gpick]").forEach(b => b.onclick = () => { scSt.pick = b.dataset.gpick; ctx(); });
   c.querySelectorAll("[data-gback]").forEach(b => b.onclick = () => { scSt.pick = null; ctx(); });
   c.querySelectorAll("[data-geat]").forEach(b => b.onclick = () => haveIceCream(b.dataset.geat));
+  c.querySelectorAll("[data-gnonna]").forEach(b => b.onclick = () => { if (!makeNonna(F, storyGiven(F, "nonna"))) return; sfx("chime"); flash("A cup of Nonna's fior di latte in your backpack"); if (isHere("sofia")) npcSay("sofia", "Just milk and sugar. Nonna would cry."); re(); });   // the loves round
   c.querySelectorAll("[data-gtake]").forEach(b => b.onclick = () => { const it = takeAway(F, scSt.pick, b.dataset.gtake); if (!it) return; sfx("paper", true); flash(`${it.n} in your backpack`);
     speak(`One ${it.n.toLowerCase()} to give. It's in your backpack: tap it there to choose who it's for.`, 4500); scSt.pick = null; re(); });
   c.querySelectorAll("[data-gprice]").forEach(b => b.onclick = () => { const [k, d] = b.dataset.gprice.split(":"); s.prices[k] = Math.max(k === "special" ? 0 : 1, Math.min(30, s.prices[k] + +d)); re(); });
@@ -2845,7 +2859,8 @@ if (window.__hbDevStub) window.__hbIntro = i => introAt(i, {replay: true, trainA
 if (window.__hbDevStub) window.__hbScene = (id, at) => setScene(id, at || (OUTDOOR.includes(id) ? [260, 330] : INNER[id] ? INNER[id].arrive : [260, 596]));
 if (window.__hbDevStub) window.__hbOrder = (shop = "The Scoop Shack") => { S.orderAt = 0; scoopState(F).bikeOut = Date.now() + (globalThis.__hbOffset || 0); orderNote([{shop: "scoop", coins: 6, what: "a cone of mango"}], shop, false); };   // tests: an order note, and Tomo riding past
 // dev builds only: test scripts read and nudge the save (the quest board tests give the backpack what a request needs)
-if (window.__hbDevStub) window.__hbGame = {F: () => F, S: () => S, near: () => { const n = nearestVillager(); return n ? n.def.id + ":" + Math.round(Math.hypot(n.x - hero.x, n.y - hero.y)) : npcActors().map(([, e]) => e.def.id + "@" + Math.round(e.x) + "," + Math.round(e.y) + " hero " + Math.round(hero.x) + "," + Math.round(hero.y)).join(";"); }, give: (id, n) => { addInv(id, n); save(true); }, save: () => { resetNpcs(); save(true); }, render: () => render(true), handOver: who => offerHandOver(who), mail: () => ({paper: paperWaiting(), unread: unreadMail().map(m => m.id), atSpot}), items: () => ITEMS};
+if (window.__hbDevStub) window.__hbGame = {F: () => F, S: () => S, near: () => { const n = nearestVillager(); return n ? n.def.id + ":" + Math.round(Math.hypot(n.x - hero.x, n.y - hero.y)) : npcActors().map(([, e]) => e.def.id + "@" + Math.round(e.x) + "," + Math.round(e.y) + " hero " + Math.round(hero.x) + "," + Math.round(hero.y)).join(";"); }, give: (id, n) => { addInv(id, n); save(true); }, save: () => { resetNpcs(); save(true); }, render: () => render(true), handOver: who => offerHandOver(who), mail: () => ({paper: paperWaiting(), unread: unreadMail().map(m => m.id), atSpot}), items: () => ITEMS,
+  notes: () => thanksMail().map(m => ({title: m.title, body: m.body}))};
 /* ---------- Routine bonuses: 1 coin a checklist step, 5 for finishing a routine (a weekly one's step counts as
    finishing it). Each pays once a day: unticking and re-ticking earns nothing more. ---------- */
 const ROUTINE_STEP = 1, ROUTINE_DONE = 8;

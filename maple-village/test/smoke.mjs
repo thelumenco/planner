@@ -295,6 +295,94 @@ if (want("\ngifts for friends")) try {
   await page.screenshot({ path: join(shots, "gifts-evening.png") });
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+// The villagers' loves (data/loves.js, LOVES-DRAFT.md): 6 to 10 each, from their stories, at most one combination
+// (what's inside a packed bonbon box, an ice cream or a mill soap) and a few everyday ones. A love is a whole heart and a
+// story love says its own thank-you; anything else is half; dairy earns Tomi nothing. Old plain bonbon boxes still work.
+if (want("\nvillagers' loves")) try {
+  console.log("\nvillagers' loves");
+  const LV = await import(new URL("../src/data/loves.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), its = await import(new URL("../src/data/items.js", import.meta.url));
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url)), kt = await import(new URL("../src/game/kitchen.js", import.meta.url));
+  const xm = await import(new URL("../src/game/xmas.js", import.meta.url)), orch = await import(new URL("../src/data/orchard.js", import.meta.url)), T = its.ITEMS;
+  const res = np.NPCS.filter(n => !n.tourist && !n.local && !n.kid).map(n => n.id);
+  check(res.length === 27 && res.every(w => LV.LOVES[w] && LV.lovesOf(w).length >= 6 && LV.lovesOf(w).length <= 10), "all 27 Honeybrook villagers have 6 to 10 loves");
+  check(res.every(w => LV.lovesOf(w).filter(l => l.kind === "combo").length <= 1 && LV.lovesOf(w).filter(l => l.kind === "story").every(l => l.thanks && !/—/.test(l.thanks))), "at most one combination each; every story love has its own thank-you (no em dashes)");
+  check(res.every(w => LV.lovesOf(w).every(l => l.match ? typeof l.match === "function" && l.what && l.thanks : typeof l.id === "string")), "every love is an item id or a matcher (with what it's for and a thank-you)");
+  // matchers, on made things the way their ITEMS entries look
+  Object.assign(T, {__box: {n: "box", kind: "gift", boxOf: "box9", bonbons: [{shell: "milk", fills: ["hazelnut"], shape: "dome"}, {shell: "dark", fills: ["wine_red", "cherry"], shape: "dome"}]},
+    __heart: {n: "box", kind: "gift", boxOf: "box4", bonbons: [{shell: "milk", fills: ["honey"], shape: "heart"}]}, __gel: {n: "cone", kind: "gift", gel: true, ings: ["apple", "honey", "milk"]},
+    __fdl: {n: "cup", kind: "gift", gel: true, ings: ["milk"]}, __fdld: {n: "cup", kind: "gift", gel: true, dip: true, ings: ["milk"]}, __pist: {n: "cup", kind: "gift", gel: true, ings: ["milk", "pistachio"]},
+    __soap: {n: "soap", kind: "gift", mill: "soap", adds: ["bq_lavender", "honey"]}, __soap3: {n: "soap", kind: "gift", mill: "soap", adds: ["bq_lavender", "honey", "mint"]}, __wrap: {n: "wrapped", kind: "gift", wrapped: true, inner: "__heart"}});
+  check(LV.loveFor("celeste", "__box").kind === "combo" && !LV.isLove("celeste", "__heart") && LV.loveFor("posy", "__heart").kind === "combo" && LV.isLove("posy", "__wrap") && LV.isLove("lila", "__box") && LV.isLove("opal", "__heart"),
+    "packed boxes: Celeste's hazelnut and red wine, Posy's honey heart (wrapped, too); a love for a box size covers every box of that size");
+  check(LV.isLove("felix", "__gel") && LV.isLove("tomo", "__pist") && !LV.isLove("tomo", "__gel") && LV.isLove("sofia", "__fdl") && !LV.isLove("sofia", "__fdld") && LV.isLove("hazel", "__soap") && !LV.isLove("hazel", "__soap3"),
+    "ice creams and mill soaps by what's in them: Felix's apple and honey, Tomo's pistachio, Sofia's plain fior di latte, Hazel's lavender and honey");
+  check(!LV.isLove("hana", "carrot") && !LV.isLove("bo", "loaf") && !LV.isLove("theo", "sunflower") && LV.isLove("hana", "hotteok") && LV.loveFor("okada", "s_toast").kind === "story", "the quest board's likes and items' `to` lists aren't loves any more");
+  // a real packed box remembers its bonbons (cocoa.js packBox)
+  const G = {coins: 0, inv: {}, goals: {cocoa: 1}}, c = cc.cocoaState(G);
+  c.bonbons.push({id: "milk+hazelnut", shell: "milk", fills: ["hazelnut"], name: "Milk Hazelnut Praline"}, {id: "dark+wine_red", shell: "dark", fills: ["wine_red"], name: "Dark Red Wine Truffle"});
+  c.trays = {"milk+hazelnut": 12, "dark+wine_red": 12}; c.display = ["milk+hazelnut", "dark+wine_red"];
+  const sel = {"milk+hazelnut": 2, "dark+wine_red": 2}, bx = cc.packBox(G, 4, {...sel}), bx2 = cc.packBox(G, 4, {...sel}), bx3 = cc.packBox(G, 4, {"dark+wine_red": 4});
+  check(/^box4_/.test(bx) && bx === bx2 && G.inv[bx] === 2 && /^box4d_/.test(bx3) && bx3 !== bx && T[bx].boxOf === "box4" && T[bx].price === T.box4.price && T[bx].dairy && !T[bx3].dairy && /Hazelnut/.test(T[bx].n),
+    "a packed box keeps its bonbons: the same box stacks, a different one doesn't, and it's priced like any box of 4");
+  check(LV.loveFor("celeste", bx).kind === "combo" && !LV.isLove("celeste", bx3) && LV.isLove("opal", bx) && LV.isLove("tomi", bx3) && xm.stallGood(bx) && xm.stallGood("box4"), "Celeste's combination counts; it's still a box of 4 for Opal (and dark for Tomi); old and new boxes go on the Christmas stall");
+  // the new things, and where they're made
+  c.choc.milk = 20;
+  check(cc.makeCoinTins(G) === 3 && G.inv.coin_tin === 3 && cc.makePralines(G, false) === 0 && !cc.makePralines(G, true) && (c.pantry.hazelnut = 1) && cc.makePralines(G, true) === 2 && G.inv.s_praline === 2 && !c.pantry.hazelnut && c.choc.milk === 8,
+    "the Cocoa Room: little tins of gold coins all year; Henri's pralines only from his recipe book, with a hazelnut");
+  const H = {inv: {}}; sc.scoopState(H).fridge.milk = 1;
+  check(!sc.makeNonna(H, false) && sc.makeNonna(H, true) === 1 && H.inv.s_nonna === 1 && !sc.scoopState(H).fridge.milk, "the Scoop Shack makes Nonna's fior di latte from a bottle of milk, once Sofia's told that chapter");
+  const K = {inv: {}}, day = "2026-10-14"; K.vine = {tapasList: [{day, id: "salmorejo", plates: 2, cooked: 1}, {day, id: "patatas", plates: 3, cooked: 1}]};
+  check(/boxed up/.test(kt.boxPlate(K, day, "salmorejo") || "") && K.inv.tk_salmorejo === 1 && K.vine.tapasList[0].plates === 1 && !kt.boxPlate(K, day, "patatas") && kt.TAKEAWAY.tortaaceite === "tk_tortaaceite" && kt.TAKEAWAY.pasteles === "tk_pasteles",
+    "a plate of salmorejo boxed to take away, off the day's batch (and Ines's cake and Farid's pastries too)");
+  check(orch.TREES.plum && orch.TREES.plum.seasons.includes("summer") && orch.TREES.plum.seasons.includes("autumn") && T.plum && T.plum.fruit && T.plum.sell <= 5, "a plum tree for the orchard, fruiting late summer into autumn");
+  const NEW = ["fudge", "btncard", "rubberstamp", "coin_tin", "tk_salmorejo", "tk_tortaaceite", "tk_pasteles", "s_toast", "s_praline", "s_nonna"];
+  check(NEW.every(id => T[id] && T[id].kind === "gift" && T[id].price > 0 && !(T[id].sell > T[id].price)) && T.coin_tin.price < T.sp_coins.price, "the new gifts all have a price (and nothing sells for more than it costs)");
+  // in the game: Postman's toast at Hana's only once Hana's told that chapter; a love is a whole heart with its own thank-you
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  page.on("pageerror", e => errors.push(`loves pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&nosample=1&time=10:00&date=2026-10-05"); await page.waitForTimeout(900);
+  const lfox = () => page.evaluate(() => window.__hbGame.F());
+  check(await page.evaluate(ids => { const I = window.__hbGame.items(); return ids.filter(id => !I[id]); }, res.flatMap(w => LV.lovesOf(w).filter(l => !l.match).map(l => l.id))).then(m => !m.length), "every love's item exists in the game");
+  await page.evaluate(() => { const g = window.__hbGame, f = g.F(); f.coins = 300; f.board = f.board || {}; f.board.hearts = {okada: 3, hana: 3, tomi: 3, celeste: 3, opal: 3}; g.save(); g.render(); });
+  await page.locator('#world [data-place="toTown"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Town square/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(300);
+  await page.locator('#world [data-place="market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-shop="treats"]', { timeout: 20000 });
+  await page.click('#ctx [data-shop="treats"]'); await page.waitForTimeout(200);
+  check(await page.locator('#ctx .item[data-id="s_toast"]').count() === 0, "no Postman's toast at Hana's before her chapter");
+  await page.evaluate(() => { const g = window.__hbGame, f = g.F(); f.story = f.story || {}; f.story.heard = {...(f.story.heard || {}), hana: 4}; g.save(); g.render(); });
+  await page.click('#ctx [data-shop="family"]'); await page.waitForTimeout(150); await page.click('#ctx [data-shop="treats"]'); await page.waitForTimeout(200);
+  check(await page.locator('#ctx .item[data-id="s_toast"]').count() === 1, "once she's told it, Postman's toast is on her Treats shelf");
+  await page.click('#ctx .item[data-id="s_toast"]'); await page.waitForTimeout(150);
+  await page.click('#ctx [data-shop="family"]'); await page.waitForTimeout(150); for (let i = 0; i < 2; i++) { await page.click('#ctx .item[data-id="fudge"]'); await page.waitForTimeout(150); }
+  check(await lfox().then(f => f.inv.s_toast === 1 && f.inv.fudge === 2 && f.coins === 300 - 9 - 10), "Postman's toast (9) and fudge (5) bought at the market");
+  await page.click('#ctx [data-close]').catch(() => {});
+  // presents sent round (nobody's here, at home base): a box packed with Celeste's hazelnut and red wine, and an old plain box for Opal
+  await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05"); await page.waitForTimeout(900);
+  await page.evaluate(() => { const g = window.__hbGame, f = g.F(); f.cocoa = f.cocoa || {}; f.cocoa.boxes = {box4_test: {base: "box4", items: [{id: "milk+hazelnut", n: 2, shell: "milk", fills: ["hazelnut"], shape: "dome", name: "Milk Hazelnut Praline"}, {id: "dark+wine_red", n: 2, shell: "dark", fills: ["wine_red"], shape: "dome", name: "Dark Red Wine Truffle"}]}};
+    f.inv.box4_test = 1; f.inv.box4 = 1; g.save(); g.render(); });
+  const send = async (id, w) => { await page.click('[data-open="bag"]'); await page.waitForTimeout(150); await page.click(`#bag .item[data-id="${id}"]`); await page.waitForTimeout(150); await page.click(`#bag [data-giveto="${w}"]`); await page.waitForTimeout(300); await page.click('[data-open="bag"]').catch(() => {}); await page.waitForTimeout(150); };
+  await send("s_toast", "okada"); await send("fudge", "hana"); await send("fudge", "tomi"); await send("box4_test", "celeste"); await send("box4", "opal");
+  const b = await lfox().then(f => f.board);
+  check(b.hearts.okada === 4 && !b.giftPts.okada, "a story love (Postman's toast for Mr Okada) is a whole heart");
+  check(b.hearts.hana === 3 && b.giftPts.hana === 1, "something that isn't one of their loves (fudge for Hana) is half a heart");
+  check(b.hearts.tomi === 3 && !b.giftPts.tomi && b.gifted.tomi, "fudge is dairy: Tomi's thanks, but nothing towards a heart");
+  check(b.hearts.celeste === 4 && b.hearts.opal === 4, "the packed hazelnut and red wine box is Celeste's combination, and an old plain box of 4 still gives (Opal's love)");
+  await page.evaluate(() => { const f = window.__hbGame.F(); (f.thanks || []).forEach(t => { t.at = Date.now() - 60e3; }); });
+  const notes = await page.evaluate(() => window.__hbGame.notes());
+  check(notes.some(n => /Mr Okada/.test(n.title) && /So this is how it feels/.test(n.body)) && notes.some(n => /Celeste/.test(n.title) && /Grand-père's hazelnut and Maman's red/.test(n.body)), "their thank-you notes say their own lines");
+  // bought where they belong: a rubber stamp at the post office, a card of buttons at Ada's
+  await page.evaluate(() => { window.__hbScene("post"); }); await page.waitForTimeout(600);
+  await page.locator('#world [data-spot="scales"]').dispatchEvent("click"); await page.waitForSelector('#ctx .item[data-id="rubberstamp"]', { timeout: 15000 });
+  await page.click('#ctx .item[data-id="rubberstamp"]'); await page.waitForTimeout(200);
+  check(await lfox().then(f => f.inv.rubberstamp === 1), "a rubber stamp from Penny's drawer by the post office scales");
+  await page.click('#ctx [data-close]').catch(() => {});
+  await page.evaluate(() => { window.__hbScene("haberdash"); }); await page.waitForTimeout(600);
+  await page.locator('#world [data-spot="buttonjar"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sew="giftcard:1"]', { timeout: 15000 });
+  await page.click('#ctx [data-sew="giftcard:1"]'); await page.waitForTimeout(200);
+  check(await lfox().then(f => f.inv.btncard === 1), "a card of buttons to give, from Ada's haberdashery");
+  await page.screenshot({ path: join(shots, "loves-haberdashery.png") });
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 // Animals: buy chicks and bunnies at the market, feed them in the run at home, upgrade the run; Pancake at the news board
 if (want("\nanimals")) try {
   console.log("\nanimals");
@@ -1333,7 +1421,7 @@ if (want("\nthe Cocoa Room")) try {
   for (let i = 0; i < 2; i++) { await page.locator('#ctx [data-cc="pkadd"]').first().click(); await page.waitForTimeout(150); }
   check(await page.locator('#ctx [data-cc="pkgo"]').isDisabled() && /2 of 4 chosen/.test(await page.locator("#ctx").textContent()), "choose the bonbons for a box: two of the first flavour, and it won't pack till there are four");
   await page.click('#ctx [data-cc="pkfill"]'); await page.waitForTimeout(150); await page.click('#ctx [data-cc="pkgo"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.inv.box4d === 1 && before - f.cocoa.trays[pickId] >= 2), "a gift box of four bonbons from the display case, the ones you chose (all dark, so dairy-free)");
+  check(await fox().then(f => { const ids = Object.keys(f.inv).filter(k => /^box4d_/.test(k)); return ids.length === 1 && f.inv[ids[0]] === 1 && f.cocoa.boxes[ids[0]].base === "box4d" && f.cocoa.boxes[ids[0]].items.some(x => x.id === pickId && x.n >= 2) && before - f.cocoa.trays[pickId] >= 2; }), "a gift box of four bonbons from the display case, the ones you chose (all dark, so dairy-free), and it remembers them");
   await page.click("#ctx [data-close]").catch(() => {});
   await tap("case", '#ctx [data-cc="case"]');
   check(await page.locator('#ctx [data-cc="case"]').count() === 2, "the display case shows the bonbons");
@@ -1396,7 +1484,7 @@ if (want("\nthe Cocoa Room")) try {
   await page.click('#ctx [data-cc="counter"]'); await page.waitForSelector('#ctx [data-cc="hot"]', { timeout: 15000 }); await page.click('#ctx [data-cc="hot"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.choc.milk === 39), "the hot chocolate bar: you have a cup (one piece of chocolate)");
   await page.click('#ctx [data-cc="pkopen"][data-k="grand"]'); await page.waitForTimeout(300); await page.click('#ctx [data-cc="pkfill"]'); await page.waitForTimeout(150); await page.click('#ctx [data-cc="pkgo"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => (f.inv.box16 || 0) + (f.inv.box16d || 0) === 1), "the gift wrapping station packs a grand box of 16");
+  check(await fox().then(f => Object.keys(f.inv).filter(k => /^box16d?_/.test(k)).reduce((a, k) => a + f.inv[k], 0) === 1), "the gift wrapping station packs a grand box of 16");
   check(await page.locator("#fore").innerHTML().then(h => /q18 6 36 0/.test(h)), "a chocolate fountain on the counter");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
@@ -3533,7 +3621,7 @@ if (want("\nHampers for Valentine's and Mother's Day (round 184)")) try {
   const G = {coins: 0, inv: {}, goals: {cocoa: 1}}, c = cc.cocoaState(G);
   c.bonbons.push({id: "a", shell: "dark", fills: [], name: "A"}, {id: "b", shell: "milk", fills: [], name: "B"}); c.trays = {a: 6, b: 6}; c.display = ["a", "b"];
   const pk = {kind: "box", size: 4, sel: {}};
-  check(cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && !cc.pickAdd(G, pk, "b", 1) && cc.packBox(G, 4, pk.sel) === "box4d" && c.trays.a === 2 && c.trays.b === 6, "choose four dark ones: exactly those come out of the case");
+  check(cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && cc.pickAdd(G, pk, "a", 1) && !cc.pickAdd(G, pk, "b", 1) && /^box4d_/.test(cc.packBox(G, 4, pk.sel)) && c.trays.a === 2 && c.trays.b === 6, "choose four dark ones: exactly those come out of the case");
   check(cc.packBox(G, 4, {a: 1}) === null && c.trays.a === 2, "a choice that doesn't add up packs nothing");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nWrapping with handmade paper (paperie round 2, round 185)")) try {

@@ -61,10 +61,10 @@ export function craftName(kind, base, adds, dye){ const a = [...adds].sort().map
 export const itemId = r => "mc_" + r.id;
 // each recipe is an item: something to keep, give, or sell (the gelato's way, scoop.js registerItems)
 export function registerCraft(F){ craftState(F).recipes.forEach(r => { const k = KINDS[r.kind], extra = Math.max(0, r.adds.length - 1);
-  if (r.kind === "balm" || r.kind === "lipoil") { const b = r.kind === "balm"; ITEMS[itemId(r)] = {n: `${b ? "A tin" : "A bottle"} of ${r.name.toLowerCase()}`, kind: "gift", to: ["hana", "posy", "farid"], crafted: true, mill: r.kind,
+  if (r.kind === "balm" || r.kind === "lipoil") { const b = r.kind === "balm"; ITEMS[itemId(r)] = {n: `${b ? "A tin" : "A bottle"} of ${r.name.toLowerCase()}`, kind: "gift", to: ["hana", "posy", "farid"], crafted: true, mill: r.kind, adds: [...r.adds],
     price: k.price + (r.dye ? 1 : 0), sell: k.sell + (r.dye ? 1 : 0), ico: `${r.kind}_${r.dye || "none"}`,
     say: b ? `Lip balm! ${r.dye ? "And it's tinted, so pretty. " : ""}It smells like ${HERB[r.adds[0]] ? HERB[r.adds[0]].n.toLowerCase() : "honey"}.` : `A lip oil! ${r.dye ? "Look at the colour. " : ""}It's going straight in my handbag.`}; return; }
-  ITEMS[itemId(r)] = {n: r.kind === "soap" ? `A bar of ${r.name.toLowerCase()}` : r.kind === "lotion" ? `A jar of ${r.name.toLowerCase()}` : `A bottle of ${r.name.toLowerCase()}`, kind: "gift", to: "family", crafted: true, mill: r.kind,
+  ITEMS[itemId(r)] = {n: r.kind === "soap" ? `A bar of ${r.name.toLowerCase()}` : r.kind === "lotion" ? `A jar of ${r.name.toLowerCase()}` : `A bottle of ${r.name.toLowerCase()}`, kind: "gift", to: "family", crafted: true, mill: r.kind, adds: [...r.adds],   // (adds: data/loves.js reads them)
     price: k.price + extra*2, sell: k.sell + extra*2, ico: r.kind === "oil" ? "olives" : r.kind === "soap" ? "soap_oat" : "honey",
     say: r.kind === "oil" ? `Your own ${r.name.toLowerCase()}! On bread, tonight. Thank you!` : r.kind === "soap" ? `Handmade ${r.name.toLowerCase()}? It smells beautiful.` : `${r.name}! My hands needed this. Thank you.`}; }); }
 const have = (F, id) => (F.inv || {})[id] || 0;

@@ -6,6 +6,7 @@
 //   wear: {top, bottom, dress}}   (a made piece: {id, kind, slot, fab, mat, col, pat, sleeves, neck, length, buttons,
 //   pockets, name, made})
 import { esc, dayKey } from "../util.js";
+import { ITEMS } from "../data/items.js";
 import { MATERIALS, COLOURS, PATTERNS, BUTTONS, GARMENTS, OPT_NAMES, fabricKey, parseFabric, fabricName, fabricPrice, makingFee, piecesFor, READY_HOUR } from "../data/sewing.js";
 
 export const fabricLabel = k => fabricName(k).toLowerCase();
@@ -48,6 +49,8 @@ export function haberdasheryHTML(F, st, open){
       <p class="muted">A top takes 2 to 4 pieces of one fabric, a skirt or shorts 2, a dress 4 (one more if it's long). Idris next door does the making.</p>`;
   } else if (tab === "buttons") {
     h += `<p class="muted">A card of buttons does one garment.</p><ul class="hlist">${Object.entries(BUTTONS).map(([b, d]) => `<li><span><i class="btndot" style="background:${d.col}"></i> ${esc(d.n)} <small>· you have ${s.buttons[b] || 0}</small></span><button class="btn small alt" data-sew="btn:${b}" ${F.coins >= d.price ? "" : "disabled"}>${coin(d.price)}</button></li>`).join("")}</ul>`;
+    // the loves round: a card of buttons to give, not to sew (Ada loves one; it goes in the backpack)
+    { const g = ITEMS.btncard, n = (F.inv || {}).btncard || 0; h += `<p class="sulabel">To give</p><ul class="hlist"><li><span><i class="btndot" style="background:#7FB8E8"></i> ${esc(g.n)} <small>· little blue ones, on Ada's own card${n ? ` · ${n} in your backpack` : ""}</small></span><button class="btn small alt" data-sew="giftcard:1" ${F.coins >= g.price ? "" : "disabled"}>${coin(g.price)}</button></li></ul>`; }
   } else h += basketHTML(F, true);
   return h + shut;
 }

@@ -57,7 +57,7 @@ export function treePanel(F, day, hm){
 // F.xmas.stall = {goods: {id: n}, wine: {shelfId: {name, type, price, n}}}, F.xmas.sold = {day: {n, coins}}
 export const STALL_KINDS = 6;
 const HONEYS = ["honey", "honey_lav", "honey_blossom", "honey_cream", "honeycomb"];
-export const stallGood = id => !!ITEMS[id] && (!!ITEMS[id].mill || !!ITEMS[id].hamper || /^chz_/.test(id) || HONEYS.includes(id) || /^bar_(milk|dark|white)$|^box(4|9|16)d?$/.test(id));
+export const stallGood = id => !!ITEMS[id] && (!!ITEMS[id].mill || !!ITEMS[id].hamper || /^chz_/.test(id) || HONEYS.includes(id) || /^bar_(milk|dark|white)$|^box(4|9|16)d?(_[a-z0-9]+)?$/.test(id));   // (a packed box keeps its bonbons: box4_<key>, cocoa.js)
 export const worth = id => { const it = ITEMS[id]; return !it ? 0 : Math.min(it.price || 0, it.sell != null ? it.sell : Math.round((it.price || 0)*.8)); };
 function stallState(F){ const x = xmasState(F); x.stall = x.stall || {}; x.stall.goods = x.stall.goods || {}; x.stall.wine = x.stall.wine || {}; x.sold = x.sold || {}; return x.stall; }
 const kindsOut = st => Object.keys(st.goods).filter(id => st.goods[id] > 0).length + Object.keys(st.wine).filter(id => st.wine[id].n > 0).length;

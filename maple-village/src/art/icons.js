@@ -321,7 +321,9 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
     lemon: (c) => [`<ellipse cx="12" cy="13" rx="8" ry="5.6" ${f(c)}/>`, `<ellipse cx="12" cy="13" rx="8" ry="5.6"/><path d="M4 13l-1.5-.6M20 13l1.5-.6M8 11c.8-.8 1.8-1.2 3-1.3" opacity=".6"/>`],
     mango: (c) => [`<path d="M6 15c0-6 5-9 9-8s4 6 1 10-10 4-10-2z" ${f(c)}/><path d="M14.5 7c1-1.5 2.5-2.3 4-2.2-.8 1.5-2.3 2.3-4 2.2z" ${f(C.moss)}/>`, `<path d="M6 15c0-6 5-9 9-8s4 6 1 10-10 4-10-2zM14.5 7c1-1.5 2.5-2.3 4-2.2-.8 1.5-2.3 2.3-4 2.2z"/>`],
     pear: (c) => [`<path d="M12 6c-2 0-2.5 3-3.5 5-1.5 2.5-3 4-3 6.5C5.5 20 8.5 21 12 21s6.5-1 6.5-3.5c0-2.5-1.5-4-3-6.5C14.5 9 14 6 12 6z" ${f(c)}/>${leaf}`, `<path d="M12 6c-2 0-2.5 3-3.5 5-1.5 2.5-3 4-3 6.5C5.5 20 8.5 21 12 21s6.5-1 6.5-3.5c0-2.5-1.5-4-3-6.5C14.5 9 14 6 12 6zM12 6V4.5"/>${leafL}`],
-    fig: (c) => [`<path d="M12 5c-1 2-6 5-6 10a6 6 0 0 0 12 0c0-5-5-8-6-10z" ${f(c)}/>`, `<path d="M12 5c-1 2-6 5-6 10a6 6 0 0 0 12 0c0-5-5-8-6-10zM12 5V3.5"/><path d="M10 17c1 .6 2.4.6 3.4 0" opacity=".6"/>`]
+    fig: (c) => [`<path d="M12 5c-1 2-6 5-6 10a6 6 0 0 0 12 0c0-5-5-8-6-10z" ${f(c)}/>`, `<path d="M12 5c-1 2-6 5-6 10a6 6 0 0 0 12 0c0-5-5-8-6-10zM12 5V3.5"/><path d="M10 17c1 .6 2.4.6 3.4 0" opacity=".6"/>`],
+    // the loves round: a plum, a little oval with its crease and a bloom of white
+    plum: (c) => [`<ellipse cx="12" cy="14" rx="6" ry="6.8" ${f(c)}/><ellipse cx="9.6" cy="11.6" rx="1.6" ry="2.2" ${f("#E9D6EA")}/>${leaf}`, `<ellipse cx="12" cy="14" rx="6" ry="6.8"/><path d="M12 7.2c-1 3-1 9 0 13.6" opacity=".55"/><path d="M12 7.2V5.6"/>${leafL}`]
   };
   Object.values(TREES).forEach(t => { if (I[t.fruit]) return; I[t.fruit] = (shapes[t.fruit] || round)(t.col); });
   Object.keys(FLOWERS).forEach(id => { const c = FLOWERS[id].col;
@@ -410,6 +412,13 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
   I.housechoc = S.bar("#3F2519"); I.sp_log = I.logcake; I.sp_mooncake = I.mooncake;
   [["red", "#7A1F3D"], ["rose", "#E98AA0"], ["white", "#E8D57A"], ["sparkling", "#F3E7B0"]].forEach(([k, c]) => { I["wine_" + k] = S.bottle(c); });
   Object.entries(GOODS).forEach(([id, g]) => { if (I[id] || !g.art) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
+  // the loves round (stall-goods.js): a card of buttons, a rubber stamp, a little tin of gold coins
+  I.btncard = [`<rect x="4" y="4.5" width="16" height="15" rx="1.2" ${f("#F3EDE4")}/>${[[8.5, 9], [15.5, 9], [8.5, 15], [15.5, 15]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" ${f("#7FB8E8")}/>`).join("")}`,
+    `<rect x="4" y="4.5" width="16" height="15" rx="1.2"/>${[[8.5, 9], [15.5, 9], [8.5, 15], [15.5, 15]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6"/><circle cx="${x - .7}" cy="${y}" r=".35"/><circle cx="${x + .7}" cy="${y}" r=".35"/>`).join("")}`];
+  I.rubberstamp = [`<ellipse cx="12" cy="5.5" rx="3.2" ry="2.4" ${f("#C98A4A")}/><rect x="10.6" y="7" width="2.8" height="6" ${f("#A8754F")}/><rect x="5" y="13" width="14" height="4" rx="1" ${f("#C98A4A")}/><rect x="5.5" y="17" width="13" height="2.4" ${f("#C2505F")}/>`,
+    `<ellipse cx="12" cy="5.5" rx="3.2" ry="2.4"/><path d="M10.6 7.5v5.5M13.4 7.5v5.5"/><rect x="5" y="13" width="14" height="4" rx="1"/><path d="M5.5 17v2.4h13V17"/>`];
+  I.coin_tin = [`<ellipse cx="12" cy="15.5" rx="8" ry="4" ${f("#C2505F")}/><path d="M4 12.5v3c0 2.2 3.6 4 8 4s8-1.8 8-4v-3" ${f("#C2505F")}/><ellipse cx="12" cy="12.5" rx="8" ry="4" ${f("#D9433A")}/><circle cx="12" cy="12.4" r="2.6" ${f("#F3C969")}/>`,
+    `<ellipse cx="12" cy="12.5" rx="8" ry="4"/><path d="M4 12.5v3c0 2.2 3.6 4 8 4s8-1.8 8-4v-3"/><circle cx="12" cy="12.4" r="2.6"/><path d="M11.2 12.4h1.6" opacity=".6"/>`];
   // round 107: Ronda's goods, and the Tempranillo grape and wine
   Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   // round 196: the makers' shelf in the gift shop (game/gallery.js)

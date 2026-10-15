@@ -65,7 +65,8 @@ export function untickTask(F, id){
 }
 
 /* ---------- village requests ---------- */
-// Who asks, what they'd most like (item ids, in order; anything else they can use comes after) and why.
+// Who asks, what they'd most like (item ids, in order; anything else they can use comes after) and why. (Requests
+// only: what a villager loves as a gift is in data/loves.js.)
 export const ASKERS = {
   hana:    {likes: ["carrot", "tomato", "potato", "corn", "pea", "pepper", "leek", "pumpkin", "egg"], why: ["for the market stall", "my regulars keep asking", "the stall looks bare without them"]},
   hazel:   {likes: ["oliveoil", "goatmilk", "rosemary", "thyme", "mint", "sunflower"], why: ["for the Mill Shop", "I've an order to fill", "I'm trying something new"]},
@@ -150,8 +151,8 @@ export function handOver(F, who, takeInv, giveInv, day = dayKey()){
   out.giveInv = giveInv; if (now > before) milestone(F, r, now, out, day); delete out.giveInv;
   return out;
 }
-// Gifts (phase 4): anyone in the village can be given something, once a day each (in person, or sent round). A
-// favourite (something they'd ask for, or a gift that suits them) is worth a heart; anything else, half a heart.
+// Gifts (phase 4): anyone in the village can be given something, once a day each (in person, or sent round). One of
+// their loves (data/loves.js, core.js isFav) is worth a heart; anything else, half a heart.
 // Hearts from gifts bring the same letters as hearts from requests. -> {fav, hearts, half, gift?, letter?} or null
 export const giftedToday = (F, who, day = dayKey()) => ((board(F).gifted || {})[who]) === day;
 // (fav "none": a kind thought that earns nothing, like dairy for Tomi)

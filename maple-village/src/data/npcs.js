@@ -177,7 +177,7 @@ export const NPCS = [
       slot("10:00", "12:00", "flowers", [[160, 300], [260, 380], [210, 300]], {dow: [1]}), slot("12:00", "13:30", "village", [[362, 372], [392, 360]], {dow: [1]}),
       slot("10:00", "12:00", "village", [[362, 372], [340, 380]]), slot("14:00", "16:00", "orchard", [[160, 330], [260, 420]]),
       slot("18:00", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [5]})],
-    lines: ["Lavender and honey. Every time.", "Smell that one. Go on. Rosemary and lemon: clears your head right out.", "A good soap needs a day to cure. Patience, like wine.", "Rose for the mums, rosemary for the dads. I've never been wrong."],
+    lines: ["Lavender and honey. Every time.", "Smell that one. Go on. Rosemary and lemon: clears your head right out.", "A good soap needs a day to cure. Patience, like wine.", "Rose for the mums, rosemary for the dads. I've never been wrong.", "The soap maker in the Lavender Hills cuts it like cheese. I'd go back just for that."],
     away: "Hazel's gone home. The Mill Shop's shut."
   },
   // The wine shop's assistant: while she's behind the counter, more customers come in (coins go in the honesty box)
@@ -263,7 +263,7 @@ export const NPCS = [
     look: {skin: "#A8754F", hair: "#1F1A17", hairStyle: "bun", top: "#8A5A3A", bottom: "#F3E7C9", extra: "apron"},
     routine: [slot("10:45", "20:15", "cocoa", [300, 268], {dow: [0, 2, 3, 4, 5, 6], needs: "cocoa"})],
     intro: "Hi, I'm Amara! I wrap, I sell, and I sneak the broken bits. Don't tell.",
-    lines: ["The dark one's flying off the wall today.", "Someone bought six bars. Six!", "It smells like heaven in here, all day long.", "I told a tourist you make it from the bean. They nearly cried."],
+    lines: ["The dark one's flying off the wall today.", "Someone bought six bars. Six!", "It smells like heaven in here, all day long.", "I told a tourist you make it from the bean. They nearly cried.", "Everyone wants the dark. I'm a white chocolate girl, secretly."],
     hellos: ["Hi! The wall's looking good.", "Boss! Want a taste?"], away: "Amara's off. The Cocoa Room's quiet."},
   // Mateo is the Cocoa Room's kitchen hand (cocoa.js handStep): Monday to Saturday 9:30-4:30, evening classes Mon and Tue
   {id: "mateo", pitch: .95, name: "Mateo", job: "Kitchen hand at the Cocoa Room",
@@ -284,7 +284,7 @@ export const NPCS = [
     routine: [slot("21:00", "22:30", "honeysuckle", [220, 470], {act: "sit"}), slot("20:30", "22:30", "hlane", [206, 306], {act: "sit"}), slot("09:00", "10:30", "hlane", [[150, 300], [236, 400], [120, 500]], {dow: [2, 3, 4, 5]}),   // home: Honeysuckle
       slot("10:45", "20:15", "cocoa", [240, 268], {dow: [1], needs: "cc_assistant"}), slot("13:00", "20:15", "cocoa", [[180, 420], [400, 440], [240, 268]], {dow: [0, 6], needs: "cc_assistant"})],
     intro: "Hi! I'm Lila. Mondays are mine, and I help Amara at weekends. I'm working my way through every bonbon. For research.",
-    lines: ["Mondays are quiet, but the regulars are lovely.", "I wrapped forty boxes on Saturday. My fingers are ribbon now.", "Someone asked if we deliver to the moon.", "The fountain is hypnotic. I keep staring at it."],
+    lines: ["Mondays are quiet, but the regulars are lovely.", "I wrapped forty boxes on Saturday. My fingers are ribbon now.", "Someone asked if we deliver to the moon.", "The fountain is hypnotic. I keep staring at it.", "Next on my research list: those tangerine chocolates from Jeju."],
     hellos: ["Hi!", "Morning, boss!"], away: "Lila's not on today."},
   // Noor runs the pet adoption corner at the Sunday farmers market and the field fair (tours.js); no routine otherwise
   // Noor lives at Clover on the cottage lane, with a pen of rescues in the garden
@@ -876,7 +876,7 @@ export const NPCS = [
       slot("13:00", "13:45", "bay", [222, 352], {act: "sit"}), slot("13:45", "15:30", "scoopshop", [[200, 440], [380, 450], [140, 560], [300, 560]], {act: "cone"}),
       slot("15:30", "18:00", "bay", [[150, 440], [230, 440], [200, 312], [262, 380]], {act: "cone"}),
       slot("18:00", "22:00", "bay", [[262, 380], [300, 400]])],   // round 155: evenings, just the bike (late-night suppers)
-    lines: ["Table four wants another round. Table four always wants another round.", "Best view in the village, this deck.", "Napkins! Who needs napkins?", "I dream in pistachio."],
+    lines: ["Table four wants another round. Table four always wants another round.", "Best view in the village, this deck.", "Napkins! Who needs napkins?", "I dream in pistachio.", "Tía Pilar brings jamón back from Ronda. Most of it reaches the kitchen."],
     actLines: {cone: ["Two cones for the deck, coming through!", "Mind the drips!", "Anyone for a waffle?", "Enjoy! Don't let the gulls see."]},
     away: "Tomo's off for the day."
   },

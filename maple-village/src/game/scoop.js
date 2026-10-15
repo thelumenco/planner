@@ -42,7 +42,7 @@ export const FORMATS = {cup: {n: "Cup", p: 4}, cone: {n: "Cone", p: 4}, float: {
 const FMT_W = [["cup", .34], ["cone", .4], ["float", .1], ["waffle", .16]];
 
 // What can go into a flavour: [display name, the word used in flavour names, colour]
-const FRUIT_COL = {cherry: "#C2334D", lemon: "#F3E27A", peach: "#F5B08A", mango: "#F3B33A", apple: "#B9D98A", pear: "#D9E39A", fig: "#8C5A7A", orange: "#F39A3A", persimmon: "#E8823A", tangerine: "#F29A2E"};
+const FRUIT_COL = {cherry: "#C2334D", lemon: "#F3E27A", peach: "#F5B08A", mango: "#F3B33A", apple: "#B9D98A", pear: "#D9E39A", fig: "#8C5A7A", orange: "#F39A3A", persimmon: "#E8823A", tangerine: "#F29A2E", plum: "#7A3A6E"};
 export const INGR = {
   milk: ["Milk", "Milk", "#FFFBEF"], honey: ["Honey", "Honey", "#F3C969"], egg: ["Egg", "Custard", "#F6E3A1"], olives: ["Olives", "Olive", "#9DAF6A"],
   strawberry: ["Strawberries", "Strawberry", "#E8566C"], blueberry: ["Blueberries", "Blueberry", "#5E6EB8"], pumpkin: ["Pumpkin", "Pumpkin", "#E8913A"],
@@ -283,15 +283,19 @@ function registerDip(s, id){
   const m = /^gel_dip_(\w+?)_(\w+?)_(\w+?)_(.+)$/.exec(id); if (!m || !FORMATS[m[1]] || !DIPS[m[2]]) return;
   const r = s.recipes.find(x => x.id.replace(/[^a-z0-9]+/g, "-") === m[4]); if (!r) return;
   const top = m[3] === "none" ? null : m[3], dairy = r.dairy || DAIRY_DIP.includes(m[2]);
-  ITEMS[id] = {n: dipName(r, m[1], m[2], top), kind: "gift", to: dairy ? NO_DAIRY : "family", ...(dairy ? {dairy: true} : {}), tab: "scoop", ico: "ic_" + m[1], gel: true, dip: true,
+  ITEMS[id] = {n: dipName(r, m[1], m[2], top), kind: "gift", to: dairy ? NO_DAIRY : "family", ...(dairy ? {dairy: true} : {}), tab: "scoop", ico: "ic_" + m[1], gel: true, dip: true, ings: [...r.ings],
     say: `Dipped AND topped? You spoil me. ${r.name}, wow.`, says: {tomi: "Dark choc and sorbet, so no tummy trouble. Legend.", farid: "So fancy! I shall eat it slowly and make it last.", theo: "Now that is an ice cream. Hana wants a bite. Officially, she can't have one."}};
 }
 export function registerItems(F){
   const s0 = scoopState(F); s0.dipIds.forEach(id => registerDip(s0, id)); Object.keys(F.inv || {}).filter(k => k.startsWith("gel_dip_")).forEach(id => registerDip(s0, id));
   s0.recipes.forEach(r => Object.keys(FORMATS).forEach(fmt => { const id = giftId(r, fmt);
-    ITEMS[id] = {n: `${r.name} ${FORMATS[fmt].n.toLowerCase()}`, kind: "gift", to: r.dairy ? NO_DAIRY : "family", ...(r.dairy ? {dairy: true} : {}), tab: "scoop", ico: "ic_" + fmt, gel: true,
+    ITEMS[id] = {n: `${r.name} ${FORMATS[fmt].n.toLowerCase()}`, kind: "gift", to: r.dairy ? NO_DAIRY : "family", ...(r.dairy ? {dairy: true} : {}), tab: "scoop", ico: "ic_" + fmt, gel: true, ings: [...r.ings],
       say: `Ice cream! ${r.name}? Ooh, I've never had that one.`, says: {tomi: "A sorbet, so no tummy trouble. Nice one.", farid: "Ice cream for me? Oh, so cold! So nice. It would go beautifully with almond cake.", theo: "I am very fond of ice cream. Don't tell Hana."}}; }));
 }
+// the loves round: Nonna's fior di latte, Sofia's way (once her chapter's been told: stories.js storyGiven "nonna"):
+// a bottle of milk from the fridge makes a cup, to give
+export function makeNonna(F, ok){ const s = scoopState(F); if (!ok || !(s.fridge.milk > 0)) return 0; s.fridge.milk--; if (s.fridge.milk <= 0) delete s.fridge.milk; F.inv.s_nonna = (F.inv.s_nonna || 0) + 1; return 1; }
+const nonnaCard = (s, ok) => !ok ? "" : `<p class="eyebrow" style="margin:12px 0 6px">Nonna's fior di latte</p><p class="muted">Milk and sugar, nothing else: let the milk be milk. A bottle of milk from the fridge makes a cup to give (${s.fridge.milk || 0} in the fridge).</p><div class="actions"><button class="btn small alt" data-gnonna="1" ${s.fridge.milk > 0 ? "" : "disabled"}>Make a cup</button></div>`;
 export function takeAway(F, rid, fmt){
   const s = scoopState(F), r = recipeOf(s, rid); if (!r || !(s.tubs[rid] > 0) || !FORMATS[fmt]) return null;
   s.tubs[rid]--; if (s.tubs[rid] <= 0) delete s.tubs[rid]; registerItems(F);
@@ -380,8 +384,8 @@ export function counterPanel(F, st){
   let h = st.cart ? `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)} cart</h2><p class="sub">At the night market till 10pm, scooping from tubs already made (no batches at the market, just serving).${st.keeper ? " Tomo's minding it." : " Tomo's off wandering: it's on an honesty tin."} ${t.cart ? `Sold tonight: ${t.cart} (${t.cartCoins} ${coin()}).` : "Nothing sold yet tonight."} Stay and scoop, and more people stop.</p>`
     : `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(s.name)}</h2><p class="sub">${openNow(hm) ? "Open till 8pm." : "Closed: open 10am to 8pm."} ${t.n ? `Sold today: ${t.n} (${t.coins} ${coin()}).` : "Nothing sold yet today."}${st.server ? " Sofia's behind the counter." : ""}</p>`;
   if (st.cart && !tubs.length) return h + `<p class="muted">Nothing to scoop: the shop's display is empty tonight.</p>` + shut;
-  if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut;
-  if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), then make more tubs from the recipe book there.</p>` + upBtn + shut;
+  if (!tubs.length && scoopsLeft(s)) return h + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + nonnaCard(s, st.nonna) + upBtn + shut;
+  if (!tubs.length) return h + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), then make more tubs from the recipe book there.</p>` + nonnaCard(s, st.nonna) + upBtn + shut;
   const pick = st.pick && s.tubs[st.pick] > 0 ? recipeOf(s, st.pick) : null;
   if (pick) return h + `<div class="gpick"><p class="olabel">${dot(pick.col)} ${esc(pick.name)}${pick.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick.ings.map(i => INGR[i][0]).join(", "))} · ${s.tubs[pick.id]} scoops left</p>
     <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick.id)}">Have one now${("")}</button></div>
@@ -389,7 +393,7 @@ export function counterPanel(F, st){
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
   h += `<ul class="hlist wlist">${tubs.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
   if (st.cart) return h + `<p class="muted">Yours are free. Cups and cones at the shop's prices.</p>` + shut;
-  return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p><div class="actions"><button class="btn small alt" data-gview="freezer">Change what's in the display</button><button class="btn small alt" data-gview="trolley">${s.trolley ? "The trolley" : "Load the trolley"}</button></div>` + upBtn + shut;
+  return h + `<p class="muted">Yours are free. Customers pay what's on the chalkboard menu.</p><div class="actions"><button class="btn small alt" data-gview="freezer">Change what's in the display</button><button class="btn small alt" data-gview="trolley">${s.trolley ? "The trolley" : "Load the trolley"}</button></div>` + nonnaCard(s, st.nonna) + upBtn + shut;
 }
 export function menuPanel(F, st){
   const s = scoopState(F), step = k => `<span class="gstep"><button class="btn small alt" data-gprice="${k}:-1" aria-label="Cheaper">−</button><b>${s.prices[k]}</b><button class="btn small alt" data-gprice="${k}:1" aria-label="Dearer">+</button></span>`;
