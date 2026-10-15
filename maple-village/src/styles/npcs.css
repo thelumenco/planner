@@ -358,3 +358,53 @@
 @keyframes verseQ{0%,50%,100%{transform:translate(0,0)}6%,18%,30%,42%{transform:translate(-1.6px,.4px)}12%,24%,36%{transform:translate(1px,0)}60%,90%{transform:translate(2px,-9px) rotate(-30deg)}}
 @keyframes dreamS{0%,56%,94%,100%{opacity:0;transform:translateY(0)}66%,86%{opacity:1;transform:translateY(-2px)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-swim .flip > g,.ch.npc.act-swim .armR,.ch.npc.act-swim .armL,.ch.npc .ripple,.ch.npc.act-rampart .armR,.ch.npc.act-rampart .inhand,.ch.npc.act-gossip .armR,.ch.npc .chatter,.ch.npc.act-boatwatch .flip > g,.ch.npc.act-rockjump .bob,.ch.npc .splash,.ch.npc.act-snorkel .flip > g,.ch.npc .spout,.ch.npc.act-verse .flip > g,.ch.npc .quill,.ch.npc .dream{animation:none}.ch.npc.act-swim .flip > g{transform:translateY(12px)}.ch.npc .splash{opacity:1}}
+
+/* a day out on Puffin Island (never done anywhere before): Mum lies back in the thrift threading a sea-pink chain, Dad
+   does his deadpan puffin (wings out, paper beak, a rocking waddle), Ma Ma bends to pick samphire into her basket at the
+   rock pools, Gong Gong polishes the lighthouse's brass plaque, Darren coils a rope over his arm at the jetty, Marcus lies
+   flat on his front watching the seal pups (now and then a slow kick), Angellina holds sea glass up to the sun */
+.ch.npc.act-garland:not(.walk) .legL,.ch.npc.act-garland:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.45)}
+.ch.npc.act-garland:not(.walk) .flip > g{transform:translateY(6px) rotate(-5deg)}.ch.npc.act-garland:not(.walk) .flip > g > ellipse{transform:translateY(-6px)}
+.ch.npc.act-garland:not(.walk) .armL{transform:rotate(-75deg)}
+.ch.npc.act-garland:not(.walk) .armR{animation:garlandA 3.2s ease-in-out infinite}
+.ch.npc .threadf{animation:threadF 3.2s ease-in-out infinite}
+@keyframes garlandA{0%,40%,100%{transform:rotate(-118deg)}55%,70%{transform:rotate(-108deg)}}
+@keyframes threadF{0%,30%{transform:translate(1px,7px);opacity:0}45%{opacity:1}60%,88%{transform:translate(0,0);opacity:1}100%{transform:translate(0,0);opacity:0}}
+.ch.npc.act-waddle:not(.walk) .armR{animation:wingR .5s ease-in-out infinite alternate}.ch.npc.act-waddle:not(.walk) .armL{animation:wingL .5s ease-in-out infinite alternate}
+.ch.npc.act-waddle:not(.walk) .flip > g{animation:waddleW 1s ease-in-out infinite}
+.ch.npc.act-waddle:not(.walk) .legL{animation:waddleL 1s ease-in-out infinite}.ch.npc.act-waddle:not(.walk) .legR{animation:waddleL 1s ease-in-out infinite -.5s}
+@keyframes wingR{from{transform:rotate(-34deg) scaleY(.8)}to{transform:rotate(-46deg) scaleY(.8)}}@keyframes wingL{from{transform:rotate(34deg) scaleY(.8)}to{transform:rotate(46deg) scaleY(.8)}}
+@keyframes waddleW{0%,100%{transform:translateX(-1px) rotate(-6deg)}50%{transform:translateX(1px) rotate(6deg)}}
+@keyframes waddleL{0%,50%,100%{transform:translateY(0)}25%{transform:translateY(-1.6px)}}
+.ch.npc.act-forage:not(.walk) .armL{transform:rotate(20deg)}
+.ch.npc.act-forage:not(.walk) .armR{animation:forageA 3.6s ease-in-out infinite}
+.ch.npc.act-forage:not(.walk) .bob{animation:forageB 3.6s ease-in-out infinite}
+.ch.npc.act-forage:not(.walk) .inhand{animation:forageS 3.6s ease-in-out infinite}
+.ch.npc .sprig{opacity:0}.ch.npc.act-forage:not(.walk) .sprig{animation:sprigS 3.6s steps(1) infinite}
+@keyframes forageA{0%,26%,90%,100%{transform:rotate(-12deg)}46%,66%{transform:rotate(-34deg)}}
+@keyframes forageB{0%,26%,90%,100%{transform:rotate(0)}46%,66%{transform:rotate(20deg)}}
+@keyframes forageS{0%,26%,90%,100%{transform:rotate(23deg)}46%,66%{transform:rotate(1deg)}}
+@keyframes sprigS{0%,62%{opacity:0}64%,96%{opacity:1}}
+.ch.npc.act-brass:not(.walk) .armR{animation:brassA 1.1s linear infinite}
+.ch.npc.act-brass:not(.walk) .inhand{animation:brassI 1.1s linear infinite}
+.ch.npc .rag{animation:ragC 1.1s linear infinite}
+.ch.npc .shine{transform-box:fill-box;transform-origin:50% 50%;animation:shineS 2.2s ease-in-out infinite}
+@keyframes brassA{0%,100%{transform:rotate(-74deg)}50%{transform:rotate(-84deg)}}@keyframes brassI{0%,100%{transform:rotate(5deg)}50%{transform:rotate(-5deg)}}
+@keyframes ragC{0%,100%{transform:translate(1.2px,0)}25%{transform:translate(0,1.2px)}50%{transform:translate(-1.2px,0)}75%{transform:translate(0,-1.2px)}}
+@keyframes shineS{0%,40%,100%{transform:scale(.2) rotate(0);opacity:0}60%{transform:scale(1.15) rotate(45deg);opacity:1}80%{transform:scale(.8) rotate(80deg);opacity:.8}}
+.ch.npc.act-coilrope:not(.walk) .armL{transform:rotate(-50deg)}
+.ch.npc.act-coilrope:not(.walk) .armR{animation:coilA 2.2s ease-in-out infinite}
+.ch.npc.act-coilrope:not(.walk) .inhand{animation:coilI 2.2s ease-in-out infinite}
+@keyframes coilA{0%,100%{transform:rotate(-40deg)}50%{transform:rotate(-122deg)}}@keyframes coilI{0%,100%{transform:rotate(20deg)}50%{transform:rotate(-62deg)}}
+.ch.npc.act-sealwatch:not(.walk) .bob{transform:translate(-29px,-9px) rotate(90deg)}
+.ch.npc.act-sealwatch:not(.walk) .bhead{transform-box:fill-box;transform-origin:50% 50%;transform:translate(-4px,-3px) rotate(-90deg)}
+.ch.npc.act-sealwatch:not(.walk) .flip > g > ellipse{transform:scaleX(2.7)}
+.ch.npc.act-sealwatch:not(.walk) .armR{transform:rotate(180deg)}.ch.npc.act-sealwatch:not(.walk) .armL{transform:rotate(168deg)}
+.ch.npc.act-sealwatch:not(.walk) .legR{animation:kickF 6s ease-in-out infinite}
+@keyframes kickF{0%,68%,100%{transform:rotate(0)}76%{transform:rotate(40deg)}84%{transform:rotate(8deg)}90%{transform:rotate(34deg)}96%{transform:rotate(0)}}
+.ch.npc.act-seaglass:not(.walk) .armR{animation:glassA 2.6s ease-in-out infinite alternate}
+.ch.npc.act-seaglass:not(.walk) .inhand{animation:glassI 2.6s ease-in-out infinite alternate}
+.ch.npc .glint{transform-box:fill-box;transform-origin:20% 80%;animation:glintS 2.6s ease-in-out infinite}
+@keyframes glassA{from{transform:rotate(-156deg)}to{transform:rotate(-164deg)}}@keyframes glassI{from{transform:rotate(4deg)}to{transform:rotate(-4deg)}}
+@keyframes glintS{0%,30%,100%{transform:scale(.3);opacity:0}50%{transform:scale(1.1);opacity:1}70%{transform:scale(.9);opacity:.7}}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-garland .armR,.ch.npc .threadf,.ch.npc.act-waddle .armR,.ch.npc.act-waddle .armL,.ch.npc.act-waddle .flip > g,.ch.npc.act-waddle .legL,.ch.npc.act-waddle .legR,.ch.npc.act-forage .armR,.ch.npc.act-forage .bob,.ch.npc.act-forage .inhand,.ch.npc.act-forage .sprig,.ch.npc.act-brass .armR,.ch.npc.act-brass .inhand,.ch.npc .rag,.ch.npc.act-coilrope .armR,.ch.npc.act-coilrope .inhand,.ch.npc.act-sealwatch .legR,.ch.npc.act-seaglass .armR,.ch.npc.act-seaglass .inhand{animation:none}.ch.npc.act-garland .armR{transform:rotate(-118deg)}.ch.npc.act-waddle .armR{transform:rotate(-38deg) scaleY(.8)}.ch.npc.act-waddle .armL{transform:rotate(38deg) scaleY(.8)}.ch.npc.act-forage .armR{transform:rotate(-12deg)}.ch.npc.act-forage .inhand{transform:rotate(23deg)}.ch.npc.act-brass .armR{transform:rotate(-79deg)}.ch.npc.act-coilrope .armR{transform:rotate(-60deg)}.ch.npc.act-seaglass .armR{transform:rotate(-160deg)}.ch.npc .shine,.ch.npc .glint{animation:none;opacity:1}}
