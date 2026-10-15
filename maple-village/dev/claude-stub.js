@@ -1,4 +1,4 @@
-// Local stand-in for the claude.ai artifact runtime (window.claude.use), dev builds only.
+// Local stand-in for the cloud (window.__hbDevCloud.use: db, user, downloads), dev builds only: the public game uses Firebase.
 window.__hbDevStub = true;   // dev only: lets test scripts jump between scenes
 // db: documents in localStorage under "stub:<path>", live onSnapshot. user: id "me". downloads: remembers the last save.
 // URL options:
@@ -39,7 +39,7 @@ window.__hbDevStub = true;   // dev only: lets test scripts jump between scenes
 
   const downloads = { save: async ({ filename, data }) => { window.__download = { filename, size: String(data).length }; return { status: "saved" }; } };
   const caps = { downloads, db, user: { id: async () => "me", isOwner: () => true, canEdit: () => true } };
-  window.claude = { use: name => new Promise(r => setTimeout(() => r(caps[name] ?? null), 250)) };
+  window.__hbDevCloud = { use: name => new Promise(r => setTimeout(() => r(caps[name] ?? null), 250)) };
 
   if (q.get("seed") && !read("data/users/me/fox")) {   // only into a fresh save: later loads keep what the game wrote
     const at = Date.now();

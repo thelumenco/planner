@@ -1,0 +1,29 @@
+# Honeybrook (the public game): every push to honeybrook-public builds the game and deploys it to Firebase Hosting
+# (honey-brook.web.app). Only this branch deploys; nothing else in the repo does. (The Firestore rules change rarely:
+# deploy them by hand with `firebase deploy --only firestore:rules` from maple-village.)
+# Needs one repository secret, FIREBASE_SERVICE_ACCOUNT_HONEY_BROOK (set up by `firebase init hosting:github`).
+name: Deploy Honeybrook
+on:
+  push:
+    branches: [honeybrook-public]
+    paths: ["maple-village/**", ".github/workflows/honeybrook-deploy.yml"]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: maple-village
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run build:public   # builds, then the leak check: nothing personal may ship
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HONEY_BROOK }}
+          projectId: honey-brook
+          channelId: live
+          entryPoint: maple-village

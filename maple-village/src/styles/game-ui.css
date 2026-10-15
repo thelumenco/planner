@@ -999,3 +999,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ttdel{background:#E8566C;color:#fff;border-color:#C8435A}
 :root[data-theme="dark"] .welcomebox{background:#2A2630}
 :root[data-theme="dark"] .ttcard,:root[data-theme="dark"] .ttslot{background:#2E2A33;color:#F1EBE0}
+.ttmail{display:flex;flex-direction:column;gap:6px;margin:14px 0 4px}
+.ttmail .actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ttmsg{margin:2px 0;font-size:.9rem;color:#8A4A3A}

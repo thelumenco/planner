@@ -9,14 +9,20 @@ const ls = () => { try { return window.localStorage; } catch { return null; } };
 export const activeSlot = () => { const n = +((ls() && ls().getItem("hb.active")) || 1); return n >= 1 && n <= SLOTS ? n : 1; };
 const gameKeys = () => { const s = ls(); return s ? Object.keys(s).filter(isGame) : []; };
 const pack = () => Object.fromEntries(gameKeys().map(k => [k, ls().getItem(k)]));
-// the playing game's keys (and, in dev builds, the stand-in cloud's copies of them) cleared away
-function clearPlaying(){ const s = ls(); if (!s) return; gameKeys().forEach(k => s.removeItem(k)); Object.keys(s).filter(k => k.startsWith("stub:")).forEach(k => s.removeItem(k)); }
+// the playing game's keys cleared away (each slot's cloud copy has its own place: cloud.js, and the dev stand-in's)
+function clearPlaying(){ const s = ls(); if (!s) return; gameKeys().forEach(k => s.removeItem(k)); }
+const devCloud = n => { const s = ls(); if (!s) return; const p = n > 1 ? `stub:data/users/me/slot${n}/` : "stub:data/users/me/";
+  Object.keys(s).filter(k => k.startsWith(p) && (n > 1 || !k.slice(p.length).includes("/"))).forEach(k => s.removeItem(k)); };
 const stored = n => { try { return JSON.parse(ls().getItem("hb.slot." + n)) || null; } catch { return null; } };
 export const slotData = n => n === activeSlot() ? pack() : stored(n);
 
 // what a slot card shows -> null for an empty slot (or one that never got past the setup card)
 export function summary(n){
   const d = slotData(n); let f = null; try { f = d && d["fox.fox"] ? JSON.parse(d["fox.fox"]) : null; } catch {}
+  return summaryOf(f);
+}
+// the same from a game's save (the cloud's copy, say)
+export function summaryOf(f){
   if (!f || !f.me || !f.pet) return null;
   const h = Object.entries((f.board && f.board.hearts) || {}).sort((a, b) => b[1] - a[1])[0];
   return {name: f.me.name || "You", pet: f.pet, petName: f.name || "", days: f.days || 0, coins: f.coins || 0, best: h && h[1] > 0 ? {id: h[0], hearts: Math.min(5, h[1])} : null, at: f.updatedAt || 0};
@@ -28,5 +34,7 @@ export function switchTo(n){
   Object.entries(stored(n) || {}).forEach(([k, v]) => s.setItem(k, v)); s.removeItem("hb.slot." + n);
   s.setItem("hb.active", String(n)); return true;
 }
+// every slot's copy in this browser (another account has signed in here)
+export function clearAllSlots(){ const s = ls(); if (!s) return; clearPlaying(); for (let n = 1; n <= SLOTS; n++) s.removeItem("hb.slot." + n); s.removeItem("hb.active"); }
 // delete a slot's game for good (the playing one too: its keys go, and it starts empty)
-export function wipe(n){ const s = ls(); if (!s) return; if (n === activeSlot()) clearPlaying(); else s.removeItem("hb.slot." + n); }
+export function wipe(n){ const s = ls(); if (!s) return; if (n === activeSlot()) clearPlaying(); else s.removeItem("hb.slot." + n); devCloud(n); }

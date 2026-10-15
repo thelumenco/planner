@@ -30,6 +30,7 @@ async function build() {
   mkdirSync(join(root, "dist"), { recursive: true });
   const out = join(root, "dist", dev ? "dev.html" : "maple-village.html");
   writeFileSync(out, html);
+  if (!dev) { mkdirSync(join(root, "dist", "hosting"), { recursive: true }); writeFileSync(join(root, "dist", "hosting", "index.html"), html); }   // what Firebase Hosting serves (honey-brook.web.app)
   console.log(`built ${out.replace(root + "/", "")} (${(html.length / 1024).toFixed(0)} KB)`);
 }
 const rank = f => { const i = STYLE_ORDER.indexOf(f); return i < 0 ? 99 : i; };

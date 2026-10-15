@@ -31,7 +31,9 @@ import * as TL from "./tailor.js";
 import { lookOf, applyLook } from "./look.js";
 import { openSetup, setupOpen } from "./setup.js";
 import { openIntro, introOpen, introAt } from "./intro.js";
-import { openTitle, titleOpen } from "./title.js";
+import { openTitle, titleOpen, refreshTitle } from "./title.js";
+import { activeSlot, summaryOf, clearAllSlots } from "./slots.js";
+import * as CL from "./cloud.js";
 import { PLACES, placeOf, placeAt } from "../data/places.js";
 import { SPECIES, speciesOf, petArt, petify } from "../art/pets.js";
 import { sendOptions, takeSend, sendMorePanel } from "./bikesend.js";
@@ -240,12 +242,32 @@ function noteHistory(){
 }
 const save = (redraw) => { clearSlots(); F.where = {scene, x: Math.round(hero.x), y: Math.round(hero.y), day: dayKey()}; noteHistory(); persist("today"); persist("fox"); render(redraw); };
 
+// The cloud: the dev builds' stand-in, or Firebase for the public game (cloud.js), once you've signed in. Each save slot
+// is its own collection of documents (fox, today, routines, journal). Not signed in, the game saves in this browser only.
+let player = null, remote = {};   // the signed-in player, and the slots' cloud summaries for the welcome screen
 async function initDb(){
-  if (!window.claude || !claude.use) return;
-  const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
-  if (!db || !user) return;
-  const uid = await user.id(); if (!uid) return;
-  const col = db.collection("data/users/" + uid);
+  const dev = window.__hbDevCloud;
+  if (dev) { const [db, user] = await Promise.all([dev.use("db"), dev.use("user")]); if (!db || !user) return;
+    const uid = await user.id(); if (uid) connect(db.collection("data/users/" + uid + (activeSlot() > 1 ? "/slot" + activeSlot() : ""))); return; }
+  CL.watchPlayer(p => {
+    const was = player; player = p; refreshTitle({checking: false});
+    // another account signed in on this browser: its own games only (this browser's copies belonged to someone else,
+    // and are safe in their account)
+    if (p) { let owner = null; try { owner = localStorage.getItem("hb.owner"); localStorage.setItem("hb.owner", p.uid); } catch {}
+      if (owner && owner !== p.uid) { leaving = true; clearAllSlots(); location.reload(); return; } }
+    if (p && !refs) connect(CL.slotCollection(p.uid, activeSlot()));
+    if (was && !p) { leaving = true; location.reload(); return; }   // signed out: back to this browser's copy only
+    if (p) cloudSummaries(); else refreshTitle({player: null, remote: {}});
+  });
+}
+async function cloudSummaries(){
+  if (!player) return; remote = {};
+  await Promise.all([1, 2, 3].map(async n => { try { const s = await CL.slotCollection(player.uid, n).doc("fox").get(); if (s.exists) remote[n] = summaryOf(s.data()); } catch {} }));
+  refreshTitle({player, remote});
+}
+// signed in: wait (a few seconds at most) for this slot's cloud copy before deciding it's a new game
+function whenSynced(fn){ const t0 = Date.now(), go = () => (!player || synced.fox || Date.now() - t0 > 6000) ? fn() : setTimeout(go, 150); go(); }
+function connect(col){
   attachRoutines(col, () => { if (routOpen && !/^(rtName|rtNew|rtPaste)$/.test(document.activeElement?.id || "") && !document.activeElement?.dataset?.day && !document.activeElement?.dataset?.item) ctx(); });
   attachMyDocs(col, id => { if (id === "journal" && journalOpen && document.activeElement?.id !== "jText") ctx(); });
   refs = {today: col.doc("today"), fox: col.doc("fox")};
@@ -2936,10 +2958,10 @@ $("bedYes").onclick = () => { bedAsk(false); F.bedSkip = nightKey(); save(); bed
 $("setBackup").onclick = async () => {
   const data = {}; Object.keys(localStorage).filter(k => k.startsWith("fox.")).forEach(k => { try { data[k] = JSON.parse(localStorage.getItem(k)); } catch { data[k] = localStorage.getItem(k); } });
   const file = JSON.stringify({game: "Honeybrook", exportedAt: new Date().toISOString(), data}, null, 1), name = `honeybrook-backup-${dayKey()}.json`;
-  let dl = null; try { dl = await claude.use("downloads"); } catch {}
-  if (!dl) { $("setBackupNote").textContent = "Downloads aren't available in this view. Try the Claude app or claude.ai in a browser."; return; }
-  try { await dl.save({filename: name, data: file}); $("setBackupNote").textContent = `Saved ${name}. Keep it somewhere safe, like your Google Drive.`; F.backupAt = Date.now(); save(); }
-  catch (e) { $("setBackupNote").textContent = e && e.code === "declined" ? "No worries, nothing saved." : "Couldn't save the backup just now."; }
+  try { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([file], {type: "application/json"})); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    if (window.__hbDevStub) window.__download = {filename: name, size: file.length};   // (for the tests)
+    $("setBackupNote").textContent = `Saved ${name}. Keep it somewhere safe.`; F.backupAt = Date.now(); save(); }
+  catch { $("setBackupNote").textContent = "Couldn't save the backup just now."; }
 };
 $("setBed").onchange = e => { F.bedLock = e.target.checked; save(); bedtimeTick(); };
 // nothing gets through while the village is asleep (keys included)
@@ -3198,7 +3220,12 @@ dressPet();
 // Phase 5: the welcome screen first (dev builds skip it unless ?title=1), then the game, or the story and the setup
 // card for a new one. After switching slots the page reloads straight into the game.
 function showTitle(){
-  openTitle({play: () => needSetup(), save: () => { save(); flushSaves(); },
+  openTitle({player, remote, needAccount: !window.__hbDevCloud, checking: !window.__hbDevCloud && !player,
+    play: () => whenSynced(needSetup), save: () => { save(); flushSaves(); },
+    signIn: () => CL.signInGoogle().catch(() => speak("Sign-in didn't go through. You can keep playing; your game saves in this browser.", 5000)),
+    signOut: () => CL.signOutPlayer(),
+    mail: (what, email, pw) => what === "reset" ? CL.emailReset(email) : what === "up" ? CL.emailSignUp(email, pw) : CL.emailSignIn(email, pw),
+    wipeCloud: n => { if (player) CL.SLOT_DOCS.forEach(d => CL.slotCollection(player.uid, n).doc(d).delete().catch(() => {})); },
     reload: skip => { leaving = true; try { if (skip) sessionStorage.setItem("hb.skipTitle", "1"); } catch {} location.reload(); },
     story: () => openIntro({replay: true, trainArt: () => trainRideArt(false), sfx})});
 }

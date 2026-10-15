@@ -198,3 +198,13 @@ title screen". Saves (game/slots.js): the game always plays from the fox.* keys;
 whole under hb.slot.N (sound and zoom stay per device); switching puts the playing slot away, takes the chosen one
 out and reloads straight into it. A save from before slots is slot 1. Dev builds skip the welcome screen unless
 ?title=1. Phase 6 (Firebase) will keep each slot in the cloud.
+
+## Phase 6: accounts and cloud saves with Firebase (built 2026-10-15; deploy steps in DEPLOY.md)
+Everyone plays with an account: the welcome screen asks for Google or email-and-password sign-in (with "make an
+account" and "forgot your password") before showing the slots. Each signed-in player's three slots live in Firestore
+under players/{uid}/slot{N}/{fox, today, routines, journal} (game/cloud.js); firestore.rules lets a player read and
+write only their own. The first sign-in uploads the game already in this browser; another account signing in on the
+same browser only ever sees its own games. Backups are a plain file download. The dev builds use a local stand-in
+(dev/claude-stub.js, window.__hbDevCloud). Hosting: honey-brook.web.app, deployed by GitHub Actions
+(.github/workflows/honeybrook-deploy.yml) on every push to honeybrook-public, after the leak check passes. The leak
+check is now clean.
