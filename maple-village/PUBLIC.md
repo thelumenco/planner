@@ -165,8 +165,8 @@ office worker in Singapore (late nights, dinner at the desk, the view of Marina 
 letter from Pembury & Vale, Solicitors, Honeybrook. Their great-uncle, Wilfred Song, has left them his house and
 vineyard; his will turned up years late inside a cookery book. His note asks two things: look after the vineyard, and
 look after his companion, who'll be waiting. Then the train to Honeybrook, the bare vineyard at golden hour, and the
-setup card, whose last question ("Who's waiting on the porch?") is the pet. Your hands (and once your reflection)
-are always in shadow, since you haven't chosen how you look yet. Skippable; "Watch the story again" in Settings.
+setup card, whose last question ("Who's waiting on the porch?") is the pet. You're never shown (only, once, a faint
+reflection in a window), since you haven't chosen how you look yet. Skippable; "Watch the story again" in Settings.
 Eight villagers have a line about Wilf. Singapore is allowed in the story's two files only (leak-check.mjs ALLOW).
 Dev builds skip it unless the page has ?intro=1; window.__mapleIntro(i) opens one screen.
 

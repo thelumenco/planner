@@ -1,24 +1,12 @@
 // The opening story's pictures (game/intro.js): everything seen through your own eyes, before you've chosen how you
-// look, so your hands (and once, your reflection) are always in shadow. Same hand-drawn ink and marker as the rest
+// look, so you're never shown (only, once, a faint reflection in a window). Same hand-drawn ink and marker as the rest
 // of the game (sk(): fills under #marker, ink lines under #wob). Each picture is 400 x 240.
 import { sk } from "./scenes.js";
 
-const HAND = "#55484F", HAND2 = "#6A5C64", SLEEVE = "#353A4C";
 const wrap = (body, bg) => `<svg viewBox="0 0 400 240" class="inpic" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid slice"><rect width="400" height="240" fill="${bg}"/>${body}</svg>`;
-// a hand in shadow, seen from the back: palm, four fingers and a thumb, with the sleeve behind. Wrist at (x, y),
-// fingers pointing up before rotating by a (degrees); flip for a right hand (thumb on the left); len: sleeve length
-function hand(x, y, a, s = 1, flip = false, len = 50, grip = false, sleeve = SLEEVE){
-  const F = [[-10.2, -44, 6.6], [-3.4, -49, 6.8], [3.4, -48, 6.8], [10, -42, 6.2]].map(([fx, top, w]) => [fx, grip ? top + 14 : top, w]);   // (curled round something when gripping)
-  const fingers = F.map(([fx, top, w]) => `<rect x="${fx - w/2}" y="${top}" width="${w}" height="${-top - 18}" rx="${w/2}"/>`).join("");
-  const thumb = `<rect x="-3.6" y="-20" width="7.2" height="20" rx="3.6" transform="translate(-14 -6) rotate(-38)"/>`;
-  const shape = `<path d="M-13 4 Q-15 -14 -13 -24 Q0 -30 13 -24 Q15 -12 12 4z"/>${fingers}${thumb}`;
-  return `<g transform="translate(${x} ${y}) rotate(${a}) scale(${s*(flip ? -1 : 1)} ${s})">` + sk(
-    `<path d="M-15 ${len} L-14 2 Q0 -3 14 2 L15 ${len}z" style="fill:${sleeve}"/><g style="fill:${HAND}">${shape}</g><path d="M-10 -20 Q0 -25 10 -20" style="fill:none;stroke:${HAND2};stroke-width:3" opacity=".7"/>`,
-    `<path d="M-15 ${len} L-14 2 Q0 -3 14 2 L15 ${len}"/><path d="M-14 6 Q0 1 14 6" opacity=".6"/>${shape}`) + `</g>`;
-}
 const glow = (id, c1, c2) => `<radialGradient id="${id}"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}" stop-opacity="0"/></radialGradient>`;
 
-// 1. Late again: hands on a laptop in a dark office, the screen the only light
+// 1. Late again: a laptop in a dark office, the screen the only light
 function late(){
   let cells = "";
   for (let r = 0; r < 10; r++) for (let c = 0; c < 6; c++) if ((r*7 + c*3) % 5 === 0) cells += `<rect x="${121 + c*27}" y="${83 + r*9}" width="25" height="7" style="fill:${(r + c) % 3 ? "#F6E3A1" : "#C8E3C0"}"/>`;
@@ -34,8 +22,7 @@ function late(){
       <path d="M96 196 H304 L330 240 H70z" style="fill:#8A909E"/>`,
       `<rect x="110" y="70" width="180" height="126" rx="7"/><rect x="118" y="78" width="164" height="104" rx="2"/>${Array.from({length: 10}, (_, r) => `<path d="M118 ${82 + r*9} H282" opacity=".25"/>`).join("")}${Array.from({length: 5}, (_, c) => `<path d="M${146 + c*27} 78 V172" opacity=".25"/>`).join("")}
       <path d="M96 196 H304 L330 240 H70z"/>${[206, 216, 226].map((y, r) => Array.from({length: 11}, (_, k) => `<rect x="${104 + r*-3 + k*19}" y="${y}" width="15" height="7" rx="1.5" opacity=".45"/>`).join("")).join("")}`)
-    + `<text x="279" y="190" text-anchor="end" font-size="7" font-family="Mulish,sans-serif" fill="#6E8094">9:47 PM</text>`
-    + hand(156, 252, 16, 1.25) + hand(246, 254, -14, 1.25, true), "#1A1F30");
+    + `<text x="279" y="190" text-anchor="end" font-size="7" font-family="Mulish,sans-serif" fill="#6E8094">9:47 PM</text>`, "#1A1F30");
 }
 
 // 2. Dinner at the desk: cold noodles in a plastic box, a plastic fork, a sticky note on the laptop
@@ -52,8 +39,7 @@ function meal(){
       <rect x="120" y="100" width="150" height="104" rx="12"/><rect x="132" y="110" width="126" height="84" rx="8"/>
       <path d="M248 122 q10 -6 14 4 l-12 6z"/><rect x="282" y="98" width="88" height="70" rx="10" transform="rotate(14 326 133)"/>
       <path d="M300 200 l70 -40 l5 6 l-70 42z"/><path d="M362 164 l14 -10 M366 168 l14 -10 M370 172 l13 -9" opacity=".7"/><rect x="40" y="150" width="56" height="44" rx="3" transform="rotate(-8 68 172)"/><path d="M50 166 l34 -4 M52 176 l30 -4" opacity=".3"/>`)
-    + `<text x="150" y="31" text-anchor="middle" transform="rotate(5 150 28)" font-size="9" font-family="Klee One,serif" font-weight="600" fill="#C0392B">Q3 deck!!</text>`
-    + hand(366, 250, -32, 1.2, true), "#7C8290");
+    + `<text x="150" y="31" text-anchor="middle" transform="rotate(5 150 28)" font-size="9" font-family="Klee One,serif" font-weight="600" fill="#C0392B">Q3 deck!!</text>`, "#7C8290");
 }
 
 // 3. The view: Marina Bay at night from an office window at Raffles Place, looking east across the bay. Left to
@@ -101,8 +87,7 @@ function commute(){
       <rect x="20" y="48" width="360" height="74" rx="10"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${30 + i*80} ${60 + i*4} h${44 - i*4}" opacity=".35"/>`).join("")}<path d="M0 16 H400"/>`)
     + `<text x="104" y="13" text-anchor="middle" font-size="7.5" font-family="Mulish,sans-serif" font-weight="700" fill="#3E4A5C" opacity=".8">NEXT STATION: RAFFLES PLACE</text>`
     + sk(ppl, pplL) + `<rect x="296" y="196" width="14" height="22" rx="3" fill="#CFE3F5" opacity=".6"/>`
-    + sk(`<rect x="190" y="0" width="9" height="240" style="fill:#C8CDD4"/>`, `<rect x="190" y="0" width="9" height="240"/><path d="M193 0 V240" opacity=".3"/>`)
-    + hand(226, 132, -90, 1.15, true, 200, true), "#E6E9EE");
+    + sk(`<rect x="190" y="0" width="9" height="240" style="fill:#C8CDD4"/>`, `<rect x="190" y="0" width="9" height="240"/><path d="M193 0 V240" opacity=".3"/>`), "#E6E9EE");
 }
 
 // 5. The envelope: a fat manila envelope, stamps and redirection stickers all over it, an official letter beneath
@@ -117,8 +102,7 @@ function envelope(){
       `<rect x="52" y="60" width="210" height="140" rx="4" transform="rotate(-5 157 130)"/><g transform="rotate(-5 157 130)"><rect x="214" y="68" width="18" height="22"/><rect x="236" y="68" width="18" height="22"/><rect x="214" y="94" width="18" height="22"/>
       <circle cx="200" cy="96" r="16" style="stroke:#C0392B" opacity=".55"/><path d="M188 90 h24 M188 96 h24 M188 102 h24" style="stroke:#C0392B" opacity=".4"/>
       <rect x="64" y="72" width="90" height="20" rx="3"/><rect x="70" y="150" width="80" height="18" rx="3"/>${[116, 126, 136].map((y, i) => `<path d="M100 ${y} q20 -3 40 0 t${40 - i*10} 0"/>`).join("")}<path d="M76 158 h50" style="stroke:#C0392B" opacity=".6"/></g>`)
-    + `<text x="109" y="86" transform="rotate(-5 157 130)" text-anchor="middle" font-size="8" font-family="Mulish,sans-serif" font-weight="700" fill="#5A4A2E">REDIRECTED</text>`
-    + hand(84, 238, 24, 1.15) + hand(240, 240, -20, 1.15, true), "#B48A62");
+    + `<text x="109" y="86" transform="rotate(-5 157 130)" text-anchor="middle" font-size="8" font-family="Mulish,sans-serif" font-weight="700" fill="#5A4A2E">REDIRECTED</text>`, "#B48A62");
 }
 
 // 6. Uncle Wilf's note: a handwritten card, an old photo of the vineyard in its green days, a key on a ribbon
@@ -130,8 +114,7 @@ function note(){
       <rect x="96" y="24" width="168" height="170" rx="4" transform="rotate(-4 180 109)" style="fill:#FFFDF6"/>`,
       `<rect x="262" y="40" width="104" height="112" rx="2" transform="rotate(9 314 96)"/><g transform="rotate(9 314 96)"><rect x="270" y="48" width="88" height="78"/><rect x="300" y="72" width="22" height="18"/><path d="M297 73 l14 -10 l14 10z"/><path d="M340 112 v-10 a3 3 0 1 1 0.1 0" opacity=".7"/></g>
       <path d="M60 196 q10 -14 22 -2 q8 10 -4 16 q-14 4 -18 -14z"/><circle cx="96" cy="204" r="9"/><circle cx="96" cy="204" r="4"/><rect x="104" y="201" width="40" height="6" rx="2"/>
-      <rect x="96" y="24" width="168" height="170" rx="4" transform="rotate(-4 180 109)"/><g transform="rotate(-4 180 109)">${[46, 60, 74, 88, 102, 116, 130, 144].map((y, i) => `<path d="M110 ${y} q12 -4 24 0 t24 0 t24 0 t${i % 3 === 2 ? 10 : 24} 0" style="stroke:#3E4A7A" opacity=".75"/>`).join("")}<path d="M208 168 q6 -12 10 0 q4 -12 10 0" style="stroke:#3E4A7A"/></g>`)
-    + hand(124, 240, 14, 1.15) + hand(244, 242, -12, 1.15, true), "#B48A62");
+      <rect x="96" y="24" width="168" height="170" rx="4" transform="rotate(-4 180 109)"/><g transform="rotate(-4 180 109)">${[46, 60, 74, 88, 102, 116, 130, 144].map((y, i) => `<path d="M110 ${y} q12 -4 24 0 t24 0 t24 0 t${i % 3 === 2 ? 10 : 24} 0" style="stroke:#3E4A7A" opacity=".75"/>`).join("")}<path d="M208 168 q6 -12 10 0 q4 -12 10 0" style="stroke:#3E4A7A"/></g>`), "#B48A62");
 }
 
 // 7. Leaving: your office pass dropped in a drawer; your suitcase waiting by the door
@@ -144,9 +127,8 @@ function leaving(){
       `<rect x="240" y="20" width="96" height="140" rx="3"/><rect x="256" y="34" width="64" height="40" rx="2"/><circle cx="326" cy="96" r="3"/>
       <rect x="350" y="96" width="46" height="62" rx="7"/><rect x="364" y="86" width="18" height="12" rx="4"/><rect x="376" y="104" width="12" height="16" rx="2"/><path d="M382 120 v10"/><circle cx="360" cy="160" r="3"/><circle cx="386" cy="160" r="3"/>
       <rect x="10" y="132" width="230" height="120" rx="6"/><rect x="28" y="150" width="194" height="80" rx="4"/>
-      <rect x="92" y="170" width="44" height="30" rx="4" transform="rotate(-10 114 185)"/><g transform="rotate(-10 114 185)"><path d="M118 180 h12 M118 186 h10" opacity=".5"/></g><path d="M112 172 Q130 150 150 174 Q166 198 182 200" style="stroke:#3E6BAE;stroke-width:3.2"/>`)
-    + `<circle cx="298" cy="54" r="70" fill="url(#inSun)" opacity=".45"/>`
-    + hand(214, 248, -34, 1.2, true), "#EFE6D6");
+      <rect x="92" y="170" width="44" height="30" rx="4" transform="rotate(-10 114 185)"/><g transform="rotate(-10 114 185)"><path d="M118 180 h12 M118 186 h10" opacity=".5"/></g><path d="M112 172 Q132 154 160 166 Q186 180 176 200 Q160 214 136 204" style="stroke:#3E6BAE;stroke-width:3.2"/>`)
+    + `<circle cx="298" cy="54" r="70" fill="url(#inSun)" opacity=".45"/>`, "#EFE6D6");
 }
 
 // 9. Arrival: at the gate in the golden evening. Bare rows, leaning posts, sagging wire, a tired house, and
@@ -167,8 +149,7 @@ function arrive(){
       <rect x="30" y="130" width="112" height="8"/><path d="M40 72 l10 4 M120 112 l6 6" opacity=".4"/><ellipse cx="152" cy="134" rx="18" ry="12"/><path d="M134 124 l-6 -5 M138 120 l-3 -7 M168 122 l5 -6 M172 128 l7 -2" opacity=".8"/>${PL}${wire}${weeds}`)
     + sk(`<rect x="0" y="176" width="10" height="64" style="fill:#9E7A52"/><path d="M10 184 L118 200 L118 214 L10 198z M10 214 L118 226 L118 238 L10 228z" style="fill:#B98A5A"/><rect x="22" y="150" width="62" height="22" rx="2" transform="rotate(-7 53 161)" style="fill:#E9DCC0"/>`,
       `<rect x="0" y="176" width="10" height="64"/><path d="M10 184 L118 200 L118 214 L10 198z M10 214 L118 226 L118 238 L10 228z M40 190 v38 M76 194 v38" /><rect x="22" y="150" width="62" height="22" rx="2" transform="rotate(-7 53 161)"/><path d="M30 150 l-2 -14 M76 145 l2 -14" opacity=".7"/>`)
-    + `<text x="53" y="165" transform="rotate(-7 53 161)" text-anchor="middle" font-size="8.5" font-family="Klee One,serif" font-weight="600" fill="#5A4A3A">Song's Vineyard</text>`
-    + hand(118, 248, -8, 1.15, true), "#F3C98A");
+    + `<text x="53" y="165" transform="rotate(-7 53 161)" text-anchor="middle" font-size="8.5" font-family="Klee One,serif" font-weight="600" fill="#5A4A3A">Song's Vineyard</text>`, "#F3C98A");
 }
 
 export const INTRO_ART = {late, meal, view, commute, envelope, note, leaving, arrive};
