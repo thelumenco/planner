@@ -4455,7 +4455,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
   const go = async sc => { await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(1500); };
   const spot = async id => { await page.locator(`#world [data-rdspot="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(2500); };
-  const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(7000); };
+  const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(11000); };
   const name = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-16"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-16&pipatch=1"); await page.waitForTimeout(1500);

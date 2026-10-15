@@ -6531,6 +6531,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     payoyo: { price: 6, line: "Payoyo with membrillo: salty goat's cheese and sweet quince paste. The waiter says it's how grandmothers do it." },
     naranjas: { price: 4, line: "Orange salad: Seville oranges, black olives, olive oil and a pinch of salt. Sweet, bitter, salty. Who knew?" }
   };
+  var FERRY_FARE = { saltwick: 12, porto: 28, puffin: 16, bali: 45, hokkaido: 45 };
+  Object.entries(FERRY_FARE).forEach(([k, fare]) => {
+    const t2 = TOWNS[k];
+    if (!t2 || !t2.boat || t2.ferry) return;
+    t2.ferry = { fare, pier: t2.boat.pier, arrive: t2.boat.arrive, arriveLine: t2.arriveLine, blurb: t2.boat.blurb || t2.blurb, sees: t2.boat.sees };
+  });
 
   // src/art/paper-icons.js
   var f = (c) => `style="fill:${c}"`;
@@ -7552,7 +7558,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     mumdad: { scene: "shore", name: "Mum and Dad's", short: "Mum and Dad's house", door: [360, 226], mark: [360, 110] },
     marcus: { scene: "shore", name: "Marcus and Angellina's", short: "Marcus and Angellina's house", door: [400, 470], mark: [400, 354] },
     suprack: { scene: "shore", name: "Paddleboards", door: [216, 488], spot: true, line: "The paddleboard rack by the jetty. Fancy a paddle?" },
-    ferry: { scene: "shore", name: "Ferry to Jeju", door: [86, 466], spot: true, mark: [78, 400], line: "The ferry stop at the end of the jetty: boats to Jeju." },
+    ferry: { scene: "shore", name: "The ferry", door: [86, 466], spot: true, mark: [78, 400], line: "The ferry stop at the end of the jetty: boats to Jeju, Saltwick, Portovenere, Puffin Isle, Bali and Hokkaido." },
     wishtower: { scene: "hwoods", name: "The wish-tower", door: [124, 470], spot: true, mark: [110, 400], line: "A little tower of stones by the river. Add one and make a wish." },
     boat: { scene: "shore", name: "Cruise boat", door: [206, 550], spot: true, line: "The mooring at the end of the jetty." },
     dolphins: { scene: "shore", name: "Boardwalk bench", door: [214, 262], spot: true, line: "A bench looking out to sea. Dolphins come by most mornings." },
@@ -32465,9 +32471,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var shut11 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin4 = () => icon("coin", 13);
+  var ferryTowns = () => Object.keys(TOWNS).filter((k) => TOWNS[k].ferry);
   function ticketPanel(F2, pick5, town = "ronda", hm11 = sgHM(), by = "train") {
+    if (by === "ferry" && !(TOWNS[town] || {}).ferry) town = ferryTowns()[0];
     const t2 = TOWNS[town], party = FAMILY.filter((id) => pick5.includes(id)), cost = fareFor(town, party, by), open2 = canLeave(town, hm11), on = tripOn(F2), boat2 = by === "ferry", fare = boat2 ? t2.ferry.fare : t2.fare, ride2 = boat2 ? "ferry" : "train";
-    let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>${boat2 ? "The ferry" : "Tickets"} to ${esc(t2.n)}</h2>${boat2 ? "" : `<div class="gchips">${Object.entries(TOWNS).filter(([, x]) => x.by === "train").map(([k, x]) => `<button class="gchip${k === town ? " on" : ""}" data-ttown="${k}" aria-pressed="${k === town}"><span>${esc(x.n)}</span></button>`).join("")}</div>`}<p class="sub">${esc(boat2 ? "Across the sea to Jeju: a slower crossing than the train over the sea bridge, but there are dolphins. Come home by ferry or by train, whichever you like." : t2.blurb)}</p>
+    let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>${boat2 ? "The ferry" : "Tickets"} to ${esc(t2.n)}</h2>${boat2 ? `<div class="gchips">${ferryTowns().map((k) => `<button class="gchip${k === town ? " on" : ""}" data-ftown="${k}" aria-pressed="${k === town}"><span>${esc(TOWNS[k].n)}</span></button>`).join("")}</div>` : `<div class="gchips">${Object.entries(TOWNS).filter(([, x]) => x.by === "train").map(([k, x]) => `<button class="gchip${k === town ? " on" : ""}" data-ttown="${k}" aria-pressed="${k === town}"><span>${esc(x.n)}</span></button>`).join("")}</div>`}<p class="sub">${esc(boat2 ? town === "jeju" ? "Across the sea to Jeju: a slower crossing than the train over the sea bridge, but there are dolphins. Come home by ferry or by train, whichever you like." : t2.ferry.blurb || t2.blurb : t2.blurb)}</p>${boat2 && t2.ferry.sees ? `<p class="muted"><b>On ${esc(t2.n)} this time of year:</b> ${esc(t2.ferry.sees(+dayKey().slice(5, 7)))}</p>` : ""}
     <p class="muted">${fare} ${coin4()} return a person (Evan ${boat2 ? "sails" : "rides"} free). ${boat2 ? "Ferries" : "Trains"} out ${fmt4(t2.outFrom)} to ${fmt4(t2.outTo)}; the last ${ride2} home leaves ${esc(t2.n)} at ${fmt4(t2.backTo)}. A day trip: you'll be home tonight.</p>`;
     if (on) return h3 + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut11;
     if (!open2) return h3 + `<p><b>${hm11 < t2.outFrom ? `The first ${ride2} to ${esc(t2.n)} is at ${fmt4(t2.outFrom)}.` : `That's the last ${ride2} to ${esc(t2.n)} gone for today. Tomorrow!`}</b></p>` + shut11;
@@ -46254,6 +46262,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var lastTrain = "";
   var tripPick = [];
   var tripTown = "ronda";
+  var ferryTown = "jeju";
   var boatTown = null;
   var swView = null;
   var swSt = {};
@@ -49273,7 +49282,7 @@ ${SIGNOFF[t2.who] || ""}`;
     } else if (bvView) h3 = bvView === "passport" ? passportPanel(F) : mapPanel(F, { pick: tripPick, ownsVan: owns2(F, "van"), region: bvRegion });
     else if (railOpen === "tickets" && scene === "hlane") h3 = ticketPanel(F, tripPick, tripTown);
     else if (railOpen === "boat" && scene === "shore") h3 = sailPanel(F, tripPick, boatTown, sgHM(), { rough: stormyOn(dayKey()), month: +dayKey().slice(5, 7) });
-    else if (railOpen === "ferry" && scene === "shore") h3 = ticketPanel(F, tripPick, "jeju", sgHM(), "ferry");
+    else if (railOpen === "ferry" && scene === "shore") h3 = ticketPanel(F, tripPick, ferryTown, sgHM(), "ferry");
     else if (railOpen && scene === "hlane") h3 = timetablePanel(dayKey(), sgHM(), true);
     else if (railOpen && townOf(scene)) h3 = homePanel(F, townOf(scene), sgHM(), railOpen === "ferry" || railOpen === "boat" ? railOpen : "train");
     else if (kyotoView && townOf(scene) === "kyoto") h3 = kyotoPanel(F, kyotoView, { ...ktSt, evan: inParty(F, "evan") && !evanNight() });
@@ -49742,6 +49751,11 @@ ${SIGNOFF[t2.who] || ""}`;
     });
     c.querySelectorAll("[data-ttown]").forEach((b) => b.onclick = () => {
       tripTown = b.dataset.ttown;
+      sfx("tap");
+      ctx();
+    });
+    c.querySelectorAll("[data-ftown]").forEach((b) => b.onclick = () => {
+      ferryTown = b.dataset.ftown;
       sfx("tap");
       ctx();
     });
@@ -52269,7 +52283,7 @@ ${SIGNOFF[t2.who] || ""}`;
       if (town === "ronda") rondaVisit(F);
       setScene(land2[0], land2[1]);
       if (town === "jeju" && sgHM() < 8 * 60) setTimeout(() => speak("And look: the sun's just coming up out of the sea behind Seongsan, turning the crater gold. Worth the early start.", 6e3), 8e3);
-      if (own && town === "hokkaido") hkScroll(scrollSeason(dayKey()), 9500);
+      if ((own || boat2) && town === "hokkaido") hkScroll(scrollSeason(dayKey()), 9500);
       if (own) {
         setTimeout(() => speak(`${r.town.boat.arriveLine || r.town.arriveLine}${t2.party.length ? ` ${partyList(t2)} climb${t2.party.length > 1 ? "" : "s"} out onto the quay behind you.` : ""} Sail home before dark: 7pm at the latest.`, 6500), 900);
       } else setTimeout(() => speak(`${boat2 && r.town.ferry.arriveLine || r.town.arriveLine || `${r.town.n}! Whitewashed walls, orange trees and a sky so blue it hums.`}${t2.party.length ? ` ${partyList(t2)} pile${t2.party.length > 1 ? "" : "s"} off the ${boat2 ? "ferry" : "train"} behind you.` : ""} The last ${boat2 ? "ferry" : "train"} home is at 10pm.`, 6500), 900);
@@ -53044,14 +53058,14 @@ ${SIGNOFF[t2.who] || ""}`;
       render();
       return;
     }
-    if (id === T.station) {
-      railOpen = true;
+    if (T.ferry && id === T.ferry.pier && (T.by !== "boat" || (tripOn(F) || {}).by === "ferry")) {
+      railOpen = "ferry";
       sfx("paper", true);
       render();
       return;
     }
-    if (T.ferry && id === T.ferry.pier) {
-      railOpen = "ferry";
+    if (id === T.station) {
+      railOpen = true;
       sfx("paper", true);
       render();
       return;
