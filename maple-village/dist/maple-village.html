@@ -27491,7 +27491,14 @@ Quests finished today: ${S3.doneIds.length}`;
   var STEP = 24;
   var inside = (x, y, r, p) => x > r[0] - p && x < r[2] + p && y > r[1] - p && y < r[3] + p;
   var blocked = (scene2, x, y) => (OBST[scene2] || []).some((r) => inside(x, y, r, 0));
-  var RIDE = { bay: [[0, 0, 156, 640], [104, 308, 248, 428], [296, 60, 474, 304], [312, 380, 480, 520], [270, 60, 330, 150], [470, 60, 520, 150], [370, 556, 520, 640]] };
+  var RIDE = {
+    hwoods: [[0, 60, 200, 112], [128, 100, 204, 200], [88, 190, 172, 300], [48, 290, 132, 400], [22, 390, 98, 500], [0, 490, 64, 640]],
+    // round 230: the river
+    vineyard: [[0, 0, 32, 640]],
+    lane: [[0, 0, 28, 640], [94, 388, 228, 452], [292, 400, 432, 452]],
+    // the stream down the left; the cottage roofs
+    bay: [[0, 0, 156, 640], [104, 308, 248, 428], [296, 60, 474, 304], [312, 380, 480, 520], [270, 60, 330, 150], [470, 60, 520, 150], [370, 556, 520, 640]]
+  };
   var rideBlocked = (scene2, x, y) => blocked(scene2, x, y) || (RIDE[scene2] || []).some((r) => inside(x, y, r, 0));
   function clear(obs, a, b) {
     const skip = obs.filter((r) => inside(a[0], a[1], r, PAD) || inside(b[0], b[1], r, PAD));
