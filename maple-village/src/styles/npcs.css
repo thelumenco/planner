@@ -271,3 +271,8 @@
 .ch.npc.act-fossil:not(.walk) .tool,.ch.npc.act-railpaint:not(.walk) .tool{animation:tapT .9s ease-in-out infinite alternate}
 .ch.npc.act-fossil:not(.walk) .armR,.ch.npc.act-railpaint:not(.walk) .armR,.ch.npc.act-sarnie:not(.walk) .armR{animation:tapA 1.4s ease-in-out infinite alternate}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-crab .tool,.ch.npc.act-fossil .tool,.ch.npc.act-railpaint .tool,.ch.npc.act-fossil .armR,.ch.npc.act-railpaint .armR,.ch.npc.act-sarnie .armR{animation:none}}
+/* round 216: Puffin Isle: watching the puffins (still), feeding the goats, sea glass held to the light, waving at the seals */
+.ch.npc.act-goatfeed:not(.walk) .perch{animation:tapT 1.6s ease-in-out infinite alternate}
+.ch.npc.act-seaglass:not(.walk) .tool{animation:tapT 2.2s ease-in-out infinite alternate}
+.ch.npc.act-sealwave:not(.walk) .armR{animation:luckA .7s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-goatfeed .perch,.ch.npc.act-seaglass .tool,.ch.npc.act-sealwave .armR{animation:none}}

@@ -1010,3 +1010,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .swline.twitch span{animation:swtwitch .18s linear infinite alternate}
 @keyframes swtwitch{from{transform:translateX(-3px) rotate(-3deg)}to{transform:translateX(3px) rotate(3deg)}}
 @media (prefers-reduced-motion:reduce){.swline.twitch span{animation:none;background:#C8432F}}
+/* round 216: Puffin Isle: a look through the bird hide's window (puffins, seals or seal pups, and the odd gull) */
+.pilook{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px;margin:8px 0;border-radius:10px;border:1.4px solid var(--line);background:linear-gradient(180deg,#9FD3E8 0 38%,#8FB46A 38% 100%)}
+.pib{display:inline-block;width:22px;height:26px;border-radius:50% 50% 45% 45%;border:1.2px solid var(--line);position:relative}
+.pib-puffin{background:linear-gradient(90deg,#2F2B28 0 50%,#FFFDF6 50%)}
+.pib-puffin::after{content:"";position:absolute;right:-6px;top:5px;width:8px;height:7px;border-radius:2px 6px 6px 2px;background:#F28C28;border:1px solid var(--line)}
+.pib-seal{width:30px;height:16px;margin-top:10px;background:#8A8C92}
+.pib-pup{width:24px;height:15px;margin-top:11px;background:#FFFDF6}
+.pib-gull{width:20px;height:18px;margin-top:8px;background:#E6E8EA}

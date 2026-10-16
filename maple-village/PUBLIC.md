@@ -223,3 +223,16 @@ check is now clean.
 - Friends' acts here: Tomi crabbing, Bo tapping fossils, Farid with a crab sandwich on the clifftop bench, Theo painting
   the lighthouse railings. Four Saltwick specials for the kitchen; sea salt and dulse for gelato and bonbons.
 - Next islands, in order: Puffin Isle, Hokkaido, Bali.
+- Any ferry town can say `ferry.dry: true`: no crossing on a rainy day (Puffin Isle's little boat). `soon: true` on a
+  town hides it from the ferry and boat menus while it's being built.
+
+## Islands by ferry: Puffin Isle (built 2026-10-16)
+- Data in `src/data/puffin.js`, people in `src/data/pi-people.js`, letters in `src/data/pen-pi.js`, panels and games
+  in `src/game/puffin.js`, art in `src/art/town-puffin.js` and `src/art/puffin-rooms.js`, music `puffin` + one track
+  per room. Ids start `pi`. The lighthouse door leads up to the lamp room.
+- Ferry 40 (dry days only, out 8 to 2, last boat 8pm); your own boat 20 of fuel. Puffins April to July, seal pups
+  October and November.
+- Things to do: the count in the bird hide (puffins, or seals/pups out of season; five right = a volunteer's badge),
+  reading the weather in the lamp room (three right in a row = Morwenna's storm glass), sea glass in the cove (once a
+  day) and a pendant at the post office's workbench, and the puffin stamps (one a month in season, five framed).
+- Friends' acts: Hana watching the puffins, Mei feeding the goats, Posy with sea glass, Bo waving at the seals.

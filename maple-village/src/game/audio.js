@@ -325,6 +325,27 @@ export const TRACKS = {
   saltwick: {name: "Shanty on the harbour wall", live: true, bpm: 100, steps: 6, tone: "rhodes", strum: [0, 3], arp: [1, 3, 2, 4, 3, 2], arpVel: .045, mel: .7,
     bars: [[38, 50, 57, 62, 66, 69], [43, 55, 59, 62, 67, 71], [38, 50, 57, 62, 66, 69], [45, 57, 61, 64, 69, 73], [38, 50, 57, 62, 66, 69], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 67, 69], [38, 50, 57, 62, 66, 69]],
     lines: [[[0, 69], [2, 71], [3, 74]], [[0, 74], [2, 71], [3, 67]], [[0, 66], [1, 69], [3, 74]], [[0, 73], [2, 71], [3, 69]], [[0, 69], [2, 74], [3, 76]], [[0, 74], [2, 71], [3, 71]], [[0, 69], [2, 67], [3, 64]], [[0, 62], [3, 62]]]},
+  // live, all over Puffin Isle (round 216): a solo fiddle-ish air (bell tone, high and clear) in G mixolydian, slow and
+  // windswept, with long notes like seabirds hanging on the wind
+  puffin: {name: "Air for a small island", live: true, bpm: 72, steps: 6, tone: "bell", arp: [1, 0, 3, 0, 2, 4], arpVel: .035, mel: .6, up: 12,
+    bars: [[43, 55, 62, 67, 71], [41, 53, 60, 65, 69], [43, 55, 62, 67, 71], [48, 55, 60, 64, 67], [43, 55, 62, 67, 71], [41, 53, 57, 65, 69], [45, 52, 57, 64, 69], [43, 55, 62, 67, 71]],
+    lines: [[[0, 74], [3, 71]], [[0, 72], [2, 69]], [[0, 67], [3, 71]], [[0, 72], [3, 76]], [[0, 74], [2, 79]], [[0, 77], [3, 74]], [[0, 72], [3, 69]], [[0, 67]]]},
+  // Round 216: Puffin Isle's interiors
+  // the keeper's cottage: the range ticking, a warm slow rhodes
+  pi_keeper: {name: "The kettle on the range", live: true, bpm: 68, steps: 8, tone: "rhodes", arp: [1, 3, 2, 0, 1, 4, 2, 0], arpVel: .035, mel: .45,
+    bars: [[43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [45, 52, 57, 60, 64], [43, 55, 59, 62, 67]]},
+  // the lamp room: glass and sky, high bells turning slowly
+  pi_lamp: {name: "All sky and glass", live: true, bpm: 40, steps: 8, tone: "bell", arp: [1, 0, 0, 4, 0, 3, 0, 0], arpVel: .03, mel: .3, up: 12,
+    bars: [[45, 57, 64, 69, 76], [41, 53, 60, 65, 72], [43, 55, 62, 67, 74], [45, 57, 64, 69, 76]]},
+  // the bird hide: hushed, a few soft piano notes, patient
+  pi_hide: {name: "Hush, they're landing", live: true, bpm: 56, steps: 8, tone: "piano", arp: [1, 0, 2, 0, 0, 3, 0, 0], arpVel: .028, mel: .35,
+    bars: [[40, 52, 59, 64, 67], [45, 52, 57, 60, 64], [43, 50, 55, 62, 67], [40, 52, 59, 64, 71]]},
+  // the tearoom: a bright little guitar waltz, scones and chatter
+  pi_tearoom: {name: "Scones before the boat", live: true, bpm: 104, steps: 6, tone: "guitar", arp: [1, 3, 4, 2, 3, 4], arpVel: .045, mel: .7,
+    bars: [[48, 60, 64, 67, 72], [53, 60, 65, 69, 72], [55, 59, 62, 67, 71], [48, 60, 64, 67, 72]]},
+  // the post office: a jaunty ticking piano, rubber stamps and pigeonholes
+  pi_post: {name: "Stamped and sent", live: true, bpm: 116, steps: 8, tone: "piano", strum: [0, 4], arp: [1, 2, 3, 2, 4, 3, 2, 1], arpVel: .04, mel: .65,
+    bars: [[50, 57, 62, 66, 69], [55, 59, 62, 67, 71], [52, 57, 61, 64, 69], [50, 57, 62, 66, 69]]},
   // Round 215: Saltwick's interiors, each its own
   // the fish market: brisk and cheerful, wellies on a wet floor
   sw_market: {name: "Ice and wellies", live: true, bpm: 126, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 3, 2, 4, 1, 3, 2, 5], arpVel: .05, mel: .8,

@@ -60,11 +60,12 @@ export const townLine = (F, id, scene) => { const town = townOf(scene), t = town
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 const coin = () => icon("coin", 13);
 // The ticket window (Honeybrook station): where to, and who's coming
-export function ticketPanel(F, pick, town = "ronda", hm = localHM(), by = "train"){
+export function ticketPanel(F, pick, town = "ronda", hm = localHM(), by = "train", wet = false){
   const t = TOWNS[town], who = tripFriends(F), party = who.filter(id => pick.includes(id)), cost = fareFor(town, party, by), open = canLeave(town, hm), on = tripOn(F), boat = by === "ferry", fare = boat ? t.ferry.fare : t.fare, ride = boat ? "ferry" : "train";
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${boat ? "The ferry" : "Tickets"} to ${esc(t.n)}</h2><div class="gchips">${Object.entries(TOWNS).filter(([, x]) => boat ? !!x.ferry && !x.soon : x.by === "train").map(([k, x]) => `<button class="gchip${k === town ? " on" : ""}" data-${boat ? "f" : "t"}town="${k}" aria-pressed="${k === town}"><span>${esc(x.n)}</span></button>`).join("")}</div><p class="sub">${esc(boat ? t.ferry.blurb || t.blurb : t.blurb)}</p>
     <p class="muted">${fare} ${coin()} return a person. ${boat ? "Ferries" : "Trains"} out ${fmt(t.outFrom)} to ${fmt(t.outTo)}; the last ${ride} home leaves ${esc(t.n)} at ${fmt(t.backTo)}. A day trip: you'll be home tonight.</p>`;
   if (on) return h + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut;
+  if (boat && t.ferry.dry && wet) return h + `<p><b>No boat to ${esc(t.n)} today: the sea's too rough for the island boat. Try again on a dry day.</b></p>` + shut;   // round 216: the island boat stays in when it rains
   if (!open) return h + `<p><b>${hm < t.outFrom ? `The first ${ride} to ${esc(t.n)} is at ${fmt(t.outFrom)}.` : `That's the last ${ride} to ${esc(t.n)} gone for today. Tomorrow!`}</b></p>` + shut;
   h += `<h3 class="ph3">Who's coming?</h3>${who.length ? "" : `<p class="muted">${NOBODY}</p>`}<div class="trippicks">${who.map(id => `<button class="tpick${party.includes(id) ? " on" : ""}" data-tpick="${id}" aria-pressed="${party.includes(id)}"><b>${esc(nameOf(id))}</b><small>${t.free.includes(id) ? "free" : `${fare} ${coin()}`}</small></button>`).join("")}</div>`;
   h += `<p class="muted">${party.length ? `You${party.map(id => ", " + esc(nameOf(id))).join("").replace(/, ([^,]*)$/, " and $1")}: ${party.filter(id => !t.free.includes(id)).length + 1} ticket${party.filter(id => !t.free.includes(id)).length ? "s" : ""}.` : `Just you (and ${esc(F.name)}, who rides in your bag).`} They'll take the day off from whatever they usually do.</p>`;

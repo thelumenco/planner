@@ -713,7 +713,7 @@ if (want("\ntasting room")) try {
   check(await page.locator('#ctx [data-k="tapas"]').count() === 32 && await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().getAttribute("aria-selected") === "true", "the stove's Local tab offers this season's local tapas (32 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams)");
   check(/from the market deli|from the farm gate|from the garden/.test(await page.locator("#ctx").innerText()), "each missing ingredient says where to get it");
   await page.locator('#ctx [data-k="ktab"][data-id="specials"]').first().click(); await page.waitForTimeout(200);
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 0 && /travel to Ronda, Kyoto, Jeju, Cinque Terre or Saltwick Harbour/.test(await page.locator("#ctx").innerText()), "the Specials tab is empty until you've travelled: specials come from the trips");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 0 && /travel to Ronda, Kyoto, Jeju, Cinque Terre, Saltwick Harbour or Puffin Isle/.test(await page.locator("#ctx").innerText()), "the Specials tab is empty until you've travelled: specials come from the trips");
   await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().click(); await page.waitForTimeout(200);
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapasList[0].id === "tortilla" && f.vine.tapasList[0].plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
@@ -2609,6 +2609,79 @@ if (want("\nSaltwick Harbour, by ferry")) try {
   check(await fox().then(f => f.trip.done) && /foreshore/i.test(await page.locator("#sceneName").textContent()), "the ferry home from Saltwick's pier, back to the foreshore jetty");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nPuffin Isle, by the island boat")) try {
+  console.log("\nPuffin Isle, by the island boat");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), T = tw.TOWNS.puffin, pi = await import(new URL("../src/game/puffin.js", import.meta.url)), pd = await import(new URL("../src/data/puffin.js", import.meta.url));
+  const tr = await import(new URL("../src/game/trips.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url));
+  check(T.by === "ferry" && T.screens.length === 4 && T.screens.every(x => tw.townOf(x) === "puffin") && T.ferry.arrive[0] === "pi_landing" && T.screens.indexOf("pi_landing") === 3 && T.ferry.dry && T.backTo === 20*60, "Puffin Isle: four screens, the island boat lands at the bottom right, it doesn't sail in the rain, and the last boat's at 8");
+  check(Object.keys(tw.TOWN_PLACES).filter(k => (tw.TOWN_PLACES[k].scene || "").startsWith("pi_")).every(k => /^pi/.test(k)) && T.screens.every(x => tw.TOWN_BOUNDS[x] && tw.TOWN_OBST[x]), "every Puffin Isle place starts with pi, and every screen has its bounds and obstacles");
+  check(Object.keys(T.rooms).length === 5 && Object.entries(T.rooms).every(([k, r]) => r.music && tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[k]) && tw.roomBehind("puffin", "pilighthouse") === "pi_lamp", "five rooms: the keeper's cottage, the lamp room (up the lighthouse), the bird hide, the tearoom and the post office, each with its own music");
+  { const used = new Set(["ronda", "kyoto", "jeju", "cinque", "saltwick", ...Object.keys(tw.TOWNS).filter(k => k.startsWith("bv_"))].flatMap(k => Object.values(tw.TOWNS[k].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
+    check(Object.values(T.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "what your friends do on Puffin Isle (puffin watching, feeding the goats, sea glass, waving at seals) they've done nowhere else"); }
+  { const pl = np.NPCS.filter(n => n.local === "puffin"), rooms = Object.keys(T.rooms);
+    check(["pimorwenna", "pirhodri", "pibryony"].every(id => pl.some(n => n.id === id)) && pl.filter(n => n.tourist).length >= 3 && rooms.every(r => pl.filter(n => n.routine.some(x => x.scene === r)).length >= 2), "Morwenna, Rhodri and Bryony, Ffion and Dai, and the visitors: at least two people for every room"); }
+  check(Object.entries(tw.TOWN_GOODS).filter(([, g]) => g.shop && g.shop.startsWith("pi_")).every(([, g]) => g.sell == null || g.sell <= g.price) && ["pisamphire", "pipate", "pitoast"].every(id => kit.TAPAS[id].special === "puffin") && sc.INGR.buckthorn, "the island's goods sell for less than they cost; three Puffin Isle specials for the kitchen, and sea buckthorn for the gelato");
+  check(pd.puffinsIn("2026-05-12") && !pd.puffinsIn("2026-09-12") && pd.pupsIn("2026-11-02") && pi.countWhat("2026-06-01") === "puffin" && pi.countWhat("2026-11-02") === "pup" && pi.countWhat("2026-01-02") === "seal", "puffins from April to July, seal pups in October and November (and in the hide you count whichever's about)");
+  { const F = {coins: 60, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, day = "2026-05-12";
+    const st = pi.countStart(() => .4); st.looks.forEach(l => pi.countPick(st, l.n));
+    const st2 = pi.countStart(() => .4); pi.countPick(st2, 99);
+    check(st.done && st.good === 5 && pi.countDone(F, st, add, day) === "badge" && F.inv.p_badge === 1 && st2.good === 0 && pi.choicesFor(st.looks[0], 0).includes(st.looks[0].n), "the count in the bird hide: five looks, five right, and Rhodri gives you a volunteer's badge");
+    const w = pi.weatherStart(() => .7); w.rounds.forEach(r => pi.weatherPick(w, pi.forecastOf(r)));
+    check(pi.forecastOf({b: 3, w: 0, k: 0}) === "storm" && pi.forecastOf({b: 0, w: 2, k: 0}) === "storm" && pi.forecastOf({b: 2, w: 1, k: 0}) === "showers" && pi.forecastOf({b: 0, w: 0, k: 1}) === "fair" && pi.weatherDone(F, w, add, day) && F.inv.p_stormglass === 1, "reading the weather with Morwenna: three right in a row and her storm glass is yours");
+    const n = pi.comb(F, add, day); check(n >= 1 && n <= 3 && pi.comb(F, add, day) === 0, "beachcombing in the cove: a few bits of sea glass, once a day");
+    F.inv.seaglass = 3; check(pi.makePendant(F, add) && F.inv.p_pendant === 1 && !F.inv.seaglass && F.coins === 57, "three bits of sea glass and some wire (3) make a pendant");
+    const s0 = pi.buyStamp(F, add, day); check(s0 && s0.k === "5" && !pi.buyStamp(F, add, day) && pi.stampNow("2026-09-12") === null && pi.stampNow("2026-10-12") === "pup", "a puffin stamp each month from April to July, and the seal pup in the autumn (one each)");
+    ["4", "6", "7"].forEach((m, i) => pi.buyStamp(F, add, `2026-0${m}-0${i + 1}`)); const last = pi.buyStamp(F, add, "2026-10-20");
+    check(last && last.framed && F.inv.p_stamps === 1, "all five stamps and Ffion frames the sheet for you"); }
+  { const F = {coins: 100, board: {hearts: {farid: 5, mei: 5}}}, r = tr.buyTrip(F, "puffin", ["farid", "mei"], 9*60, "boat");
+    check(r && r.cost === 20 && F.trip.own, "or take your own boat: 20 coins of fuel, friends free"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);
+  page.on("pageerror", e => errors.push(`puffin pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/picoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-05-14"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-05-14&picoins=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftown="puffin"]', { timeout: 15000 });
+  await page.click('#ctx [data-ftown="puffin"]'); await page.waitForTimeout(300);
+  check(/too rough/.test(await page.locator("#ctx").innerText()) && await page.locator("#ctx [data-trip]").count() === 0, "on a rainy day the island boat stays in");
+  await page.goto(url + "?seed=1&time=10:00&date=2026-05-12&picoins=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftown="puffin"]', { timeout: 15000 });
+  await page.click('#ctx [data-ftown="puffin"]'); await page.waitForSelector('#ctx [data-trip="puffin"]', { timeout: 15000 });
+  await page.click('#ctx [data-tpick="farid"]');
+  check(/80/.test(await page.locator("#ctx [data-trip]").textContent()), "on a dry day: you and Farid to Puffin Isle, 80 coins");
+  await page.click("#ctx [data-trip]");
+  await page.waitForFunction(() => /Puffin Isle/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
+  check(await fox().then(f => f.coins === 220 && f.trip.town === "puffin" && f.towns && f.towns.puffin) && /landing/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("farid")), "off the boat at Puffin Isle's landing, with Farid");
+  for (const [gate, want, places] of [["piToVillage", "village", ["picottages", "pitearoom", "pigarden", "pichurch", "pigoats"]], ["piToLighthouse", "lighthouse", ["pilighthouse", "pikeeper", "pifoghorn", "pihide"]], ["piToCliffsS", "cliffs", ["piburrows", "piledges", "picove"]], ["piToLandingE", "landing", ["pipier", "piboathouse", "pipost", "piseals"]]]) {
+    await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
+    await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
+    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("farid")), `through the gate to Puffin Isle's ${want} (Farid follows)`);
+  }
+  await page.locator('#world [data-place="pipost"]').dispatchEvent("click"); await page.waitForFunction(() => /post office/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1000);
+  await page.locator('#world [data-rdspot="pi_post"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pi="stamp"]', { timeout: 15000 });
+  await page.click('#ctx [data-pi="stamp"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.ps_5 === 1 && f.coins === 218) && await ids().then(a => a.includes("piffion")), "in the post office: Ffion sells you May's puffin stamp (2)");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
+  await page.evaluate(() => window.__hbScene("pi_cliffs")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="picove"]').dispatchEvent("click"); await page.waitForTimeout(3500);
+  check(await fox().then(f => f.inv.seaglass >= 1), "down in the cove: sea glass at the tideline");
+  await page.evaluate(() => window.__hbScene("pi_hide")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-rdspot="pi_hide"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pi="count"]', { timeout: 15000 });
+  await page.click('#ctx [data-pi="count"]'); await page.waitForSelector("#ctx .pilook .pib-puffin", { timeout: 6000 });
+  check(await page.locator('#ctx [data-pi^="pick"]').count() === 4, "in the bird hide: how many puffins through the window? (four answers)");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
+  await page.evaluate(() => window.__hbScene("pi_landing")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="pipier"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="ferry"]', { timeout: 15000 });
+  await page.click('#ctx [data-triphome="ferry"]');
+  await page.waitForFunction(() => !/Puffin Isle/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
+  check(await fox().then(f => f.trip.done) && /foreshore/i.test(await page.locator("#sceneName").textContent()), "the boat home from the jetty, back to the foreshore");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nCinque Terre: the five villages (well, four)")) try {
   console.log("\nCinque Terre: the five villages (well, four)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), C = tw.TOWNS.cinque;
@@ -2645,8 +2718,8 @@ if (want("\nCinque Terre: the five villages (well, four)")) try {
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
-    check(sp.length === 32 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
-      "the 32 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(sp.length === 35 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 35 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "ornella"), L = np.NPCS.find(n => n.id === "dario");

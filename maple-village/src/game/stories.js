@@ -97,7 +97,7 @@ export function tellStory(F, id, addInv, day = dayKey()){
 // the friendship view's "Stories so far": a record to look back on, one card per teller (in the order you first heard
 // them, the latest teller's card open), headed with their name and job (from NPCS; `names` from core.js wins for the
 // name), each chapter numbered and in order, with its bubbles as they were said
-const PLACES = {ronda: "Ronda", kyoto: "Kyoto", cinque: "Cinque Terre", saltwick: "Saltwick Harbour"};
+const PLACES = {ronda: "Ronda", kyoto: "Kyoto", cinque: "Cinque Terre", saltwick: "Saltwick Harbour", puffin: "Puffin Isle"};
 export function storiesHTML(F, names){
   const s = storyState(F), ids = Object.keys(STORIES).filter(id => s.heard[id]);
   if (!ids.length) return `<h3 class="ph3">Stories so far</h3><p class="muted">Everyone in Honeybrook has a story. Help your neighbours and bring them gifts: as their hearts grow, they'll tell you theirs, a little at a time. Look for the "…" over their heads.</p>`;

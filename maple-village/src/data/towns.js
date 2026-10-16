@@ -15,6 +15,7 @@
 import { BB_TOWNS, BB_PLACES, BB_BRIDGES, BB_ARRIVE, BB_BOUNDS, BB_OBST, BB_GOODS, BB_KEEP } from "./bellbird.js";
 import { PAINTINGS } from "./terrace-people.js";
 import { SW_TOWN, SW_PLACES, SW_BRIDGES, SW_ARRIVE, SW_BOUNDS, SW_OBST, SW_GOODS, SW_KEEP } from "./saltwick.js";
+import { PI_TOWN, PI_PLACES, PI_BRIDGES, PI_ARRIVE, PI_BOUNDS, PI_OBST, PI_GOODS, PI_KEEP } from "./puffin.js";
 export const TOWNS = {
   ronda: {
     n: "Ronda", by: "train", fare: 40, free: [], outFrom: 7*60, outTo: 18*60, backTo: 22*60,
@@ -309,6 +310,7 @@ export const TOWNS = {
   }
 };
 TOWNS.saltwick = SW_TOWN;   // round 215: the first island by ferry (data/saltwick.js)
+TOWNS.puffin = PI_TOWN;   // round 216: Puffin Isle (data/puffin.js)
 Object.assign(TOWNS, BB_TOWNS);   // Bellbird Valley's stops (round 141): campervan "towns" of two screens each
 export const TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t]) => [...t.screens, ...Object.keys(t.rooms || {})].map(s => [s, id])));
 // an interior of a town (round 116) -> its room entry, or null
@@ -495,6 +497,7 @@ export const TOWN_OBST = {
 };
 // round 146: the wine shop's terrace isn't a town, but it walks like one of their rooms (bounds, the long table)
 TOWN_BOUNDS.terrace = [52, 226, 470, 612]; TOWN_OBST.terrace = [[236, 300, 284, 580], [400, 280, 472, 340], [424, 520, 472, 592], [62, 330, 92, 372], [196, 320, 226, 578], [294, 320, 324, 578]];
+Object.assign(TOWN_PLACES, PI_PLACES); Object.assign(TOWN_BRIDGES, PI_BRIDGES); Object.assign(TOWN_ARRIVE, PI_ARRIVE); Object.assign(TOWN_BOUNDS, PI_BOUNDS); Object.assign(TOWN_OBST, PI_OBST);   // Puffin Isle
 Object.assign(TOWN_PLACES, SW_PLACES); Object.assign(TOWN_BRIDGES, SW_BRIDGES); Object.assign(TOWN_ARRIVE, SW_ARRIVE); Object.assign(TOWN_BOUNDS, SW_BOUNDS); Object.assign(TOWN_OBST, SW_OBST);   // Saltwick Harbour
 Object.assign(TOWN_PLACES, BB_PLACES); Object.assign(TOWN_BRIDGES, BB_BRIDGES); Object.assign(TOWN_ARRIVE, BB_ARRIVE); Object.assign(TOWN_BOUNDS, BB_BOUNDS); Object.assign(TOWN_OBST, BB_OBST);   // Bellbird Valley
 
@@ -635,6 +638,10 @@ TOWN_GOODS.c_magnet.magnet = true;
 Object.assign(TOWN_GOODS, SW_GOODS); Object.assign(KEEP_LINES, SW_KEEP);
 Object.keys(SW_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
 TOWN_GOODS.s_magnet.magnet = true;
+// Puffin Isle's goods (round 216: data/puffin.js)
+Object.assign(TOWN_GOODS, PI_GOODS); Object.assign(KEEP_LINES, PI_KEEP);
+Object.keys(PI_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
+TOWN_GOODS.p_magnet.magnet = true;
 // Bellbird Valley's goods (round 142: data/bellbird.js)
 Object.assign(TOWN_GOODS, BB_GOODS, PAINTINGS); Object.assign(KEEP_LINES, BB_KEEP);   // (and round 152: the terrace keepsakes)
 Object.keys(BB_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
