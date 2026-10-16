@@ -1525,10 +1525,10 @@ function ctx(){
     else if (a === "blow") { const st = hkSt.glass; if (!st) return; const r = blow(st); sfx(r === "burst" ? "paper" : "tap", r === "burst"); }
     else if (a === "glassdone") { const st = hkSt.glass; if (!st || !glassDone(F, st, addInv)) return; sfx("chime"); gainXp(2); act("cheer"); flash("Your glass float"); save(); }
     else if (a === "box") { const r = buyBox(F, addInv); if (!r) return; sfx("chime"); gainXp(1); flash(r.set ? "Four music boxes" : "A music box"); if (r.set) speak("That's all four seasons! Ms Yuki winds them all at once and they play together, just about in tune. \"Now you have the whole year,\" she says.", 6500); save(); }
-    else if (a === "tour") { const st = hkTasteStart(F); if (!st) return; hkSt = {taste: st}; sfx("chaching"); }
+    else if (a === "tour") { const st = hkTasteStart(F); if (!st) return; hkSt = {taste: st}; sfx("chaching"); save(); }
     else if (a === "note") { const st = hkSt.taste; if (!st) return; const r = hkTastePick(st, +v); sfx(r === "ok" ? "tap" : "paper", true); if (st.done) { const first = hkTasteDone(F, st, addInv); gainXp(2); hearts(1); if (first) flash("A beer factory glass"); save(); } }
     else if (a === "ramen" || a === "lodge" || a === "soft") { const c0 = hkTreat(F, a, v); if (!c0) return; sfx("slurp"); gainXp(1); hearts(2); speak(c0[2], 5500); save(); }
-    else if (a === "ski") { const st = skiStart(F); if (!st) return; hkSt = {ski: st}; sfx("chaching"); }
+    else if (a === "ski") { const st = skiStart(F); if (!st) return; hkSt = {ski: st}; sfx("chaching"); save(); }
     else if (a === "turn") { const st = hkSt.ski; if (!st) return; const r = skiTurn(st, v); sfx(r === "ok" ? "tap" : "paper", true); if (st.done) { const first = skiDone(F, st, addInv); gainXp(2); hearts(1); if (first) { flash("Your first ski pass"); act("cheer"); } save(); } }
     else if (a === "carve") { hkSt = {carve: {step: 0, done: false}}; sfx("paper", true); }
     else if (a === "cstep") { const st = hkSt.carve; if (!st) return; const r = carveStep(st, +v); sfx(r === "ok" ? "tap" : "paper", true); if (st.done) { const s0 = hkState(F); if (s0.carved !== dayKey()) { s0.carved = dayKey(); gainXp(2); hearts(2); act("cheer"); } save(); } }

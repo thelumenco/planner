@@ -20,7 +20,6 @@ export const festivalIn = day => +day.slice(5, 7) === 2;   // the snow festival
 export const lavenderIn = day => +day.slice(5, 7) === 7;
 
 export const HK_TOWN = {
-  soon: true,   // hidden from the ferry menu until its art is in
   n: "Hokkaido", by: "ferry", fare: 90, free: [], outFrom: 7*60, outTo: 13*60, backTo: 22*60,
   screens: ["hk_otaru", "hk_sapporo", "hk_niseko", "hk_furano"], arrive: ["hk_otaru", [130, 110]], station: "hkpier", music: "hokkaido",
   ferry: {fare: 90, pier: "hkpier", arrive: ["hk_otaru", [130, 110]],
@@ -128,7 +127,7 @@ export const HK_PLACES = {
 export const HK_BRIDGES = {hk_otaru: {hk_sapporo: "hkToSapporo", hk_niseko: "hkToNiseko"}, hk_sapporo: {hk_otaru: "hkToOtaru", hk_furano: "hkToFurano"},
   hk_niseko: {hk_otaru: "hkToOtaruN", hk_furano: "hkToFuranoE"}, hk_furano: {hk_sapporo: "hkToSapporoN", hk_niseko: "hkToNisekoW"}};
 export const HK_ARRIVE = {"hk_otaru>hk_sapporo": [44, 560], "hk_sapporo>hk_otaru": [474, 560], "hk_otaru>hk_niseko": [262, 70], "hk_niseko>hk_otaru": [262, 572],
-  "hk_sapporo>hk_furano": [262, 70], "hk_furano>hk_sapporo": [262, 572], "hk_niseko>hk_furano": [44, 300], "hk_furano>hk_niseko": [474, 300]};
+  "hk_sapporo>hk_furano": [262, 44], "hk_furano>hk_sapporo": [262, 572], "hk_niseko>hk_furano": [44, 300], "hk_furano>hk_niseko": [474, 300]};
 export const HK_BOUNDS = {hk_otaru: [14, 70, 506, 616], hk_sapporo: [14, 40, 506, 616], hk_niseko: [14, 26, 506, 516], hk_furano: [14, 26, 506, 616],
   hk_glass: [30, 250, 490, 600], hk_musicbox: [30, 250, 490, 600], hk_beer: [30, 250, 490, 600], hk_ramen: [30, 250, 490, 600], hk_lodge: [30, 250, 490, 600], hk_dairy: [30, 250, 490, 600]};
 export const HK_OBST = {
