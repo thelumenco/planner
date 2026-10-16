@@ -30,11 +30,17 @@ export function kiteArt(sx, sy){
 
 // Round 113: the Friday market on the field: three little stalls with striped awnings, and Hiro with his kites
 const AWN = ["#7FB8E8", "#F2A0B8", "#F3C969"];
+// round 235 (Mel: they were standing on their stands): a taller awning, and the counter is also drawn among the people
+// (bayStallFront, core.js stallFronts) so the keeper behind it is hidden from the waist down
 export function bayStallArt(k, x, y, label){
   return `<g data-place="bm${k}" aria-label="${label}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="30" ry="9" style="fill:var(--butter)"/>
-    ${sk(`<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2" style="fill:#C9A27E"/><path d="M${x - 30} ${y - 48} h60 l-4 12 h-52z" style="fill:${AWN[k % 3]}"/>${[0, 1, 2].map(i => `<path d="M${x - 26 + i*20} ${y - 48} h10 l-1 12 h-10z" style="fill:#FFFDF6"/>`).join("")}<path d="M${x - 26} ${y - 36} v16 M${x + 26} ${y - 36} v16" style="stroke:#8A6A52" stroke-width="2"/>${[0, 1, 2].map(i => `<rect x="${x - 20 + i*14}" y="${y - 26}" width="10" height="7" rx="2" style="fill:${["#E8566C", "#9CC27E", "#C9A3E0"][(i + k) % 3]}"/>`).join("")}`,
-      `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2"/><path d="M${x - 30} ${y - 48} h60 l-4 12 h-52z"/>`)}
+    ${sk(`<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2" style="fill:#C9A27E"/><path d="M${x - 30} ${y - 80} h60 l-4 12 h-52z" style="fill:${AWN[k % 3]}"/>${[0, 1, 2].map(i => `<path d="M${x - 26 + i*20} ${y - 80} h10 l-1 12 h-10z" style="fill:#FFFDF6"/>`).join("")}<path d="M${x - 26} ${y - 68} v48 M${x + 26} ${y - 68} v48" style="stroke:#8A6A52" stroke-width="2"/>${[0, 1, 2].map(i => `<rect x="${x - 20 + i*14}" y="${y - 26}" width="10" height="7" rx="2" style="fill:${["#E8566C", "#9CC27E", "#C9A3E0"][(i + k) % 3]}"/>`).join("")}`,
+      `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2"/><path d="M${x - 30} ${y - 80} h60 l-4 12 h-52z"/>`)}
     ${tapeLabel(x, y + 16, label, "#F6E3B4", 8.5)}</g>`;
+}
+export function bayStallFront(k, x, y){
+  return sk(`<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2" style="fill:#C9A27E"/>${[0, 1, 2].map(i => `<rect x="${x - 20 + i*14}" y="${y - 26}" width="10" height="7" rx="2" style="fill:${["#E8566C", "#9CC27E", "#C9A3E0"][(i + k) % 3]}"/>`).join("")}`,
+    `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2"/>`);
 }
 export function kiteSellerArt(x, y){
   return `<g data-place="kites" aria-label="Kites"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="26" ry="8" style="fill:var(--butter)"/>

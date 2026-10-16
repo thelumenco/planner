@@ -18,6 +18,14 @@ const OBST = {
     [336, 534, 480, 598], [300, 540, 336, 554], [36, 494, 184, 594]]
 };
 Object.assign(OBST, TOWN_OBST);   // the towns' screens (towns.js)
+// round 235 (Mel: she and Evan could walk on the sea): the bay's water. The deck stands out over it, so that stays open.
+// A tap out on the water walks you to the water's edge instead.
+const WATER = {bay: [[0, 0, 154, 308], [0, 428, 154, 640], [0, 308, 100, 428]]};
+for (const [k, w] of Object.entries(WATER)) OBST[k] = [...(OBST[k] || []), ...w];
+export function offWater(scene, x, y){
+  const r = (WATER[scene] || []).find(r => x > r[0] - 6 && x < r[2] + 6 && y > r[1] - 6 && y < r[3] + 6);
+  return r ? [r[2] + 8, y] : [x, y];
+}
 const PAD = 5, STEP = 24;
 const inside = (x, y, r, p) => x > r[0] - p && x < r[2] + p && y > r[1] - p && y < r[3] + p;
 export const blocked = (scene, x, y) => (OBST[scene] || []).some(r => inside(x, y, r, 0));

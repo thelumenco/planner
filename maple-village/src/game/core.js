@@ -15,7 +15,7 @@ import { initNotebook, openTask, openMail, openDigest, openTracker, closeNoteboo
 import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama, subtaskInSunsama } from "./sunsama.js";
 import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx, TRACKS, setTrack, currentTrack, setLive } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
-import { findPath, blocked, rideBlocked } from "./paths.js";
+import { findPath, blocked, rideBlocked, offWater } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
 import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML, ohayoHellos, reactionsPanel, helloPanel } from "./feeds.js";
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, setFridgeTab, hestiaCounts, importHestia, chatLastDone, lastDueCount, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
@@ -50,7 +50,7 @@ import { hlaneArt } from "../art/hlane.js";
 import { hwoodsArt } from "../art/hwoods.js";
 import { greenhouseArt, GH_BED_AT, GH_POT_AT } from "../art/greenhouse.js";
 import { millArt } from "../art/mill.js";
-import { bonfireArt, fishVanArt, kiteArt, bayStallArt, kiteSellerArt, movieArt } from "../art/friday.js";
+import { bonfireArt, fishVanArt, kiteArt, bayStallArt, bayStallFront, kiteSellerArt, movieArt } from "../art/friday.js";
 import { vanPanel, vanBuy, VAN_MULT, bonfirePanel, releaseLanterns, grillFish, bayStallGoods, bayKeeperName, filmOf } from "./friday.js";
 import { millState, pressLeft, millPanel, startPress, collectOil, millStory } from "./mill.js";
 import { ghState, ghGrowth, bedPanel, ghPlant, ghHarvest, ghBoost, setGhTools, herbPotPanel, potPlant, potClip, potDig, ghRipe } from "./greenhouse.js";
@@ -2504,12 +2504,16 @@ let tableKey = "";
 // Market days: each stall's table is also a prop sorted among the people, so a keeper behind it is hidden from the waist down
 let frontKey = "", fronts = [];
 function stallFronts(){
-  const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null, dine = DINING[scene], key = ev ? dayKey() + ev.kind : dine ? "dine:" + scene : "";
+  const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null, dine = DINING[scene], fri = !ev && scene === "field" && bayMarketNow(dayKey(), sgHM()),
+    key = ev ? dayKey() + ev.kind : dine ? "dine:" + scene : fri ? "fri:" + dayKey() : "";
   if (key !== frontKey) { fronts.forEach(([n]) => n.remove()); fronts = []; frontKey = key;
     // a house's dining table: drawn among the people too, so the family along the back sit behind it
     if (dine) { const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "sfront"); g.setAttribute("pointer-events", "none"); g.innerHTML = diningTable(dine.cx, dine.fy); fronts = [[g, {y: dine.fy - 1}]]; }
     if (ev) fronts = ev.stalls.map(st => { const [x, y] = STALL_SPOTS[st.at], g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      g.setAttribute("class", "sfront"); g.setAttribute("pointer-events", "none"); g.innerHTML = stallFront(st.at, x, y, st); return [g, {y: y - 1}]; }); }
+      g.setAttribute("class", "sfront"); g.setAttribute("pointer-events", "none"); g.innerHTML = stallFront(st.at, x, y, st); return [g, {y: y - 1}]; });
+    // round 235: the Friday market's three stalls the same way (Mel: the keepers were standing on their stands)
+    if (fri) fronts = BAY_STALLS.map(([x, y], k) => { const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      g.setAttribute("class", "sfront"); g.setAttribute("pointer-events", "none"); g.innerHTML = bayStallFront(k, x, y); return [g, {y: y - 1}]; }); }
   return fronts;
 }
 function drawTableware(){
@@ -3185,7 +3189,7 @@ function nextLeg(){
 // Outdoors Mel walks round buildings and the pond (paths.js); indoors she goes straight.
 function walkTo(x, y){
   if (!Number.isFinite(x) || !Number.isFinite(y)) return;   // round 230: a spot with no position never sends Mel nowhere
-  const b = bounds(), to = [clamp(x, b[0], b[2]), clamp(y, b[1], b[3])];
+  const b = bounds(), to = offWater(scene, clamp(x, b[0], b[2]), clamp(y, b[1], b[3]));
   const pts = outside() || townRoom(scene) ? findPath(scene, [mel.x, mel.y], to, b) : [to];
   const first = pts.shift(); mel.tx = first[0]; mel.ty = first[1]; mel.path = pts;
 }
@@ -4243,7 +4247,7 @@ const EVAN_SPOTS = {...BB_EVAN, ...SW_EVAN, ...PV_EVAN, ...PI_EVAN, ...BA_EVAN, 
 // Evan's destination is evan.tx/ty; outdoors he follows route-finder waypoints to it (round the house, not through it)
 function evanWalk(speed, dt){
   const key = evan.tx + "," + evan.ty;
-  if (key !== evan.rk) { evan.rk = key; evan.path = outside() || townRoom(scene) ? findPath(scene, [evan.x, evan.y], [evan.tx, evan.ty], bounds()) : [[evan.tx, evan.ty]]; }
+  if (key !== evan.rk) { [evan.tx, evan.ty] = offWater(scene, evan.tx, evan.ty); evan.rk = evan.tx + "," + evan.ty; evan.path = outside() || townRoom(scene) ? findPath(scene, [evan.x, evan.y], [evan.tx, evan.ty], bounds()) : [[evan.tx, evan.ty]]; }
   const p = evan.path && evan.path[0]; if (!p) { evan.moving = false; return true; }
   const want = [evan.tx, evan.ty]; evan.tx = p[0]; evan.ty = p[1];
   const r = stepTo(evan, speed, dt); evan.tx = want[0]; evan.ty = want[1];

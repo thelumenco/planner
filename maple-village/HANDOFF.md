@@ -2601,3 +2601,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - **Kitchen:** flordesal, peixsec, fm_fig, fm_cheese; specials `ensaladapayesa` 16, `flao` 15, `figbread` 15 (46 trip specials). Scoop INGR flor de sal (salted caramel) and figs. Fridge `fridge10`.
 - **Family acts:** Mum `sandals`, Dad `bikebell`, Ma Ma `figpick`, Gong Gong `flamingos`, Darren `stonestack`, Marcus `maskup`, Angellina `shorepose`.
 - **Tests:** "Formentera by ferry (rounds 231 to 234)"; specials 46.
+
+## Round 235 (Mel: "the people on the Friday store are standing on their stands" and "I'm now able to walk on the sea, and so is Evan")
+- **Friday market keepers:** core.js `stallFronts` now also adds the three Friday stalls' counters (`bayStallFront` in art/friday.js) among the people, sorted by y like the night market's, so the keeper at [x + 3, y - 9] is hidden from the waist down behind the counter. The awning sits higher (y - 80) so heads clear it.
+- **No walking on the bay's sea:** paths.js `WATER.bay` (the sea left of about x 154, with the deck at x 104 to 248, y 308 to 428 left open) is added to `OBST`, and `offWater(scene, x, y)` moves a tap or Evan's target out on the water to the water's edge (walkTo, evanWalk). The bay never had walking obstacles before (only Tomo's `RIDE`). The woods' river and the streams aren't in it, because the river taxi stops stand in the water there.
+- **Tests:** in "the ice cream trolley, and the delivery bike's orders": a tap on the bay's sea stops Mel at the edge.

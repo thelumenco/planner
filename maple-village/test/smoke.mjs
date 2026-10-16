@@ -3243,6 +3243,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     const pts = []; for (let k = 0; k < 14; k++) { pts.push(await page.evaluate(() => { const g = document.querySelector("#actors .rideby"); if (!g) return null; const m = g.getAttribute("transform").match(/translate\(([-\d.]+) ([-\d.]+)\)/); return [+m[1], +m[2], +(g.style.opacity || 1)]; })); await page.waitForTimeout(450); }
     const seen = pts.filter(p => p && p[2] > .1 && p[0] > -20 && p[0] < 540);
     check(seen.length >= 3 && seen.every(([x, y]) => ok(x, y)), `${sc}: Tomo rides along a clear row, not over the water or through buildings (${seen.length} sightings)`); await page.waitForTimeout(2000); }
+  // round 235 (Mel: she and Evan could walk on the sea at the bay): a tap out on the water stops her at the water's edge
+  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(1500);
+  { const box = await page.locator("#world").boundingBox(), s = box.width/520; await page.mouse.click(box.x + 60*s, box.y + 470*s); await page.waitForTimeout(3500);
+    const [mx] = (await page.locator("#mel").getAttribute("transform")).match(/[-\d.]+/g).map(Number);
+    check(mx >= 150, `at the bay, a tap out on the sea walks Mel to the water's edge, not onto the water (x ${mx})`); }
   await page.close();
 }
 {
