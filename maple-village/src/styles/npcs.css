@@ -266,3 +266,8 @@
 .ch.npc.act-candle:not(.walk) .armR{transform:rotate(-55deg)}
 .ch.npc.act-goat:not(.walk) .armR{animation:feedA 2s ease-in-out infinite alternate}.ch.npc.act-goat .perch{animation:gullH 3s ease-in-out infinite}
 .ch.npc.act-heart:not(.walk) .armR{transform:rotate(-125deg)}.ch.npc.act-heart:not(.walk) .armL{transform:rotate(125deg)}
+/* round 215: Saltwick Harbour: crabbing (a slow dip of the line), fossil tapping, a crab sandwich, painting the railings */
+.ch.npc.act-crab:not(.walk) .tool{animation:tapT 2.6s ease-in-out infinite alternate}
+.ch.npc.act-fossil:not(.walk) .tool,.ch.npc.act-railpaint:not(.walk) .tool{animation:tapT .9s ease-in-out infinite alternate}
+.ch.npc.act-fossil:not(.walk) .armR,.ch.npc.act-railpaint:not(.walk) .armR,.ch.npc.act-sarnie:not(.walk) .armR{animation:tapA 1.4s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-crab .tool,.ch.npc.act-fossil .tool,.ch.npc.act-railpaint .tool,.ch.npc.act-fossil .armR,.ch.npc.act-railpaint .armR,.ch.npc.act-sarnie .armR{animation:none}}

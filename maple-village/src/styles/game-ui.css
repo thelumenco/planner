@@ -1002,3 +1002,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ttmail{display:flex;flex-direction:column;gap:6px;margin:14px 0 4px}
 .ttmail .actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .ttmsg{margin:2px 0;font-size:.9rem;color:#8A4A3A}
+/* round 215: Saltwick's crabbing line (down the harbour wall; it twitches when a crab's on) */
+.swline{position:relative;height:84px;margin:10px auto;width:120px;border-radius:10px;background:linear-gradient(180deg,#B9B0A4 0 22%,#6E8C8A 22% 100%);border:1.4px solid var(--line);overflow:hidden}
+.swline span{position:absolute;left:58px;top:0;width:2px;height:18px;background:#F3D34A;transition:height .6s ease-out}
+.swline span::after{content:"";position:absolute;left:-5px;bottom:-8px;width:12px;height:9px;border-radius:4px;background:#C9877A;border:1px solid var(--line)}
+.swline.down span{height:62px}
+.swline.twitch span{animation:swtwitch .18s linear infinite alternate}
+@keyframes swtwitch{from{transform:translateX(-3px) rotate(-3deg)}to{transform:translateX(3px) rotate(3deg)}}
+@media (prefers-reduced-motion:reduce){.swline.twitch span{animation:none;background:#C8432F}}

@@ -320,6 +320,27 @@ export const TRACKS = {
   // the lemon shop: a sunny mandolin strum in A major
   ct_limoni: {name: "Lemons on the terrace", live: true, bpm: 104, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 2, 3, 5, 3, 2, 4, 3], arpVel: .05, mel: .8,
     bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [52, 56, 59, 64, 68], [45, 57, 61, 64, 73]]},
+  // live, all over Saltwick Harbour (round 215): a sea shanty on a squeezebox (rhodes tone, a lilting 6/8) in D major,
+  // swaying like a coble at anchor, with a tune that climbs and comes home again
+  saltwick: {name: "Shanty on the harbour wall", live: true, bpm: 100, steps: 6, tone: "rhodes", strum: [0, 3], arp: [1, 3, 2, 4, 3, 2], arpVel: .045, mel: .7,
+    bars: [[38, 50, 57, 62, 66, 69], [43, 55, 59, 62, 67, 71], [38, 50, 57, 62, 66, 69], [45, 57, 61, 64, 69, 73], [38, 50, 57, 62, 66, 69], [43, 55, 59, 62, 67, 71], [45, 57, 61, 64, 67, 69], [38, 50, 57, 62, 66, 69]],
+    lines: [[[0, 69], [2, 71], [3, 74]], [[0, 74], [2, 71], [3, 67]], [[0, 66], [1, 69], [3, 74]], [[0, 73], [2, 71], [3, 69]], [[0, 69], [2, 74], [3, 76]], [[0, 74], [2, 71], [3, 71]], [[0, 69], [2, 67], [3, 64]], [[0, 62], [3, 62]]]},
+  // Round 215: Saltwick's interiors, each its own
+  // the fish market: brisk and cheerful, wellies on a wet floor
+  sw_market: {name: "Ice and wellies", live: true, bpm: 126, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 3, 2, 4, 1, 3, 2, 5], arpVel: .05, mel: .8,
+    bars: [[43, 55, 62, 67, 71], [48, 55, 60, 64, 67], [50, 57, 62, 66, 69], [43, 55, 62, 67, 71]]},
+  // the chandlery: a slow piano and a ticking clock, dust in the light
+  sw_chandlery: {name: "Rope and brass", live: true, bpm: 66, steps: 8, tone: "piano", arp: [1, 0, 3, 0, 2, 0, 4, 0], arpVel: .035, mel: .45,
+    bars: [[41, 53, 57, 60, 65], [46, 53, 58, 62, 65], [43, 55, 58, 62, 67], [48, 52, 55, 60, 64]]},
+  // the quay café: a cosy piano waltz, the teapot and the steamed-up windows
+  sw_cafe: {name: "Steamed-up windows", live: true, bpm: 84, steps: 6, tone: "piano", arp: [1, 3, 4, 2, 3, 4], arpVel: .04, mel: .55,
+    bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [52, 56, 59, 64, 68], [45, 57, 61, 64, 69]]},
+  // the smokehouse: low and slow, oak smoke drifting up into the rafters
+  sw_smokehouse: {name: "Sixteen hours of oak", live: true, bpm: 52, steps: 8, tone: "rhodes", arp: [1, 0, 2, 3, 0, 2, 1, 0], arpVel: .03, mel: .35,
+    bars: [[36, 48, 55, 58, 63], [41, 48, 53, 56, 60], [39, 46, 51, 55, 58], [36, 48, 55, 60, 63]]},
+  // the lighthouse: a few bells and a great deal of space, the lamp turning in the dark
+  sw_lighthouse: {name: "Green light every five seconds", live: true, bpm: 42, steps: 8, tone: "bell", arp: [1, 0, 0, 3, 0, 0, 2, 0], arpVel: .03, mel: .3, up: 12,
+    bars: [[40, 52, 59, 64, 71], [45, 52, 57, 64, 69], [43, 50, 55, 62, 67], [40, 52, 59, 66, 71]]},
   // Round 128: Jeju's interiors, each its own
   // the divers' house: slow waves, low bells, a song you could hold your breath to
   jj_haenyeo: {name: "Breath of the sea", live: true, bpm: 46, steps: 8, tone: "bell", arp: [1, 0, 2, 0, 3, 0, 2, 0], arpVel: .03, mel: .35,

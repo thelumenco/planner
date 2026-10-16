@@ -53,10 +53,10 @@ export function shoreArt(){
     ${flowers([[440, 250, "#EFA3A6"], [462, 268, "#F3C969"], [288, 360, "#C3CDEE"], [470, 400, "#EFA3A6"], [300, 560, "#F3C969"]])}`;
   const sea = dolphin(80, 200, 11, 1, false) + dolphin(64, 238, 11, 2.2, false) + dolphin(96, 470, 14, 6, true) + farPaddler(40, 330, 140, 70);
   const jetty = `<g pointer-events="none">${sk(`<rect x="34" y="454" width="176" height="18" rx="2" style="fill:#C9A27E"/>`, `<rect x="34" y="454" width="176" height="18" rx="2"/>${Array.from({length: 11}, (_, i) => `<path d="M${50 + i*15} 454 v18"/>`).join("")}${[44, 88, 132, 176].map(x => `<path d="M${x} 472 v10"/>`).join("")}`)}</g>`;
-  // round 127: the ferry stop for Jeju, a little blue signboard at the end of the jetty
-  const ferry = `<g data-place="ferry" aria-label="The ferry to Jeju"><ellipse class="hov" cx="78" cy="466" rx="24" ry="8" style="fill:var(--butter)"/>
+  // round 127: the ferry stop (Jeju; round 215: and the islands), a little blue signboard at the end of the jetty
+  const ferry = `<g data-place="ferry" aria-label="The ferry: boats to the islands"><ellipse class="hov" cx="78" cy="466" rx="24" ry="8" style="fill:var(--butter)"/>
     ${sk(`<rect x="70" y="420" width="4" height="36" style="fill:#8A6A52"/><rect x="54" y="414" width="40" height="18" rx="2" style="fill:#3E7CC0"/><path d="M60 428 h6 M80 428 h8" style="stroke:#FFFDF6" stroke-width="1"/>`, `<rect x="54" y="414" width="40" height="18" rx="2"/><rect x="70" y="420" width="4" height="36"/>`)}
-    <text x="74" y="426" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7" fill="#FFFDF6" pointer-events="none">JEJU</text>${tapeLabel(78, 498, "Ferry to Jeju", "#C3DDF3", 9)}</g>`;
+    <text x="74" y="426" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="6.4" fill="#FFFDF6" pointer-events="none">FERRY</text>${tapeLabel(78, 498, "Ferries", "#C3DDF3", 9)}</g>`;
   const rack = `<g data-place="suprack" aria-label="Paddleboard rack"><ellipse class="hov" cx="216" cy="480" rx="30" ry="9" style="fill:var(--butter)"/>
     ${sk(`${["#F3C969", "#7FB8E8", "#E8566C"].map((c, i) => `<path d="M${202 + i*9} 474 q-4 -20 2 -38 q6 18 2 38z" style="fill:${c}"/>`).join("")}<rect x="196" y="452" width="40" height="5" rx="2" style="fill:var(--wood)"/>`,
       `${[0, 1, 2].map(i => `<path d="M${202 + i*9} 474 q-4 -20 2 -38 q6 18 2 38z"/>`).join("")}<path d="M198 474 v-24 M234 474 v-24"/><rect x="196" y="452" width="40" height="5" rx="2"/>`)}

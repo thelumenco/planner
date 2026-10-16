@@ -14,6 +14,7 @@
 
 import { BB_TOWNS, BB_PLACES, BB_BRIDGES, BB_ARRIVE, BB_BOUNDS, BB_OBST, BB_GOODS, BB_KEEP } from "./bellbird.js";
 import { PAINTINGS } from "./terrace-people.js";
+import { SW_TOWN, SW_PLACES, SW_BRIDGES, SW_ARRIVE, SW_BOUNDS, SW_OBST, SW_GOODS, SW_KEEP } from "./saltwick.js";
 export const TOWNS = {
   ronda: {
     n: "Ronda", by: "train", fare: 40, free: [], outFrom: 7*60, outTo: 18*60, backTo: 22*60,
@@ -167,7 +168,7 @@ export const TOWNS = {
     n: "Jeju", by: "train", fare: 70, free: [], outFrom: 7*60, outTo: 15*60, backTo: 22*60,
     screens: ["jj_shore", "jj_farms", "jj_harbour", "jj_village"], arrive: ["jj_village", [396, 584]], station: "jjtrain", music: "jeju",
     // the ferry: tickets at the foreshore jetty (world.js "ferry"), into the harbour; same hours as the train
-    ferry: {fare: 50, pier: "jjpier", arrive: ["jj_harbour", [214, 436]], arriveLine: "Jeju! The ferry noses in past two little horse-shaped lighthouses, one red, one white. Gulls, salt, and black rocks everywhere."},
+    ferry: {fare: 50, pier: "jjpier", arrive: ["jj_harbour", [214, 436]], blurb: "Across the sea to Jeju: a slower crossing than the train over the sea bridge, but there are dolphins. Come home by ferry or by train, whichever you like.", arriveLine: "Jeju! The ferry noses in past two little horse-shaped lighthouses, one red, one white. Gulls, salt, and black rocks everywhere."},
     blurb: "A volcanic island: black stone walls, tangerine orchards, thatched stone houses, a green crater by the sea and the women divers bobbing out past the rocks. By train over the sea bridge, or by ferry from the foreshore jetty (50).",
     arriveLine: "Jeju! The train rolls off the sea bridge into a little stone station. Black stone walls, orange tangerines, and the wind smells of the sea.",
     hints: {jj_shore: "Seongsan: the crater by the sea, the divers' house and the rock pools. East: the tangerine farms. South: the harbour.",
@@ -307,6 +308,7 @@ export const TOWNS = {
     }
   }
 };
+TOWNS.saltwick = SW_TOWN;   // round 215: the first island by ferry (data/saltwick.js)
 Object.assign(TOWNS, BB_TOWNS);   // Bellbird Valley's stops (round 141): campervan "towns" of two screens each
 export const TOWN_SCENES = Object.fromEntries(Object.entries(TOWNS).flatMap(([id, t]) => [...t.screens, ...Object.keys(t.rooms || {})].map(s => [s, id])));
 // an interior of a town (round 116) -> its room entry, or null
@@ -493,6 +495,7 @@ export const TOWN_OBST = {
 };
 // round 146: the wine shop's terrace isn't a town, but it walks like one of their rooms (bounds, the long table)
 TOWN_BOUNDS.terrace = [52, 226, 470, 612]; TOWN_OBST.terrace = [[236, 300, 284, 580], [400, 280, 472, 340], [424, 520, 472, 592], [62, 330, 92, 372], [196, 320, 226, 578], [294, 320, 324, 578]];
+Object.assign(TOWN_PLACES, SW_PLACES); Object.assign(TOWN_BRIDGES, SW_BRIDGES); Object.assign(TOWN_ARRIVE, SW_ARRIVE); Object.assign(TOWN_BOUNDS, SW_BOUNDS); Object.assign(TOWN_OBST, SW_OBST);   // Saltwick Harbour
 Object.assign(TOWN_PLACES, BB_PLACES); Object.assign(TOWN_BRIDGES, BB_BRIDGES); Object.assign(TOWN_ARRIVE, BB_ARRIVE); Object.assign(TOWN_BOUNDS, BB_BOUNDS); Object.assign(TOWN_OBST, BB_OBST);   // Bellbird Valley
 
 // Ronda's goods (round 107, round 3): things you can't get in Honeybrook. kind ingredient: they go to the kitchen
@@ -628,6 +631,10 @@ Object.assign(TOWN_GOODS, {
 Object.assign(KEEP_LINES, {c_magnet: "A tiny stack of coloured houses over a blue sea, from Cinque Terre.", c_linen: "A linen tea towel with lemons on it, from Monterosso."});
 ["c_magnet", "c_linen"].forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
 TOWN_GOODS.c_magnet.magnet = true;
+// Saltwick Harbour's goods (round 215: data/saltwick.js)
+Object.assign(TOWN_GOODS, SW_GOODS); Object.assign(KEEP_LINES, SW_KEEP);
+Object.keys(SW_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
+TOWN_GOODS.s_magnet.magnet = true;
 // Bellbird Valley's goods (round 142: data/bellbird.js)
 Object.assign(TOWN_GOODS, BB_GOODS, PAINTINGS); Object.assign(KEEP_LINES, BB_KEEP);   // (and round 152: the terrace keepsakes)
 Object.keys(BB_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));

@@ -1221,7 +1221,9 @@ if (want("\nbig goals")) try {
   await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(800);
   await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-goal="boat"]', { timeout: 15000 });
   await page.click('#ctx [data-goal="boat"]'); await page.waitForTimeout(400);
-  await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForTimeout(4000);
+  await page.locator('#world [data-place="boat"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-boat="cruise"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-btown="saltwick"]').count() === 1, "your own boat: a dolphin cruise, or sail to Saltwick Harbour for the day (just the fuel)");
+  await page.click('#ctx [data-boat="cruise"]'); await page.waitForTimeout(4000);
   check(await page.locator("#world .cruising").count() === 1 && await page.evaluate(() => getComputedStyle(document.getElementById("hero")).visibility === "hidden"), "the dolphin cruise boat: everyone aboard and off up the coast");
   // the monthly wine club in the cellar door: the first Friday of the month, 6 to 9pm
   await page.addInitScript(() => { if (!/clubpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
@@ -2430,7 +2432,8 @@ if (want("\nJeju, by ferry and by train")) try {
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-11-12&jjcoins=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(900);
-  await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-trip="jeju"][data-by="ferry"]', { timeout: 15000 });
+  await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftown="jeju"]', { timeout: 15000 });
+  await page.click('#ctx [data-ftown="jeju"]'); await page.waitForSelector('#ctx [data-trip="jeju"][data-by="ferry"]', { timeout: 15000 });
   await page.click('#ctx [data-tpick="farid"]');
   check(/100/.test(await page.locator("#ctx [data-trip]").textContent()) && /ferry to Jeju/i.test(await page.locator("#ctx h2").textContent()), "the ferry stop at the end of the jetty: you and Farid to Jeju, 100 coins");
   await page.click("#ctx [data-trip]");
@@ -2535,6 +2538,75 @@ if (want("\nJeju's rooms, people and things to do")) try {
   await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(1200);
   await page.locator('#world [data-rdspot="dyecloth"]').dispatchEvent("click"); await page.waitForTimeout(3500);
   check(await fox().then(f => f.inv.j_scarf === 1 && !f.jeju.dye), "three days later, the scarf's a deep rust on the washing line at home, and it's a keepsake now");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nSaltwick Harbour, by ferry")) try {
+  console.log("\nSaltwick Harbour, by ferry");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), T = tw.TOWNS.saltwick, sw = await import(new URL("../src/game/saltwick.js", import.meta.url));
+  const tr = await import(new URL("../src/game/trips.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url)), kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url));
+  check(T.by === "ferry" && T.screens.length === 4 && T.screens.every(x => tw.townOf(x) === "saltwick") && T.ferry.arrive[0] === "sw_harbour" && T.screens.indexOf("sw_harbour") === 3, "Saltwick Harbour: four screens, reached by ferry, arriving at the harbour (bottom right)");
+  check(Object.keys(tw.TOWN_PLACES).filter(k => (tw.TOWN_PLACES[k].scene || "").startsWith("sw_")).every(k => /^sw/.test(k)) && T.screens.every(x => tw.TOWN_BOUNDS[x] && tw.TOWN_OBST[x]), "every Saltwick place starts with sw, and every screen has its bounds and obstacles");
+  check(Object.keys(T.rooms).length === 5 && Object.entries(T.rooms).every(([k, r]) => r.music && tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[k]), "five rooms: the fish market, the chandlery, the quay café, the smokehouse and the lighthouse, each with its own music");
+  { const used = new Set(["ronda", "kyoto", "jeju", "cinque", ...Object.keys(tw.TOWNS).filter(k => k.startsWith("bv_"))].flatMap(k => Object.values(tw.TOWNS[k].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
+    check(Object.values(T.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "what your friends do in Saltwick (crabbing, fossils, a crab sandwich, painting the railings) they've done nowhere else"); }
+  { const sl = np.NPCS.filter(n => n.local === "saltwick"), rooms = Object.keys(T.rooms);
+    check(["swruth", "swalfie", "swnell"].every(id => sl.some(n => n.id === id)) && sl.filter(n => n.tourist).length >= 3 && rooms.every(r => sl.filter(n => n.routine.some(x => x.scene === r)).length >= 2), "Ruth, Alfie and Nell, the shopkeepers and the visitors: at least two people for every room"); }
+  check(Object.entries(tw.TOWN_GOODS).filter(([, g]) => g.shop && g.shop.startsWith("sw_")).every(([, g]) => g.sell == null || g.sell <= g.price) && ["lobster", "seaweed", "onion", "kipper"].every(id => tw.TOWN_GOODS[id] && Object.values(kit.TAPAS).some(t => t.need[id])), "the fish market's and smokehouse's goods sell for less than they cost, and each one cooks into something at home");
+  check(["swlobster", "swtart", "swkipper", "swdulse"].every(id => kit.TAPAS[id].special === "saltwick") && sc.INGR && sc.INGR.seasalt && sc.INGR.seaweed, "four Saltwick specials for the kitchen once you've been, and sea salt and seaweed for the gelato");
+  { const F = {coins: 50, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, day = "2026-11-12", has = [...sw.stonesToday(day)];
+    const r = [0, 1, 2, 3, 4, 5].map(i => sw.splitStone(F, i, add, day));
+    check(r.filter(Boolean).length === sw.SCAR.SPLITS && r.slice(0, 3).filter(x => x && !x.empty).length === has.filter(i => i < 3).length && Object.keys(F.saltwick.found).length === has.filter(i => i < 3).length, "the scar: three stones a day to split, and the ones with an ammonite inside give you a new kind");
+    for (let d = 1; d <= 30 && !F.saltwick.cased; d++) { const dd = `2026-12-${String(d).padStart(2, "0")}`; [...sw.stonesToday(dd)].forEach(i => sw.splitStone(F, i, add, dd)); }
+    check(F.saltwick.cased && F.inv.s_case === 1 && sw.KINDS.every(k => F.inv["am_" + k] >= 1), "find all six ammonites and Jack makes you a glass case for them");
+    const c = sw.crabStart(); let t = 1e6; for (let i = 0; i < 5; i++) { const ms = sw.dropLine(c, () => .5, t); sw.pullUp(c, t + ms + (i === 4 ? 2000 : 300)); t += 1e4; }
+    const e = sw.crabStart(); sw.dropLine(e, () => .5, 1000); sw.pullUp(e, 1500);
+    check(c.done && c.got === 4 && e.last === "soon" && sw.crabDone(F, c, add, day) && F.inv.s_crabline === 1 && !sw.crabDone(F, c, add, day), "crabbing: pull up just after the twitch (not before, not too late); five drops, and three or more earns your own line");
+    const tea = {step: 0}; check(sw.teaStep(tea, 1) === "oops" && [0, 1, 2, 3, 4].every(i => sw.teaStep(tea, i) === "ok") && tea.done && sw.teaDone(F, add, day) && F.inv.s_mug === 1, "a proper brew with Nell: warm the pot first, five steps in order, and a Saltwick mug");
+    const L = sw.lampStart(); check(!sw.lampStep(L, "wind") && [1, 2, 3].every(() => sw.lampStep(L, "wipe")) && [1, 2, 3, 4, 5].every(() => sw.lampStep(L, "wind")) && sw.lampStep(L, "light") === "lit" && sw.lampDone(F, add, day) && F.inv.s_ledger === 1, "the lamp with Alfie: polish the lens, wind the clockwork, light it, and a page from his ledger");
+    check(sw.duskFrom("2026-11-12") === 17*60 && sw.duskFrom("2026-06-12") === 18*60 && /Come back at dusk/.test(sw.lampPanel(F, null, 12*60, "2026-11-12")), "the lamp's lit at dusk (five in the winter months, six in summer)"); }
+  { const F = {coins: 100, board: {hearts: {farid: 5, mei: 5, bo: 5}}}, r = tr.buyTrip(F, "saltwick", ["farid", "mei", "bo"], 10*60, "boat");
+    check(r && r.cost === 15 && F.coins === 85 && F.trip.by === "ferry" && F.trip.own && F.trip.party.length === 3, "or sail there in your own boat: 15 coins of fuel, friends ride free, and you moor where the ferry does"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);
+  page.on("pageerror", e => errors.push(`saltwick pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/swcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-11-12&swcoins=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-trip="saltwick"][data-by="ferry"]', { timeout: 15000 });
+  check(await page.locator('#ctx [data-ftown]').count() >= 2 && await page.locator('#ctx [data-ftown="jeju"]').count() === 1, "the ferry stop: boats to Saltwick Harbour and to Jeju");
+  await page.click('#ctx [data-tpick="farid"]');
+  check(/60/.test(await page.locator("#ctx [data-trip]").textContent()), "you and Farid to Saltwick: 60 coins");
+  await page.click("#ctx [data-trip]");
+  await page.waitForFunction(() => /Saltwick/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
+  check(await fox().then(f => f.coins === 240 && f.trip.town === "saltwick" && f.trip.by === "ferry") && /harbour/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("farid")), "off the ferry at Saltwick's harbour, with Farid");
+  for (const [gate, want, places] of [["swToWynds", "wynds", ["swcafe", "swsmokehouse", "swsteps", "swcat"]], ["swToClifftop", "clifftop", ["swabbey", "swcoastguard", "swsheep", "swbench"]], ["swToBeachS", "beach", ["swscar", "swpools", "swhuts", "swseals"]], ["swToHarbourE", "harbour", ["swpier", "swmarket", "swchandlery", "swboats", "swcrab", "swlighthouse"]]]) {
+    await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
+    await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
+    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("farid")), `through the gate to Saltwick's ${want} (Farid follows)`);
+  }
+  await page.locator('#world [data-place="swmarket"]').dispatchEvent("click"); await page.waitForFunction(() => /fish market/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1000);
+  await page.locator('#world [data-rdspot="sw_market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="lobster"]', { timeout: 15000 });
+  await page.click('#ctx [data-rbuy="lobster"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.inv.lobster === 1 && f.coins === 222) && await ids().then(a => a.includes("swruth")), "inside the fish market: Ruth sells you a lobster (18)");
+  await page.evaluate(() => window.__hbScene("sw_beach")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="swscar"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sw="split:0"]', { timeout: 15000 });
+  for (const i of [0, 1, 2]) { await page.click(`#ctx [data-sw="split:${i}"]`); await page.waitForTimeout(200); }
+  check(await page.locator('#ctx [data-sw^="split"]:not([disabled])').count() === 0 && /That's your three/.test(await page.locator("#ctx").innerText()), "on the scar: three stones split, and that's it till the tide comes in");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
+  await page.evaluate(() => window.__hbScene("sw_harbour")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="swcrab"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sw="crab"]', { timeout: 15000 });
+  await page.click('#ctx [data-sw="crab"]'); await page.click('#ctx [data-sw="drop"]'); await page.waitForSelector("#ctx .swline.twitch", { timeout: 6000 });
+  await page.click('#ctx [data-sw="pull"]'); await page.waitForTimeout(200);
+  check(/crab! Hanging on/i.test(await page.locator("#ctx").innerText()), "crabbing off the wall: the line twitches, you pull up, and there's a crab on the bacon");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
+  await page.locator('#world [data-place="swpier"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="ferry"]', { timeout: 15000 });
+  await page.click('#ctx [data-triphome="ferry"]');
+  await page.waitForFunction(() => !/Saltwick/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
+  check(await fox().then(f => f.trip.done) && /foreshore/i.test(await page.locator("#sceneName").textContent()), "the ferry home from Saltwick's pier, back to the foreshore jetty");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nCinque Terre: the five villages (well, four)")) try {

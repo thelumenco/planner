@@ -208,3 +208,18 @@ same browser only ever sees its own games. Backups are a plain file download. Th
 (dev/claude-stub.js, window.__hbDevCloud). Hosting: honey-brook.web.app, deployed by GitHub Actions
 (.github/workflows/honeybrook-deploy.yml) on every push to honeybrook-public, after the leak check passes. The leak
 check is now clean.
+
+## Islands by ferry: Saltwick Harbour (built 2026-10-16; plan in ISLANDS-PLAN.md)
+- The foreshore jetty's ferry now goes to any town with a `ferry` entry (Jeju and Saltwick Harbour); the panel has a
+  chip for each. The train window only lists train towns. Your own boat (the dolphin cruise goal) opens a panel too:
+  a dolphin cruise, or a day trip to an island with a `boat` entry (Saltwick: 15 coins of fuel, up to 7 friends free,
+  dry days only). A boat trip is stored as a ferry trip with `own: true`, so it lands and leaves where the ferry does.
+- Saltwick: data in `src/data/saltwick.js` (merged into towns.js), people in `src/data/sw-people.js`, letters in
+  `src/data/pen-sw.js`, panels and games in `src/game/saltwick.js`, art in `src/art/town-saltwick.js` and
+  `src/art/saltwick-rooms.js`, music `saltwick` + one track per room in audio.js. Ids start `sw`.
+- Things to do: fossil hunting on the scar (three stones a day; six ammonites, then a glass case), crabbing off the
+  harbour wall (pull up just after the twitch; three crabs earns your own line), a proper pot of tea with Nell (five
+  steps in order; a Saltwick mug), lighting the lighthouse lamp with Alfie at dusk (a page from his ledger).
+- Friends' acts here: Tomi crabbing, Bo tapping fossils, Farid with a crab sandwich on the clifftop bench, Theo painting
+  the lighthouse railings. Four Saltwick specials for the kitchen; sea salt and dulse for gelato and bonbons.
+- Next islands, in order: Puffin Isle, Hokkaido, Bali.

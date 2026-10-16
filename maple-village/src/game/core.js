@@ -68,6 +68,8 @@ import * as LVA from "./lvacts.js";
 import { FIRE_FOLK } from "../data/bb-people.js";
 import { loftPanel, startBatch, collect as loftCollect, loftState } from "./loft.js";
 import { cinqueRoomArt } from "../art/cinque-rooms.js";
+import { saltwickArt, swFerryRideArt } from "../art/town-saltwick.js";
+import { saltwickRoomArt } from "../art/saltwick-rooms.js";
 import { bellbirdRoomArt } from "../art/bellbird-rooms.js";
 import { terraceArt } from "../art/terrace.js";
 import { coastArt } from "../art/coast.js";
@@ -90,6 +92,7 @@ import { millUpArt } from "../art/millup.js";
 import { tastePanel, tasteStart, tastePick, tasteNext, tasteDone, finishTaste, tastingNow, workshopNow, workshopPanel, helpWorkshop, WORKSHOP } from "./millcraft.js";
 import { mullPanel, mullStart, mullTick, mullState, mulledSeason, MULL, ADDS as MULL_ADDS, toRack, fromRack } from "./mulled.js";
 import { occasionOn, occasionNow, OCC, weddingOn, WED, dancingNow, triviaPanel, triviaStart, triviaAnswer, triviaNext, finishTrivia, TEAM_NAMES, QUIZ, paintPanel, paintStart, paintStep, paintDone, finishPaint, PAINT_PRICE, PAINT_SUBJECTS, comingUpHTML, mothersDay } from "./occasions.js";
+import { swPanel, swState, splitStone, crabStart, dropLine, pullUp, crabDone, cafeTreat as swCafe, teaStep, teaDone, lampStart, lampStep, lampDone } from "./saltwick.js";
 import { cinquePanel, cinqueState, treat as ctTreat, GELATO, FOCACCIA, pestoStart, pestoAdd, pestoPound, pestoDone, finishPesto, harvestStart, pick as ctPick, harvestDone, finishHarvest, TASTE, paintBoat, boatCols } from "./cinque.js";
 import { jejuRoomArt, dyeCloth } from "../art/jeju-rooms.js";
 import { jejuPanel, jejuState, diveStart, descend, surface, diveReward, JUK, sortStart, sortTap, sortReward, cafeTreat as jjCafe, slowPost, slowMail, DYE, dyeScarf, dyeDays, takeDye } from "./jeju.js";
@@ -97,7 +100,7 @@ import { kyotoRoomArt } from "../art/kyoto-rooms.js";
 import { kyotoPanel, kyotoState, stamp as ktStamp, rentYukata, yukataOn, YUKATA, whiskStart, whisk, froth, TEA, sitStart, breathe, calm, drawFortune, makeNerikiri, seasonShape, centre as ktCentre, throwCup, NERI } from "./kyoto.js";
 import { TOWNS, townOf, townRoom, roomBehind, TOWN_BOUNDS, TOWN_PLACES } from "../data/towns.js";
 import { rondaPanel, rondaVisit, buyGood, buyVines, taste, buyTile, picnic as rondaPicnic, tileBench, cafeTreat, showOn, palmasStart, palmasEnd, clap, ole, paintTile, pour, TEA_GLASSES, rondaState } from "./ronda.js";
-import { tripOn, inParty, buyTrip, endTrip, ticketPanel, homePanel, initTrips, nameOf as tripName, awayOn } from "./trips.js";
+import { tripOn, inParty, buyTrip, endTrip, ticketPanel, homePanel, boatPanel, initTrips, nameOf as tripName, awayOn } from "./trips.js";
 import { bikeArt, taxiBoat, taxiBank, transportArt } from "../art/transport.js";
 import { bikeOn, bikeLeft, hireBike, returnBike, bikeExpired, bikePanel, STOPS as TAXI_STOPS, taxiPanel, takeTaxi } from "./transport.js";
 import { forage, rangerPanel } from "./woods.js";
@@ -312,7 +315,7 @@ let ghBed = null, millOpen = false, lastMill = "";   // round 110: the olive pre
 let rondaView = null;   // round 107: a Ronda shop (ronda.js): "mercado", "tapas", "dulces", "convento", "azulejos"
 let woodsView = null;   // round 103: "ranger", "bike" or a river taxi stop id (transport.js, woods.js)
 let fishSpot = null, fishSt = {}, fishT = null;   // fishing: which spot you're at, and the cast in progress (fishing.js)
-let railOpen = false, lastTrain = "", tripPick = [], tripTown = "ronda";   // the timetable board on Honeybrook's platform
+let railOpen = false, lastTrain = "", tripPick = [], tripTown = "ronda", ferryTown = "saltwick", boatTown = "saltwick";   // (round 215: the ferry goes to the islands too)   // the timetable board on Honeybrook's platform
 let lastFarm = 0;
 // the farm's clock: your shelf at the farm stand sells, and a hive left full too long swarms
 function farmNow(){
@@ -1068,7 +1071,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 /* ---------- storage at home (round 166, game/storage.js): the fridge's "Stored" tab, and the garage shelf ---------- */
 // the fridge: what's stored for the shops (storage.js), and the shopping list on the door (shopping.js)
@@ -1149,12 +1152,14 @@ function ctx(){
       : bbRoom === "pots" ? CRA.potsPanel(F, bbSt.pots, {hm: localHM()}) : bbRoom === "penguins" ? CRA.pengPanel(F, bbSt.peng, {hm: localHM()}) : bbRoom === "nippers" ? CRA.nipPanel(F, bbSt.nip, {hm: localHM()}) : TLA.TL_KINDS.includes(bbRoom) ? TLA.tlPanel(F, bbRoom, bbSt, {hm: localHM()}) : LVA.LV_KINDS.includes(bbRoom) ? LVA.lvPanel(F, bbRoom, bbSt, {hm: localHM()}) : bbRoomPanel(F, bbRoom, {party: !!tp.length}); }
   else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van"), region: bvRegion});
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
-  else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, "jeju", localHM(), "ferry");   // round 127: the Jeju ferry from the jetty
+  else if (railOpen === "boat" && scene === "shore") h = boatPanel(F, tripPick, boatTown, localHM(), rainyOn(dayKey()));   // round 215: your own boat: the cruise, or an island
+  else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, TOWNS[ferryTown] && !TOWNS[ferryTown].soon ? ferryTown : "jeju", localHM(), "ferry");   // round 127: the Jeju ferry from the jetty (round 215: and the islands)
   else if (railOpen && scene === "hlane") h = timetablePanel(dayKey(), localHM(), true);
   else if (railOpen && townOf(scene)) h = homePanel(F, townOf(scene), localHM(), railOpen === "ferry" ? "ferry" : "train");
   else if (kyotoView && townOf(scene) === "kyoto") h = kyotoPanel(F, kyotoView, {...ktSt});
   else if (jejuView && townOf(scene) === "jeju") h = jejuPanel(F, jejuView, {...jjSt});
   else if (cinqueView && townOf(scene) === "cinque") h = cinquePanel(F, cinqueView, {...ctSt});
+  else if (swView && townOf(scene) === "saltwick") h = swPanel(F, swView, {...swSt}, localHM());
   else if (rondaView && townOf(scene)) h = rondaPanel(F, rondaView, {flam: flamSt, hm: localHM(), tea: teaSt, amina: isHere("amina"), paint: paintSt});
   else if (fishSpot && FISH_SPOTS[fishSpot].scene === scene) h = fishPanel(F, fishSpot, fishSt);
   else if (woodsView === "ranger" && scene === "hwoods") h = rangerPanel(F, isHere("wren"));
@@ -1321,6 +1326,9 @@ function ctx(){
   c.querySelectorAll("[data-bvregion]").forEach(b => b.onclick = () => { bvRegion = b.dataset.bvregion; sfx("paper", true); ctx(); });
   c.querySelectorAll("[data-bvpass]").forEach(b => b.onclick = () => { bvView = "passport"; sfx("paper", true); ctx(); });
   c.querySelectorAll("[data-ttown]").forEach(b => b.onclick = () => { tripTown = b.dataset.ttown; sfx("tap"); ctx(); });
+  c.querySelectorAll("[data-btown]").forEach(b => b.onclick = () => { boatTown = b.dataset.btown; sfx("tap"); ctx(); });
+  c.querySelectorAll("[data-boat]").forEach(b => b.onclick = () => { railOpen = false; ctx(); startCruise(); });
+  c.querySelectorAll("[data-ftown]").forEach(b => b.onclick = () => { ferryTown = b.dataset.ftown; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-tpick]").forEach(b => b.onclick = () => { const id = b.dataset.tpick; tripPick = tripPick.includes(id) ? tripPick.filter(x => x !== id) : [...tripPick, id]; sfx("tap"); ctx(); });
   c.querySelectorAll("[data-trip]").forEach(b => b.onclick = () => startTrip(b.dataset.trip, b.dataset.by || "train"));
   c.querySelectorAll("[data-triphome]").forEach(b => b.onclick = () => tripHome(false, b.dataset.triphome === "ferry" ? "ferry" : "train"));
@@ -1501,6 +1509,20 @@ function ctx(){
       if (r.cask) speak("The grapes have shrivelled into sweet little raisins. Pressed, and into the cask for four days.", 5000); else { flash(`${r.n} × ${ITEMS[r.id].n.toLowerCase()}`); speak(r.id === "w_raisin" ? "Three bottles of amber raisin wine, sticky and sweet. A week of waiting, and worth every day." : `${ITEMS[r.id].n}, ready. Into the backpack.`, 5000); } save(); }
     ctx(); });
   // Jeju (rounds 128–129): the breath song, the sorting, the café, the porridge, the slow post, the dye
+  // Saltwick Harbour (round 215): the scar, the crab line, the café and its brew, the lamp
+  c.querySelectorAll("[data-sw]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.sw.split(":");
+    if (a === "split") { const r = splitStone(F, +v, addInv); if (!r) return; swSt = {last: r}; sfx(r.empty ? "tap" : "chime"); if (!r.empty) { gainXp(r.fresh ? 2 : 1); act("cheer"); flash(r.cased ? "A glass case of ammonites" : "An ammonite"); } save(); }
+    else if (a === "crab") { clearTimeout(swCrabT); swSt = {crab: crabStart()}; sfx("paper", true); }
+    else if (a === "drop") { const st = swSt.crab; if (!st) return; const ms = dropLine(st); if (!ms) return; sfx("tap"); clearTimeout(swCrabT); swCrabT = setTimeout(() => { if (swView === "crab" && swSt.crab === st) { sfx("tap"); ctx(); } }, ms + 30); }
+    else if (a === "pull") { const st = swSt.crab; if (!st) return; clearTimeout(swCrabT); const r = pullUp(st); sfx(r === "crab" ? "chime" : "paper", true);
+      if (st.done) { const first = crabDone(F, st, addInv); gainXp(st.got >= 3 ? 2 : 1); if (st.got) hearts(1); if (first) { flash("Your crabbing line"); speak("Jack grins and hands you the line to keep. \"Three! You're a natural. That one's lucky now.\"", 5500); } save(); } }
+    else if (a === "cafe") { const c0 = swCafe(F, v); if (!c0) return; sfx("slurp"); gainXp(1); hearts(2); speak(c0[2], 5500); save(); }
+    else if (a === "tea") { swSt = {tea: {step: 0, done: false}}; sfx("paper", true); }
+    else if (a === "step") { const st = swSt.tea; if (!st) return; const r = teaStep(st, +v); sfx(r === "ok" ? "tap" : "paper", true); if (st.done) { const first = teaDone(F, addInv); gainXp(2); hearts(2); if (first) flash("A Saltwick mug"); save(); } }
+    else if (a === "lamp") { swSt = {lamp: lampStart()}; sfx("paper", true); }
+    else if (a === "wipe" || a === "wind" || a === "light") { const st = swSt.lamp; if (!st) return; const r = lampStep(st, a); if (!r) return; sfx(r === "lit" ? "chime" : "tap");
+      if (r === "lit") { const first = lampDone(F, addInv); gainXp(3); hearts(2); act("cheer"); if (first) flash("A page from the keeper's ledger"); save(); } }
+    ctx(); });
   c.querySelectorAll("[data-jj]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.jj.split(":"), evanOn = false, ev = (l, d = 1600) => { ; };
     if (a === "dive" || a === "again") { jjSt = {dive: diveStart()}; sfx("paper", true); }
     else if (a === "down") { const d = jjSt.dive; if (!d || !descend(d)) return; sfx("tap"); }
@@ -1586,7 +1608,7 @@ function ctx(){
     else if (a === "fill") { const [oid, hid] = v0.split("|"), pay = fillOrder(F, oid, hid, dayKey()); if (pay) { sfx("coin"); gainXp(2); flash(`+${pay}: a hamper order`); speak("Penny takes the hamper and the envelope of coins, and crosses the order off. \"They'll be thrilled.\"", 5000); } }
     else if (a === "tie") { const hp = packTie(F); if (hp) { sfx("chime"); hearts(2); gainXp(2); flash(`${hp.name} hamper`); speak(`Penny ties a fat red bow on top and writes the tag: "${hp.name}". It's in your backpack.`, 5500); } }
     save(true); ctx(); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { gsPk = null; ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { gsPk = null; ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
   c.querySelectorAll('[data-rec="stop"]').forEach(b => b.onclick = () => { setMusic(false); speak("Needle up. Quiet time.", 2500); ctx(); drawScene(); });
@@ -1666,11 +1688,11 @@ function drawScene(){
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; const light = rainLevel(day) === 1; setTimeout(() => speak(light ? "A light shower today. Brollies up!" : "Rainy day! Perfect for something cosy indoors.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
-  $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene): TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene): TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene);
+  $("sceneArt").innerHTML = scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene): TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene): TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene);
   $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), localHM()) ? discoArt() : "") + vanCrateArt() + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));   // shelves with keepsakes, and pets at home here
   if ((outside() || scene === "terrace") && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(localHM()));   // (round 153: the terrace too)   // the same evening light everywhere outdoors
   if ((outside() || scene === "terrace") && isDusk()) nightLights();
-  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), terrace:"The terrace", millup:"The old mill: upstairs", orchard:"The orchard", flowers:"The flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, ct_vernazza:"Cinque Terre: Vernazza", ct_corniglia:"Cinque Terre: Corniglia", ct_monterosso:"Cinque Terre: Monterosso", ct_manarola:"Cinque Terre: Manarola", ...Object.fromEntries(Object.entries(BB_NAMES).map(([k, v]) => [k, "Bellbird Valley: " + v])), jj_shore:"Jeju: Seongsan", jj_farms:"Jeju: the tangerine farms", jj_harbour:"Jeju: the harbour", jj_village:"Jeju: the stone village", kt_station:"Kyoto: the station", kt_lane:"Kyoto: Higashiyama", kt_temple:"Kyoto: the temple", kt_river:"Kyoto: the river", rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
+  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), terrace:"The terrace", millup:"The old mill: upstairs", orchard:"The orchard", flowers:"The flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, ct_vernazza:"Cinque Terre: Vernazza", ct_corniglia:"Cinque Terre: Corniglia", ct_monterosso:"Cinque Terre: Monterosso", ct_manarola:"Cinque Terre: Manarola", ...Object.fromEntries(Object.entries(BB_NAMES).map(([k, v]) => [k, "Bellbird Valley: " + v])), sw_harbour:"Saltwick: the harbour", sw_wynds:"Saltwick: the wynds", sw_beach:"Saltwick: the beach", sw_clifftop:"Saltwick: the clifftop", jj_shore:"Jeju: Seongsan", jj_farms:"Jeju: the tangerine farms", jj_harbour:"Jeju: the harbour", jj_village:"Jeju: the stone village", kt_station:"Kyoto: the station", kt_lane:"Kyoto: Higashiyama", kt_temple:"Kyoto: the temple", kt_river:"Kyoto: the river", rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || (townRoom(scene) ? `${TOWNS[townOf(scene)].n}: ${townRoom(scene).n.replace(/^The /, "the ")}` : ROOMS[scene].name))}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
   $("maphint").textContent = townRoom(scene) ? `${townRoom(scene).say} Exit at the bottom, back out the way you came.` : townOf(scene) && TOWNS[townOf(scene)].hints ? TOWNS[townOf(scene)].hints[scene] : townOf(scene) ? {rd_station: "Ronda's station (trains home till 10pm) and the Alameda balcony over the valley. East: the plaza. South: steps down into the gorge.", rd_plaza: "The plaza: the market, the tapas bar, Doña Carmen's sweets. West: the station. South: over Puente Nuevo.", rd_bridge: "Puente Nuevo over the gorge, the viewpoint and the Moorish garden. North: back over the bridge. West: the old town.", rd_old: "La Ciudad: the convent hatch, the tile shop, the Arab baths. North: the gorge steps up to the station. East: the bridge."}[scene] : scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Hana's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Farid and Mei's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Bo's workshop, and Auntie Lin's, Juniper's and Mr Okada's homes. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
@@ -1773,17 +1795,17 @@ function trainRide(text, town, then){
 }
 const partyList = t => t.party.map(tripName).join(", ").replace(/, ([^,]*)$/, " and $1");
 // the ferry crossing (round 127: Jeju): longer than the train, and the sea has dolphins in it
-function ferryRide(text, home, then){
-  const o = document.createElement("div"); o.className = "taxiride trainride ferryride"; o.innerHTML = ferryRideArt(home) + `<p>${esc(text)}</p>`; $("map").appendChild(o); sfx("honk");
+function ferryRide(text, home, then, town){
+  const o = document.createElement("div"); o.className = "taxiride trainride ferryride"; o.innerHTML = (town === "saltwick" ? swFerryRideArt(home) : ferryRideArt(home)) + `<p>${esc(text)}</p>`; $("map").appendChild(o); sfx("honk");
   setTimeout(() => { o.remove(); then(); }, 6000);   // (a slow crossing: 6s, the CSS .ferryride matches)
 }
 function startTrip(town, by = "train"){
   const r = buyTrip(F, town, tripPick, localHM(), by); if (!r) return;
-  const t = tripOn(F), boat = by === "ferry", land = boat ? r.town.ferry.arrive : r.town.arrive; railOpen = false; tripPick = []; ctx(); sfx("chaching"); flash(`Tickets to ${r.town.n}`); save(true);
-  (boat ? ferryRide : trainRide)(boat ? `All aboard the ferry for ${r.town.n}!` : `All aboard for ${r.town.n}!`, boat ? false : town, () => { if (town === "ronda") rondaVisit(F); setScene(land[0], land[1]);
+  const t = tripOn(F), own = by === "boat", boat = by === "ferry" || own, land = boat ? r.town.ferry.arrive : r.town.arrive; railOpen = false; tripPick = []; ctx(); sfx("chaching"); flash(own ? "Fuel for the boat" : `Tickets to ${r.town.n}`); save(true);
+  (boat ? ferryRide : trainRide)(own ? `Casting off for ${r.town.n}!` : boat ? `All aboard the ferry for ${r.town.n}!` : `All aboard for ${r.town.n}!`, boat ? false : town, () => { if (town === "ronda") rondaVisit(F); setScene(land[0], land[1]);
     if (town === "jeju" && localHM() < 8*60) setTimeout(() => speak("And look: the sun's just coming up out of the sea behind Seongsan, turning the crater gold. Worth the early start.", 6000), 8000);   // round 129: the early boat
     setTimeout(() => speak(`${(boat && r.town.ferry.arriveLine) || r.town.arriveLine || `${r.town.n}! Whitewashed walls, orange trees and a sky so blue it hums.`}${t.party.length ? ` ${partyList(t)} pile${t.party.length > 1 ? "" : "s"} off the ${boat ? "ferry" : "train"} behind you.` : ""} The last ${boat ? "ferry" : "train"} home is at 10pm.`, 6500), 900);
-    ; });
+    ; }, town);
 }
 // Bellbird Valley (round 141): set off in the van, drive between stops, drive home
 function vanRide(text, then, ms = 3200){
@@ -1819,7 +1841,7 @@ function tripHome(late, by){
   if (t && t.town === "kyoto" && t.party.includes("farid") && !kyotoState(F).cranes) { kyotoState(F).cranes = true; addInv("k_cranes", 1); setTimeout(() => flash("Farid's paper cranes"), 3400); }
   save(true);
   (boat ? ferryRide : trainRide)(late ? `The last ${boat ? "ferry" : "train"} home, everyone sleepy...` : boat ? "Home across the sea to Honeybrook..." : "Home to Honeybrook...", boat ? true : null, () => { setScene(boat ? "shore" : "hlane", boat ? VILLAGE.ferry.door : VILLAGE.timetable.door);
-    setTimeout(() => speak(`Back in Honeybrook. ${town.n} was ${pick(["unforgettable", "a proper adventure", "glorious"])}.${t && t.party.length ? ` ${partyList(t)} head${t.party.length > 1 ? "" : "s"} off home.` : ""}`, 5000), 800); });
+    setTimeout(() => speak(`Back in Honeybrook. ${town.n} was ${pick(["unforgettable", "a proper adventure", "glorious"])}.${t && t.party.length ? ` ${partyList(t)} head${t.party.length > 1 ? "" : "s"} off home.` : ""}`, 5000), 800); }, t ? t.town : townOf(scene));
 }
 // places on a town's screens (the gates are handled as bridges): the station, and a line for everywhere else
 // inside one of a town's rooms (round 116): the bar, the café counter and Rafael's stall open their panels; the
@@ -1835,6 +1857,7 @@ let kyotoView = null, ktSt = {};
 let jejuView = null, jjSt = {};
 let loftView = false;   // round 132: the drying loft over the barrel shed (loft.js)
 let cinqueView = null, ctSt = {};
+let swView = null, swSt = {}, swCrabT = 0;   // round 215: Saltwick Harbour's panels and activities (saltwick.js)
 let lunchView = null, occView = null, trvSt = null, pntSt = null, mullSt = {};   // round 152: occView "trivia" or "paint" on the terrace (occasions.js)
    // round 146: the bookings book ("book") and the long table ("table") on the terrace
 let bbRoom = null, bbSt = {}, ppView = null, ppCame = 0, wrSt = {};   // wrSt: the gift being wrapped (round 185)   // round 183: the paperie's station panels (paperie.js)
@@ -1873,6 +1896,12 @@ function roomSpot(id){
   if (id === "pp_buy") { goalView = "paperie"; sfx("paper", true); render(); return; }   // round 183: the paperie
   if (id.startsWith("pp_")) { ppView = id; if (id === "pp_rack") wrSt = {}; paperNow(); sfx("paper", true); render(); return; }
   if (id.startsWith("bv_")) { bbRoom = id; sfx("paper", true); render(); return; }
+  // Saltwick Harbour (round 215): the counters, the café, the lamp; the tank, the racks, the ledger and the window seat
+  if (["sw_market", "sw_chandlery", "sw_cafe", "sw_smokehouse", "sw_lighthouse"].includes(id)) { swView = id; swSt = {}; sfx("paper", true); render(); return; }
+  if (id === "swtank") { sfx("tap"); speak(pick(["The lobsters sit in the tank with their claws banded, looking blue and black and thoroughly fed up.", "One lobster taps the glass. Ruth says that's Gerald. Gerald's been here a week. Nobody has the heart.", "A crab climbs over a lobster, who doesn't care for it at all."]), 5000); render(); return; }
+  if (id === "swracks") { speak(pick(["Rows and rows of kippers, split and golden, hanging on the speats in the oak smoke. It stings your eyes a bit. Worth it.", "Sid checks a kipper, sniffs it, and hangs it back. \"Two more hours. The smoke knows.\"", "Up in the rafters it's dark as a chimney, and the herring glow like old brass."]), 5500); render(); return; }
+  if (id === "swledger") { const s0 = swState(F); speak(`The keeper's ledger, open on the desk: the weather in the margin, every boat out and every boat home, in Alfie's careful hand. ${s0.lamp ? `Your name's in there ${s0.lamp === 1 ? "once" : `${s0.lamp} times`}: "helped light the lamp."` : "Today: wind fresh, sea moderate, all boats home by four."}`, 7000); render(); return; }
+  if (id === "swwindow") { hero.sitting = true; nodes.hero.classList.add("sit"); speak(pick(["The harbour through the steamed-up glass: the cobles leaning in the mud, the lighthouse, a gull on every post.", "A coble comes in round the harbour wall, low in the water with the catch. Ruth's already waiting on the quay.", "Rain on the window, the teapot at your elbow. There's nowhere you need to be."]), 6000); render(); return; }
   // Cinque Terre (round 132): each room's panel
   if (id === "ct_focacceria" || id === "ct_pesto" || id === "ct_cantina" || id === "ct_gelato" || id === "ct_limoni") { cinqueView = id; ctSt = {}; sfx("paper", true); render(); return; }
   // Jeju (round 128): each room's thing to do, and the slow-post box
@@ -1906,7 +1935,11 @@ function townSpot(id){
   if (id === "bvswing") { speak(T.say[id] || "The rope swing: a fat rope with a knot at the bottom, hanging off a river red gum over the swimming hole.", 4000); sfx("chime"); gainXp(1);
     setTimeout(() => { speak(pick(["You grab the rope, run, and swing out over the water... and let go. SPLASH. It's freezing! It's wonderful!", "Out, out, out over the river, and back again. You chicken out of letting go. Next time.", "You swing, let go at the very top, and hit the water with a whoop that sends the cockatoos up."]), 6000); mprop("sparkle", hero.x + 30, hero.y - 40, 1400); }, 1800);
     ; save(); render(); return; }
-  if (id === T.station) { railOpen = true; sfx("paper", true); render(); return; }
+  // Saltwick Harbour (round 215): fossil hunting on the scar, crabbing off the wall, the cat and the bench
+  if (town === "saltwick" && (id === "swscar" || id === "swcrab")) { swView = id === "swscar" ? "scar" : "crab"; swSt = {}; sfx("paper", true); speak(T.say[id], 4500); render(); return; }
+  if (id === "swcat") { sfx("chime"); hearts(1); speak(pick(["The harbour cat opens one eye, decides you'll do, and rolls over for his tummy to be rubbed. Just the once.", "He purrs like a boat engine. Jack says he's called Captain. Ruth says he's called Trouble.", "The cat yawns, enormous, and goes back to sleep on the lobster pot. You've been dismissed."]), 5000); render(); return; }
+  if (id === "swbench") { hero.sitting = true; nodes.hero.classList.add("sit"); speak(pick([T.say[id], "The whole sea, grey-green and glittering, all the way to the edge of the world. A gannet folds up and drops like a dart.", "The wind's in your hair and a skylark's going up and up somewhere behind you."]), 6000); render(); return; }
+  if (id === T.station) { railOpen = T.by === "ferry" ? "ferry" : true; sfx("paper", true); render(); return; }   // (an island's station is its ferry pier)
   if (T.ferry && id === T.ferry.pier) { railOpen = "ferry"; sfx("paper", true); render(); return; }   // Jeju: the ferry home
   const room = roomBehind(town, id);   // round 116: the tapas bar, the café, the market, the baths and the garden have insides
   if (room) { sfx("paper", true); setScene(room, [260, 560]); setTimeout(() => speak(T.rooms[room].say, 5000), 700); if (town === "kyoto") setTimeout(() => stampHere(room), 5800);
@@ -2075,7 +2108,7 @@ function setScene(id, at){
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scView = null; scSt.pick = null; scSt.dpick = null; ppView = null;
-    GU.signBook(F); scene = id; cam.snap = true; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; resetNpcs();
+    GU.signBook(F); scene = id; cam.snap = true; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; resetNpcs();
     const p = at || [260, 596];
     hero.x = hero.tx = p[0]; hero.y = hero.ty = p[1]; hero.path = []; chum.x = chum.tx = p[0] - 22; chum.y = chum.ty = p[1] + 2;
     render(true); w.classList.remove("fading");
@@ -2293,7 +2326,7 @@ function arriveVillageSpot(id){
   if (id === "wishtower") { const w = F.wish = F.wish || {n: 3}; if (w.day === dayKey()) { speak("You've added your stone today. The wish is in there now: it just needs time.", 4000); render(); return; }
     w.day = dayKey(); if (w.n < 9) w.n++; sfx("chime"); gainXp(1); speak(pick(["You find a flat black-ish pebble by the river, balance it on top, and make a wish. Don't tell anyone what it was.", "Clack. One more stone on the tower. A wish for today.", "Very carefully... there. The tower's a little taller, and so is the wish."]), 5000);
     ; save(); render(); return; }
-  if (id === "boat") { if (owns(F, "boat")) startCruise(); else { goalView = "boat"; sfx("paper", true); render(); } return; }
+  if (id === "boat") { if (owns(F, "boat")) { railOpen = "boat"; tripPick = []; sfx("paper", true); render(); } else { goalView = "boat"; sfx("paper", true); render(); } return; }
   if (id === "dolphins") { hero.sitting = true; nodes.hero.classList.add("sit"); hero.dir = -1; sfx("paper", true);
     const m = localHM(), morning = m >= 6*60 && m < 11*60;
     if (morning && S.dolphinDay !== dayKey()) { S.dolphinDay = dayKey(); gainXp(1); setTimeout(() => { speak(pick(["There! Dolphins, three of them, just past the jetty.", "A fin! Then another. The dolphins are out this morning."]), 5000); [0, 300].forEach((d, k) => setTimeout(() => mprop("heart", 90 + k*30, 220, 1800), d)); ; }, 2400); save(); }

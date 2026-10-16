@@ -21,14 +21,14 @@ export const tripOn = (F, day = dayKey()) => F.trip && F.trip.day === day && !F.
 export const inParty = (F, id, day = dayKey()) => { const t = tripOn(F, day); return !!t && t.party.includes(id); };
 // villagers away all day
 export const awayOn = (F, day = dayKey()) => { const t = tripOn(F, day); return t ? t.party.slice() : []; };
-// by: "train" (every town) or "ferry" (towns with a ferry: Jeju, round 127)
-export const fareFor = (town, party, by = "train") => { const t = TOWNS[town], f = by === "ferry" && t.ferry ? t.ferry.fare : t.fare; return f*(1 + party.filter(id => !t.free.includes(id)).length); };
+// by: "train" (the train towns) or "ferry" (towns with a ferry: Jeju, round 127; the islands, round 215)
+export const fareFor = (town, party, by = "train") => { const t = TOWNS[town]; if (by === "boat") return t.boat ? t.boat.fuel : 0; const f = by === "ferry" && t.ferry ? t.ferry.fare : t.fare; return f*(1 + party.filter(id => !t.free.includes(id)).length); };
 export const canLeave = (town, hm = localHM()) => hm >= TOWNS[town].outFrom && hm < TOWNS[town].outTo;
 export const canReturn = (town, hm = localHM()) => hm < TOWNS[town].backTo;
 export function buyTrip(F, town, party, hm = localHM(), by = "train"){
-  const t = TOWNS[town]; if (!t || !canLeave(town, hm) || tripOn(F) || (by === "ferry" && !t.ferry)) return null;
-  party = tripFriends(F).filter(id => party.includes(id)); const cost = fareFor(town, party, by); if (F.coins < cost) return null;
-  F.coins -= cost; F.trip = {town, day: dayKey(), party, from: hm, by}; F.towns = {...(F.towns || {}), [town]: F.towns && F.towns[town] || dayKey()};   // F.towns: where you've been (first visit), round 132
+  const t = TOWNS[town]; if (!t || !canLeave(town, hm) || tripOn(F) || (by === "ferry" && !t.ferry) || (by === "boat" && !t.boat)) return null;
+  party = tripFriends(F).filter(id => party.includes(id)); if (by === "boat") party = party.slice(0, t.boat.max); const cost = fareFor(town, party, by); if (F.coins < cost) return null;
+  F.coins -= cost; F.trip = {town, day: dayKey(), party, from: hm, by: by === "boat" ? "ferry" : by, ...(by === "boat" ? {own: true} : {})};   // (your own boat lands where the ferry does) F.towns = {...(F.towns || {}), [town]: F.towns && F.towns[town] || dayKey()};   // F.towns: where you've been (first visit), round 132
   return {cost, town: t, by};
 }
 export function endTrip(F){ if (F.trip && !F.trip.done) F.trip.done = true; }
@@ -61,7 +61,7 @@ const coin = () => icon("coin", 13);
 // The ticket window (Honeybrook station): where to, and who's coming
 export function ticketPanel(F, pick, town = "ronda", hm = localHM(), by = "train"){
   const t = TOWNS[town], who = tripFriends(F), party = who.filter(id => pick.includes(id)), cost = fareFor(town, party, by), open = canLeave(town, hm), on = tripOn(F), boat = by === "ferry", fare = boat ? t.ferry.fare : t.fare, ride = boat ? "ferry" : "train";
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${boat ? "The ferry" : "Tickets"} to ${esc(t.n)}</h2>${boat ? "" : `<div class="gchips">${Object.entries(TOWNS).filter(([, x]) => x.by !== "van").map(([k, x]) => `<button class="gchip${k === town ? " on" : ""}" data-ttown="${k}" aria-pressed="${k === town}"><span>${esc(x.n)}</span></button>`).join("")}</div>`}<p class="sub">${esc(boat ? "Across the sea to Jeju: a slower crossing than the train over the sea bridge, but there are dolphins. Come home by ferry or by train, whichever you like." : t.blurb)}</p>
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${boat ? "The ferry" : "Tickets"} to ${esc(t.n)}</h2><div class="gchips">${Object.entries(TOWNS).filter(([, x]) => boat ? !!x.ferry && !x.soon : x.by === "train").map(([k, x]) => `<button class="gchip${k === town ? " on" : ""}" data-${boat ? "f" : "t"}town="${k}" aria-pressed="${k === town}"><span>${esc(x.n)}</span></button>`).join("")}</div><p class="sub">${esc(boat ? t.ferry.blurb || t.blurb : t.blurb)}</p>
     <p class="muted">${fare} ${coin()} return a person. ${boat ? "Ferries" : "Trains"} out ${fmt(t.outFrom)} to ${fmt(t.outTo)}; the last ${ride} home leaves ${esc(t.n)} at ${fmt(t.backTo)}. A day trip: you'll be home tonight.</p>`;
   if (on) return h + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut;
   if (!open) return h + `<p><b>${hm < t.outFrom ? `The first ${ride} to ${esc(t.n)} is at ${fmt(t.outFrom)}.` : `That's the last ${ride} to ${esc(t.n)} gone for today. Tomorrow!`}</b></p>` + shut;
@@ -77,4 +77,20 @@ export function homePanel(F, town, hm = localHM(), by = "train"){
   if (on && on.party.length) h += `<p class="muted">With you today: ${on.party.map(nameOf).join(", ").replace(/, ([^,]*)$/, " and $1")}.</p>`;
   h += `<div class="actions"><button class="btn primary" data-triphome="${by}">Take the ${boat ? "ferry" : "train"} home</button></div>`;
   return h + shut;
+}
+// Your own boat (round 215, once the dolphin cruise boat's bought): a cruise to see the dolphins, or a day out to an
+// island that has a mooring for it (Saltwick Harbour): just the fuel, and up to seven friends aboard. Daylight and dry days.
+export function boatPanel(F, pick, town, hm = localHM(), wet = false){
+  const isles = Object.entries(TOWNS).filter(([, x]) => x.boat && !x.soon);
+  if (!isles.length) return `<span class="tape gingham" aria-hidden="true"></span><h2>Your boat</h2><div class="actions"><button class="btn alt" data-boat="cruise">A dolphin cruise up the coast</button></div>` + shut;
+  const t = TOWNS[town] || TOWNS[isles[0][0]], id = TOWNS[town] ? town : isles[0][0], who = tripFriends(F), party = who.filter(x => pick.includes(x)).slice(0, t.boat.max), on = tripOn(F), open = canLeave(id, hm) && !wet;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Your boat</h2><p class="sub">She's tied up at the end of the jetty, rocking gently, with a full tank and a flask of tea in the cabin.</p>
+    <div class="actions"><button class="btn alt" data-boat="cruise">A dolphin cruise up the coast</button></div>
+    <h3 class="ph3">Or sail somewhere for the day</h3><div class="gchips">${isles.map(([k, x]) => `<button class="gchip${k === id ? " on" : ""}" data-btown="${k}" aria-pressed="${k === id}"><span>${esc(x.n)}</span></button>`).join("")}</div>
+    <p class="muted">${t.boat.fuel} ${coin()} of fuel, however many come. Up to ${t.boat.max} friends aboard. Set off between ${fmt(t.outFrom)} and ${fmt(t.outTo)}, and be home by dark.</p>`;
+  if (on) return h + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut;
+  if (wet) return h + `<p><b>Not in this weather. The harbour master would have words.</b></p>` + shut;
+  if (!open) return h + `<p><b>${hm < t.outFrom ? `Too early to set off: from ${fmt(t.outFrom)}.` : "Too late to set off today. Tomorrow!"}</b></p>` + shut;
+  h += `<h3 class="ph3">Who's coming?</h3>${who.length ? "" : `<p class="muted">${NOBODY}</p>`}<div class="trippicks">${who.map(x => `<button class="tpick${party.includes(x) ? " on" : ""}" data-tpick="${x}" aria-pressed="${party.includes(x)}"><b>${esc(nameOf(x))}</b><small>free</small></button>`).join("")}</div>`;
+  return h + `<div class="actions"><button class="btn primary" data-trip="${id}" data-by="boat" ${F.coins >= t.boat.fuel ? "" : "disabled"}>Cast off · ${t.boat.fuel} ${coin()}</button></div>` + shut;
 }

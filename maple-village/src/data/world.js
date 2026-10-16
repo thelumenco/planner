@@ -94,7 +94,7 @@ export const VILLAGE = {
   linjun: {scene:"shore", name:"Lin and Juniper's", short:"Lin and Juniper's cottage", door:[438,578], mark:[438,470]},
   tomiposy: {scene:"shore", name:"Tomi and Posy's", short:"Tomi and Posy's house", door:[400,470], mark:[400,354]},
   suprack:{scene:"shore", name:"Paddleboards", door:[216,488], spot:true, line:"The paddleboard rack by the jetty. Fancy a paddle?"},
-  ferry:  {scene:"shore", name:"Ferry to Jeju", door:[86,466], spot:true, mark:[78,400], line:"The ferry stop at the end of the jetty: boats to Jeju."},
+  ferry:  {scene:"shore", name:"The ferry", door:[86,466], spot:true, mark:[78,400], line:"The ferry stop at the end of the jetty: boats to Jeju and Saltwick Harbour."},
   wishtower:{scene:"hwoods", name:"The wish-tower", door:[124,470], spot:true, mark:[110,400], line:"A little tower of stones by the river. Add one and make a wish."},
   boat:   {scene:"shore", name:"Cruise boat", door:[206,550], spot:true, line:"The mooring at the end of the jetty."},
   dolphins:{scene:"shore", name:"Boardwalk bench", door:[214,262], spot:true, line:"A bench looking out to sea. Dolphins come by most mornings."},
