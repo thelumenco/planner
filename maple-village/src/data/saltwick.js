@@ -15,7 +15,6 @@ const famSpots = per => Object.fromEntries(FRIENDS.map((id, i) => [id, Object.fr
 const room = (door, n, say) => ({door, n, music: door.replace(/^sw/, "sw_"), party: [[200, 560], [330, 560], [120, 540], [420, 540]], say});
 
 export const SW_TOWN = {
-  soon: true,   // hidden from the ferry and boat menus until its outdoor art is in
   n: "Saltwick Harbour", by: "ferry", fare: 30, free: [], outFrom: 7*60, outTo: 16*60, backTo: 22*60,
   screens: ["sw_clifftop", "sw_wynds", "sw_beach", "sw_harbour"], arrive: ["sw_harbour", [230, 548]], station: "swpier", music: "saltwick",
   // your own boat (the dolphin cruise boat, a big goal): fuel for the day, up to seven friends aboard, daylight and dry days only
