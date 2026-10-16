@@ -1024,3 +1024,5 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .hkbubble i{position:absolute;bottom:4px;width:2px;height:12px;background:#F3D98A}
 /* round 218: Bali: the gamelan's five gongs */
 .blgongs .gchip{min-width:58px;justify-content:center;background:#F3E1A0}
+/* round 219: Elena's cottages: a dot of the piece's colour */
+.letsw{display:inline-block;width:11px;height:11px;border-radius:50%;border:1px solid var(--line);vertical-align:-1px;margin-right:4px}

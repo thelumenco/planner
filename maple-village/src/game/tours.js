@@ -421,10 +421,14 @@ export function trainSlot(id, day, hm){
   return null;
 }
 const weekOf = day => { const t = Date.parse(day + "T00:00:00Z"); return new Date(t - ((dow(day) + 6) % 7)*864e5).toISOString().slice(0, 10); };
-export const letGuests = day => { const g = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS); return [g.slice(0, 2), g.slice(2, 4)]; };
+// round 219: once a cottage is yours its guests are your bookings (game/lets.js), not Elena's weekly lets
+let letsHook = () => null, arrivalsHook = () => []; export const setLetsHook = (fn, arr) => { letsHook = fn; if (arr) arrivalsHook = arr; };
+export const letGuests = day => { const g = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS), own = letsHook(day) || {}; return [own.bluebell !== undefined ? own.bluebell || [] : g.slice(0, 2), own.figtree !== undefined ? own.figtree || [] : g.slice(2, 4)]; };
 const LET_SEATS = [[[300, 292], [376, 292]], [[300, 466], [376, 466]]];
 export function letSlot(id, day, hm){
   const lets = letGuests(day), c = lets.findIndex(g => g.includes(id)); if (c < 0) return null;
+  // round 219: your cottage's guests come off the 11:15 with their suitcases on the day they arrive
+  if (arrivalsHook(day).includes(id) && hm >= 11*60 + 15 && hm < 11*60 + 45) return {from: 11*60 + 15, to: 11*60 + 45, scene: "hlane", wander: LANE_WALK, act: "suitcase"};
   const k = lets[c].indexOf(id), at = LET_SEATS[c][k];
   if (hm >= 7*60 + 30 && hm < 9*60) return {from: 7*60 + 30, to: 9*60, scene: "hlane", at, act: "sit", dir: k ? -1 : 1};
   if (hm >= 18*60 && hm < 21*60 + 30) return {from: 18*60, to: 21*60 + 30, scene: "hlane", at, act: "sit", dir: k ? -1 : 1};

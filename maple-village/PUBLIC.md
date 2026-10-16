@@ -135,29 +135,33 @@ unless the page has ?setup=1. The leak check now finds nothing but window.claude
   you've met, the last at five hearts. Every chapter re-introduces what it's about, and the Stories tab keeps the
   whole story per villager. Ada and Idris have stories of their own (Ada's button jar, Idris's grandfather's suit).
 
-## Planned: Elena sells her cottages, and a little landlord business (Mel, 2026-10-14)
+## Elena sells her cottages, and a little landlord business (Mel 2026-10-14, built in round 219)
 Bluebell and Fig Tree, the two holiday lets on the cottage lane by the station, are Elena's. They stay holiday lets
-(guests for the week, out on the porch mornings and evenings) until you reach five hearts with her. Then Elena decides
-to sell them to you: she'd rather sell to a friend than a stranger off the train (about 3,000 for Bluebell and 2,000
-for Fig Tree, from the personal edition's plan).
+(guests for the week, out on the porch mornings and evenings) until you reach five hearts with her. Then Elena writes
+to say she'd rather sell them to a friend than a stranger off the train, and knocking on either door brings up her
+offer: 3,000 for Bluebell (sleeps four, two bedrooms) and 2,000 for Fig Tree (sleeps two). Data in data/lets.js,
+logic and panels in game/lets.js, the rooms in art/lets-art.js.
 
 Then they're yours to furnish and let, a mini landlord business:
-- A furniture catalogue with a wide range: beds and bed linen (covers, quilts, pillows), dining tables and chairs,
-  armchairs and sofas, bookshelves and shelves, lamps, potted plants, rugs, curtains, pictures and little accessories
-  for each room. Pieces come in quality tiers, from simple to very fine, priced to match.
-- Nothing is instant: you order from the catalogue and it arrives on the train the next day, to unpack and place.
-- The game sets the rent, not the player: each cottage's nightly rate comes from how nice its furniture is and how
-  complete the set is (a bed, somewhere to sit, a table, light, something on the walls, and so on), up to a cap for
-  the cottage. Nicer and more complete means better guests and a higher rate; a half-furnished cottage still lets,
-  just for less. The cap keeps money from getting too easy.
-- It works like a little Airbnb. Guests book short stays (a night to a week), arrive on the train with their
-  suitcases, stay in the cottage and wander the village like the holiday guests do now, then leave a star rating
-  and a short review in a guest book. The rating comes from the same things as the rate (how nice, how complete),
-  plus whether the place is clean and ready between guests (a quick tidy-up after each stay). Good reviews bring
-  bookings more often; the nightly rate itself stays the game's to set, up to the cottage's cap.
-- Still to design: the tiers and prices, the completeness checklist, how often bookings come, and how payment
-  works (paid when a stay ends, into your coins, with the review).
-Nothing is built yet; hearts with Elena already count from requests and gifts.
+- Each cottage has fixed places for furniture (Fig Tree 11, Bluebell 13 with a second bed and linen). The hall
+  table inside is where it's all run: the catalogue, the parcels to unpack, the spares and the guest book.
+- The catalogue has eleven kinds of piece, each in three tiers (simple, good, fine) and five colours (sage,
+  cornflower, rose, ochre, cream). Prices, simple/good/fine: bed 120/260/520, bed linen 30/70/140, armchair or
+  sofa 90/200/420, table and chairs 100/220/450, shelves 60/140/300, lamp 25/60/130, rug 30/80/170, curtains
+  25/60/130, picture 20/50/120, plant 15/35/80, little touches 15/40/90. Furnishing Fig Tree all fine costs 2,550.
+- Nothing is instant: an order comes on the next day's train, as a parcel in the hall, to unpack into its place.
+  Swapping a piece out puts the old one in the spare room, to put back or use in the other cottage.
+- The game sets the rent: how complete (places filled) and how fine (average tier) make a score from 0 to 1, half
+  each. Nightly rate = cap x (0.3 + 0.7 x score); caps are 70 for Bluebell and 50 for Fig Tree. Stars = 1 + 4 x
+  score, rounded. A cottage won't let at all without a bed and bed linen; a bed and simple sheets alone lets for
+  about 24 a night at two stars.
+- Guests (visitors from the village's tourist pool) arrive two days after you buy, on the morning train with their
+  suitcases (walking up the lane about 11:15), and stay one to five nights. They pay at checkout (rate x nights,
+  into your coins) and write a short review in the guest book. Then the cottage needs a tidy (a button at the hall
+  table) before anyone else can book. After the tidy, the next guests come after a gap set by the last review:
+  5 days after a one-star stay, 4 after two stars, 3 after three, 2 after four, 1 after five.
+- Away for a while, the cottages run on (up to the last 60 days): the guests that came and went have paid, and the
+  cottage waits for its tidy.
 
 ## The opening story (2026-10-14)
 A new game starts with a short story told through your own eyes (game/intro.js, pictures in art/intro.js): a tired

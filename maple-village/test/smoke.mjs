@@ -4107,6 +4107,55 @@ if (want("\nThe gift basket beside the wrapping table (round 202)")) try {
   check(gs.takeWrapped(F, 0) === id && F.inv[id] === 1 && !gs.giftState(F).wrapped.length, "and it can come back out");
   check(!/Put out:/.test(wr.wrapPanel(F, {}, {where: "giftshop", table: []})), "the wrapping table just points to the basket now");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) try {
+  console.log("\nElena's cottages: buy them, furnish them, let them (round 219)");
+  const lt = await import(new URL("../src/game/lets.js", import.meta.url)), ld = await import(new URL("../src/data/lets.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
+  lt.LIVE.on = true; const day = "2026-10-12", F = {coins: 9000, inv: {}};
+  check(!lt.offerOpen(F, 4) && !lt.buyCottage(F, "figtree", 4, day) && lt.offerOpen(F, 5) && lt.letsMail(F, 5, 1).length === 1 && !lt.letsMail(F, 4, 1).length, "Elena offers the cottages at five hearts (and writes to say so)");
+  check(lt.buyCottage(F, "figtree", 5, day) && F.coins === 7000 && lt.owns(F, "figtree") && !lt.letsMail(F, 5, 1).length && !lt.buyCottage(F, "figtree", 5, day), "Fig Tree is yours for 2000");
+  check(Object.values(ld.CATS).every(c => c.prices[0] < c.prices[1] && c.prices[1] < c.prices[2]) && np.NPCS && ld.GUEST_POOL.every(g => np.NPCS.some(n => n.id === g)), "simple, good and fine, each dearer than the last; the guests are real visitors");
+  check(lt.order(F, "figtree", "bed", 1, "sage", day) && F.coins === 6880 && !lt.order(F, "bluebell", "bed", 1, "sage", day) && !lt.order(F, "figtree", "bed", 4, "sage", day), "a pine bed ordered (120); nothing for a cottage you don't own");
+  check(lt.deliver(F, day) === 0 && lt.deliver(F, "2026-10-13") === 1 && F.lets.cottages.figtree.parcels.length === 1, "it comes on the next day's train, a parcel in the hall");
+  check(!lt.place(F, "figtree", "seat", "parcel", 0) && lt.place(F, "figtree", "bed", "parcel", 0) && !lt.rateOf(F, "figtree"), "a bed only goes where a bed goes; and a bed without linen won't let");
+  lt.order(F, "figtree", "linen", 1, "cream", day); lt.deliver(F, "2026-10-13"); lt.place(F, "figtree", "linen", "parcel", 0);
+  const r1 = lt.rateOf(F, "figtree"), s1 = lt.starsOf(F, "figtree");
+  check(r1 > 0 && r1 < 30 && s1 === 2, "made up with simple linen: it'll let, cheaply (" + r1 + " a night, " + s1 + " stars)");
+  check(lt.missing(F, "figtree").includes("somewhere to sit"), "the hall table says what's still missing");
+  const G = {coins: 0, inv: {}}; lt.letsState(G).cottages.bluebell.owned = day;
+  for (const s of Object.keys(ld.COTTAGES.bluebell.slots)) { G.lets.cottages.bluebell.slots[s] = {cat: ld.catOf("bluebell", s), tier: 3, col: "blue"}; }
+  check(lt.rateOf(G, "bluebell") === 70 && lt.starsOf(G, "bluebell") === 5, "Bluebell all fine furniture: 70 a night (its cap), five stars");
+  lt.order(F, "figtree", "bed", 3, "rose", day); lt.deliver(F, "2026-10-13"); lt.place(F, "figtree", "bed", "parcel", 0);
+  check(F.lets.spare.length === 1 && F.lets.spare[0].tier === 1 && lt.place(F, "figtree", "bed", "spare", 0) && F.lets.cottages.figtree.slots.bed.tier === 1 && F.lets.spare[0].tier === 3, "a brass bedstead in; the pine bed goes to the spares, and can swap back");
+  lt.place(F, "figtree", "bed", "spare", 0);
+  F.lets.last = "2026-10-13"; let ev = lt.settle(F, "2026-10-14"); const c = F.lets.cottages.figtree;
+  check(ev.some(e => e.kind === "arrived") && c.stay && c.stay.nights >= 1 && c.stay.nights <= 5 && lt.staying(F, "figtree", "2026-10-14"), "two days after buying, the first guests come off the train (" + c.stay.nights + " nights)");
+  const s = c.stay, coins = F.coins; let d = "2026-10-14"; for (let k = 0; k < s.nights; k++) d = new Date(Date.parse(d + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
+  ev = lt.settle(F, d);
+  check(ev.some(e => e.kind === "left") && F.coins === coins + s.rate*s.nights && c.book.length === 1 && c.book[0].text && c.needTidy && !c.stay, "they pay at checkout (" + s.rate*s.nights + "), write in the guest book, and the cottage needs a tidy");
+  check(!lt.settle(F, d).some(e => e.kind === "arrived") && lt.tidy(F, "figtree", d) && c.next > d, "no new guests until it's tidied; then a few days' gap before the next booking");
+  F.lets.last = d; const far = "2027-03-01", c0 = F.coins; lt.settle(F, far);
+  check(F.coins > c0 && c.needTidy, "away for months: the guests that came and went still paid, then it waits for a tidy");
+  const p = lt.hallPanel(F, "figtree", {tab: "shop"}, far);
+  check(/data-let="order:bed:1:sage"/.test(p) && /data-let="order:touches:3:rose"/.test(lt.hallPanel(F, "figtree", {tab: "shop", cat: "touches", col: "rose"}, far)) && /data-let="tidy"/.test(lt.hallPanel(F, "figtree", {}, far)), "the hall table: a catalogue of every piece, and the tidy button");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);
+  page.on("pageerror", e => errors.push(`lets pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { window.__hbNoResume = true; if (!/letpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 6000; f.board = f.board || {}; f.board.hearts = Object.assign(f.board.hearts || {}, {elena: 5}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&letpatch=1&lets=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("hlane")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="figtree"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-let="buy:figtree"]', { timeout: 15000 });
+  await page.click('#ctx [data-let="buy:figtree"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.coins === 4000 && f.lets.cottages.figtree.owned), "knock at Fig Tree: Elena sells it to you (2000)");
+  await page.click("#ctx [data-close]"); await page.locator('#world [data-place="figtree"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Fig Tree/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1200);
+  await page.locator('#world [data-spot="lethall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-let="tab:shop"]', { timeout: 15000 });
+  await page.click('#ctx [data-let="tab:shop"]'); await page.click('#ctx [data-let="order:bed:2:sage"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.coins === 3740 && f.lets.orders.length === 1 && f.lets.orders[0].day === "2026-10-13"), "inside, at the hall table: an oak bed from the catalogue (260), coming tomorrow");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

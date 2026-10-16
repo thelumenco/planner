@@ -19,6 +19,9 @@ import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, scatterTreat, roo
 import { wardrobePanel, wearing, ACCESSORIES } from "./wardrobe.js";
 import { goodNewsHTML } from "./gazette.js";
 import * as QB from "./quests.js";
+import * as LT from "./lets.js";
+if (typeof location !== "undefined" && /[?&]lets=1/.test(location.search)) LT.LIVE.on = true;
+import { COTTAGES as LET_COTTAGES } from "../data/lets.js";
 import * as SL from "./shopping.js";
 import { colourOf } from "../art/garments.js";
 import { journalCount } from "./myroom.js";
@@ -135,7 +138,7 @@ import { GOALS, owns, buyGoal, goalPanel, garagePanel, jettyPanel, ride, rideSpe
 import { diningTable, skyWash, tapeLabel } from "../art/scenes.js";
 import { orchState, orchTick, handTin, spotPanel, shopPanel, potPanel, teaPanel, wireOrchard, stateOf, tourBoard } from "./orchard.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
-import { discoNow, discoOn, DISCO_FROM, aperitivoNow, vanNow, movieNow, bayMarketNow, BAY_STALLS, KITE_SELLER, SCREEN, lastFriday, tourNow, eventNow, eventOn, eventsOn, xmasOn, XMAS_FROM, XMAS_TO, XMAS_LIT, XMAS_TREE, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, DINING, tableSeat, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
+import { setLetsHook, discoNow, discoOn, DISCO_FROM, aperitivoNow, vanNow, movieNow, bayMarketNow, BAY_STALLS, KITE_SELLER, SCREEN, lastFriday, tourNow, eventNow, eventOn, eventsOn, xmasOn, XMAS_FROM, XMAS_TO, XMAS_LIT, XMAS_TREE, stallAt, STALL_SPOTS, STAGE, keeperAway, classOn, DINING, tableSeat, fmtTime, wineClubOn, wineClubNow, clubMembers, setStallOwned, workshopGroup, letGuests } from "./tours.js";
 
 /* =================== STATE =================== */
 const freshToday = () => ({day:dayKey(), berries:0, earned:0, steps:0, stepMs:0, water:0, crown:false, npcSaid:{}, harvested:0, updatedAt:0});
@@ -177,7 +180,7 @@ function renameIds(F){
 }
 migrate();
 setPaperArtF(() => F);
-setArtContext({cocoa: () => cocoaState(F), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, boardCount: () => QB.tasksLeft(F) + QB.board(F).reqs.length, growth:p => growth(p), stats:() => ({}), day:() => dayKey(), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns(F, "giftshop") && GAL.stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey())});
+setArtContext({lets: id => ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).slots || {}, letParcels: id => (((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).parcels || []).length, cocoa: () => cocoaState(F), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, boardCount: () => QB.tasksLeft(F) + QB.board(F).reqs.length, growth:p => growth(p), stats:() => ({}), day:() => dayKey(), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns(F, "giftshop") && GAL.stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey())});
 function isDusk(){ const t = localHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, selPlot = null, shopTab = "seeds";
@@ -530,6 +533,7 @@ setInterval(() => {
   { const l = bikeExpired(F); if (l) { speak(l, 4500); save(); } }
   townTick();
   { const k = scene === "bay" ? `${vanNow(dayKey(), localHM())}${spotOpen("bay")}` : scene === "field" ? `${!!(S.kite && S.kite.until > Date.now())}${movieNow(dayKey(), localHM())}${bayMarketNow(dayKey(), localHM())}` : ""; if (k !== lastFri) { lastFri = k; if (k) drawScene(); } }
+  letsTick();
   if (scene === "mill") { const m = millState(F), k = m.press ? (pressLeft(m) ? "on" : "ready") : ""; if (k !== lastMill) { lastMill = k; drawScene(); if (millOpen) ctx(); } }
   if ((outside() || scene === "terrace") && skyKey() !== lastSky) { lastSky = skyKey(); drawScene(); }
   { const tk = outside() ? trainKey(scene) : ""; if (tk !== lastTrain) { lastTrain = tk; drawScene();   // a train coming through: draw it (it runs on from where it is)
@@ -672,6 +676,7 @@ function localMail(){
   if (hm >= 1080 && doneToday()) out.push({id: "wind-" + day, from: "winddown", at: sgAt(day, 18), pond: true,
     title: "Time to close the day", body: "Meet me at the pond. Each of today's wins gets a lantern on the water."});
   { const gl = GU.thanksLetter(F, dearMe(F)); if (gl) out.push(gl); }
+  out.push(...LT.letsMail(F, QB.hearts(F, "elena"), (F.lets && F.lets.offerAt) || 0));   // round 219: Elena's offer
   out.push(...QB.villageLetters(F), ...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__hbOffset || 0)), ...PP.bloomMail(F), ...BK.bookMail(F), ...GAL.galleryMail(F, Date.now()));   // round 129: Jeju's slow-post postcards, two weeks on
   return (localCache = {key, items: out}).items;
 }
@@ -1082,7 +1087,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 /* ---------- storage at home (round 166, game/storage.js): the fridge's "Stored" tab, and the garage shelf ---------- */
 // the fridge: what's stored for the shops (storage.js), and the shopping list on the door (shopping.js)
@@ -1170,6 +1175,8 @@ function ctx(){
   else if (kyotoView && townOf(scene) === "kyoto") h = kyotoPanel(F, kyotoView, {...ktSt});
   else if (jejuView && townOf(scene) === "jeju") h = jejuPanel(F, jejuView, {...jjSt});
   else if (cinqueView && townOf(scene) === "cinque") h = cinquePanel(F, cinqueView, {...ctSt});
+  else if (letView === "offer" && scene === "hlane") h = LT.offerPanel(F, QB.hearts(F, "elena")) || "";
+  else if (letView && LET_COTTAGES[letView] && scene === letView) h = LT.hallPanel(F, letView, letSt);
   else if (swView && townOf(scene) === "saltwick") h = swPanel(F, swView, {...swSt}, localHM());
   else if (piView && townOf(scene) === "puffin") h = piPanel(F, piView, {...piSt});
   else if (hkView && townOf(scene) === "hokkaido") h = hkPanel(F, hkView, {...hkSt});
@@ -1559,6 +1566,17 @@ function ctx(){
     else if (a === "pendant") { if (!makePendant(F, addInv)) return; sfx("chime"); gainXp(2); flash("A sea glass pendant"); speak("Ffion shows you how to wrap the wire: round, under, round again, and a loop at the top. Three bits of glass catch the light like a little bit of the sea.", 6500); save(); }
     else if (a === "cafe") { const c0 = piCafe(F, v); if (!c0) return; sfx("slurp"); gainXp(1); hearts(2); speak(c0[2], 5500); save(); }
     ctx(); });
+  // round 219: Elena's cottages: buying one, the catalogue, unpacking, the tidy
+  c.querySelectorAll("[data-let]").forEach(b => b.onclick = () => { const [a, v, w, x] = b.dataset.let.split(":");
+    if (a === "buy") { const C = LT.buyCottage(F, v, QB.hearts(F, "elena")); if (!C) return; sfx("chaching"); act("cheer"); gainXp(3); flash(`${C.n} is yours`); speak(`Elena puts a big iron key in your hand, tied with a ribbon. "${C.n}'s yours. Look after her." It's empty inside: furnish it from the catalogue on the hall table, and the guests will come.`, 7000); save(); }
+    else if (a === "tab") letSt = {...letSt, tab: v};
+    else if (a === "cat") letSt = {...letSt, cat: v};
+    else if (a === "col") letSt = {...letSt, col: v};
+    else if (a === "order") { const r = LT.order(F, letView, v, +w, x); if (!r) return; sfx("chaching"); flash(LT.pieceName(r.piece)); speak("Ordered. It'll come on tomorrow's train, and wait in the hall for you to unpack.", 4000); save(); }
+    else if (a === "place") { const p = LT.place(F, letView, v, w, +x); if (!p) return; sfx("tap"); gainXp(1); save(); drawScene(); }
+    else if (a === "out") { if (!LT.takeOut(F, letView, v)) return; sfx("paper", true); save(); drawScene(); }
+    else if (a === "tidy") { if (!LT.tidy(F, letView)) return; sfx("chime"); gainXp(1); speak("Sheets changed, floor swept, windows opened, a jar of fresh flowers on the table. Ready for the next guests.", 5000); save(); drawScene(); }
+    ctx(); });
   // Saltwick Harbour (round 215): the scar, the crab line, the café and its brew, the lamp
   c.querySelectorAll("[data-sw]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.sw.split(":");
     if (a === "split") { const r = splitStone(F, +v, addInv); if (!r) return; swSt = {last: r}; sfx(r.empty ? "tap" : "chime"); if (!r.empty) { gainXp(r.fresh ? 2 : 1); act("cheer"); flash(r.cased ? "A glass case of ammonites" : "An ammonite"); } save(); }
@@ -1658,7 +1676,7 @@ function ctx(){
     else if (a === "fill") { const [oid, hid] = v0.split("|"), pay = fillOrder(F, oid, hid, dayKey()); if (pay) { sfx("coin"); gainXp(2); flash(`+${pay}: a hamper order`); speak("Penny takes the hamper and the envelope of coins, and crosses the order off. \"They'll be thrilled.\"", 5000); } }
     else if (a === "tie") { const hp = packTie(F); if (hp) { sfx("chime"); hearts(2); gainXp(2); flash(`${hp.name} hamper`); speak(`Penny ties a fat red bow on top and writes the tag: "${hp.name}". It's in your backpack.`, 5500); } }
     save(true); ctx(); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { gsPk = null; ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { gsPk = null; ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
   c.querySelectorAll('[data-rec="stop"]').forEach(b => b.onclick = () => { setMusic(false); speak("Needle up. Quiet time.", 2500); ctx(); drawScene(); });
@@ -1849,6 +1867,20 @@ function ferryRide(text, home, then, town){
   const o = document.createElement("div"); o.className = "taxiride trainride ferryride"; o.innerHTML = (town === "saltwick" ? swFerryRideArt(home) : town === "puffin" ? piFerryRideArt(home) : town === "hokkaido" ? hkFerryRideArt(home) : town === "bali" ? blFerryRideArt(home) : ferryRideArt(home)) + `<p>${esc(text)}</p>`; $("map").appendChild(o); sfx("honk");
   setTimeout(() => { o.remove(); then(); }, 6000);   // (a slow crossing: 6s, the CSS .ferryride matches)
 }
+// round 219: the cottages run on the date: parcels come, guests leave (and pay) and arrive
+let letsLast = "";
+function letsTick(){
+  const k = dayKey(); if (letsLast === k + ":" + Math.floor(localHM()/30)) return; letsLast = k + ":" + Math.floor(localHM()/30);
+  if (!F.lets && LT.offerOpen(F, QB.hearts(F, "elena"))) LT.letsState(F);
+  if (F.lets && !F.lets.offerAt && LT.offerOpen(F, QB.hearts(F, "elena"))) { F.lets.offerAt = Date.now(); save(); }
+  if (!LT.ownsAny(F)) return;
+  const ev = LT.settle(F); if (!ev.length) return;
+  ev.forEach(e => { if (e.kind === "left") { flash(`+${e.pay} from ${LET_COTTAGES[e.id].n}`); } });
+  const left = ev.filter(e => e.kind === "left"), arr = ev.filter(e => e.kind === "arrived"), parcels = ev.find(e => e.kind === "parcels");
+  const lines = [...left.map(e => `Guests have left ${LET_COTTAGES[e.id].n} (${"★".repeat(e.stars)}): ${e.pay} coins, and it needs a tidy.`), ...arr.map(e => `New guests at ${LET_COTTAGES[e.id].n} for ${e.nights} night${e.nights === 1 ? "" : "s"}.`), ...(parcels ? [`${parcels.n} parcel${parcels.n === 1 ? "" : "s"} came on the train for the cottages.`] : [])];
+  if (lines.length) setTimeout(() => speak(lines.join(" "), 6500), 1200);
+  save();
+}
 function startTrip(town, by = "train"){
   if (by === "ferry" && TOWNS[town] && TOWNS[town].ferry && TOWNS[town].ferry.dry && rainyOn(dayKey())) return;   // round 216: no island boat in the rain
   const r = buyTrip(F, town, tripPick, localHM(), by); if (!r) return;
@@ -1908,6 +1940,7 @@ let kyotoView = null, ktSt = {};
 let jejuView = null, jjSt = {};
 let loftView = false;   // round 132: the drying loft over the barrel shed (loft.js)
 let cinqueView = null, ctSt = {};
+let letView = null, letSt = {};   // round 219: Elena's cottages: "offer", or a cottage's hall table (lets.js)
 let swView = null, swSt = {}, swCrabT = 0, piView = null, piSt = {}, blView = null, blSt = {}, hkView = null, hkSt = {};   // (round 218: Bali's, bali.js) (round 217: Hokkaido's, hokkaido.js) (round 216: Puffin Isle's, puffin.js)
 let _unusedPi;   // round 215: Saltwick Harbour's panels and activities (saltwick.js)
 let lunchView = null, occView = null, trvSt = null, pntSt = null, mullSt = {};   // round 152: occView "trivia" or "paint" on the terrace (occasions.js)
@@ -2193,7 +2226,7 @@ function setScene(id, at){
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scView = null; scSt.pick = null; scSt.dpick = null; ppView = null;
-    GU.signBook(F); scene = id; cam.snap = true; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; resetNpcs();
+    GU.signBook(F); scene = id; cam.snap = true; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; resetNpcs();
     const p = at || [260, 596];
     hero.x = hero.tx = p[0]; hero.y = hero.ty = p[1]; hero.path = []; chum.x = chum.tx = p[0] - 22; chum.y = chum.ty = p[1] + 2;
     render(true); w.classList.remove("fading");
@@ -2278,6 +2311,7 @@ function arriveSpot(id){
   if (id === "dine") sitAtTable();
   if (scene === "haberdash" && ["habcounter", "bolts", "buttonjar", "habtable"].includes(id)) { habView = true; habSt.tab = id === "buttonjar" ? "buttons" : habSt.tab || "fabric"; sfx("paper", true); if (isHere("ada") && sewOpen()) npcSay("ada", pick(["What are we making?", "Gingham's on the left. Everything else is on the right. Mostly.", "Feel that linen. Go on."])); render(); return; }
   if (scene === "tailor" && ["tailtable", "rail", "sewing", "mirror"].includes(id)) { tailView = true; sfx("paper", true); if (isHere("idris") && sewOpen() && !TL.orderState(F)) npcSay("idris", pick(["Right. What shall we make?", "Stand there. Arms out. Lovely.", "Show me what Ada sold you."])); render(); return; }
+  if (id === "lethall" && LET_COTTAGES[scene]) { letView = scene; letSt = {}; sfx("paper", true); render(); return; }   // round 219: the cottage's hall table
   if (id === "gbook") { guestView = true; sfx("paper", true); render(); return; }
   if (id === "gbed") { const g = GU.guestHere(F); speak(g && isHere(g) && (localHM() >= 22*60 + 30 || localHM() < 7*60) ? `Shh. ${GU.nameOf(g)}'s fast asleep under the quilt.` : g ? `${GU.nameOf(g)}'s bed, made with hospital corners. Their book's on the pillow.` : "Clean sheets, a patchwork quilt and a sprig of lavender on the pillow. All ready for a guest.", 4500); render(); return; }
   if (id === "bedroom") { const m = localHM(), who = {cottage: "Farid and Mei", hanatheo: "Hana and Theo", tomiposy: "Tomi and Posy", linjun: "Lin and Juniper"}[scene] || "They";
@@ -2377,6 +2411,9 @@ function arriveVillageSpot(id){
   if (id === "forage") { const r = forage(F, addInv); if (!r) { speak("You've foraged here today. Come back tomorrow: the woods need time to grow back.", 4000); render(); return; }
     sfx("chime"); gainXp(1); act("cheer"); speak(`${r.line} +${r.n} ${ITEMS[r.id].n.toLowerCase()} in your backpack.`, 5500); mprop("sparkle", hero.x, hero.y - 60, 1600); ; save(); render(); return; }
   if (id === "fishriver" || id === "fishlake" || id === "fishsea" || id === "fishpool" || id === "fishbay") { fishSpot = spotIn(scene); fishSt = {}; fishState(F); hero.dir = scene === "shore" || scene === "bay" ? -1 : 1; sfx("paper", true); render(); return; }
+  // round 219: Elena's cottages: in through the door once it's yours; her offer once you're friends; else her guests
+  if ((id === "bluebell" || id === "figtree") && scene === "hlane" && LT.owns(F, id)) { setScene(id, [260, 560]); setTimeout(() => { const st = LT.staying(F, id); speak(st ? `Guests in this week, so you tiptoe. Everything's as you left it.` : `${LET_COTTAGES[id].n}: yours. ${(F.lets.cottages[id].parcels || []).length ? "There are parcels in the hall." : "The hall table has the catalogue and the guest book."}`, 4500); }, 600); return; }
+  if ((id === "bluebell" || id === "figtree") && scene === "hlane" && LT.offerOpen(F, QB.hearts(F, "elena"))) { letView = "offer"; letSt = {}; sfx("paper", true); render(); return; }
   if ((id === "bluebell" || id === "figtree") && scene === "hlane") { const g = letGuests(dayKey())[id === "bluebell" ? 0 : 1]; speak(`${VILLAGE[id].line}${g && g.length ? ` Staying this week: ${g.map(x => (NPCS.find(n => n.id === x) || {}).name).join(" and ")}.` : ""}`, 5000); render(); return; }
   if (scene === "hfarm" && id === "farmhouse") { hfView = "house"; hfState(F); sfx("paper", true); render(); return; }
   if (scene === "hfarm" && id === "stray") { const g = catchGoat(F); if (!g) { render(); return; } sfx("chime"); act("cheer"); gainXp(1); farmTrust(3); speak(`Got you, ${g.n}! Back in the paddock you go. Latch the gate tonight and nobody gets out.`, 5000); ; save(); drawScene(); render(); return; }
@@ -3342,6 +3379,8 @@ initNpcs({sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyR
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
 initTrips(() => F);
+setLetsHook(day => F && F.lets ? Object.fromEntries(Object.keys(LET_COTTAGES).filter(id => LT.owns(F, id)).map(id => [id, (LT.staying(F, id, day) || {}).guests || null])) : null,
+  day => F && F.lets ? Object.keys(LET_COTTAGES).flatMap(id => { const st = LT.staying(F, id, day); return st && st.from === day ? st.guests : []; }) : []);   // round 219: your cottages' guests (and who arrives today)
 setCloseFriends(() => QB.friendIds(F, QB.TRIP_HEARTS));   // Sunday lunch and Christmas lunch: your closest friends
 setGhTools(() => F.tools || {});
 // Pick up where the player left off (round 105): the same game day, back on the screen they closed the game on (a new day, they

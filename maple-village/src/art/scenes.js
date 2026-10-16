@@ -7,6 +7,8 @@ import { ink, localHM, dayKey, LOC } from "../util.js";
 import { VILLAGE, ROOMS, stationsOf, PET_BED } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
+import { LET_SHELLS, letFurniture, hallTable } from "./lets-art.js";
+import { COTTAGES } from "../data/lets.js";
 import { iconAt } from "./icons.js";
 import { TABLES, SEATS, halfW } from "../data/dining.js";
 import { runArt } from "../game/pets.js";
@@ -309,6 +311,7 @@ export function furn(kind, x, y){
   const W2 = "var(--wood)";
   const legs = (w, h) => `<path d="M${x-w/2+6} ${y} v${h} M${x+w/2-6} ${y} v${h}"/>`;
   if (kind.startsWith("dining:")) { const host = kind.slice(7); return diningChairs(x, y, host) + diningTable(x, y, host); }
+  if (kind === "lethall") return hallTable(x, y);   // round 219: the cottages' hall table
   switch (kind){
     case "desk": return sk(`<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3" style="fill:${W2}"/><rect x="${x-18}" y="${y-50}" width="36" height="20" rx="2" style="fill:#DCE3EE"/><rect x="${x+22}" y="${y-38}" width="16" height="10" rx="1" style="fill:var(--card)"/><circle cx="${x-34}" cy="${y-36}" r="5" style="fill:var(--sky)"/>`,
       `<rect x="${x-52}" y="${y-30}" width="104" height="24" rx="3"/><rect x="${x-18}" y="${y-50}" width="36" height="20" rx="2"/><path d="M${x-22} ${y-30} h44"/><rect x="${x+22}" y="${y-38}" width="16" height="10" rx="1"/><circle cx="${x-34}" cy="${y-36}" r="5"/><path d="M${x-46} ${y-6} v14 M${x+46} ${y-6} v14"/>`);
@@ -754,7 +757,7 @@ export function foreArt(id){
 }
 export function roomArt(id){
   const r = ROOMS[id], st = stationsOf(id);
-  let h = roomShell(id);
+  let h = LET_SHELLS[id] ? LET_SHELLS[id]() + letFurniture(id, (G.lets && G.lets(id)) || {}, COTTAGES[id].slots, (G.letParcels && G.letParcels(id)) || 0) : roomShell(id);   // round 219: Elena's cottages, furnished as you go
   if (id === "market") h += sk(`<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
     `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`) +
     `<g>${[["apple","dumpling","fish","toast"],["tulip","carrot","strawberry","sunflower"]].map((row, r) => row.map((n, i) => iconAt(n, 64 + i*30, 62 + r*38, 26)).join("")).join("")}${[["yarn","ball","brush","crown"],["bath","fort","corn","blueberry"]].map((row, r) => row.map((n, i) => iconAt(n, 374 + i*30, 62 + r*38, 26)).join("")).join("")}</g>`;

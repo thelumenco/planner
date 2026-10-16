@@ -349,6 +349,12 @@ export const ROOMS = {
     ["books","Bookshelf","B","bookcase",null,"Poetry and seed catalogues, mixed up on purpose. Lin says it keeps them both honest.",30],
     ["chairs","Sofa","P","sofa",null,"A squashy sofa with two cushions: Lin's, yellow, embroidered with tomatoes, and Juniper's, pink, embroidered with stars.",34],
     ["table","Tea table","X","teatable",null,"A little table for two, one teapot, and a jar of whatever's flowering. They've been arguing about compost for an hour.",34]]},
+  // round 219: Elena's holiday cottages, once they're yours (game/lets.js): the hall table has the catalogue, the
+  // parcels and the guest book; the furniture is drawn in its places (art/lets-art.js)
+  bluebell: {name:"Bluebell", wall:"#EEF3FA", trim:"#5E7AB0", noBoard:true, pos:{H:[420,540]}, stations:[
+    ["lethall","The hall table","H","lethall",null,"The hall table: the catalogue, the guest book, and any parcels from the train.",30]]},
+  figtree: {name:"Fig Tree", wall:"#FFF3E3", trim:"#8A6A3A", noBoard:true, pos:{H:[420,540]}, stations:[
+    ["lethall","The hall table","H","lethall",null,"The hall table: the catalogue, the guest book, and any parcels from the train.",30]]},
   tomiposy: {name:"Tomi and Posy's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[110,262], K:[432,261], D:[284,262], S:[110,420], X:[340,470], R:[480,340]}, stations:[
     ["bedroom","Bedroom","R","bedroomdoor",null,"Tomi and Posy's room.",0],
     ["games","Games corner","G","gamingtv",null,"Tomi's games. He says he's 'nearly finished' this one. He's been nearly finished for a month.",36],
