@@ -19,7 +19,6 @@ export const puffinsIn = day => PUFFIN_MONTHS.includes(+day.slice(5, 7));
 export const pupsIn = day => PUP_MONTHS.includes(+day.slice(5, 7));
 
 export const PI_TOWN = {
-  soon: true,   // hidden from the ferry and boat menus until its art is in
   n: "Puffin Isle", by: "ferry", fare: 40, free: [], outFrom: 8*60, outTo: 14*60, backTo: 20*60,
   screens: ["pi_lighthouse", "pi_village", "pi_cliffs", "pi_landing"], arrive: ["pi_landing", [330, 540]], station: "pipier", music: "puffin",
   boat: {fuel: 20, max: 7},
