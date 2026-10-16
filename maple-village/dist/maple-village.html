@@ -2315,6 +2315,23 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   </div>
 </main>
 <div class="notebook" id="notebook" hidden role="dialog" aria-modal="true" aria-labelledby="nbTitle"><div class="nbpage" id="nbPage"></div></div>
+<script>
+/* round 230: if the game ever crashes, a small card says what went wrong (to screenshot for Claude) and offers a way
+   back home; never shown otherwise */
+(function(){
+  var shown = false;
+  function card(msg){
+    if (shown) return; shown = true;
+    var d = document.createElement("div"); d.id = "rescue";
+    d.setAttribute("style", "position:fixed;left:16px;right:16px;bottom:24px;z-index:99999;background:#FFFDF6;border:1.5px solid #3b3530;border-radius:14px;padding:14px 16px;font:15px/1.4 system-ui,sans-serif;color:#3b3530;box-shadow:0 6px 20px rgba(0,0,0,.18)");
+    d.innerHTML = '<b>Something went wrong in Honeybrook.</b><div style="margin:6px 0 10px;font-size:13px;opacity:.8;word-break:break-word"></div><button style="font:inherit;padding:8px 14px;border-radius:10px;border:1.5px solid #3b3530;background:#F4C7CF">Take me home</button> <span style="font-size:13px;opacity:.7">A screenshot of this helps fix it.</span>';
+    d.children[1].textContent = String(msg).slice(0, 400);
+    d.querySelector("button").onclick = function(){ try { sessionStorage.setItem("fox.home", "1"); } catch(e) {} location.reload(); };
+    (document.body || document.documentElement).appendChild(d);
+  }
+  window.addEventListener("error", function(e){ if (!e.error || /ResizeObserver|^Script error/i.test(e.message || "")) return; card((e.message || "error") + (e.error && e.error.stack ? " | " + String(e.error.stack).split("\n").slice(1, 3).join(" ").trim() : "")); });
+})();
+</script>
 
 <script>(() => {
   // src/util.js
@@ -31191,6 +31208,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       c["ground" + g16] = null;
       h3.pots++;
     }
+    const coming = (k) => ["", "2"].reduce((n, g16) => n + (c["ground" + g16] === k || c["grind" + g16] && c["grind" + g16].kind === k ? POT : 0), 0);
+    const want = Object.keys(KINDS2).some((k) => c.keep[k] - c.res[k] - coming(k) > 0 || c.bars[k] + c.choc[k] + coming(k) < WALL);
+    if (!want) {
+      for (const k of Object.keys(KINDS2)) while (c.choc[k] >= MOULD && c.bars[k] < WALL) {
+        c.choc[k] -= MOULD;
+        c.bars[k] += MOULD;
+        c.made += MOULD;
+        h3.bars += MOULD;
+      }
+      return;
+    }
     let g15;
     while (c.roasted > 0 && (g15 = freeSlot2(c)) !== void 0) {
       const kind = nextKind(c);
@@ -46054,7 +46082,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var save2 = (redraw) => {
     clearSlots();
-    F.where = { scene, x: Math.round(mel.x), y: Math.round(mel.y), day: dayKey() };
+    if (Number.isFinite(mel.x) && Number.isFinite(mel.y)) F.where = { scene, x: Math.round(mel.x), y: Math.round(mel.y), day: dayKey() };
     noteHistory();
     persist("today");
     persist("fox");
@@ -53811,6 +53839,7 @@ ${SIGNOFF[t2.who] || ""}`;
     mel.force = true;
   }
   function walkTo(x, y) {
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
     const b = bounds(), to = [clamp(x, b[0], b[2]), clamp(y, b[1], b[3])];
     const pts = outside() || townRoom(scene) ? findPath(scene, [mel.x, mel.y], to, b) : [to];
     const first = pts.shift();
@@ -56671,6 +56700,11 @@ ${SIGNOFF[t2.who] || ""}`;
   }
   setTimeout(vineTick, 3e3);
   if (window.__mapleDevStub) window.__mapleScene = (id) => setScene(id, OUTDOOR.includes(id) ? [260, 330] : INNER[id] ? INNER[id].arrive : [260, 596]);
+  if (window.__mapleDevStub) window.__mapleBreak = () => {
+    mel.x = mel.tx = NaN;
+    mel.y = mel.ty = NaN;
+    cam.x = NaN;
+  };
   if (window.__mapleDevStub) window.__mapleOrder = (shop = "The Scoop Shack") => {
     S2.orderAt = 0;
     scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0);
@@ -57397,7 +57431,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     cam.canFollow = cw / ch < W / HH - 5e-3;
     if (cam.canFollow && !cam.fit) {
       const fx = scene === "kidroom" ? evan.x : mel.x;
-      const s = ch / HH, vw = cw / s, tx = clamp(fx - vw / 2, 0, W - vw);
+      const s = ch / HH, vw = cw / s, tx = Number.isFinite(fx) ? clamp(fx - vw / 2, 0, W - vw) : 0;
+      if (!Number.isFinite(cam.x)) cam.snap = true;
       cam.x = cam.snap ? tx : cam.x + (tx - cam.x) * Math.min(1, dt * 3.2);
       cam.s = s;
       cam.ox = -cam.x * s;
@@ -57470,6 +57505,28 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     el.style.top = (below ? (ey + 8) * sc + cam.oy + 10 : py - 10) + "px";
   }
   function unstick() {
+    const ok = (v) => Number.isFinite(v);
+    if (!ok(mel.x) || !ok(mel.y) || !ok(mel.tx) || !ok(mel.ty) || !ok(cam.x)) {
+      const b2 = bounds(), a2 = INNER[scene] && INNER[scene].arrive || [(b2[0] + b2[2]) / 2, clamp(560, b2[1], b2[3])];
+      if (!ok(mel.x) || !ok(mel.y)) {
+        mel.x = a2[0];
+        mel.y = a2[1];
+        maple3.x = maple3.tx = a2[0] - 22;
+        maple3.y = maple3.ty = a2[1] + 2;
+      }
+      mel.tx = mel.x;
+      mel.ty = mel.y;
+      mel.path = [];
+      route2 = [];
+      cam.x = 0;
+      cam.snap = true;
+      return;
+    }
+    if (!ok(evan.x) || !ok(evan.y)) {
+      evan.x = evan.tx = mel.x + 24;
+      evan.y = evan.ty = mel.y + 6;
+      evan.path = null;
+    }
     if (sup || mel.sitting || typeof paddling !== "undefined" && paddling || !INNER[scene] || !INNER[scene].arrive || scene === "kidroom") return;
     const b = bounds(), out = mel.x < b[0] - 30 || mel.x > b[2] + 30 || mel.y < b[1] - 40 || mel.y > b[3] + 30;
     if (!out) return;
@@ -57797,7 +57854,13 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
   initTrips(() => F);
   setGhTools(() => F.tools || {});
   {
-    const w = !globalThis.__mapleNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F));
+    let home2 = false;
+    try {
+      home2 = sessionStorage.getItem("fox.home") === "1";
+      sessionStorage.removeItem("fox.home");
+    } catch {
+    }
+    const w = !home2 && !globalThis.__mapleNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F)) && Number.isFinite(w.x) && Number.isFinite(w.y);
     if (ok) {
       scene = w.scene;
       mel.x = mel.tx = w.x;

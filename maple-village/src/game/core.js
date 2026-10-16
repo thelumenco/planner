@@ -4414,7 +4414,8 @@ initTrips(() => F);
 setGhTools(() => F.tools || {});
 // Pick up where Mel left off (round 105): the same game day, back on the screen she closed the game on (a new day, she
 // wakes up at home as usual). F.where is kept by save().
-{ const w = !globalThis.__mapleNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F)) && Number.isFinite(w.x) && Number.isFinite(w.y);
+{ let home = false; try { home = sessionStorage.getItem("fox.home") === "1"; sessionStorage.removeItem("fox.home"); } catch {}   // round 230: "Take me home" on the rescue card
+  const w = !home && !globalThis.__mapleNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F)) && Number.isFinite(w.x) && Number.isFinite(w.y);
   if (ok) { scene = w.scene; mel.x = mel.tx = w.x; mel.y = mel.ty = w.y; mel.path = []; maple.x = maple.tx = w.x - 22; maple.y = maple.ty = w.y + 2; } }
 render(true);
 if (F.gift) setTimeout(() => speak("A welcome gift! Seeds are in your backpack 🌷", 5000), 1200);
