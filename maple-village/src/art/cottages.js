@@ -1,7 +1,7 @@
-// The holiday cottages (round 236): Fig Tree and Bluebell, which Mel buys from Elena and does up for guests. Three
+// The holiday cottages (round 236): Fig Tree and Bluebell, which Mel buys from Elena and does up for guests. Four
 // screens each: downstairs (the sitting room on the left, the kitchen on the right, the front door at the bottom and
-// the wooden stairs up, like the mill's), upstairs (the bedroom, and the bath behind a half wall on the left) and the
-// back garden (a wall with climbing roses, grass, a stepping-stone path and the hot tub). Furniture comes in three
+// the wooden stairs up, like the mill's), upstairs (the bedroom, with the bathroom door in its left wall), the bathroom (tiled
+// to half height, the bath under the window, basin and towel rail) and the back garden (a wall with climbing roses, grass, a stepping-stone path and the hot tub). Furniture comes in three
 // tiers in one of six looks (STYLES, src/data/cottages.js); tier 0 is a faint dashed footprint Mel can tap to buy.
 // Mid-changeover the jobs still to do show: a rumpled bed, towels on the floor, mugs on the tables, leaves in the tub.
 // Bluebell has blue shutters and a blue door; Fig Tree has its fig tree in the garden corner.
@@ -42,8 +42,8 @@ const books = (x0, x1, base, seed, hMax = 20) => { let s = "", x = x0, k = 0; co
 
 /* ---------- the spot wrapper, and the faint footprint of a piece not bought yet ---------- */
 // FOOT: the footprint [w, h] above the front edge, used for the dashed outline and the hover
-const FOOT = {sofa: [150, 68], armchair: [66, 64], coffee: [90, 30], rug: [176, 70], fireplace: [96, 56], lamp: [40, 90], kitchen: [118, 48], dining: [112, 40], bookshelf: [92, 56],
-  bed: [140, 120], bedside: [214, 36], wardrobe: [64, 100], bath: [100, 46], windowseat: [86, 26], bedrug: [168, 62], vanity: [92, 56],
+const FOOT = {basin: [70, 40], bathrug: [96, 34], sofa: [150, 68], armchair: [66, 64], coffee: [90, 30], rug: [176, 70], fireplace: [96, 56], lamp: [40, 90], kitchen: [118, 48], dining: [112, 40], bookshelf: [92, 56],
+  bed: [140, 120], bedside: [214, 36], wardrobe: [64, 100], bath: [172, 70], windowseat: [86, 26], bedrug: [168, 62], vanity: [92, 56],
   hottub: [136, 72], patio: [110, 44], festoon: [400, 40], beds: [280, 30], hammock: [100, 50], firepit: [70, 34]};
 // where the "buy one" tape goes, when it would sit badly in the middle of the footprint
 const GHOST_LAB = {festoon: [260, 118], beds: [260, 230], windowseat: [396, 160], bedside: [270, 300], lamp: [56, 344]};
@@ -122,7 +122,7 @@ const nightWash = () => `<rect width="520" height="640" fill="#2E3470" opacity="
 const glowDefs = `<defs><radialGradient id="coGlow"><stop offset="0" stop-color="#FFD98A" stop-opacity=".6"/><stop offset=".45" stop-color="#FFC66B" stop-opacity=".22"/><stop offset="1" stop-color="#FFC66B" stop-opacity="0"/></radialGradient></defs>`;
 
 /* ---------- deliveries waiting: wrapped crates and parcels with string ---------- */
-const SLOTS = {down: [[334, 612], [372, 612], [352, 586], [316, 562], [356, 560]], up: [[172, 612], [210, 612], [190, 586], [228, 586], [154, 586]], garden: [[330, 584], [368, 584], [348, 560], [386, 560]]};
+const SLOTS = {down: [[334, 612], [372, 612], [352, 586], [316, 562], [356, 560]], up: [[172, 612], [210, 612], [190, 586], [228, 586], [154, 586]], bath: [[170, 612], [134, 612], [152, 586], [350, 612], [388, 612]], garden: [[330, 584], [368, 584], [348, 560], [386, 560]]};
 function crates(){
   const here = (ST.crates || []).filter(id => { const r = (PIECES[id] || ACCESSORIES[id] || {}).room; return r ? r === ST.floor : ST.floor === "down"; });
   return g(here.slice(0, SLOTS[ST.floor].length).map((id, i) => { const [x, y] = SLOTS[ST.floor][i];
@@ -340,23 +340,6 @@ function downArt(){
 
 /* ====================================================================================================== */
 /* ---------- upstairs ---------- */
-function bathroomShell(){   // tiles on the bathroom floor and wall, and the half wall that screens it from the bed
-  let s = "";
-  for (let r = 0; r < 6; r++) for (let k = 0; k < 6; k++) s += `<rect x="${k*24}" y="${200 + r*24}" width="24" height="24" style="fill:${(r + k) % 2 ? CREAM : lt(S.wall2, .1)};stroke:${dk(S.wall2, .15)}" stroke-width=".8"/>`;
-  for (let r = 0; r < 4; r++) for (let k = 0; k < 12; k++) s += `<rect x="${k*12 + (r % 2)*6 - 6}" y="${134 + r*13}" width="12" height="13" style="fill:${k % 5 === 2 ? lt(S.accent, .55) : CREAM};stroke:${dk(S.wall2, .1)}" stroke-width=".6"/>`;
-  return g(s);
-}
-const halfWall = () => g(D(`<path d="M140 166 h12 v140 h-12z" style="fill:${lt(S.wall2, .25)}"/><path d="M152 166 l4 3 v171 l-4 -2z" style="fill:${dk(S.wall2, .15)}"/><rect x="140" y="306" width="12" height="34" style="fill:${S.wall2}"/>`, `<path d="M140 338 h12" stroke="${INK}"/>`));
-function bath(t){
-  if (t === 1) return D(`<rect x="50" y="262" width="84" height="32" rx="2" style="fill:${CREAM}"/><rect x="50" y="292" width="84" height="8" style="fill:${lt(S.wall2, .05)}"/><path d="M56 164 q36 -10 76 0 l-2 4 q-6 60 4 120 h-18 q-10 -60 -4 -120z" style="fill:${S.fabric2}"/>`,
-    `<path d="M60 268 h64" stroke="#C9D4DA" stroke-width="1"/><circle cx="92" cy="278" r="3" fill="#9AA0A6"/><path d="M92 136 v22 q0 4 -4 6" stroke="${S.metal}" stroke-width="2" fill="none"/><ellipse cx="86" cy="166" rx="6" ry="2.4" fill="${S.metal}"/>${[0, 1, 2].map(k => `<path d="M${118 + k*4} 170 q-4 60 4 118" stroke="${dk(S.fabric2, .15)}" stroke-width="1" fill="none"/>`).join("")}<path d="M54 162 h80" stroke="${S.metal}" stroke-width="2"/>`);
-  const copper = t === 3, body = copper ? "#C9824A" : CREAM;
-  if (copper) glow(140, 236, 26);
-  return (copper ? D(`<rect x="134" y="246" width="20" height="5" style="fill:${S.wood}"/>`, `<path d="M137 251 v14 M151 251 v14" stroke="${dk(S.wood, .3)}" stroke-width="2"/><rect x="138" y="238" width="6" height="8" fill="${CREAM}"/>${flame(141, 238, .4)}<path d="M146 246 l3 -8 h4 l2 8z" fill="#6E9A5A"/>`) : "")
-    + D(`<path d="M40 256 h104 q2 30 -18 38 h-68 q-20 -8 -18 -38z" style="fill:${body}"/><ellipse cx="92" cy="256" rx="52" ry="8" style="fill:${copper ? "#E6A86A" : CREAM}"/><ellipse cx="92" cy="257" rx="46" ry="5.4" style="fill:#BFE0EA"/>`,
-      `<path d="M56 292 l-4 8 h6 M128 292 l4 8 h-6" stroke="${copper ? INK : S.metal}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M88 250 v-8 h8 v8 M92 242 v-4" stroke="${S.metal}" stroke-width="2" fill="none"/>`
-      + (copper ? `<path d="M50 264 q4 20 18 28" stroke="#F2C08A" stroke-width="3" fill="none" opacity=".8"/><rect x="72" y="250" width="40" height="5" rx="1" fill="${S.wood}" stroke="${INK}" stroke-width=".6"/><rect x="78" y="246" width="10" height="4" fill="${S.fabric}"/>` : `<path d="M52 266 q6 18 16 24" stroke="#FFFFFF" stroke-width="2" fill="none"/>`));
-}
 function bed(t){
   const rump = undone("beds"), duv = t === 1 ? S.fabric2 : t === 2 ? S.fabric : lt(S.fabric, .15), quilt = has("linen");
   let head;
@@ -442,34 +425,109 @@ function stairsDown(){   // the top of the stairs, bottom left, going down (like
     sk(`<rect x="36" y="520" width="90" height="96" style="fill:#7A5638"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${40 + i*4}" y="${528 + i*17}" width="${82 - i*8}" height="12" style="fill:#A8754F"/>`).join("")}<path d="M130 520 v96 M126 520 h8" style="stroke:#5A3A2A" stroke-width="3"/>`, `<rect x="36" y="520" width="90" height="96"/>`)
     + lab(80, 628, "Downstairs", "#F3E1A0", 9));
 }
-function accUp(){
-  let s = "";
-  if (has("mirror")) s += g(D(`<circle cx="330" cy="96" r="14" style="fill:#DDEEF2"/>`, `<circle cx="330" cy="96" r="14" fill="none" stroke="${S.metal}" stroke-width="3"/><path d="M323 92 l9 -8" stroke="#FFFFFF" stroke-width="2"/><path d="M330 82 l-6 -12 h12z" fill="none" stroke="${INK}" stroke-width=".6"/>`));
-  if (has("towels")) s += g(D(`<path d="M48 236 L52 166 M72 236 L68 166" style="stroke:${S.wood}" stroke-width="3"/><rect x="48" y="176" width="24" height="22" rx="2" style="fill:${S.fabric2}"/><rect x="49" y="206" width="22" height="18" rx="2" style="fill:${CREAM}"/>`, `<path d="M50 180 h20 M50 220 h20" stroke="${S.accent}" stroke-width="1.2"/>`));
-  if (has("robes")) s += g(D(`<path d="M158 196 l8 -4 l8 4 l3 40 h-22z" style="fill:${CREAM}"/><path d="M172 198 l8 -4 l8 4 l3 40 h-22z" style="fill:${S.fabric2}"/>`, `<circle cx="166" cy="192" r="1.6" fill="${S.metal}"/><circle cx="180" cy="194" r="1.6" fill="${S.metal}"/><path d="M160 214 h18 M174 216 h18" stroke="${S.accent}" stroke-width="1.2"/>`));
-  if (has("plant")) s += g(D(`<path d="M456 516 h28 l-3 24 h-22z" style="fill:#C8643B"/>`, [[-22, -40, -30], [18, -46, 24], [-4, -62, -4], [-26, -18, -50], [24, -22, 50]].map(([dx, dy, a]) => `<path d="M470 516 Q${470 + dx*.4} ${516 + dy*.5} ${470 + dx} ${516 + dy}" stroke="#4E7A3E" stroke-width="1.6" fill="none"/><ellipse cx="${470 + dx}" cy="${516 + dy}" rx="13" ry="8" fill="${(dx + dy) % 3 ? "#5E9A4A" : "#6EAA5A"}" stroke="${INK}" stroke-width=".7" transform="rotate(${a} ${470 + dx} ${516 + dy})"/>`).join("") + `<path d="M456 520 h28" stroke="#8E4A2A" stroke-width="2"/>`));
-  return s;
+/* ---------- the bedroom's left wall, and the door through to the bathroom ---------- */
+function bathDoor(){
+  const col = ST.c === "bluebell" ? BLUE : lt(S.wood, .1);
+  return otherSpot("bathroom", "Through the door to the bathroom", hovE(56, 344, 32, 14),
+    D(`<path d="M8 236 L48 254 V344 L8 362z" style="fill:${lt(S.wall2, .3)}"/><path d="M12 242 L44 257 V342 L12 356z" style="fill:${col}"/><path d="M14 360 l40 -14 h20 l-36 18z" style="fill:${S.fabric2}"/>`,
+      `<path d="M17 252 L39 262 V292 L17 284z M17 296 L39 302 V334 L17 344z" fill="none" stroke="${dk(col, .25)}" stroke-width="1"/><circle cx="38" cy="304" r="2" fill="${S.metal}"/><ellipse cx="28" cy="270" rx="7" ry="4" fill="${CREAM}" stroke="${INK}" stroke-width=".5" transform="rotate(22 28 270)"/>`)
+    + lab(70, 232, "Bathroom", "#DDEBF2", 9));
+}
+// a little rush chair by the bathroom door, with a folded throw
+const doorChair = () => g(D(`<rect x="94" y="276" width="26" height="7" rx="2" style="fill:#D9B866"/>`, `<path d="M96 300 v-36 M118 300 v-36 M96 268 h22 M96 274 h22" stroke="${dk(S.wood, .2)}" stroke-width="2.6"/><path d="M98 283 l-2 17 M116 283 l2 17" stroke="${dk(S.wood, .2)}" stroke-width="2.4"/><rect x="99" y="270" width="16" height="8" rx="2" fill="${S.fabric}" stroke="${INK}" stroke-width=".5"/>`));
+function accUp(id){
+  if (!has(id)) return "";
+  if (id === "mirror") return g(D(`<circle cx="330" cy="96" r="14" style="fill:#DDEEF2"/>`, `<circle cx="330" cy="96" r="14" fill="none" stroke="${S.metal}" stroke-width="3"/><path d="M323 92 l9 -8" stroke="#FFFFFF" stroke-width="2"/><path d="M330 82 l-6 -12 h12z" fill="none" stroke="${INK}" stroke-width=".6"/>`));
+  if (id === "plant") return g(D(`<path d="M456 516 h28 l-3 24 h-22z" style="fill:#C8643B"/>`, [[-22, -40, -30], [18, -46, 24], [-4, -62, -4], [-26, -18, -50], [24, -22, 50]].map(([dx, dy, a]) => `<path d="M470 516 Q${470 + dx*.4} ${516 + dy*.5} ${470 + dx} ${516 + dy}" stroke="#4E7A3E" stroke-width="1.6" fill="none"/><ellipse cx="${470 + dx}" cy="${516 + dy}" rx="13" ry="8" fill="${(dx + dy) % 3 ? "#5E9A4A" : "#6EAA5A"}" stroke="${INK}" stroke-width=".7" transform="rotate(${a} ${470 + dx} ${516 + dy})"/>`).join("") + `<path d="M456 520 h28" stroke="#8E4A2A" stroke-width="2"/>`));
+  return "";
 }
 function livedUp(){
   let s = "";
   if (ST.occupied) s += g(D(`<ellipse cx="222" cy="352" rx="5" ry="9" style="fill:${S.fabric}"/><ellipse cx="236" cy="354" rx="5" ry="9" style="fill:${S.fabric}"/>`, `<path d="M218 346 q4 -3 8 0 M232 348 q4 -3 8 0" stroke="${CREAM}" stroke-width="2.4" fill="none"/>`));
   if (undone("beds")) s += g(D(`<path d="M376 342 q-4 -18 12 -22 q10 -10 22 -2 q14 -2 16 12 q6 10 -4 14 q-20 4 -46 -2z" style="fill:${CREAM}"/><path d="M386 336 q8 -10 18 -4 q8 -2 10 6 q-12 4 -28 -2z" style="fill:${S.fabric2}"/>`, `<path d="M384 330 q10 4 18 -2 M396 322 q4 6 12 4" stroke="#D8D0C4" stroke-width="1" fill="none"/>`));
-  if (undone("bath")) {
-    if (tier("bath") > 1) s += g(D(`<path d="M108 252 h20 l2 26 q-8 6 -12 0 q-4 6 -10 0z" style="fill:${S.fabric2}"/>`, `<path d="M110 270 h18" stroke="${S.accent}" stroke-width="1.2"/>`));
-    s += g(D(`<path d="M40 328 q8 -10 24 -6 q12 0 14 8 q-2 8 -18 8 q-18 0 -20 -10z" style="fill:${CREAM}"/><path d="M104 334 q6 -12 22 -8 q8 4 6 10 q-14 6 -28 -2z" style="fill:${S.fabric2}"/>`, `<path d="M50 330 q10 2 20 0" stroke="#D8D0C4" stroke-width="1" fill="none"/><path d="M108 332 h18" stroke="${S.accent}" stroke-width="1"/>`));
-  }
   return s;
 }
 function upArt(){
-  return floorArt() + wallArt() + bathroomShell() + windowArt(52, 44, 76, 72, {curtains: false, seed: 4}) + seatRecess()
-    + upAccBack() + pieceSpot("bath", bath) + halfWall() + upAccRobes() + pieceSpot("windowseat", windowseat) + pieceSpot("wardrobe", wardrobe)
-    + pieceSpot("bedside", bedside) + pieceSpot("bed", bed) + upAccMirror() + pieceSpot("bedrug", bedrug) + pieceSpot("vanity", vanity) + upAccPlant()
-    + livedUp() + stairsDown() + crates();
+  return floorArt() + wallArt() + windowArt(52, 44, 76, 72, {seed: 4}) + seatRecess() + sideWall() + bathDoor() + doorChair()
+    + pieceSpot("windowseat", windowseat) + pieceSpot("wardrobe", wardrobe) + pieceSpot("bedside", bedside) + pieceSpot("bed", bed) + accUp("mirror")
+    + pieceSpot("bedrug", bedrug) + pieceSpot("vanity", vanity) + accUp("plant") + livedUp() + stairsDown() + crates();
 }
-// the accessories upstairs, split so each sits at the right depth
-const upAccBack = () => { const keep = ACC_UP("towels"); return keep; };
-const upAccRobes = () => ACC_UP("robes"), upAccMirror = () => ACC_UP("mirror"), upAccPlant = () => ACC_UP("plant");
-function ACC_UP(id){ const save = ST.acc; ST.acc = {[id]: has(id)}; const s = accUp(); ST.acc = save; return s; }
+
+/* ====================================================================================================== */
+/* ---------- the bathroom (round 237): its own room, through the door off the bedroom ---------- */
+function bathShell(){
+  let s = "";
+  // a checked tile floor in cream and the style's soft wall colour
+  s += `<rect y="200" width="520" height="440" style="fill:${CREAM}"/>`;
+  for (let r = 0; 200 + r*32 < 640; r++) for (let k = 0; k < 17; k++) s += `<rect x="${k*32}" y="${200 + r*32}" width="32" height="32" style="fill:${(r + k) % 2 ? CREAM : mix(S.wall2, CREAM, .15)};stroke:${dk(S.wall2, .12)}" stroke-width=".8"/>`;
+  s += `<rect width="520" height="200" style="fill:${S.wall}"/>`;
+  // tiles to half height: little brick-laid tiles, a few in the accent, a border along the top
+  for (let r = 0; r < 7; r++) for (let k = 0; k < 28; k++) { const x = k*20 - (r % 2)*10, c = (k*7 + r*3) % 9 === 0 ? lt(S.accent, .35) : (k + r) % 5 === 0 ? lt(S.fabric2, .2) : CREAM;
+    s += `<rect x="${x}" y="${96 + r*13}" width="20" height="13" style="fill:${c};stroke:${dk(S.wall2, .15)}" stroke-width=".6"/>`; }
+  s += `<rect y="90" width="520" height="7" style="fill:${S.accent}"/><path d="M0 90 H520 M0 97 H520" stroke="${dk(S.accent, .3)}" stroke-width=".8"/>`;
+  s += `<rect width="520" height="16" style="fill:${dk(S.wood, .4)}"/><path d="M0 16 H520" style="stroke:${INK}" stroke-width="1.2"/>${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<rect x="${k*72 + 12}" y="14" width="14" height="10" rx="1" style="fill:${dk(S.wood, .5)}"/>`).join("")}`;
+  s += `<rect y="187" width="520" height="13" style="fill:${S.accent}" opacity=".55"/><path d="M0 200 H520" style="stroke:${INK}" stroke-width="1.4"/>`;
+  return g(s);
+}
+function bathTub(t){
+  if (t === 1) return D(`<rect x="250" y="290" width="100" height="32" rx="2" style="fill:${CREAM}"/><rect x="250" y="320" width="100" height="10" style="fill:${lt(S.wall2, .05)}"/><path d="M252 166 q48 -10 96 0 l-2 4 q-8 60 4 118 h-20 q-10 -60 -4 -118z" style="fill:${S.fabric2}"/>`,
+    `<path d="M262 298 h76" stroke="#C9D4DA" stroke-width="1"/><circle cx="300" cy="308" r="3" fill="#9AA0A6"/><path d="M286 196 v-50 q0 -6 6 -6 h8" stroke="${S.metal}" stroke-width="2.4" fill="none"/><ellipse cx="302" cy="142" rx="7" ry="2.6" fill="${S.metal}"/><path d="M250 164 h100" stroke="${S.metal}" stroke-width="2"/>${[0, 1, 2].map(k => `<path d="M${330 + k*5} 172 q-4 60 4 116" stroke="${dk(S.fabric2, .15)}" stroke-width="1" fill="none"/>`).join("")}`);
+  const copper = t === 3, body = copper ? "#C9824A" : CREAM;
+  if (copper) glow(392, 250, 30);
+  return (copper ? D(`<rect x="384" y="258" width="22" height="5" style="fill:${S.wood}"/>`, `<path d="M387 263 v28 M403 263 v28" stroke="${dk(S.wood, .3)}" stroke-width="2"/><rect x="389" y="250" width="7" height="9" fill="${CREAM}"/>${flame(392.5, 250, .45)}<path d="M398 258 l3 -9 h4 l2 9z" fill="#6E9A5A"/>`) : "")
+    + D(`<path d="M214 264 h172 q4 46 -28 58 h-116 q-32 -12 -28 -58z" style="fill:${body}"/><ellipse cx="300" cy="264" rx="86" ry="12" style="fill:${copper ? "#E6A86A" : CREAM}"/><ellipse cx="300" cy="265" rx="78" ry="8" style="fill:#BFE0EA"/>`,
+      `<path d="M238 318 l-6 12 h8 M362 318 l6 12 h-8" stroke="${copper ? INK : S.metal}" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M294 256 v-12 h12 v12 M300 244 v-6" stroke="${S.metal}" stroke-width="2.4" fill="none"/><ellipse cx="270" cy="263" rx="20" ry="2" fill="#FFFFFF" opacity=".5"/>`
+      + (copper ? `<path d="M226 276 q8 30 30 42" stroke="#F2C08A" stroke-width="4" fill="none" opacity=".8"/><rect x="276" y="258" width="48" height="6" rx="1" fill="${S.wood}" stroke="${INK}" stroke-width=".6"/><rect x="284" y="253" width="12" height="5" fill="${S.fabric}"/><rect x="304" y="250" width="6" height="8" fill="${CREAM}"/>` : `<path d="M228 278 q8 26 24 36" stroke="#FFFFFF" stroke-width="2.4" fill="none"/>`));
+}
+function basin(t){
+  const mirror = (x, w, h) => `<rect x="${x - w/2}" y="${120}" width="${w}" height="${h}" rx="${w/2}" style="fill:#DDEEF2"/>`;
+  if (t === 1) return D(`<path d="M96 228 h48 q0 14 -24 16 q-24 -2 -24 -16z" style="fill:${CREAM}"/><rect x="114" y="242" width="12" height="20" style="fill:${CREAM}"/>`, `<ellipse cx="120" cy="229" rx="20" ry="3" fill="#DDEEF2"/><path d="M120 226 v-8 q0 -3 4 -3" stroke="${S.metal}" stroke-width="2" fill="none"/>`);
+  if (t === 2) return D(mirror(120, 40, 56) + `<rect x="82" y="226" width="76" height="8" rx="1" style="fill:${lt(S.wood, .1)}"/><rect x="86" y="234" width="68" height="14" style="fill:${S.wood}"/><path d="M102 226 h36 q0 10 -18 11 q-18 -1 -18 -11z" style="fill:${CREAM}"/>`,
+    `<rect x="${100}" y="120" width="40" height="56" rx="20" fill="none" stroke="${S.wood}" stroke-width="3"/><path d="M110 150 l14 -18" stroke="#FFFFFF" stroke-width="2.4"/><path d="M90 248 v14 M150 248 v14" stroke="${dk(S.wood, .25)}" stroke-width="3"/><path d="M120 226 v-8 q0 -3 4 -3" stroke="${S.metal}" stroke-width="2" fill="none"/><path d="M90 241 h60" stroke="${dk(S.wood, .25)}" stroke-width="1"/>`);
+  return D(mirror(88, 32, 50) + mirror(152, 32, 50) + `<rect x="60" y="224" width="120" height="10" rx="1" style="fill:#F2EEE8"/><rect x="64" y="234" width="112" height="28" style="fill:${mix(S.accent, "#FFFFFF", .4)}"/>`,
+    `<rect x="72" y="120" width="32" height="50" rx="16" fill="none" stroke="${S.metal}" stroke-width="2.6"/><rect x="136" y="120" width="32" height="50" rx="16" fill="none" stroke="${S.metal}" stroke-width="2.6"/><path d="M60 228 q30 -3 60 1 q30 3 60 -2" stroke="#C9C0B8" stroke-width=".8" fill="none"/>${[88, 152].map(x => `<ellipse cx="${x}" cy="228" rx="13" ry="2.4" fill="#DDEEF2" stroke="${INK}" stroke-width=".5"/><path d="M${x} 225 v-7 q0 -3 4 -3" stroke="${S.metal}" stroke-width="2" fill="none"/><path d="M${x - 8} 144 l10 -14" stroke="#FFFFFF" stroke-width="2"/>`).join("")}<path d="M120 236 v24" stroke="${dk(S.accent, .2)}" stroke-width="1"/><circle cx="114" cy="248" r="1.6" fill="${S.metal}"/><circle cx="126" cy="248" r="1.6" fill="${S.metal}"/>`);
+}
+function bathrug(t){
+  if (t === 1) return D(`<rect x="262" y="440" width="76" height="30" rx="4" style="fill:${S.fabric2}"/>`, `<rect x="268" y="445" width="64" height="20" rx="2" fill="none" stroke="${S.accent}" stroke-width="1.4" stroke-dasharray="4 3"/>`);
+  if (t === 2) return D(`<rect x="246" y="438" width="92" height="32" rx="6" style="fill:${S.fabric2}"/><ellipse cx="364" cy="446" rx="14" ry="4" style="fill:${S.wood}"/>`, `${[0, 1, 2].map(k => `<path d="M252 ${446 + k*8} h80" stroke="${S.accent}" stroke-width="1.6"/>`).join("")}<path d="M354 449 l-3 21 M374 449 l3 21" stroke="${dk(S.wood, .25)}" stroke-width="2.6"/><rect x="358" y="436" width="12" height="7" rx="2" fill="${S.fabric}" stroke="${INK}" stroke-width=".5"/>`);
+  return D(`<path d="M232 452 q-6 -22 30 -24 q38 -6 76 2 q30 4 26 24 q-2 18 -40 18 h-60 q-30 -2 -32 -20z" style="fill:${lt(S.fabric2, .45)}"/><rect x="374" y="412" width="30" height="10" rx="3" style="fill:${S.fabric}"/>`,
+    Array.from({length: 18}, (_, k) => `<path d="M${f1(240 + R(k)*120)} ${f1(436 + R(k + 2)*28)} q3 -3 6 0" stroke="#D8D0C0" stroke-width="1" fill="none"/>`).join("") + `<path d="M376 412 v-24 q14 -6 26 0 v24" fill="none" stroke="${dk(S.wood, .2)}" stroke-width="2.6"/><path d="M378 422 l-2 16 M400 422 l2 16" stroke="${dk(S.wood, .2)}" stroke-width="2.6"/>`);
+}
+function towelRail(){   // the towel rail on the right, always there; the fluffy towels are an accessory
+  const towels = has("towels") ? `<rect x="414" y="262" width="22" height="40" rx="3" style="fill:${S.fabric2}"/><rect x="440" y="262" width="22" height="36" rx="3" style="fill:${CREAM}"/>` : "";
+  const det = has("towels") ? `<path d="M414 292 h22 M440 290 h22" stroke="${S.accent}" stroke-width="1.6"/><rect x="420" y="312" width="40" height="8" rx="3" fill="${S.fabric}" stroke="${INK}" stroke-width=".6"/><rect x="422" y="306" width="36" height="7" rx="3" fill="${CREAM}" stroke="${INK}" stroke-width=".6"/>` : `<path d="M422 262 v18 h12 v-18" fill="${CREAM}" stroke="${INK}" stroke-width=".6"/>`;
+  return g(sk(`<path d="M408 330 V252 M468 330 V252" style="stroke:${S.metal}" stroke-width="4"/><path d="M406 258 h64 M408 300 h60" style="stroke:${S.metal}" stroke-width="3"/>`, `<path d="M404 330 h8 M464 330 h8"/>`) + D(towels, det));
+}
+function accBath(id){
+  if (!has(id)) return "";
+  if (id === "robes") return g(D(`<path d="M424 166 l10 -5 l10 5 l4 64 h-28z" style="fill:${CREAM}"/><path d="M450 168 l10 -5 l10 5 l4 64 h-28z" style="fill:${S.fabric2}"/><rect x="420" y="156" width="56" height="6" rx="2" style="fill:${S.wood}"/>`, `<circle cx="434" cy="161" r="1.8" fill="${S.metal}"/><circle cx="460" cy="163" r="1.8" fill="${S.metal}"/><path d="M426 200 h20 M452 202 h20" stroke="${S.accent}" stroke-width="1.6"/><path d="M434 166 v40 M460 168 v40" stroke="#D8D0C4" stroke-width="1"/>`));
+  if (id === "soaps") return g(D(`<rect x="88" y="206" width="64" height="4" rx="1" style="fill:${S.wood}"/><rect x="92" y="196" width="12" height="10" rx="2" style="fill:#C9B3E3"/><rect x="106" y="198" width="12" height="8" rx="2" style="fill:#F4C7CF"/><path d="M124 206 v-14 h10 v14z" style="fill:#E8F1F0"/><path d="M138 206 v-12 h10 v12z" style="fill:#FFF3D6"/>`, `<path d="M124 196 h10 M138 198 h10" stroke="${S.fabric}" stroke-width="2"/><circle cx="129" cy="201" r="1.4" fill="#C9B3E3"/><circle cx="143" cy="202" r="1.4" fill="#9FB04A"/>`));
+  if (id === "bathplant") return g(D(`<path d="M290 102 h20 l-2 -12 h-16z" style="fill:#C8643B"/>`, [-60, -35, -12, 12, 35, 60].map(a => `<path d="M300 90 q${a*.3} -14 ${a*.5} -10" stroke="#5E8A4A" stroke-width="2.2" fill="none"/>${[1, 2, 3].map(j => `<ellipse cx="${f1(300 + a*.5*j/3)}" cy="${f1(90 - 10*j/3 - (j === 2 ? 3 : 0))}" rx="3" ry="1.6" fill="#6E9A4A"/>`).join("")}`).join("")));
+  return "";
+}
+function bathCorners(){   // calm, full edges: a laundry basket bottom left, a little cupboard with a candle bottom right
+  glow(452, 520, 30);
+  return g(D(`<path d="M44 584 h44 l-4 -40 h-36z" style="fill:#C9A26A"/><rect x="424" y="540" width="56" height="44" rx="2" style="fill:${lt(S.wood, .1)}"/><rect x="420" y="534" width="64" height="7" rx="1" style="fill:${dk(S.wood, .1)}"/>`,
+    `${[0, 1, 2, 3].map(k => `<path d="M48 ${552 + k*8} h38" stroke="#9A7A4A" stroke-width=".8"/>`).join("")}<path d="M50 546 q6 -10 14 -4 q8 -8 16 2" fill="${S.fabric2}" stroke="${INK}" stroke-width=".6"/><path d="M452 541 v43" stroke="${dk(S.wood, .25)}" stroke-width="1"/><circle cx="446" cy="560" r="1.6" fill="${S.metal}"/><circle cx="458" cy="560" r="1.6" fill="${S.metal}"/><rect x="434" y="520" width="9" height="14" rx="1" fill="${CREAM}" stroke="${INK}" stroke-width=".5"/>${flame(438.5, 520, .45)}<path d="M456 534 l3 -12 h8 l3 12z" fill="#E8F1F0" stroke="${INK}" stroke-width=".5"/><path d="M462 522 l-3 -10 M464 522 l1 -11 M466 522 l4 -9" stroke="#5A3A2A" stroke-width=".7"/>`));
+}
+function livedBath(){
+  if (!undone("bath")) return "";
+  let s = "";
+  if (tier("bath") > 1) s += g(D(`<path d="M332 258 h24 l2 30 q-8 6 -14 0 q-4 6 -12 0z" style="fill:${S.fabric2}"/>`, `<path d="M334 278 h22" stroke="${S.accent}" stroke-width="1.2"/>`));
+  s += g(D(`<path d="M190 372 q10 -12 28 -8 q14 0 16 10 q-2 10 -22 10 q-20 0 -22 -12z" style="fill:${CREAM}"/><path d="M372 384 q8 -14 26 -10 q10 4 8 12 q-18 8 -34 -2z" style="fill:${S.fabric2}"/>`, `<path d="M200 374 q12 2 24 0" stroke="#D8D0C4" stroke-width="1" fill="none"/><path d="M378 382 h22" stroke="${S.accent}" stroke-width="1"/>`));
+  return s;
+}
+function bedroomDoor(){   // the way back to the bedroom: a mat at the bottom centre
+  return otherSpot("bedroom", "Back through to the bedroom", hovE(260, 612, 54, 14),
+    sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:${S.fabric2}"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/>`) + `<path d="M222 606 h76 M222 620 h76" stroke="${S.accent}" stroke-width="1.4" pointer-events="none"/>`
+    + lab(260, 590, "Bedroom", "#F3E1A0", 9));
+}
+function bathArt(){
+  glow(250, 70, 26); glow(350, 70, 26);
+  const sconce = x => `<path d="M${x} 64 v10" stroke="${S.metal}" stroke-width="2"/><path d="M${x - 6} 56 h12 l-2 10 h-8z" fill="${NIGHT ? "#FFE8A8" : "#F6EEDA"}" stroke="${INK}" stroke-width=".7"/>`;
+  return bathShell() + windowArt(266, 34, 68, 64, {seed: 5}) + g(sconce(242) + sconce(358)) + accBath("bathplant") + accBath("soaps") + pieceSpot("basin", basin) + accBath("robes")
+    + towelRail() + pieceSpot("bath", bathTub) + pieceSpot("bathrug", bathrug) + bathCorners() + livedBath() + crates() + bedroomDoor();
+}
 
 /* ====================================================================================================== */
 /* ---------- the back garden ---------- */
@@ -606,9 +664,9 @@ function accGardenOnly(id){ const save = ST.acc; ST.acc = {[id]: has(id)}; const
 
 /* ====================================================================================================== */
 export function cottageArt(scene, st = {}){
-  const m = /^(figtree|bluebell)_(down|up|garden)$/.exec(scene || "") || [0, st.c || "figtree", st.floor || "down"];
+  const m = /^(figtree|bluebell)_(down|up|bath|garden)$/.exec(scene || "") || [0, st.c || "figtree", st.floor || "down"];
   ST = {...st, c: m[1], floor: m[2], tiers: st.tiers || {}, acc: st.acc || {}, crates: st.crates || []};
   S = STYLES[ST.style] || STYLES.cottagecore; NIGHT = !!st.night; GL = []; CID = 0;
-  const body = ST.floor === "up" ? upArt() : ST.floor === "garden" ? gardenArt() : downArt();
+  const body = ST.floor === "up" ? upArt() : ST.floor === "bath" ? bathArt() : ST.floor === "garden" ? gardenArt() : downArt();
   return glowDefs + body + (NIGHT ? nightWash() + `<g pointer-events="none">${GL.join("")}</g>` : "");
 }

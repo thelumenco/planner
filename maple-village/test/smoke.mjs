@@ -190,9 +190,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(200);
   check(await page.locator("#ctx").textContent().then(t => /Next digest in/.test(t)), "the next digest is rationed");
 
-  // Morning briefing as a gazette
+  // Morning briefing as a gazette (round 236: Elena's cottage letter is in the post too)
   await page.click('[data-open="mail"]');
-  await page.locator('#mailList [data-mail]').last().click();
+  await page.locator('#mailList [data-mail]').filter({ hasNotText: /from Elena|Bluebell, if/ }).last().click();
   await page.waitForTimeout(300);
   check(await page.locator("#nbPage.news .nmast").count() > 0, "morning briefing opens as The Morning Crier newspaper");
   await page.screenshot({ path: join(shots, `${vp.name}-8-briefing.png`) });
