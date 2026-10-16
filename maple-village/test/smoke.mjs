@@ -3084,8 +3084,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
-    check(sp.length === 43 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
-      "the 43 dishes from the trips (rounds 207, 211, 215, 219 and 223: Saltwick's, Portovenere's, Puffin Isle's, Bali's and Hokkaido's three each) are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(sp.length === 46 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 46 dishes from the trips (rounds 207, 211, 215, 219, 223 and 232: Saltwick's, Portovenere's, Puffin Isle's, Bali's, Hokkaido's and Formentera's three each) are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "jason"), L = np.NPCS.find(n => n.id === "luca");
@@ -4676,6 +4676,59 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="shed"]').first().dispatchEvent("click").catch(() => {}); await page.waitForTimeout(2500);
   const moved = await melAt();
   check(moved.every(Number.isFinite) && Math.hypot(moved[0] - back[0], moved[1] - back[1]) > 20, "and she walks off normally when you tap somewhere");
+  await page.close();
+}
+
+// Rounds 231 to 234: Formentera by ferry (and boat): the four screens in a ring, bikes on the Green Route to La Mola,
+// the three lighthouse stamps (a painted lighthouse), snorkelling the seagrass, the market on a Wednesday, the bar
+{
+  console.log("\nFormentera by ferry (rounds 231 to 234)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`formentera pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/fmpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 500;
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  const gf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const go = async sc => { await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(1500); };
+  const spot = async id => { await page.locator(`#world [data-rdspot="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(2500); };
+  const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(11000); };
+  const name = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
+  const fm = async (a, n = 1) => { for (let k = 0; k < n; k++) { await page.click(`#ctx [data-fm="${a}"]`); await page.waitForTimeout(150); } };
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-14&fmpatch=1"); await page.waitForTimeout(1500);
+  await go("shore"); await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftown="formentera"]', { timeout: 15000 });
+  await page.click('#ctx [data-ftown="formentera"]'); await page.waitForTimeout(300); await page.click('#ctx [data-tpick="evan"]'); await page.waitForTimeout(200);
+  const t = await page.locator("#ctx").innerText();
+  check(/flamingo/i.test(t) && /30/.test(await page.locator('#ctx [data-trip="formentera"][data-by="ferry"]').textContent()), "the ferry to Formentera: 30 coins (Evan free), and it says the flamingos are in");
+  await page.click('#ctx [data-trip="formentera"]'); await page.waitForTimeout(12000);
+  check((await gf()).trip.town === "formentera" && /Illetes/i.test(await name()), "off the ferry at La Savina, by Ses Illetes");
+  check(/salt/i.test(await (async () => { await place("fmToSalines"); return name(); })()), "north to the salt flats");
+  check(/Mola/i.test(await (async () => { await place("fmToMola"); return name(); })()), "east to La Mola");
+  check(/Francesc/i.test(await (async () => { await place("fmToVillageS"); return name(); })()), "south to Sant Francesc");
+  check(/Illetes/i.test(await (async () => { await place("fmToIlletesW"); return name(); })()), "and west back to the beach");
+  // the harbour light and Cap de Barbaria stamps
+  await go("fm_illetes"); await place("fmharbourlight"); await go("fm_village"); await place("fmbarbaria");
+  let f = await gf();
+  check(f.formentera.stamps.harbour && f.formentera.stamps.barbaria, "two lighthouse stamps: the harbour light and Cap de Barbaria");
+  // bikes to La Mola, then the lighthouse
+  const c0 = f.coins; await go("fm_bikes"); await spot("fm_bikes"); await fm("ride"); await page.waitForTimeout(3000);
+  f = await gf();
+  check(/Mola/i.test(await name()) && f.coins === c0 - 3 && f.formentera.rides === 1, "hire bikes at Joan's (3 coins, Evan rides on the back) and ride the Green Route to La Mola");
+  await go("fm_light"); await spot("fmstamp"); await fm("stamp:mola"); await page.waitForTimeout(4000);
+  f = await gf();
+  check(f.formentera.stamps.mola && f.inv.fm_lighthouse === 1, "the third stamp at La Mola lighthouse: a painted lighthouse to keep");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // the market on a Wednesday in October
+  await go("fm_mola"); await place("fmmarket");
+  check(await page.locator('#ctx [data-rbuy]').count() >= 2, "the hippy market's on (a Wednesday in October): sandals, beads, dreamcatchers");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // the salt pans out of season
+  await go("fm_salines"); await place("fmpans");
+  check(/harvest in July/.test(await page.locator("#ctx").innerText()), "no salt harvest in October: the pans are flooded till July");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  // snorkelling the seagrass
+  await go("fm_illetes"); await place("fmsnorkel"); await fm("snorkel"); await fm("look", 3); await fm("snorkeldone"); await page.waitForTimeout(600);
+  f = await gf();
+  check(f.formentera.snorkel && Object.keys(f.formentera.seen).length === 3, "snorkelling the seagrass meadows: three on the fish card");
   await page.close();
 }
 

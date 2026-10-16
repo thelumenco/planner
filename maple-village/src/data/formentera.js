@@ -65,8 +65,32 @@ export const FM_TOWNS = {
       angelina: {fm_illetes: [[340, 400], [250, 500]], fm_salines: [[180, 450], [350, 520]], fm_village: [[330, 540], [220, 400]], fm_mola: [[260, 300], [320, 540]]}
     },
     // the family's acts and the rooms are filled in by rounds 232 to 234
-    acts: {},
-    rooms: {},
+    // what the family do (round 234; nothing done in any earlier town): Mum trying on sandals at the market with her
+    // basket, Dad on a hire bike ringing the bell, Ma Ma picking figs off the propped-up tree, Gong Gong watching the
+    // flamingos through binoculars, Darren building a stone stack on the beach, Marcus with his snorkel mask pushed up,
+    // Angellina posing on the turquoise shore. (Evan chases the little crabs: core.js.)
+    acts: {
+      mum: {fm_mola: {act: "sandals", at: [320, 384]}},
+      dad: {fm_village: {act: "bikebell", at: [300, 462]}},
+      mama: {fm_village: {act: "figpick", at: [232, 540], dir: -1}},
+      gonggong: {fm_salines: {act: "flamingos", at: [204, 420], dir: -1}},
+      darren: {fm_illetes: {act: "stonestack", at: [300, 304]}},
+      marcus: {fm_illetes: {act: "maskup", at: [218, 290]}},
+      angelina: {fm_illetes: {act: "shorepose", at: [384, 420], dir: -1}}
+    },
+    // round 233: five rooms (the chiringuito, the salt works shop, the bakery, La Mola lighthouse, the bike hire)
+    rooms: {
+      fm_bar: {door: "fmchiringuito", n: "The chiringuito", music: "fm_bar", party: FM_ROOM_PARTY.fm_bar,
+        say: "The chiringuito: a palm-thatch roof, driftwood tables in the sand, grilled fish, cold juices, and the turquoise water right there."},
+      fm_salt: {door: "fmsaltworks", n: "The salt works shop", music: "fm_salt", party: FM_ROOM_PARTY.fm_salt,
+        say: "The salt works shop: a cool old stone store with sacks and jars of salt, a long rake on the wall and photos of the salt workers."},
+      fm_bakery: {door: "fmbakery", n: "Margalida's bakery", music: "fm_bakery", party: FM_ROOM_PARTY.fm_bakery,
+        say: "Margalida's bakery: a blue-and-white tiled counter, a wood oven, trays of flaó and the smell of anise and mint."},
+      fm_light: {door: "fmlighthouse", n: "La Mola lighthouse", music: "fm_light", party: FM_ROOM_PARTY.fm_light,
+        say: "Inside La Mola lighthouse: a spiral stair, the keeper's desk and logbook, and a window full of nothing but sea."},
+      fm_bikes: {door: "fmbikes", n: "Joan's bikes", music: "fm_bikes", party: FM_ROOM_PARTY.fm_bikes,
+        say: "Joan's bike hire: rows of bikes with baskets, helmets on pegs and a big map of the Green Routes."}
+    },
     lines: {
       mum: ["Look at the colour of that water. If I painted it nobody would believe me. Mel, I'm not getting out until lunch.", "Leather sandals made right here by the man on the stall. I'm trying on every pair, so get comfortable.", "Everything is white and blue and smells of pine. Why don't we live somewhere like this?"],
       dad: ["The water's this clear because of the seagrass, posidonia. The meadows out there are thousands of years old, some of the oldest living things on earth.", "That church was built like a fortress, thick walls and hardly a window, because pirates used to raid the island. The bell rang to send everyone running inside.", "Jules Verne wrote about this lighthouse. In one of his books a comet carries off a piece of the earth, and La Mola is the last bit of land they see."],

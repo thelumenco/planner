@@ -12,6 +12,7 @@ import { PV_PEOPLE } from "./pv-people.js";
 import { PI_PEOPLE } from "./pi-people.js";
 import { BA_PEOPLE } from "./ba-people.js";
 import { HK_PEOPLE } from "./hk-people.js";
+import { FM_PEOPLE } from "./fm-people.js";
 import { TL_PEOPLE } from "./tl-people.js";
 import { LV_PEOPLE } from "./lv-people.js";
 import { WEDDING_PEOPLE } from "./terrace-people.js";
@@ -1074,6 +1075,7 @@ export const NPCS = [
   ...PI_PEOPLE,   // round 216: Puffin Isle (data/pi-people.js)
   ...BA_PEOPLE,   // round 220: Bali (data/ba-people.js)
   ...HK_PEOPLE,   // round 224: Hokkaido (data/hk-people.js)
+  ...FM_PEOPLE,   // round 233: Formentera (data/fm-people.js)
   ...TL_PEOPLE,   // round 159: the Tablelands (data/tl-people.js)
   ...LV_PEOPLE,   // round 163: the Lavender Hills (data/lv-people.js)
   ...WEDDING_PEOPLE,   // round 152: the wedding parties on the terrace (data/terrace-people.js)
