@@ -63,6 +63,7 @@ export const INGR = {
   seabuckthorn: ["Sea buckthorn", "Sea Buckthorn", "#F28C28"], pi_honey: ["Island thyme honey", "Thyme Honey", "#E3B04B"],   // from Puffin Isle (round 215)
   ba_vanilla: ["Bali vanilla", "Bali Vanilla", "#F3E7C8"], lemongrass: ["Lemongrass", "Lemongrass", "#D9E8A8"], kaffir: ["Kaffir lime leaf", "Kaffir Lime", "#B9D98A"], salak: ["Snake fruit", "Snake Fruit", "#F3D9A8"],   // from Bali (round 219)
   hk_milk: ["Hokkaido milk", "Hokkaido Milk", "#FFFDF4"], hk_melon: ["Yubari melon", "Yubari Melon", "#F6A85A"],   // from Hokkaido (round 223)
+  flordesal: ["Flor de sal", "Salted Caramel", "#D9A866"], fm_fig: ["Formentera figs", "Fig", "#8A5A7A"],   // from Formentera (round 232)
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
   yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
