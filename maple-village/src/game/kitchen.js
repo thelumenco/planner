@@ -37,6 +37,7 @@ export const GOODS = {
   // round 128: from Jeju
   tangerine: ["tangerine", "tangerines"], hallabong: ["hallabong", "hallabong"], omija: ["handful of omija berries", "handfuls of omija berries"], blackpork: ["piece of black pork", "pieces of black pork"], abalone: ["abalone", "abalone"],
   // round 215: from Saltwick Harbour
+  cacao_bl: ["handful of cacao", "handfuls of cacao"], salak: ["snake fruit", "snake fruit"], lemongrass: ["stalk of lemongrass", "stalks of lemongrass"],
   hkmilk: ["bottle of Hokkaido milk", "bottles of Hokkaido milk"], hkmelon: ["Furano melon", "Furano melons"], scallop_hk: ["Hokkaido scallop", "Hokkaido scallops"], sweetcorn: ["cob of sweetcorn", "cobs of sweetcorn"], kombu: ["sheet of kombu", "sheets of kombu"],
   buckthorn: ["handful of sea buckthorn", "handfuls of sea buckthorn"], samphire: ["bunch of samphire", "bunches of samphire"], smokedmack: ["smoked mackerel", "smoked mackerel"], goatcheese: ["round of goat's cheese", "rounds of goat's cheese"],
   lobster: ["lobster", "lobsters"], seasalt: ["jar of sea salt", "jars of sea salt"], seaweed: ["bag of dulse", "bags of dulse"], onion: ["onion", "onions"], kipper: ["kipper", "kippers"],
@@ -130,6 +131,9 @@ Object.assign(TAPAS, {trofie: {n: "Trofie with pesto", need: {flour: 1, pesto: 1
 Object.assign(TAPAS, {pavlova: {n: "Berry pavlova", need: {egg: 2, raspberry: 2, milk: 1}, price: 12}, damper: {n: "Damper with golden syrup", need: {flour: 1, milk: 1, goldensyrup: 1}, price: 10},
   wattlescone: {n: "Wattleseed scones", need: {flour: 1, wattleseed: 1, milk: 1}, price: 11}});
 // round 149: the Coast Road's (crayfish off Mags's boat or from the lake, scallops from the co-op, squid from the sea at night)
+// round 218: Bali's specials
+Object.assign(TAPAS, {blsate: {n: "Sate lilit", need: {fish: 1, coconut: 1, lemongrass: 1}, price: 11}, blsalak: {n: "Snake fruit salad with palm sugar", need: {salak: 2, gulamelaka: 1}, price: 9},
+  blpudding: {n: "Coconut and cacao pudding", need: {cacao_bl: 1, coconut: 1, milk: 1}, price: 10}});
 // round 217: Hokkaido's specials
 Object.assign(TAPAS, {hkscallop: {n: "Seared scallops with butter", need: {scallop_hk: 2, milk: 1}, price: 12}, hkcorn: {n: "Butter corn", need: {sweetcorn: 2, milk: 1}, price: 8},
   hkramen: {n: "Miso ramen", need: {kombu: 1, flour: 1, egg: 1, sweetcorn: 1}, price: 12}});
@@ -316,7 +320,7 @@ export function stovePanel(F, today){
   // two tabs (round 136): Local dishes, and Specials from the trips (each says where it's from)
   const tab = KP.tab === "specials" ? "specials" : "local", tabbed = ids => ids.filter(id => !!TAPAS[id].special === (tab === "specials"));
   const tabs = `<div class="gchips ktabs" role="tablist">${[["local", "Local"], ["specials", "Specials"]].map(([t, n]) => `<button class="gchip${tab === t ? " on" : ""}" data-k="ktab" data-id="${t}" role="tab" aria-selected="${tab === t}">${n}</button>`).join("")}</div>`;
-  const chooser = (all, act, on = []) => { const ids = tabbed(all); return tabs + (ids.length ? "" : `<p class="muted">${tab === "specials" ? "Specials are dishes from your trips: travel to Ronda, Kyoto, Jeju, Cinque Terre, Saltwick Harbour, Puffin Isle or Hokkaido to learn some." : "Nothing local in season right now."}</p>`) + `<div class="kdishes">${ids.map(id => { const d = TAPAS[id], ok = has(k, d.need);
+  const chooser = (all, act, on = []) => { const ids = tabbed(all); return tabs + (ids.length ? "" : `<p class="muted">${tab === "specials" ? "Specials are dishes from your trips: travel to Ronda, Kyoto, Jeju, Cinque Terre, Saltwick Harbour, Puffin Isle, Hokkaido or Bali to learn some." : "Nothing local in season right now."}</p>`) + `<div class="kdishes">${ids.map(id => { const d = TAPAS[id], ok = has(k, d.need);
       return `<button class="kdish ${ok ? "ok" : ""}${on.includes(id) ? " chosen" : ""}" data-k="${act}" data-id="${id}" aria-pressed="${on.includes(id)}">${dishArt("tapas:" + id, 46)}<span><b>${esc(d.n)}${on.includes(id) ? " ✓" : ""}</b><small>${d.special ? `Special from ${TOWN_NAME[d.special]} · ` : ""}${d.price} coins a plate</small><span class="kneeds">${needList(k, d.need)}</span></span></button>`; }).join("")}</div>`; };
   if (list.length < TAPAS_MAX) h += `<p class="sub">${list.length ? `Add another (${list.length} of ${TAPAS_MAX})` : "Pick today's dish"}: it goes on the chalkboard, sells for more than the small plates and brings extra people in. <b>${SEASONS[seasonOf(today)].n}</b> menu: ${SEASONS[seasonOf(today)].line.toLowerCase()}.</p>${chooser(Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(today)) && knows(F, id) && !list.some(t => t.id === id)), "tapas")}`;
   h += `<details class="kplan" data-kp="plan"${KP.plan ? " open" : ""}><summary><b>Plan tomorrow's tapas</b> <small>${plan.length ? plan.map(x => esc(TAPAS[x].n)).join(", ") : `up to ${TAPAS_MAX}, they go on the chalkboard first thing`}</small></summary>${chooser(Object.keys(TAPAS).filter(id => inSeason(id, seasonOf(tomorrow)) && knows(F, id)), "plantapas", plan)}</details>`;
@@ -358,6 +362,7 @@ export const SPECIALS = {salmorejo: ["ronda", 17], ajoblanco: ["ronda", 17], cro
   misofish: ["kyoto", 14], hiyayakko: ["kyoto", 14], mochihoney: ["kyoto", 15], heukdwaeji: ["jeju", 15], jeonbok: ["jeju", 15], hallaomija: ["jeju", 15],
   trofie: ["cinque", 14], focaccia: ["cinque", 16], farinata: ["cinque", 16], acciughe: ["cinque", 14], crostini: ["cinque", 16],
   pavlova: ["bellbird", 16], damper: ["bellbird", 14], wattlescone: ["bellbird", 15],
+  blsate: ["bali", 16], blsalak: ["bali", 14], blpudding: ["bali", 15],
   hkscallop: ["hokkaido", 17], hkcorn: ["hokkaido", 14], hkramen: ["hokkaido", 17],
   pisamphire: ["puffin", 14], pipate: ["puffin", 15], pitoast: ["puffin", 16],
   swlobster: ["saltwick", 17], swtart: ["saltwick", 15], swkipper: ["saltwick", 15], swdulse: ["saltwick", 14],
@@ -365,7 +370,7 @@ export const SPECIALS = {salmorejo: ["ronda", 17], ajoblanco: ["ronda", 17], cro
   macslice: ["tablelands", 15], flprawns: ["tablelands", 16], lamington: ["tablelands", 14],
   madeleines: ["lavender", 15], chevretart: ["lavender", 16], ratatouille: ["lavender", 15]};
 Object.entries(SPECIALS).forEach(([id, [town, price]]) => Object.assign(TAPAS[id], {special: town, price}));
-export const TOWN_NAME = {ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", saltwick: "Saltwick Harbour", puffin: "Puffin Isle", hokkaido: "Hokkaido", bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills"};
+export const TOWN_NAME = {ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre", saltwick: "Saltwick Harbour", puffin: "Puffin Isle", hokkaido: "Hokkaido", bali: "Bali", bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills"};
 export const beenTo = (F, town) => town === "lavender" ? !!(F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).some(s => /^bv_(lavender|hilltown|perfume|honey|bridge|chapel)$/.test(s))) : town === "tablelands" ? !!(F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).some(s => /^bv_(falls|crater|town|dairy|nuts|gold)$/.test(s))) : town === "coast" ? !!(F.bellbird && F.bellbird.stamps && Object.keys(F.bellbird.stamps).some(s => /^bv_(breakwater|lighthouse|gully|harbour|sisters|cove)$/.test(s))) : !!((F.towns && F.towns[town]) || F[town]);   // (the Coast Road: once she's stamped a stop there)   // (F.towns from round 132; a town's own state for earlier trips)
 // where each ingredient comes from, shown on the recipe cards ("where do I get almonds? squid?")
 export const SOURCE = {
@@ -382,6 +387,7 @@ export const SOURCE = {
   oliveoil: "your olive mill (or Ronda)", anchovy_salt: "your drying loft", pesto: "your drying loft (or Cinque Terre)", pinenuts: "the market, once you've been to Cinque Terre",
   almond: "Ronda's market", sevilla: "Ronda's market", jamon: "Ronda's market", payoyo: "Ronda's market", membrillo: "Ronda's market",
   yuzu: "Kyoto's market", miso: "Kyoto's market", tofu: "Kyoto's market", mochi: "Kyoto's market",
+  cacao_bl: "Bali's coffee and cacao house", salak: "Ubud market", lemongrass: "Ubud market",
   hkmilk: "Hokkaido's Furano dairy", hkmelon: "Hokkaido's Furano dairy", scallop_hk: "Otaru's morning market", sweetcorn: "Otaru's morning market", kombu: "Otaru's morning market",
   buckthorn: "Puffin Isle's tearoom", samphire: "Puffin Isle's post office", smokedmack: "Puffin Isle's post office", goatcheese: "Puffin Isle's tearoom",
   lobster: "Saltwick's fish market", seasalt: "Saltwick's fish market", seaweed: "Saltwick's fish market", onion: "Saltwick's fish market", kipper: "Saltwick's smokehouse",

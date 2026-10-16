@@ -80,5 +80,6 @@ export const GUEST_LINES = {
   cinque: ["No terraces, no cliffs, and I love it anyway.", "The coffee's different. I'll say no more."],
   saltwick: ["No steps! I keep looking for steps. Your village is so flat and kind.", "I brought kippers. Sid insisted. They're in your fridge, sorry about the smell."],
   puffin: ["So many trees! And not one puffin. I keep looking at the ground for burrows.", "It's so still here. I keep waiting for the wind to start."],
-  hokkaido: ["It's so warm here! I've taken off two jumpers.", "No soft-serve stand on every corner. How do you live?"]
+  hokkaido: ["It's so warm here! I've taken off two jumpers.", "No soft-serve stand on every corner. How do you live?"],
+  bali: ["Where are your offerings? I made you one for the doorstep.", "It's so cool here at night! I'm wearing all my sarongs at once."]
 };

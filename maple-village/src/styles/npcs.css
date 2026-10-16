@@ -282,3 +282,10 @@
 .ch.npc.act-ski:not(.walk) .bob{animation:skisway 1.6s ease-in-out infinite alternate}
 @keyframes skisway{from{transform:translateX(-4px) rotate(-3deg)}to{transform:translateX(4px) rotate(3deg)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-softserve .tool,.ch.npc.act-toast .tool,.ch.npc.act-ski .bob{animation:none}}
+/* round 218: Bali: on a beanbag, planting rice, swinging out over the valley, a coconut, setting down an offering, the gamelan */
+.ch.npc.act-beanbag:not(.walk) .bob{transform:translateY(12px)}
+.ch.npc.act-riceplant:not(.walk) .armR,.ch.npc.act-offering:not(.walk) .armR,.ch.npc.act-gamelan:not(.walk) .armR{animation:tapA 1.2s ease-in-out infinite alternate}
+.ch.npc.act-coconut:not(.walk) .tool{animation:tapT 2.2s ease-in-out infinite alternate}
+.ch.npc.act-jungleswing:not(.walk) .bob{animation:blswing 2.4s ease-in-out infinite alternate;transform-origin:0 -90px}
+@keyframes blswing{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-riceplant .armR,.ch.npc.act-offering .armR,.ch.npc.act-gamelan .armR,.ch.npc.act-coconut .tool,.ch.npc.act-jungleswing .bob{animation:none}}

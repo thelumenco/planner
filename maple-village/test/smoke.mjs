@@ -719,7 +719,7 @@ if (want("\ntasting room")) try {
   check(await page.locator('#ctx [data-k="tapas"]').count() === 32 && await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().getAttribute("aria-selected") === "true", "the stove's Local tab offers this season's local tapas (32 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams)");
   check(/from the market deli|from the farm gate|from the garden/.test(await page.locator("#ctx").innerText()), "each missing ingredient says where to get it");
   await page.locator('#ctx [data-k="ktab"][data-id="specials"]').first().click(); await page.waitForTimeout(200);
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 0 && /travel to Ronda, Kyoto, Jeju, Cinque Terre, Saltwick Harbour, Puffin Isle or Hokkaido/.test(await page.locator("#ctx").innerText()), "the Specials tab is empty until you've travelled: specials come from the trips");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 0 && /travel to Ronda, Kyoto, Jeju, Cinque Terre, Saltwick Harbour, Puffin Isle, Hokkaido or Bali/.test(await page.locator("#ctx").innerText()), "the Specials tab is empty until you've travelled: specials come from the trips");
   await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().click(); await page.waitForTimeout(200);
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapasList[0].id === "tortilla" && f.vine.tapasList[0].plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
@@ -2751,6 +2751,61 @@ if (want("\nHokkaido, by ferry")) try {
   check(await fox().then(f => f.trip.done) && /foreshore/i.test(await page.locator("#sceneName").textContent()), "the ferry home from Otaru, back to the foreshore");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nBali, by ferry")) try {
+  console.log("\nBali, by ferry");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), T = tw.TOWNS.bali, bl = await import(new URL("../src/game/bali.js", import.meta.url));
+  const np = await import(new URL("../src/data/npcs.js", import.meta.url)), kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url));
+  check(T.by === "ferry" && T.screens.join() === "ba_tegallalang,ba_ubud,ba_seminyak,ba_uluwatu" && T.ferry.arrive[0] === "ba_seminyak" && T.ferry.fare === 110 && T.outTo === 12*60 && !T.boat, "Bali: Tegallalang, Ubud, Seminyak and Uluwatu; the ferry lands at Seminyak (bottom left), 110 a person, boats out until noon");
+  check(Object.keys(tw.TOWN_PLACES).filter(k => (tw.TOWN_PLACES[k].scene || "").startsWith("ba_")).every(k => /^ba/.test(k)) && T.screens.every(x => tw.TOWN_BOUNDS[x] && tw.TOWN_OBST[x]) && tw.roomBehind("bali", "bapalace") === "ba_dance", "every Bali place starts with ba; the palace gate leads into the dance pavilion");
+  check(Object.keys(T.rooms).length === 5 && Object.entries(T.rooms).every(([k, r]) => r.music && tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[k]), "five rooms: the warung, Ubud market, the silversmith, the dance pavilion, the coffee and cacao house, each with its own music");
+  { const used = new Set(["ronda", "kyoto", "jeju", "cinque", "saltwick", "puffin", "hokkaido", ...Object.keys(tw.TOWNS).filter(k => k.startsWith("bv_"))].flatMap(k => Object.values(tw.TOWNS[k].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
+    check(Object.values(T.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "what your friends do in Bali (a beanbag, rice planting, the swing, a coconut, an offering, the gamelan) they've done nowhere else"); }
+  { const bp = np.NPCS.filter(n => n.local === "bali"), rooms = Object.keys(T.rooms);
+    check(["blwayan", "blketut", "blmade"].every(id => bp.some(n => n.id === id)) && bp.filter(n => n.tourist).length >= 3 && rooms.every(r => bp.filter(n => n.routine.some(x => x.scene === r)).length >= 2), "Wayan, Ketut and Made, Ibu Sari, Kadek, Pak Gede and Pak Nyoman, and the visitors: at least two people for every room"); }
+  check(Object.entries(tw.TOWN_GOODS).filter(([, g]) => g.shop && /^ba/.test(g.shop)).every(([, g]) => g.sell == null || g.sell <= g.price) && ["blsate", "blsalak", "blpudding"].every(id => kit.TAPAS[id].special === "bali") && sc.INGR.cacao_bl && sc.INGR.salak, "Bali's goods sell for less than they cost; three specials for the kitchen; cacao and snake fruit for the gelato");
+  { const F = {coins: 100, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, day = "2026-10-16";
+    const c = bl.canangStart(); check(bl.canangPlace(c, "north") === "oops" && ["east", "south", "west", "north"].every(d => bl.canangPlace(c, d) === "ok") && c.done && bl.canangDone(F, add, day) && F.inv.b_canang === 1 && !bl.canangDone(F, add, day), "a canang sari with Ibu Sari: white east, red south, yellow west, blue north (yours to keep, once a day)");
+    const g = bl.gamelanStart(() => .3); bl.gamelanListen(g); check(bl.gamelanStrike(g, (g.rounds[0][0] + 1) % 5) === "miss" && g.listening, "the gamelan: a wrong gong and Pak Nyoman plays the pattern again");
+    while (!g.done) { bl.gamelanListen(g); g.rounds[g.r].forEach(n => bl.gamelanStrike(g, n)); }
+    check(g.good === 3 && bl.gamelanDone(F, add, day) && F.inv.b_gong === 1, "three patterns played back (three, four, five notes) and Pak Nyoman gives you a little gong");
+    const r = bl.ringStart(F, "frangipani"); check(!bl.ringStep(r, "polish") && [1, 2, 3, 4, 5].every(() => bl.ringStep(r, "hammer") === "ok") && bl.ringStep(r, "polish") === "done" && bl.ringDone(F, add) && F.inv.b_ring === 1 && F.coins === 80, "a silver ring with Wayan (20): hammer it round, then polish");
+    ["2026-10-11", "2026-10-12", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17"].forEach(d => bl.buyCarving(F, add, d));
+    check(F.inv.b_ark === 1 && Object.keys(F.inv).filter(k => k.startsWith("bc_")).length === 7 && !bl.buyCarving(F, add, "2026-10-18"), "Pak Gede's animal of the day, seven days, seven carvings, and a shelf for them all");
+    check(bl.kecakOn(18*60) && !bl.kecakOn(15*60), "the kecak fire dance at Uluwatu, at sunset"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);
+  page.on("pageerror", e => errors.push(`bali pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/blcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 400; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=09:00&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=09:00&date=2026-10-16&blcoins=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftown="bali"]', { timeout: 15000 });
+  await page.click('#ctx [data-ftown="bali"]'); await page.waitForSelector('#ctx [data-trip="bali"]', { timeout: 15000 });
+  await page.click('#ctx [data-tpick="posy"]');
+  check(/220/.test(await page.locator("#ctx [data-trip]").textContent()), "you and Posy to Bali: 220 coins");
+  await page.click("#ctx [data-trip]");
+  await page.waitForFunction(() => /Bali/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
+  check(await fox().then(f => f.coins === 180 && f.trip.town === "bali" && f.towns && f.towns.bali) && /Seminyak/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("posy")), "off the ferry at Seminyak, with Posy");
+  for (const [gate, want, places] of [["baToTegallalang", "Tegallalang", ["baterraces", "basubak", "baswing", "bacacao"]], ["baToUbud", "Ubud", ["bamarket", "basilver", "bapalace", "bamonkeys"]], ["baToUluwatuS", "Uluwatu", ["batemple", "bakecak", "bacliff", "basurf"]], ["baToSeminyakW", "Seminyak", ["bajetty", "bawarung", "babeach", "basunset", "baboats"]]]) {
+    await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
+    await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
+    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("posy")), `through the gate to ${want} (Posy follows)`);
+  }
+  await page.evaluate(() => window.__hbScene("ba_market")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-rdspot="ba_market"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bl="canang"]', { timeout: 15000 });
+  await page.click('#ctx [data-bl="canang"]'); for (const d of ["east", "south", "west", "north"]) { await page.click(`#ctx [data-bl="dir:${d}"]`); await page.waitForTimeout(150); }
+  check(await fox().then(f => f.inv.b_canang === 1) && await ids().then(a => a.includes("blsari")), "in Ubud market: Ibu Sari shows you how to fold a canang sari");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
+  await page.evaluate(() => window.__hbScene("ba_seminyak")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="bajetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="ferry"]', { timeout: 15000 });
+  await page.click('#ctx [data-triphome="ferry"]');
+  await page.waitForFunction(() => !/Bali/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
+  check(await fox().then(f => f.trip.done) && /foreshore/i.test(await page.locator("#sceneName").textContent()), "the ferry home from Seminyak, back to the foreshore");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nCinque Terre: the five villages (well, four)")) try {
   console.log("\nCinque Terre: the five villages (well, four)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), C = tw.TOWNS.cinque;
@@ -2787,8 +2842,8 @@ if (want("\nCinque Terre: the five villages (well, four)")) try {
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
-    check(sp.length === 38 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
-      "the 38 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(sp.length === 41 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 41 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "ornella"), L = np.NPCS.find(n => n.id === "dario");

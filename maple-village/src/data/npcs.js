@@ -10,6 +10,7 @@ import { CR_PEOPLE } from "./cr-people.js";
 import { SW_PEOPLE } from "./sw-people.js";
 import { PI_PEOPLE } from "./pi-people.js";
 import { HK_PEOPLE } from "./hk-people.js";
+import { BL_PEOPLE } from "./bl-people.js";
 import { TL_PEOPLE } from "./tl-people.js";
 import { LV_PEOPLE } from "./lv-people.js";
 import { WEDDING_PEOPLE } from "./terrace-people.js";
@@ -912,6 +913,7 @@ export const NPCS = [
   ...SW_PEOPLE,   // round 215: Saltwick Harbour (data/sw-people.js)
   ...PI_PEOPLE,   // round 216: Puffin Isle (data/pi-people.js)
   ...HK_PEOPLE,   // round 217: Hokkaido (data/hk-people.js)
+  ...BL_PEOPLE,   // round 218: Bali (data/bl-people.js)
   ...TL_PEOPLE,   // round 159: the Tablelands (data/tl-people.js)
   ...LV_PEOPLE,   // round 163: the Lavender Hills (data/lv-people.js)
   ...WEDDING_PEOPLE,   // round 152: the wedding parties on the terrace (data/terrace-people.js)

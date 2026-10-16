@@ -249,3 +249,16 @@ check is now clean.
   tour and tasting (match three beers), a ski lesson December to March (a first ski pass), carving at the snow festival
   in February, the foot bath. Friends: Hana in the foot bath, Bo with a soft-serve, Posy in the flowers, Theo's toast in
   the beer garden, Tomi skiing.
+
+## Islands by ferry: Bali (built 2026-10-16)
+- Data in `src/data/bali.js`, people in `src/data/bl-people.js`, letters in `src/data/pen-bl.js`, panels and games in
+  `src/game/bali.js`, art in `src/art/town-bali.js` and `src/art/bali-rooms.js`, music `bali` + one track per room.
+  Scene and place ids start `ba` (not `bl`: Bellbird Valley's lookout already has `bl_paddock` and `bl_valley`). Ferry
+  only (110, out 7 to noon, home by 10).
+- Screens: Seminyak (the jetty, beach, warung, sunset spot, jukung), Ubud (market, silversmith, the palace gate into
+  the dance pavilion, the monkey forest), Tegallalang (the terraces, the subak, the jungle swing, the coffee and cacao
+  house), Uluwatu (the cliff temple, the amphitheatre, the cliff path, the surf).
+- Things to do: a canang sari with Ibu Sari (each colour to its compass point), a gamelan lesson (play back three
+  patterns: a little gong), a silver ring with Wayan, Pak Gede's carved animal of the day (seven, then a shelf), the
+  kecak fire dance at sunset, the jungle swing, the monkeys (who sometimes take your sunglasses). Friends: Hana on a
+  beanbag, Farid planting rice, Tomi on the swing, Bo with a coconut, Posy's offering, Theo at the gamelan.

@@ -335,6 +335,27 @@ export const TRACKS = {
   hokkaido: {name: "Snow on the canal", live: true, bpm: 76, steps: 8, tone: "piano", arp: [1, 3, 5, 3, 2, 4, 3, 2], arpVel: .038, mel: .6,
     bars: [[45, 57, 64, 67, 72], [43, 55, 62, 67, 71], [41, 53, 60, 64, 69], [40, 52, 59, 64, 67], [45, 57, 64, 69, 72], [48, 55, 60, 64, 67], [43, 50, 55, 62, 67], [45, 57, 64, 67, 72]],
     lines: [[[0, 76], [2, 79], [3, 76]], [[0, 74], [3, 71]], [[0, 72], [2, 74], [3, 76]], [[0, 76], [3, 72]], [[0, 81], [2, 79]], [[0, 76], [2, 74], [3, 72]], [[0, 74], [3, 71]], [[0, 69]]]},
+  // live, all over Bali (round 218): a gamelan (bell tone, interlocking quick figures) in pelog-ish E (E, F, G, B, C),
+  // shimmering and circling, with a gong on the first beat of every bar
+  bali: {name: "Gamelan by the rice fields", live: true, bpm: 92, steps: 8, tone: "bell", strum: [0], arp: [1, 3, 2, 4, 3, 5, 4, 2], arpVel: .045, mel: .65, up: 12,
+    bars: [[40, 52, 53, 55, 59, 60], [41, 53, 55, 59, 60, 64], [43, 55, 59, 60, 64, 65], [40, 52, 53, 55, 59, 64], [40, 52, 55, 59, 60, 64], [45, 52, 53, 57, 60, 64], [43, 55, 59, 60, 65, 67], [40, 52, 53, 55, 59, 60]],
+    lines: [[[0, 76], [1, 77], [2, 79], [3, 76]], [[0, 77], [2, 76], [3, 72]], [[0, 71], [1, 72], [2, 76], [3, 77]], [[0, 76], [3, 72]], [[0, 79], [1, 77], [2, 76]], [[0, 72], [2, 71], [3, 72]], [[0, 76], [1, 77], [3, 79]], [[0, 76]]]},
+  // Round 218: Bali's interiors
+  // the warung: a lazy rhodes, fans turning, waves outside
+  ba_warung: {name: "Fans turning, waves outside", live: true, bpm: 76, steps: 8, tone: "rhodes", arp: [1, 3, 2, 4, 1, 3, 2, 0], arpVel: .038, mel: .5,
+    bars: [[45, 57, 61, 64, 69], [50, 57, 62, 66, 69], [52, 56, 59, 64, 68], [45, 57, 61, 64, 69]]},
+  // the market: bright quick guitar, haggling and incense
+  ba_market: {name: "Incense and frangipani", live: true, bpm: 120, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 2, 3, 5, 3, 2, 4, 3], arpVel: .05, mel: .8,
+    bars: [[52, 59, 64, 67, 71], [53, 60, 65, 69, 72], [55, 59, 62, 67, 71], [52, 59, 64, 67, 71]]},
+  // the silversmith's: tiny bells like hammers on silver
+  ba_silver: {name: "Tap, tap, turn", live: true, bpm: 100, steps: 8, tone: "bell", arp: [1, 0, 2, 0, 3, 0, 2, 4], arpVel: .035, mel: .45, up: 24,
+    bars: [[48, 60, 64, 67, 72], [50, 62, 65, 69, 74], [47, 59, 62, 67, 71], [48, 60, 64, 67, 72]]},
+  // the dance pavilion: the gamelan at full tilt, quick and interlocking
+  ba_dance: {name: "Legong", live: true, bpm: 132, steps: 8, tone: "bell", strum: [0, 4], arp: [1, 4, 2, 5, 3, 4, 2, 5], arpVel: .05, mel: .85, up: 12,
+    bars: [[40, 52, 53, 55, 59, 60], [41, 53, 55, 59, 60, 64], [43, 55, 59, 60, 64, 65], [40, 52, 53, 55, 59, 60]]},
+  // the coffee and cacao house: slow piano over the terraces, smoke from the roasting pan
+  ba_cacao: {name: "Roasting over the terraces", live: true, bpm: 64, steps: 8, tone: "piano", arp: [1, 3, 5, 3, 2, 4, 3, 0], arpVel: .035, mel: .45,
+    bars: [[43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [45, 52, 57, 60, 64], [43, 55, 59, 62, 67]]},
   // Round 217: Hokkaido's interiors
   // the glassworks: the roar of the furnace, low rhodes and a glinting top
   hk_glass: {name: "Breath in the glass", live: true, bpm: 60, steps: 8, tone: "rhodes", arp: [1, 0, 4, 0, 2, 0, 3, 0], arpVel: .035, mel: .45, up: 12,
