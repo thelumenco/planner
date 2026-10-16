@@ -458,7 +458,10 @@ export function trainSlot(id, day, hm){
   return null;
 }
 const weekOf = day => { const t = Date.parse(day + "T00:00:00Z"); return new Date(t - ((dow(day) + 6) % 7)*864e5).toISOString().slice(0, 10); };
-export const letGuests = day => { const g = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS); return [g.slice(0, 2), g.slice(2, 4)]; };
+// round 236: once Mel owns a cottage its porch guests come from its bookings (lets.js porchGuests, set by core.js)
+let letsGuests = null; export const setLetsGuests = f => { letsGuests = f; };
+export const letGuests = day => { const g = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS), base = [g.slice(0, 2), g.slice(2, 4)], own = letsGuests && letsGuests(day);
+  return own ? base.map((b, i) => own[i] == null ? b : own[i]) : base; };
 const LET_SEATS = [[[300, 292], [376, 292]], [[300, 466], [376, 466]]];
 export function letSlot(id, day, hm){
   const lets = letGuests(day), c = lets.findIndex(g => g.includes(id)); if (c < 0) return null;

@@ -10,6 +10,7 @@ import { archGate } from "./orchard.js";
 import { track, brook, trainLayer, RAIL_Y } from "./railway.js";
 import { artCtx } from "./scenes.js";
 import { STYLES } from "../game/van.js";
+import { forSale, owns as ownsLet } from "../game/lets.js";
 import { bikeRack } from "./transport.js";
 
 const W = ink;
@@ -65,8 +66,13 @@ export function hlaneArt(){
   const bluebell = `<g data-place="bluebell" aria-label="Bluebell cottage">${house("bluebellh", 290, 196, 96, 60, "#EEF3FA", "#B5443A", "Bluebell", "#C3CDEE").replace(/data-place="bluebellh"[^>]*>/, ">")}</g>`;
   const figtree = `<g data-place="figtree" aria-label="Fig Tree cottage">${house("figtreeh", 290, 370, 96, 60, "#FFF3E3", "#B5443A", "Fig Tree", "#F3E1A0").replace(/data-place="figtreeh"[^>]*>/, ">")}</g>`
     + `<g ${W} pointer-events="none"><rect x="413" y="398" width="6" height="18" style="fill:var(--wood)"/><circle cx="416" cy="388" r="14" style="fill:#7FA35A"/>${[[410, 386], [421, 392], [414, 380]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" style="fill:#8C5A7A"/>`).join("")}</g>`;
+  // round 236: Elena's "For sale" board by a cottage she's selling, and a little "Mel's" heart once it's hers
+  const letSign = (c, x, y) => { const F = artCtx() && artCtx().F && artCtx().F(); if (!F) return "";
+    if (forSale(F, c)) return `<g pointer-events="none">${sk(`<rect x="${x - 1.5}" y="${y - 30}" width="3" height="30" style="fill:#8A6A52"/><rect x="${x - 20}" y="${y - 44}" width="40" height="18" rx="2" style="fill:#FFFDF6"/>`, `<rect x="${x - 20}" y="${y - 44}" width="40" height="18" rx="2"/>`)}<text x="${x}" y="${y - 32}" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="7.4" fill="#B5443A">FOR SALE</text></g>`;
+    if (ownsLet(F, c)) return `<g pointer-events="none"><path d="M${x} ${y - 20} c-6 -8 -14 -2 -8 5 l8 7 l8 -7 c6 -7 -2 -13 -8 -5z" style="fill:#E8566C;stroke:var(--line)" stroke-width="1"/></g>`;
+    return ""; };
   const van = vanOwned() ? campervan(420, 588) : `<g data-place="vanspot" aria-label="Campervan spot"><ellipse class="hov" cx="420" cy="584" rx="48" ry="10" style="fill:var(--butter)"/>${sk(`<rect x="372" y="548" width="96" height="40" rx="6" style="fill:#D8CFC2" opacity=".85"/>`, `<rect x="372" y="548" width="96" height="40" rx="6" stroke-dasharray="4 5"/>`)}${tapeLabel(420, 536, "Campervan spot", "#E3EED2", 9)}</g>`;
-  return lampDefs + ground + top + trainLayer("hlane") + trees + honeysuckle + hive(180, 254) + clover + pen + bluebell + figtree + hens(436, 486)
+  return lampDefs + ground + top + trainLayer("hlane") + trees + honeysuckle + hive(180, 254) + clover + pen + bluebell + figtree + letSign("bluebell", 272, 262) + letSign("figtree", 272, 436) + hens(436, 486)
     + `<g data-place="windmill" aria-label="The windmill"><ellipse class="hov" cx="458" cy="344" rx="30" ry="8" style="fill:var(--butter)"/>${windmill(458, 340)}</g>`
     + grazer(470, 372, "#FFFDF6", 0) + grazer(496, 352, "#D9B48A", 1) + grazer(484, 520, "#FFFDF6", 2) + van
     + archGate("toFarmL", 22, 560, "Wildflower Farm", 70, 520, "var(--butter)", "Gate west to Wildflower Farm")

@@ -4743,6 +4743,82 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
 }
 
 {
+  console.log("\nThe holiday cottages: Elena sells Fig Tree, the catalogue, the train, bookings and changeovers (round 236)");
+  const L = await import(new URL("../src/game/lets.js", import.meta.url));
+  { const F = {coins: 5000, inv: {}}, d = "2026-10-16"; L.step(F, d, 600);
+    check(L.forSale(F, "figtree") && !L.forSale(F, "bluebell") && L.buy(F, "figtree", d).ok && F.coins === 3000, "Elena sells Fig Tree for 2,000 (Bluebell later)");
+    L.setStyle(F, "figtree", "scandi"); ["sofa", "kitchen", "dining", "bed"].forEach(k => L.order(F, "figtree", k, d));
+    check(!L.isOpen(F, "figtree") && L.order(F, "figtree", "sofa", d).ok === false, "orders wait for the train (one of each at a time)");
+    L.step(F, "2026-10-17", 9*60); const before = L.isOpen(F, "figtree"); L.step(F, "2026-10-17", 9*60 + 20);
+    check(!before && L.isOpen(F, "figtree") && L.staysFor(F, "figtree").length >= 2, "they come on the 9:15 next morning, and with the basics in, bookings fill the calendar");
+    const st = L.staysFor(F, "figtree"); check(st.every((s, i) => !i || s.in >= L.addDays(st[i - 1].out, 1)), "a day's buffer between guests");
+    const wk = L.mondayOf(st[0].in); L.setBlocked(F, "figtree", wk, true, "2026-10-17");
+    check(L.staysFor(F, "figtree").every(s => Array.from({length: s.n}, (_, i) => L.addDays(s.in, i)).every(x => L.mondayOf(x) !== wk)), "a blocked week has no guests in it");
+    L.setBuffer(F, "figtree", 2, "2026-10-17"); L.setBlocked(F, "figtree", wk, false, "2026-10-17");
+    const s0 = L.staysFor(F, "figtree")[0], c0 = F.coins;
+    for (let x = "2026-10-17"; x <= s0.out; x = L.addDays(x, 1)) for (const hm of [9*60 + 20, 10*60 + 5, 15*60 + 5]) L.step(F, x, hm);
+    check(F.coins === c0 + s0.n*s0.rate && L.letState(F).reviews.length === 1 && L.toDo(F, "figtree").length === 3, `the first guests check out: ${s0.n} nights paid, a review, and the changeover waiting (beds, bathroom, tidy)`);
+    F.inv = {apple: 2, fig: 1, milk: 1, honey: 1};
+    check(["beds", "bath", "tidy"].every(k => L.doTask(F, "figtree", k).ok) && L.ready(F, "figtree") && L.doTask(F, "figtree", "basket").ok && L.doTask(F, "figtree", "fridge").ok && !Object.keys(F.inv).length, "turned round, with a fruit basket and welcome treats from the backpack");
+    check(L.forSale(F, "bluebell"), "and Bluebell's for sale once Fig Tree has had guests"); }
+  // in the browser
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`cottages pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/rich=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 4000; f.inv = Object.assign(f.inv || {}, {apple: 3, milk: 2});
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-16&rich=1"); await page.waitForTimeout(1200);
+  const cf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(1500);
+  check(/FOR SALE/.test(await page.locator("#sceneArt").innerHTML()), "a For Sale board outside Fig Tree on the lane");
+  await page.locator('#world [data-place="figtree"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-co="buy"]', { timeout: 20000 });
+  await page.click('#ctx [data-co="buy"]'); await page.waitForSelector('#ctx [data-co="style:coastal"]', { timeout: 10000 });
+  await page.click('#ctx [data-co="style:coastal"]'); await page.waitForSelector('#ctx [data-cotab="down"]', { timeout: 10000 });
+  for (const k of ["sofa", "kitchen", "dining"]) { await page.click(`#ctx [data-co="order:${k}"]`); await page.waitForTimeout(250); }
+  await page.click('#ctx [data-cotab="up"]'); await page.waitForTimeout(250); await page.click('#ctx [data-co="order:bed"]'); await page.waitForTimeout(250);
+  let f = await cf();
+  check(f.lets.owned.figtree && f.lets.style.figtree === "coastal" && f.lets.orders.length === 4 && f.coins === 4000 - 2000 - 80 - 120 - 50 - 90, "buy Fig Tree, pick Coastal, order a sofa, kitchen, table and bed out of the catalogue");
+  check(await page.locator('#ctx .hbadge', { hasText: "on the train" }).count() >= 1, "the catalogue says it's on tomorrow's train");
+  // the next morning, after the 9:15
+  await page.goto(url + "?seed=1&time=09:40&date=2026-10-17"); await page.waitForTimeout(2500);
+  f = await cf();
+  check(!f.lets.orders.length && f.lets.tiers.figtree.sofa === 1 && f.lets.tiers.figtree.bed === 1 && f.lets.stays.figtree.length >= 1, "the 9:15 brought it all, and the first bookings are in");
+  await page.evaluate(() => window.__mapleScene("hlane")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="figtree"]').dispatchEvent("click"); await page.waitForFunction(() => /Fig Tree/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(1200);
+  check(await page.locator('#world [data-cospot]').count() >= 14 && await page.locator('#world [data-cospot="sofa"]').count() === 1, "inside Fig Tree: the sitting room and kitchen, everything tappable");
+  await page.locator('#world [data-cospot="calendar"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-co^="block:"]', { timeout: 20000 });
+  check(/Buffer between guests/i.test(await page.locator("#ctx").textContent()), "the bookings calendar on the wall: five weeks, a buffer setting, block or unblock any week");
+  const wk = await page.locator('#ctx [data-co^="block:"]').nth(2).getAttribute("data-co");
+  await page.click(`#ctx [data-co="${wk}"]`); await page.waitForTimeout(400);
+  f = await cf(); check(f.lets.blocked.figtree.includes(wk.slice(6)), "block off a week");
+  await page.click('#ctx [data-co="buffer:2"]'); await page.waitForTimeout(300);
+  f = await cf(); check(f.lets.buffer.figtree === 2, "and set a two-day buffer");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await page.locator('#world [data-cospot="stairs"]').dispatchEvent("click"); await page.waitForFunction(() => /upstairs/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(800);
+  check(await page.locator('#world [data-cospot="bed"]').count() === 1 && await page.locator('#world [data-cospot="bath"]').count() === 1, "up the wooden stairs: the bedroom and the bath");
+  await page.locator('#world [data-cospot="stairs"]').dispatchEvent("click"); await page.waitForFunction(() => !/upstairs|garden/.test(document.querySelector("#sceneName").textContent) && /Fig Tree/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(800);
+  await page.locator('#world [data-cospot="garden"]').dispatchEvent("click"); await page.waitForFunction(() => /garden/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(800);
+  check(await page.locator('#world [data-cospot="hottub"]').count() === 1, "out the back door: the garden, with a spot for a hot tub");
+  // after the first guests leave
+  f = await cf(); const s0 = f.lets.stays.figtree[0];
+  await page.goto(url + `?seed=1&time=11:00&date=${s0.out}`); await page.waitForTimeout(2500);
+  f = await cf();
+  check(f.lets.reviews.length >= 1 && f.lets.turn.figtree && !f.lets.turn.figtree.beds, `${s0.who.join(" and ")} checked out: paid, a review in the guest book, and the changeover to do`);
+  await page.evaluate(() => window.__mapleScene("figtree_up")); await page.waitForTimeout(1500);
+  await page.locator('#world [data-cospot="bed"]').dispatchEvent("click"); await page.waitForTimeout(5000);
+  f = await cf(); check(f.lets.turn.figtree && f.lets.turn.figtree.beds, "strip and make the bed upstairs");
+  await page.evaluate(() => window.__mapleScene("figtree_down")); await page.waitForTimeout(1500);
+  await page.locator('#world [data-cospot="basket"]').dispatchEvent("click"); await page.waitForTimeout(5000);
+  f = await cf(); check(Array.isArray(f.lets.basket.figtree) && f.lets.basket.figtree.length === 3, "fill the fruit basket on the table");
+  await page.locator('#world [data-cospot="guestbook"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 20000 });
+  check(/guest book/i.test(await page.locator("#ctx").innerText()) && /★/.test(await page.locator("#ctx").innerText()), "the guest book has its first review");
+  await page.close();
+}
+{
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
   const missing = Object.entries(sd.STORIES).flatMap(([id, chs]) => chs.map((c, i) => i > 0 && !c.recap ? id + ":" + i : null).filter(Boolean));
