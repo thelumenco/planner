@@ -38,11 +38,14 @@ let XF = null;   // the scale a free-standing piece is drawn at (about its front
 const glow = (x, y, r = 40) => { if (XF) { x = XF.x + (x - XF.x)*XF.k; y = XF.y + (y - XF.y)*XF.k; r = r*XF.k; } GL.push(`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" fill="url(#coGlow)"/>`); return ""; };
 // free-standing pieces are drawn 1.2x about their front-edge centre (Mel's sprite stands about 64px tall in the room),
 // and the things that sit on them (cushions, the fruit, mugs) go through the same transform
-const K = {sofa: 1.2, armchair: 1.2, coffee: 1.2, rug: 1.2, lamp: 1.2, dining: 1.2, bedrug: 1.2, bathrug: 1.2, hottub: 1.2, patio: 1.2, hammock: 1.2, firepit: 1.2};
+const K = {sofa: 1.2, armchair: 1.2, coffee: 1.2, rug: 1.2, lamp: 1.2, dining: 1.2, bedrug: 1.2, bathrug: 1.2, hottub: 1.2, patio: 1.2, hammock: 1.2, firepit: 1.2, bath: 1.15};
 const scaled = (id, fn) => { const k = K[id] || 1, [x, y] = PIECES[id].at; if (k === 1) return fn(); const save = XF; XF = {x, y, k}; const s = fn(); XF = save;
   return `<g transform="translate(${x} ${y}) scale(${k}) translate(${-x} ${-y})">${s}</g>`; };
 const BLUE = "#5277B8", BLUE2 = "#3A5A92", INK = "#3A2E28", CREAM = "#FFFDF6";
-const FL = 210;   // where the back wall meets the floor (the garden wall's foot is a little lower)
+// each room's footprint, dolls-house style: x0..x1 wide, the back wall from WT down to FL, the floor down to y1;
+// outside it, the cottage's thick whitewashed walls (the bedroom is a little narrower, the bathroom snug)
+const ROOMS = {down: {x0: 0, x1: 520, ceil: 0, WT: 99, FL: 210, y1: 640}, up: {x0: 50, x1: 470, ceil: 0, WT: 99, FL: 210, y1: 566}, bath: {x0: 110, x1: 410, ceil: 64, WT: 124, FL: 220, y1: 500}};
+let FL = 210, WT = 99;
 
 // a little flame (it flickers via the game's .flame class)
 const flame = (x, y, s = 1) => `<path class="flame" d="M${f1(x)} ${f1(y)} q${f1(-6*s)} ${f1(-4*s)} ${f1(-1*s)} ${f1(-13*s)} q${f1(s)} ${f1(5*s)} ${f1(4*s)} ${f1(6*s)} q${f1(3*s)} ${f1(4*s)} ${f1(-3*s)} ${f1(7*s)}z" fill="#F6A23A"/><path class="flame" d="M${f1(x)} ${f1(y)} q${f1(-3*s)} ${f1(-3*s)} 0 ${f1(-7*s)} q${f1(s)} ${f1(3*s)} ${f1(2*s)} ${f1(4*s)} q${f1(s)} ${f1(2*s)} ${f1(-2*s)} ${f1(3*s)}z" fill="#FFE08A"/>`;
@@ -89,29 +92,45 @@ function floorArt(y0 = FL){
       for (let k = 0; k < 5; k++) { const x = Math.round((k*130 + r*53) % 650) - 60; s += `<path d="M${x} ${y} v18" style="stroke:${S.floor2}" stroke-width=".9"/>`; }
       if (r % 3 === 1) s += `<path d="M${Math.round(R(r)*440)} ${y + 9} q14 -2 28 0" fill="none" style="stroke:${S.floor2}" stroke-width=".6" opacity=".6"/>`; }
   }
-  return g(s);
+  return s;
 }
 // the low cottage ceiling: plaster between dark oak beams that run towards us, and the wall plate along the top of the wall
 function ceiling(){
   const plaster = lt(S.wall2, .35), oak = dk(S.wood, .42);
-  let s = `<rect width="520" height="98" style="fill:${plaster}"/>`;
-  for (let k = 0; k < 6; k++) { const xb = 36 + k*90, xt = 260 + (xb - 260)*1.35; s += `<path d="M${f1(xt - 9)} 0 L${f1(xt + 9)} 0 L${xb + 6} 92 L${xb - 6} 92z" style="fill:${oak}"/><path d="M${f1(xt - 3)} 0 L${xb - 1} 92" style="stroke:${dk(S.wood, .55)}" stroke-width=".8"/>`; }
-  s += `<rect y="88" width="520" height="11" style="fill:${dk(S.wood, .35)}"/><path d="M0 88 H520" style="stroke:${INK}" stroke-width="1"/><path d="M0 99 H520" style="stroke:${INK}" stroke-width="1.2"/>`;
+  let s = `<rect width="520" height="${WT}" style="fill:${plaster}"/>`;
+  for (let k = 0; k < 6; k++) { const xb = 36 + k*90, xt = 260 + (xb - 260)*1.35; s += `<path d="M${f1(xt - 9)} 0 L${f1(xt + 9)} 0 L${xb + 6} ${WT - 7} L${xb - 6} ${WT - 7}z" style="fill:${oak}"/>`; }
+  s += `<rect y="${WT - 11}" width="520" height="11" style="fill:${dk(S.wood, .35)}"/><path d="M0 ${WT - 11} H520" style="stroke:${INK}" stroke-width="1"/><path d="M0 ${WT} H520" style="stroke:${INK}" stroke-width="1.2"/>`;
   return s;
 }
 function wallArt(){
-  let s = `<rect y="99" width="520" height="${FL - 99}" style="fill:${S.wall}"/>`;
-  if (ST.style === "cottagecore") for (let r = 0; r < 4; r++) for (let k = 0; k < 18; k++) s += `<g opacity=".4"><circle cx="${k*30 + (r % 2)*15 + 8}" cy="${112 + r*16}" r="1.5" style="fill:${S.fabric}"/><path d="M${k*30 + (r % 2)*15 + 8} ${114 + r*16} l-2 3 M${k*30 + (r % 2)*15 + 8} ${114 + r*16} l2 3" style="stroke:${S.accent}" stroke-width=".6"/></g>`;
-  // the dado rail at about a metre, and panelling below it
-  s += `<rect y="176" width="520" height="${FL - 176}" style="fill:${S.wall2}" opacity="${ST.style === "peranakan" ? .5 : 1}"/><rect y="173" width="520" height="4" style="fill:${lt(S.wood, .25)}"/>`;
-  if (ST.style === "peranakan") for (let k = 0; k < 26; k++) s += `<rect x="${k*20}" y="178" width="20" height="24" style="fill:${k % 2 ? S.floor2 : lt(S.floor2, .45)}" opacity=".55"/><circle cx="${k*20 + 10}" cy="190" r="4" style="fill:${S.fabric}" opacity=".6"/>`;
-  else if (["coastal", "scandi", "cottagecore"].includes(ST.style)) s += Array.from({length: 58}, (_, k) => `<path d="M${k*9 + 4} 178 V202" style="stroke:${dk(S.wall2, .15)}" stroke-width=".6"/>`).join("");
-  else s += Array.from({length: 11}, (_, k) => `<rect x="${k*48 + 6}" y="181" width="38" height="18" rx="1" fill="none" style="stroke:${dk(S.wall2, .15)}" stroke-width=".8"/>`).join("");
-  s += `<rect y="202" width="520" height="${FL - 202}" style="fill:${lt(S.wall2, .2)}"/><path d="M0 202 H520" style="stroke:${dk(S.wall2, .35)}" stroke-width=".8"/><path d="M0 ${FL} H520" style="stroke:${INK}" stroke-width="1.3"/>`;
-  return g(ceiling() + s);
+  const D1 = FL - 36;   // the dado rail, about a metre up
+  let s = `<rect y="${WT}" width="520" height="${FL - WT}" style="fill:${S.wall}"/>`;
+  if (ST.style === "cottagecore") for (let r = 0; WT + 12 + r*16 < D1 - 4; r++) for (let k = 0; k < 18; k++) s += `<g opacity=".4"><circle cx="${k*30 + (r % 2)*15 + 8}" cy="${WT + 13 + r*16}" r="1.5" style="fill:${S.fabric}"/><path d="M${k*30 + (r % 2)*15 + 8} ${WT + 15 + r*16} l-2 3 M${k*30 + (r % 2)*15 + 8} ${WT + 15 + r*16} l2 3" style="stroke:${S.accent}" stroke-width=".6"/></g>`;
+  s += `<rect y="${D1}" width="520" height="${FL - D1}" style="fill:${S.wall2}" opacity="${ST.style === "peranakan" ? .5 : 1}"/><rect y="${D1 - 3}" width="520" height="4" style="fill:${lt(S.wood, .25)}"/>`;
+  if (ST.style === "peranakan") for (let k = 0; k < 26; k++) s += `<rect x="${k*20}" y="${D1 + 2}" width="20" height="24" style="fill:${k % 2 ? S.floor2 : lt(S.floor2, .45)}" opacity=".55"/><circle cx="${k*20 + 10}" cy="${D1 + 14}" r="4" style="fill:${S.fabric}" opacity=".6"/>`;
+  else if (["coastal", "scandi", "cottagecore"].includes(ST.style)) s += Array.from({length: 58}, (_, k) => `<path d="M${k*9 + 4} ${D1 + 2} V${FL - 8}" style="stroke:${dk(S.wall2, .15)}" stroke-width=".6"/>`).join("");
+  else s += Array.from({length: 11}, (_, k) => `<rect x="${k*48 + 6}" y="${D1 + 5}" width="38" height="18" rx="1" fill="none" style="stroke:${dk(S.wall2, .15)}" stroke-width=".8"/>`).join("");
+  s += `<rect y="${FL - 8}" width="520" height="8" style="fill:${lt(S.wall2, .2)}"/><path d="M0 ${FL - 8} H520" style="stroke:${dk(S.wall2, .35)}" stroke-width=".8"/><path d="M0 ${FL} H520" style="stroke:${INK}" stroke-width="1.3"/>`;
+  return s;
+}
+// the room itself (ceiling, back wall, floor) inside its footprint, and the cottage's thick walls round it
+function roomShell(inner = ""){
+  const r = ROOMS[ST.floor];
+  if (r.x0 === 0 && r.x1 === 520) return g(ceiling() + wallArt() + floorArt() + inner);
+  const lime = "#EFE9DD", lime2 = "#E2DACB", oak = dk(S.wood, .45), T = 16;
+  let out = `<rect width="520" height="640" style="fill:${lime}"/>`
+    // old stone showing through the limewash, and the oak frame of the cottage
+    + Array.from({length: 26}, (_, k) => `<ellipse cx="${f1(R(k*3)*520)}" cy="${f1(R(k*5 + 1)*640)}" rx="${f1(8 + R(k)*14)}" ry="${f1(4 + R(k + 2)*6)}" style="fill:${lime2}" opacity=".8"/>`).join("")
+    + [r.x0 - T - 22, r.x1 + T + 10].map(x => `<rect x="${x}" y="0" width="12" height="640" style="fill:${oak}"/>`).join("")
+    + `<rect y="${Math.max(0, r.ceil - 22)}" width="520" height="12" style="fill:${oak}"/>` + (r.ceil > 30 ? `<path d="M${r.x0 - T - 22} ${r.ceil - 10} L${r.x0 - T - 60} 0 h-12 L${r.x0 - T - 22} ${r.ceil + 20}z M${r.x1 + T + 22} ${r.ceil - 10} L${r.x1 + T + 60} 0 h12 L${r.x1 + T + 22} ${r.ceil + 20}z" style="fill:${oak}"/>` : "");
+  const room = clip(r.x0, r.ceil, r.x1 - r.x0, r.y1 - r.ceil, ceiling() + wallArt() + floorArt() + inner);
+  // the wall tops round the room (the walls are seen from above, thick and whitewashed)
+  const caps = sk(`<rect x="${r.x0 - T}" y="${r.ceil}" width="${T}" height="${r.y1 - r.ceil + T}" style="fill:#F7F3EA"/><rect x="${r.x1}" y="${r.ceil}" width="${T}" height="${r.y1 - r.ceil + T}" style="fill:#F7F3EA"/><rect x="${r.x0 - T}" y="${r.y1}" width="${r.x1 - r.x0 + 2*T}" height="${T}" style="fill:#F7F3EA"/>`,
+    `<rect x="${r.x0 - T}" y="${r.ceil}" width="${r.x1 - r.x0 + 2*T}" height="${r.y1 - r.ceil + T}"/><rect x="${r.x0}" y="${r.ceil}" width="${r.x1 - r.x0}" height="${r.y1 - r.ceil}"/>`);
+  return g(out + room + caps);
 }
 // a thin strip of the left-hand wall, for the doors in it
-const sideWall = () => g(`<path d="M0 ${FL} H14 V640 H0z" style="fill:${S.wall2}"/>` + sk("", `<path d="M14 ${FL} V640"/>`));
+const sideWall = () => g(`<path d="M0 ${FL} H14 V640 H0z" style="fill:${S.wall2}"/>` + sk("", `<path d="M14 ${FL} V640"/>`));   // downstairs only
 // what you see through a window: sky, downs and a hedge by day; dark blue, the moon and stars by night
 function view(x, y, w, h, seed = 0){
   if (NIGHT) return `<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:#26325E"/><rect x="${x}" y="${f1(y + h*.65)}" width="${w}" height="${f1(h*.35)}" style="fill:#1E284C"/>`
@@ -138,8 +157,8 @@ const nightWash = () => `<rect width="520" height="640" fill="#2E3470" opacity="
 const glowDefs = `<defs><radialGradient id="coGlow"><stop offset="0" stop-color="#FFD98A" stop-opacity=".6"/><stop offset=".45" stop-color="#FFC66B" stop-opacity=".22"/><stop offset="1" stop-color="#FFC66B" stop-opacity="0"/></radialGradient></defs>`;
 
 /* ---------- deliveries waiting: wrapped crates and parcels with string ---------- */
-const SLOTS = {down: [[332, 612], [360, 612], [346, 592], [318, 592], [374, 592]], up: [[160, 612], [188, 612], [174, 592], [202, 592], [146, 592]],
-  bath: [[176, 612], [148, 612], [162, 592], [346, 612], [374, 612]], garden: [[372, 578], [400, 578], [386, 558], [160, 578]]};
+const SLOTS = {down: [[332, 612], [360, 612], [346, 592], [318, 592], [374, 592]], up: [[190, 552], [218, 552], [204, 532], [246, 552], [232, 532]],
+  bath: [[180, 488], [208, 488], [194, 468], [330, 488], [358, 488]], garden: [[372, 578], [400, 578], [386, 558], [160, 578]]};
 function crates(){
   const here = (ST.crates || []).filter(id => { const r = (PIECES[id] || ACCESSORIES[id] || {}).room; return r ? r === ST.floor : ST.floor === "down"; });
   return g(here.slice(0, SLOTS[ST.floor].length).map((id, i) => { const [x, y] = SLOTS[ST.floor][i];
@@ -268,11 +287,11 @@ function lamp(t, x, y){
   glow(x - 34, y - 70, 46);
   return D(`<rect x="${x - 6}" y="${y - 7}" width="12" height="7" rx="1.5" style="fill:#E8E4DC"/><path d="M${x - 44} ${y - 72} q10 -11 20 0z" style="fill:${S.metal}"/>`, `<path d="M${x} ${y - 7} Q${x + 4} ${y - 104} ${x - 34} ${y - 80}" fill="none" stroke="${S.metal}" stroke-width="2.2"/><ellipse cx="${x - 34}" cy="${y - 72}" rx="6" ry="1.6" fill="${NIGHT ? "#FFE8A8" : "#F2E6C8"}"/>`);
 }
-function gardenDoor(){   // the back door to the garden, in the left wall
+function gardenDoor(){   // the back door to the garden, in the left wall, near the front
   const col = ST.c === "bluebell" ? BLUE : "#7E9A68";
-  return otherSpot("garden", "The back door to the garden", hovE(30, 480, 24, 10),
-    D(`<path d="M1 396 L16 403 V474 L1 484z" style="fill:${col}"/><path d="M4 402 L13 407 V432 L4 429z" style="fill:${NIGHT ? "#26325E" : "#CFE6F2"}"/><path d="M4 484 l16 -8 h18 l-14 10z" style="fill:#B9875E"/>`, `<circle cx="13" cy="444" r="1.4" fill="${S.metal}"/>`)
-    + lab(30, 500, "Garden", "#D8EBC8", 8));
+  return otherSpot("garden", "The back door to the garden", hovE(30, 574, 24, 10),
+    D(`<path d="M1 494 L16 501 V572 L1 582z" style="fill:${col}"/><path d="M4 500 L13 505 V530 L4 527z" style="fill:${NIGHT ? "#26325E" : "#CFE6F2"}"/><path d="M4 582 l16 -8 h18 l-14 10z" style="fill:#B9875E"/>`, `<circle cx="13" cy="542" r="1.4" fill="${S.metal}"/>`)
+    + lab(36, 598, "Garden", "#D8EBC8", 8));
 }
 function calendar(){
   const [x] = SPOTS.down.calendar;
@@ -288,24 +307,22 @@ function broomCupboard(){   // a slim cupboard by the kitchen, its door ajar on 
       `<path d="M${x - 3} ${y - 58} L${x - 1} ${y - 12}" stroke="#8A6A52" stroke-width="1.8"/><path d="M${x - 6} ${y - 2} l2 -10 h6 l2 10z" fill="#D9B866"/><path d="M${x + 1} ${y - 2} h5 l-1 -6 h-4z" fill="${S.accent}"/>`))
     + lab(x, 160, "Broom cupboard", "#E6DDF2", 7));
 }
-function consoleArt(){
-  const [gx] = SPOTS.down.guestbook, x0 = gx - 22, x1 = gx + 56, y = 566;
+function consoleArt(){   // the console table behind the sofa, where the guest book and the catalogue live
+  const [gx] = SPOTS.down.guestbook, [cx] = SPOTS.down.catalogue, x0 = gx - 26, x1 = cx + 36, y = 500;
   return g(D(`<rect x="${x0}" y="${y - 30}" width="${x1 - x0}" height="5" rx="1" style="fill:${S.wood}"/><rect x="${x0 + 2}" y="${y - 25}" width="${x1 - x0 - 4}" height="7" style="fill:${dk(S.wood, .12)}"/><rect x="${x0 + 3}" y="${y - 18}" width="3.4" height="18" style="fill:${dk(S.wood, .25)}"/><rect x="${x1 - 6.4}" y="${y - 18}" width="3.4" height="18" style="fill:${dk(S.wood, .25)}"/>`,
-    `<circle cx="${(x0 + x1)/2}" cy="${y - 21}" r="1.2" fill="${S.metal}"/><path d="M${x0 + 10} ${y - 4} h${x1 - x0 - 20}" stroke="${dk(S.wood, .25)}" stroke-width="1.6"/>`)
-    // a little framed picture and hooks with a coat and an umbrella above the console
-    + D(`<rect x="${x0 + 16}" y="${y - 70}" width="20" height="16" style="fill:${dk(S.wood, .2)}"/>`, `<rect x="${x0 + 18}" y="${y - 68}" width="16" height="12" fill="#CFE6F2"/><path d="M${x0 + 18} ${y - 60} q8 -4 16 0 v4 h-16z" fill="#7FA86A"/>`));
+    `<circle cx="${(x0 + x1)/2}" cy="${y - 21}" r="1.2" fill="${S.metal}"/><path d="M${x0 + 10} ${y - 4} h${x1 - x0 - 20}" stroke="${dk(S.wood, .25)}" stroke-width="1.6"/><path d="M${x0 + 8} ${y - 6} l-2 -8 h12 l-2 8z" fill="#C9A26A"/>`));
 }
 function guestbook(){
-  const [x] = SPOTS.down.guestbook, y = 536;
-  return otherSpot("guestbook", "The guest book", hovE(x, 572, 18, 8),
+  const [x] = SPOTS.down.guestbook, y = 470;
+  return otherSpot("guestbook", "The guest book", hovE(x, 498, 18, 8),
     g(D(`<path d="M${x - 11} ${y} l1 -6 q5 -2 10 1 q5 -3 10 -1 l1 6 q-6 -2 -11 1 q-5 -3 -11 -1z" style="fill:${CREAM}"/>`, `<path d="M${x} ${y - 5} v6" stroke="${INK}" stroke-width=".5"/><path d="M${x + 6} ${y + 1} l7 -5" stroke="${S.accent}" stroke-width="1.2"/>`))
-    + lab(x - 4, 600, "Guest book", "#F4D3C8", 8));
+    + lab(x - 8, 522, "Guest book", "#F4D3C8", 8));
 }
 function catalogue(){
-  const [x] = SPOTS.down.catalogue, y = 536;
-  return otherSpot("catalogue", "The furniture catalogue", hovE(x, 572, 16, 8),
+  const [x] = SPOTS.down.catalogue, y = 470;
+  return otherSpot("catalogue", "The furniture catalogue", hovE(x, 498, 16, 8),
     g(D(`<rect x="${x - 9}" y="${y - 10}" width="18" height="10" rx="1" style="fill:#E8574A"/><path d="M${x - 9} ${y} h18 v-2 h-18z" style="fill:${CREAM}"/>`, `<path d="M${x - 9} ${y - 7} h18" stroke="${CREAM}" stroke-width="1.4"/><circle cx="${x}" cy="${y - 4}" r="1.6" fill="#F6E3A1"/>`))
-    + lab(x + 14, 622, "Catalogue", "#F3E1A0", 8));
+    + lab(x + 8, 542, "Catalogue", "#F3E1A0", 8));
 }
 // the stairs up: side-on wooden stairs, exactly the mill's (six treads rising to the right over a solid stringer,
 // a handrail on turned balusters, a newel post at the foot), here against the right of the bottom
@@ -360,16 +377,18 @@ function livedDown(){
 }
 // decor that makes the zones: a runner from the front door, a side table by the armchair, a bench for boots by the stairs
 function downDecor(){
-  const runner = D(`<rect x="238" y="430" width="44" height="168" rx="2" style="fill:${S.fabric2}"/>`, `<rect x="243" y="436" width="34" height="156" fill="none" stroke="${S.accent}" stroke-width="1.6"/>${[0, 1, 2, 3, 4, 5, 6].map(k => `<path d="M${252 + (k % 2)*8} ${452 + k*20} l8 6 l-8 6" fill="none" stroke="${S.fabric}" stroke-width="1.2"/>`).join("")}${Array.from({length: 9}, (_, k) => `<path d="M${241 + k*4.8} 430 v-3" stroke="${S.fabric2}" stroke-width="1"/>`).join("")}`);
   const [ax, ay] = at("armchair");
-  const side = D(`<ellipse cx="${ax - 40}" cy="${ay - 20}" rx="9" ry="3" style="fill:${lt(S.wood, .1)}"/><path d="M${ax - 46} ${ay - 2} h12 l-1 -3 h-10z" style="fill:${dk(S.wood, .2)}"/>`, `<path d="M${ax - 40} ${ay - 18} v14" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M${ax - 44} ${ay - 22} l1 -5 h6 l1 5z" fill="#C8643B"/><ellipse cx="${ax - 42}" cy="${ay - 30}" rx="3" ry="4" fill="#6E9A5A"/><ellipse cx="${ax - 38}" cy="${ay - 31}" rx="2.4" ry="3.4" fill="#88AE6A"/>`);
-  const bench = D(`<rect x="420" y="458" width="62" height="6" rx="1.5" style="fill:${S.wood}"/><path d="M432 478 v-10 q0 -3 4 -3 h4 v13z M446 478 v-10 q0 -3 4 -3 h4 v13z" style="fill:#4E7A5E"/><path d="M458 458 l2 -12 h16 l2 12z" style="fill:#C9A26A"/>`,
-    `<path d="M424 464 v14 M478 464 v14" stroke="${dk(S.wood, .3)}" stroke-width="2"/><path d="M462 450 h12" stroke="#9A7A4A" stroke-width=".7"/><path d="M462 448 q4 -6 8 -2" fill="${S.fabric}" stroke="${INK}" stroke-width=".4"/>`);
-  return g(side + bench);
+  // a side table and plant tucked behind the armchair
+  const side = D(`<ellipse cx="${ax - 24}" cy="${ay - 62}" rx="9" ry="3" style="fill:${lt(S.wood, .1)}"/><path d="M${ax - 30} ${ay - 44} h12 l-1 -3 h-10z" style="fill:${dk(S.wood, .2)}"/>`, `<path d="M${ax - 24} ${ay - 60} v14" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M${ax - 28} ${ay - 64} l1 -5 h6 l1 5z" fill="#C8643B"/><ellipse cx="${ax - 26}" cy="${ay - 72}" rx="3" ry="4" fill="#6E9A5A"/><ellipse cx="${ax - 22}" cy="${ay - 73}" rx="2.4" ry="3.4" fill="#88AE6A"/>`);
+  // a Welsh dresser against the right-hand wall, between the fridge and the stairs
+  const x0 = 454, x1 = 500, y = 382, c = mix(S.accent, "#FFFFFF", .55);
+  const dresser = D(`<rect x="${x0}" y="${y - 84}" width="${x1 - x0}" height="50" style="fill:${c}"/><rect x="${x0 - 3}" y="${y - 88}" width="${x1 - x0 + 6}" height="5" rx="1" style="fill:${dk(c, .15)}"/><rect x="${x0 - 2}" y="${y - 36}" width="${x1 - x0 + 4}" height="6" rx="1" style="fill:${dk(c, .1)}"/><rect x="${x0}" y="${y - 30}" width="${x1 - x0}" height="28" style="fill:${c}"/>`,
+    `${[0, 1].map(r => `<path d="M${x0 + 2} ${y - 60 + r*22} h${x1 - x0 - 4}" stroke="${dk(c, .25)}" stroke-width="1.4"/>${[0, 1, 2, 3].map(k => `<circle cx="${x0 + 8 + k*10}" cy="${y - 68 + r*22}" r="4" fill="${CREAM}" stroke="${S.accent}" stroke-width=".9"/>`).join("")}`).join("")}<path d="M${(x0 + x1)/2} ${y - 30} v28" stroke="${dk(c, .25)}" stroke-width=".8"/><circle cx="${(x0 + x1)/2 - 4}" cy="${y - 16}" r="1.2" fill="${S.metal}"/><circle cx="${(x0 + x1)/2 + 4}" cy="${y - 16}" r="1.2" fill="${S.metal}"/><path d="M${x0 + 2} ${y - 2} v2 M${x1 - 2} ${y - 2} v2" stroke="${INK}" stroke-width="2"/><path d="M${x0 + 6} ${y - 36} q6 -8 12 0z" fill="#C9A26A"/><circle cx="${x0 + 10}" cy="${y - 40}" r="2.4" fill="#D9433A"/><circle cx="${x0 + 15}" cy="${y - 40}" r="2.4" fill="#F2A03A"/>`);
+  return g(side + dresser);
 }
 function downArt(){
   const [kx] = at("kitchen");
-  return floorArt() + wallArt() + windowArt(38, 116, 48, 56, {seed: 1}) + windowArt(kx - 22, 112, 44, 50, {curtains: false, seed: 2}) + sideWall()
+  return roomShell() + windowArt(38, 116, 48, 56, {seed: 1}) + windowArt(kx - 22, 112, 44, 50, {curtains: false, seed: 2}) + sideWall()
     + chimney() + accDown("prints") + accDown("records") + pieceSpot("fireplace", fireplace) + accDown("candles") + pieceSpot("bookshelf", bookshelf) + calendar() + broomCupboard() + pieceSpot("kitchen", kitchen) + fridge()
     + gardenDoor() + downDecor() + pieceSpot("rug", rug) + pieceSpot("armchair", armchair) + pieceSpot("coffee", coffee) + pieceSpot("dining", dining) + scaled("dining", () => accDown("flowers") + fruitBowl())
     + pieceSpot("sofa", sofa) + scaled("sofa", () => accDown("cushions")) + pieceSpot("lamp", lamp)
@@ -378,16 +397,15 @@ function downArt(){
 
 /* ====================================================================================================== */
 /* ---------- upstairs: the bedroom ---------- */
-function bathDoor(){   // the door through to the bathroom, in the left wall
-  const col = ST.c === "bluebell" ? BLUE : lt(S.wood, .1);
-  return otherSpot("bathroom", "Through the door to the bathroom", hovE(30, 352, 26, 10),
-    D(`<path d="M1 270 L18 278 V350 L1 362z" style="fill:${col}"/><path d="M3 362 l17 -10 h20 l-16 12z" style="fill:${S.fabric2}"/>`,
-      `<path d="M5 280 L14 284 V310 L5 307z M5 315 L14 317 V344 L5 350z" fill="none" stroke="${dk(col, .25)}" stroke-width=".8"/><circle cx="15" cy="318" r="1.4" fill="${S.metal}"/><ellipse cx="9" cy="296" rx="3.4" ry="2.2" fill="${CREAM}" stroke="${INK}" stroke-width=".4" transform="rotate(24 9 296)"/>`)
-    + lab(40, 378, "Bathroom", "#DDEBF2", 8));
+function bathDoor(){   // the door through to the bathroom, in the thick left-hand wall
+  const col = ST.c === "bluebell" ? BLUE : lt(S.wood, .1), [sx, sy] = SPOTS.up.bathroom;
+  return otherSpot("bathroom", "Through the door to the bathroom", hovE(sx - 10, sy + 6, 26, 10),
+    D(`<rect x="32" y="${sy - 58}" width="20" height="74" rx="1" style="fill:${col}"/><path d="M52 ${sy + 16} h22 l-4 -12 h-18z" style="fill:${S.fabric2}"/>`,
+      `<rect x="35" y="${sy - 52}" width="14" height="28" fill="none" stroke="${dk(col, .25)}" stroke-width=".8"/><rect x="35" y="${sy - 18}" width="14" height="28" fill="none" stroke="${dk(col, .25)}" stroke-width=".8"/><circle cx="48" cy="${sy - 20}" r="1.4" fill="${S.metal}"/><ellipse cx="42" cy="${sy - 38}" rx="4" ry="2.4" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/>`)
+    + lab(sx + 4, sy + 36, "Bathroom", "#DDEBF2", 8));
 }
 // a little rush chair and a basket of spare blankets by the bathroom door
-const doorCorner = () => g(D(`<rect x="40" y="416" width="16" height="4" rx="1" style="fill:#D9B866"/><path d="M38 440 h22 l-2 -16 h-18z" style="fill:#C9A26A"/>`,
-  `<path d="M41 420 v12 M55 420 v12 M41 420 v-14 M41 408 h0" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M41 406 v14 M41 410 h-0" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M42 424 q4 -6 8 -2 q6 -4 8 2" fill="${S.fabric2}" stroke="${INK}" stroke-width=".5"/>`));
+const doorCorner = () => "";
 function vanity(t, x, y){
   if (t === 1) return D(`<rect x="${x - 18}" y="196" width="36" height="3" rx="1" style="fill:${S.wood}"/><circle cx="${x}" cy="176" r="10" style="fill:#DDEEF2"/>`, `<path d="M${x - 14} 199 l3 5 M${x + 14} 199 l-3 5" stroke="${dk(S.wood, .3)}" stroke-width="1.4"/><circle cx="${x}" cy="176" r="10" fill="none" stroke="${S.metal}" stroke-width="1.8"/><path d="M${x - 5} 173 l6 -5" stroke="#FFFFFF" stroke-width="1.6"/><rect x="${x + 6}" y="190" width="5" height="6" rx="1" fill="${S.fabric}"/><rect x="${x - 12}" y="191" width="4" height="5" rx="1" fill="#C9B3E3"/>`);
   const c = t === 3 ? CREAM : S.wood, w = 24;
@@ -466,10 +484,11 @@ function bedrug(t, x, y){
   if (t === 2) return D(`<path d="M${x - 40} ${y - 18} q-4 -18 22 -22 q20 -6 40 0 q24 2 22 20 q2 16 -22 20 q-22 4 -42 0 q-24 -2 -20 -18z" style="fill:#F6F2E8"/>`, Array.from({length: 14}, (_, k) => `<path d="M${f1(x - 34 + R(k)*68)} ${f1(y - 34 + R(k + 3)*30)} q2 -2 4 0" stroke="#D8D0C0" stroke-width=".8" fill="none"/>`).join(""));
   return D(`<ellipse cx="${x}" cy="${y - 28}" rx="72" ry="28" style="fill:${S.fabric}"/>`, `<ellipse cx="${x}" cy="${y - 28}" rx="64" ry="23" fill="none" stroke="${S.fabric2}" stroke-width="4"/><ellipse cx="${x}" cy="${y - 28}" rx="46" ry="16" fill="none" stroke="${S.accent}" stroke-width="2.4" stroke-dasharray="6 3"/><ellipse cx="${x}" cy="${y - 28}" rx="22" ry="8" fill="${S.fabric2}"/>`);
 }
-function stairsDown(){   // the top of the stairs, bottom left, going down (like the mill's upstairs)
-  return otherSpot("stairs", "Down the stairs to the sitting room", hovE(80, 590, 46, 14),
-    sk(`<rect x="36" y="520" width="90" height="96" style="fill:#7A5638"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${40 + i*4}" y="${528 + i*17}" width="${82 - i*8}" height="12" style="fill:#A8754F"/>`).join("")}<path d="M130 520 v96 M126 520 h8" style="stroke:#5A3A2A" stroke-width="3"/>`, `<rect x="36" y="520" width="90" height="96"/>`)
-    + lab(80, 628, "Downstairs", "#F3E1A0", 8));
+function stairsDown(){   // the top of the stairs, a stairwell in the front left corner, going down (like the mill's upstairs)
+  const [sx, sy] = SPOTS.up.stairs, x0 = sx - 48, y0 = sy + 10;
+  return otherSpot("stairs", "Down the stairs to the sitting room", hovE(sx, sy + 20, 46, 14),
+    sk(`<rect x="${x0}" y="${y0}" width="90" height="90" style="fill:#7A5638"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${x0 + 4 + i*4}" y="${y0 + 6 + i*16}" width="${82 - i*8}" height="11" style="fill:#A8754F"/>`).join("")}<path d="M${x0 + 94} ${y0} v90 M${x0} ${y0 - 2} h94" style="stroke:#5A3A2A" stroke-width="3"/>${[0, 1, 2, 3].map(k => `<path d="M${x0 + 94} ${y0 + 10 + k*22} v-10" style="stroke:#6B4A2E" stroke-width="1.6"/>`).join("")}`, `<rect x="${x0}" y="${y0}" width="90" height="90"/>`)
+    + lab(sx + 70, sy + 96, "Downstairs", "#F3E1A0", 8));
 }
 function accUp(id){
   if (!has(id)) return "";
@@ -489,36 +508,37 @@ function livedUp(){
 function upDecor(){
   const [bx, by] = at("bed");
   let s = tier("bed") ? D(`<rect x="${bx - 24}" y="${by + 2}" width="48" height="6" rx="2" style="fill:${S.fabric2}"/><rect x="${bx - 24}" y="${by + 8}" width="48" height="5" style="fill:${S.wood}"/>`, `<path d="M${bx - 22} ${by + 13} v4 M${bx + 22} ${by + 13} v4" stroke="${dk(S.wood, .3)}" stroke-width="2"/>`) : "";
-  const cx = 432, cy = 504, col = mix(S.fabric, S.accent, .3);
-  glow(462, 462, 30);
+  // a reading corner against the right-hand wall: a chair, a lamp on a little table
+  const cx = 424, cy = 470, col = mix(S.fabric, S.accent, .3);
+  glow(454, 426, 30);
   s += D(`<rect x="${cx - 15}" y="${cy - 34}" width="30" height="22" rx="7" style="fill:${col}"/><rect x="${cx - 19}" y="${cy - 20}" width="8" height="16" rx="3" style="fill:${dk(col, .1)}"/><rect x="${cx + 11}" y="${cy - 20}" width="8" height="16" rx="3" style="fill:${dk(col, .1)}"/><rect x="${cx - 12}" y="${cy - 16}" width="24" height="10" rx="3" style="fill:${lt(col, .15)}"/>`,
     `<path d="M${cx - 15} ${cy - 4} v4 M${cx + 15} ${cy - 4} v4" stroke="${dk(S.wood, .3)}" stroke-width="2"/><rect x="${cx - 6}" y="${cy - 30}" width="12" height="9" rx="3" fill="${S.fabric2}" stroke="${INK}" stroke-width=".4"/>`)
-    + D(`<ellipse cx="462" cy="484" rx="9" ry="3" style="fill:${lt(S.wood, .1)}"/><path d="M455 461 h14 l3 9 h-20z" style="fill:${NIGHT ? lt(S.fabric2, .5) : S.fabric2}"/>`, `<path d="M462 486 v18 M456 504 h12" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M462 481 v-11" stroke="${S.metal}" stroke-width="1.2"/><rect x="452" y="478" width="7" height="3" fill="${S.accent}"/>`)
-    + D(`<rect x="20" y="462" width="36" height="38" rx="1.5" style="fill:${S.wood}"/><rect x="18" y="458" width="40" height="5" rx="1" style="fill:${dk(S.wood, .1)}"/>`, `${[0, 1, 2].map(k => `<path d="M22 ${474 + k*12} h32" stroke="${dk(S.wood, .3)}" stroke-width=".8"/><circle cx="31" cy="${468 + k*12}" r="1" fill="${S.metal}"/><circle cx="45" cy="${468 + k*12}" r="1" fill="${S.metal}"/>`).join("")}<path d="M34 458 q-2 -8 2 -12 h4 q4 4 2 12z" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/><circle cx="36" cy="442" r="2.4" fill="${S.fabric}"/><circle cx="40" cy="444" r="2" fill="#F6E3A1"/>`);
+    + D(`<ellipse cx="454" cy="448" rx="9" ry="3" style="fill:${lt(S.wood, .1)}"/><path d="M447 425 h14 l3 9 h-20z" style="fill:${NIGHT ? lt(S.fabric2, .5) : S.fabric2}"/>`, `<path d="M454 450 v18 M448 468 h12" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M454 445 v-11" stroke="${S.metal}" stroke-width="1.2"/><rect x="444" y="442" width="7" height="3" fill="${S.accent}"/>`)
+  // a chest of drawers against the left-hand wall, below the bathroom door
+    + D(`<rect x="54" y="384" width="38" height="38" rx="1.5" style="fill:${S.wood}"/><rect x="52" y="380" width="42" height="5" rx="1" style="fill:${dk(S.wood, .1)}"/>`, `${[0, 1, 2].map(k => `<path d="M56 ${396 + k*12} h34" stroke="${dk(S.wood, .3)}" stroke-width=".8"/><circle cx="66" cy="${390 + k*12}" r="1" fill="${S.metal}"/><circle cx="80" cy="${390 + k*12}" r="1" fill="${S.metal}"/>`).join("")}<path d="M66 380 q-2 -8 2 -12 h4 q4 4 2 12z" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/><circle cx="68" cy="364" r="2.4" fill="${S.fabric}"/><circle cx="72" cy="366" r="2" fill="#F6E3A1"/><rect x="78" y="374" width="10" height="6" fill="${S.accent}" stroke="${INK}" stroke-width=".3"/>`);
   return g(s);
 }
 function upArt(){
-  return floorArt() + wallArt() + windowArt(44, 116, 48, 56, {seed: 4}) + seatRecess() + sideWall() + accUp("mirror")
+  return roomShell() + windowArt(70, 116, 48, 56, {seed: 4}) + seatRecess() + accUp("mirror")
     + pieceSpot("windowseat", windowseat) + pieceSpot("wardrobe", wardrobe) + pieceSpot("vanity", vanity) + pieceSpot("bedrug", bedrug) + pieceSpot("bedside", bedside) + pieceSpot("bed", bed)
     + bathDoor() + doorCorner() + upDecor() + accUp("plant") + livedUp() + stairsDown() + crates();
 }
 
 /* ====================================================================================================== */
 /* ---------- the bathroom (round 237): its own room, through the door off the bedroom ---------- */
-function bathShell(){
-  let s = `<rect y="${FL}" width="520" height="${640 - FL}" style="fill:${CREAM}"/>`;
-  for (let r = 0; FL + r*26 < 640; r++) for (let k = 0; k < 20; k++) s += `<rect x="${k*26}" y="${FL + r*26}" width="26" height="26" style="fill:${(r + k) % 2 ? CREAM : mix(S.wall2, CREAM, .15)};stroke:${dk(S.wall2, .12)}" stroke-width=".6"/>`;
-  s += `<rect y="99" width="520" height="${FL - 99}" style="fill:${S.wall}"/>`;
-  // tiles to half height: little brick-laid tiles, a few in the accent, a border along the top
-  for (let r = 0; r < 6; r++) for (let k = 0; k < 36; k++) { const x = k*15 - (r % 2)*7.5, c = (k*7 + r*3) % 9 === 0 ? lt(S.accent, .35) : (k + r) % 5 === 0 ? lt(S.fabric2, .2) : CREAM;
-    s += `<rect x="${x}" y="${154 + r*9.4}" width="15" height="9.4" style="fill:${c};stroke:${dk(S.wall2, .15)}" stroke-width=".4"/>`; }
-  s += `<rect y="150" width="520" height="5" style="fill:${S.accent}"/><rect y="${FL - 6}" width="520" height="6" style="fill:${S.accent}" opacity=".55"/><path d="M0 ${FL} H520" style="stroke:${INK}" stroke-width="1.3"/>`;
-  return g(ceiling() + s);
+function bathShell(){   // tiles to half height on the back wall, a checked tile floor
+  let t = `<rect y="${FL}" width="520" height="${640 - FL}" style="fill:${CREAM}"/>`;
+  for (let r = 0; FL + r*24 < 640; r++) for (let k = 0; k < 22; k++) t += `<rect x="${k*24 + 2}" y="${FL + r*24}" width="24" height="24" style="fill:${(r + k) % 2 ? CREAM : mix(S.wall2, CREAM, .15)};stroke:${dk(S.wall2, .12)}" stroke-width=".6"/>`;
+  for (let r = 0; r < 7; r++) for (let k = 0; k < 36; k++) { const x = k*15 - (r % 2)*7.5, c = (k*7 + r*3) % 9 === 0 ? lt(S.accent, .35) : (k + r) % 5 === 0 ? lt(S.fabric2, .2) : CREAM;
+    t += `<rect x="${x}" y="${f1(FL - 66 + r*9.4)}" width="15" height="9.4" style="fill:${c};stroke:${dk(S.wall2, .15)}" stroke-width=".4"/>`; }
+  t += `<rect y="${FL - 70}" width="520" height="5" style="fill:${S.accent}"/><rect y="${FL - 6}" width="520" height="6" style="fill:${S.accent}" opacity=".55"/><path d="M0 ${FL} H520" style="stroke:${INK}" stroke-width="1.3"/>`;
+  return roomShell(t);
 }
 function bathTub(t, x, y){
   const L = x - 34, Rr = x + 34;
-  if (t === 1) return D(`<rect x="${x - 22}" y="${y - 26}" width="44" height="20" rx="1.5" style="fill:${CREAM}"/><rect x="${x - 22}" y="${y - 7}" width="44" height="7" style="fill:${lt(S.wall2, .05)}"/><path d="M${x - 22} 132 q22 -6 44 0 l-1 3 q-4 40 2 76 h-12 q-6 -40 -2 -76z" style="fill:${S.fabric2}"/>`,
-    `<circle cx="${x}" cy="${y - 15}" r="2" fill="#9AA0A6"/><path d="M${x - 10} ${FL} v-60 q0 -4 4 -4 h5" stroke="${S.metal}" stroke-width="1.8" fill="none"/><ellipse cx="${x}" cy="148" rx="5" ry="1.8" fill="${S.metal}"/><path d="M${x - 24} 131 h48" stroke="${S.metal}" stroke-width="1.6"/>${[0, 1, 2].map(k => `<path d="M${x + 10 + k*3} 136 q-3 40 3 74" stroke="${dk(S.fabric2, .15)}" stroke-width=".8" fill="none"/>`).join("")}`);
+  // a walk-in shower tray in the middle of the room, a curtain on a ring rail hung from the beams
+  if (t === 1) return D(`<path d="M${x - 30} ${y - 104} q30 -10 60 0 l-2 4 q-6 40 2 74 h-56 q8 -34 -4 -78z" style="fill:${lt(S.fabric2, .25)}" opacity=".9"/><rect x="${x - 24}" y="${y - 28}" width="48" height="22" rx="1.5" style="fill:${CREAM}"/><rect x="${x - 24}" y="${y - 7}" width="48" height="7" style="fill:${lt(S.wall2, .05)}"/><path d="M${x + 12} ${y - 102} q-4 40 4 76 h14 q-2 -40 -2 -78z" style="fill:${S.fabric2}"/>`,
+    `<ellipse cx="${x}" cy="${y - 104}" rx="30" ry="7" fill="none" stroke="${S.metal}" stroke-width="1.6"/><path d="M${x - 24} ${y - 106} V${WT} M${x + 24} ${y - 106} V${WT}" stroke="${S.metal}" stroke-width=".8"/><path d="M${x} ${WT} V${y - 92}" stroke="${S.metal}" stroke-width="1.6"/><ellipse cx="${x}" cy="${y - 90}" rx="6" ry="2" fill="${S.metal}"/><circle cx="${x}" cy="${y - 17}" r="2" fill="#9AA0A6"/>${[0, 1, 2].map(k => `<path d="M${x + 15 + k*4} ${y - 98} q-3 36 3 70" stroke="${dk(S.fabric2, .15)}" stroke-width=".8" fill="none"/>`).join("")}`);
   const copper = t === 3, body = copper ? "#C9824A" : CREAM;
   if (copper) glow(Rr + 10, y - 34, 26);
   return (copper ? D(`<rect x="${Rr + 4}" y="${y - 22}" width="14" height="4" style="fill:${S.wood}"/>`, `<path d="M${Rr + 6} ${y - 18} v18 M${Rr + 16} ${y - 18} v18" stroke="${dk(S.wood, .3)}" stroke-width="1.6"/><rect x="${Rr + 7}" y="${y - 28}" width="5" height="6" fill="${CREAM}"/>${flame(Rr + 9.5, y - 28, .35)}<path d="M${Rr + 13} ${y - 22} l2 -6 h3 l1 6z" fill="#6E9A5A"/>`) : "")
@@ -554,12 +574,12 @@ function accBath(id){
   if (id === "bathplant") return g(D(`<path d="M${x - 6} ${y - 4} h12 l-1.4 -8 h-9.2z" style="fill:#C8643B"/>`, [-60, -35, -12, 12, 35, 60].map(a => `<path d="M${x} ${y - 12} q${f1(a*.2)} -10 ${f1(a*.34)} -7" stroke="#5E8A4A" stroke-width="1.6" fill="none"/>${[1, 2, 3].map(j => `<ellipse cx="${f1(x + a*.34*j/3)}" cy="${f1(y - 12 - 7*j/3 - (j === 2 ? 2 : 0))}" rx="2" ry="1.1" fill="#6E9A4A"/>`).join("")}`).join("")));
   return "";
 }
-function bathCorners(){   // calm, full edges: a laundry basket and a cupboard against the back wall, a plant and a chair by the door
-  glow(462, 186, 26);
-  return g(D(`<path d="M44 240 h28 l-3 -26 h-22z" style="fill:#C9A26A"/><rect x="440" y="196" width="44" height="44" rx="1.5" style="fill:${lt(S.wood, .1)}"/><rect x="437" y="192" width="50" height="5" rx="1" style="fill:${dk(S.wood, .1)}"/>`,
-    `${[0, 1, 2].map(k => `<path d="M47 ${220 + k*6} h24" stroke="#9A7A4A" stroke-width=".7"/>`).join("")}<path d="M48 214 q4 -6 9 -2 q5 -5 10 1" fill="${S.fabric2}" stroke="${INK}" stroke-width=".5"/><path d="M462 197 v42" stroke="${dk(S.wood, .25)}" stroke-width=".8"/><circle cx="458" cy="216" r="1.2" fill="${S.metal}"/><circle cx="466" cy="216" r="1.2" fill="${S.metal}"/><rect x="448" y="182" width="6" height="10" rx="1" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/>${flame(451, 182, .35)}<path d="M464 192 l2 -9 h6 l2 9z" fill="#E8F1F0" stroke="${INK}" stroke-width=".4"/><rect x="474" y="184" width="8" height="8" rx="1" fill="${S.fabric2}" stroke="${INK}" stroke-width=".4"/>`)
-    + D(`<path d="M462 560 h22 l-2 -16 h-18z" style="fill:#C8643B"/>`, [[-12, -26, -30], [10, -30, 24], [-1, -40, -4], [-14, -12, -50], [13, -14, 50]].map(([dx, dy, a]) => `<path d="M473 544 Q${473 + dx*.4} ${544 + dy*.5} ${473 + dx} ${544 + dy}" stroke="#4E7A3E" stroke-width="1.2" fill="none"/><ellipse cx="${473 + dx}" cy="${544 + dy}" rx="8" ry="4" fill="#5E9A4A" stroke="${INK}" stroke-width=".5" transform="rotate(${a} ${473 + dx} ${544 + dy})"/>`).join(""))
-    + D(`<rect x="44" y="548" width="20" height="5" rx="1.4" style="fill:${S.fabric}"/>`, `<path d="M46 553 v12 M62 553 v12 M46 548 v-16 q8 -4 16 0 v16" stroke="${dk(S.wood, .2)}" stroke-width="1.8" fill="none"/>`));
+function bathCorners(){   // a slipper chair on the left, a cupboard on the right, a laundry basket and a plant in the front corners
+  glow(386, 384, 26);
+  return g(D(`<path d="M134 492 h24 l-3 -22 h-18z" style="fill:#C9A26A"/><rect x="366" y="398" width="36" height="42" rx="1.5" style="fill:${lt(S.wood, .1)}"/><rect x="363" y="394" width="42" height="5" rx="1" style="fill:${dk(S.wood, .1)}"/>`,
+    `${[0, 1, 2].map(k => `<path d="M137 ${476 + k*5} h18" stroke="#9A7A4A" stroke-width=".7"/>`).join("")}<path d="M137 470 q4 -6 8 -2 q4 -5 9 1" fill="${S.fabric2}" stroke="${INK}" stroke-width=".5"/><path d="M384 399 v40" stroke="${dk(S.wood, .25)}" stroke-width=".8"/><circle cx="380" cy="416" r="1.2" fill="${S.metal}"/><circle cx="388" cy="416" r="1.2" fill="${S.metal}"/><rect x="372" y="384" width="6" height="10" rx="1" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/>${flame(375, 384, .35)}<path d="M386 394 l2 -9 h6 l2 9z" fill="#E8F1F0" stroke="${INK}" stroke-width=".4"/>`)
+    + D(`<path d="M378 494 h20 l-2 -14 h-16z" style="fill:#C8643B"/>`, [[-11, -24, -30], [9, -27, 24], [-1, -36, -4], [-13, -11, -50], [12, -13, 50]].map(([dx, dy, a]) => `<path d="M388 480 Q${388 + dx*.4} ${480 + dy*.5} ${388 + dx} ${480 + dy}" stroke="#4E7A3E" stroke-width="1.2" fill="none"/><ellipse cx="${388 + dx}" cy="${480 + dy}" rx="7.4" ry="3.8" fill="#5E9A4A" stroke="${INK}" stroke-width=".5" transform="rotate(${a} ${388 + dx} ${480 + dy})"/>`).join(""))
+    + D(`<rect x="126" y="378" width="30" height="20" rx="8" style="fill:${S.fabric}"/><rect x="128" y="396" width="26" height="8" rx="3" style="fill:${lt(S.fabric, .15)}"/>`, `<path d="M130 404 v8 M152 404 v8" stroke="${S.metal}" stroke-width="1.8"/><rect x="134" y="390" width="14" height="5" rx="2" fill="${CREAM}" stroke="${INK}" stroke-width=".3"/>`));
 }
 function livedBath(){
   if (!undone("bath")) return "";
@@ -569,27 +589,24 @@ function livedBath(){
   s += g(D(`<path d="M${x - 70} ${y + 30} q6 -8 18 -5 q9 0 10 6 q-1 6 -14 6 q-13 0 -14 -7z" style="fill:${CREAM}"/><path d="M${x + 54} ${y + 50} q5 -9 17 -6 q6 3 5 8 q-12 5 -22 -2z" style="fill:${S.fabric2}"/>`, `<path d="M${x - 64} ${y + 31} q8 2 15 0" stroke="#D8D0C4" stroke-width=".8" fill="none"/>`));
   return s;
 }
-function bedroomDoor(){   // the way back to the bedroom: a mat at the bottom centre
-  return otherSpot("bedroom", "Back through to the bedroom", hovE(260, 612, 54, 14),
-    sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:${S.fabric2}"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/>`) + `<path d="M222 606 h76 M222 620 h76" stroke="${S.accent}" stroke-width="1.4" pointer-events="none"/>`
-    + lab(260, 590, "Bedroom", "#F3E1A0", 8));
+function bedroomDoor(){   // the doorway in the front wall, out to the landing and back to the bedroom
+  const r = ROOMS.bath, [sx, sy] = SPOTS.bath.bedroom;
+  const landing = `<rect x="${sx - 70}" y="${r.y1 + 16}" width="140" height="${640 - r.y1 - 16}" style="fill:${S.floor}"/>${[0, 1, 2, 3, 4, 5, 6].map(k => `<path d="M${sx - 70} ${r.y1 + 30 + k*18} h140" stroke="${S.floor2}" stroke-width=".8"/>`).join("")}`;
+  return g(D(landing + `<rect x="${sx - 22}" y="${r.y1 - 1}" width="44" height="18" style="fill:${S.floor}"/>`, `<path d="M${sx - 60} ${r.y1 + 40} V640 M${sx + 60} ${r.y1 + 40} V640" stroke="#6B4A2E" stroke-width="2.4"/>${[0, 1, 2, 3, 4].map(k => `<path d="M${sx - 60} ${r.y1 + 50 + k*22} h-6 M${sx + 60} ${r.y1 + 50 + k*22} h6" stroke="#6B4A2E" stroke-width="1.6"/>`).join("")}`)
+    + D(`<path d="M${sx + 22} ${r.y1} l14 -4 v20 l-14 2z" style="fill:${ST.c === "bluebell" ? BLUE : lt(S.wood, .1)}"/>`))
+    + otherSpot("bedroom", "Back through to the bedroom", hovE(sx, sy, 34, 10),
+    sk(`<rect x="${sx - 26}" y="${sy - 12}" width="52" height="16" rx="5" style="fill:${S.fabric2}"/>`, `<rect x="${sx - 26}" y="${sy - 12}" width="52" height="16" rx="5"/>`) + `<path d="M${sx - 20} ${sy - 8} h40 M${sx - 20} ${sy} h40" stroke="${S.accent}" stroke-width="1.2" pointer-events="none"/>`
+    + lab(sx, r.y1 + 44, "Bedroom", "#F3E1A0", 8));
 }
 // a runner from the door to the bath, a ladder of towels against the side wall, a slipper chair and a plant stand
-function bathDecor(){
-  const runner = D(`<rect x="242" y="302" width="36" height="296" rx="2" style="fill:${lt(S.accent, .45)}"/>`, `<rect x="246" y="306" width="28" height="288" fill="none" stroke="${CREAM}" stroke-width="1.4"/>${Array.from({length: 12}, (_, k) => `<circle cx="260" cy="${320 + k*23}" r="2.4" fill="${CREAM}"/>`).join("")}`);
-  const ladder = D(`<path d="M20 384 L28 296 M38 384 L44 296" style="stroke:${S.wood}" stroke-width="3"/><rect x="22" y="312" width="22" height="12" rx="2" style="fill:${S.fabric2}"/><rect x="21" y="340" width="20" height="10" rx="2" style="fill:${CREAM}"/>`, `${[0, 1, 2, 3].map(k => `<path d="M${27 - k*2} ${308 + k*22} h17" stroke="${dk(S.wood, .2)}" stroke-width="1.6"/>`).join("")}<path d="M22 318 h22" stroke="${S.accent}" stroke-width="1"/>`);
-  const chair = D(`<rect x="420" y="378" width="30" height="20" rx="8" style="fill:${S.fabric}"/><rect x="422" y="396" width="26" height="8" rx="3" style="fill:${lt(S.fabric, .15)}"/>`, `<path d="M424 404 v8 M446 404 v8" stroke="${S.metal}" stroke-width="1.8"/>`)
-    + D(`<ellipse cx="474" cy="390" rx="9" ry="3" style="fill:${lt(S.wood, .1)}"/><path d="M469 389 l1 -7 h8 l1 7z" style="fill:#C8643B"/>`, `<path d="M474 392 v20 M468 412 h12" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/>${[-30, -10, 10, 30].map(a => `<path d="M474 382 q${a*.2} -10 ${a*.4} -14" stroke="#5E8A4A" stroke-width="1.6" fill="none"/><ellipse cx="${474 + a*.4}" cy="368" rx="2.4" ry="4" fill="#6E9A4A"/>`).join("")}`);
-  return g(ladder + chair);
-}
+const bathDecor = () => "";
 function bathArt(){
   const [wx] = at("bathplant");
-  glow(wx - 40, 128, 24); glow(wx + 40, 128, 24);
-  const sconce = sx => `<path d="M${sx} 124 v8" stroke="${S.metal}" stroke-width="1.6"/><path d="M${sx - 5} 118 h10 l-2 8 h-6z" fill="${NIGHT ? "#FFE8A8" : "#F6EEDA"}" stroke="${INK}" stroke-width=".6"/>`;
-  return bathShell() + sideWall() + bathDecor() + windowArt(wx - 24, 116, 48, 56, {seed: 5}) + g(sconce(wx - 40) + sconce(wx + 40)) + accBath("bathplant") + accBath("robes") + pieceSpot("basin", basin) + accBath("soaps")
-    + bathCorners() + pieceSpot("bath", bathTub) + towelRail() + pieceSpot("bathrug", bathrug) + livedBath() + crates() + bedroomDoor();
+  glow(wx - 40, WT + 18, 24); glow(wx + 40, WT + 18, 24);
+  const sconce = sx => `<path d="M${sx} ${WT + 16} v8" stroke="${S.metal}" stroke-width="1.6"/><path d="M${sx - 5} ${WT + 10} h10 l-2 8 h-6z" fill="${NIGHT ? "#FFE8A8" : "#F6EEDA"}" stroke="${INK}" stroke-width=".6"/>`;
+  return bathShell() + windowArt(wx - 24, WT + 12, 48, 48, {seed: 5}) + g(sconce(wx - 40) + sconce(wx + 40)) + accBath("bathplant") + accBath("robes") + pieceSpot("basin", basin) + accBath("soaps")
+    + bathCorners() + pieceSpot("bathrug", bathrug) + pieceSpot("bath", bathTub) + towelRail() + livedBath() + bedroomDoor() + crates();
 }
-
 /* ====================================================================================================== */
 /* ---------- the back garden ---------- */
 const GW = 214;   // the foot of the garden wall
@@ -742,6 +759,7 @@ export function cottageArt(scene, st = {}){
   const m = /^(figtree|bluebell)_(down|up|bath|garden)$/.exec(scene || "") || [0, st.c || "figtree", st.floor || "down"];
   ST = {...st, c: m[1], floor: m[2], tiers: st.tiers || {}, acc: st.acc || {}, crates: st.crates || []};
   S = STYLES[ST.style] || STYLES.cottagecore; NIGHT = !!st.night; GL = []; CID = 0;
+  const rm = ROOMS[ST.floor] || ROOMS.down; FL = rm.FL; WT = rm.WT;
   const body = ST.floor === "up" ? upArt() : ST.floor === "bath" ? bathArt() : ST.floor === "garden" ? gardenArt() : downArt();
   return glowDefs + body + (NIGHT ? nightWash() + `<g pointer-events="none">${GL.join("")}</g>` : "");
 }

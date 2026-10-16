@@ -37,25 +37,25 @@ export const REPAINT = 120;   // changing a cottage's look later (the furniture 
 const T = (a, b, c, p) => [{n: a, price: p[0]}, {n: b, price: p[1]}, {n: c, price: p[2]}];
 export const PIECES = {
   // downstairs: the sitting room on the left, the kitchen on the right
-  sofa:      {room: "down", n: "Sofa", at: [140, 386], stand: [140, 410], basic: true, tiers: T("Second-hand sofa", "Linen sofa", "Deep velvet sofa", [80, 220, 420])},
-  armchair:  {room: "down", n: "Armchair", at: [64, 334], stand: [70, 360], tiers: T("Wicker chair", "Reading armchair", "Wingback with a footstool", [40, 120, 260])},
-  coffee:    {room: "down", n: "Coffee table", at: [140, 330], stand: [186, 316], tiers: T("Crate table", "Oak coffee table", "Table with a glass top and books", [30, 90, 180])},
-  rug:       {room: "down", n: "Rug", at: [140, 356], stand: [214, 346], tiers: T("Rag rug", "Wool rug", "Big hand-knotted rug", [25, 80, 170])},
+  sofa:      {room: "down", n: "Sofa", at: [150, 452], stand: [150, 470], basic: true, tiers: T("Second-hand sofa", "Linen sofa", "Deep velvet sofa", [80, 220, 420])},
+  armchair:  {room: "down", n: "Armchair", at: [56, 400], stand: [66, 426], tiers: T("Wicker chair", "Reading armchair", "Wingback with a footstool", [40, 120, 260])},
+  coffee:    {room: "down", n: "Coffee table", at: [150, 396], stand: [150, 340], tiers: T("Crate table", "Oak coffee table", "Table with a glass top and books", [30, 90, 180])},
+  rug:       {room: "down", n: "Rug", at: [150, 420], stand: [246, 410], tiers: T("Rag rug", "Wool rug", "Big hand-knotted rug", [25, 80, 170])},
   fireplace: {room: "down", n: "Fireplace", at: [138, 240], stand: [138, 264], tiers: T("Little wood burner", "Stone fireplace", "Fireplace with a carved mantel", [90, 240, 450])},
-  lamp:      {room: "down", n: "Floor lamp", at: [198, 386], stand: [214, 406], tiers: T("Paper lamp", "Brass reading lamp", "Arc lamp", [20, 60, 130])},
+  lamp:      {room: "down", n: "Floor lamp", at: [222, 452], stand: [238, 468], tiers: T("Paper lamp", "Brass reading lamp", "Arc lamp", [20, 60, 130])},
   kitchen:   {room: "down", n: "Kitchen", at: [384, 240], stand: [384, 264], basic: true, tiers: T("Two-ring hob and a sink", "Range cooker and dresser", "Farmhouse kitchen with an island shelf", [120, 320, 600])},
-  dining:    {room: "down", n: "Dining table", at: [392, 334], stand: [392, 358], basic: true, tiers: T("Fold-out table", "Farmhouse table", "Long table with a bench", [50, 150, 300])},
+  dining:    {room: "down", n: "Dining table", at: [384, 440], stand: [384, 466], basic: true, tiers: T("Fold-out table", "Farmhouse table", "Long table with a bench", [50, 150, 300])},
   bookshelf: {room: "down", n: "Bookshelf", at: [220, 240], stand: [220, 264], tiers: T("Plank shelf", "Full bookcase", "Library wall with a ladder", [30, 100, 220])},
   // upstairs: the bedroom (the bathroom door is on its left wall)
   bed:       {room: "up", n: "Bed", at: [260, 296], stand: [260, 320], basic: true, tiers: T("Metal bed", "Double bed with a quilt", "Four-poster with drapes", [90, 260, 520])},
   bedside:   {room: "up", n: "Bedside tables", at: [260, 240], stand: [204, 264], tiers: T("Stools as tables", "Matching bedsides", "Bedsides with little lamps", [25, 70, 150])},
-  wardrobe:  {room: "up", n: "Wardrobe", at: [466, 240], stand: [466, 264], tiers: T("Clothes rail", "Painted wardrobe", "Armoire with a mirror", [30, 110, 240])},
+  wardrobe:  {room: "up", n: "Wardrobe", at: [432, 240], stand: [432, 264], tiers: T("Clothes rail", "Painted wardrobe", "Armoire with a mirror", [30, 110, 240])},
   // the bathroom (round 237)
-  bath:      {room: "bath", n: "Bath", at: [260, 252], stand: [260, 276], tiers: T("Shower tray", "Clawfoot bath", "Copper tub by the window", [80, 260, 520])},
-  windowseat:{room: "up", n: "Window seat", at: [400, 212], stand: [400, 264], tiers: T("Cushion on the sill", "Window seat with a throw", "Window seat, bookshelf and fairy lights", [25, 80, 170])},
-  bedrug:    {room: "up", n: "Bedroom rug", at: [260, 332], stand: [260, 350], tiers: T("Cotton rug", "Sheepskin", "Big round rug", [20, 70, 150])},
-  basin:     {room: "bath", n: "Basin", at: [130, 240], stand: [130, 264], tiers: T("Little corner basin", "Washstand with a mirror", "Marble double basin", [40, 140, 300])},
-  bathrug:   {room: "bath", n: "Bath mat and stool", at: [260, 292], stand: [300, 300], tiers: T("Cotton bath mat", "Mat and a wooden stool", "Big fluffy mat and a little chair", [15, 50, 110])},
+  bath:      {room: "bath", n: "Bath", at: [260, 340], stand: [208, 352], tiers: T("Shower tray", "Clawfoot bath", "Copper tub by the window", [80, 260, 520])},
+  windowseat:{room: "up", n: "Window seat", at: [368, 212], stand: [368, 264], tiers: T("Cushion on the sill", "Window seat with a throw", "Window seat, bookshelf and fairy lights", [25, 80, 170])},
+  bedrug:    {room: "up", n: "Bedroom rug", at: [260, 372], stand: [260, 388], tiers: T("Cotton rug", "Sheepskin", "Big round rug", [20, 70, 150])},
+  basin:     {room: "bath", n: "Basin", at: [160, 246], stand: [160, 270], tiers: T("Little corner basin", "Washstand with a mirror", "Marble double basin", [40, 140, 300])},
+  bathrug:   {room: "bath", n: "Bath mat and stool", at: [260, 384], stand: [300, 398], tiers: T("Cotton bath mat", "Mat and a wooden stool", "Big fluffy mat and a little chair", [15, 50, 110])},
   vanity:    {room: "up", n: "Dressing table", at: [150, 240], stand: [150, 264], tiers: T("Little shelf and mirror", "Dressing table", "Vanity with bulbs round the mirror", [30, 100, 220])},
   // the back garden
   hottub:    {room: "garden", n: "Hot tub", at: [430, 350], stand: [376, 366], tiers: T("Wooden hot tub", "Cedar tub with steps", "Hot tub with lights and a canopy", [600, 900, 1300])},
@@ -72,16 +72,16 @@ export const BASICS = PIECE_IDS.filter(k => PIECES[k].basic);
 export const ACCESSORIES = {
   cushions: {room: "down", n: "Cushions and a throw", at: [140, 358], price: 25},
   candles:  {room: "down", n: "Candles on the mantel", at: [138, 176], price: 15},
-  flowers:  {room: "down", n: "A jug of fresh flowers", at: [404, 304], price: 12},
+  flowers:  {room: "down", n: "A jug of fresh flowers", at: [396, 406], price: 12},
   prints:   {room: "down", n: "Framed prints", at: [138, 132], price: 30},
   records:  {room: "down", n: "Record player and records", at: [62, 240], price: 60},
-  diffuser: {room: "down", n: "A lavender diffuser", at: [124, 536], price: 18},
+  diffuser: {room: "down", n: "A lavender diffuser", at: [204, 470], price: 18},
   linen:    {room: "up", n: "Crisp linen and a quilt", at: [260, 262], price: 40},
-  robes:    {room: "bath", n: "Two fluffy robes", at: [410, 200], price: 35},
-  towels:   {room: "bath", n: "Fluffy towels", at: [334, 244], price: 20},
-  bathplant:{room: "bath", n: "A fern on the windowsill", at: [260, 180], price: 15},
-  soaps:    {room: "bath", n: "Mill soaps and bath salts", at: [130, 196], price: 18},
-  plant:    {room: "up", n: "A big leafy plant", at: [490, 500], price: 22},
+  robes:    {room: "bath", n: "Two fluffy robes", at: [372, 214], price: 35},
+  towels:   {room: "bath", n: "Fluffy towels", at: [326, 330], price: 20},
+  bathplant:{room: "bath", n: "A fern on the windowsill", at: [260, 190], price: 15},
+  soaps:    {room: "bath", n: "Mill soaps and bath salts", at: [160, 214], price: 18},
+  plant:    {room: "up", n: "A big leafy plant", at: [446, 544], price: 22},
   mirror:   {room: "up", n: "A round mirror", at: [260, 140], price: 28},
   lanterns: {room: "garden", n: "Lanterns on the path", at: [214, 560], price: 24},
   blankets: {room: "garden", n: "Blankets by the fire", at: [268, 470], price: 20},
@@ -91,13 +91,14 @@ export const ACC_IDS = Object.keys(ACCESSORIES);
 
 // Other places in each room (where Mel stands for them)
 export const SPOTS = {
-  down: {stairs: [446, 600], garden: [40, 470], calendar: [262, 264], guestbook: [72, 586], catalogue: [100, 586], fridge: [476, 264], basket: [376, 358], tidy: [302, 264]},
-  up: {stairs: [80, 600], bathroom: [44, 330]},   // the bed is a piece (its own spot); the bathroom door on the left wall
-  bath: {bedroom: [260, 600]},   // back through the door to the bedroom (the bath is a piece)
+  down: {stairs: [446, 600], garden: [40, 560], calendar: [262, 264], guestbook: [124, 512], catalogue: [176, 512], fridge: [476, 264], basket: [372, 466], tidy: [302, 264]},
+  up: {stairs: [110, 456], bathroom: [80, 316]},   // the bed is a piece (its own spot); the bathroom door on the left wall, the stairwell front left
+  bath: {bedroom: [260, 486]},   // back through the door to the bedroom (the bath is a piece)
   garden: {house: [260, 600]}   // the hot tub is a piece
 };
-export const ARRIVE = {down: [260, 560], up: [130, 560], bath: [260, 560], garden: [260, 560]};
-export const BOUNDS = [30, 250, 490, 600];
+export const ARRIVE = {down: [260, 560], up: [180, 476], bath: [260, 474], garden: [260, 560]};
+// round 238: each floor its own size, dolls-house style (the bedroom a little narrower, the bathroom snug)
+export const BOUNDS = {down: [30, 250, 490, 600], up: [70, 252, 450, 552], bath: [130, 250, 390, 490], garden: [30, 250, 490, 600]};
 
 // the changeover after guests leave: the first three must be done before the next guests arrive (the hot tub too,
 // if there is one); the fruit basket and the welcome fridge are the extra touches guests love
