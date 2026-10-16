@@ -22,7 +22,7 @@ export const HK_PEOPLE = [
     ["Scallops! Look at the size. My husband caught these at four this morning. He's asleep now. Lazy.", "Sea urchin. Try it. Try it! There. See? Like eating the sea.", "Corn, butter, a little soy. That's Hokkaido in one bite."],
     "Nakamura! Come, come, look at my scallops. Biggest in Otaru. Possibly in Japan.", "Mrs Nakamura's stall is covered with a blue tarp. Back tomorrow at seven."),
   P("hkkenji", "Kenji", "Has brewed at the Sapporo beer factory for forty years", {skin: "#E8C2A0", hair: "#D6D0C6", hairStyle: "short", top: "#C8432F", bottom: "#2F2B28"},
-    [slot("10:00", "13:00", "hk_beer", [262, 380], {dir: 1}), slot("13:00", "14:00", "hk_ramen", [100, 540], {act: "sit", dir: 1}), slot("14:00", "19:00", "hk_beer", [262, 380], {dir: 1})],
+    [slot("10:00", "13:00", "hk_beer", [404, 404], {dir: -1}), slot("13:00", "14:00", "hk_ramen", [100, 540], {act: "sit", dir: 1}), slot("14:00", "19:00", "hk_beer", [404, 404], {dir: -1})],
     ["Forty years. I've tasted every batch. My doctor is not pleased. My doctor has never tasted a batch.", "The star on the gable is the North Star. Hokkaido was the frontier. You followed the star north.", "Hops, malt, water, yeast. And snow. The snow makes the water. Everything here starts with snow."],
     "Kenji. Brewer. Will you join the tour? I'll show you the kettles. They're very beautiful. I polish them myself, on Sundays.", "Kenji's down in the cellars, checking on the lagers."),
   P("hkoda", "Mr Oda", "Makes miso ramen in Sapporo, and nothing else", {skin: "#C99A78", hair: "#3A3430", hairStyle: "short", top: "#FFFDF6", bottom: "#2F2B28", extra: "apron"},
