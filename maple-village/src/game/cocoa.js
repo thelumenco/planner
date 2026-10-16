@@ -255,6 +255,11 @@ export function nextKind(c){
 function handStep(F, c, t, out){
   const h = out.hand;
   for (const g of ["", "2"]) if (c["ground" + g]) { const k = c["ground" + g]; h.res += pour(c, k); c["ground" + g] = null; h.pots++; }
+  // round 230: only make more when it's wanted (a bonbon shelf short of its target, or a bar under the wall's limit
+  // counting what's tempered and coming), so a full shop doesn't keep buying sacks
+  const coming = k => ["", "2"].reduce((n, g) => n + (c["ground" + g] === k || (c["grind" + g] && c["grind" + g].kind === k) ? POT : 0), 0);
+  const want = Object.keys(KINDS).some(k => c.keep[k] - c.res[k] - coming(k) > 0 || c.bars[k] + c.choc[k] + coming(k) < WALL);
+  if (!want) { for (const k of Object.keys(KINDS)) while (c.choc[k] >= MOULD && c.bars[k] < WALL) { c.choc[k] -= MOULD; c.bars[k] += MOULD; c.made += MOULD; h.bars += MOULD; } return; }
   let g; while (c.roasted > 0 && (g = freeSlot(c)) !== undefined) { const kind = nextKind(c); c.roasted--; c["grind" + g] = {kind, done: t + GRIND_MIN*60000, by: "hand"}; }
   if (!c.roast && c.roasted < 1) {
     if (c.beans <= c.plan.hold && c.plan.buy && F.coins - SACK >= c.plan.floor) { F.coins -= SACK; c.beans++; c.bought = (c.bought || 0) + 1; h.sacks++; h.spent += SACK; }

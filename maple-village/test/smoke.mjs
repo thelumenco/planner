@@ -4663,9 +4663,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     f.goals = {...(f.goals || {}), giftshop: 1}; f.where = {scene: "giftshop", x: -8, y: -24, day: "2026-10-14"};
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(800);
-  await page.goto(url + "?seed=1&time=11:00&date=2026-10-14&stuckpatch=1"); await page.waitForTimeout(2500);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-14&stuckpatch=1"); await page.waitForTimeout(900);
   const at = await page.evaluate(() => { const m = document.querySelector("#mel").getAttribute("transform").match(/translate\(([-\d.]+)[ ,]+([-\d.]+)\)/); return [+m[1], +m[2]]; });
   check(/gift shop/i.test(await page.locator("#sceneName").innerText()) && at[0] > 300 && at[1] > 300, `back in the gift shop, Mel's put inside by the door, not stuck above the wall (${at.map(Math.round)})`);
+  // round 230: a position that isn't a number (Mel frozen at the map's corner, the camera broken): she's put back
+  // on her feet on any screen, and the next tap walks her normally
+  const melAt = () => page.evaluate(() => { const m = (document.querySelector("#mel").getAttribute("transform") || "").match(/translate\(([-\d.]+)[ ,]+([-\d.]+)\)/); return m ? [+m[1], +m[2]] : [NaN, NaN]; });
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__mapleBreak()); await page.waitForTimeout(800);
+  const back = await melAt();
+  check(back.every(Number.isFinite) && back[0] > 100 && back[1] > 300 && /translate3d\(-?\d/.test(await page.evaluate(() => document.querySelector("#world").style.transform || "translate3d(0")), `the home screen: Mel's back on her feet (${back.map(Math.round)}), not frozen at the corner`);
+  await page.locator('#world [data-place="shed"]').first().dispatchEvent("click").catch(() => {}); await page.waitForTimeout(2500);
+  const moved = await melAt();
+  check(moved.every(Number.isFinite) && Math.hypot(moved[0] - back[0], moved[1] - back[1]) > 20, "and she walks off normally when you tap somewhere");
   await page.close();
 }
 

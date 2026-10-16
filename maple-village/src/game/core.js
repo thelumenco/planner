@@ -232,7 +232,7 @@ function noteHistory(){
   F.history[S.day] = {q: S.doneIds.length, steps: S.steps || 0, water: S.waterMl || 0, harvest: S.harvested || 0, coins: S.earned || 0, chats: (S.chats || []).slice(0, 12)};
   Object.keys(F.history).sort().slice(0, -21).forEach(k => delete F.history[k]);
 }
-const save = (redraw) => { clearSlots(); F.where = {scene, x: Math.round(mel.x), y: Math.round(mel.y), day: dayKey()}; noteHistory(); persist("today"); persist("fox"); render(redraw); };
+const save = (redraw) => { clearSlots(); if (Number.isFinite(mel.x) && Number.isFinite(mel.y)) F.where = {scene, x: Math.round(mel.x), y: Math.round(mel.y), day: dayKey()}; noteHistory(); persist("today"); persist("fox"); render(redraw); };
 
 async function initDb(){
   if (!window.claude || !claude.use) return;
@@ -3139,6 +3139,7 @@ function nextLeg(){
 }
 // Outdoors Mel walks round buildings and the pond (paths.js); indoors she goes straight.
 function walkTo(x, y){
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return;   // round 230: a spot with no position never sends Mel nowhere
   const b = bounds(), to = [clamp(x, b[0], b[2]), clamp(y, b[1], b[3])];
   const pts = outside() || townRoom(scene) ? findPath(scene, [mel.x, mel.y], to, b) : [to];
   const first = pts.shift(); mel.tx = first[0]; mel.ty = first[1]; mel.path = pts;
@@ -3972,6 +3973,7 @@ function playground(id){
 setTimeout(vineTick, 3000);
 // dev builds only (the stub sets the flag): test scripts jump straight to a scene
 if (window.__mapleDevStub) window.__mapleScene = id => setScene(id, OUTDOOR.includes(id) ? [260, 330] : INNER[id] ? INNER[id].arrive : [260, 596]);
+if (window.__mapleDevStub) window.__mapleBreak = () => { mel.x = mel.tx = NaN; mel.y = mel.ty = NaN; cam.x = NaN; };   // round 230: tests break Mel's position on purpose
 if (window.__mapleDevStub) window.__mapleOrder = (shop = "The Scoop Shack") => { S.orderAt = 0; scoopState(F).bikeOut = Date.now() + (globalThis.__mapleOffset || 0); orderNote([{shop: "scoop", coins: 6, what: "a cone of mango"}], shop, false); };   // tests: an order note, and Tomo riding past
 /* ---------- The bank ---------- */
 function vaultPoured(j, nowFull){
@@ -4245,7 +4247,7 @@ function updateCam(dt){
   cam.canFollow = cw/ch < W/HH - .005;
   if (cam.canFollow && !cam.fit) {
     const fx = scene === "kidroom" ? evan.x : mel.x;   // in Evan's room the camera follows Evan
-    const s = ch/HH, vw = cw/s, tx = clamp(fx - vw/2, 0, W - vw);
+    const s = ch/HH, vw = cw/s, tx = Number.isFinite(fx) ? clamp(fx - vw/2, 0, W - vw) : 0; if (!Number.isFinite(cam.x)) cam.snap = true;
     cam.x = cam.snap ? tx : cam.x + (tx - cam.x)*Math.min(1, dt*3.2);
     cam.s = s; cam.ox = -cam.x*s; cam.oy = 0;
   } else {
@@ -4286,6 +4288,16 @@ function bubbleAt(el, ex, ey, off, forceBelow){
 // round 229 (Mel: "I'm stuck here on mobile", above the gift shop's back wall): if Mel is ever well outside the
 // screen's walkable ground (a stale saved spot, a sync from another device), put her back inside by the door
 function unstick(){
+  // round 230 (Mel, still stuck, on the home screen this time): a position that isn't a number (a tap worked out while
+  // the map was hidden, a spot with no position) froze Mel at the map's corner and broke the camera, so every tap after
+  // made it worse. Any screen: put her back somewhere sensible and straighten the camera.
+  const ok = v => Number.isFinite(v);
+  if (!ok(mel.x) || !ok(mel.y) || !ok(mel.tx) || !ok(mel.ty) || !ok(cam.x)) {
+    const b = bounds(), a = (INNER[scene] && INNER[scene].arrive) || [(b[0] + b[2])/2, clamp(560, b[1], b[3])];
+    if (!ok(mel.x) || !ok(mel.y)) { mel.x = a[0]; mel.y = a[1]; maple.x = maple.tx = a[0] - 22; maple.y = maple.ty = a[1] + 2; }
+    mel.tx = mel.x; mel.ty = mel.y; mel.path = []; route = []; cam.x = 0; cam.snap = true; return;
+  }
+  if (!ok(evan.x) || !ok(evan.y)) { evan.x = evan.tx = mel.x + 24; evan.y = evan.ty = mel.y + 6; evan.path = null; }
   if (sup || mel.sitting || typeof paddling !== "undefined" && paddling || !INNER[scene] || !INNER[scene].arrive || scene === "kidroom") return;   // indoors only: outside, paddleboards and boats go past the edges on purpose
   const b = bounds(), out = mel.x < b[0] - 30 || mel.x > b[2] + 30 || mel.y < b[1] - 40 || mel.y > b[3] + 30; if (!out) return;
   const a = INNER[scene].arrive;
@@ -4402,7 +4414,7 @@ initTrips(() => F);
 setGhTools(() => F.tools || {});
 // Pick up where Mel left off (round 105): the same game day, back on the screen she closed the game on (a new day, she
 // wakes up at home as usual). F.where is kept by save().
-{ const w = !globalThis.__mapleNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F));
+{ const w = !globalThis.__mapleNoResume && F.where, ok = w && w.day === dayKey() && w.scene && w.scene !== scene && (OUTDOOR.includes(w.scene) || ROOMS[w.scene] || INNER[w.scene] || VILLAGE[w.scene]) && !["kidroom", "room"].includes(w.scene) && (!townOf(w.scene) || !!tripOn(F)) && Number.isFinite(w.x) && Number.isFinite(w.y);
   if (ok) { scene = w.scene; mel.x = mel.tx = w.x; mel.y = mel.ty = w.y; mel.path = []; maple.x = maple.tx = w.x - 22; maple.y = maple.ty = w.y + 2; } }
 render(true);
 if (F.gift) setTimeout(() => speak("A welcome gift! Seeds are in your backpack 🌷", 5000), 1200);

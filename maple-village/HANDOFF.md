@@ -2586,3 +2586,9 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Round 229 (Mel: "I'm stuck here on mobile", Mel above the gift shop's back wall)
 - core.js `unstick()` (every frame, indoor rooms with an INNER arrive point only; not while sitting or paddling): if Mel is well outside the room's walkable bounds (30px sideways/below, 40px above), she's put back at the room's arrive point by the door. Covers a stale saved spot (F.where) or a sync from another device.
 - Test "Never stuck outside a room (round 229)" (opens with resume on).
+
+## Round 230 (Mel: still stuck, on the home screen, with the map shifted)
+- The real cause: Mel's position could become NaN (a tap worked out while the map had no size, or a spot with no data-x/y). NaN froze her at the SVG origin and made `cam.x` NaN, which broke the world transform, so every later tap was NaN too.
+- core.js: `walkTo` ignores non-finite targets; `unstick()` (every frame, ANY screen) resets a non-finite Mel/target/camera (to the room's arrive point, or the bottom middle of the screen's bounds) and a non-finite Evan; `updateCam` never feeds NaN into the camera; `save()` never stores a non-finite F.where; resume skips one. Dev hook `window.__mapleBreak()` (tests only).
+- cocoa.js `handStep`: the line only roasts, buys sacks and grinds when something's wanted (a bonbon shelf under target, or a kind under the wall's 40 counting tempered and coming pots); before, with the longer hours from round 227, it kept buying sacks into a full shop (about 500 coins a week of beans for nothing). A week's takings are unchanged (about 800).
+- Tests in "Never stuck outside a room (round 229)".
