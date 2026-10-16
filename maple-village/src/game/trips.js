@@ -28,7 +28,8 @@ export const canReturn = (town, hm = localHM()) => hm < TOWNS[town].backTo;
 export function buyTrip(F, town, party, hm = localHM(), by = "train"){
   const t = TOWNS[town]; if (!t || !canLeave(town, hm) || tripOn(F) || (by === "ferry" && !t.ferry) || (by === "boat" && !t.boat)) return null;
   party = tripFriends(F).filter(id => party.includes(id)); if (by === "boat") party = party.slice(0, t.boat.max); const cost = fareFor(town, party, by); if (F.coins < cost) return null;
-  F.coins -= cost; F.trip = {town, day: dayKey(), party, from: hm, by: by === "boat" ? "ferry" : by, ...(by === "boat" ? {own: true} : {})};   // (your own boat lands where the ferry does) F.towns = {...(F.towns || {}), [town]: F.towns && F.towns[town] || dayKey()};   // F.towns: where you've been (first visit), round 132
+  F.coins -= cost; F.trip = {town, day: dayKey(), party, from: hm, by: by === "boat" ? "ferry" : by, ...(by === "boat" ? {own: true} : {})};   // (your own boat lands where the ferry does)
+  F.towns = {...(F.towns || {}), [town]: F.towns && F.towns[town] || dayKey()};   // F.towns: where you've been (first visit), round 132
   return {cost, town: t, by};
 }
 export function endTrip(F){ if (F.trip && !F.trip.done) F.trip.done = true; }
