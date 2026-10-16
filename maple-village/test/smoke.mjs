@@ -28,7 +28,13 @@ const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM 
 // Pages are tracked so a section that throws before its page.close() doesn't leave its page open for the rest of the
 // run (dozens of leaked pages once crashed the browser near the end): each new section closes any left over.
 const openPages = new Set();
-{ const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); openPages.add(pg); pg.on("close", () => openPages.delete(pg)); if (!resume) await pg.addInitScript(() => { window.__hbNoResume = true; }); return pg; }; }
+{ const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); openPages.add(pg); pg.on("close", () => openPages.delete(pg)); if (!resume) await pg.addInitScript(() => { window.__hbNoResume = true; });
+  // a click that times out leaves a screenshot and says what's on top of the target (to catch the odd blocked click)
+  const click = pg.click.bind(pg); let shot = 0; pg.click = async (sel, opts) => { try { return await click(sel, opts); } catch (e) {
+    const f = join(shots, `stuck-click-${Date.now()}-${shot++}.png`); await pg.screenshot({path: f}).catch(() => {});
+    const top = await pg.evaluate(s0 => { const el = document.querySelector(s0); if (!el) return "no such element"; const r = el.getBoundingClientRect(), t = document.elementFromPoint(r.x + r.width/2, r.y + r.height/2); return t ? (t.id || t.className || t.tagName) + "" : "nothing"; }, sel).catch(() => "?");
+    console.log(`    (stuck click on ${sel}: on top is ${top}; screenshot ${f})`); throw e; } };
+  return pg; }; }
 const errors = [];
 // a save where the seven friends the older tests rely on are at five hearts (presents sent round need 3, trips 5)
 const closeFriends = page => page.addInitScript(() => { const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
