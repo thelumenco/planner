@@ -3742,8 +3742,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForTimeout(2500);
   check(await page.locator("#world .billow").count() === 3 && await page.locator("#world .tcurtain").count() === 4, "out through the glass doors: canvas sails billowing, curtains swaying");
   check(await page.locator("#actors .npc.act-sit").count() >= 9, "Sunday lunch: the long table's full");
-  await page.locator('#world [data-tspot="book"]').dispatchEvent("click"); await page.waitForSelector("#ctx .lunchbook", { timeout: 20000 });
-  check(/seats booked/.test(await page.locator("#ctx").innerText()), "the bookings book on its lectern");
+  // round 235 (Mel couldn't open it): Maple's bubble floating over the lectern; a tap on the bubble reaches the book under it
+  { const bb = await page.locator('#world [data-tspot="book"] path').first().boundingBox(), x = bb.x + bb.width/2, y = bb.y + bb.height/2;
+    await page.evaluate(([x, y]) => { const s = document.querySelector("#speech"), r = document.querySelector("#map").getBoundingClientRect(); s.hidden = false; s.textContent = "Lovely out here."; s.style.left = (x - r.left) + "px"; s.style.top = (y - r.top + 20) + "px"; }, [x, y]);
+    check(await page.evaluate(([x, y]) => !!document.elementFromPoint(x, y).closest("#speech"), [x, y]), "(Maple's bubble is over the lectern)");
+    await page.mouse.click(x, y); }
+  await page.waitForSelector("#ctx .lunchbook", { timeout: 20000 });
+  check(/seats booked/.test(await page.locator("#ctx").innerText()), "the bookings book on its lectern, even with Maple's speech bubble over it");
   await page.click('#ctx [data-close]'); await page.locator('#world [data-exit="vineyard"]').dispatchEvent("click"); await page.waitForTimeout(4000);
   check(/vineyard/i.test(await page.locator("#sceneName").textContent()) || await page.locator('#world [data-place="terrace"]').count() === 1, "down the steps to the vineyard");
   await page.locator('#world [data-place="terrace"]').dispatchEvent("click"); await page.waitForFunction(() => /terrace/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }).catch(() => {});

@@ -4433,10 +4433,12 @@ document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("aft
 $("pclose").onclick = closePanel;
 // Speech bubbles close with a tap (the next thing anyone says brings them back)
 // Tapping a speech bubble closes it, and if someone's standing under it (Penny with the post, a villager), the tap
-// reaches them too: a bubble shouldn't make the person beneath it untappable.
+// reaches them too: a bubble shouldn't make the person beneath it untappable. Round 235 (Mel couldn't open the terrace's
+// bookings book: Maple's bubble sat right over the lectern): the same for a place or thing under it.
+const UNDER = ["data-npc", "data-ent", "data-spot", "data-tspot", "data-rdspot", "data-place", "data-exit", "data-pet", "data-keep", "data-vine", "data-tree", "data-bed", "data-bush", "data-gh", "data-pigeon", "data-ugarden"].map(a => `#world [${a}]`).join(", ");
 ["speech", "npcSay", "evanSay", "melSay"].forEach(id => $(id).addEventListener("click", ev => { ev.stopPropagation(); $(id).hidden = true;
-  const under = document.elementFromPoint(ev.clientX, ev.clientY), who = under && under.closest("#actors [data-npc], #actors [data-ent]");
-  if (who) who.dispatchEvent(new MouseEvent("click", {bubbles: true, clientX: ev.clientX, clientY: ev.clientY})); }));
+  const under = document.elementFromPoint(ev.clientX, ev.clientY);
+  if (under && under.closest(UNDER)) under.dispatchEvent(new MouseEvent("click", {bubbles: true, clientX: ev.clientX, clientY: ev.clientY})); }));
 $("chatForm").onsubmit = e => { e.preventDefault(); const v = $("chatIn").value; $("chatIn").value = ""; sendChat(v); };
 $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
