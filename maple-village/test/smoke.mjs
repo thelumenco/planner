@@ -4797,7 +4797,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   await page.locator('#world [data-cospot="stairs"]').dispatchEvent("click"); await page.waitForFunction(() => /upstairs/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(800);
-  check(await page.locator('#world [data-cospot="bed"]').count() === 1 && await page.locator('#world [data-cospot="bath"]').count() === 1, "up the wooden stairs: the bedroom and the bath");
+  check(await page.locator('#world [data-cospot="bed"]').count() === 1 && await page.locator('#world [data-cospot="bathroom"]').count() === 1, "up the wooden stairs: the bedroom, with the bathroom door");
+  // round 237 (Mel): the bathroom is its own room through a door off the bedroom
+  await page.locator('#world [data-cospot="bathroom"]').dispatchEvent("click"); await page.waitForFunction(() => /bathroom/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(800);
+  check(await page.locator('#world [data-cospot="bath"]').count() === 1 && await page.locator('#world [data-cospot="basin"]').count() === 1, "through the door: the bathroom, with the bath and the basin");
+  await page.locator('#world [data-cospot="bedroom"]').dispatchEvent("click"); await page.waitForFunction(() => /upstairs/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(800);
   await page.locator('#world [data-cospot="stairs"]').dispatchEvent("click"); await page.waitForFunction(() => !/upstairs|garden/.test(document.querySelector("#sceneName").textContent) && /Fig Tree/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(800);
   await page.locator('#world [data-cospot="garden"]').dispatchEvent("click"); await page.waitForFunction(() => /garden/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });

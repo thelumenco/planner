@@ -13,7 +13,7 @@ const buyBtn = (F, price, attr, label) => `<button class="btn small ${F.coins >=
 const starStr = n => n == null ? "no reviews yet" : "★".repeat(Math.floor(n)) + (n % 1 >= .5 ? "½" : "") + ` ${n}`;
 const WD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const fmtDay = d => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", {weekday: "short", day: "numeric", month: "short", timeZone: "UTC"});
-const ROOMN = {down: "Downstairs", up: "Upstairs", garden: "Garden", acc: "Accessories"};
+const ROOMN = {down: "Downstairs", up: "Bedroom", bath: "Bathroom", garden: "Garden", acc: "Extras"};
 
 export function salePanel(F, c){
   const C = COTTAGES[c];
@@ -35,7 +35,7 @@ function pieceRow(F, c, id){
   return `<li><span class="wtxt"><b>${esc(p.n)}${p.basic && !t ? " (needed to open)" : ""}</b><small>${t ? `${"●".repeat(t)}${"○".repeat(3 - t)} ${esc(now)}` : "Not yet"}${o ? `. Coming: ${esc(o.n)}` : nx ? `. ${t ? "Next" : "Start with"}: ${esc(nx.n)}` : ""}</small></span>${act}</li>`;
 }
 export function catalogPanel(F, c, tab = "down"){
-  const tabs = `<div class="tabs" role="tablist">${["down", "up", "garden", "acc"].map(k => `<button role="tab" data-cotab="${k}" aria-selected="${k === tab}">${ROOMN[k]}</button>`).join("")}</div>`;
+  const tabs = `<div class="tabs" role="tablist">${["down", "up", "bath", "garden", "acc"].map(k => `<button role="tab" data-cotab="${k}" aria-selected="${k === tab}">${ROOMN[k]}</button>`).join("")}</div>`;
   let h = `${tape}<h2>The catalogue</h2>${tabs}<p class="sub">For ${esc(COTTAGES[c].n)}, in ${esc(STYLES[LT.letState(F).style[c]].n)}. Order today and it comes on the 9:15 train tomorrow morning. You have ${F.coins} ${coin()}.</p>`;
   if (tab === "acc") h += `<ul class="hlist wlist">${ACC_IDS.map(k => { const a = ACCESSORIES[k], have = LT.letState(F).acc[c][k], o = LT.pending(F, c, k);
     return `<li><span class="wtxt"><b>${esc(a.n)}</b><small>${ROOMN[a.room]}</small></span>${have ? `<span class="hbadge">there</span>` : o ? `<span class="hbadge">on the train</span>` : buyBtn(F, a.price, `data-co="order:${k}"`, "Order")}</li>`; }).join("")}</ul>`;
@@ -86,7 +86,7 @@ export function todoPanel(F, c){
   for (const [k, T] of Object.entries(TASKS)) {
     if (T.only && !LT.tierOf(F, c, T.only)) continue;
     const done = k === "basket" ? !!L.basket[c] : k === "fridge" ? !!L.fridge[c] : !t || t[k];
-    h += `<li><span class="wtxt"><b>${done ? "✓ " : ""}${esc(T.n)}</b><small>${T.need ? (T.floor === "up" ? "Upstairs" : T.floor === "garden" ? "In the garden" : "Downstairs") : k === "basket" ? `A nice extra: ${T.fruit} pieces of fruit from your backpack` : `A nice extra: ${T.treats} treats from your backpack (milk, eggs, honey, cheese)`}</small></span>${done ? `<span class="hbadge">done</span>` : !T.need ? `<button class="btn small primary" data-co="task:${k}">Do it</button>` : ""}</li>`;
+    h += `<li><span class="wtxt"><b>${done ? "✓ " : ""}${esc(T.n)}</b><small>${T.need ? (T.floor === "up" ? "Upstairs" : T.floor === "bath" ? "In the bathroom" : T.floor === "garden" ? "In the garden" : "Downstairs") : k === "basket" ? `A nice extra: ${T.fruit} pieces of fruit from your backpack` : `A nice extra: ${T.treats} treats from your backpack (milk, eggs, honey, cheese)`}</small></span>${done ? `<span class="hbadge">done</span>` : !T.need ? `<button class="btn small primary" data-co="task:${k}">Do it</button>` : ""}</li>`;
   }
   return h + `</ul>${shut}`;
 }
