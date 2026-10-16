@@ -387,7 +387,7 @@ export const SOURCE = {
   oliveoil: "your olive mill (or Ronda)", anchovy_salt: "your drying loft", pesto: "your drying loft (or Cinque Terre)", pinenuts: "the market, once you've been to Cinque Terre",
   almond: "Ronda's market", sevilla: "Ronda's market", jamon: "Ronda's market", payoyo: "Ronda's market", membrillo: "Ronda's market",
   yuzu: "Kyoto's market", miso: "Kyoto's market", tofu: "Kyoto's market", mochi: "Kyoto's market",
-  cacao_bl: "Bali's coffee and cacao house", salak: "Ubud market", lemongrass: "Ubud market",
+  gulamelaka: "the market deli", cacao_bl: "Bali's coffee and cacao house", salak: "Ubud market", lemongrass: "Ubud market",
   hkmilk: "Hokkaido's Furano dairy", hkmelon: "Hokkaido's Furano dairy", scallop_hk: "Otaru's morning market", sweetcorn: "Otaru's morning market", kombu: "Otaru's morning market",
   buckthorn: "Puffin Isle's tearoom", samphire: "Puffin Isle's post office", smokedmack: "Puffin Isle's post office", goatcheese: "Puffin Isle's tearoom",
   lobster: "Saltwick's fish market", seasalt: "Saltwick's fish market", seaweed: "Saltwick's fish market", onion: "Saltwick's fish market", kipper: "Saltwick's smokehouse",

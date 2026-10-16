@@ -17,7 +17,6 @@ export const KECAK = {from: 17*60 + 30, to: 19*60 + 30};
 export const kecakOn = hm => hm >= KECAK.from && hm < KECAK.to;
 
 export const BL_TOWN = {
-  soon: true,   // hidden from the ferry menu until its art is in
   n: "Bali", by: "ferry", fare: 110, free: [], outFrom: 7*60, outTo: 12*60, backTo: 22*60,
   screens: ["ba_tegallalang", "ba_ubud", "ba_seminyak", "ba_uluwatu"], arrive: ["ba_seminyak", [230, 500]], station: "bajetty", music: "bali",
   ferry: {fare: 110, pier: "bajetty", arrive: ["ba_seminyak", [230, 500]],
