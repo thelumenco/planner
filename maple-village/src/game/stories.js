@@ -36,7 +36,7 @@ function eligible(F, id, day){
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 // Ronda's locals tell theirs on a day trip, quest or no quest (Mel's on holiday); the two-a-day limit still holds
-const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "pvrosa", "ilario", "bianca", "morwenna", "pifinn", "piivy", "bawayan", "bamade", "baketut", "hkharuko", "hkkenta", "hksato"];   // Ronda's, Kyoto's, Saltwick's, Portovenere's, Puffin Isle's, Bali's and Hokkaido's, and Jason in Cinque Terre
+const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "jason", "nanstorr", "tomhawsker", "priyajet", "pvrosa", "ilario", "bianca", "morwenna", "pifinn", "piivy", "bawayan", "bamade", "baketut", "hkharuko", "hkkenta", "hksato", "fmtoni", "fmmargalida", "fmrainbow"];   // Ronda's, Kyoto's, Saltwick's, Portovenere's, Puffin Isle's, Bali's, Hokkaido's and Formentera's, and Jason in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
   if (id === "jason") return eligible(F, id, day);   // Jason (Mel's friend) tells his whenever she visits, a chapter a day, outside the two-a-day limit
   if (F.storyDay !== day && !LOCALS.includes(id)) return null;
@@ -91,7 +91,14 @@ const REWARDS = {
   hkfloat: (F, addInv) => { addInv("hk_float", 1); return "one of Kenta's glass floats, made the way his grandfather made them (a keepsake)"; },
   hkmusicbox: (F, addInv) => { addInv("hk_musicbox", 1); return "a glass music box from Kenta that plays the old herring song"; },
   hksalts: (F, addInv) => { addInv("hk_bathsalts", 1); return "a jar of Mrs Sato's bath salts, from the ryokan's own spring"; },
-  hkyukata: (F, addInv) => { addInv("hk_yukata", 1); return "a cotton yukata from Mrs Sato, chosen for you by Yui"; }
+  hkyukata: (F, addInv) => { addInv("hk_yukata", 1); return "a cotton yukata from Mrs Sato, chosen for you by Yui"; },
+  // Formentera's locals
+  fmflor: (F, addInv) => { addInv("flordesal", 1); return "a jar of flor de sal from Toni, skimmed off the pans on a still afternoon"; },
+  fmherbsalt: (F, addInv) => { addInv("fm_herbsalt", 1); return "a jar of herb salt from this year's harvest, the rosemary mixed in by Toni's son Biel"; },
+  fmfig: (F, addInv) => { addInv("fm_fig", 2); return "two bags of dried figs from the old tree behind Margalida's bakery"; },
+  fmbiscuits: (F, addInv) => { addInv("fm_biscuits", 1); return "a bag of almond biscuits baked by Margalida's niece Aina"; },
+  fmbracelet: (F, addInv) => { addInv("fm_bracelet", 1); return "a turquoise bead bracelet from Rainbow's blanket at La Mola market"; },
+  fmring: (F, addInv) => { addInv("fm_ring", 1); return "a silver ring Rainbow made for you, with a tiny wave stamped inside (a keepsake)"; }
 };
 // flags that change the game: the koi tip, Farid's pastries on the menu
 export function applyFlags(F){
