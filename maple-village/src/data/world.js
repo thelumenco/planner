@@ -207,8 +207,8 @@ export const INNER = {
   bluebellup: {parent: "bluebell", door: [150, 600], arrive: [150, 540], exit: [70, 584]},
   figtreeup: {parent: "figtree", door: [150, 600], arrive: [150, 540], exit: [70, 584]},
   // round 221: the bathroom, through a door at the back of the bedroom; the garden, out of the back door downstairs
-  bluebellbath: {parent: "bluebellup", door: [466, 262], arrive: [260, 540], exit: [260, 604]},
-  figtreebath: {parent: "figtreeup", door: [466, 262], arrive: [260, 540], exit: [260, 604]},
+  bluebellbath: {parent: "bluebellup", door: [466, 190], arrive: [260, 540], exit: [260, 604]},
+  figtreebath: {parent: "figtreeup", door: [466, 190], arrive: [260, 540], exit: [260, 604]},
   bluebellgdn: {parent: "bluebell", door: [476, 380], arrive: [260, 540], exit: [260, 604]},
   figtreegdn: {parent: "figtree", door: [476, 380], arrive: [260, 540], exit: [260, 604]}   // round 154: upstairs in the old mill (the shop, the workbench, tastings)
 };

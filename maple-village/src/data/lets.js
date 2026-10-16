@@ -37,16 +37,16 @@ export const ESSENTIAL = ["bed", "linen", "bath"];
 export const COTTAGES = {
   bluebell: {n: "Bluebell", price: 3000, cap: 70, sleeps: 4, line: "the bigger one, blue shutters, two bedrooms under the eaves",
     // downstairs: the sitting room and dining table by the fire; upstairs: two beds under the eaves; through the bedroom: the bathroom
-    slots: {curtains: [110, 124], picture: [246, 96], shelf: [450, 254], seat: [150, 392], lamp: [52, 360], rug: [262, 414], table: [372, 420], plant: [352, 290],
-      bed: [116, 330], linen: [116, 338], bed2: [364, 330], linen2: [364, 338], touches: [220, 286],
-      bath: [150, 336], basin: [372, 262], towels: [462, 262], bathmat: [150, 410], toiletries: [282, 304], bplant: [454, 476]},
+    slots: {curtains: [88, 94], picture: [200, 90], shelf: [282, 186], seat: [200, 312], lamp: [256, 310], rug: [200, 256], table: [392, 368], plant: [28, 190],
+      bed: [128, 240], linen: [128, 240], bed2: [372, 240], linen2: [372, 240], touches: [250, 186],
+      bath: [132, 204], basin: [304, 188], towels: [350, 188], bathmat: [132, 232], toiletries: [190, 200], bplant: [472, 190]},
     up: ["bed", "linen", "bed2", "linen2", "touches"], bath: ["bath", "basin", "towels", "bathmat", "toiletries", "bplant"],
     cats: {bed2: "bed", linen2: "linen", bplant: "plant"}},
   figtree: {n: "Fig Tree", price: 2000, cap: 50, sleeps: 2, line: "the little one, a fig tree by the door, one bedroom and a window seat",
     // downstairs: the window seat, the range, a sofa and a table; upstairs: the bedroom under the beams, and the bathroom off it
-    slots: {curtains: [100, 122], picture: [200, 96], shelf: [450, 254], seat: [150, 400], lamp: [52, 370], rug: [276, 420], table: [380, 430], plant: [222, 300],
-      bed: [250, 330], linen: [250, 338], touches: [356, 300],
-      bath: [150, 336], basin: [372, 262], towels: [462, 262], bathmat: [150, 410], toiletries: [282, 304], bplant: [454, 476]},
+    slots: {curtains: [222, 98], picture: [372, 72], shelf: [462, 186], seat: [372, 312], lamp: [428, 310], rug: [372, 256], table: [108, 352], plant: [292, 188],
+      bed: [250, 240], linen: [250, 240], touches: [356, 186],
+      bath: [362, 204], basin: [168, 188], towels: [212, 188], bathmat: [362, 232], toiletries: [420, 200], bplant: [478, 188]},
     up: ["bed", "linen", "touches"], bath: ["bath", "basin", "towels", "bathmat", "toiletries", "bplant"],
     cats: {bplant: "plant"}}
 };

@@ -1953,6 +1953,8 @@ let kyotoView = null, ktSt = {};
 let jejuView = null, jjSt = {};
 let loftView = false;   // round 132: the drying loft over the barrel shed (loft.js)
 let cinqueView = null, ctSt = {};
+// round 222: the cottages' bedrooms and bathrooms are small rooms, drawn to the player's scale (art/lets-art.js draws the front wall below)
+const LET_SMALL = /^(bluebell|figtree)(up|bath)$/, LET_ROOM = [34, 176, 486, 430];
 let letView = null, letSt = {};   // round 219: Elena's cottages: "offer", or a cottage's hall table (lets.js)
 let swView = null, swSt = {}, swCrabT = 0, piView = null, piSt = {}, blView = null, blSt = {}, hkView = null, hkSt = {};   // (round 218: Bali's, bali.js) (round 217: Hokkaido's, hokkaido.js) (round 216: Puffin Isle's, puffin.js)
 let _unusedPi;   // round 215: Saltwick Harbour's panels and activities (saltwick.js)
@@ -2232,7 +2234,7 @@ const chum = {x:hero.x - 24, y:hero.y + 2, tx:hero.x - 24, ty:hero.y + 2, dir:1,
 let route = [], keys = new Set();
 const svg = $("world");
 function outside(){ return OUTDOOR.includes(scene); }
-const bounds = () => TOWN_BOUNDS[scene] ? TOWN_BOUNDS[scene] : scene === "van" ? [182, 210, 338, 612] : scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : (scene === "lane" || scene === "vineyard" || scene === "orchard" || scene === "flowers") ? [14, 140, W - 14, HH - 14] : scene === "field" ? [14, 150, W - 14, HH - 14] : scene === "shore" ? [186, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
+const bounds = () => TOWN_BOUNDS[scene] ? TOWN_BOUNDS[scene] : scene === "van" ? [182, 210, 338, 612] : LET_SMALL.test(scene) ? LET_ROOM : scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : (scene === "lane" || scene === "vineyard" || scene === "orchard" || scene === "flowers") ? [14, 140, W - 14, HH - 14] : scene === "field" ? [14, 150, W - 14, HH - 14] : scene === "shore" ? [186, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
 
 function setScene(id, at){
   const w = $("world"), from = scene; w.classList.add("fading");
