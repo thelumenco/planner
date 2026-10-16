@@ -4147,12 +4147,13 @@ if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) tr
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-12"); await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-12&letpatch=1&lets=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__hbScene("hlane")); await page.waitForTimeout(900);
-  await page.locator('#world [data-place="figtree"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-let="buy:figtree"]', { timeout: 15000 });
+  const tapTill = async (sel, want) => { for (let k = 0; k < 3; k++) { await page.locator(sel).dispatchEvent("click"); try { await page.waitForSelector(want, { timeout: 10000 }); return; } catch (e) { if (k === 2) throw e; } } };   // a tap mid-walk can be lost: tap again
+  await tapTill('#world [data-place="figtree"]', '#ctx [data-let="buy:figtree"]');
   await page.click('#ctx [data-let="buy:figtree"]'); await page.waitForTimeout(400);
   check(await fox().then(f => f.coins === 4000 && f.lets.cottages.figtree.owned), "knock at Fig Tree: Elena sells it to you (2000)");
   await page.click("#ctx [data-close]"); await page.locator('#world [data-place="figtree"]').dispatchEvent("click");
   await page.waitForFunction(() => /Fig Tree/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1200);
-  await page.locator('#world [data-spot="lethall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-let="tab:shop"]', { timeout: 15000 });
+  await tapTill('#world [data-spot="lethall"]', '#ctx [data-let="tab:shop"]');
   await page.click('#ctx [data-let="tab:shop"]'); await page.click('#ctx [data-let="order:bed:2:sage"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.coins === 3740 && f.lets.orders.length === 1 && f.lets.orders[0].day === "2026-10-13"), "inside, at the hall table: an oak bed from the catalogue (260), coming tomorrow");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
