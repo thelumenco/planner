@@ -39,14 +39,14 @@ export const COTTAGES = {
     // downstairs: the sitting room and dining table by the fire; upstairs: two beds under the eaves; through the bedroom: the bathroom
     slots: {curtains: [88, 94], picture: [200, 90], shelf: [282, 186], seat: [200, 312], lamp: [256, 310], rug: [200, 256], table: [392, 368], plant: [28, 190],
       bed: [128, 240], linen: [128, 240], bed2: [372, 240], linen2: [372, 240], touches: [250, 186],
-      bath: [132, 204], basin: [304, 188], towels: [350, 188], bathmat: [132, 232], toiletries: [190, 200], bplant: [472, 190]},
+      bath: [132, 204], basin: [304, 188], towels: [350, 188], bathmat: [132, 224], toiletries: [190, 200], bplant: [466, 432]},
     up: ["bed", "linen", "bed2", "linen2", "touches"], bath: ["bath", "basin", "towels", "bathmat", "toiletries", "bplant"],
     cats: {bed2: "bed", linen2: "linen", bplant: "plant"}},
   figtree: {n: "Fig Tree", price: 2000, cap: 50, sleeps: 2, line: "the little one, a fig tree by the door, one bedroom and a window seat",
     // downstairs: the window seat, the range, a sofa and a table; upstairs: the bedroom under the beams, and the bathroom off it
     slots: {curtains: [222, 98], picture: [372, 72], shelf: [462, 186], seat: [372, 312], lamp: [428, 310], rug: [372, 256], table: [108, 352], plant: [292, 188],
       bed: [250, 240], linen: [250, 240], touches: [356, 186],
-      bath: [362, 204], basin: [168, 188], towels: [212, 188], bathmat: [362, 232], toiletries: [420, 200], bplant: [478, 188]},
+      bath: [362, 204], basin: [168, 188], towels: [212, 188], bathmat: [362, 224], toiletries: [420, 200], bplant: [466, 432]},
     up: ["bed", "linen", "touches"], bath: ["bath", "basin", "towels", "bathmat", "toiletries", "bplant"],
     cats: {bplant: "plant"}}
 };

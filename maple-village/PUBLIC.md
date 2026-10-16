@@ -178,6 +178,12 @@ Then they're yours to furnish and let, a mini landlord business:
   a night, Fig Tree up to 96.
 - Away for a while, the cottages run on (up to the last 60 days): guests come, stay and pay; with nobody tidying,
   the reviews suffer.
+- Round 222 (Mel: "why is the bathtub so huge? Things should be proportionate to me, placed like an interior
+  designer would"): everything in the cottages is drawn to the player's scale (the player is 64 units tall: a bath
+  about as long as you are tall, a double bed a little narrower). Rooms are laid out in groups (sofa facing the fire
+  on a rug, a kitchen corner with the fridge, beds centred under their windows with bedside tables). The bedrooms and
+  bathrooms are smaller rooms (walkable y 176 to 430, LET_ROOM in core.js), with the front of the cottage drawn below
+  them like an open doll's house.
 - Switched off on the live game (LIVE in game/lets.js) until it's finished; ?lets=1 turns it on.
 
 ## The opening story (2026-10-14)

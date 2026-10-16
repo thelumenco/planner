@@ -82,12 +82,46 @@ function stairsUp(){
     ${tapeTop(X + 62, 628, "Upstairs")}</g>`;
 }
 // and the top of the stairwell upstairs, bottom left, with a banister: the way back down
-const stairsDown = () => `<g data-exit="1" aria-label="Down the stairs"><ellipse class="hov" cx="86" cy="594" rx="56" ry="14" style="fill:var(--butter)"/>
-    ${sk(`<rect x="30" y="500" width="124" height="116" style="fill:#5A3A2A"/>${rows(8, i => `<rect x="${34 + i*2}" y="${505 + i*14}" width="${116 - i*4}" height="9" style="fill:#A8754F"/>`)}
-      ${rows(14, i => `<path d="M${34 + i*9} 500 v-27" style="stroke:#6B4A2E" stroke-width="1.6"/>`)}${rows(5, i => `<path d="M156 ${512 + i*22} v-27" style="stroke:#6B4A2E" stroke-width="1.6"/>`)}
-      <path d="M28 473 H156 V590" style="stroke:#5A3A2A;fill:none" stroke-width="3"/><rect x="152" y="466" width="8" height="36" rx="1.5" style="fill:#6B4A2E"/><rect x="152" y="584" width="8" height="34" rx="1.5" style="fill:#6B4A2E"/><circle cx="156" cy="465" r="3.6" style="fill:#5A3A2A"/>`,
-      `<rect x="30" y="500" width="124" height="116"/><path d="M28 473 H156 V590"/><rect x="152" y="466" width="8" height="36" rx="1.5"/><rect x="152" y="584" width="8" height="34" rx="1.5"/>`)}
-    ${tapeTop(86, 630, "Downstairs")}</g>`;
+// upstairs the room is a doll's house, cut open at the front (round 222): the floor stops at CUT, and below it are the
+// floor's thickness and the outside of the cottage. The player walks only on the room's floor (LET_ROOM in core.js).
+const CUT = 450;
+// the top of the stairwell, in the front-left corner of the room: an opening in the floor with the first treads
+// going down, and a banister round its two inner sides. The way back down.
+const stairsDown = () => `<g data-exit="1" aria-label="Down the stairs"><ellipse class="hov" cx="80" cy="418" rx="54" ry="13" style="fill:var(--butter)"/>
+    ${sk(`<rect x="30" y="352" width="98" height="${CUT - 352}" style="fill:#5A3A2A"/>${rows(6, i => `<rect x="${33 + i*2}" y="${357 + i*15}" width="${92 - i*4}" height="9" style="fill:#A8754F"/>`)}
+      ${rows(11, i => `<path d="M${34 + i*9} 352 v-26" style="stroke:#6B4A2E" stroke-width="1.6"/>`)}${rows(4, i => `<path d="M130 ${366 + i*22} v-26" style="stroke:#6B4A2E" stroke-width="1.6"/>`)}
+      <path d="M28 326 H130 V420" style="stroke:#5A3A2A;fill:none" stroke-width="3"/><rect x="126" y="320" width="8" height="34" rx="1.5" style="fill:#6B4A2E"/><circle cx="130" cy="319" r="3.6" style="fill:#5A3A2A"/>`,
+      `<rect x="30" y="352" width="98" height="${CUT - 352}"/><path d="M28 326 H130 V420"/><rect x="126" y="320" width="8" height="34" rx="1.5"/>`)}
+    ${tapeTop(82, 312, "Downstairs")}</g>`;
+// the bathroom's door back to the bedroom, on the left-hand wall at the front, seen side-on
+function bedroomDoor(trim, door){
+  const fr = "M32 352 L32 418 L0 438 L0 342z", dr = "M28 357 L28 414 L4 429 L4 349z";
+  return `<g data-exit="1" aria-label="Back to the bedroom"><ellipse class="hov" cx="30" cy="436" rx="30" ry="10" style="fill:var(--butter)"/>
+    ${sk(`<path d="${fr}" style="fill:${trim}"/><path d="${dr}" style="fill:${door}"/><path d="M25 372 v-9 M7 360 v12" style="stroke:${D(door, .2)}" stroke-width="3"/><circle cx="24" cy="392" r="2" style="fill:${BRASS}"/>`,
+      `<path d="${fr}"/><path d="${dr}"/><path d="M16 352 v70" opacity=".4"/><circle cx="24" cy="392" r="2"/>`)}
+    ${tape(66, 336, "Bedroom")}</g>`;
+}
+// the cut: floorboards, the joists and the plaster ceiling below in section, and the side walls cut too; then the
+// front of the cottage under it (the downstairs windows with their window boxes), and a strip of front garden
+function cutaway(o){
+  const win = wx => sk(`<rect x="${wx-27}" y="494" width="54" height="52" rx="2" style="fill:${o.trim}"/><rect x="${wx-23}" y="498" width="46" height="44" style="fill:#C9DCE6"/><path d="M${wx-23} 528 q12 -6 23 -2 v16 h-23z M${wx+23} 528 q-12 -6 -23 -2 v16 h23z" style="fill:#F3E1A0" opacity=".7"/>
+      <rect x="${wx-32}" y="546" width="64" height="12" rx="2" style="fill:${o.box}"/>${rows(9, i => `<circle cx="${wx-26 + i*6.5}" cy="${544 - (i % 2)*3}" r="3.4" style="fill:${["#E3A5B0", "#F3C969", "#C2505F", CREAM, "#B9A3D6"][i % 5]}"/><circle cx="${wx-23 + i*6.5}" cy="${549}" r="2.6" style="fill:#6F9A5E"/>`)}`,
+    `<rect x="${wx-27}" y="494" width="54" height="52" rx="2"/><rect x="${wx-23}" y="498" width="46" height="44"/><path d="M${wx} 498 v44 M${wx-23} 520 h46"/><rect x="${wx-32}" y="546" width="64" height="12" rx="2"/>`);
+  return `<g pointer-events="none">` + sk(`<rect y="${CUT}" width="520" height="${640 - CUT}" style="fill:${o.wall}"/>`, "")
+    + `<g style="fill:${o.course}" opacity=".7">${rows(22, i => `<rect x="${(i*137) % 500 + 6}" y="${486 + (i*29) % 100}" width="${12 + (i % 3)*5}" height="6" rx="3"/>`)}</g>`
+    + win(110) + win(410)
+    + sk(`<path d="M8 640 q-4 -60 6 -150 q10 40 6 150z M512 640 q4 -60 -6 -150 q-10 40 -6 150z" style="fill:#6F9A5E"/>${rows(10, i => `<circle cx="${i < 5 ? 12 + (i % 2)*6 : 508 - (i % 2)*6}" cy="${500 + (i % 5)*26}" r="3" style="fill:#E3A5B0"/>`)}`, "")
+    + sk(`<rect y="596" width="520" height="44" style="fill:#A8C784"/><path d="M226 596 h68 l10 44 h-88z" style="fill:#E2D6BE"/>${rows(30, i => { const x = 12 + i*17.3; return x > 208 && x < 312 ? "" : `<path d="M${x} 604 v-10" style="stroke:#6F9A5E" stroke-width="1.4"/><circle cx="${x}" cy="592" r="3.2" style="fill:${["#E3A5B0", "#F3C969", CREAM, "#B9A3D6", "#C2505F"][i % 5]}"/>`; })}`,
+      `<path d="M0 596 H226 M294 596 H520"/>`)
+    + sk(`<rect y="${CUT}" width="520" height="6" style="fill:${o.boards}"/><rect y="${CUT + 6}" width="520" height="16" style="fill:#7A5638"/>${rows(13, i => `<rect x="${12 + i*40}" y="${CUT + 8}" width="12" height="12" style="fill:#A8754F"/>`)}<rect y="${CUT + 22}" width="520" height="6" style="fill:#F3EEE2"/>
+        <rect x="0" y="0" width="8" height="${CUT + 28}" style="fill:#F3EEE2"/><rect x="512" y="0" width="8" height="${CUT + 28}" style="fill:#F3EEE2"/><rect x="3" y="0" width="3" height="${CUT + 28}" style="fill:#C9B48E"/><rect x="514" y="0" width="3" height="${CUT + 28}" style="fill:#C9B48E"/>`,
+      `<path d="M0 ${CUT} H520 M0 ${CUT + 6} H520 M0 ${CUT + 22} H520 M0 ${CUT + 28} H520 M8 0 V${CUT} M512 0 V${CUT}"/>${rows(13, i => `<rect x="${12 + i*40}" y="${CUT + 8}" width="12" height="12" opacity=".6"/>`)}`)
+    + `<rect y="${CUT - 10}" width="520" height="10" fill="#3A2E28" opacity=".05"/></g>`;
+}
+const B_CUT = {wall: "#EEF0EC", course: "#D5DAD6", trim: "#5E7AB0", box: "#7F9BC8", boards: "#E6D2AE"}, F_CUT = {wall: "#F5E8CF", course: "#EADBBE", trim: "#C8923A", box: "#B07D4A", boards: "#E3C58A"};
+// a luggage rack with a suitcase open on it, for the guests
+const luggage = (x, y, col) => shp([[R(x-20, y-24, 40, 4, 1), "#9A6E48"], [R(x-18, y-34, 36, 10, 2), col], [Pa(`M${x-18} ${y-34} l4 -12 h28 l4 12z`), L(col, .4)], [R(x-14, y-31, 28, 5, 1), CREAM]],
+  `<path d="M${x-17} ${y-20} L${x+17} ${y} M${x+17} ${y-20} L${x-17} ${y}" style="stroke:#7A5638" stroke-width="2"/>`, `<path d="M${x-17} ${y-20} L${x+17} ${y} M${x+17} ${y-20} L${x-17} ${y}"/>`);
 
 // the back door out to the garden, on the right-hand wall of the sitting room, seen side-on (a narrow parallelogram:
 // the far edge is higher and shorter than the near one). 80 tall at the near edge.
@@ -393,7 +427,8 @@ export const LET_SHELLS = {
     ${[s.bed[0] - 42, s.bed[0] + 42, s.bed2[0] - 42, s.bed2[0] + 42].map(x => bedside(x, WALL + 14, "#9A6E48", "#F6E7C4")).join("")}
     ${chest(s.touches[0], s.touches[1], "#A9BCD8")}
     ${bathDoor(trim, "#A9BCD8", "#8FA7CF")}
-    ${stairsDown()}${frontShade()}`; },
+    ${luggage(420, 410, "#7F9BC8")}
+    ${cutaway(B_CUT)}${stairsDown()}`; },
 
   // Fig Tree upstairs: one bedroom under low beams, the bed under the dormer, a washstand with a jug and bowl, a
   // wardrobe, and a chest of drawers for the little touches
@@ -412,7 +447,8 @@ export const LET_SHELLS = {
     ${ragOval(s.bed[0], 280, 96, 30, ["#E3B26A", "#9DB08A", "#F3E7C8", "#C98B6B", "#F1D9A8"])}
     ${blanketBox(s.bed[0], WALL + 92, "#C08D58", "#9DB08A")}
     ${bathDoor(trim, "#C08D58", OAK)}
-    ${stairsDown()}${frontShade()}`; },
+    ${luggage(420, 410, "#C98B6B")}
+    ${cutaway(F_CUT)}${stairsDown()}`; },
 
   // the bathrooms, through the bedroom. Bluebell: blue-and-white tiles to the dado, sprig paper above; the bath under
   // the window, the basin and towels in the middle, the loo and the towel cupboard on the right
@@ -427,7 +463,9 @@ export const LET_SHELLS = {
     ${pegRail(s.toiletries[0] + 46, 74, trim, "#A9BCD8", "#F3F0E8")}
     ${loo(404, WALL + 16, "#9A6E48")}${wallShelf(404, 54, "#9A6E48")}
     ${towelCupboard(44, WALL + 16, "#C9D6E4")}
-    ${laundry(s.toiletries[0] + 50, WALL + 16)}${frontShade()}`; },
+    ${laundry(s.toiletries[0] + 50, WALL + 16)}
+    ${ragOval(280, 318, 130, 30, ["#A9BCD8", "#F3F0E8", "#7F9BC8", "#E8EEF3"])}
+    ${cutaway(B_CUT)}${bedroomDoor(trim, "#A9BCD8")}`; },
 
   // Fig Tree: cream tongue-and-groove to the dado, limewash above, terracotta tiles underfoot; the towel cupboard and
   // the loo on the left, the basin, and the bath under the window on the right
@@ -441,7 +479,9 @@ export const LET_SHELLS = {
     ${pegRail(s.towels[0] + 44, 70, OAK, "#F3E7C8", "#E3B26A")}
     ${loo(96, WALL + 16, OAK)}${wallShelf(96, 50, OAK)}
     ${towelCupboard(42, WALL + 16, "#E8D9B8")}
-    ${laundry(130, WALL + 16)}${frontShade()}`; },
+    ${laundry(130, WALL + 16)}
+    ${ragOval(250, 318, 130, 30, ["#E3B26A", "#F3E7C8", "#C98B6B", "#F1D9A8"])}
+    ${cutaway(F_CUT)}${bedroomDoor(trim, "#C08D58")}`; },
 
   // the gardens, out of the back door. Bluebell's is the bigger, with a picket fence; Fig Tree's is hedged, with its
   // fig tree in the corner
