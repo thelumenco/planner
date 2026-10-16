@@ -2324,12 +2324,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (shown) return; shown = true;
     var d = document.createElement("div"); d.id = "rescue";
     d.setAttribute("style", "position:fixed;left:16px;right:16px;bottom:24px;z-index:99999;background:#FFFDF6;border:1.5px solid #3b3530;border-radius:14px;padding:14px 16px;font:15px/1.4 system-ui,sans-serif;color:#3b3530;box-shadow:0 6px 20px rgba(0,0,0,.18)");
-    d.innerHTML = '<b>Something went wrong in Honeybrook.</b><div style="margin:6px 0 10px;font-size:13px;opacity:.8;word-break:break-word"></div><button style="font:inherit;padding:8px 14px;border-radius:10px;border:1.5px solid #3b3530;background:#F4C7CF">Take me home</button> <span style="font-size:13px;opacity:.7">A screenshot of this helps fix it.</span>';
+    d.innerHTML = '<b>Something went wrong in Honeybrook.</b><div style="margin:6px 0 10px;font-size:13px;opacity:.8;word-break:break-word"></div><button style="font:inherit;padding:8px 14px;border-radius:10px;border:1.5px solid #3b3530;background:#F4C7CF">Take me home</button> <span style="font-size:13px;opacity:.7">A screenshot of this helps fix it.</span> <button aria-label="Close" style="float:right;font:inherit;border:0;background:none;font-size:20px;line-height:1">×</button>';
     d.children[1].textContent = String(msg).slice(0, 400);
+    d.querySelectorAll("button")[1].onclick = function(){ d.remove(); };
     d.querySelector("button").onclick = function(){ try { sessionStorage.setItem("fox.home", "1"); } catch(e) {} location.reload(); };
     (document.body || document.documentElement).appendChild(d);
   }
-  window.addEventListener("error", function(e){ if (!e.error || /ResizeObserver|^Script error/i.test(e.message || "")) return; card((e.message || "error") + (e.error && e.error.stack ? " | " + String(e.error.stack).split("\n").slice(1, 3).join(" ").trim() : "")); });
+  window.addEventListener("error", function(e){ if (!e.error || /ResizeObserver|^Script error/i.test(e.message || "")) return; card((e.message || "error") + (e.error && e.error.stack ? " | " + String(e.error.stack).split("\n").slice(1, 6).join(" ").trim() : "")); });
 })();
 </script>
 
@@ -7098,6 +7099,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   I.water = I.drop;
   I.well = I.drop;
   var art = (name) => {
+    if (typeof name !== "string") return I.sparkle;
     if (name.startsWith("seed:")) {
       const inner = I[name.slice(5)] || I.sprout;
       return [
@@ -19889,7 +19891,7 @@ ${r.n}`;
         out.push(`${s.name} has run out of ice cream on display, so nobody can buy any. Churn a tub, or put another flavour out from the freezer.`);
       }
     }
-    const report = (d) => {
+    const report2 = (d) => {
       const t2 = s.sold[d];
       s.reported = d;
       if (!t2 || !(t2.n || t2.trolley || t2.deliv)) return null;
@@ -19897,10 +19899,10 @@ ${r.n}`;
       return (t2.n ? `${when6} ${s.name.replace(/^The /, "the ")} sold ${t2.n} ice cream${t2.n === 1 ? "" : "s"}: ${t2.coins} coins${t2.outAt != null ? `. It ran out at ${hmTxt(t2.outAt)}, so there's more to be had with fuller tubs` : ""}.` : "") + trol;
     };
     if (hm11 >= CLOSE && s.reported !== day) {
-      const r = report(day);
+      const r = report2(day);
       if (r) out.push(r);
     } else if (hm11 < CLOSE && s.reported && s.reported < dayBefore(day)) {
-      const r = report(dayBefore(day));
+      const r = report2(dayBefore(day));
       if (r) out.push(r);
     } else if (!s.reported) s.reported = dayBefore(day);
     return out;
@@ -53407,7 +53409,23 @@ ${SIGNOFF[t2.who] || ""}`;
     const m = $("mel");
     if (m) m.style.visibility = S2.sleep && scene === "room" || cruisingNow() ? "hidden" : "";
   }
+  var reported = false;
+  function report(e) {
+    if (reported) return;
+    reported = true;
+    try {
+      window.dispatchEvent(new ErrorEvent("error", { message: e && e.message || String(e), error: e }));
+    } catch {
+    }
+  }
   function render(redraw) {
+    try {
+      renderNow(redraw);
+    } catch (e) {
+      report(e);
+    }
+  }
+  function renderNow(redraw) {
     if (S2.day !== dayKey()) S2 = freshToday();
     applyFlags(F);
     registerItems(F);
@@ -57541,6 +57559,14 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
   }
   var last = performance.now();
   function frame3(now5) {
+    try {
+      frameNow(now5);
+    } catch (e) {
+      report(e);
+    }
+    requestAnimationFrame(frame3);
+  }
+  function frameNow(now5) {
     const dt = Math.min(0.05, (now5 - last) / 1e3);
     last = now5;
     if (keys.size) {
@@ -57679,7 +57705,6 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     if (evanHere()) bubbleAt($("evanSay"), evan.x, evan.y, 40);
     else $("evanSay").hidden = true;
     bubbleAt($("melSay"), mel.x, mel.y, 70);
-    requestAnimationFrame(frame3);
   }
   document.querySelectorAll("[data-track]").forEach((b) => b.onclick = () => openTracker(b.dataset.track));
   $("addForm").onsubmit = (e) => {

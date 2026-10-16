@@ -2969,7 +2969,13 @@ function dressMel(){
   dressRain();
   const m = $("mel"); if (m) m.style.visibility = (S.sleep && scene === "room") || cruisingNow() ? "hidden" : "";
 }
-function render(redraw){
+// round 230: one broken drawing (an icon with no name in Mel's save) used to stop the whole game: the first render at
+// startup threw, so the frame loop never started and nothing could be tapped. Now a failure is reported once on the
+// rescue card (index.html) and the game carries on.
+let reported = false;
+function report(e){ if (reported) return; reported = true; try { window.dispatchEvent(new ErrorEvent("error", {message: e && e.message || String(e), error: e})); } catch {} }
+function render(redraw){ try { renderNow(redraw); } catch (e) { report(e); } }
+function renderNow(redraw){
   if (S.day !== dayKey()) S = freshToday();
   storyFlags(F);   // story rewards that change the game (the koi tip, Farid's pastries)
   registerItems(F);   // each discovered gelato flavour is a gift item (one per type) in the backpack
@@ -4304,7 +4310,8 @@ function unstick(){
   mel.x = mel.tx = a[0]; mel.y = mel.ty = a[1]; mel.path = []; route = []; maple.x = maple.tx = a[0] - 22; maple.y = maple.ty = a[1] + 2; cam.snap = true;
 }
 let last = performance.now();
-function frame(now){
+function frame(now){ try { frameNow(now); } catch (e) { report(e); } requestAnimationFrame(frame); }
+function frameNow(now){
   const dt = Math.min(.05, (now - last)/1000); last = now;
   if (keys.size) {
     const v = 190*dt, b = bounds(); let dx = 0, dy = 0;
@@ -4365,7 +4372,6 @@ function frame(now){
   bubbleAt($("speech"), close ? (maple.x*0.35 + mel.x*0.65) : maple.x, close ? Math.min(maple.y, mel.y) : maple.y, close ? 76 : (sleeping ? 18 : 30));
   if (evanHere()) bubbleAt($("evanSay"), evan.x, evan.y, 40); else $("evanSay").hidden = true;
   bubbleAt($("melSay"), mel.x, mel.y, 70);
-  requestAnimationFrame(frame);
 }
 
 /* =================== WIRING =================== */

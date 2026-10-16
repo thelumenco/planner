@@ -113,6 +113,7 @@ I.water = I.drop;
 I.well = I.drop;
 
 const art = name => {
+  if (typeof name !== "string") return I.sparkle;   // round 230: an item or place with no icon name draws a sparkle, never a crash
   if (name.startsWith("seed:")) {   // a seed packet with the crop drawn on it
     const inner = I[name.slice(5)] || I.sprout;
     return [`<path d="M5 3h14l-1 18H6z" ${f(C.paper)}/><path d="M5 3h14v3.5H5z" ${f(C.sage)}/><g transform="translate(7 8) scale(.42)">${inner[0]}</g>`,
