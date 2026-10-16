@@ -58,6 +58,144 @@ function bathDoor(trim, wood, ledge){
     ${tape(x, top + 40, "Bathroom")}</g>`;
 }
 
+// round 221: bathroom bits. A small frosted window, a peg rail with a dressing gown and a wash bag, terracotta tiles
+const frosted = (x, y, trim) => sk(`<rect x="${x-38}" y="${y-44}" width="76" height="88" rx="3" style="fill:${trim}"/><rect x="${x-32}" y="${y-38}" width="64" height="76" rx="2" style="fill:#E4EDF1"/>
+    ${rows(18, i => `<circle cx="${x - 26 + (i*23) % 54}" cy="${y - 32 + (i*17) % 66}" r="${2 + i % 3}" style="fill:#FFFFFF" opacity=".7"/>`)}<rect x="${x-44}" y="${y+44}" width="88" height="7" rx="2" style="fill:${CREAM}"/>`,
+  `<rect x="${x-38}" y="${y-44}" width="76" height="88" rx="3"/><rect x="${x-32}" y="${y-38}" width="64" height="76" rx="2"/><path d="M${x} ${y-38} v76 M${x-32} ${y} h64"/><rect x="${x-44}" y="${y+44}" width="88" height="7" rx="2"/>`);
+const pegRail = (rail, robe, bag) => sk(`<rect x="246" y="96" width="74" height="8" rx="2" style="fill:${rail}"/><circle cx="266" cy="104" r="3.5" style="fill:${DARK}"/><circle cx="302" cy="104" r="3.5" style="fill:${DARK}"/>
+    <path d="M266 106 c-10 0 -20 6 -22 18 l-6 68 h56 l-6 -68 c-2 -12 -12 -18 -22 -18z" style="fill:${robe}"/><path d="M256 110 l10 24 l10 -24z" style="fill:${L(robe, .5)}"/><rect x="240" y="150" width="52" height="5" style="fill:${D(robe, .2)}"/><path d="M262 155 l-4 22 M270 155 l4 20" style="stroke:${D(robe, .2)}" stroke-width="3"/>
+    <path d="M302 108 v8" style="stroke:${LINE}" stroke-width="1.2"/><path d="M291 118 q11 -6 22 0 l3 30 q-14 6 -28 0z" style="fill:${bag}"/>`,
+  `<rect x="246" y="96" width="74" height="8" rx="2"/><path d="M266 106 c-10 0 -20 6 -22 18 l-6 68 h56 l-6 -68 c-2 -12 -12 -18 -22 -18z"/><path d="M256 110 l10 24 l10 -24"/><path d="M266 134 v58" opacity=".5"/><path d="M291 118 q11 -6 22 0 l3 30 q-14 6 -28 0z"/><path d="M293 124 q9 4 18 0" opacity=".6"/>`);
+const terracotta = () => `<rect width="520" height="640" style="fill:#C98B6B"/><g style="fill:#D49A78" opacity=".6">${rows(16, i => { const r = (i*7) % 11, k = (i*3 + r) % 10; return `<rect x="${k*56 + (r % 2)*28 + 3}" y="${252 + r*36 + 3}" width="50" height="30"/>`; })}</g>
+  <g opacity=".6" style="stroke:#A0664A" stroke-width="1.6">${rows(11, r => `<path d="M0 ${252 + r*36} H520"/>${rows(11, k => `<path d="M${k*56 + (r % 2)*28} ${252 + r*36} v36"/>`)}`)}</g>`;
+
+// ---------- the gardens (round 221) ----------
+// the back of the cottage along the top, a fence or hedge down each side, and a lawn: scruffy long grass until you
+// buy a proper garden (flower beds, a mown lawn, a gravel path). Each extra has its own place: `o.at`.
+const GH = 196;   // the back wall of the cottage comes down to here
+const qpt = (a, c, b, t) => [0, 1].map(i => (1 - t)*(1 - t)*a[i] + 2*(1 - t)*t*c[i] + t*t*b[i]);
+function houseBack(o){
+  const win = wx => sk(`${o.fence === "picket" ? `<rect x="${wx-64}" y="58" width="22" height="88" rx="2" style="fill:${o.trim}"/><rect x="${wx+42}" y="58" width="22" height="88" rx="2" style="fill:${o.trim}"/>` : ""}
+      <rect x="${wx-40}" y="58" width="80" height="88" rx="3" style="fill:${o.fence === "picket" ? CREAM : o.trim}"/><rect x="${wx-34}" y="64" width="68" height="76" style="fill:#C9DCE6"/><path d="M${wx-34} 120 q16 -10 30 -4 v24 h-30z M${wx+34} 120 q-16 -10 -30 -4 v24 h30z" style="fill:#E6D2AE" opacity=".8"/><rect x="${wx-46}" y="144" width="92" height="8" rx="2" style="fill:${CREAM}"/>`,
+    `${o.fence === "picket" ? `<rect x="${wx-64}" y="58" width="22" height="88" rx="2"/><rect x="${wx+42}" y="58" width="22" height="88" rx="2"/><path d="M${wx-58} 70 h10 M${wx-58} 84 h10 M${wx-58} 98 h10 M${wx-58} 112 h10 M${wx-58} 126 h10 M${wx+48} 70 h10 M${wx+48} 84 h10 M${wx+48} 98 h10 M${wx+48} 112 h10 M${wx+48} 126 h10" opacity=".45"/>` : ""}
+      <rect x="${wx-40}" y="58" width="80" height="88" rx="3"/><rect x="${wx-34}" y="64" width="68" height="76"/><path d="M${wx} 64 v76 M${wx-34} 102 h68"/><rect x="${wx-46}" y="144" width="92" height="8" rx="2"/>`);
+  return sk(`<rect width="520" height="${GH}" style="fill:${o.wall}"/>`, `<path d="M0 ${GH} H520"/>`)
+    + `<g style="fill:${o.course}" opacity=".75">${rows(14, i => `<rect x="${(i*137) % 470 + 10}" y="${44 + (i*37) % 140}" width="${26 + (i % 3)*10}" height="11" rx="5"/>`)}</g>`
+    + sk(`<rect width="520" height="30" style="fill:${o.roof}"/><rect y="30" width="520" height="7" style="fill:${D(o.roof, .3)}"/>`, `<path d="M0 30 H520 M0 37 H520"/><g opacity=".35">${rows(13, i => `<path d="M${i*40 + 20} 0 v30"/>`)}<path d="M0 15 H520"/></g>`)
+    + o.wins.map(win).join("")
+    + sk(`<rect x="226" y="78" width="68" height="${GH - 78}" rx="2" style="fill:${CREAM}"/><rect x="232" y="84" width="56" height="${GH - 84}" style="fill:${o.door}"/>${rows(4, i => `<rect x="${241 + (i % 2)*20}" y="${94 + (i > 1 ? 16 : 0)}" width="18" height="14" style="fill:#D6E8F2"/>`)}
+      <circle cx="280" cy="146" r="3" style="fill:${BRASS}"/><rect x="220" y="${GH - 3}" width="80" height="10" rx="2" style="fill:#BDB3A6"/>
+      <rect x="310" y="104" width="14" height="20" rx="2" style="fill:#3A3430"/><rect x="312" y="108" width="10" height="13" style="fill:#FFE6A8"/><path d="M308 104 h18 l-9 -8z" style="fill:#3A3430"/>`,
+      `<rect x="226" y="78" width="68" height="${GH - 78}" rx="2"/><rect x="232" y="84" width="56" height="${GH - 84}"/><rect x="238" y="134" width="44" height="${GH - 144}" opacity=".45"/><circle cx="280" cy="146" r="3"/><rect x="220" y="${GH - 3}" width="80" height="10" rx="2"/><rect x="310" y="104" width="14" height="20" rx="2"/>`);
+}
+// a picket fence (or a hedge) down the left side; the right side is the same, mirrored
+const picketSide = col => sk(rows(22, i => { const yb = GH + 14 + i*21; return `<path d="M3 ${yb} V${yb-38} l8 -8 l8 8 V${yb}z" style="fill:${col}"/><rect x="14" y="${yb-37}" width="5" height="37" style="fill:${D(col, .12)}"/>`; }),
+  rows(22, i => { const yb = GH + 14 + i*21; return `<path d="M3 ${yb} V${yb-38} l8 -8 l8 8 V${yb}"/>`; }));
+const hedgeSide = w => sk(`<rect x="0" y="${GH - 14}" width="${w - 6}" height="${640 - GH + 14}" style="fill:#4E7A3E"/>${rows(20, i => `<circle cx="${w - 8}" cy="${GH - 4 + i*24}" r="15" style="fill:${i % 2 ? "#5E8A48" : "#6F9A5E"}"/><circle cx="${w - 24}" cy="${GH + 8 + i*24}" r="11" style="fill:#5E8A48"/>`)}
+    ${rows(16, i => `<circle cx="${8 + (i*13) % (w - 14)}" cy="${GH + 10 + (i*67) % 420}" r="2.4" style="fill:#9EBE8C"/>`)}`,
+  `<path d="M${w + 6} ${GH - 14} ${rows(19, () => "q8 12 0 24 ").trim()}"/>`);
+function figTree(){
+  const leaf = [[34, 168, 40], [88, 146, 44], [132, 178, 34], [70, 202, 36], [18, 214, 30], [112, 216, 28], [56, 120, 30]];
+  return `<ellipse cx="86" cy="300" rx="70" ry="12" style="fill:#3A2E28" opacity=".1"/>` + sk(`<path d="M58 300 Q64 256 52 214 Q66 236 70 206 Q78 250 80 300z" style="fill:#8A7058"/><path d="M60 236 Q40 214 30 196 M74 226 Q100 204 116 196" style="stroke:#8A7058;fill:none" stroke-width="6" stroke-linecap="round"/>
+      ${leaf.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r + 3}" style="fill:#44683A"/>`).join("")}${leaf.map(([x, y, r], i) => `<circle cx="${x}" cy="${y}" r="${r}" style="fill:${["#5E8A48", "#6F9A5E", "#567F42"][i % 3]}"/>`).join("")}
+      ${[[30, 150], [74, 132], [110, 160], [52, 196], [124, 200], [90, 186], [14, 196]].map(([x, y]) => `<path d="M${x} ${y} q-9 -4 -8 -12 q4 4 8 2 q-1 -8 4 -12 q3 7 1 12 q6 0 8 -4 q1 9 -9 14z" style="fill:#86AE6E"/>`).join("")}
+      ${[[44, 178], [98, 168], [66, 214], [118, 196], [22, 222], [84, 116]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="5" ry="6" style="fill:#7B5A7A"/>`).join("")}`,
+    `<path d="M58 300 Q64 256 52 214 Q66 236 70 206 Q78 250 80 300"/>
+      ${[[44, 178], [98, 168], [66, 214], [118, 196], [22, 222], [84, 116]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="5" ry="6"/>`).join("")}`);
+}
+const GX = {
+  // paving slabs, a little bistro table in the trim colour, two chairs and a pot of tea
+  patio: (x, y, o) => { const chair = (cx, d) => [`<rect x="${cx-12}" y="${y-14}" width="24" height="6" rx="2" style="fill:${o.trim}"/><rect x="${cx - d*12 - 2}" y="${y-46}" width="5" height="34" rx="2" style="fill:${o.trim}"/>`,
+      `<rect x="${cx-12}" y="${y-14}" width="24" height="6" rx="2"/><rect x="${cx - d*12 - 2}" y="${y-46}" width="5" height="34" rx="2"/><path d="M${cx-10} ${y-8} l-2 12 M${cx+10} ${y-8} l2 12"/>`];
+    const cl = chair(x - 44, 1), cr = chair(x + 44, -1);
+    return sk(`${rows(8, i => `<rect x="${x - 70 + (i % 4)*35}" y="${y - 30 + Math.floor(i/4)*28}" width="35" height="28" style="fill:${(i + Math.floor(i/4)) % 2 ? "#D8D0C2" : "#CBC1B0"}"/>`)}${cl[0]}${cr[0]}
+      <rect x="${x-2}" y="${y-28}" width="4" height="30" style="fill:${o.trim}"/><ellipse cx="${x}" cy="${y+2}" rx="12" ry="3" style="fill:${o.trim}"/><ellipse cx="${x}" cy="${y-30}" rx="26" ry="7" style="fill:${o.trim}"/>
+      <path d="M${x-10} ${y-32} q0 -14 10 -14 q10 0 10 14z" style="fill:${CREAM}"/><path d="M${x+10} ${y-40} l8 -4" style="stroke:${CREAM}" stroke-width="3"/><rect x="${x+12}" y="${y-38}" width="7" height="6" rx="2" style="fill:${CREAM}"/><rect x="${x-22}" y="${y-38}" width="7" height="6" rx="2" style="fill:${CREAM}"/>`,
+      `<rect x="${x-70}" y="${y-30}" width="140" height="56"/><path d="M${x-35} ${y-30} v56 M${x} ${y-30} v56 M${x+35} ${y-30} v56 M${x-70} ${y-2} h140" opacity=".45"/>${cl[1]}${cr[1]}<ellipse cx="${x}" cy="${y-30}" rx="26" ry="7"/><path d="M${x-2} ${y-23} v24 M${x+2} ${y-23} v24"/><path d="M${x-10} ${y-32} q0 -14 10 -14 q10 0 10 14"/>`); },
+  // a little charcoal kettle barbecue on three legs, sausages on, and a sack of charcoal
+  bbq: (x, y) => sk(`<path d="M${x-12} ${y-22} L${x-17} ${y} M${x+12} ${y-22} L${x+17} ${y} M${x} ${y-20} V${y-2}" style="stroke:#3A3A3A" stroke-width="3"/><path d="M${x-20} ${y-38} Q${x-20} ${y-18} ${x} ${y-18} Q${x+20} ${y-18} ${x+20} ${y-38}z" style="fill:#3E3E3E"/>
+      <rect x="${x-14}" y="${y-44}" width="9" height="5" rx="2.5" style="fill:#B8674A"/><rect x="${x-3}" y="${y-45}" width="9" height="5" rx="2.5" style="fill:#A85A3E"/><rect x="${x+8}" y="${y-44}" width="8" height="5" rx="2.5" style="fill:#B8674A"/>
+      <path d="M${x-28} ${y} q-4 -18 2 -24 h12 q6 6 2 24z" style="fill:#C9A06E"/><path d="M${x-2} ${y-50} q-6 -8 0 -16 q6 -8 0 -16" style="stroke:#E8E4DC;fill:none" stroke-width="3" opacity=".8"/>`,
+    `<path d="M${x-20} ${y-38} Q${x-20} ${y-18} ${x} ${y-18} Q${x+20} ${y-18} ${x+20} ${y-38}z"/><path d="M${x-20} ${y-38} h40" /><path d="M${x-28} ${y} q-4 -18 2 -24 h12 q6 6 2 24z"/><path d="M${x-24} ${y-16} h10" opacity=".5"/>`),
+  // a ring of stones with logs burning, and two log stools
+  firepit: (x, y) => { const stone = s => `<ellipse cx="${s.sx}" cy="${s.sy}" rx="8" ry="6" style="fill:${["#A8A39A", "#BDB8AE", "#958F86"][s.i % 3]}"/>`;
+    const ring = Array.from({length: 14}, (_, i) => { const a = i/14*Math.PI*2; return {sx: x + 40*Math.cos(a), sy: y + 13*Math.sin(a), i, back: Math.sin(a) < 0}; });
+    const stool = sx => [`<rect x="${sx-12}" y="${y-14}" width="24" height="18" style="fill:#8A6448"/><ellipse cx="${sx}" cy="${y-14}" rx="12" ry="5" style="fill:#D9B98A"/>`, `<rect x="${sx-12}" y="${y-14}" width="24" height="18"/><ellipse cx="${sx}" cy="${y-14}" rx="12" ry="5"/><ellipse cx="${sx}" cy="${y-14}" rx="5" ry="2" opacity=".5"/>`];
+    const sl = stool(x - 70), sr = stool(x + 70);
+    return `<circle cx="${x}" cy="${y-18}" r="56" fill="url(#gdnglow)" opacity=".55"/>` + sk(`${sl[0]}${sr[0]}${ring.filter(s => s.back).map(stone).join("")}<ellipse cx="${x}" cy="${y}" rx="34" ry="10" style="fill:#4A403A"/>
+      <rect x="${x-24}" y="${y-8}" width="48" height="8" rx="4" transform="rotate(-14 ${x} ${y-4})" style="fill:#8A6448"/><rect x="${x-24}" y="${y-8}" width="48" height="8" rx="4" transform="rotate(14 ${x} ${y-4})" style="fill:#7A5638"/>
+      <path d="M${x-14} ${y-6} q0 -20 10 -30 q2 14 8 10 q4 -10 2 -22 q14 16 8 42z" style="fill:#F2A65A"/><path d="M${x-6} ${y-6} q2 -12 6 -16 q2 8 6 4 q2 6 -2 12z" style="fill:#F3D36A"/>${ring.filter(s => !s.back).map(stone).join("")}`,
+      `${sl[1]}${sr[1]}<ellipse cx="${x}" cy="${y}" rx="44" ry="17" opacity=".5"/><path d="M${x-14} ${y-6} q0 -20 10 -30 q2 14 8 10 q4 -10 2 -22 q14 16 8 42z"/>`); },
+  // two bikes with baskets, leaning on the back wall
+  bikes: (x, y, o) => { const bike = (cx, col, load) => [`<circle cx="${cx-26}" cy="${y-17}" r="16" style="fill:none;stroke:#3A3430" stroke-width="3.5"/><circle cx="${cx+26}" cy="${y-17}" r="16" style="fill:none;stroke:#3A3430" stroke-width="3.5"/>
+        <path d="M${cx-26} ${y-17} L${cx-2} ${y-17} L${cx-8} ${y-44} M${cx-2} ${y-17} Q${cx+6} ${y-30} ${cx+18} ${y-46} L${cx+26} ${y-17} M${cx-26} ${y-17} L${cx-8} ${y-38}" style="stroke:${col};fill:none" stroke-width="4" stroke-linejoin="round"/>
+        <ellipse cx="${cx-9}" cy="${y-47}" rx="8" ry="3.4" style="fill:#5A3A2A"/><path d="M${cx+16} ${y-50} q4 -6 12 -4" style="stroke:#3A3430;fill:none" stroke-width="3"/>
+        <rect x="${cx+18}" y="${y-62}" width="22" height="16" rx="2" style="fill:#D9B97E"/>${load}`,
+      `<path d="M${cx-26} ${y-17} m-16 0 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0 M${cx+26} ${y-17} m-16 0 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0" opacity=".5"/><path d="M${cx-26} ${y-27} v20 M${cx-36} ${y-17} h20 M${cx+26} ${y-27} v20 M${cx+16} ${y-17} h20" opacity=".3"/><rect x="${cx+18}" y="${y-62}" width="22" height="16" rx="2"/><path d="M${cx+18} ${y-54} h22 M${cx+25} ${y-62} v16 M${cx+33} ${y-62} v16" opacity=".5"/>`];
+    const a = bike(x - 30, o.trim, `${[0, 1, 2].map(i => `<circle cx="${x - 7 + i*6}" cy="${y - 66 + (i % 2)*3}" r="3.6" style="fill:${["#E3A5B0", "#F3C969", CREAM][i]}"/>`).join("")}`),
+      b = bike(x + 32, o.bike2, `<rect x="${x+52}" y="${y-76}" width="7" height="22" rx="3" transform="rotate(14 ${x+55} ${y-65})" style="fill:#D9A066"/>`);
+    return sk(a[0] + b[0], a[1] + b[1]); },
+  // a hammock slung between two posts
+  hammock: (x, y, o) => sk(`<ellipse cx="${x}" cy="${y+2}" rx="52" ry="6" style="fill:#3A2E28" opacity=".12"/><rect x="${x-66}" y="${y-92}" width="8" height="94" rx="2" style="fill:#8A6448"/><rect x="${x+58}" y="${y-92}" width="8" height="94" rx="2" style="fill:#8A6448"/>
+      <path d="M${x-58} ${y-80} L${x-44} ${y-62} M${x+58} ${y-80} L${x+44} ${y-62}" style="stroke:#C9B48A" stroke-width="2"/>
+      <path d="M${x-44} ${y-64} Q${x} ${y-28} ${x+44} ${y-64} L${x+44} ${y-54} Q${x} ${y-10} ${x-44} ${y-54}z" style="fill:${CREAM}"/><path d="M${x-44} ${y-60} Q${x} ${y-22} ${x+44} ${y-60} M${x-44} ${y-57} Q${x} ${y-16} ${x+44} ${y-57}" style="stroke:${o.trim};fill:none" stroke-width="2.6"/>
+      <ellipse cx="${x-28}" cy="${y-54}" rx="13" ry="7" style="fill:${L(o.trim, .35)}"/>`,
+    `<rect x="${x-66}" y="${y-92}" width="8" height="94" rx="2"/><rect x="${x+58}" y="${y-92}" width="8" height="94" rx="2"/><path d="M${x-44} ${y-64} Q${x} ${y-28} ${x+44} ${y-64} L${x+44} ${y-54} Q${x} ${y-10} ${x-44} ${y-54}z"/><ellipse cx="${x-28}" cy="${y-54}" rx="13" ry="7"/>`),
+  // a round wood-fired hot tub: staves, iron hoops, a little stove and chimney, steam, and a step
+  hottub: (x, y) => { const body = `M${x-58} ${y-62} V${y-6} Q${x} ${y+8} ${x+58} ${y-6} V${y-62}z`;
+    return sk(`<rect x="${x-80}" y="${y-46}" width="22" height="32" rx="2" style="fill:#3A3A3A"/><rect x="${x-74}" y="${y-124}" width="9" height="80" style="fill:#4A4A4A"/><rect x="${x-77}" y="${y-128}" width="15" height="6" style="fill:#3A3A3A"/><rect x="${x-75}" y="${y-36}" width="12" height="9" rx="2" style="fill:#F2A65A"/>
+      <path d="${body}" style="fill:#A8754F"/><path d="M${x-58} ${y-48} Q${x} ${y-34} ${x+58} ${y-48} M${x-58} ${y-18} Q${x} ${y-4} ${x+58} ${y-18}" style="stroke:#5A5550;fill:none" stroke-width="4"/>
+      <ellipse cx="${x}" cy="${y-62}" rx="58" ry="16" style="fill:#C08D58"/><ellipse cx="${x}" cy="${y-62}" rx="50" ry="12" style="fill:#9CCFE0"/><path d="M${x-30} ${y-62} q8 -3 16 0 M${x+8} ${y-58} q8 -3 16 0" style="stroke:#E3F2F7;fill:none" stroke-width="2"/>
+      <path d="M${x-22} ${y-72} q-6 -10 0 -18 q6 -8 0 -18 M${x+2} ${y-74} q-6 -10 0 -18 q6 -8 0 -18 M${x+26} ${y-72} q-6 -10 0 -18 q6 -8 0 -16" style="stroke:#FFFFFF;fill:none" stroke-width="3" opacity=".85"/>
+      <circle cx="${x-70}" cy="${y-136}" r="5" style="fill:#D8D4CC" opacity=".8"/><circle cx="${x-62}" cy="${y-146}" r="4" style="fill:#D8D4CC" opacity=".6"/>
+      <rect x="${x+36}" y="${y-20}" width="34" height="20" rx="2" style="fill:#B07D4A"/>`,
+      `<rect x="${x-80}" y="${y-46}" width="22" height="32" rx="2"/><rect x="${x-74}" y="${y-124}" width="9" height="80"/><path d="${body}"/><ellipse cx="${x}" cy="${y-62}" rx="58" ry="16"/><ellipse cx="${x}" cy="${y-62}" rx="50" ry="12"/>
+      <g opacity=".4">${rows(9, i => `<path d="M${x-46 + i*11.5} ${y-48 + Math.abs(i - 4)*1.5} V${y + 2 - Math.abs(i - 4)*1.5}"/>`)}</g><rect x="${x+36}" y="${y-20}" width="34" height="20" rx="2"/><path d="M${x+36} ${y-10} h34" opacity=".5"/>`); }
+};
+// fairy lights: swagged under the eaves and along the top of each side fence
+function fairyLights(o){
+  const runs = [], bulbs = [];
+  for (let k = 0; k < 6; k++) runs.push([[20 + k*80, 40], [60 + k*80, 58], [100 + k*80, 40]]);
+  const fx = o.side - 6;
+  for (let k = 0; k < 5; k++) for (const s of [0, 1]) { const X = s ? 520 - fx : fx; runs.push([[X, GH + 4 + k*84], [X + (s ? -14 : 14), GH + 46 + k*84], [X, GH + 88 + k*84]]); }
+  runs.forEach(([a, c, b]) => [.17, .5, .83].forEach(t => bulbs.push(qpt(a, c, b, t))));
+  return `<g pointer-events="none"><path d="${runs.map(([a, c, b]) => `M${a[0]} ${a[1]} Q${c[0]} ${c[1]} ${b[0]} ${b[1]}`).join(" ")}" style="stroke:#4A4038;fill:none" stroke-width="1.3"/>
+    ${bulbs.map(([bx, by]) => `<circle cx="${bx}" cy="${by + 3}" r="9" style="fill:#FFE9A8" opacity=".35"/><circle cx="${bx}" cy="${by + 3}" r="3.6" style="fill:#FFE08A;stroke:#3A2E28" stroke-width=".8"/>`).join("")}</g>`;
+}
+function garden(info, o){
+  const ex = (info && info.extras) || {}, nice = !!ex.garden, S = o.side;
+  let h = `<defs><radialGradient id="gdnglow"><stop offset="0" stop-color="#FFD27A" stop-opacity=".8"/><stop offset="1" stop-color="#FFD27A" stop-opacity="0"/></radialGradient></defs>`;
+  // the lawn: mown in stripes, or long grass with weeds
+  h += `<rect width="520" height="640" style="fill:${nice ? "#A8C784" : "#9AAE70"}"/>`;
+  if (nice) h += `<g style="fill:#B6D293" opacity=".75">${rows(6, i => `<rect y="${GH + 30 + i*74}" width="520" height="37"/>`)}</g>`;
+  else h += `<g style="stroke:#748A50;fill:none" stroke-width="1.6" stroke-linecap="round">${rows(90, i => { const x = (i*97) % 500 + 10, y = GH + 20 + (i*53) % 430; return `<path d="M${x} ${y} q-3 -10 -8 -15 M${x} ${y} q0 -12 2 -18 M${x} ${y} q4 -9 9 -12"/>`; })}</g>
+    <g style="stroke:#B9C98A;fill:none" stroke-width="1.4" stroke-linecap="round">${rows(40, i => { const x = (i*151) % 500 + 10, y = GH + 30 + (i*89) % 420; return `<path d="M${x} ${y} q-2 -9 -6 -13 M${x} ${y} q3 -10 7 -13"/>`; })}</g>`;
+  h += houseBack(o);
+  if (nice) {
+    // flower beds under the house wall either side of the door, and a gravel path down the middle
+    const bed = (a, b) => sk(`<path d="M${a} ${GH} H${b} V${GH + 24} Q${(a + b)/2} ${GH + 34} ${a} ${GH + 24}z" style="fill:#8A6448"/>${rows(Math.floor((b - a - 16)/17), i => { const fx = a + 12 + i*17, fy = GH + 16 + (i % 2)*5;
+        return `<path d="M${fx} ${fy} v-16" style="stroke:#6F9A5E" stroke-width="2"/><circle cx="${fx-4}" cy="${fy-6}" r="4" style="fill:#7FA36E"/><circle cx="${fx}" cy="${fy-18}" r="5" style="fill:${["#E3A5B0", "#F3C969", "#C2505F", "#B9A3D6", CREAM][i % 5]}"/>`; })}`,
+      `<path d="M${a} ${GH + 24} Q${(a + b)/2} ${GH + 34} ${b} ${GH + 24}"/>`);
+    h += sk(`<path d="M234 ${GH + 6} L286 ${GH + 6} L310 640 L210 640z" style="fill:#E2D6BE"/>${rows(90, i => { const y = GH + 14 + (i*53) % 430, hw = 20 + (y - GH)/444*24; return `<circle cx="${(260 + (((i*61) % 97)/48.5 - 1)*hw).toFixed(1)}" cy="${y}" r="${1.4 + (i % 3)*.5}" style="fill:${i % 2 ? "#B9A98A" : "#CDBFA3"}"/>`; })}`,
+      `<path d="M234 ${GH + 6} L210 640 M286 ${GH + 6} L310 640"/>`) + bed(S + 4, 222) + bed(298, 516 - S);
+  } else {
+    // stepping stones, half lost in the grass, and dandelions and docks
+    h += sk(`${[[260, 232, 20], [252, 298, 22], [268, 370, 22], [256, 446, 24], [264, 520, 24]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.42}" style="fill:#C9C2B4"/>`).join("")}
+      ${[[70, 260], [180, 330], [330, 280], [450, 380], [120, 420], [380, 520], [60, 560], [460, 600], [180, 600], [300, 420], [440, 250], [150, 520]].map(([x, y]) => `<path d="M${x} ${y} q1 -10 -1 -16" style="stroke:#6F9A5E;fill:none" stroke-width="1.6"/><circle cx="${x-1}" cy="${y-18}" r="4" style="fill:#F3C969"/>`).join("")}
+      ${[[100, 230], [400, 226], [200, 470], [340, 590]].map(([x, y]) => `<path d="M${x} ${y} q-16 -6 -18 -22 q14 2 18 22z M${x} ${y} q14 -10 12 -26 q-12 8 -12 26z" style="fill:#5E7A44"/>`).join("")}
+      ${rows(26, i => `<path d="M${S + 8 + i*19} ${GH + 6} q-4 -16 -2 -26 M${S + 14 + i*19} ${GH + 8} q4 -14 8 -22" style="stroke:#7F9A5A;fill:none" stroke-width="2"/>`)}`,
+      `${[[260, 232, 20], [252, 298, 22], [268, 370, 22], [256, 446, 24], [264, 520, 24]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.42}"/>`).join("")}`);
+  }
+  // the fence or hedge down each side
+  const side = o.fence === "picket" ? picketSide("#F1EEE6") : hedgeSide(S);
+  h += side + `<g transform="translate(520 0) scale(-1 1)">${side}</g>`;
+  if (o.fig) h += figTree();
+  // the extras, back to front
+  Object.keys(GX).filter(k => ex[k] && o.at[k]).sort((a, b) => o.at[a][1] - o.at[b][1]).forEach(k => { h += GX[k](o.at[k][0], o.at[k][1], o); });
+  if (ex.lights) h += fairyLights(o);
+  return `<g pointer-events="none">${h}</g>`;
+}
+
 export const LET_SHELLS = {
   // Bluebell: pale blue-grey walls under the eaves, beams, a stone fireplace, and an arch through to the second bedroom
   bluebell: () => { const [wx, wy] = COTTAGES.bluebell.slots.curtains, trim = "#5E7AB0";
@@ -150,9 +288,9 @@ export const LET_SHELLS = {
 
   // round 221: the gardens, out of the back door. Bluebell's is the bigger, with a picket fence; Fig Tree's is
   // hedged, with its fig tree in the corner
-  bluebellgdn: info => garden(info, {wall: "#EEF0EC", course: "#D5DAD6", roof: "#6D7685", trim: "#5E7AB0", door: "#7F9BC8", wins: [110, 410], fence: "picket", side: 22,
+  bluebellgdn: info => garden(info, {wall: "#EEF0EC", course: "#D5DAD6", roof: "#6D7685", trim: "#5E7AB0", door: "#7F9BC8", bike2: "#9DB08A", wins: [110, 410], fence: "picket", side: 22,
     at: {patio: [126, 304], bbq: [62, 414], firepit: [140, 494], bikes: [408, 232], hammock: [416, 340], hottub: [404, 490]}}),
-  figtreegdn: info => garden(info, {wall: "#F5E8CF", course: "#EADBBE", roof: "#B8674A", trim: "#C8923A", door: "#B07D4A", wins: [392], fence: "hedge", side: 40, fig: true,
+  figtreegdn: info => garden(info, {wall: "#F5E8CF", course: "#EADBBE", roof: "#B8674A", trim: "#C8923A", door: "#B07D4A", bike2: "#7FA0D0", wins: [392], fence: "hedge", side: 40, fig: true,
     at: {patio: [156, 350], bbq: [84, 446], firepit: [152, 522], bikes: [386, 232], hammock: [392, 336], hottub: [386, 490]}})
 };
 
@@ -357,8 +495,86 @@ function parcels(n, x, y){
     spots.map(([dx, dy, w, h]) => `<rect x="${x+dx-w/2}" y="${y+dy-h}" width="${w}" height="${h}" rx="2"/><path d="M${x+dx} ${y+dy-h} v${h} M${x+dx-w/2} ${y+dy-h/2} h${w}" style="stroke:#8A5A3A" stroke-width="1.1"/><path d="M${x+dx} ${y+dy-h} q-4 -5 -6 -1 q2 3 6 1 q4 -5 6 -1 q-2 3 -6 1" style="stroke:#8A5A3A" stroke-width="1"/>`).join(""));
 }
 
-const DRAW = {seat, table, shelf, lamp, rug, curtains, picture, plant: plantP, touches};
-const FLAT = {rug: 0, curtains: 1, picture: 1};   // drawn first, in this order; everything else by how far forward it stands
+// ---------- round 221: the bathroom pieces ----------
+const WATER = "#C4E0EC", PORC = "#F7F6F1", CHROME = "#C9D3D9";
+// the bath stands with its back to the back wall; (x, y) is the middle of its front, on the floor
+function bath(x, y, t, c){
+  if (t === 1) { const body = `M${x-76} ${y-58} L${x-64} ${y-6} Q${x} ${y+4} ${x+64} ${y-6} L${x+76} ${y-58}z`;
+    return sk(`<ellipse cx="${x}" cy="${y-2}" rx="70" ry="7" style="fill:#3A2E28" opacity=".1"/><path d="${body}" style="fill:#B9C2C8"/><path d="M${x-73} ${y-42} Q${x} ${y-32} ${x+73} ${y-42} M${x-69} ${y-22} Q${x} ${y-12} ${x+69} ${y-22}" style="stroke:#9AA5AD;fill:none" stroke-width="3"/>
+        <ellipse cx="${x}" cy="${y-58}" rx="78" ry="11" style="fill:#D5DCE0"/><ellipse cx="${x}" cy="${y-58}" rx="70" ry="7" style="fill:${WATER}"/><rect x="${x+30}" y="${y-66}" width="18" height="24" rx="3" style="fill:${c}"/>`,
+      `<path d="${body}"/><ellipse cx="${x}" cy="${y-58}" rx="78" ry="11"/><ellipse cx="${x}" cy="${y-58}" rx="70" ry="7" opacity=".6"/><ellipse cx="${x-84}" cy="${y-48}" rx="6" ry="8"/><ellipse cx="${x+84}" cy="${y-48}" rx="6" ry="8"/><rect x="${x+30}" y="${y-66}" width="18" height="24" rx="3"/>`); }
+  if (t === 2) return sk(`<rect x="${x-72}" y="${y-98}" width="5" height="12" style="fill:${CHROME}"/><rect x="${x-53}" y="${y-98}" width="5" height="12" style="fill:${CHROME}"/><circle cx="${x-69.5}" cy="${y-100}" r="4.5" style="fill:${CHROME}"/><circle cx="${x-50.5}" cy="${y-100}" r="4.5" style="fill:${CHROME}"/>
+      <rect x="${x-95}" y="${y-88}" width="190" height="12" rx="6" style="fill:${PORC}"/><rect x="${x-88}" y="${y-80}" width="176" height="6" style="fill:${WATER}"/>
+      <rect x="${x-95}" y="${y-64}" width="190" height="58" rx="3" style="fill:${c}"/><rect x="${x-95}" y="${y-8}" width="190" height="8" style="fill:${D(c, .25)}"/><rect x="${x-99}" y="${y-76}" width="198" height="14" rx="7" style="fill:${PORC}"/>`,
+    `<rect x="${x-95}" y="${y-88}" width="190" height="12" rx="6"/><rect x="${x-95}" y="${y-64}" width="190" height="64" rx="3"/><rect x="${x-85}" y="${y-56}" width="80" height="42" rx="2" opacity=".5"/><rect x="${x+5}" y="${y-56}" width="80" height="42" rx="2" opacity=".5"/><rect x="${x-99}" y="${y-76}" width="198" height="14" rx="7"/><circle cx="${x-69.5}" cy="${y-100}" r="4.5"/><circle cx="${x-50.5}" cy="${y-100}" r="4.5"/>`);
+  // the clawfoot: a double-ended roll top on four brass feet, painted outside, brass taps and a bath rack
+  const body = `M${x-96} ${y-84} Q${x-100} ${y-30} ${x-62} ${y-22} H${x+62} Q${x+100} ${y-30} ${x+96} ${y-84}z`, rim = `M${x-102} ${y-82} Q${x-104} ${y-104} ${x-84} ${y-98} Q${x} ${y-88} ${x+84} ${y-98} Q${x+104} ${y-104} ${x+102} ${y-82} Q${x} ${y-72} ${x-102} ${y-82}z`;
+  const foot = fx => `<path d="M${fx-6} ${y-26} q-6 14 -10 26 h10 q2 -8 6 -10 q4 2 6 10 h10 q-4 -12 -10 -26z" style="fill:${BRASS}"/>`;
+  return sk(`<path d="M${x-12} ${y-96} v-14 q12 -10 24 0 v14" style="fill:none;stroke:${BRASS}" stroke-width="4"/><circle cx="${x-12}" cy="${y-112}" r="4" style="fill:${BRASS}"/><circle cx="${x+12}" cy="${y-112}" r="4" style="fill:${BRASS}"/>
+      ${foot(x - 70)}${foot(x + 70)}<path d="${body}" style="fill:${c}"/><path d="M${x-84} ${y-66} Q${x-86} ${y-38} ${x-58} ${y-32}" style="stroke:${L(c, .4)};fill:none" stroke-width="4" opacity=".7"/>
+      <path d="${rim}" style="fill:${PORC}"/><path d="M${x-86} ${y-90} Q${x} ${y-82} ${x+86} ${y-90} Q${x} ${y-86} ${x-86} ${y-90}z" style="fill:${WATER}"/>
+      <rect x="${x+14}" y="${y-98}" width="56" height="6" rx="2" style="fill:${OAK}"/><rect x="${x+22}" y="${y-110}" width="16" height="12" rx="5" style="fill:#F3D36A"/><path d="M${x+48} ${y-98} v-14 h8 v14z" style="fill:${L(c, .5)}"/><rect x="${x+50}" y="${y-116}" width="4" height="4" style="fill:${OAK}"/>`,
+    `${foot(x - 70).replace(/ style="[^"]*"/, "")}${foot(x + 70).replace(/ style="[^"]*"/, "")}<path d="${body}"/><path d="${rim}"/><rect x="${x+14}" y="${y-98}" width="56" height="6" rx="2"/><rect x="${x+22}" y="${y-110}" width="16" height="12" rx="5"/><path d="M${x+48} ${y-98} v-14 h8 v14z"/><path d="M${x-12} ${y-96} v-14 q12 -10 24 0 v14"/>`);
+}
+// the basin stands against the back wall at (x, y); its mirror hangs on the wall above
+function basin(x, y, t, c){
+  if (t === 1) return sk(`<rect x="${x-18}" y="${y-176}" width="36" height="44" rx="2" style="fill:${PINE}"/><rect x="${x-13}" y="${y-171}" width="26" height="34" style="fill:#E6EEF2"/><path d="M${x-8} ${y-150} l12 -14" style="stroke:#FFFFFF" stroke-width="3"/>
+      <path d="M${x-34} ${y-72} V${y} M${x+34} ${y-72} V${y}" style="stroke:${PINE}" stroke-width="6"/><rect x="${x-36}" y="${y-26}" width="72" height="6" style="fill:${PINE}"/><rect x="${x-40}" y="${y-78}" width="80" height="8" rx="2" style="fill:${PINE}"/>
+      <path d="M${x-30} ${y-78} q4 -12 22 -12 q18 0 22 12z" style="fill:${L(c, .45)}"/><path d="M${x+14} ${y-78} q-2 -14 2 -22 q-4 -4 2 -6 h10 q4 8 -2 10 q6 8 2 18z" style="fill:${c}"/><rect x="${x-24}" y="${y-36}" width="20" height="10" rx="2" style="fill:${CREAM}"/>`,
+    `<path d="M${x} ${y-176} l-12 -10 M${x} ${y-176} l12 -10"/><rect x="${x-18}" y="${y-176}" width="36" height="44" rx="2"/><rect x="${x-13}" y="${y-171}" width="26" height="34"/><rect x="${x-40}" y="${y-78}" width="80" height="8" rx="2"/><path d="M${x-34} ${y-70} V${y} M${x+34} ${y-70} V${y}"/>
+      <path d="M${x-30} ${y-78} q4 -12 22 -12 q18 0 22 12"/><path d="M${x+14} ${y-78} q-2 -14 2 -22 q-4 -4 2 -6 h10 q4 8 -2 10 q6 8 2 18z"/><rect x="${x-24}" y="${y-36}" width="20" height="10" rx="2"/>`);
+  if (t === 2) { const bowl = `M${x-42} ${y-82} H${x+42} Q${x+40} ${y-58} ${x} ${y-56} Q${x-40} ${y-58} ${x-42} ${y-82}z`;
+    return sk(`<ellipse cx="${x}" cy="${y-158}" rx="28" ry="36" style="fill:${c}"/><ellipse cx="${x}" cy="${y-158}" rx="21" ry="29" style="fill:#E6EEF2"/><path d="M${x-10} ${y-166} l14 -14 M${x-6} ${y-154} l10 -10" style="stroke:#FFFFFF" stroke-width="3"/>
+        <path d="M${x-12} ${y} L${x-8} ${y-60} H${x+8} L${x+12} ${y}z" style="fill:${PORC}"/><path d="M${x-14} ${y-82} v-10 M${x+14} ${y-82} v-10" style="stroke:${CHROME}" stroke-width="4"/><circle cx="${x-14}" cy="${y-94}" r="4" style="fill:${CHROME}"/><circle cx="${x+14}" cy="${y-94}" r="4" style="fill:${CHROME}"/>
+        <path d="${bowl}" style="fill:${PORC}"/><rect x="${x-44}" y="${y-86}" width="88" height="7" rx="3" style="fill:${PORC}"/><path d="M${x-36} ${y-72} Q${x} ${y-62} ${x+36} ${y-72}" style="stroke:${c};fill:none" stroke-width="3"/>`,
+      `<ellipse cx="${x}" cy="${y-158}" rx="28" ry="36"/><ellipse cx="${x}" cy="${y-158}" rx="21" ry="29"/><path d="M${x-12} ${y} L${x-8} ${y-60} H${x+8} L${x+12} ${y}"/><path d="${bowl}"/><rect x="${x-44}" y="${y-86}" width="88" height="7" rx="3"/>`); }
+  const arch = (i) => `M${x-34+i} ${y-112-i} V${y-176} Q${x} ${y-206+i*1.6} ${x+34-i} ${y-176} V${y-112-i}z`;
+  return glow(x, y - 160, 60, .3) + sk(`<path d="${arch(0)}" style="fill:${BRASS}"/><path d="${arch(6)}" style="fill:#E6EEF2"/><path d="M${x-14} ${y-168} l18 -18 M${x-10} ${y-152} l14 -14" style="stroke:#FFFFFF" stroke-width="3"/><circle cx="${x}" cy="${y-200}" r="6" style="fill:${BRASS}"/><path d="M${x-14} ${y-196} q14 -10 28 0" style="stroke:${BRASS};fill:none" stroke-width="3"/>
+      <rect x="${x-48}" y="${y-72}" width="96" height="66" rx="2" style="fill:${c}"/><path d="M${x-44} ${y-6} v6 M${x+44} ${y-6} v6" style="stroke:${D(c, .3)}" stroke-width="5"/>
+      <path d="M${x} ${y-80} v-12 q0 -6 8 -6 h4" style="stroke:${BRASS};fill:none" stroke-width="4"/><circle cx="${x-10}" cy="${y-86}" r="3.5" style="fill:${BRASS}"/><circle cx="${x+18}" cy="${y-86}" r="3.5" style="fill:${BRASS}"/>
+      <rect x="${x-52}" y="${y-82}" width="104" height="12" rx="2" style="fill:#F2EEE8"/><path d="M${x-46} ${y-78} q10 4 18 0 q8 -3 14 2 M${x+16} ${y-74} q10 -4 26 0" style="stroke:#B9B2A8;fill:none" stroke-width="1.2"/><ellipse cx="${x}" cy="${y-80}" rx="22" ry="3" style="fill:#D6E2E6"/>
+      <rect x="${x+28}" y="${y-92}" width="18" height="10" rx="2" style="fill:${L(c, .55)}"/><path d="M${x-40} ${y-82} v-12 h8 v12z" style="fill:#E8C25A"/>`,
+    `<path d="${arch(0)}"/><path d="${arch(6)}"/><circle cx="${x}" cy="${y-200}" r="6"/><rect x="${x-48}" y="${y-72}" width="96" height="66" rx="2"/><path d="M${x} ${y-70} v62"/><rect x="${x-42}" y="${y-64}" width="36" height="50" rx="2" opacity=".55"/><rect x="${x+6}" y="${y-64}" width="36" height="50" rx="2" opacity=".55"/>
+      <circle cx="${x-8}" cy="${y-40}" r="2"/><circle cx="${x+8}" cy="${y-40}" r="2"/><rect x="${x-52}" y="${y-82}" width="104" height="12" rx="2"/><rect x="${x+28}" y="${y-92}" width="18" height="10" rx="2"/>`);
+}
+// towels in the corner by the basin: on a hook, on a wooden rail, or on a warm brass ladder rail
+function towels(x, y, t, c){
+  if (t === 1) return sk(`<path d="M${x-15} ${y-146} h30 l4 66 h-38z" style="fill:${c}"/><rect x="${x-17}" y="${y-98}" width="34" height="6" style="fill:${CREAM}"/><circle cx="${x}" cy="${y-150}" r="3.5" style="fill:${DARK}"/>`,
+    `<path d="M${x} ${y-150} q-6 -4 -4 -10"/><path d="M${x-15} ${y-146} h30 l4 66 h-38z"/><path d="M${x-8} ${y-146} q8 6 16 0" opacity=".6"/><rect x="${x-17}" y="${y-98}" width="34" height="6"/>`);
+  if (t === 2) return sk(`<rect x="${x-28}" y="${y-152}" width="6" height="14" style="fill:${OAK}"/><rect x="${x+22}" y="${y-152}" width="6" height="14" style="fill:${OAK}"/><rect x="${x-32}" y="${y-146}" width="64" height="6" rx="3" style="fill:${OAK}"/>
+      <path d="M${x-2} ${y-142} h26 v52 h-26z" style="fill:${CREAM}"/><rect x="${x-2}" y="${y-104}" width="26" height="5" style="fill:${c}"/><path d="M${x-26} ${y-142} h28 v64 h-28z" style="fill:${c}"/><rect x="${x-26}" y="${y-90}" width="28" height="5" style="fill:${L(c, .5)}"/>`,
+    `<rect x="${x-32}" y="${y-146}" width="64" height="6" rx="3"/><path d="M${x-2} ${y-142} h26 v52 h-26z"/><path d="M${x-26} ${y-142} h28 v64 h-28z"/>`);
+  return glow(x, y - 90, 50, .3) + sk(`<path d="M${x-22} ${y} V${y-148} M${x+22} ${y} V${y-148}" style="stroke:${BRASS}" stroke-width="5"/>${rows(7, i => `<path d="M${x-22} ${y-20 - i*18} H${x+22}" style="stroke:${BRASS}" stroke-width="3.5"/>`)}
+      <path d="M${x-26} ${y-140} h52 v34 h-52z" style="fill:${c}"/><path d="M${x-26} ${y-140} h52 v8 h-52z" style="fill:${D(c, .12)}"/><path d="M${x-24} ${y-74} h48 v26 h-48z" style="fill:${CREAM}"/><rect x="${x-24}" y="${y-60}" width="48" height="5" style="fill:${c}"/>
+      <path d="M${x-8} ${y-150} q-4 -6 0 -12 M${x+8} ${y-150} q-4 -6 0 -12" style="stroke:#E8C25A;fill:none" stroke-width="2" opacity=".7"/>`,
+    `<path d="M${x-22} ${y} V${y-148} M${x+22} ${y} V${y-148}"/><path d="M${x-26} ${y-140} h52 v34 h-52z"/><path d="M${x-24} ${y-74} h48 v26 h-48z"/><path d="M${x-30} ${y} h16 M${x+14} ${y} h16"/>`);
+}
+// the bath mat lies flat in front of the bath, like the rug
+function bathmat(x, y, t, c){
+  if (t === 1) return `<g filter="url(#wob)"><rect x="${x-62}" y="${y-20}" width="124" height="40" rx="4" style="fill:${L(c, .45)}"/><rect x="${x-62}" y="${y-12}" width="124" height="5" style="fill:${c}"/><rect x="${x-62}" y="${y+7}" width="124" height="5" style="fill:${c}"/>
+    <rect x="${x-62}" y="${y-20}" width="124" height="40" rx="4" fill="none" style="stroke:${LINE}" stroke-width="1.3"/></g>`;
+  if (t === 2) return `<g filter="url(#wob)"><rect x="${x-64}" y="${y-22}" width="128" height="44" rx="18" style="fill:${c}"/>${rows(3, r => rows(10, k => `<circle cx="${x-50 + k*11 + (r % 2)*5}" cy="${y-11 + r*11}" r="3" style="fill:${L(c, .35)}"/>`))}
+    <rect x="${x-64}" y="${y-22}" width="128" height="44" rx="18" fill="none" style="stroke:${LINE}" stroke-width="1.3"/></g>`;
+  return `<g filter="url(#wob)"><rect x="${x-58}" y="${y-24}" width="10" height="48" style="fill:#8A6448"/><rect x="${x+48}" y="${y-24}" width="10" height="48" style="fill:#8A6448"/>${rows(6, i => `<rect x="${x-64}" y="${y-24 + i*8.4}" width="128" height="6" rx="2" style="fill:${i % 2 ? "#C99A62" : "#B98552"}"/>`)}
+    ${rows(6, i => `<rect x="${x-64}" y="${y-24 + i*8.4}" width="128" height="6" rx="2" fill="none" style="stroke:${LINE}" stroke-width="1"/>`)}</g>`;
+}
+// nice things to wash with, on a little stool by the bath
+function toiletries(x, y, t, c){
+  const stool = t === 3 ? [`<rect x="${x-26}" y="${y-48}" width="52" height="7" rx="2" style="fill:${OAK}"/><path d="M${x-22} ${y-41} V${y} M${x+22} ${y-41} V${y}" style="stroke:${DARK}" stroke-width="4"/><path d="M${x-22} ${y-14} H${x+22}" style="stroke:${DARK}" stroke-width="3"/>`,
+      `<rect x="${x-26}" y="${y-48}" width="52" height="7" rx="2"/><path d="M${x-22} ${y-41} V${y} M${x+22} ${y-41} V${y}"/>`]
+    : [`<rect x="${x-20}" y="${y-40}" width="40" height="7" rx="3" style="fill:${PINE}"/><path d="M${x-15} ${y-33} L${x-18} ${y} M${x+15} ${y-33} L${x+18} ${y}" style="stroke:${OAK}" stroke-width="4"/>`,
+      `<rect x="${x-20}" y="${y-40}" width="40" height="7" rx="3"/><path d="M${x-15} ${y-33} L${x-18} ${y} M${x+15} ${y-33} L${x+18} ${y}"/>`];
+  if (t === 1) return sk(stool[0] + `<ellipse cx="${x}" cy="${y-42}" rx="15" ry="4" style="fill:${c}"/><rect x="${x-9}" y="${y-50}" width="18" height="8" rx="4" style="fill:${CREAM}"/><circle cx="${x+10}" cy="${y-56}" r="2.4" style="fill:#FFFFFF"/><circle cx="${x+5}" cy="${y-60}" r="1.6" style="fill:#FFFFFF"/>`,
+    stool[1] + `<ellipse cx="${x}" cy="${y-42}" rx="15" ry="4"/><rect x="${x-9}" y="${y-50}" width="18" height="8" rx="4"/>`);
+  if (t === 2) return sk(stool[0] + `<rect x="${x-6}" y="${y-62}" width="12" height="20" rx="3" style="fill:${L(c, .5)}"/><rect x="${x-5}" y="${y-66}" width="10" height="5" style="fill:${OAK}"/><circle cx="${x-12}" cy="${y-52}" r="5" style="fill:${c}"/><circle cx="${x+12}" cy="${y-52}" r="5" style="fill:#F3E7C8"/><path d="M${x-18} ${y-50} h36 l-3 10 h-30z" style="fill:#D9B97E"/>`,
+    stool[1] + `<path d="M${x-18} ${y-50} h36 l-3 10 h-30z"/><path d="M${x-14} ${y-45} h28" opacity=".5"/><rect x="${x-6}" y="${y-62}" width="12" height="20" rx="3"/>`);
+  return glow(x, y - 66, 40, .55) + sk(stool[0] + `<rect x="${x-22}" y="${y-54}" width="44" height="6" rx="2" style="fill:${BRASS}"/>${[-14, -6, 2].map((dx, i) => `<rect x="${x+dx}" y="${y-68 + i*3}" width="7" height="${14 - i*3}" style="fill:${CREAM}"/><path d="M${x+dx+3.5} ${y-70 + i*3} q-3 -4 0 -8 q3 4 0 8z" style="fill:#F3C969"/>`).join("")}
+      <path d="M${x+10} ${y-54} v-12 q0 -4 3 -6 v-6 h4 v6 q3 2 3 6 v12z" style="fill:#D99A3A"/><rect x="${x-20}" y="${y-62}" width="7" height="8" rx="2" style="fill:${L(c, .4)}"/>`,
+    stool[1] + `<rect x="${x-22}" y="${y-54}" width="44" height="6" rx="2"/><path d="M${x+10} ${y-54} v-12 q0 -4 3 -6 v-6 h4 v6 q3 2 3 6 v12z"/><rect x="${x-20}" y="${y-62}" width="7" height="8" rx="2"/>`);
+}
+
+const DRAW = {seat, table, shelf, lamp, rug, curtains, picture, plant: plantP, touches, bath, basin, towels, bathmat, toiletries};
+const FLAT = {rug: 0, bathmat: 0, curtains: 1, picture: 1};   // drawn first, in this order; everything else by how far forward it stands
 // floor: "down", "up" or "bath" (round 221: the bathroom); parcels only ever wait downstairs in the hall
 export function letFurniture(id, slots, pos, n, floor = "down"){
   const C = COTTAGES[id]; if (!C) return "";
@@ -389,5 +605,17 @@ export const hallTable = (x, y) => sk(`<rect x="${x-50}" y="${y-44}" width="100"
   `<rect x="${x-50}" y="${y-44}" width="100" height="8" rx="2"/><rect x="${x-46}" y="${y-36}" width="92" height="12"/><rect x="${x-10}" y="${y-33}" width="20" height="6" rx="2"/><path d="M${x-42} ${y-24} V${y} M${x+42} ${y-24} V${y}"/>
     <path d="M${x-40} ${y-46} l2 -8 h17 l2 8z M${x-19} ${y-46} l2 -8 h17 l2 8z"/><path d="M${x-36} ${y-51} h12 M${x-15} ${y-51} h12" opacity=".5"/><rect x="${x+8}" y="${y-50}" width="18" height="6" rx="1"/><path d="M${x+32} ${y-46} q-6 0 -5 -8 q1 -5 4 -6 h2 q3 1 4 6 q1 8 -5 8z"/>`);
 
-// round 221: the welcome you've left out: a fruit bowl (fruit 0-3) and treats from the fridge (0-4), on the table (placeholder)
-export const welcomeArt = (x, y, fruit, treats) => `<g pointer-events="none">${fruit ? `<ellipse cx="${x - 14}" cy="${y}" rx="16" ry="6" fill="#E3EEF2" stroke="#3A2E28"/>${rows(fruit, i => `<circle cx="${x - 22 + i*8}" cy="${y - 5}" r="5" fill="${["#D9534F", "#F2A65A", "#9BC26A"][i]}" stroke="#3A2E28" stroke-width=".8"/>`)}` : ""}${rows(treats, i => `<rect x="${x + 6 + i*9}" y="${y - (i % 2 ? 14 : 22)}" width="7" height="${i % 2 ? 14 : 22}" rx="2" fill="${["#6B1F3A", "#5A3A2A", "#F3E7C8", "#C8923A"][i]}" stroke="#3A2E28" stroke-width=".8"/>`)}</g>`;
+// round 221: the welcome you've left out, on the table top at (x, y): a fruit bowl (fruit 0-3) and treats from the
+// fridge (0-4: a bottle of wine, a wedge of cheese, a bar of chocolate, a jar of jam)
+export const welcomeArt = (x, y, fruit, treats) => {
+  fruit = Math.max(0, Math.min(3, fruit || 0)); treats = Math.max(0, Math.min(4, treats || 0));
+  const bx = x - 28, fr = [[bx - 8, y - 12, "#D9534F"], [bx + 7, y - 13, "#9BC26A"], [bx, y - 19, "#F2A65A"]].slice(0, fruit);
+  const T = [
+    [`<rect x="${x-4}" y="${y-30}" width="11" height="30" rx="4" style="fill:#6B1F3A"/><rect x="${x}" y="${y-40}" width="3.5" height="11" style="fill:#6B1F3A"/><rect x="${x-3}" y="${y-18}" width="9" height="9" style="fill:${CREAM}"/>`, `<rect x="${x-4}" y="${y-30}" width="11" height="30" rx="4"/><path d="M${x} ${y-40} v11 M${x+3.5} ${y-40} v11"/>`],
+    [`<path d="M${x+9} ${y} L${x+27} ${y} L${x+27} ${y-11}z" style="fill:#F3D36A"/><circle cx="${x+22}" cy="${y-4}" r="1.6" style="fill:#D9B44A"/>`, `<path d="M${x+9} ${y} L${x+27} ${y} L${x+27} ${y-11}z"/>`],
+    [`<rect x="${x+29}" y="${y-8}" width="17" height="8" rx="1" style="fill:#5A3A2A"/><rect x="${x+35}" y="${y-8}" width="6" height="8" style="fill:#C2505F"/>`, `<rect x="${x+29}" y="${y-8}" width="17" height="8" rx="1"/>`],
+    [`<rect x="${x+48}" y="${y-14}" width="11" height="14" rx="2" style="fill:#B03A48"/><path d="M${x+46} ${y-14} q7 -6 15 0z" style="fill:#F3E7C8"/><path d="M${x+47} ${y-13} h13" style="stroke:#C2505F" stroke-width="1.4"/>`, `<rect x="${x+48}" y="${y-14}" width="11" height="14" rx="2"/><path d="M${x+46} ${y-14} q7 -6 15 0"/>`]].slice(0, treats);
+  const bowl = fruit ? [`${fr.map(([fx, fy, col]) => `<circle cx="${fx}" cy="${fy}" r="6.5" style="fill:${col}"/>`).join("")}<path d="M${bx-18} ${y-10} Q${bx} ${y+2} ${bx+18} ${y-10}z" style="fill:#E3EEF2"/><path d="M${bx-14} ${y-7} Q${bx} ${y} ${bx+14} ${y-7}" style="stroke:#7FA0D0;fill:none" stroke-width="2"/><rect x="${bx-6}" y="${y-2}" width="12" height="3" style="fill:#E3EEF2"/>`,
+    `<path d="M${bx-18} ${y-10} Q${bx} ${y+2} ${bx+18} ${y-10}z"/>${fr.map(([fx, fy]) => `<circle cx="${fx}" cy="${fy}" r="6.5"/>`).join("")}<path d="M${bx+7} ${y-19} l2 -4" />`] : ["", ""];
+  return `<g pointer-events="none">${sk(bowl[0] + T.map(p => p[0]).join(""), bowl[1] + T.map(p => p[1]).join(""))}</g>`;
+};

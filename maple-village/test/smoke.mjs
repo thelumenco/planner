@@ -4190,6 +4190,23 @@ if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) tr
   await page.locator('#world g[data-exit][aria-label="Down the stairs"]').dispatchEvent("click");
   await page.waitForFunction(() => /^Fig Tree/.test(document.querySelector("#sceneName").textContent) && !/upstairs/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "and back down to the sitting room");
+  await tapTill('#world [data-spot="lethall"]', '#ctx [data-let="tab:cal"]');
+  await page.click('#ctx [data-let="tab:cal"]'); await page.waitForTimeout(200);
+  const free = await page.locator('#ctx .letcal .lc.free:not([disabled])').first().getAttribute("data-let");
+  await page.click(`#ctx [data-let="${free}"]`); await page.waitForTimeout(200);
+  check(await fox().then(f => f.lets.cottages.figtree.closed[free.slice(4)] === 1) && await page.locator(`#ctx [data-let="${free}"].closed`).count() === 1, "the calendar: tap a free day and it's closed");
+  await page.click('#ctx [data-let="tab:welcome"]'); await page.waitForTimeout(200);
+  check(await page.locator('#ctx [data-let="keeper:1"]').count() === 1 && /fruit basket/.test(await page.locator("#ctx").textContent()), "the welcome tab: the fruit basket, the fridge, and Nell to hire");
+  await page.click('#ctx [data-let="tab:garden"]'); await page.waitForTimeout(200);
+  check(await page.locator('#ctx [data-let="extra:hottub"]').count() === 1, "the garden tab: a hot tub, among other things");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
+  await page.locator('#world [data-letgarden]').dispatchEvent("click");
+  await page.waitForFunction(() => /the garden/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "out of the back door into the garden");
+  await page.evaluate(() => window.__hbScene("figtreeup")); await page.waitForTimeout(900);
+  await page.locator('#world [data-letbath]').dispatchEvent("click");
+  await page.waitForFunction(() => /the bathroom/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "and through the bedroom to the bathroom");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 await browser.close();
