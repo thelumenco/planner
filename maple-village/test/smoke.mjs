@@ -4624,7 +4624,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=10:00&date=2026-10-16&fypatch=1"); await page.waitForTimeout(1500);
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftown="puffin"]', { timeout: 15000 });
-  check(await page.locator("#ctx [data-ftown]").count() === 6, "the ferry board at the jetty: Jeju and all five boat towns");
+  check(await page.locator("#ctx [data-ftown]").count() === 7, "the ferry board at the jetty: Jeju, the five boat towns and Formentera");
   await page.click('#ctx [data-ftown="puffin"]'); await page.waitForTimeout(300);
   await page.click('#ctx [data-tpick="mama"]'); await page.click('#ctx [data-tpick="evan"]'); await page.waitForTimeout(200);
   const t = await page.locator("#ctx").innerText();
