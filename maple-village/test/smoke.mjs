@@ -310,7 +310,7 @@ if (want("\nvillagers' loves")) try {
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url)), kt = await import(new URL("../src/game/kitchen.js", import.meta.url));
   const xm = await import(new URL("../src/game/xmas.js", import.meta.url)), orch = await import(new URL("../src/data/orchard.js", import.meta.url)), T = its.ITEMS;
   const res = np.NPCS.filter(n => !n.tourist && !n.local && !n.kid).map(n => n.id);
-  check(res.length === 27 && res.every(w => LV.LOVES[w] && LV.lovesOf(w).length >= 6 && LV.lovesOf(w).length <= 10), "all 27 Honeybrook villagers have 6 to 10 loves");
+  check(res.length === 28 && res.every(w => LV.LOVES[w] && LV.lovesOf(w).length >= 6 && LV.lovesOf(w).length <= 10), "all 28 Honeybrook villagers have 6 to 10 loves");
   check(res.every(w => LV.lovesOf(w).filter(l => l.kind === "combo").length <= 1 && LV.lovesOf(w).filter(l => l.kind === "story").every(l => l.thanks && !/—/.test(l.thanks))), "at most one combination each; every story love has its own thank-you (no em dashes)");
   check(res.every(w => LV.lovesOf(w).every(l => l.match ? typeof l.match === "function" && l.what && l.thanks : typeof l.id === "string")), "every love is an item id or a matcher (with what it's for and a thank-you)");
   // matchers, on made things the way their ITEMS entries look
@@ -4110,34 +4110,61 @@ if (want("\nThe gift basket beside the wrapping table (round 202)")) try {
 if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) try {
   console.log("\nElena's cottages: buy them, furnish them, let them (round 219)");
   const lt = await import(new URL("../src/game/lets.js", import.meta.url)), ld = await import(new URL("../src/data/lets.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
-  lt.LIVE.on = true; const day = "2026-10-12", F = {coins: 9000, inv: {}};
+  lt.LIVE.on = true; const day = "2026-10-12", F = {coins: 9000, inv: {}}, A = lt.addDays;
   check(!lt.offerOpen(F, 4) && !lt.buyCottage(F, "figtree", 4, day) && lt.offerOpen(F, 5) && lt.letsMail(F, 5, 1).length === 1 && !lt.letsMail(F, 4, 1).length, "Elena offers the cottages at five hearts (and writes to say so)");
   check(lt.buyCottage(F, "figtree", 5, day) && F.coins === 7000 && lt.owns(F, "figtree") && !lt.letsMail(F, 5, 1).length && !lt.buyCottage(F, "figtree", 5, day), "Fig Tree is yours for 2000");
-  check(["bed", "linen", "bed2", "linen2"].every(sl => ld.upstairs("bluebell", sl)) && ["seat", "table", "shelf", "rug"].every(sl => !ld.upstairs("bluebell", sl) && !ld.upstairs("figtree", sl)) && ld.upstairs("figtree", "bed"), "beds upstairs, the sitting room downstairs, in both cottages");
-  check(Object.values(ld.CATS).every(c => c.prices[0] < c.prices[1] && c.prices[1] < c.prices[2]) && np.NPCS && ld.GUEST_POOL.every(g => np.NPCS.some(n => n.id === g)), "simple, good and fine, each dearer than the last; the guests are real visitors");
+  check(["bed", "linen", "bed2", "linen2"].every(sl => ld.floorOf("bluebell", sl) === "up") && ["bath", "basin", "towels", "bathmat", "toiletries", "bplant"].every(sl => ld.floorOf("figtree", sl) === "bath") && ["seat", "table", "shelf", "rug"].every(sl => ld.floorOf("figtree", sl) === "down"), "the sitting room downstairs, beds upstairs, and a bathroom off the bedroom");
+  check(Object.values(ld.CATS).every(c => c.prices[0] < c.prices[1] && c.prices[1] < c.prices[2]) && ld.GUEST_POOL.every(g => np.NPCS.some(n => n.id === g)) && np.NPCS.some(n => n.id === "nell" && !n.tourist), "simple, good and fine, each dearer than the last; the guests are real visitors; Nell lives on the lane");
   check(lt.order(F, "figtree", "bed", 1, "sage", day) && F.coins === 6880 && !lt.order(F, "bluebell", "bed", 1, "sage", day) && !lt.order(F, "figtree", "bed", 4, "sage", day), "a pine bed ordered (120); nothing for a cottage you don't own");
   check(lt.deliver(F, day) === 0 && lt.deliver(F, "2026-10-13") === 1 && F.lets.cottages.figtree.parcels.length === 1, "it comes on the next day's train, a parcel in the hall");
-  check(!lt.place(F, "figtree", "seat", "parcel", 0) && lt.place(F, "figtree", "bed", "parcel", 0) && !lt.rateOf(F, "figtree"), "a bed only goes where a bed goes; and a bed without linen won't let");
+  check(!lt.place(F, "figtree", "seat", "parcel", 0) && lt.place(F, "figtree", "bed", "parcel", 0), "a bed only goes where a bed goes");
   lt.order(F, "figtree", "linen", 1, "cream", day); lt.deliver(F, "2026-10-13"); lt.place(F, "figtree", "linen", "parcel", 0);
+  check(!lt.rateOf(F, "figtree") && lt.missing(F, "figtree").includes("a bath"), "a bed made up isn't enough: it needs a bath too");
+  lt.order(F, "figtree", "bath", 1, "cream", day); lt.deliver(F, "2026-10-13"); lt.place(F, "figtree", "bath", "parcel", 0);
   const r1 = lt.rateOf(F, "figtree"), s1 = lt.starsOf(F, "figtree");
-  check(r1 > 0 && r1 < 30 && s1 === 2, "made up with simple linen: it'll let, cheaply (" + r1 + " a night, " + s1 + " stars)");
-  check(lt.missing(F, "figtree").includes("somewhere to sit"), "the hall table says what's still missing");
-  const G = {coins: 0, inv: {}}; lt.letsState(G).cottages.bluebell.owned = day;
-  for (const s of Object.keys(ld.COTTAGES.bluebell.slots)) { G.lets.cottages.bluebell.slots[s] = {cat: ld.catOf("bluebell", s), tier: 3, col: "blue"}; }
+  check(r1 > 0 && r1 < 30 && s1 === 2, "with a tin tub: it'll let, cheaply (" + r1 + " a night, " + s1 + " stars)");
+  const G = {coins: 2000, inv: {}}; lt.letsState(G).cottages.bluebell.owned = day;
+  for (const s of Object.keys(ld.COTTAGES.bluebell.slots)) G.lets.cottages.bluebell.slots[s] = {cat: ld.catOf("bluebell", s), tier: 3, col: "blue"};
   check(lt.rateOf(G, "bluebell") === 70 && lt.starsOf(G, "bluebell") === 5, "Bluebell all fine furniture: 70 a night (its cap), five stars");
-  lt.order(F, "figtree", "bed", 3, "rose", day); lt.deliver(F, "2026-10-13"); lt.place(F, "figtree", "bed", "parcel", 0);
-  check(F.lets.spare.length === 1 && F.lets.spare[0].tier === 1 && lt.place(F, "figtree", "bed", "spare", 0) && F.lets.cottages.figtree.slots.bed.tier === 1 && F.lets.spare[0].tier === 3, "a brass bedstead in; the pine bed goes to the spares, and can swap back");
-  lt.place(F, "figtree", "bed", "spare", 0);
-  F.lets.last = "2026-10-13"; let ev = lt.settle(F, "2026-10-14"); const c = F.lets.cottages.figtree;
-  check(ev.some(e => e.kind === "arrived") && c.stay && c.stay.nights >= 1 && c.stay.nights <= 5 && lt.staying(F, "figtree", "2026-10-14"), "two days after buying, the first guests come off the train (" + c.stay.nights + " nights)");
-  const s = c.stay, coins = F.coins; let d = "2026-10-14"; for (let k = 0; k < s.nights; k++) d = new Date(Date.parse(d + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
-  ev = lt.settle(F, d);
-  check(ev.some(e => e.kind === "left") && F.coins === coins + s.rate*s.nights && c.book.length === 1 && c.book[0].text && c.needTidy && !c.stay, "they pay at checkout (" + s.rate*s.nights + "), write in the guest book, and the cottage needs a tidy");
-  check(!lt.settle(F, d).some(e => e.kind === "arrived") && lt.tidy(F, "figtree", d) && c.next > d, "no new guests until it's tidied; then a few days' gap before the next booking");
-  F.lets.last = d; const far = "2027-03-01", c0 = F.coins; lt.settle(F, far);
-  check(F.coins > c0 && c.needTidy, "away for months: the guests that came and went still paid, then it waits for a tidy");
+  check(lt.orderExtra(G, "bluebell", "hottub", day) && G.coins === 500 && !lt.orderExtra(G, "bluebell", "hottub", day) && lt.extraComing(G, "bluebell", "hottub") && lt.rateOf(G, "bluebell") === 70, "a hot tub ordered (1500), coming tomorrow");
+  lt.deliver(G, A(day, 1)); check(G.lets.cottages.bluebell.extras.hottub && lt.capOf(G, "bluebell") === 85 && lt.rateOf(G, "bluebell") === 85, "in the garden: up to 85 a night now");
+  // bookings, changeovers, the welcome
+  const c = F.lets.cottages.figtree; let ev = lt.settle(F, "2026-10-13");
+  check(c.bookings.length >= 1 && c.bookings[0].from >= "2026-10-15" && c.bookings[0].from <= "2026-10-17" && ev.some(e => e.kind === "booked"), "guests book a few days ahead (first: " + c.bookings[0].from + ")");
+  check(c.bookings.every((b, i) => !i || b.from > A(c.bookings[i - 1].from, c.bookings[i - 1].nights - 1)) && c.bookings.every(b => b.from <= A("2026-10-13", ld.BOOK.horizon)), "no two bookings overlap, none more than three weeks ahead");
+  const b0 = c.bookings[0], inside = A(b0.from, 0);
+  check(!lt.toggleDay(F, "figtree", inside, "2026-10-13") && lt.dayState(F, "figtree", b0.from).k === "arrive", "a booked day can't be closed");
+  let shut = "2026-10-14"; while (lt.dayState(F, "figtree", shut).k !== "free") shut = A(shut, 1); lt.toggleDay(F, "figtree", shut, "2026-10-13");
+  check(lt.dayState(F, "figtree", shut).k === "closed", "a free day closed on the calendar");
+  F.inv = {apple: 2, pear: 1, cheese: 1, bar_dark: 1, carrot: 3};
+  check(lt.stock(F, "figtree", "fruit", "apple") && lt.stock(F, "figtree", "fruit", "pear") && !lt.stock(F, "figtree", "fruit", "carrot") && !lt.stock(F, "figtree", "fruit", "cheese") && lt.stock(F, "figtree", "fridge", "cheese") && lt.stock(F, "figtree", "fridge", "bar_dark") && F.inv.apple === 1 && !F.inv.cheese, "the fruit basket and the fridge, from your own backpack (a carrot isn't fruit)");
+  check(lt.unstock(F, "figtree", "fruit", "pear") && F.inv.pear === 1 && lt.stock(F, "figtree", "fruit", "pear"), "and you can take things back");
+  const c0 = F.coins; lt.settle(F, b0.from);
+  check(c.stay && c.stay.welcome && !c.stay.untidy && !Object.keys(c.ready.fruit).length && lt.staying(F, "figtree", b0.from), "the guests arrive to a tidy cottage and a welcome (" + b0.nights + " nights)");
+  const out = A(b0.from, b0.nights); ev = lt.settle(F, out); const rv = c.book[0];
+  check(ev.some(e => e.kind === "left") && rv.stars === Math.min(5, s1 + 1) && rv.tip === 4*4 && F.coins === c0 + rv.pay && rv.pay === r1*b0.nights + 16 && /lovely welcome/.test(rv.text), "they pay when they leave, with a tip for the welcome, and the welcome adds a star (" + rv.stars + ")");
+  check(!c.ready.tidy && lt.tidy(F, "figtree", out) && c.ready.tidy && !lt.tidy(F, "figtree", out), "then it needs a tidy, and you tidy it");
+  // an untidy arrival costs two stars
+  const H = {coins: 5000, inv: {}}; lt.buyCottage(H, "figtree", 5, day); Object.assign(H.lets.cottages.figtree.slots, F.lets.cottages.figtree.slots);
+  H.lets.last = day; lt.settle(H, A(day, 1)); const hb = H.lets.cottages.figtree.bookings[0]; lt.settle(H, hb.from); lt.settle(H, A(hb.from, hb.nights));
+  const hc = H.lets.cottages.figtree, hb2 = hc.bookings[0]; lt.settle(H, hb2.from);
+  check(hc.stay && hc.stay.untidy, "nobody tidied: the next guests arrive to a mess");
+  lt.settle(H, A(hb2.from, hb2.nights));
+  check(hc.book[0].stars === Math.max(1, s1 - 2) && /wasn't quite clean/.test(hc.book[0].text), "and it shows in the review (" + hc.book[0].stars + " star)");
+  // Nell
+  lt.hireKeeper(H, "figtree", true); H.inv = {plum: 2, tangerine: 1, cheese: 2}; ["plum", "plum", "tangerine", "cheese", "cheese"].forEach(i => lt.stock(H, "figtree", "pantry", i));
+  hc.ready.tidy = true; const hb3 = hc.bookings[0]; lt.settle(H, hb3.from); const hk = H.coins; lt.settle(H, A(hb3.from, hb3.nights));
+  check(hc.ready.tidy && Object.keys(hc.ready.fruit).length === 2 && hc.ready.fridge.cheese === 2 && !Object.keys(hc.pantry).length && H.coins - hk === hc.book[0].pay - 25 && lt.keeperDays(H, A(hb3.from, hb3.nights)).includes("figtree"), "Nell does the changeover (25) and fills the basket and fridge from the pantry");
+  // closing and pausing
+  const P = {coins: 5000, inv: {}}; lt.buyCottage(P, "figtree", 5, day); Object.assign(P.lets.cottages.figtree.slots, F.lets.cottages.figtree.slots);
+  for (let k = 2; k < 30; k++) lt.toggleDay(P, "figtree", A(day, k), day); P.lets.last = day; lt.settle(P, A(day, 1));
+  check(!P.lets.cottages.figtree.bookings.length, "closed for four weeks: no bookings");
+  const Q = {coins: 5000, inv: {}}; lt.buyCottage(Q, "figtree", 5, day); Object.assign(Q.lets.cottages.figtree.slots, F.lets.cottages.figtree.slots); lt.setPaused(Q, "figtree", true); Q.lets.last = day; lt.settle(Q, A(day, 5));
+  check(!Q.lets.cottages.figtree.bookings.length && lt.setBuffer(Q, "figtree", 3) && !lt.setBuffer(Q, "figtree", 4) && Q.lets.cottages.figtree.buffer === 3, "bookings paused; three changeover days chosen");
+  F.lets.last = out; const far = "2027-03-01", f0 = F.coins; lt.settle(F, far);
+  check(F.coins > f0 && F.lets.cottages.figtree.book.length > 2, "away for months: guests still came, stayed and paid");
   const p = lt.hallPanel(F, "figtree", {tab: "shop"}, far);
-  check(/data-let="order:bed:1:sage"/.test(p) && /data-let="order:touches:3:rose"/.test(lt.hallPanel(F, "figtree", {tab: "shop", cat: "touches", col: "rose"}, far)) && /data-let="tidy"/.test(lt.hallPanel(F, "figtree", {}, far)), "the hall table: a catalogue of every piece, and the tidy button");
+  check(/data-let="order:bed:1:sage"/.test(p) && /data-let="order:bath:3:rose"/.test(lt.hallPanel(F, "figtree", {tab: "shop", cat: "bath", col: "rose"}, far)) && /data-let="extra:hottub"/.test(lt.hallPanel(F, "figtree", {tab: "garden"}, far)) && /data-let="day:/.test(lt.hallPanel(F, "figtree", {tab: "cal"}, far)) && /data-let="keeper:/.test(lt.hallPanel(F, "figtree", {tab: "welcome"}, far)), "the hall table: the catalogue (bathrooms too), the garden, the calendar, the welcome and Nell");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await closeFriends(page);
   page.on("pageerror", e => errors.push(`lets pageerror: ${e.message}`));

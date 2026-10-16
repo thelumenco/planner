@@ -262,6 +262,13 @@ export const NPCS = [
     intro: "I'm Elena. Cows, goats, and soon a proper cheese cave in the barn. The cheese at my market stall? Aged right here.",
     lines: ["Wilf used to bring {pet} up to see the goats. Daisy pretended not to care. She cared.", "Daisy's the boss of the paddock. Mochi just pretends.", "Milking at six. The goats prefer six-fifteen.", "A good cheese takes patience. So does a good goat.", "Pepper ate my notebook again."],
     hellos: ["Hi! Grab a bucket.", "Morning! Hay's in the barn."], away: "Elena's done for the day. Even the goats are asleep."},
+  // round 221: Nell keeps house for the holiday cottages on the lane, and does your changeovers if you hire her (lets.js)
+  {id: "nell", pitch: 1.1, name: "Nell", job: "Keeps house for the cottages on the lane",
+    look: {skin: "#E8C2A0", hair: "#B8B0A8", hairStyle: "bun", top: "#7FA0D0", bottom: "#5A4636", extra: "apron"},
+    routine: [slot("8:30", "10:00", "hlane", [[300, 300], [250, 420], [360, 470]]), slot("15:00", "17:30", "hlane", [[250, 300], [300, 480], [380, 420]])],
+    intro: "I'm Nell. I've kept the cottages on this lane spick and span for thirty years. Fresh sheets, a jug of flowers, and never a crumb under the sofa.",
+    lines: ["A good changeover is all in the order: windows open first, beds last.", "I can tell a lot about guests from how they leave the teaspoons.", "Lavender in the linen cupboard. Keeps the moths guessing.", "Elena says I fuss. I say a cottage notices.", "Somebody left a whole jar of honey once. Unopened! I gave it a good home."],
+    hellos: ["Morning! Lovely day for drying sheets.", "Hello, love. Mind the wet floor."], away: "Nell's gone home with her feet up."},
   // Amara serves at the Cocoa Room's counter (once you open it, goals.js "cocoa"), Tuesday to Sunday
   {id: "amara", pitch: 1.15, name: "Amara", job: "Serves at the Cocoa Room",
     look: {skin: "#A8754F", hair: "#1F1A17", hairStyle: "bun", top: "#8A5A3A", bottom: "#F3E7C9", extra: "apron"},

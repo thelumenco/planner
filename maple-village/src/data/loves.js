@@ -113,6 +113,11 @@ export const LOVES = {
       {id: "b_beans", thanks: "Proper coffee. Not grey at all. My old bank would never."},
       {id: "carrot", thanks: "Carrots! Daisy will pretend not to care. She'll care."}],
     everyday: ["scallion", "beewraps", "soap_oat"]},
+  nell: {story: [
+      {id: "soycandle", thanks: "A fig candle! The cottages will smell like a summer garden."},
+      {id: "figjam", thanks: "Fig jam, for my toast. You know me too well."},
+      {id: "honey_lav", thanks: "Lavender honey! Like my linen cupboard, but you can eat it."}],
+    everyday: ["croissant", "bananabread", "pinklemonade"]},
   amara: {story: [
       {id: "bar_white", thanks: "White chocolate! My secret's out. Don't tell Mateo."},
       {id: "furoshiki", thanks: "A wrapping cloth! I'm going to wrap everything. Even you."}],

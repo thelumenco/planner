@@ -180,7 +180,7 @@ function renameIds(F){
 }
 migrate();
 setPaperArtF(() => F);
-setArtContext({lets: id => ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).slots || {}, letParcels: id => (((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).parcels || []).length, cocoa: () => cocoaState(F), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, boardCount: () => QB.tasksLeft(F) + QB.board(F).reqs.length, growth:p => growth(p), stats:() => ({}), day:() => dayKey(), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns(F, "giftshop") && GAL.stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey())});
+setArtContext({lets: id => ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).slots || {}, letParcels: id => (((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).parcels || []).length, letExtras: id => ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).extras || {}, letWelcome: id => { const r = ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).ready || {}, n = o => Object.values(o || {}).reduce((a, b) => a + b, 0); return {fruit: n(r.fruit), fridge: n(r.fridge)}; }, cocoa: () => cocoaState(F), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, boardCount: () => QB.tasksLeft(F) + QB.board(F).reqs.length, growth:p => growth(p), stats:() => ({}), day:() => dayKey(), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns(F, "giftshop") && GAL.stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey())});
 function isDusk(){ const t = localHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, selPlot = null, shopTab = "seeds";
@@ -1576,6 +1576,14 @@ function ctx(){
     else if (a === "place") { const p = LT.place(F, letView, v, w, +x); if (!p) return; sfx("tap"); gainXp(1); save(); drawScene(); }
     else if (a === "out") { if (!LT.takeOut(F, letView, v)) return; sfx("paper", true); save(); drawScene(); }
     else if (a === "tidy") { if (!LT.tidy(F, letView)) return; sfx("chime"); gainXp(1); speak("Sheets changed, floor swept, windows opened, a jar of fresh flowers on the table. Ready for the next guests.", 5000); save(); drawScene(); }
+    // round 221: the garden, the welcome, Nell, the calendar
+    else if (a === "extra") { const x = LT.orderExtra(F, letView, v); if (!x) return; sfx("chaching"); flash(x.n); speak("Ordered. The builders will bring it tomorrow and put it in the garden.", 4000); save(); }
+    else if (a === "put") { if (!LT.stock(F, letView, v, w)) return; sfx("tap"); save(); drawScene(); }
+    else if (a === "un") { if (!LT.unstock(F, letView, v, w)) return; sfx("tap"); save(); drawScene(); }
+    else if (a === "keeper") { LT.hireKeeper(F, letView, v === "1"); sfx("paper", true); if (v === "1") speak("Nell beams. \"Leave it with me. I'll do the changeovers, and fill the basket and the fridge from the pantry. Just keep it stocked.\"", 6000); save(); }
+    else if (a === "day") { if (!LT.toggleDay(F, letView, v)) { sfx("tap"); return; } sfx("tap"); save(); }
+    else if (a === "buffer") { LT.setBuffer(F, letView, +v); sfx("tap"); save(); }
+    else if (a === "pause") { LT.setPaused(F, letView, v === "1"); sfx("paper", true); save(); }
     ctx(); });
   // Saltwick Harbour (round 215): the scar, the crab line, the café and its brew, the lamp
   c.querySelectorAll("[data-sw]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.sw.split(":");
@@ -1876,8 +1884,13 @@ function letsTick(){
   if (!LT.ownsAny(F)) return;
   const ev = LT.settle(F); if (!ev.length) return;
   ev.forEach(e => { if (e.kind === "left") { flash(`+${e.pay} from ${LET_COTTAGES[e.id].n}`); } });
-  const left = ev.filter(e => e.kind === "left"), arr = ev.filter(e => e.kind === "arrived"), parcels = ev.find(e => e.kind === "parcels");
-  const lines = [...left.map(e => `Guests have left ${LET_COTTAGES[e.id].n} (${"★".repeat(e.stars)}): ${e.pay} coins, and it needs a tidy.`), ...arr.map(e => `New guests at ${LET_COTTAGES[e.id].n} for ${e.nights} night${e.nights === 1 ? "" : "s"}.`), ...(parcels ? [`${parcels.n} parcel${parcels.n === 1 ? "" : "s"} came on the train for the cottages.`] : [])];
+  const nm = e => LET_COTTAGES[e.id].n, by = k => ev.filter(e => e.kind === k), parcels = ev.find(e => e.kind === "parcels"), kept = id => ev.some(e => e.kind === "keeper" && e.id === id);
+  const lines = [...by("left").map(e => `Guests have left ${nm(e)} (${"★".repeat(e.stars)}): ${e.pay} coins${e.tip ? `, with a tip` : ""}.${kept(e.id) ? " Nell's done the changeover." : " It needs a tidy before the next guests."}`),
+    ...by("keeperUnpaid").map(e => `Nell couldn't do the changeover at ${nm(e)}: not enough coins for her fee.`),
+    ...by("arrived").map(e => `New guests at ${nm(e)} for ${e.nights} night${e.nights === 1 ? "" : "s"}.${e.untidy ? " It wasn't tidy when they arrived." : ""}`),
+    ...by("cancelled").map(e => `A booking at ${nm(e)} was called off: it isn't ready to let.`),
+    ...by("booked").map(e => `A new booking at ${nm(e)}: ${e.b.nights} night${e.b.nights === 1 ? "" : "s"} from ${e.b.from}.`),
+    ...(parcels ? [`${parcels.n} parcel${parcels.n === 1 ? "" : "s"} came on the train for the cottages.`] : [])];
   if (lines.length) setTimeout(() => speak(lines.join(" "), 6500), 1200);
   save();
 }
@@ -3191,6 +3204,8 @@ svg.addEventListener("click", ev => {
   const ms = ev.target.closest("[data-millspot]");
   if (ms && scene === "mill" && ms.dataset.millspot === "photo") { go("mill", 150, 260, () => { millOpen = "story"; atSpot = "photo"; sfx("paper", true); ctx(); }); return; }
   // round 154: upstairs (art/millup.js), and the stairs up from the press
+  { const lb = ev.target.closest("[data-letbath]") && /^(bluebell|figtree)up$/.test(scene) ? scene.replace(/up$/, "bath") : ev.target.closest("[data-letgarden]") && (scene === "bluebell" || scene === "figtree") ? scene + "gdn" : null;   // round 221: the bathroom, the garden
+    if (lb) { const I = INNER[lb]; go(scene, I.door[0], I.door[1], () => setScene(lb, I.arrive)); return; } }
   if (ev.target.closest("[data-letstairs]") && (scene === "bluebell" || scene === "figtree")) { const up = scene + "up", I = INNER[up]; go(scene, I.door[0], I.door[1], () => setScene(up, I.arrive)); return; }   // round 220: up to the cottage's bedrooms
   if (ms && scene === "mill" && ms.dataset.millspot === "stairs") { go("mill", INNER.millup.door[0], INNER.millup.door[1], () => setScene("millup", INNER.millup.arrive)); return; }
   if (ms && scene === "millup") { const k = ms.dataset.millspot, at = {bench: [400, 280], shop: [214, 600], tasting: [260, 440], workshop: [410, 600]}[k] || [260, 470];
@@ -3381,7 +3396,8 @@ initNpcs({sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyR
 measureHud();
 initTrips(() => F);
 setLetsHook(day => F && F.lets ? Object.fromEntries(Object.keys(LET_COTTAGES).filter(id => LT.owns(F, id)).map(id => [id, (LT.staying(F, id, day) || {}).guests || null])) : null,
-  day => F && F.lets ? Object.keys(LET_COTTAGES).flatMap(id => { const st = LT.staying(F, id, day); return st && st.from === day ? st.guests : []; }) : []);   // round 219: your cottages' guests (and who arrives today)
+  day => F && F.lets ? Object.keys(LET_COTTAGES).flatMap(id => { const st = LT.staying(F, id, day); return st && st.from === day ? st.guests : []; }) : [],
+  day => F ? LT.keeperDays(F, day) : []);   // round 219: your cottages' guests (and who arrives today)
 setCloseFriends(() => QB.friendIds(F, QB.TRIP_HEARTS));   // Sunday lunch and Christmas lunch: your closest friends
 setGhTools(() => F.tools || {});
 // Pick up where the player left off (round 105): the same game day, back on the screen they closed the game on (a new day, they

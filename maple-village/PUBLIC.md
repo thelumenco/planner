@@ -157,13 +157,28 @@ Then they're yours to furnish and let, a mini landlord business:
   each. Nightly rate = cap x (0.3 + 0.7 x score); caps are 70 for Bluebell and 50 for Fig Tree. Stars = 1 + 4 x
   score, rounded. A cottage won't let at all without a bed and bed linen; a bed and simple sheets alone lets for
   about 24 a night at two stars.
-- Guests (visitors from the village's tourist pool) arrive two days after you buy, on the morning train with their
-  suitcases (walking up the lane about 11:15), and stay one to five nights. They pay at checkout (rate x nights,
-  into your coins) and write a short review in the guest book. Then the cottage needs a tidy (a button at the hall
-  table) before anyone else can book. After the tidy, the next guests come after a gap set by the last review:
-  5 days after a one-star stay, 4 after two stars, 3 after three, 2 after four, 1 after five.
-- Away for a while, the cottages run on (up to the last 60 days): the guests that came and went have paid, and the
-  cottage waits for its tidy.
+- Round 221 (Mel: bathroom, calendar, changeovers, housekeeper, garden): a bathroom through a door in the bedroom,
+  with its own catalogue section (bath 150/320/650, basin and mirror 60/140/300, towels 20/50/110, bath mat 15/35/80,
+  toiletries 15/40/90, and a plant). A cottage now needs a bed, linen and a bath before it can let.
+- The calendar (a tab at the hall table): guests book 2 to 4 days ahead, never more than three weeks ahead, for one
+  to five nights. Tap a free day to close it; "Pause new bookings" stops new ones altogether (booked stays still
+  come). Between stays there are changeover days, 1, 2 or 3 (your choice; the day they leave counts as the first).
+  The better the last review, the sooner the next booking after that (3 extra days after one or two stars, down to
+  none after five).
+- The welcome (another tab): on a changeover day, tidy up and make the beds, then fill the fruit basket (up to 3
+  fruit) and the fridge (up to 4: your own wine, cheese, chocolate, bread, jam, honey, cider and so on), all from
+  your backpack. Tidy with 2 or more in each: the guests add a star to their review and leave a tip of 4 a thing.
+  Guests who arrive to an untidy cottage take two stars off. Either way they come, and pay when they leave.
+- Nell (a new villager on the lane, round 221) does changeovers if you hire her: 25 a time at Fig Tree, 35 at
+  Bluebell, paid on the day guests leave. She tidies, and fills the basket and fridge from a pantry cupboard you
+  keep stocked. Let her go any time. On her changeover mornings she's at the cottage from 10.
+- The garden, out of the back door downstairs: things the builders bring the next day, each raising the most the
+  cottage can charge a night: a proper garden 300 (+5), patio table 250 (+4), fairy lights 120 (+2), hammock 180
+  (+3), fire pit 400 (+6), barbecue 350 (+5), bikes 500 (+6), hot tub 1,500 (+15). All of them: Bluebell up to 116
+  a night, Fig Tree up to 96.
+- Away for a while, the cottages run on (up to the last 60 days): guests come, stay and pay; with nobody tidying,
+  the reviews suffer.
+- Switched off on the live game (LIVE in game/lets.js) until it's finished; ?lets=1 turns it on.
 
 ## The opening story (2026-10-14)
 A new game starts with a short story told through your own eyes (game/intro.js, pictures in art/intro.js): a tired

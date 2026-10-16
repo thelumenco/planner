@@ -2,7 +2,7 @@
 // Every piece comes in three tiers (simple, good, fine) and is tinted with its colour. The window in each shell sits
 // where COTTAGES[id].slots.curtains says, so the curtains always hang on it.
 import { sk } from "./scenes.js";
-import { COLOURS, COTTAGES, catOf } from "../data/lets.js";
+import { COLOURS, COTTAGES, catOf, floorOf } from "../data/lets.js";
 
 const rows = (n, f) => Array.from({length: n}, (_, i) => f(i)).join("");
 const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
@@ -36,6 +36,28 @@ const stairsDown = () => `<g data-exit="1" aria-label="Down the stairs"><ellipse
     ${sk(`<rect x="36" y="520" width="90" height="96" style="fill:#7A5638"/>${rows(5, i => `<rect x="${40 + i*4}" y="${528 + i*17}" width="${82 - i*8}" height="12" style="fill:#A8754F"/>`)}<path d="M130 520 v96 M126 520 h8" style="stroke:#5A3A2A" stroke-width="3"/>`, `<rect x="36" y="520" width="90" height="96"/>`)}
     ${tape(80, 630, "Downstairs")}</g>`;
 
+// round 221: the back door out to the garden, on the right-hand wall of the sitting room, seen side-on (a narrow
+// parallelogram: the far edge is higher and shorter than the near one)
+function gardenDoor(trim, door){
+  const fr = "M489 296 L489 426 L520 446 L520 276z", dr = "M494 302 L494 422 L516 436 L516 290z", gl = "M498 310 L498 336 L512 333 L512 302z";
+  return `<g data-letgarden="1" aria-label="The back door to the garden"><ellipse class="hov" cx="490" cy="444" rx="32" ry="11" style="fill:var(--butter)"/>
+    ${sk(`<path d="${fr}" style="fill:${trim}"/><path d="${dr}" style="fill:${door}"/><path d="${gl}" style="fill:#D6E8F2"/><path d="M498 330 q6 -8 14 -10 v13 l-14 3z" style="fill:#A9C79A"/>
+      <path d="M487 427 L520 448 L520 454 L485 431z" style="fill:#BDB3A6"/><circle cx="498" cy="372" r="2.6" style="fill:${BRASS}"/>`,
+      `<path d="${fr}"/><path d="${dr}"/><path d="${gl}"/><path d="M505 306 v29" opacity=".6"/><path d="M497 350 L513 346 V420 L497 412z" opacity=".45"/><circle cx="498" cy="372" r="2.6"/>`)}
+    ${tape(486, 466, "Garden")}</g>`;
+}
+// round 221: the bathroom door upstairs, a cottage plank door on the back wall at x 466
+function bathDoor(trim, wood, ledge){
+  const x = 466, top = 132;
+  return `<g data-letbath="1" aria-label="The bathroom door"><ellipse class="hov" cx="${x}" cy="${WALL + 14}" rx="36" ry="10" style="fill:var(--butter)"/>
+    ${sk(`<rect x="${x-29}" y="${top-6}" width="58" height="${WALL - top + 6}" rx="2" style="fill:${trim}"/><rect x="${x-23}" y="${top}" width="46" height="${WALL - top}" style="fill:${wood}"/>
+      <rect x="${x-23}" y="${top+16}" width="46" height="7" style="fill:${ledge}"/><rect x="${x-23}" y="${WALL-26}" width="46" height="7" style="fill:${ledge}"/><path d="M${x-21} ${WALL-24} L${x+21} ${top+21}" style="stroke:${ledge}" stroke-width="6"/>
+      <path d="M${x+13} ${top+52} v14" style="stroke:#3A3430" stroke-width="3"/><rect x="${x+11}" y="${top+58}" width="8" height="3" style="fill:#3A3430"/>`,
+      `<rect x="${x-29}" y="${top-6}" width="58" height="${WALL - top + 6}" rx="2"/><rect x="${x-23}" y="${top}" width="46" height="${WALL - top}"/><path d="M${x-12} ${top} V${WALL} M${x-1} ${top} V${WALL} M${x+11} ${top} V${WALL}" opacity=".4"/>
+      <rect x="${x-23}" y="${top+16}" width="46" height="7" opacity=".7"/><rect x="${x-23}" y="${WALL-26}" width="46" height="7" opacity=".7"/>`)}
+    ${tape(x, top + 40, "Bathroom")}</g>`;
+}
+
 export const LET_SHELLS = {
   // Bluebell: pale blue-grey walls under the eaves, beams, a stone fireplace, and an arch through to the second bedroom
   bluebell: () => { const [wx, wy] = COTTAGES.bluebell.slots.curtains, trim = "#5E7AB0";
@@ -53,6 +75,7 @@ export const LET_SHELLS = {
       `<path d="M196 12 V${WALL} M296 12 V${WALL}"/><rect x="206" y="166" width="80" height="${WALL - 166}"/><path d="M220 ${WALL} V196 Q246 176 272 196 V${WALL}"/>
       <path d="M206 186 h14 M272 186 h14 M206 210 h14 M272 210 h14 M230 166 v12 M262 166 v12" opacity=".5"/><rect x="198" y="156" width="96" height="10" rx="2"/><rect x="190" y="${WALL}" width="112" height="12" rx="2"/>
       <rect x="206" y="138" width="7" height="18"/><rect x="279" y="138" width="7" height="18"/>`)}
+    ${gardenDoor(trim, "#8FA7CF")}
     ${stairsUp()}
     `; },
 
@@ -76,6 +99,7 @@ export const LET_SHELLS = {
       ${rows(9, i => `<circle cx="${248 + i*12}" cy="${134 + (i % 2)*3}" r="4" style="fill:#B9C98A"/>`)}`,
       `<rect x="250" y="150" width="90" height="${WALL - 150}"/><rect x="266" y="172" width="58" height="${WALL - 172}"/><rect x="276" y="198" width="38" height="${WALL - 198}" rx="2"/><rect x="284" y="208" width="22" height="16" rx="3"/>
       ${rows(4, r => `<path d="M250 ${162 + r*20} h16 M324 ${162 + r*20} h16"/>`)}<path d="M300 196 q0 -12 9 -12 q9 0 9 12z M318 190 l6 -4"/><rect x="240" y="138" width="110" height="16" rx="2"/><rect x="244" y="${WALL}" width="102" height="12" rx="2"/>`)}</g>
+    ${gardenDoor(trim, OAK)}
     ${stairsUp()}
 `; },
 
@@ -85,8 +109,9 @@ export const LET_SHELLS = {
     <g style="fill:none;stroke:#B4C4D4" stroke-width="1.2" opacity=".75">${rows(6, r => rows(14, i => `<path transform="translate(${i*40 + (r % 2)*20 + 10} ${r*32 + 62})" d="M0 0 l-3 -5 M0 0 l3 -5 M0 0 v4"/>`))}</g>
     <rect y="${WALL - 14}" width="520" height="14" style="fill:${trim}"/>
     ${sk(`<path d="M0 0 H520 V40 L470 70 H50 L0 40z" style="fill:#F3F0E8"/><path d="M0 40 L50 70 H470 L520 40" style="fill:none;stroke:#8A6A52" stroke-width="8"/>`, `<path d="M0 40 L50 70 H470 L520 40"/><path d="M120 70 V0 M260 70 V0 M400 70 V0" opacity=".4"/>`)}
-    ${dormer(130, 140, trim)}${dormer(390, 140, trim)}
-    ${sk(`<rect x="250" y="70" width="20" height="${WALL - 70}" style="fill:#9A6E48"/>`, `<rect x="250" y="70" width="20" height="${WALL - 70}"/>`)}
+    ${dormer(COTTAGES.bluebell.slots.bed[0], 140, trim)}${dormer(COTTAGES.bluebell.slots.bed2[0], 140, trim)}
+    ${(p => sk(`<rect x="${p-10}" y="70" width="20" height="${WALL - 70}" style="fill:#9A6E48"/>`, `<rect x="${p-10}" y="70" width="20" height="${WALL - 70}"/>`))(COTTAGES.bluebell.slots.touches[0])}
+    ${bathDoor(trim, "#A9BCD8", "#8FA7CF")}
     ${stairsDown()}`; },
 
   // Fig Tree upstairs: one bedroom under low beams, a washstand with a jug and bowl
@@ -96,10 +121,39 @@ export const LET_SHELLS = {
     <rect y="${WALL - 14}" width="520" height="14" style="fill:${trim}"/>
     ${sk(`<path d="M0 0 H520 V30 L440 60 H80 L0 30z" style="fill:${DARK}"/>${rows(5, i => `<rect x="${90 + i*80}" y="60" width="14" height="10" style="fill:${DARK}"/>`)}<rect x="0" y="30" width="14" height="${WALL - 30}" style="fill:#8A6448"/><rect x="506" y="30" width="14" height="${WALL - 30}" style="fill:#8A6448"/>`,
       `<path d="M0 30 L80 60 H440 L520 30"/><path d="M14 30 V${WALL} M506 30 V${WALL}"/>`)}
-    ${dormer(270, 130, trim)}
+    ${dormer(COTTAGES.figtree.slots.bed[0], 130, trim)}
+    ${bathDoor(trim, "#C08D58", OAK)}
     ${sk(`<rect x="62" y="210" width="76" height="50" rx="3" style="fill:#B07D4A"/><rect x="58" y="204" width="84" height="8" rx="2" style="fill:#9A6E48"/><ellipse cx="100" cy="202" rx="26" ry="6" style="fill:#E3EEF2"/><path d="M86 202 q-2 -22 8 -28 h12 q6 4 4 10 q8 0 6 10 l-6 2 q0 6 -4 6z" style="fill:#F3F0E8"/><path d="M68 260 v20 M132 260 v20" style="stroke:${DARK}" stroke-width="5"/>`,
       `<rect x="62" y="210" width="76" height="50" rx="3"/><rect x="58" y="204" width="84" height="8" rx="2"/><ellipse cx="100" cy="202" rx="26" ry="6"/><path d="M86 202 q-2 -22 8 -28 h12 q6 4 4 10 q8 0 6 10 l-6 2 q0 6 -4 6z"/><rect x="72" y="222" width="56" height="14" rx="2" opacity=".5"/>`)}
-    ${stairsDown()}`; }
+    ${stairsDown()}`; },
+
+  // round 221: the bathrooms, through the bedroom. Bluebell: blue-and-white tiles to the dado, sprig paper above
+  bluebellbath: () => { const trim = "#5E7AB0", DADO = 150;
+    return floorBoards("#D9D4C7", "#BDB5A4") + `<rect width="520" height="${WALL}" style="fill:#E8EEF3"/>
+    <g style="fill:none;stroke:#B4C4D4" stroke-width="1.2" opacity=".8">${rows(4, r => rows(14, i => `<path transform="translate(${i*40 + (r % 2)*20 + 10} ${r*30 + 52})" d="M0 0 l-3 -5 M0 0 l3 -5 M0 0 v4"/>`))}</g>
+    <rect y="${DADO}" width="520" height="${WALL - DADO}" style="fill:#F7F8F5"/>
+    <g style="fill:#B9CBE3">${rows(5, r => rows(29, k => (r*3 + k*2) % 7 === 0 ? `<rect x="${k*18}" y="${DADO + 12 + r*15}" width="18" height="15"/>` : ""))}</g>
+    <rect y="${DADO + 4}" width="520" height="8" style="fill:#7F9BC8"/>
+    <g style="stroke:#C9D3DE" stroke-width="1">${rows(5, r => `<path d="M0 ${DADO + 12 + r*15} H520"/>`)}${rows(29, k => `<path d="M${k*18} ${DADO + 12} V${WALL}"/>`)}</g>
+    ${sk(`<rect y="${DADO - 4}" width="520" height="8" style="fill:${trim}"/><rect y="${WALL - 8}" width="520" height="8" style="fill:${trim}"/>`, `<path d="M0 ${DADO - 4} H520 M0 ${DADO + 4} H520 M0 ${WALL - 8} H520" opacity=".6"/>`)}
+    ${sk(`<path d="M0 0 H520 V26 L470 44 H50 L0 26z" style="fill:#F3F0E8"/><path d="M0 26 L50 44 H470 L520 26" style="fill:none;stroke:#8A6A52" stroke-width="7"/>`, `<path d="M0 26 L50 44 H470 L520 26"/>`)}
+    ${frosted(150, 94, trim)}${pegRail(trim, "#A9BCD8", "#F3F0E8")}`; },
+
+  // Fig Tree: cream tongue-and-groove to the dado, limewash above, terracotta tiles underfoot
+  figtreebath: () => { const trim = "#C8923A", DADO = 140;
+    return terracotta() + `<rect width="520" height="${WALL}" style="fill:#F5E8CF"/>
+    <g style="fill:#EADBBE" opacity=".7">${rows(6, i => `<ellipse cx="${(i*131) % 500 + 20}" cy="${(i*41) % 80 + 40}" rx="${18 + (i % 3)*8}" ry="${7 + (i % 2)*4}"/>`)}</g>
+    ${sk(`<rect y="${DADO}" width="520" height="${WALL - DADO}" style="fill:#F1E3C2"/><rect y="${DADO - 6}" width="520" height="9" style="fill:${trim}"/><rect y="${WALL - 10}" width="520" height="10" style="fill:#C99A62"/>`,
+      `<g opacity=".4">${rows(43, k => `<path d="M${6 + k*12} ${DADO + 3} V${WALL - 10}"/>`)}</g><path d="M0 ${DADO + 3} H520 M0 ${WALL - 10} H520" opacity=".6"/>`)}
+    ${sk(`<rect width="520" height="24" style="fill:${DARK}"/>${rows(6, i => `<rect x="${30 + i*92}" y="24" width="16" height="10" style="fill:${DARK}"/>`)}`, `<rect width="520" height="24"/><path d="M40 12 h60 M180 8 h40 M330 14 h70" opacity=".4"/>`)}
+    ${frosted(150, 86, trim)}${pegRail(OAK, "#F3E7C8", "#E3B26A")}`; },
+
+  // round 221: the gardens, out of the back door. Bluebell's is the bigger, with a picket fence; Fig Tree's is
+  // hedged, with its fig tree in the corner
+  bluebellgdn: info => garden(info, {wall: "#EEF0EC", course: "#D5DAD6", roof: "#6D7685", trim: "#5E7AB0", door: "#7F9BC8", wins: [110, 410], fence: "picket", side: 22,
+    at: {patio: [126, 304], bbq: [62, 414], firepit: [140, 494], bikes: [408, 232], hammock: [416, 340], hottub: [404, 490]}}),
+  figtreegdn: info => garden(info, {wall: "#F5E8CF", course: "#EADBBE", roof: "#B8674A", trim: "#C8923A", door: "#B07D4A", wins: [392], fence: "hedge", side: 40, fig: true,
+    at: {patio: [156, 350], bbq: [84, 446], firepit: [152, 522], bikes: [386, 232], hammock: [392, 336], hottub: [386, 490]}})
 };
 
 // ---------- the pieces: each takes the slot position, the tier and the tint ----------
@@ -305,9 +359,10 @@ function parcels(n, x, y){
 
 const DRAW = {seat, table, shelf, lamp, rug, curtains, picture, plant: plantP, touches};
 const FLAT = {rug: 0, curtains: 1, picture: 1};   // drawn first, in this order; everything else by how far forward it stands
-export function letFurniture(id, slots, pos, n, up = false){
+// floor: "down", "up" or "bath" (round 221: the bathroom); parcels only ever wait downstairs in the hall
+export function letFurniture(id, slots, pos, n, floor = "down"){
   const C = COTTAGES[id]; if (!C) return "";
-  slots = Object.fromEntries(Object.entries(slots).filter(([s]) => C.up.includes(s) === up));
+  slots = Object.fromEntries(Object.entries(slots).filter(([s]) => floorOf(id, s) === floor));
   const tint = p => (COLOURS[p.col] || COLOURS.cream)[1];
   const items = Object.keys(slots).filter(s => pos[s] && slots[s]).map(s => ({s, cat: catOf(id, s), p: slots[s], at: pos[s]}));
   const bedFor = s => s.replace("linen", "bed");
@@ -322,7 +377,7 @@ export function letFurniture(id, slots, pos, n, up = false){
     } else if (it.cat === "linen") { if (!slots[bedFor(it.s)]) h += linen(x, y, t, c, false); }
     else if (DRAW[it.cat]) h += DRAW[it.cat](x, y, t, c);
   }
-  return `<g pointer-events="none">${h}</g>` + (up ? "" : parcels(n, 340, 584));
+  return `<g pointer-events="none">${h}</g>` + (floor === "down" ? parcels(n, 340, 584) : "");
 }
 // the hall table: a console with the guest book, a pen, a little vase and the catalogue
 export const hallTable = (x, y) => sk(`<rect x="${x-50}" y="${y-44}" width="100" height="8" rx="2" style="fill:#9A6E48"/><rect x="${x-46}" y="${y-36}" width="92" height="12" style="fill:${OAK}"/><rect x="${x-10}" y="${y-33}" width="20" height="6" rx="2" style="fill:#C08D58"/>
@@ -333,3 +388,6 @@ export const hallTable = (x, y) => sk(`<rect x="${x-50}" y="${y-44}" width="100"
     <circle cx="${x+23}" cy="${y-68}" r="3" style="fill:#F3C969"/><circle cx="${x+41}" cy="${y-70}" r="3" style="fill:#E3A5B0"/><circle cx="${x+33}" cy="${y-71}" r="3" style="fill:${CREAM}"/>`,
   `<rect x="${x-50}" y="${y-44}" width="100" height="8" rx="2"/><rect x="${x-46}" y="${y-36}" width="92" height="12"/><rect x="${x-10}" y="${y-33}" width="20" height="6" rx="2"/><path d="M${x-42} ${y-24} V${y} M${x+42} ${y-24} V${y}"/>
     <path d="M${x-40} ${y-46} l2 -8 h17 l2 8z M${x-19} ${y-46} l2 -8 h17 l2 8z"/><path d="M${x-36} ${y-51} h12 M${x-15} ${y-51} h12" opacity=".5"/><rect x="${x+8}" y="${y-50}" width="18" height="6" rx="1"/><path d="M${x+32} ${y-46} q-6 0 -5 -8 q1 -5 4 -6 h2 q3 1 4 6 q1 8 -5 8z"/>`);
+
+// round 221: the welcome you've left out: a fruit bowl (fruit 0-3) and treats from the fridge (0-4), on the table (placeholder)
+export const welcomeArt = (x, y, fruit, treats) => `<g pointer-events="none">${fruit ? `<ellipse cx="${x - 14}" cy="${y}" rx="16" ry="6" fill="#E3EEF2" stroke="#3A2E28"/>${rows(fruit, i => `<circle cx="${x - 22 + i*8}" cy="${y - 5}" r="5" fill="${["#D9534F", "#F2A65A", "#9BC26A"][i]}" stroke="#3A2E28" stroke-width=".8"/>`)}` : ""}${rows(treats, i => `<rect x="${x + 6 + i*9}" y="${y - (i % 2 ? 14 : 22)}" width="7" height="${i % 2 ? 14 : 22}" rx="2" fill="${["#6B1F3A", "#5A3A2A", "#F3E7C8", "#C8923A"][i]}" stroke="#3A2E28" stroke-width=".8"/>`)}</g>`;

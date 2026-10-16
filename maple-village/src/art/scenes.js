@@ -7,7 +7,7 @@ import { ink, localHM, dayKey, LOC } from "../util.js";
 import { VILLAGE, ROOMS, stationsOf, PET_BED } from "../data/world.js";
 import { CROPS, PLOTS } from "../data/items.js";
 import { roomShell } from "./interiors.js";
-import { LET_SHELLS, letFurniture, hallTable } from "./lets-art.js";
+import { LET_SHELLS, letFurniture, hallTable, welcomeArt } from "./lets-art.js";
 import { COTTAGES } from "../data/lets.js";
 import { iconAt } from "./icons.js";
 import { TABLES, SEATS, halfW } from "../data/dining.js";
@@ -757,8 +757,11 @@ export function foreArt(id){
 }
 export function roomArt(id){
   const r = ROOMS[id], st = stationsOf(id);
-  const lb = id.replace(/up$/, ""), up = lb !== id;   // round 219: Elena's cottages, furnished as you go (round 220: bedrooms upstairs)
-  let h = LET_SHELLS[id] ? LET_SHELLS[id]() + letFurniture(lb, (G.lets && G.lets(lb)) || {}, COTTAGES[lb].slots, up ? 0 : (G.letParcels && G.letParcels(lb)) || 0, up) : roomShell(id);
+  // round 219: Elena's cottages, furnished as you go (round 220: bedrooms upstairs; round 221: the bathroom, the garden, the welcome)
+  const lb = id.replace(/(up|bath|gdn)$/, ""), floor = id === lb ? "down" : id.endsWith("up") ? "up" : id.endsWith("bath") ? "bath" : "gdn";
+  const linfo = LET_SHELLS[id] ? {extras: (G.letExtras && G.letExtras(lb)) || {}, welcome: (G.letWelcome && G.letWelcome(lb)) || {fruit: 0, fridge: 0}} : null;
+  let h = !LET_SHELLS[id] ? roomShell(id) : floor === "gdn" ? LET_SHELLS[id](linfo) : LET_SHELLS[id](linfo) + letFurniture(lb, (G.lets && G.lets(lb)) || {}, COTTAGES[lb].slots, floor === "down" ? (G.letParcels && G.letParcels(lb)) || 0 : 0, floor)
+    + (floor === "down" && (linfo.welcome.fruit || linfo.welcome.fridge) ? (((G.lets && G.lets(lb)) || {}).table ? welcomeArt(COTTAGES[lb].slots.table[0], COTTAGES[lb].slots.table[1] - 46, linfo.welcome.fruit, linfo.welcome.fridge) : welcomeArt(420, 496, linfo.welcome.fruit, linfo.welcome.fridge)) : "");
   if (id === "market") h += sk(`<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
     `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`) +
     `<g>${[["apple","dumpling","fish","toast"],["tulip","carrot","strawberry","sunflower"]].map((row, r) => row.map((n, i) => iconAt(n, 64 + i*30, 62 + r*38, 26)).join("")).join("")}${[["yarn","ball","brush","crown"],["bath","fort","corn","blueberry"]].map((row, r) => row.map((n, i) => iconAt(n, 374 + i*30, 62 + r*38, 26)).join("")).join("")}</g>`;

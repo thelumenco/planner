@@ -422,10 +422,13 @@ export function trainSlot(id, day, hm){
 }
 const weekOf = day => { const t = Date.parse(day + "T00:00:00Z"); return new Date(t - ((dow(day) + 6) % 7)*864e5).toISOString().slice(0, 10); };
 // round 219: once a cottage is yours its guests are your bookings (game/lets.js), not Elena's weekly lets
-let letsHook = () => null, arrivalsHook = () => []; export const setLetsHook = (fn, arr) => { letsHook = fn; if (arr) arrivalsHook = arr; };
+let letsHook = () => null, arrivalsHook = () => [], keeperHook = () => []; export const setLetsHook = (fn, arr, keep) => { letsHook = fn; if (arr) arrivalsHook = arr; if (keep) keeperHook = keep; };
 export const letGuests = day => { const g = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS), own = letsHook(day) || {}; return [own.bluebell !== undefined ? own.bluebell || [] : g.slice(0, 2), own.figtree !== undefined ? own.figtree || [] : g.slice(2, 4)]; };
 const LET_SEATS = [[[300, 292], [376, 292]], [[300, 466], [376, 466]]];
 export function letSlot(id, day, hm){
+  // round 221: Nell does the changeover the morning guests leave, if you've hired her (Bluebell first, then Fig Tree)
+  if (id === "nell") { const k = keeperHook(day); if (!k.length) return null; const i = hm >= 10*60 && hm < 11*60 ? 0 : hm >= 11*60 && hm < 12*60 ? 1 : -1; if (i < 0 || !k[i]) return null;
+    return {from: (10 + i)*60, to: (11 + i)*60, scene: k[i], wander: [[200, 470], [320, 520], [260, 440]]}; }
   const lets = letGuests(day), c = lets.findIndex(g => g.includes(id)); if (c < 0) return null;
   // round 219: your cottage's guests come off the 11:15 with their suitcases on the day they arrive
   if (arrivalsHook(day).includes(id) && hm >= 11*60 + 15 && hm < 11*60 + 45) return {from: 11*60 + 15, to: 11*60 + 45, scene: "hlane", wander: LANE_WALK, act: "suitcase"};
