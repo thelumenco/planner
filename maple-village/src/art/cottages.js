@@ -1,286 +1,311 @@
 // The holiday cottages (round 236): Fig Tree and Bluebell, which Mel buys from Elena and does up for guests. Four
-// screens each: downstairs (the sitting room on the left, the kitchen on the right, the front door at the bottom and
-// the wooden stairs up, like the mill's), upstairs (the bedroom, with the bathroom door in its left wall), the bathroom (tiled
-// to half height, the bath under the window, basin and towel rail) and the back garden (a wall with climbing roses, grass, a stepping-stone path and the hot tub). Furniture comes in three
-// tiers in one of six looks (STYLES, src/data/cottages.js); tier 0 is a faint dashed footprint Mel can tap to buy.
-// Mid-changeover the jobs still to do show: a rumpled bed, towels on the floor, mugs on the tables, leaves in the tub.
-// Bluebell has blue shutters and a blue door; Fig Tree has its fig tree in the garden corner.
-// The edges full, the middle calm and clear (the playbook). Spots: data-cospot (core.js coSpot).
+// screens each: downstairs (the sitting room on the left round the fire, the kitchen along the back wall on the right
+// with the dining table in front of it, the front door at the bottom and the wooden stairs up, like the mill's),
+// upstairs (the bedroom, with the bathroom door in its left wall), the bathroom (tiled to half height, the bath under
+// the window, basin and towel rail) and the back garden (a wall with climbing roses, a stepping-stone path, a dining
+// corner, the fire pit, a hammock and the hot tub tucked behind planting).
+// Round 238 (Mel: "proportionate to me, placed like an interior designer would"): everything is drawn to Mel's scale
+// (she is about 54px tall, so 1m is about 34px, softened to at most about 1.2x), under a low beamed cottage ceiling,
+// and each room is laid out in zones with clear walkways from the doors to every piece.
+// Furniture comes in three tiers in one of six looks (STYLES, src/data/cottages.js); tier 0 is a faint dashed footprint
+// of the real size Mel can tap to buy. Mid-changeover the jobs still to do show: a rumpled bed, towels on the floor,
+// mugs on the tables, leaves in the tub. Bluebell has blue shutters and a blue door; Fig Tree has its fig tree.
+// Positions come from PIECES/ACCESSORIES/SPOTS (front-edge centres), so the drawings follow the data.
 import { sk, tapeLabel } from "./scenes.js";
 import { STYLES, PIECES, ACCESSORIES, SPOTS } from "../data/cottages.js";
 
 /* ---------- helpers ---------- */
 const g = s => `<g pointer-events="none">${s}</g>`;
 const hovE = (x, y, rx, ry) => `<ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>`;
-const lab = (x, y, t, col = "#F3E1A0", size = 9) => tapeLabel(x, y, t, col, size);
+const lab = (x, y, t, col = "#F3E1A0", size = 8) => tapeLabel(x, y, t, col, size);
 const f1 = n => (+n).toFixed(1);
 const R = i => { const x = Math.sin(i*127.1 + 311.7)*43758.5453; return x - Math.floor(x); };   // a steady scatter
 const hx = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
 const mix = (a, b, t) => { const A = hx(a), B = hx(b); return "#" + A.map((v, i) => Math.round(v + (B[i] - v)*t).toString(16).padStart(2, "0")).join("").toUpperCase(); };
 const dk = (c, t = .25) => mix(c, "#2A1E16", t), lt = (c, t = .3) => mix(c, "#FFFFFF", t);
 // hand-drawn: the shapes get the marker fill, and their own outlines in wobbly ink; `det` is fine detail, no outline
-const strip = s => s.replace(/ style="[^"]*"/g, "").replace(/ (opacity|fill|stroke-width|stroke-dasharray|transform-origin)="[^"]*"/g, "");
+const strip = s => s.replace(/ style="[^"]*"/g, "").replace(/ (opacity|fill|stroke-width|stroke-dasharray)="[^"]*"/g, "");
 const D = (main, det = "") => sk(main + det, strip(main));
-const txt = (x, y, t, size = 7, fill = "#3A2E28", weight = 400, rot = 0) => `<text x="${x}" y="${y}" text-anchor="middle" font-family="Klee One,serif" font-weight="${weight}" font-size="${size}" fill="${fill}" pointer-events="none"${rot ? ` transform="rotate(${rot} ${x} ${y})"` : ""}>${t}</text>`;
+const txt = (x, y, t, size = 7, fill = "#3A2E28", weight = 400) => `<text x="${x}" y="${y}" text-anchor="middle" font-family="Klee One,serif" font-weight="${weight}" font-size="${size}" fill="${fill}" pointer-events="none">${t}</text>`;
+const at = id => (PIECES[id] || ACCESSORIES[id]).at;
 
 // the state for one render (set at the top of cottageArt)
 let S = STYLES.cottagecore, ST = {}, NIGHT = false, GL = [];
 const tier = id => +((ST.tiers || {})[id] || 0);
 const has = id => !!(ST.acc || {})[id];
 const undone = k => !!ST.turn && !ST.turn[k];
-const glow = (x, y, r = 40) => { GL.push(`<circle cx="${f1(x)}" cy="${f1(y)}" r="${r}" fill="url(#coGlow)"/>`); return ""; };
+let XF = null;   // the scale a free-standing piece is drawn at (about its front-edge centre), so glows land in the right place
+const glow = (x, y, r = 40) => { if (XF) { x = XF.x + (x - XF.x)*XF.k; y = XF.y + (y - XF.y)*XF.k; r = r*XF.k; } GL.push(`<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" fill="url(#coGlow)"/>`); return ""; };
+// free-standing pieces are drawn 1.2x about their front-edge centre (Mel's sprite stands about 64px tall in the room),
+// and the things that sit on them (cushions, the fruit, mugs) go through the same transform
+const K = {sofa: 1.2, armchair: 1.2, coffee: 1.2, rug: 1.2, lamp: 1.2, dining: 1.2, bedrug: 1.2, bathrug: 1.2, hottub: 1.2, patio: 1.2, hammock: 1.2, firepit: 1.2};
+const scaled = (id, fn) => { const k = K[id] || 1, [x, y] = PIECES[id].at; if (k === 1) return fn(); const save = XF; XF = {x, y, k}; const s = fn(); XF = save;
+  return `<g transform="translate(${x} ${y}) scale(${k}) translate(${-x} ${-y})">${s}</g>`; };
 const BLUE = "#5277B8", BLUE2 = "#3A5A92", INK = "#3A2E28", CREAM = "#FFFDF6";
+const FL = 210;   // where the back wall meets the floor (the garden wall's foot is a little lower)
 
 // a little flame (it flickers via the game's .flame class)
-const flame = (x, y, s = 1) => `<path class="flame" d="M${x} ${y} q${-6*s} ${-4*s} ${-1*s} ${-13*s} q${1*s} ${5*s} ${4*s} ${6*s} q${3*s} ${4*s} ${-3*s} ${7*s}z" fill="#F6A23A"/><path class="flame" d="M${x} ${y} q${-3*s} ${-3*s} 0 ${-7*s} q${1*s} ${3*s} ${2*s} ${4*s} q${1*s} ${2*s} ${-2*s} ${3*s}z" fill="#FFE08A"/>`;
-const books = (x0, x1, base, seed, hMax = 20) => { let s = "", x = x0, k = 0; const cols = [S.accent, S.fabric, dk(S.wood, .2), "#E8D9B8", S.fabric2, "#7E8FA6", "#C8553D"];
-  while (x < x1 - 4) { const w = 4 + Math.round(R(seed + k)*3), h = hMax - 6 + Math.round(R(seed*3 + k)*6), c = cols[(k*3 + seed) % cols.length];
-    if (R(seed + k*7) > .88 && x + 12 < x1) { s += `<rect x="${x + 2}" y="${base - h + 2}" width="${w}" height="${h - 2}" transform="rotate(-14 ${x + 2} ${base})" style="fill:${c}" stroke="${INK}" stroke-width=".6"/>`; x += w + 6; }
-    else { s += `<rect x="${x}" y="${base - h}" width="${w}" height="${h}" style="fill:${c}" stroke="${INK}" stroke-width=".6"/><path d="M${x} ${base - h + 3} h${w}" stroke="${lt(c, .5)}" stroke-width=".8"/>`; x += w + .6; }
-    k++; }
+const flame = (x, y, s = 1) => `<path class="flame" d="M${f1(x)} ${f1(y)} q${f1(-6*s)} ${f1(-4*s)} ${f1(-1*s)} ${f1(-13*s)} q${f1(s)} ${f1(5*s)} ${f1(4*s)} ${f1(6*s)} q${f1(3*s)} ${f1(4*s)} ${f1(-3*s)} ${f1(7*s)}z" fill="#F6A23A"/><path class="flame" d="M${f1(x)} ${f1(y)} q${f1(-3*s)} ${f1(-3*s)} 0 ${f1(-7*s)} q${f1(s)} ${f1(3*s)} ${f1(2*s)} ${f1(4*s)} q${f1(s)} ${f1(2*s)} ${f1(-2*s)} ${f1(3*s)}z" fill="#FFE08A"/>`;
+// a row of book spines between x0 and x1 standing on `base`, about h tall
+const books = (x0, x1, base, seed, h = 12) => { let s = "", x = x0, k = 0; const cols = [S.accent, S.fabric, dk(S.wood, .2), "#E8D9B8", S.fabric2, "#7E8FA6", "#C8553D"];
+  while (x < x1 - 2.5) { const w = 2.4 + Math.round(R(seed + k)*2)*.8, hh = h - 3 + Math.round(R(seed*3 + k)*3), c = cols[(k*3 + seed) % cols.length];
+    s += `<rect x="${f1(x)}" y="${f1(base - hh)}" width="${f1(w)}" height="${f1(hh)}" fill="${c}" stroke="${INK}" stroke-width=".4"/>`; x += w + .3; k++; }
   return s; };
+// a straight-backed chair seen from behind (its back towards us), and one side-on at the end of a table
+const chairBack = (x, y, col, h = 26) => `<path d="M${x - 7} ${y} v${-h} M${x + 7} ${y} v${-h}" stroke="${dk(col, .3)}" stroke-width="2.2"/><path d="M${x - 7} ${y - h + 2} h14 M${x - 7} ${y - h + 8} h14" stroke="${dk(col, .3)}" stroke-width="2.2"/><rect x="${x - 8}" y="${y - 12}" width="16" height="3" fill="${dk(col, .15)}"/>`;
+const chairSide = (x, y, col, face = 1) => `<path d="M${x} ${y} v-12 M${x + 10*face} ${y} v-12 M${x} ${y - 12} v-14" stroke="${dk(col, .3)}" stroke-width="2.2"/><path d="M${x - face} ${y - 13} h${12*face}" stroke="${dk(col, .2)}" stroke-width="3"/>`;
 
 /* ---------- the spot wrapper, and the faint footprint of a piece not bought yet ---------- */
-// FOOT: the footprint [w, h] above the front edge, used for the dashed outline and the hover
-const FOOT = {basin: [70, 40], bathrug: [96, 34], sofa: [150, 68], armchair: [66, 64], coffee: [90, 30], rug: [176, 70], fireplace: [96, 56], lamp: [40, 90], kitchen: [118, 48], dining: [112, 40], bookshelf: [92, 56],
-  bed: [140, 120], bedside: [214, 36], wardrobe: [64, 100], bath: [172, 70], windowseat: [86, 26], bedrug: [168, 62], vanity: [92, 56],
-  hottub: [136, 72], patio: [110, 44], festoon: [400, 40], beds: [280, 30], hammock: [100, 50], firepit: [70, 34]};
-// where the "buy one" tape goes, when it would sit badly in the middle of the footprint
-const GHOST_LAB = {festoon: [260, 118], beds: [260, 230], windowseat: [396, 160], bedside: [270, 300], lamp: [56, 344]};
+// FOOT: the real footprint [w, h] above the front edge, for the dashed outline and the hover
+const FOOT = {sofa: [86, 38], armchair: [38, 40], coffee: [50, 20], rug: [140, 64], fireplace: [76, 62], lamp: [22, 66], kitchen: [138, 40], dining: [64, 36], bookshelf: [50, 44],
+  bed: [66, 84], wardrobe: [48, 80], windowseat: [66, 22], bedrug: [130, 56], vanity: [52, 44],
+  bath: [72, 36], basin: [46, 40], bathrug: [56, 20],
+  hottub: [78, 50], patio: [70, 36], beds: [300, 26], hammock: [104, 44], firepit: [54, 26]};
+const GHOST_LAB = {festoon: [260, 200], windowseat: [400, 196]};
 function pieceSpot(id, draw){
-  const P = PIECES[id], t = tier(id), [ax, ay] = P.at, [sx, sy] = P.stand, [w, h] = FOOT[id] || [60, 40];
-  const hov = id === "festoon" ? hovE(260, 110, 200, 30) : id === "bedside" ? hovE(180, 312, 24, 10) + hovE(360, 312, 24, 10) : hovE(ax, ay - (t ? 6 : h/2), Math.round(w/2 + 6), t ? 13 : Math.round(h/2 + 4));
+  const P = PIECES[id], t = tier(id), [ax, ay] = P.at, [sx, sy] = P.stand, k = K[id] || 1, [w, h] = (FOOT[id] || [40, 30]).map(v => Math.round(v*k));
+  const hov = id === "festoon" ? hovE(260, 200, 220, 24) : id === "bedside" ? hovE(ax - 46, ay - 4, 14, 8) + hovE(ax + 46, ay - 4, 14, 8) : hovE(ax, ay - Math.min(h/2, 10), Math.round(w/2 + 4), Math.max(8, Math.min(16, Math.round(h/3))));
   let body;
-  if (t) body = draw(t);
+  if (t) body = scaled(id, () => draw(t, ax, ay));
   else {
-    const ghost = id === "festoon" ? `<path d="M30 80 Q260 150 490 80" fill="none"/>` : id === "bedside" ? `<rect x="164" y="280" width="32" height="36" rx="4"/><rect x="344" y="280" width="32" height="36" rx="4"/>`
-      : id === "hottub" || id === "rug" || id === "bedrug" || id === "firepit" ? `<ellipse cx="${ax}" cy="${ay - h/2}" rx="${w/2}" ry="${h/2}"/>` : `<rect x="${ax - w/2}" y="${ay - h}" width="${w}" height="${h}" rx="6"/>`;
+    const ghost = id === "festoon" ? `<path d="M32 176 Q260 250 488 176" fill="none"/><path d="M28 262 V172 M492 262 V172"/>` : id === "bedside" ? `<rect x="${ax - 56}" y="${ay - 22}" width="20" height="22" rx="3"/><rect x="${ax + 36}" y="${ay - 22}" width="20" height="22" rx="3"/>`
+      : ["hottub", "rug", "bedrug", "firepit"].includes(id) ? `<ellipse cx="${ax}" cy="${ay - h/2}" rx="${w/2}" ry="${h/2}"/>` : `<rect x="${ax - w/2}" y="${ay - h}" width="${w}" height="${h}" rx="4"/>`;
     const [lx, ly] = GHOST_LAB[id] || [ax, ay - h/2];
-    body = `<g opacity=".38" pointer-events="none"><g fill="${id === "festoon" ? "none" : "#FFFDF6"}" fill-opacity=".35" style="stroke:var(--line)" stroke-width="1.6" stroke-dasharray="6 5">${ghost}</g></g><g opacity=".85">${lab(lx, ly, P.n, "#EFE6D6", 8)}</g>`;
+    body = `<g opacity=".4" pointer-events="none"><g fill="${id === "festoon" ? "none" : "#FFFDF6"}" fill-opacity=".35" style="stroke:var(--line)" stroke-width="1.4" stroke-dasharray="5 4">${ghost}</g></g><g opacity=".85">${lab(lx, ly, P.n, "#EFE6D6", 7)}</g>`;
   }
   return `<g data-cospot="${id}" data-x="${sx}" data-y="${sy}" aria-label="${t ? P.tiers[t - 1].n : `${P.n}: not bought yet`}">${hov}${body}</g>`;
 }
 const otherSpot = (id, aria, hov, body) => { const [sx, sy] = SPOTS[ST.floor][id]; return `<g data-cospot="${id}" data-x="${sx}" data-y="${sy}" aria-label="${aria}">${hov}${body}</g>`; };
 
-/* ---------- the room shell: floor, back wall, beams, windows ---------- */
-function floorArt(y0 = 200){
+/* ---------- the room shell: a low beamed ceiling, the back wall, the floor, windows ---------- */
+function floorArt(y0 = FL){
   let s = `<rect y="${y0}" width="520" height="${640 - y0}" style="fill:${S.floor}"/>`;
-  if (ST.style === "peranakan") {   // painted floor tiles: cream squares with a jade diamond at each corner and a pink flower
-    for (let r = 0; y0 + r*48 < 640; r++) for (let k = 0; k < 11; k++) { const x = k*48, y = y0 + r*48;
-      s += `<rect x="${x}" y="${y}" width="48" height="48" style="fill:${S.floor};stroke:${mix(S.floor, S.floor2, .45)}" stroke-width="1"/><path d="M${x} ${y - 8} l8 8 l-8 8 l-8 -8z" style="fill:${S.floor2}" opacity=".75"/><circle cx="${x + 24}" cy="${y + 24}" r="5" style="fill:${S.fabric}" opacity=".7"/><circle cx="${x + 24}" cy="${y + 24}" r="2" style="fill:${S.metal}"/>`; }
+  if (ST.style === "peranakan") {   // painted floor tiles: cream squares, a jade diamond at each corner, a pink flower
+    for (let r = 0; y0 + r*34 < 640; r++) for (let k = 0; k < 16; k++) { const x = k*34, y = y0 + r*34;
+      s += `<rect x="${x}" y="${y}" width="34" height="34" style="fill:${S.floor};stroke:${mix(S.floor, S.floor2, .4)}" stroke-width=".8"/><path d="M${x} ${y - 6} l6 6 l-6 6 l-6 -6z" style="fill:${S.floor2}" opacity=".7"/><circle cx="${x + 17}" cy="${y + 17}" r="3.4" style="fill:${S.fabric}" opacity=".6"/>`; }
   } else {
-    for (let r = 0; y0 + r*28 < 640; r++) { const y = y0 + r*28;
-      s += `<path d="M0 ${y} H520" style="stroke:${S.floor2}" stroke-width="1.2"/>`;
-      for (let k = 0; k < 4; k++) { const x = Math.round((k*150 + r*67) % 600) - 40; s += `<path d="M${x} ${y} v28" style="stroke:${S.floor2}" stroke-width="1"/>`; }
-      if (r % 2) s += `<path d="M${Math.round(R(r)*400)} ${y + 13} q20 -3 40 0" fill="none" style="stroke:${S.floor2}" stroke-width=".7" opacity=".6"/>`; }
+    for (let r = 0; y0 + r*18 < 640; r++) { const y = y0 + r*18;
+      s += `<path d="M0 ${y} H520" style="stroke:${S.floor2}" stroke-width="1"/>`;
+      for (let k = 0; k < 5; k++) { const x = Math.round((k*130 + r*53) % 650) - 60; s += `<path d="M${x} ${y} v18" style="stroke:${S.floor2}" stroke-width=".9"/>`; }
+      if (r % 3 === 1) s += `<path d="M${Math.round(R(r)*440)} ${y + 9} q14 -2 28 0" fill="none" style="stroke:${S.floor2}" stroke-width=".6" opacity=".6"/>`; }
   }
   return g(s);
+}
+// the low cottage ceiling: plaster between dark oak beams that run towards us, and the wall plate along the top of the wall
+function ceiling(){
+  const plaster = lt(S.wall2, .35), oak = dk(S.wood, .42);
+  let s = `<rect width="520" height="98" style="fill:${plaster}"/>`;
+  for (let k = 0; k < 6; k++) { const xb = 36 + k*90, xt = 260 + (xb - 260)*1.35; s += `<path d="M${f1(xt - 9)} 0 L${f1(xt + 9)} 0 L${xb + 6} 92 L${xb - 6} 92z" style="fill:${oak}"/><path d="M${f1(xt - 3)} 0 L${xb - 1} 92" style="stroke:${dk(S.wood, .55)}" stroke-width=".8"/>`; }
+  s += `<rect y="88" width="520" height="11" style="fill:${dk(S.wood, .35)}"/><path d="M0 88 H520" style="stroke:${INK}" stroke-width="1"/><path d="M0 99 H520" style="stroke:${INK}" stroke-width="1.2"/>`;
+  return s;
 }
 function wallArt(){
-  let s = `<rect width="520" height="200" style="fill:${S.wall}"/>`;
-  // a little pattern on the upper wall for the busier looks
-  if (ST.style === "cottagecore") for (let r = 0; r < 5; r++) for (let k = 0; k < 14; k++) s += `<g opacity=".45"><circle cx="${k*40 + (r % 2)*20 + 10}" cy="${36 + r*20}" r="2" style="fill:${S.fabric}"/><path d="M${k*40 + (r % 2)*20 + 10} ${38 + r*20} l-3 4 M${k*40 + (r % 2)*20 + 10} ${38 + r*20} l3 4" style="stroke:${S.accent}" stroke-width=".8"/></g>`;
-  if (ST.style === "peranakan") for (let k = 0; k < 18; k++) s += `<rect x="${k*30}" y="136" width="30" height="50" style="fill:${k % 2 ? S.floor2 : lt(S.floor2, .45)}" opacity=".55"/><circle cx="${k*30 + 15}" cy="161" r="6" style="fill:${S.fabric}" opacity=".6"/>`;
-  // the dado rail and panelling below it
-  s += `<rect y="132" width="520" height="56" style="fill:${S.wall2}" opacity="${ST.style === "peranakan" ? .35 : 1}"/><rect y="128" width="520" height="5" style="fill:${lt(S.wood, .25)}"/><path d="M0 128 H520 M0 133 H520" style="stroke:${dk(S.wall2, .3)}" stroke-width=".8"/>`;
-  if (["coastal", "scandi", "cottagecore"].includes(ST.style)) s += Array.from({length: 40}, (_, k) => `<path d="M${k*13 + 6} 134 V188" style="stroke:${dk(S.wall2, .15)}" stroke-width=".8"/>`).join("");
-  else if (ST.style === "midcentury" || ST.style === "japandi") s += Array.from({length: 8}, (_, k) => `<rect x="${k*66 + 8}" y="140" width="52" height="40" rx="2" fill="none" style="stroke:${dk(S.wall2, .15)}" stroke-width="1"/>`).join("");
-  // the beams along the ceiling edge, and the joists' ends
-  s += `<rect width="520" height="16" style="fill:${dk(S.wood, .4)}"/><path d="M0 16 H520" style="stroke:${INK}" stroke-width="1.2"/>${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<rect x="${k*72 + 12}" y="14" width="14" height="10" rx="1" style="fill:${dk(S.wood, .5)}"/>`).join("")}`
-    + Array.from({length: 10}, (_, k) => `<path d="M${k*56 + 10} 6 q12 2 24 0" fill="none" style="stroke:${dk(S.wood, .2)}" stroke-width=".8"/>`).join("");
-  // the skirting
-  s += `<rect y="187" width="520" height="13" style="fill:${lt(S.wall2, .2)}"/><path d="M0 187 H520" style="stroke:${dk(S.wall2, .35)}" stroke-width="1"/><path d="M0 200 H520" style="stroke:${INK}" stroke-width="1.4"/>`;
-  return g(s);
+  let s = `<rect y="99" width="520" height="${FL - 99}" style="fill:${S.wall}"/>`;
+  if (ST.style === "cottagecore") for (let r = 0; r < 4; r++) for (let k = 0; k < 18; k++) s += `<g opacity=".4"><circle cx="${k*30 + (r % 2)*15 + 8}" cy="${112 + r*16}" r="1.5" style="fill:${S.fabric}"/><path d="M${k*30 + (r % 2)*15 + 8} ${114 + r*16} l-2 3 M${k*30 + (r % 2)*15 + 8} ${114 + r*16} l2 3" style="stroke:${S.accent}" stroke-width=".6"/></g>`;
+  // the dado rail at about a metre, and panelling below it
+  s += `<rect y="176" width="520" height="${FL - 176}" style="fill:${S.wall2}" opacity="${ST.style === "peranakan" ? .5 : 1}"/><rect y="173" width="520" height="4" style="fill:${lt(S.wood, .25)}"/>`;
+  if (ST.style === "peranakan") for (let k = 0; k < 26; k++) s += `<rect x="${k*20}" y="178" width="20" height="24" style="fill:${k % 2 ? S.floor2 : lt(S.floor2, .45)}" opacity=".55"/><circle cx="${k*20 + 10}" cy="190" r="4" style="fill:${S.fabric}" opacity=".6"/>`;
+  else if (["coastal", "scandi", "cottagecore"].includes(ST.style)) s += Array.from({length: 58}, (_, k) => `<path d="M${k*9 + 4} 178 V202" style="stroke:${dk(S.wall2, .15)}" stroke-width=".6"/>`).join("");
+  else s += Array.from({length: 11}, (_, k) => `<rect x="${k*48 + 6}" y="181" width="38" height="18" rx="1" fill="none" style="stroke:${dk(S.wall2, .15)}" stroke-width=".8"/>`).join("");
+  s += `<rect y="202" width="520" height="${FL - 202}" style="fill:${lt(S.wall2, .2)}"/><path d="M0 202 H520" style="stroke:${dk(S.wall2, .35)}" stroke-width=".8"/><path d="M0 ${FL} H520" style="stroke:${INK}" stroke-width="1.3"/>`;
+  return g(ceiling() + s);
 }
-// what you see through a window: the sky, the downs and a hedge by day; dark blue, the moon and stars by night
+// a thin strip of the left-hand wall, for the doors in it
+const sideWall = () => g(`<path d="M0 ${FL} H14 V640 H0z" style="fill:${S.wall2}"/>` + sk("", `<path d="M14 ${FL} V640"/>`));
+// what you see through a window: sky, downs and a hedge by day; dark blue, the moon and stars by night
 function view(x, y, w, h, seed = 0){
-  if (NIGHT) return `<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:#26325E"/><rect x="${x}" y="${y + h*.6}" width="${w}" height="${h*.4}" style="fill:#1E284C"/>`
-    + [0, 1, 2, 3, 4].map(k => `<circle cx="${f1(x + 4 + R(seed + k)*(w - 8))}" cy="${f1(y + 4 + R(seed*2 + k*3)*h*.5)}" r="${f1(.8 + R(k)*.8)}" fill="#FFF3C4"/>`).join("")
-    + (seed % 2 ? `<path d="M${x + w*.72} ${y + 10} a6 6 0 1 0 6 8 a5 5 0 1 1 -6 -8z" fill="#FFF3C4"/>` : "");
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:#CFE6F2"/><ellipse cx="${x + w*.3}" cy="${y + h*.25}" rx="${w*.18}" ry="4" fill="#FFFFFF" opacity=".8"/>`
-    + `<path d="M${x} ${y + h*.62} q${w*.3} ${-h*.18} ${w*.6} ${-h*.06} q${w*.25} ${-h*.08} ${w*.4} ${h*.02} V${y + h} H${x}z" style="fill:#A9C98A"/><path d="M${x} ${y + h*.8} q${w*.5} ${-h*.1} ${w} 0 V${y + h} H${x}z" style="fill:#7FA86A"/>`
-    + [0, 1, 2].map(k => `<circle cx="${f1(x + w*(.2 + k*.3))}" cy="${f1(y + h*.82)}" r="${f1(w*.09)}" style="fill:#6E9A5A"/>`).join("");
+  if (NIGHT) return `<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:#26325E"/><rect x="${x}" y="${f1(y + h*.65)}" width="${w}" height="${f1(h*.35)}" style="fill:#1E284C"/>`
+    + [0, 1, 2, 3].map(k => `<circle cx="${f1(x + 3 + R(seed + k)*(w - 6))}" cy="${f1(y + 3 + R(seed*2 + k*3)*h*.5)}" r=".9" fill="#FFF3C4"/>`).join("")
+    + (seed % 2 ? `<path d="M${f1(x + w*.7)} ${y + 7} a4 4 0 1 0 4 5 a3.4 3.4 0 1 1 -4 -5z" fill="#FFF3C4"/>` : "");
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:#CFE6F2"/><ellipse cx="${f1(x + w*.3)}" cy="${f1(y + h*.22)}" rx="${f1(w*.16)}" ry="2.4" fill="#FFFFFF" opacity=".8"/>`
+    + `<path d="M${x} ${f1(y + h*.62)} q${f1(w*.3)} ${f1(-h*.16)} ${f1(w*.6)} ${f1(-h*.05)} q${f1(w*.25)} ${f1(-h*.07)} ${f1(w*.4)} ${f1(h*.02)} V${y + h} H${x}z" style="fill:#A9C98A"/><path d="M${x} ${f1(y + h*.82)} q${f1(w*.5)} ${f1(-h*.08)} ${w} 0 V${y + h} H${x}z" style="fill:#7FA86A"/>`;
 }
 let CID = 0;
-function windowArt(x, y, w, h, {curtains = true, seed = 1} = {}){
-  const id = `coWin${++CID}`;
-  let s = `<rect x="${x - 6}" y="${y - 6}" width="${w + 12}" height="${h + 12}" rx="2" style="fill:${lt(S.wall2, .1)}"/>`;
-  s += `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath></defs><g clip-path="url(#${id})">${view(x, y, w, h, seed)}</g>`;
-  const frame = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" style="stroke:${CREAM}" stroke-width="4"/>`;
-  const bars = `<path d="M${x + w/2} ${y} v${h} M${x} ${y + h*.48} h${w}" style="stroke:${CREAM}" stroke-width="2.6"/>`;
-  s += sk(frame + bars + `<rect x="${x - 9}" y="${y + h + 3}" width="${w + 18}" height="6" rx="1" style="fill:${lt(S.wood, .2)}"/>`, `<rect x="${x}" y="${y}" width="${w}" height="${h}"/><rect x="${x - 9}" y="${y + h + 3}" width="${w + 18}" height="6" rx="1"/>`);
-  if (ST.c === "bluebell") {   // Bluebell's blue shutters, folded back against the wall
+const clip = (x, y, w, h, inner) => { const id = `coClip${++CID}`; return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath></defs><g clip-path="url(#${id})">${inner}</g>`; };
+function windowArt(x, y, w, h, {curtains = true, seed = 1, shutters = true} = {}){
+  let s = `<rect x="${x - 4}" y="${y - 4}" width="${w + 8}" height="${h + 8}" rx="1" style="fill:${lt(S.wall2, .1)}"/>` + clip(x, y, w, h, view(x, y, w, h, seed));
+  s += sk(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" style="stroke:${CREAM}" stroke-width="3"/><path d="M${x + w/2} ${y} v${h} M${x} ${f1(y + h*.48)} h${w}" style="stroke:${CREAM}" stroke-width="2"/><rect x="${x - 6}" y="${y + h + 2}" width="${w + 12}" height="4" rx="1" style="fill:${lt(S.wood, .2)}"/>`,
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}"/><rect x="${x - 6}" y="${y + h + 2}" width="${w + 12}" height="4" rx="1"/>`);
+  if (shutters && ST.c === "bluebell") {   // Bluebell's blue shutters, folded back against the wall
     const sw = Math.round(w*.34);
-    s += [x - 8 - sw, x + w + 8].map(sx => D(`<rect x="${sx}" y="${y - 4}" width="${sw}" height="${h + 8}" rx="1" style="fill:${BLUE}"/>`, Array.from({length: Math.floor((h + 4)/8)}, (_, k) => `<path d="M${sx + 2} ${y + 2 + k*8} h${sw - 4}" style="stroke:${BLUE2}" stroke-width="1.2"/>`).join(""))).join("");
+    s += [x - 5 - sw, x + w + 5].map(sx => D(`<rect x="${sx}" y="${y - 2}" width="${sw}" height="${h + 4}" rx="1" style="fill:${BLUE}"/>`, Array.from({length: Math.floor((h + 2)/6)}, (_, k) => `<path d="M${sx + 2} ${y + 2 + k*6} h${sw - 4}" style="stroke:${BLUE2}" stroke-width=".9"/>`).join(""))).join("");
   }
-  if (curtains) s += D(`<path d="M${x - 10} ${y - 10} h${w*.28} q-6 ${h*.5} ${-2} ${h*.6} q4 ${h*.2} -6 ${h*.48} h${-w*.18} q-4 ${-h*.5} 0 ${-h*1.08}z" style="fill:${S.fabric2}"/><path d="M${x + w + 10} ${y - 10} h${-w*.28} q6 ${h*.5} 2 ${h*.6} q-4 ${h*.2} 6 ${h*.48} h${w*.18} q4 ${-h*.5} 0 ${-h*1.08}z" style="fill:${S.fabric2}"/>`,
-    `<path d="M${x - 14} ${y - 12} H${x + w + 14}" style="stroke:${dk(S.wood, .3)}" stroke-width="3" stroke-linecap="round"/><path d="M${x - 2} ${y + h*.62} q4 2 8 0 M${x + w + 2} ${y + h*.62} q-4 2 -8 0" style="stroke:${S.accent}" stroke-width="2"/>`);
+  if (curtains) s += D(`<path d="M${x - 7} ${y - 7} h${f1(w*.26)} q-4 ${f1(h*.5)} -1 ${f1(h*.6)} q3 ${f1(h*.2)} -4 ${f1(h*.48)} h${f1(-w*.17)} q-3 ${f1(-h*.5)} 0 ${f1(-h*1.08)}z" style="fill:${S.fabric2}"/><path d="M${x + w + 7} ${y - 7} h${f1(-w*.26)} q4 ${f1(h*.5)} 1 ${f1(h*.6)} q-3 ${f1(h*.2)} 4 ${f1(h*.48)} h${f1(w*.17)} q3 ${f1(-h*.5)} 0 ${f1(-h*1.08)}z" style="fill:${S.fabric2}"/>`,
+    `<path d="M${x - 10} ${y - 8} H${x + w + 10}" style="stroke:${dk(S.wood, .3)}" stroke-width="2.4" stroke-linecap="round"/><path d="M${x - 1} ${f1(y + h*.62)} q3 1.4 6 0 M${x + w + 1} ${f1(y + h*.62)} q-3 1.4 -6 0" style="stroke:${S.accent}" stroke-width="1.6"/>`);
   return g(s);
 }
-// the night: the room dims a little and the warm lights glow
 const nightWash = () => `<rect width="520" height="640" fill="#2E3470" opacity=".3" style="mix-blend-mode:multiply" pointer-events="none"/>`;
 const glowDefs = `<defs><radialGradient id="coGlow"><stop offset="0" stop-color="#FFD98A" stop-opacity=".6"/><stop offset=".45" stop-color="#FFC66B" stop-opacity=".22"/><stop offset="1" stop-color="#FFC66B" stop-opacity="0"/></radialGradient></defs>`;
 
 /* ---------- deliveries waiting: wrapped crates and parcels with string ---------- */
-const SLOTS = {down: [[334, 612], [372, 612], [352, 586], [316, 562], [356, 560]], up: [[172, 612], [210, 612], [190, 586], [228, 586], [154, 586]], bath: [[170, 612], [134, 612], [152, 586], [350, 612], [388, 612]], garden: [[330, 584], [368, 584], [348, 560], [386, 560]]};
+const SLOTS = {down: [[332, 612], [360, 612], [346, 592], [318, 592], [374, 592]], up: [[160, 612], [188, 612], [174, 592], [202, 592], [146, 592]],
+  bath: [[176, 612], [148, 612], [162, 592], [346, 612], [374, 612]], garden: [[372, 578], [400, 578], [386, 558], [160, 578]]};
 function crates(){
   const here = (ST.crates || []).filter(id => { const r = (PIECES[id] || ACCESSORIES[id] || {}).room; return r ? r === ST.floor : ST.floor === "down"; });
   return g(here.slice(0, SLOTS[ST.floor].length).map((id, i) => { const [x, y] = SLOTS[ST.floor][i];
-    if (PIECES[id]) return D(`<rect x="${x - 17}" y="${y - 26}" width="34" height="26" rx="1" style="fill:#C9A26A"/>`, `${[0, 1, 2].map(k => `<path d="M${x - 17} ${y - 20 + k*8} h34" stroke="#9A7A4A" stroke-width="1"/>`).join("")}<path d="M${x} ${y - 26} v26 M${x - 17} ${y - 13} h34" stroke="#8A3A2A" stroke-width="1.6"/><path d="M${x} ${y - 26} q-7 -7 -8 0 q1 3 8 0 q7 -7 8 0 q-1 3 -8 0" fill="none" stroke="#8A3A2A" stroke-width="1.4"/><rect x="${x + 6}" y="${y - 10}" width="9" height="6" rx="1" fill="${CREAM}" stroke="${INK}" stroke-width=".5" transform="rotate(8 ${x + 10} ${y - 7})"/>`);
-    return D(`<rect x="${x - 13}" y="${y - 18}" width="26" height="18" rx="2" style="fill:#D8B98A"/>`, `<path d="M${x} ${y - 18} v18 M${x - 13} ${y - 9} h26" stroke="#7A4A2A" stroke-width="1.3"/><path d="M${x} ${y - 18} q-6 -6 -6 0 q1 2 6 0 q6 -6 6 0 q-1 2 -6 0" fill="none" stroke="#7A4A2A" stroke-width="1.2"/>`);
+    if (PIECES[id]) return D(`<rect x="${x - 12}" y="${y - 18}" width="24" height="18" rx="1" style="fill:#C9A26A"/>`, `<path d="M${x - 12} ${y - 12} h24 M${x - 12} ${y - 6} h24" stroke="#9A7A4A" stroke-width=".8"/><path d="M${x} ${y - 18} v18 M${x - 12} ${y - 9} h24" stroke="#8A3A2A" stroke-width="1.3"/><path d="M${x} ${y - 18} q-5 -5 -6 0 q1 2 6 0 q5 -5 6 0 q-1 2 -6 0" fill="none" stroke="#8A3A2A" stroke-width="1.1"/>`);
+    return D(`<rect x="${x - 9}" y="${y - 12}" width="18" height="12" rx="1.5" style="fill:#D8B98A"/>`, `<path d="M${x} ${y - 12} v12 M${x - 9} ${y - 6} h18" stroke="#7A4A2A" stroke-width="1.1"/><path d="M${x} ${y - 12} q-4 -4 -4 0 q1 1.4 4 0 q4 -4 4 0 q-1 1.4 -4 0" fill="none" stroke="#7A4A2A" stroke-width="1"/>`);
   }).join(""));
 }
 
 /* ====================================================================================================== */
-/* ---------- downstairs ---------- */
-function fireplace(t){
-  const fire = (x, y, s) => `<path d="M${x - 14*s} ${y} l${28*s} -4 M${x - 12*s} ${y - 4} l${24*s} 4" stroke="#6B4A2E" stroke-width="${4*s}" stroke-linecap="round"/>` + flame(x - 5*s, y - 4, s) + flame(x + 5*s, y - 4, s*.8) + flame(x, y - 5, s*1.2);
-  glow(110, 232, t === 3 ? 70 : 56);
-  if (t === 1) return D(`<rect x="72" y="240" width="76" height="12" rx="2" style="fill:#8E8A86"/><rect x="106" y="197" width="8" height="14" style="fill:#3A3634"/><rect x="86" y="207" width="48" height="5" rx="1" style="fill:#4A4644"/><rect x="88" y="211" width="44" height="31" rx="3" style="fill:#3A3634"/><rect x="96" y="217" width="28" height="19" rx="2" style="fill:#2A201C"/>`,
-    fire(110, 234, .7) + `<path d="M92 242 v4 M128 242 v4" stroke="#3A3634" stroke-width="3"/><circle cx="110" cy="214" r="1.6" fill="${S.metal}"/>`);
-  if (t === 2) return D(`<rect x="60" y="244" width="100" height="10" rx="2" style="fill:#B8AE9E"/><rect x="66" y="197" width="88" height="49" style="fill:#CFC4B2"/><path d="M84 246 V222 q26 -16 52 0 V246z" style="fill:#2E2622"/>`,
-    [0, 1, 2].map(r => `<path d="M66 ${208 + r*13} h18 M136 ${208 + r*13} h18" stroke="#A89C88" stroke-width="1"/><path d="M${74 + (r % 2)*6} ${197 + r*13} v13 M${144 - (r % 2)*6} ${197 + r*13} v13" stroke="#A89C88" stroke-width="1"/>`).join("") + `<path d="M92 204 h36" stroke="#A89C88" stroke-width="1"/>` + fire(110, 244, 1));
-  return D(`<rect x="62" y="194" width="96" height="56" style="fill:${S.wood}"/><rect x="78" y="202" width="64" height="48" style="fill:${lt(S.accent, .35)}"/><path d="M88 250 V224 q22 -16 44 0 V250z" style="fill:#2E2622"/><rect x="54" y="187" width="112" height="9" rx="2" style="fill:${dk(S.wood, .15)}"/><rect x="58" y="252" width="104" height="5" rx="2" style="fill:${S.metal}"/><path d="M160 252 l4 -20 h22 l4 20z" style="fill:#C9A26A"/>`,
-    `${[0, 1, 2, 3].map(k => `<path d="M${66 + k*3} 198 v50 M${146 + k*3} 198 v50" stroke="${dk(S.wood, .3)}" stroke-width=".7"/>`).join("")}${[0, 1, 2, 3, 4, 5].map(k => `<rect x="${79 + (k % 2)*54}" y="${203 + Math.floor(k/2)*15}" width="8" height="12" fill="${S.accent}" opacity=".7"/>`).join("")}`
-    + `<path d="M60 196 q4 6 10 6 M160 196 q-4 6 -10 6" stroke="${dk(S.wood, .3)}" stroke-width="2" fill="none"/>` + fire(110, 248, 1.2)
-    + [0, 1, 2, 3, 4, 5, 6, 7, 8].map(k => `<ellipse cx="${60 + k*13}" cy="${187 + (k % 2)}" rx="6" ry="3" fill="${k % 3 ? "#6E9A5A" : "#88AE6A"}"/>`).join("") + `<circle cx="84" cy="186" r="2" fill="#C8483A"/><circle cx="132" cy="187" r="2" fill="#C8483A"/>`
-    + [0, 1, 2].map(k => `<ellipse cx="${170 + k*7}" cy="${232}" rx="4" ry="3" fill="#8A6A52" stroke="${INK}" stroke-width=".5"/>`).join(""));
-}
+/* ---------- downstairs: the sitting room round the fire, the kitchen and the dining table ---------- */
 function chimney(){   // the chimney breast and its oak beam: part of the cottage, there before any fireplace
-  return g(`<rect x="62" y="16" width="96" height="172" style="fill:${mix(S.wall, S.wall2, .55)}"/><path d="M62 128 h96" stroke="${dk(S.wall2, .2)}" stroke-width="1"/>` + sk("", `<path d="M62 16 V188 M158 16 V188"/>`) + D(`<rect x="58" y="188" width="104" height="9" rx="1" style="fill:${dk(S.wood, .25)}"/>`, `<path d="M64 192 q20 -2 40 0 q20 2 50 -1" fill="none" stroke="${dk(S.wood, .45)}" stroke-width=".7"/>`));
+  const [x] = at("fireplace");
+  return g(`<rect x="${x - 38}" y="99" width="76" height="${FL - 99}" style="fill:${mix(S.wall, S.wall2, .5)}"/>` + sk("", `<path d="M${x - 38} 99 V${FL} M${x + 38} 99 V${FL}"/>`)
+    + D(`<rect x="${x - 40}" y="176" width="80" height="6" rx="1" style="fill:${dk(S.wood, .25)}"/>`, `<path d="M${x - 34} 179 q20 -1 40 0 q14 1 28 -1" fill="none" stroke="${dk(S.wood, .45)}" stroke-width=".6"/>`));
 }
-function bookshelf(t){
-  if (t === 1) return D(`${[[206, 196], [206, 222], [206, 246]].map(([x, y]) => `<rect x="${x - 4}" y="${y}" width="96" height="5" rx="1" style="fill:${lt(S.wood, .15)}"/>`).join("")}${[210, 280].map(x => `<rect x="${x}" y="201" width="12" height="21" style="fill:#B8583C"/><rect x="${x}" y="227" width="12" height="19" style="fill:#B8583C"/>`).join("")}`,
-    books(224, 278, 222, 3, 19) + books(224, 278, 246, 7, 18) + [210, 280].map(x => `<path d="M${x} 211 h12 M${x} 236 h12" stroke="#8E3E2A" stroke-width=".8"/>`).join(""));
-  const lower = (x0, x1) => `<rect x="${x0}" y="196" width="${x1 - x0}" height="56" style="fill:${S.wood}"/><rect x="${x0 + 5}" y="201" width="${x1 - x0 - 10}" height="46" style="fill:${dk(S.wood, .35)}"/><rect x="${x0 - 2}" y="194" width="${x1 - x0 + 4}" height="5" rx="1" style="fill:${dk(S.wood, .1)}"/>`;
-  if (t === 2) return D(lower(204, 296), `<path d="M209 224 h82" stroke="${S.wood}" stroke-width="3"/>` + books(210, 290, 222, 5) + books(210, 290, 247, 11));
-  // the library wall: shelves either side of the window, a bridge over it, and a ladder on a rail
-  return D(`<rect x="198" y="18" width="28" height="178" style="fill:${S.wood}"/><rect x="274" y="18" width="28" height="178" style="fill:${S.wood}"/><rect x="198" y="18" width="104" height="18" style="fill:${S.wood}"/>` + lower(198, 302),
-    [0, 1, 2, 3].map(k => `<rect x="202" y="${40 + k*38}" width="20" height="34" fill="${dk(S.wood, .35)}"/><rect x="278" y="${40 + k*38}" width="20" height="34" fill="${dk(S.wood, .35)}"/>` + books(203, 222, 74 + k*38, k*5 + 2, 22) + books(279, 298, 74 + k*38, k*7 + 4, 22)).join("")
-    + `<path d="M203 222 h94" stroke="${S.wood}" stroke-width="3"/>` + books(204, 296, 222, 9) + books(204, 296, 247, 13) + books(206, 294, 34, 17, 14)
-    + `<path d="M196 30 h108" stroke="${S.metal}" stroke-width="2"/><path d="M262 30 L276 252 M282 30 L296 252" stroke="${dk(S.wood, .4)}" stroke-width="3"/>${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<path d="M${263 + k*1.7} ${50 + k*26} h20" stroke="${dk(S.wood, .4)}" stroke-width="2"/>`).join("")}`);
+function fireplace(t, x, y){
+  const fire = (fy, s) => `<path d="M${x - 9*s} ${fy} l${18*s} -3 M${x - 8*s} ${fy - 3} l${16*s} 3" stroke="#6B4A2E" stroke-width="${3*s}" stroke-linecap="round"/>` + flame(x - 3*s, fy - 2, s*.7) + flame(x + 3*s, fy - 2, s*.55) + flame(x, fy - 3, s*.85);
+  glow(x, y - 26, t === 3 ? 56 : 46);
+  const hearth = `<rect x="${x - 36}" y="${y - 10}" width="72" height="10" rx="1" style="fill:${t === 3 ? "#E8E2D8" : t === 2 ? "#B8AE9E" : "#8E8A86"}"/>`;
+  if (t === 1) return D(hearth + `<rect x="${x - 3}" y="182" width="6" height="${y - 42 - 182}" style="fill:#3A3634"/><rect x="${x - 16}" y="${y - 44}" width="32" height="4" rx="1" style="fill:#4A4644"/><rect x="${x - 14}" y="${y - 40}" width="28" height="27" rx="2" style="fill:#3A3634"/><rect x="${x - 9}" y="${y - 35}" width="18" height="15" rx="1.5" style="fill:#2A201C"/>`,
+    fire(y - 22, .7) + `<path d="M${x - 11} ${y - 13} v3 M${x + 11} ${y - 13} v3" stroke="#3A3634" stroke-width="2.4"/><path d="M${x + 22} ${y - 10} v-16 M${x + 25} ${y - 10} v-14" stroke="${S.metal}" stroke-width="1.4"/>`);
+  if (t === 2) return D(hearth + `<rect x="${x - 32}" y="182" width="64" height="${y - 10 - 182}" style="fill:#CFC4B2"/><path d="M${x - 18} ${y - 10} V${y - 32} q18 -12 36 0 V${y - 10}z" style="fill:#2E2622"/>`,
+    [0, 1, 2].map(r => `<path d="M${x - 32} ${190 + r*12} h14 M${x + 18} ${190 + r*12} h14" stroke="#A89C88" stroke-width=".8"/><path d="M${x - 26 + (r % 2)*5} ${182 + r*12} v12 M${x + 26 - (r % 2)*5} ${182 + r*12} v12" stroke="#A89C88" stroke-width=".8"/>`).join("") + fire(y - 12, 1));
+  return D(hearth + `<rect x="${x - 34}" y="182" width="68" height="${y - 10 - 182}" style="fill:${S.wood}"/><rect x="${x - 24}" y="188" width="48" height="${y - 10 - 188}" style="fill:${lt(S.accent, .35)}"/><path d="M${x - 15} ${y - 10} V${y - 30} q15 -11 30 0 V${y - 10}z" style="fill:#2E2622"/><rect x="${x - 42}" y="174" width="84" height="8" rx="1.5" style="fill:${dk(S.wood, .15)}"/><path d="M${x + 40} ${y} l2 -14 h14 l2 14z" style="fill:#C9A26A"/>`,
+    `${[0, 1, 2].map(k => `<path d="M${x - 32 + k*3} 184 v${y - 196} M${x + 26 + k*3} 184 v${y - 196}" stroke="${dk(S.wood, .3)}" stroke-width=".6"/>`).join("")}${[0, 1, 2, 3].map(k => `<rect x="${x - 23 + (k % 2)*40}" y="${190 + Math.floor(k/2)*12}" width="6" height="10" fill="${S.accent}" opacity=".7"/>`).join("")}`
+    + `<path d="M${x - 30} ${y - 8} h60" stroke="${S.metal}" stroke-width="2.4"/>` + fire(y - 12, 1.1)
+    + Array.from({length: 11}, (_, k) => `<ellipse cx="${x - 40 + k*8}" cy="${174 + (k % 2)}" rx="4.4" ry="2.4" fill="${k % 3 ? "#6E9A5A" : "#88AE6A"}"/>`).join("") + `<circle cx="${x - 20}" cy="173" r="1.6" fill="#C8483A"/><circle cx="${x + 18}" cy="174" r="1.6" fill="#C8483A"/>`
+    + [0, 1, 2].map(k => `<ellipse cx="${x + 45 + k*4}" cy="${y - 14}" rx="3" ry="2.2" fill="#8A6A52" stroke="${INK}" stroke-width=".4"/>`).join(""));
 }
-function kitchen(t){
-  const top = `<rect x="342" y="205" width="120" height="8" rx="1" style="fill:${t === 3 ? dk(S.wood, .1) : lt(S.wood, .25)}"/>`;
-  if (t === 1) return D(`<rect x="346" y="213" width="112" height="41" style="fill:${S.wall2}"/>${top}<rect x="354" y="199" width="40" height="7" rx="1" style="fill:#3A3634"/><path d="M410 205 h36 l-3 7 h-30z" style="fill:#C3C8CC"/><rect x="346" y="134" width="30" height="4" style="fill:${S.wood}"/>`,
-    `<path d="M348 214 q14 4 26 0 q14 4 26 0 v38 h-52z" fill="${S.fabric}" opacity=".85"/>${[0, 1, 2, 3].map(k => `<path d="M${352 + k*12} 214 v38" stroke="${lt(S.fabric, .5)}" stroke-width="2"/>`).join("")}<ellipse cx="366" cy="200" rx="7" ry="2" fill="none" stroke="#8A8E92" stroke-width="1.2"/><ellipse cx="383" cy="200" rx="7" ry="2" fill="none" stroke="#8A8E92" stroke-width="1.2"/><path d="M428 205 v-12 q0 -4 6 -4" fill="none" stroke="#8A9096" stroke-width="2"/><path d="M360 194 q0 -10 9 -10 q9 0 9 10z" fill="${S.accent}" stroke="${INK}" stroke-width=".7"/><path d="M378 190 l6 -3" stroke="${INK}" stroke-width="1"/><rect x="350" y="122" width="8" height="12" rx="2" fill="#E8D9B8" stroke="${INK}" stroke-width=".6"/><rect x="362" y="124" width="8" height="10" rx="2" fill="${S.fabric}" stroke="${INK}" stroke-width=".6"/>`);
-  const cup = t === 3 ? mix(S.accent, "#FFFFFF", .35) : mix(S.accent, "#FFFFFF", .5);
-  const range = (x, w) => `<rect x="${x}" y="196" width="${w}" height="58" rx="3" style="fill:${S.accent}"/><rect x="${x - 2}" y="193" width="${w + 4}" height="6" rx="1" style="fill:${dk(S.accent, .2)}"/><rect x="${x + 4}" y="214" width="${w/2 - 6}" height="34" rx="2" style="fill:${dk(S.accent, .12)}"/><rect x="${x + w/2 + 2}" y="214" width="${w/2 - 6}" height="34" rx="2" style="fill:${dk(S.accent, .12)}"/>`;
-  const rangeDet = (x, w) => `<path d="M${x + 3} 210 h${w - 6}" stroke="#C3C8CC" stroke-width="2"/>${[0, 1, 2, 3].map(k => `<circle cx="${x + 8 + k*(w - 16)/3}" cy="203" r="1.8" fill="#C3C8CC"/>`).join("")}<path d="M${x + 8} 220 h${w/2 - 16} M${x + w/2 + 6} 220 h${w/2 - 16}" stroke="#C3C8CC" stroke-width="1.6"/>`;
-  const doors = (x0, x1) => Array.from({length: Math.floor((x1 - x0)/24)}, (_, k) => `<rect x="${x0 + 3 + k*24}" y="217" width="20" height="33" rx="1.5" fill="none" stroke="${dk(cup, .2)}" stroke-width="1"/><circle cx="${x0 + 19 + k*24}" cy="226" r="1.6" fill="${S.metal}"/>`).join("");
-  if (t === 2) return D(`<rect x="346" y="213" width="112" height="41" style="fill:${cup}"/>${top}${range(346, 48)}<path d="M410 204 h36 v12 h-36z" style="fill:${CREAM}"/><rect x="430" y="58" width="30" height="70" rx="1" style="fill:${S.wood}"/><rect x="344" y="132" width="26" height="4" style="fill:${S.wood}"/>`,
-    rangeDet(346, 48) + doors(398, 458) + `<path d="M428 205 v-12 q0 -4 6 -4" fill="none" stroke="${S.metal}" stroke-width="2"/>` + [0, 1, 2].map(r => `<path d="M432 ${80 + r*22} h26" stroke="${dk(S.wood, .3)}" stroke-width="2"/>${[0, 1, 2].map(k => `<circle cx="${437 + k*8}" cy="${72 + r*22}" r="5" fill="${CREAM}" stroke="${S.accent}" stroke-width="1.2"/>`).join("")}`).join("")
-      + `<rect x="348" y="120" width="8" height="12" rx="2" fill="#E8D9B8" stroke="${INK}" stroke-width=".6"/><rect x="359" y="122" width="8" height="10" rx="2" fill="${S.fabric}" stroke="${INK}" stroke-width=".6"/>`);
-  // the farmhouse kitchen: tiled splashback, a big range under its mantle, a butler sink, copper pans, herbs on the sill
-  return D(`<rect x="342" y="150" width="120" height="55" style="fill:${CREAM}"/><rect x="346" y="213" width="112" height="41" style="fill:${cup}"/>${top}<rect x="342" y="118" width="58" height="32" style="fill:${S.wall2}"/><rect x="338" y="114" width="66" height="6" rx="1" style="fill:${dk(S.wood, .1)}"/>${range(346, 54)}<rect x="412" y="203" width="40" height="16" rx="1" style="fill:${CREAM}"/><rect x="430" y="40" width="32" height="4" style="fill:${S.metal}"/>`,
-    Array.from({length: 30}, (_, k) => `<rect x="${342 + (k % 10)*12}" y="${152 + Math.floor(k/10)*17}" width="11" height="16" fill="${k % 3 === 1 ? lt(S.accent, .3) : CREAM}" stroke="${mix(S.accent, "#FFFFFF", .5)}" stroke-width=".6"/>`).join("")
-    + rangeDet(346, 54) + doors(404, 458) + `<path d="M424 205 v-14 q0 -4 6 -4" fill="none" stroke="${S.metal}" stroke-width="2.2"/>`
-    + [436, 452].map((x, k) => `<path d="M${x} 44 v6" stroke="${INK}" stroke-width="1"/><circle cx="${x}" cy="${58 + k*2}" r="${7 - k}" fill="#C9824A" stroke="${INK}" stroke-width=".7"/><path d="M${x} ${51} v-2" stroke="#8A4A2A" stroke-width="2"/>`).join("")
-    + [380, 396, 412].map((x, k) => `<path d="M${x - 5} 122 h10 l-2 6 h-6z" fill="#C8643B" stroke="${INK}" stroke-width=".5"/>${[0, 1, 2].map(j => `<ellipse cx="${x - 3 + j*3}" cy="${116 - (j % 2)*3}" rx="2.4" ry="4" fill="${k === 1 ? "#88AE6A" : "#6E9A5A"}"/>`).join("")}`).join("")
-    + `<rect x="352" y="128" width="8" height="12" rx="2" fill="#E8D9B8" stroke="${INK}" stroke-width=".6"/>`);
+function bookshelf(t, x, y){
+  if (t === 1) return D(`${[y - 27, y - 14, y - 2].map(py => `<rect x="${x - 24}" y="${py}" width="48" height="3" rx="1" style="fill:${lt(S.wood, .15)}"/>`).join("")}${[x - 22, x + 16].map(bx => `<rect x="${bx}" y="${y - 24}" width="6" height="10" style="fill:#B8583C"/><rect x="${bx}" y="${y - 11}" width="6" height="9" style="fill:#B8583C"/>`).join("")}`,
+    books(x - 15, x + 15, y - 14, 3, 10) + books(x - 15, x + 15, y - 2, 7, 9) + `<path d="M${x - 20} ${y - 30} l4 -6 l4 6z M${x + 12} ${y - 27} v-6 h6 v6z" fill="${S.accent}" stroke="${INK}" stroke-width=".4"/>`);
+  if (t === 2) return D(`<rect x="${x - 22}" y="${y - 76}" width="44" height="76" style="fill:${S.wood}"/><rect x="${x - 18}" y="${y - 72}" width="36" height="66" style="fill:${dk(S.wood, .35)}"/><rect x="${x - 24}" y="${y - 80}" width="48" height="5" rx="1" style="fill:${dk(S.wood, .1)}"/>`,
+    [0, 1, 2].map(k => `<path d="M${x - 18} ${y - 55 + k*17} h36" stroke="${S.wood}" stroke-width="2"/>`).join("") + books(x - 17, x + 17, y - 56, 5) + books(x - 17, x + 10, y - 39, 9) + books(x - 17, x + 17, y - 22, 11) + `<path d="M${x + 11} ${y - 40} q3 -8 6 0z" fill="${S.accent}"/>` + books(x - 17, x + 17, y - 6, 13));
+  // the library wall: floor to ceiling, a ladder on a brass rail
+  return D(`<rect x="${x - 32}" y="99" width="64" height="${y - 99}" style="fill:${S.wood}"/><rect x="${x - 28}" y="104" width="56" height="${y - 110}" style="fill:${dk(S.wood, .35)}"/>`,
+    Array.from({length: 7}, (_, k) => { const by = 122 + k*18; return `<path d="M${x - 28} ${by} h56" stroke="${S.wood}" stroke-width="2"/>` + (by < y - 4 ? books(x - 27, x + 27, by - 1, k*5 + 2, 13) : ""); }).join("")
+    + `<path d="M${x - 34} 108 h68" stroke="${S.metal}" stroke-width="1.6"/><path d="M${x + 12} 108 L${x + 20} ${y} M${x + 22} 108 L${x + 30} ${y}" stroke="${dk(S.wood, .45)}" stroke-width="2.2"/>${Array.from({length: 7}, (_, k) => `<path d="M${f1(x + 13 + k*1.15)} ${120 + k*18} h10" stroke="${dk(S.wood, .45)}" stroke-width="1.6"/>`).join("")}`);
+}
+function kitchen(t, x, y){
+  const x0 = x - 66, x1 = x + 68, top = `<rect x="${x0 - 2}" y="${y - 38}" width="${x1 - x0 + 4}" height="8" rx="1" style="fill:${t === 3 ? dk(S.wood, .1) : lt(S.wood, .25)}"/>`;
+  const cup = t === 3 ? mix(S.accent, "#FFFFFF", .35) : t === 2 ? mix(S.accent, "#FFFFFF", .5) : S.wall2;
+  const doors = (a, b) => Array.from({length: Math.floor((b - a)/18)}, (_, k) => `<rect x="${a + 2 + k*18}" y="${y - 27}" width="15" height="24" rx="1" fill="none" stroke="${dk(cup, .2)}" stroke-width=".8"/><circle cx="${a + 14 + k*18}" cy="${y - 20}" r="1.2" fill="${S.metal}"/>`).join("");
+  const range = (rx, w) => `<rect x="${rx}" y="${y - 36}" width="${w}" height="36" rx="2" style="fill:${S.accent}"/><rect x="${rx - 1}" y="${y - 40}" width="${w + 2}" height="5" rx="1" style="fill:${dk(S.accent, .2)}"/>`;
+  const rangeDet = (rx, w) => `<rect x="${rx + 3}" y="${y - 26}" width="${w/2 - 4}" height="22" rx="1" fill="${dk(S.accent, .12)}"/><rect x="${rx + w/2 + 1}" y="${y - 26}" width="${w/2 - 4}" height="22" rx="1" fill="${dk(S.accent, .12)}"/><path d="M${rx + 2} ${y - 30} h${w - 4}" stroke="#C3C8CC" stroke-width="1.6"/>${[0, 1, 2].map(k => `<circle cx="${rx + 6 + k*(w - 12)/2}" cy="${y - 33}" r="1.3" fill="#C3C8CC"/>`).join("")}`;
+  const sink = (sx, w) => `<path d="M${sx} ${y - 38} h${w} v8 h-${w}z" style="fill:${t === 1 ? "#C3C8CC" : CREAM}"/>`;
+  const tap = sx => `<path d="M${sx} ${y - 38} v-8 q0 -3 4 -3" fill="none" stroke="${S.metal}" stroke-width="1.6"/>`;
+  if (t === 1) return D(`<rect x="${x0}" y="${y - 30}" width="${x1 - x0}" height="30" style="fill:${cup}"/>${top}${sink(x + 2, 20)}<rect x="${x0 + 8}" y="${y - 42}" width="26" height="4" rx="1" style="fill:#3A3634"/><rect x="${x1 - 32}" y="148" width="30" height="3" style="fill:${S.wood}"/>`,
+    `<path d="M${x0 + 2} ${y - 29} q12 3 22 0 q12 3 22 0 v27 h-44z" fill="${S.fabric}" opacity=".85"/>${[0, 1, 2, 3].map(k => `<path d="M${x0 + 6 + k*10} ${y - 29} v27" stroke="${lt(S.fabric, .5)}" stroke-width="1.6"/>`).join("")}${tap(x + 12)}<ellipse cx="${x0 + 15}" cy="${y - 42}" rx="5" ry="1.4" fill="none" stroke="#8A8E92"/><ellipse cx="${x0 + 28}" cy="${y - 42}" rx="5" ry="1.4" fill="none" stroke="#8A8E92"/><path d="M${x0 + 10} ${y - 44} q0 -8 7 -8 q7 0 7 8z" fill="${S.accent}" stroke="${INK}" stroke-width=".5"/>${[0, 1, 2].map(k => `<rect x="${x1 - 30 + k*9}" y="${140 + (k % 2)}" width="6" height="${8 - (k % 2)}" rx="1.4" fill="${["#E8D9B8", S.fabric, "#E8F1F0"][k]}" stroke="${INK}" stroke-width=".4"/>`).join("")}`);
+  if (t === 2) return D(`<rect x="${x0}" y="${y - 30}" width="${x1 - x0}" height="30" style="fill:${cup}"/>${top}${range(x0 + 2, 32)}${sink(x + 2, 22)}<rect x="${x1 - 34}" y="116" width="32" height="50" rx="1" style="fill:${S.wood}"/><rect x="${x0 + 2}" y="148" width="28" height="3" style="fill:${S.wood}"/>`,
+    rangeDet(x0 + 2, 32) + doors(x0 + 36, x1) + tap(x + 13) + [0, 1, 2].map(r => `<path d="M${x1 - 32} ${132 + r*16} h28" stroke="${dk(S.wood, .3)}" stroke-width="1.6"/>${[0, 1, 2].map(k => `<circle cx="${x1 - 26 + k*9}" cy="${126 + r*16}" r="3.6" fill="${CREAM}" stroke="${S.accent}" stroke-width="1"/>`).join("")}`).join("")
+      + [0, 1].map(k => `<rect x="${x0 + 6 + k*12}" y="${139 + k}" width="7" height="${9 - k}" rx="1.4" fill="${["#E8D9B8", S.fabric][k]}" stroke="${INK}" stroke-width=".4"/>`).join(""));
+  // the farmhouse kitchen: tiled splashback, a big range under its chimney mantle, a butler sink, copper pans, herbs on the sill
+  return D(`<rect x="${x0 - 2}" y="182" width="${x1 - x0 + 4}" height="${y - 38 - 182}" style="fill:${CREAM}"/><rect x="${x0}" y="${y - 30}" width="${x1 - x0}" height="30" style="fill:${cup}"/>${top}<rect x="${x0}" y="140" width="44" height="34" style="fill:${S.wall2}"/><rect x="${x0 - 3}" y="136" width="50" height="5" rx="1" style="fill:${dk(S.wood, .1)}"/>${range(x0 + 2, 40)}${sink(x + 2, 24)}<rect x="${x1 - 32}" y="120" width="30" height="3" style="fill:${S.metal}"/>`,
+    Array.from({length: Math.floor((x1 - x0)/9)*3}, (_, k) => { const n = Math.floor((x1 - x0)/9); return `<rect x="${x0 + (k % n)*9}" y="${174 + Math.floor(k/n)*6.6}" width="9" height="6.6" fill="${k % 4 === 1 ? lt(S.accent, .3) : CREAM}" stroke="${mix(S.accent, "#FFFFFF", .5)}" stroke-width=".4"/>`; }).join("")
+    + rangeDet(x0 + 2, 40) + doors(x0 + 44, x1) + tap(x + 14)
+    + [x1 - 26, x1 - 12].map((px, k) => `<path d="M${px} 123 v4" stroke="${INK}" stroke-width=".8"/><circle cx="${px}" cy="${133 + k*2}" r="${5.4 - k}" fill="#C9824A" stroke="${INK}" stroke-width=".5"/>`).join("")
+    + [x - 10, x + 2, x + 14].map((px, k) => `<path d="M${px - 3.4} 170 h7 l-1.4 4 h-4z" fill="#C8643B" stroke="${INK}" stroke-width=".4"/>${[0, 1, 2].map(j => `<ellipse cx="${px - 2 + j*2}" cy="${166 - (j % 2)*2}" rx="1.6" ry="3" fill="${k === 1 ? "#88AE6A" : "#6E9A5A"}"/>`).join("")}`).join(""));
 }
 function fridge(){
-  const col = mix(S.accent, "#FFFFFF", .72), body = `<path d="M468 262 V160 q0 -12 12 -12 h22 q12 0 12 12 V262z" style="fill:${col}"/>`;
-  const note = ST.fridge ? `<g transform="rotate(-6 490 204)"><rect x="476" y="194" width="30" height="20" rx="1" fill="#F4C7CF" stroke="${INK}" stroke-width=".6"/>${txt(491, 206, "Welcome!", 6.4, INK, 700)}<path d="M480 210 q11 3 22 0" stroke="#C2505F" stroke-width=".7" fill="none"/><circle cx="491" cy="194" r="2.4" fill="${S.accent}"/></g>` : "";
-  return otherSpot("fridge", ST.fridge ? "The fridge: welcome treats inside" : "The fridge", hovE(490, 268, 30, 10),
-    D(body, `<path d="M468 184 h46" stroke="${dk(col, .3)}" stroke-width="1.2"/><path d="M473 166 v12 M473 192 v22" stroke="#9AA0A6" stroke-width="3" stroke-linecap="round"/><path d="M470 262 v4 M512 262 v4" stroke="${INK}" stroke-width="2"/><circle cx="500" cy="230" r="2.4" fill="#C8553D"/><circle cx="486" cy="240" r="2.4" fill="#7FA06B"/>`) + note
-    + lab(490, 280, "Fridge", "#E6EEF2", 8));
+  const [sx] = SPOTS.down.fridge, x0 = sx - 16, y = 240, col = mix(S.accent, "#FFFFFF", .72);
+  const note = ST.fridge ? `<g transform="rotate(-6 ${sx} 212)"><rect x="${sx - 13}" y="205" width="26" height="14" rx="1" fill="#F4C7CF" stroke="${INK}" stroke-width=".5"/>${txt(sx, 214, "Welcome!", 5.4, INK, 700)}<circle cx="${sx}" cy="205" r="1.8" fill="${S.accent}"/></g>` : "";
+  return otherSpot("fridge", ST.fridge ? "The fridge: welcome treats inside" : "The fridge", hovE(sx, 246, 22, 9),
+    D(`<path d="M${x0} ${y} V185 q0 -9 9 -9 h14 q9 0 9 9 V${y}z" style="fill:${col}"/>`, `<path d="M${x0} 198 h32" stroke="${dk(col, .3)}" stroke-width="1"/><path d="M${x0 + 4} 186 v8 M${x0 + 4} 203 v16" stroke="#9AA0A6" stroke-width="2.4" stroke-linecap="round"/><circle cx="${x0 + 24}" cy="226" r="1.8" fill="#C8553D"/><circle cx="${x0 + 14}" cy="232" r="1.8" fill="#7FA06B"/>`) + note
+    + lab(sx, 254, "Fridge", "#E6EEF2", 7));
 }
-function dining(t){
-  const tops = {1: [362, 438, 410], 2: [344, 456, 404], 3: [330, 470, 400]}[t], [x0, x1, ty] = tops, w = x1 - x0;
-  const chair = (x, y, col = S.wood) => `<path d="M${x - 9} ${y} v-30 M${x + 9} ${y} v-30" stroke="${dk(col, .3)}" stroke-width="2.4"/><path d="M${x - 9} ${y - 28} h18 M${x - 9} ${y - 20} h18" stroke="${dk(col, .3)}" stroke-width="2.4"/>`;
+function dining(t, x, y){
+  const W = {1: 24, 2: 30, 3: 40}[t], ty = y - 36;
   let back = "";
-  if (t === 1) back = chair(382, 410, S.metal) + chair(420, 410, S.metal);
-  if (t === 2) back = chair(374, 406) + chair(426, 406);
-  if (t === 3) back = `<rect x="346" y="384" width="108" height="8" rx="2" fill="${S.wood}" stroke="${INK}" stroke-width="1"/><path d="M352 392 v8 M448 392 v8" stroke="${dk(S.wood, .3)}" stroke-width="3"/>`;
-  const legs = t === 1 ? `<path d="M${x0 + 8} 436 L${x0 + 22} 446 M${x0 + 22} 436 L${x0 + 8} 446 M${x1 - 8} 436 L${x1 - 22} 446 M${x1 - 22} 436 L${x1 - 8} 446" stroke="${S.metal}" stroke-width="2.4"/>`
-    : `<rect x="${x0 + 4}" y="${ty + 32}" width="7" height="${446 - ty - 32}" style="fill:${dk(S.wood, .2)}"/><rect x="${x1 - 11}" y="${ty + 32}" width="7" height="${446 - ty - 32}" style="fill:${dk(S.wood, .2)}"/>`;
-  const ends = t > 1 ? [x0 - 10, x1 + 10].map(x => `<path d="M${x} 446 v-34 M${x} 424 h${x < 400 ? 10 : -10}" stroke="${dk(S.wood, .3)}" stroke-width="2.6"/><rect x="${x - 4}" y="${x < 400 ? 420 : 420}" width="8" height="4" fill="${S.fabric}"/>`).join("") : "";
-  const top = `<rect x="${x0}" y="${ty}" width="${w}" height="${t === 1 ? 20 : 26}" rx="2" style="fill:${t === 1 ? lt(S.wood, .3) : S.wood}"/><rect x="${x0}" y="${ty + (t === 1 ? 20 : 26)}" width="${w}" height="6" style="fill:${dk(S.wood, .25)}"/>`;
-  const runner = t === 3 ? `<rect x="${x0 + 12}" y="${ty + 9}" width="${w - 24}" height="9" fill="${S.fabric2}" opacity=".9"/><path d="M${x0 + 12} ${ty + 11} h${w - 24} M${x0 + 12} ${ty + 16} h${w - 24}" stroke="${S.accent}" stroke-width=".8"/>${[344, 456].map(x => `<rect x="${x - 2}" y="${ty - 4}" width="4" height="14" fill="${CREAM}" stroke="${INK}" stroke-width=".5"/><rect x="${x - 4}" y="${ty + 9}" width="8" height="3" fill="${S.metal}"/>`).join("")}` : "";
-  return back + D(top + (t === 1 ? "" : legs), (t === 1 ? legs : "") + ends + runner + (t > 1 ? `<path d="M${x0 + 10} ${ty + 6} q${w/2} 3 ${w - 20} 0" stroke="${dk(S.wood, .2)}" stroke-width=".7" fill="none"/>` : ""));
+  if (t === 1) back = chairBack(x - 11, y - 18, S.metal) + chairBack(x + 11, y - 18, S.metal);
+  if (t === 2) back = chairBack(x - 14, y - 20, S.wood) + chairBack(x + 14, y - 20, S.wood);
+  if (t === 3) back = `<rect x="${x - 34}" y="${y - 44}" width="68" height="5" rx="1.5" fill="${S.wood}" stroke="${INK}" stroke-width=".8"/><path d="M${x - 30} ${y - 39} v6 M${x + 30} ${y - 39} v6" stroke="${dk(S.wood, .3)}" stroke-width="2"/>`;
+  const legs = t === 1 ? `<path d="M${x - W + 4} ${ty + 18} L${x - W + 12} ${y} M${x - W + 12} ${ty + 18} L${x - W + 4} ${y} M${x + W - 4} ${ty + 18} L${x + W - 12} ${y} M${x + W - 12} ${ty + 18} L${x + W - 4} ${y}" stroke="${S.metal}" stroke-width="1.8"/>`
+    : `<rect x="${x - W + 2}" y="${ty + 18}" width="4" height="${y - ty - 18}" style="fill:${dk(S.wood, .2)}"/><rect x="${x + W - 6}" y="${ty + 18}" width="4" height="${y - ty - 18}" style="fill:${dk(S.wood, .2)}"/>`;
+  const ends = t > 1 ? chairSide(x - W - 14, y - 2, S.wood, 1) + chairSide(x + W + 14, y - 2, S.wood, -1) : "";
+  const top = `<rect x="${x - W}" y="${ty}" width="${W*2}" height="14" rx="1.5" style="fill:${t === 1 ? lt(S.wood, .3) : S.wood}"/><rect x="${x - W}" y="${ty + 14}" width="${W*2}" height="4" style="fill:${dk(S.wood, .25)}"/>`;
+  const runner = t === 3 ? `<rect x="${x - W + 8}" y="${ty + 5}" width="${W*2 - 16}" height="5" fill="${S.fabric2}" opacity=".9"/>${[x - W + 6, x + W - 6].map(cx => `<rect x="${cx - 1.4}" y="${ty - 4}" width="2.8" height="9" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/>`).join("")}` : "";
+  return back + D(top + (t === 1 ? "" : legs), (t === 1 ? legs : "") + ends + runner);
 }
 function fruitBowl(){   // the fruit basket on the dining table (filled when st.basket)
-  const t = tier("dining"), x = 368, y = t ? ({1: 420, 2: 418, 3: 414})[t] : 436;
-  const fruit = ST.basket ? `<circle cx="${x - 7}" cy="${y - 7}" r="5" fill="#D9433A"/><circle cx="${x + 2}" cy="${y - 9}" r="5" fill="#F2A03A"/><path d="M${x + 9} ${y - 4} q-4 -9 1 -12 q5 3 3 12z" fill="#A8C25A"/><circle cx="${x - 2}" cy="${y - 4}" r="4.4" fill="#7A4A66"/><path d="M${x + 2} ${y - 14} v-3 M${x - 7} ${y - 12} l1 -3" stroke="#5A3A2A" stroke-width="1"/><ellipse cx="${x - 9}" cy="${y - 9}" rx="1.4" ry="1" fill="#FFFFFF" opacity=".6"/>` : "";
-  return otherSpot("basket", ST.basket ? "The fruit basket, full" : "The fruit basket, empty", hovE(x, y + 4, 20, 9),
-    `<g pointer-events="none">${fruit}${D(`<path d="M${x - 13} ${y - 5} h26 q-2 9 -13 9 q-11 0 -13 -9z" style="fill:#C9A26A"/>`, `<path d="M${x - 11} ${y - 2} h22" stroke="#9A7A4A" stroke-width=".8"/>`)}</g>`);
+  const [dx, dy] = at("dining"), t = tier("dining"), x = dx - 14, y = t ? dy - 28 : dy - 4;
+  const fruit = ST.basket ? `<circle cx="${x - 4}" cy="${y - 5}" r="3.2" fill="#D9433A"/><circle cx="${x + 2}" cy="${y - 6}" r="3.2" fill="#F2A03A"/><path d="M${x + 6} ${y - 3} q-3 -6 1 -8 q3 2 2 8z" fill="#A8C25A"/><circle cx="${x - 1}" cy="${y - 3}" r="2.8" fill="#7A4A66"/>` : "";
+  return otherSpot("basket", ST.basket ? "The fruit basket, full" : "The fruit basket, empty", hovE(x, y + 2, 13, 7),
+    `<g pointer-events="none">${fruit}${D(`<path d="M${x - 9} ${y - 3} h18 q-2 6 -9 6 q-7 0 -9 -6z" style="fill:#C9A26A"/>`)}</g>`);
 }
-function sofa(t){
+function rug(t, x, y){
+  if (t === 1) return D(`<ellipse cx="${x}" cy="${y - 30}" rx="62" ry="30" style="fill:${S.fabric2}"/>`, [S.fabric, S.accent, S.wall2, S.fabric, lt(S.accent, .3)].map((c, k) => `<ellipse cx="${x}" cy="${y - 30}" rx="${56 - k*10}" ry="${26 - k*4.6}" fill="none" stroke="${c}" stroke-width="3.6" stroke-dasharray="${7 + k} 2.4"/>`).join(""));
+  if (t === 2) return D(`<rect x="${x - 66}" y="${y - 62}" width="132" height="62" rx="3" style="fill:${S.fabric2}"/>`, `<rect x="${x - 60}" y="${y - 57}" width="120" height="52" rx="2" fill="none" stroke="${S.accent}" stroke-width="2.4"/><rect x="${x - 54}" y="${y - 52}" width="108" height="42" fill="none" stroke="${S.fabric}" stroke-width="1"/>`);
+  const c = mix(S.fabric, "#8E3A3A", .35);
+  return D(`<rect x="${x - 72}" y="${y - 66}" width="144" height="66" rx="2" style="fill:${c}"/>`,
+    `<rect x="${x - 66}" y="${y - 61}" width="132" height="56" fill="none" stroke="${S.fabric2}" stroke-width="4"/>${Array.from({length: 16}, (_, k) => `<path d="M${x - 62 + k*8} ${y - 61} l2 -2 l2 2" fill="none" stroke="${S.accent}" stroke-width=".9"/>`).join("")}<path d="M${x} ${y - 53} l30 20 l-30 20 l-30 -20z" fill="${S.fabric2}" opacity=".9"/><path d="M${x} ${y - 45} l18 12 l-18 12 l-18 -12z" fill="${S.accent}"/><circle cx="${x}" cy="${y - 33}" r="3.4" fill="${S.metal}"/>`
+      + Array.from({length: 9}, (_, k) => `<path d="M${x - 72} ${y - 63 + k*7.4} h-4 M${x + 72} ${y - 63 + k*7.4} h4" stroke="${lt(S.fabric2, .2)}" stroke-width="1.2"/>`).join(""));
+}
+function coffee(t, x, y){
+  if (t === 1) return D(`<rect x="${x - 18}" y="${y - 20}" width="36" height="5" style="fill:${lt("#C9A26A", .15)}"/><rect x="${x - 17}" y="${y - 15}" width="34" height="15" style="fill:#C9A26A"/>`, `<path d="M${x - 17} ${y - 10} h34 M${x - 17} ${y - 5} h34" stroke="#9A7A4A" stroke-width=".8"/>`);
+  if (t === 2) return D(`<rect x="${x - 24}" y="${y - 20}" width="48" height="7" rx="1.5" style="fill:${lt(S.wood, .1)}"/><rect x="${x - 22}" y="${y - 13}" width="3.4" height="13" style="fill:${dk(S.wood, .2)}"/><rect x="${x + 18.6}" y="${y - 13}" width="3.4" height="13" style="fill:${dk(S.wood, .2)}"/>`);
+  return D(`<rect x="${x - 22}" y="${y - 7}" width="44" height="3" style="fill:${S.metal}"/><rect x="${x - 26}" y="${y - 21}" width="52" height="6" rx="1.5" style="fill:#DDEEF2" opacity=".8"/>`,
+    `<path d="M${x - 24} ${y - 15} v15 M${x + 24} ${y - 15} v15" stroke="${S.metal}" stroke-width="2.2"/><rect x="${x - 16}" y="${y - 11}" width="16" height="4" fill="${S.accent}" stroke="${INK}" stroke-width=".4"/><rect x="${x + 4}" y="${y - 12}" width="12" height="5" fill="${dk(S.wood, .2)}" stroke="${INK}" stroke-width=".4"/><rect x="${x - 14}" y="${y - 25}" width="12" height="3.4" fill="${S.fabric2}" stroke="${INK}" stroke-width=".4"/><path d="M${x + 12} ${y - 21} l-2 -5 h7 l-2 5z" fill="#C8643B"/><ellipse cx="${x + 13}" cy="${y - 29}" rx="3" ry="3.6" fill="#6E9A5A"/>`);
+}
+// the sofa faces the fire, so we see its back; the tops of the seat cushions peek over it
+function sofa(t, x, y){
   const col = t === 1 ? mix(S.fabric2, "#B8A890", .3) : t === 2 ? S.fabric : dk(S.fabric, .12), d = dk(col, .18);
-  const backY = t === 3 ? 296 : 304;
-  const main = `<rect x="104" y="${backY}" width="132" height="${342 - backY}" rx="${t === 3 ? 16 : 10}" style="fill:${col}"/><rect x="104" y="350" width="132" height="16" rx="3" style="fill:${d}"/><rect x="112" y="334" width="58" height="20" rx="5" style="fill:${lt(col, .1)}"/><rect x="170" y="334" width="58" height="20" rx="5" style="fill:${lt(col, .1)}"/>`
-    + `<rect x="92" y="${t === 3 ? 318 : 324}" width="26" height="${t === 3 ? 48 : 42}" rx="${t === 3 ? 12 : 7}" style="fill:${col}"/><rect x="222" y="${t === 3 ? 318 : 324}" width="26" height="${t === 3 ? 48 : 42}" rx="${t === 3 ? 12 : 7}" style="fill:${col}"/>`;
-  let det = t === 3 ? `<path d="M100 372 v-6 M240 372 v-6 M150 372 v-6 M190 372 v-6" stroke="${S.metal}" stroke-width="4" stroke-linecap="round"/>` : `<path d="M110 366 l-2 6 M230 366 l2 6" stroke="${dk(S.wood, .3)}" stroke-width="3"/>`;
-  if (t === 1) det += `<rect x="190" y="314" width="16" height="13" fill="${lt(S.accent, .3)}" stroke="${INK}" stroke-width=".6" stroke-dasharray="2 1.4" transform="rotate(6 198 320)"/><path d="M128 344 q12 4 24 0" stroke="${d}" stroke-width="1" fill="none"/>`;
-  if (t === 2) det += `<path d="M106 358 h128 M110 310 h120" stroke="${lt(col, .35)}" stroke-width="1.2"/>`;
-  if (t === 3) det += [0, 1, 2].map(r => [0, 1, 2, 3, 4, 5].map(k => `<circle cx="${122 + k*20 + (r % 2)*10}" cy="${306 + r*9}" r="1.3" fill="${dk(col, .35)}"/>`).join("")).join("") + `<ellipse cx="140" cy="314" rx="22" ry="4" fill="#FFFFFF" opacity=".18"/><ellipse cx="200" cy="343" rx="16" ry="3" fill="#FFFFFF" opacity=".2"/><circle cx="105" cy="324" r="7" fill="none" stroke="${d}" stroke-width="1.2"/><circle cx="235" cy="324" r="7" fill="none" stroke="${d}" stroke-width="1.2"/><path d="M104 366 h132" stroke="${S.metal}" stroke-width="1.6" stroke-dasharray="2 2"/>`;
+  const main = `<rect x="${x - 34}" y="${y - 40}" width="68" height="10" rx="4" style="fill:${lt(col, .15)}"/><rect x="${x - 38}" y="${y - 34}" width="76" height="30" rx="${t === 3 ? 9 : 6}" style="fill:${col}"/>`
+    + `<rect x="${x - 44}" y="${y - 31}" width="12" height="27" rx="${t === 3 ? 6 : 4}" style="fill:${d}"/><rect x="${x + 32}" y="${y - 31}" width="12" height="27" rx="${t === 3 ? 6 : 4}" style="fill:${d}"/><rect x="${x - 40}" y="${y - 7}" width="80" height="4" style="fill:${dk(col, .3)}"/>`;
+  let det = t === 3 ? `<path d="M${x - 38} ${y} v-3 M${x + 38} ${y} v-3 M${x - 10} ${y} v-3 M${x + 10} ${y} v-3" stroke="${S.metal}" stroke-width="2.6" stroke-linecap="round"/>` : `<path d="M${x - 36} ${y - 3} l-1 3 M${x + 36} ${y - 3} l1 3" stroke="${dk(S.wood, .3)}" stroke-width="2"/>`;
+  det += `<path d="M${x} ${y - 39} v8" stroke="${d}" stroke-width=".8"/>`;
+  if (t === 1) det += `<rect x="${x + 8}" y="${y - 24}" width="10" height="8" fill="${lt(S.accent, .3)}" stroke="${INK}" stroke-width=".5" stroke-dasharray="1.6 1" transform="rotate(6 ${x + 13} ${y - 20})"/>`;
+  if (t === 2) det += `<path d="M${x - 36} ${y - 29} h72" stroke="${lt(col, .35)}" stroke-width="1"/>`;
+  if (t === 3) det += [0, 1].map(r => [0, 1, 2, 3, 4, 5].map(k => `<circle cx="${x - 28 + k*11 + (r % 2)*5.5}" cy="${y - 26 + r*8}" r="1" fill="${dk(col, .35)}"/>`).join("")).join("") + `<ellipse cx="${x - 14}" cy="${y - 29}" rx="14" ry="2.4" fill="#FFFFFF" opacity=".18"/>`;
   return D(main, det);
 }
-function armchair(t){
+// the armchair, side-on, angled in towards the fire and the rug
+function armchair(t, x, y){
   if (t === 1) { const c = lt(S.wood, .3);
-    return D(`<path d="M270 352 q-6 -34 30 -36 q36 2 30 36z" style="fill:${c}"/><rect x="276" y="346" width="48" height="16" rx="6" style="fill:${S.fabric2}"/><path d="M276 362 h48 l-4 12 h-40z" style="fill:${c}"/>`,
-      `${[0, 1, 2, 3].map(k => `<path d="M${274 - k} ${336 - k*5} q26 -8 52 0" fill="none" stroke="${dk(c, .25)}" stroke-width=".8"/>`).join("")}<path d="M282 374 l-3 6 M318 374 l3 6" stroke="${dk(c, .3)}" stroke-width="2.4"/>`); }
+    return D(`<path d="M${x - 18} ${y - 6} q-4 -24 6 -32 q6 2 6 14 h20 q4 0 4 6 v12z" style="fill:${c}"/><rect x="${x - 10}" y="${y - 20}" width="26" height="7" rx="3" style="fill:${S.fabric2}"/>`,
+      `${[0, 1, 2].map(k => `<path d="M${x - 16} ${y - 24 + k*6} q14 -2 30 0" fill="none" stroke="${dk(c, .25)}" stroke-width=".6"/>`).join("")}<path d="M${x - 14} ${y - 6} l-2 6 M${x + 14} ${y - 6} l2 6" stroke="${dk(c, .3)}" stroke-width="2"/>`); }
   const col = t === 2 ? mix(S.accent, S.fabric2, .35) : S.accent, d = dk(col, .2);
-  const back = t === 3 ? `<path d="M274 352 V306 q0 -8 10 -8 h32 q10 0 10 8 V352z" style="fill:${col}"/><path d="M272 312 q-10 4 -8 30 l10 4 V312z M328 312 q10 4 8 30 l-10 4 V312z" style="fill:${d}"/>` : `<rect x="276" y="318" width="48" height="36" rx="8" style="fill:${col}"/>`;
-  const stool = t === 3 ? `<rect x="284" y="394" width="32" height="14" rx="5" style="fill:${col}"/>` : "";
-  return D(back + `<rect x="266" y="338" width="16" height="36" rx="6" style="fill:${col}"/><rect x="318" y="338" width="16" height="36" rx="6" style="fill:${col}"/><rect x="280" y="346" width="40" height="16" rx="4" style="fill:${lt(col, .12)}"/><rect x="280" y="360" width="40" height="14" style="fill:${d}"/>` + stool,
-    `<path d="M272 374 v6 M328 374 v6" stroke="${dk(S.wood, .3)}" stroke-width="3"/>` + (t === 3 ? `<path d="M288 408 v4 M312 408 v4" stroke="${dk(S.wood, .3)}" stroke-width="3"/>${[0, 1, 2].map(k => `<circle cx="${290 + k*10}" cy="${312}" r="1.2" fill="${d}"/>`).join("")}` : ""));
+  const back = t === 3 ? `<path d="M${x - 18} ${y - 6} V${y - 40} q0 -6 6 -6 q4 0 4 6 q6 0 6 8 l-4 4 V${y - 6}z" style="fill:${col}"/>` : `<path d="M${x - 18} ${y - 6} V${y - 32} q0 -5 5 -5 q5 0 5 5 V${y - 6}z" style="fill:${col}"/>`;
+  const stool = t === 3 ? `<rect x="${x + 22}" y="${y - 12}" width="16" height="8" rx="3" style="fill:${col}"/>` : "";
+  return D(back + `<rect x="${x - 12}" y="${y - 19}" width="28" height="7" rx="3" style="fill:${lt(col, .12)}"/><rect x="${x - 12}" y="${y - 13}" width="28" height="8" style="fill:${d}"/><rect x="${x - 10}" y="${y - 26}" width="26" height="7" rx="3.4" style="fill:${col}"/>` + stool,
+    `<path d="M${x - 14} ${y - 5} v5 M${x + 14} ${y - 5} v5" stroke="${dk(S.wood, .3)}" stroke-width="2.4"/>` + (t === 3 ? `<path d="M${x + 25} ${y - 4} v4 M${x + 35} ${y - 4} v4" stroke="${dk(S.wood, .3)}" stroke-width="2"/>` : ""));
 }
-function coffee(t){
-  if (t === 1) return D(`<rect x="192" y="414" width="68" height="8" style="fill:${lt("#C9A26A", .15)}"/><rect x="194" y="422" width="64" height="24" style="fill:#C9A26A"/>`, `${[0, 1, 2].map(k => `<path d="M194 ${428 + k*6} h64" stroke="#9A7A4A" stroke-width="1"/>`).join("")}${txt(226, 440, "APPLES", 6, "#7A5A3A", 700)}`);
-  if (t === 2) return D(`<rect x="182" y="414" width="88" height="10" rx="2" style="fill:${lt(S.wood, .1)}"/><rect x="186" y="424" width="80" height="5" style="fill:${dk(S.wood, .2)}"/><rect x="188" y="428" width="6" height="18" style="fill:${dk(S.wood, .2)}"/><rect x="258" y="428" width="6" height="18" style="fill:${dk(S.wood, .2)}"/>`,
-    `<path d="M190 418 q30 -2 72 1" fill="none" stroke="${dk(S.wood, .15)}" stroke-width=".7"/>`);
-  return D(`<rect x="184" y="434" width="84" height="5" style="fill:${S.metal}"/><rect x="178" y="410" width="96" height="9" rx="2" style="fill:#DDEEF2" opacity=".75"/>`,
-    `<path d="M182 419 v27 M270 419 v27" stroke="${S.metal}" stroke-width="3"/><rect x="194" y="426" width="30" height="5" fill="${S.accent}" stroke="${INK}" stroke-width=".5"/><rect x="196" y="421" width="26" height="5" fill="${S.fabric}" stroke="${INK}" stroke-width=".5"/><rect x="236" y="427" width="24" height="7" fill="${dk(S.wood, .2)}" stroke="${INK}" stroke-width=".5"/>`
-      + `<rect x="194" y="404" width="22" height="5" fill="${S.fabric2}" stroke="${INK}" stroke-width=".5"/><path d="M252 410 l-3 -8 h10 l-3 8z" fill="#C8643B"/><ellipse cx="251" cy="399" rx="4" ry="5" fill="#6E9A5A"/><ellipse cx="257" cy="400" rx="3" ry="4" fill="#88AE6A"/><path d="M182 412 h90" stroke="#FFFFFF" stroke-width="1" opacity=".8"/>`);
-}
-function rug(t){
-  if (t === 1) return D(`<ellipse cx="226" cy="430" rx="92" ry="40" style="fill:${S.fabric2}"/>`, [S.fabric, S.accent, S.wall2, S.fabric, lt(S.accent, .3)].map((c, k) => `<ellipse cx="226" cy="430" rx="${84 - k*15}" ry="${35 - k*6.5}" fill="none" stroke="${c}" stroke-width="5" stroke-dasharray="${9 + k} 3"/>`).join(""));
-  if (t === 2) return D(`<rect x="138" y="390" width="176" height="80" rx="4" style="fill:${S.fabric2}"/>`, `<rect x="146" y="397" width="160" height="66" rx="2" fill="none" stroke="${S.accent}" stroke-width="3"/><rect x="154" y="404" width="144" height="52" fill="none" stroke="${S.fabric}" stroke-width="1.4"/>`);
-  const c = mix(S.fabric, "#8E3A3A", .35);
-  return D(`<rect x="118" y="382" width="216" height="92" rx="3" style="fill:${c}"/>`,
-    `<rect x="126" y="389" width="200" height="78" fill="none" stroke="${S.fabric2}" stroke-width="5"/>${Array.from({length: 18}, (_, k) => `<path d="M${132 + k*11} 389 l3 -3 l3 3" fill="none" stroke="${S.accent}" stroke-width="1.2"/>`).join("")}<path d="M226 400 l40 28 l-40 28 l-40 -28z" fill="${S.fabric2}" opacity=".9"/><path d="M226 410 l26 18 l-26 18 l-26 -18z" fill="${S.accent}"/><circle cx="226" cy="428" r="5" fill="${S.metal}"/>${[150, 302].map(x => `<path d="M${x - 10} 418 l10 10 l-10 10 l-10 -10z" fill="${S.accent}" opacity=".8"/>`).join("")}`
-      + Array.from({length: 12}, (_, k) => `<path d="M118 ${386 + k*7.4} h-6 M334 ${386 + k*7.4} h6" stroke="${lt(S.fabric2, .2)}" stroke-width="1.4"/>`).join(""));
-}
-function lamp(t){
-  if (t === 1) { glow(56, 290, 54); return D(`<ellipse cx="56" cy="372" rx="12" ry="4" style="fill:${S.wood}"/><circle cx="56" cy="290" r="18" style="fill:${NIGHT ? "#FFF3D0" : CREAM}"/>`, `<path d="M56 368 V308" stroke="${S.wood}" stroke-width="2.4"/>${[-10, 0, 10].map(d => `<path d="M${56 + d*.9} 273 q${d*.6} 17 0 34" fill="none" stroke="#D8CCB8" stroke-width=".8"/>`).join("")}`); }
-  if (t === 2) { glow(56, 300, 50); return D(`<ellipse cx="56" cy="372" rx="12" ry="4" style="fill:${S.metal}"/><path d="M42 274 h28 l6 26 h-40z" style="fill:${NIGHT ? lt(S.fabric2, .5) : S.fabric2}"/>`, `<path d="M56 368 V300" stroke="${S.metal}" stroke-width="3"/><path d="M38 296 h40" stroke="${dk(S.fabric2, .2)}" stroke-width="1"/>`); }
-  glow(130, 280, 60);
-  return D(`<rect x="44" y="360" width="24" height="12" rx="2" style="fill:#E8E4DC"/><path d="M112 276 q18 -16 36 0z" style="fill:${S.metal}"/>`, `<path d="M56 360 Q56 210 130 262" fill="none" stroke="${S.metal}" stroke-width="3"/><ellipse cx="130" cy="277" rx="10" ry="2.4" fill="${NIGHT ? "#FFE8A8" : "#F2E6C8"}"/>`);
+function lamp(t, x, y){
+  if (t === 1) { glow(x, y - 66, 44); return D(`<ellipse cx="${x}" cy="${y - 1}" rx="7" ry="2.4" style="fill:${S.wood}"/><circle cx="${x}" cy="${y - 64}" r="9" style="fill:${NIGHT ? "#FFF3D0" : CREAM}"/>`, `<path d="M${x} ${y - 2} V${y - 55}" stroke="${S.wood}" stroke-width="1.8"/>${[-5, 0, 5].map(d => `<path d="M${x + d*.9} ${y - 72} q${d*.5} 8 0 16" fill="none" stroke="#D8CCB8" stroke-width=".6"/>`).join("")}`); }
+  if (t === 2) { glow(x, y - 62, 40); return D(`<ellipse cx="${x}" cy="${y - 1}" rx="7" ry="2.4" style="fill:${S.metal}"/><path d="M${x - 7} ${y - 74} h14 l3 13 h-20z" style="fill:${NIGHT ? lt(S.fabric2, .5) : S.fabric2}"/>`, `<path d="M${x} ${y - 2} V${y - 61}" stroke="${S.metal}" stroke-width="2"/>`); }
+  glow(x - 34, y - 70, 46);
+  return D(`<rect x="${x - 6}" y="${y - 7}" width="12" height="7" rx="1.5" style="fill:#E8E4DC"/><path d="M${x - 44} ${y - 72} q10 -11 20 0z" style="fill:${S.metal}"/>`, `<path d="M${x} ${y - 7} Q${x + 4} ${y - 104} ${x - 34} ${y - 80}" fill="none" stroke="${S.metal}" stroke-width="2.2"/><ellipse cx="${x - 34}" cy="${y - 72}" rx="6" ry="1.6" fill="${NIGHT ? "#FFE8A8" : "#F2E6C8"}"/>`);
 }
 function gardenDoor(){   // the back door to the garden, in the left wall
   const col = ST.c === "bluebell" ? BLUE : "#7E9A68";
-  return otherSpot("garden", "The back door to the garden", hovE(34, 486, 30, 14),
-    D(`<path d="M0 372 L24 384 V490 L0 504z" style="fill:${col}"/><path d="M4 384 L20 392 V430 L4 426z" style="fill:${NIGHT ? "#26325E" : "#CFE6F2"}"/><rect x="2" y="496" width="38" height="10" rx="3" style="fill:#B9875E"/>`, `<path d="M12 388 V428" stroke="${CREAM}" stroke-width="1.4"/><circle cx="20" cy="448" r="2" fill="${S.metal}"/>`)
-    + lab(34, 526, "Garden", "#D8EBC8", 9));
+  return otherSpot("garden", "The back door to the garden", hovE(30, 480, 24, 10),
+    D(`<path d="M1 396 L16 403 V474 L1 484z" style="fill:${col}"/><path d="M4 402 L13 407 V432 L4 429z" style="fill:${NIGHT ? "#26325E" : "#CFE6F2"}"/><path d="M4 484 l16 -8 h18 l-14 10z" style="fill:#B9875E"/>`, `<circle cx="13" cy="444" r="1.4" fill="${S.metal}"/>`)
+    + lab(30, 500, "Garden", "#D8EBC8", 8));
 }
-function sideWall(){ return g(`<path d="M0 200 H16 V640 H0z" style="fill:${S.wall2}"/><path d="M0 214 H16" stroke="${dk(S.wall2, .3)}"/>` + sk("", `<path d="M16 200 V640"/>`)); }
 function calendar(){
-  return otherSpot("calendar", "The bookings calendar", hovE(320, 94, 26, 34),
-    g(D(`<rect x="304" y="66" width="32" height="46" rx="1" style="fill:${CREAM}"/><rect x="304" y="66" width="32" height="10" style="fill:${S.accent}"/>`,
-      `<path d="M320 60 v6" stroke="${INK}" stroke-width="1"/><circle cx="320" cy="60" r="1.6" fill="${INK}"/>${Array.from({length: 20}, (_, k) => `<rect x="${307 + (k % 5)*5.4}" y="${80 + Math.floor(k/5)*7.4}" width="4.4" height="6" fill="${[3, 4, 5, 11, 12, 17].includes(k) ? S.fabric : "#EFE8DA"}" stroke="#C9C0B0" stroke-width=".3"/>`).join("")}`))
-    + lab(320, 128, "Bookings", "#F4D3C8", 8));
+  const [x] = SPOTS.down.calendar;
+  return otherSpot("calendar", "The bookings calendar", hovE(x, 142, 18, 22),
+    g(D(`<rect x="${x - 11}" y="126" width="22" height="28" rx="1" style="fill:${CREAM}"/><rect x="${x - 11}" y="126" width="22" height="6" style="fill:${S.accent}"/>`,
+      `<circle cx="${x}" cy="122" r="1.2" fill="${INK}"/><path d="M${x} 122 v4" stroke="${INK}" stroke-width=".7"/>${Array.from({length: 16}, (_, k) => `<rect x="${x - 9 + (k % 4)*4.6}" y="${134 + Math.floor(k/4)*4.8}" width="3.8" height="4" fill="${[2, 3, 9, 10, 14].includes(k) ? S.fabric : "#EFE8DA"}" stroke="#C9C0B0" stroke-width=".2"/>`).join("")}`))
+    + lab(x, 112, "Bookings", "#F4D3C8", 7));
+}
+function broomCupboard(){   // a slim cupboard by the kitchen, its door ajar on a broom and dustpan
+  const [x] = SPOTS.down.tidy, y = 240;
+  return otherSpot("tidy", "The broom cupboard", hovE(x, 246, 16, 8),
+    g(D(`<rect x="${x - 11}" y="${y - 68}" width="22" height="68" style="fill:${lt(S.wood, .1)}"/><rect x="${x - 7}" y="${y - 62}" width="12" height="60" style="fill:${dk(S.wood, .45)}"/><path d="M${x + 5} ${y - 62} l6 -2 v62 l-6 -2z" style="fill:${lt(S.wood, .2)}"/>`,
+      `<path d="M${x - 3} ${y - 58} L${x - 1} ${y - 12}" stroke="#8A6A52" stroke-width="1.8"/><path d="M${x - 6} ${y - 2} l2 -10 h6 l2 10z" fill="#D9B866"/><path d="M${x + 1} ${y - 2} h5 l-1 -6 h-4z" fill="${S.accent}"/>`))
+    + lab(x, 160, "Broom cupboard", "#E6DDF2", 7));
 }
 function consoleArt(){
-  return g(D(`<rect x="62" y="518" width="124" height="8" rx="1" style="fill:${S.wood}"/><rect x="66" y="526" width="116" height="10" style="fill:${dk(S.wood, .12)}"/><rect x="68" y="536" width="6" height="18" style="fill:${dk(S.wood, .25)}"/><rect x="174" y="536" width="6" height="18" style="fill:${dk(S.wood, .25)}"/>`,
-    `<circle cx="124" cy="531" r="1.6" fill="${S.metal}"/><ellipse cx="124" cy="517" rx="8" ry="2.4" fill="${S.fabric2}" stroke="${INK}" stroke-width=".5"/><path d="M120 516 l5 -2 l2 2" stroke="${S.metal}" stroke-width="1.2" fill="none"/><path d="M174 518 l-3 -10 h12 l-3 10z" fill="#C8643B"/><path d="M177 508 q-6 -10 -2 -16 M177 508 q4 -12 8 -14 M177 508 v-14" stroke="#6E9A5A" stroke-width="2" fill="none"/>`));
+  const [gx] = SPOTS.down.guestbook, x0 = gx - 22, x1 = gx + 56, y = 566;
+  return g(D(`<rect x="${x0}" y="${y - 30}" width="${x1 - x0}" height="5" rx="1" style="fill:${S.wood}"/><rect x="${x0 + 2}" y="${y - 25}" width="${x1 - x0 - 4}" height="7" style="fill:${dk(S.wood, .12)}"/><rect x="${x0 + 3}" y="${y - 18}" width="3.4" height="18" style="fill:${dk(S.wood, .25)}"/><rect x="${x1 - 6.4}" y="${y - 18}" width="3.4" height="18" style="fill:${dk(S.wood, .25)}"/>`,
+    `<circle cx="${(x0 + x1)/2}" cy="${y - 21}" r="1.2" fill="${S.metal}"/><path d="M${x0 + 10} ${y - 4} h${x1 - x0 - 20}" stroke="${dk(S.wood, .25)}" stroke-width="1.6"/>`)
+    // a little framed picture and hooks with a coat and an umbrella above the console
+    + D(`<rect x="${x0 + 16}" y="${y - 70}" width="20" height="16" style="fill:${dk(S.wood, .2)}"/>`, `<rect x="${x0 + 18}" y="${y - 68}" width="16" height="12" fill="#CFE6F2"/><path d="M${x0 + 18} ${y - 60} q8 -4 16 0 v4 h-16z" fill="#7FA86A"/>`));
 }
 function guestbook(){
-  return otherSpot("guestbook", "The guest book", hovE(96, 560, 30, 12),
-    g(D(`<path d="M78 518 l2 -10 q8 -3 16 1 q8 -4 16 -1 l2 10 q-9 -3 -18 1 q-9 -4 -18 -1z" style="fill:${CREAM}"/>`, `<path d="M96 509 v10" stroke="${INK}" stroke-width=".6"/>${[0, 1, 2].map(k => `<path d="M${83} ${511 + k*2.4} q5 -1 10 0 M${99} ${511 + k*2.4} q5 -1 10 0" stroke="#9A8E80" stroke-width=".5" fill="none"/>`).join("")}<path d="M104 520 l10 -8" stroke="${S.accent}" stroke-width="1.6"/>`))
-    + lab(92, 578, "Guest book", "#F4D3C8", 9));
+  const [x] = SPOTS.down.guestbook, y = 536;
+  return otherSpot("guestbook", "The guest book", hovE(x, 572, 18, 8),
+    g(D(`<path d="M${x - 11} ${y} l1 -6 q5 -2 10 1 q5 -3 10 -1 l1 6 q-6 -2 -11 1 q-5 -3 -11 -1z" style="fill:${CREAM}"/>`, `<path d="M${x} ${y - 5} v6" stroke="${INK}" stroke-width=".5"/><path d="M${x + 6} ${y + 1} l7 -5" stroke="${S.accent}" stroke-width="1.2"/>`))
+    + lab(x - 4, 600, "Guest book", "#F4D3C8", 8));
 }
 function catalogue(){
-  return otherSpot("catalogue", "The furniture catalogue", hovE(150, 560, 26, 12),
-    g(D(`<rect x="136" y="500" width="30" height="18" rx="1" style="fill:#E8574A"/><path d="M136 518 h30 v-3 h-30z" style="fill:${CREAM}"/>`, `<path d="M136 506 h30" stroke="${CREAM}" stroke-width="2"/><path d="M137 516.5 h28" stroke="#C9C0B0" stroke-width=".5"/><circle cx="151" cy="511" r="2.4" fill="#F6E3A1"/>`))
-    + lab(164, 600, "Catalogue", "#F3E1A0", 9));
-}
-function broom(){
-  return otherSpot("tidy", "The broom cupboard", hovE(306, 518, 32, 11),
-    g(D(`<path d="M300 520 h28 l-3 -16 h-22z" style="fill:#C9A26A"/><path d="M302 522 l2 -14 h18 l4 14z" style="fill:#D9B866"/><path d="M276 522 h18 l3 -10 h-18z" style="fill:${S.accent}"/>`,
-      `<path d="M314 508 L322 446" stroke="#8A6A52" stroke-width="3" stroke-linecap="round"/><path d="M304 512 h20" stroke="${S.fabric}" stroke-width="2"/>${[0, 1, 2, 3, 4].map(k => `<path d="M${306 + k*4} 512 v9" stroke="#A88A3A" stroke-width=".7"/>`).join("")}<path d="M294 514 l10 -6" stroke="${dk(S.accent, .3)}" stroke-width="2.4" stroke-linecap="round"/>`))
-    + lab(306, 538, "Broom cupboard", "#E6DDF2", 8));
+  const [x] = SPOTS.down.catalogue, y = 536;
+  return otherSpot("catalogue", "The furniture catalogue", hovE(x, 572, 16, 8),
+    g(D(`<rect x="${x - 9}" y="${y - 10}" width="18" height="10" rx="1" style="fill:#E8574A"/><path d="M${x - 9} ${y} h18 v-2 h-18z" style="fill:${CREAM}"/>`, `<path d="M${x - 9} ${y - 7} h18" stroke="${CREAM}" stroke-width="1.4"/><circle cx="${x}" cy="${y - 4}" r="1.6" fill="#F6E3A1"/>`))
+    + lab(x + 14, 622, "Catalogue", "#F3E1A0", 8));
 }
 // the stairs up: side-on wooden stairs, exactly the mill's (six treads rising to the right over a solid stringer,
 // a handrail on turned balusters, a newel post at the foot), here against the right of the bottom
@@ -291,376 +316,426 @@ function stairsUp(){
       ${Array.from({length: N}, (_, k) => `<path d="M${X + k*RW + RW/2} ${B - (k + 1)*RH - 2} V${B - (k + 1)*RH - 30}" style="stroke:#6B4A2E" stroke-width="2"/>`).join("")}
       <path d="M${X + 2} ${B - 44} L${X + N*RW + 2} ${top - 32}" style="stroke:#5A3A2A" stroke-width="3.5" stroke-linecap="round"/><rect x="${X - 2}" y="${B - 50}" width="7" height="50" rx="1.5" style="fill:#6B4A2E"/><circle cx="${X + 1.5}" cy="${B - 52}" r="4" style="fill:#5A3A2A"/>`,
       `<path d="${prof}"/><path d="M${X + 2} ${B - 44} L${X + N*RW + 2} ${top - 32}"/>`)
-    + lab(X + 30, 628, "Upstairs", "#F3E1A0", 9));
+    + lab(X + 30, 628, "Upstairs", "#F3E1A0", 8));
 }
 const exitMat = () => `<g data-exit="1" aria-label="Out of the front door to the lane"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
   ${sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:${ST.c === "bluebell" ? BLUE : "#C9A27E"}"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/>`)}<text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none"${ST.c === "bluebell" ? ` style="fill:#FFFDF6"` : ""}>Exit</text></g>`;
 
-// the one-off touches downstairs
-function accDown(){
-  let s = "";
-  if (has("prints")) s += g(D(`<rect x="158" y="70" width="20" height="26" style="fill:${dk(S.wood, .2)}"/><rect x="182" y="80" width="18" height="24" style="fill:${S.metal}"/><rect x="162" y="100" width="16" height="14" style="fill:${dk(S.wood, .2)}"/>`,
-    `<rect x="161" y="73" width="14" height="20" fill="#CFE6F2"/><path d="M161 88 q7 -6 14 -2 v7 h-14z" fill="#7FA86A"/><rect x="185" y="83" width="12" height="18" fill="${CREAM}"/><circle cx="191" cy="90" r="3.4" fill="${S.fabric}"/><path d="M191 93 v6" stroke="#6E9A5A" stroke-width="1"/><rect x="165" y="103" width="10" height="8" fill="${S.fabric2}"/><path d="M168 70 l0 -4 M191 80 l0 -4" stroke="${INK}" stroke-width=".7"/>`));
-  if (has("candles")) { glow(110, 176, 34); s += g(D(`<rect x="94" y="176" width="8" height="13" rx="1" style="fill:${CREAM}"/><rect x="106" y="170" width="9" height="19" rx="1" style="fill:${CREAM}"/><rect x="119" y="180" width="8" height="9" rx="1" style="fill:${CREAM}"/>`, flame(98, 175, .5) + flame(110.5, 169, .55) + flame(123, 179, .45))); }
-  if (has("records")) s += g(D(`<rect x="230" y="184" width="30" height="12" rx="1" style="fill:${S.wood}"/><rect x="263" y="178" width="20" height="18" style="fill:#C9A26A"/>`,
-    `<ellipse cx="243" cy="184" rx="10" ry="2.6" fill="#2A2420"/><circle cx="243" cy="184" r="1.4" fill="${S.fabric}"/><path d="M256 182 l-6 2" stroke="${S.metal}" stroke-width="1.2"/>${[0, 1, 2, 3].map(k => `<rect x="${265 + k*4}" y="${170 + (k % 2)*2}" width="4" height="10" fill="${[S.accent, S.fabric, "#2A2420", S.fabric2][k]}" stroke="${INK}" stroke-width=".4"/>`).join("")}`));
-  if (has("diffuser")) s += g(D(`<ellipse cx="330" cy="215" rx="11" ry="3.4" style="fill:${lt(S.wood, .1)}"/><rect x="326" y="203" width="8" height="11" rx="2" style="fill:#C9B3E3"/>`,
-    `<path d="M324 218 l-3 18 M336 218 l3 18 M330 219 v17" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M329 203 l-5 -14 M330 203 l1 -15 M331 203 l6 -13" stroke="#5A3A2A" stroke-width=".8"/><path d="M322 186 q2 -6 6 -4 M336 184 q4 -6 6 -2" stroke="#C9B3E3" stroke-width="1" fill="none" opacity=".8"/>`));
-  if (has("flowers")) { const y = tier("dining") ? 412 : 444; s += g(D(`<path d="M394 ${y} q-4 -10 2 -16 h8 q6 6 2 16z" style="fill:${CREAM}"/>`,
-    `<path d="M397 ${y - 15} l1 -3 h4 l1 3" stroke="${S.accent}" stroke-width="1" fill="none"/>${[[-8, -26, S.fabric], [0, -30, "#F6E3A1"], [8, -26, S.fabric], [-4, -22, "#FFFFFF"], [5, -21, "#C9B3E3"]].map(([dx, dy, c]) => `<path d="M400 ${y - 16} L${400 + dx} ${y + dy}" stroke="#6E9A5A" stroke-width="1"/><circle cx="${400 + dx}" cy="${y + dy}" r="3.4" fill="${c}" stroke="${INK}" stroke-width=".4"/>`).join("")}`)); }
-  if (has("cushions")) s += g(D(`<path d="M120 324 q14 -6 28 0 q2 12 -2 22 q-12 4 -24 0 q-4 -10 -2 -22z" style="fill:${S.accent}"/><path d="M196 324 q14 -6 28 0 q2 12 -2 22 q-12 4 -24 0 q-4 -10 -2 -22z" style="fill:${S.fabric2}"/><path d="M214 306 q20 -4 30 6 v40 q-8 6 -14 2 q2 -24 -16 -30z" style="fill:${lt(S.fabric, .25)}"/>`,
-    `<circle cx="134" cy="334" r="4" fill="none" stroke="${lt(S.accent, .4)}" stroke-width="1.2"/><path d="M200 330 h20 M200 336 h20" stroke="${S.accent}" stroke-width="1"/>${[0, 1, 2].map(k => `<path d="M${226 + k*5} 314 q2 20 0 38" stroke="${S.accent}" stroke-width=".9" fill="none"/>`).join("")}`));
-  return s;
+// the one-off touches downstairs, each where a stylist would put it
+function accDown(id){
+  if (!has(id)) return "";
+  const [x, y] = at(id);
+  if (id === "prints") return g(D(`<rect x="${x - 13}" y="${y - 16}" width="26" height="30" style="fill:${dk(S.wood, .2)}"/><rect x="${x - 31}" y="${y - 8}" width="13" height="17" style="fill:${S.metal}"/><rect x="${x + 18}" y="${y - 8}" width="13" height="17" style="fill:${S.metal}"/>`,
+    `<rect x="${x - 10}" y="${y - 13}" width="20" height="24" fill="#CFE6F2"/><path d="M${x - 10} ${y + 2} q10 -8 20 -3 v12 h-20z" fill="#7FA86A"/><circle cx="${x + 5}" cy="${y - 7}" r="2.4" fill="#F6E3A1"/><rect x="${x - 29}" y="${y - 6}" width="9" height="13" fill="${CREAM}"/><circle cx="${x - 24.5}" cy="${y - 1}" r="2.4" fill="${S.fabric}"/><rect x="${x + 20}" y="${y - 6}" width="9" height="13" fill="${S.fabric2}"/><path d="M${x + 22} ${y + 5} l3 -6 l3 6z" fill="${S.accent}"/>`));
+  if (id === "candles") { glow(x, y - 10, 30); return g(D(`<rect x="${x - 16}" y="${y - 8}" width="5" height="8" rx="1" style="fill:${CREAM}"/><rect x="${x - 3}" y="${y - 12}" width="6" height="12" rx="1" style="fill:${CREAM}"/><rect x="${x + 11}" y="${y - 6}" width="5" height="6" rx="1" style="fill:${CREAM}"/>`, flame(x - 13.5, y - 8, .35) + flame(x, y - 12, .4) + flame(x + 13.5, y - 6, .32))); }
+  if (id === "records") return g(D(`<rect x="${x - 20}" y="${y - 24}" width="40" height="24" style="fill:${S.wood}"/><rect x="${x - 21}" y="${y - 28}" width="42" height="5" rx="1" style="fill:${dk(S.wood, .1)}"/><rect x="${x - 16}" y="${y - 34}" width="20" height="6" rx="1" style="fill:${lt(S.wood, .2)}"/>`,
+    `<ellipse cx="${x - 6}" cy="${y - 34}" rx="7" ry="1.8" fill="#2A2420"/><circle cx="${x - 6}" cy="${y - 34}" r=".9" fill="${S.fabric}"/>${[0, 1, 2, 3, 4, 5].map(k => `<rect x="${x - 17 + k*5.6}" y="${y - 20}" width="4.4" height="15" fill="${[S.accent, S.fabric, "#2A2420", S.fabric2, "#E8D9B8", "#7E8FA6"][k]}" stroke="${INK}" stroke-width=".3"/>`).join("")}<path d="M${x + 9} ${y - 28} l-2 -6 h7 l-2 6z" fill="#C8643B"/><ellipse cx="${x + 10.5}" cy="${y - 37}" rx="3" ry="3.4" fill="#6E9A5A"/>`));
+  if (id === "diffuser") return g(D(`<rect x="${x - 3}" y="${y - 8}" width="6" height="8" rx="1.4" style="fill:#C9B3E3"/>`, `<path d="M${x - 1} ${y - 8} l-4 -10 M${x} ${y - 8} l1 -11 M${x + 1} ${y - 8} l4 -9" stroke="#5A3A2A" stroke-width=".6"/>`));
+  if (id === "flowers") { const fy = tier("dining") ? y : at("dining")[1] - 2; return g(D(`<path d="M${x - 4} ${fy} q-3 -7 1 -11 h6 q4 4 1 11z" style="fill:${CREAM}"/>`,
+    [[-6, -18, S.fabric], [0, -21, "#F6E3A1"], [6, -18, S.fabric], [-3, -15, "#FFFFFF"], [4, -14, "#C9B3E3"]].map(([dx, dy, c]) => `<path d="M${x} ${fy - 11} L${x + dx} ${fy + dy}" stroke="#6E9A5A" stroke-width=".8"/><circle cx="${x + dx}" cy="${fy + dy}" r="2.4" fill="${c}" stroke="${INK}" stroke-width=".3"/>`).join(""))); }
+  if (id === "cushions") return g(D(`<path d="M${x - 30} ${y - 6} q8 -4 16 0 q1 7 -1 12 h-14 q-2 -5 -1 -12z" style="fill:${S.accent}"/><path d="M${x + 10} ${y - 6} q8 -4 16 0 q1 7 -1 12 h-14 q-2 -5 -1 -12z" style="fill:${S.fabric2}"/><path d="M${x + 26} ${y - 4} q10 -2 16 6 v22 q-6 4 -10 0 q2 -16 -8 -20z" style="fill:${lt(S.fabric, .25)}"/>`,
+    `<circle cx="${x - 22}" cy="${y}" r="2.4" fill="none" stroke="${lt(S.accent, .4)}" stroke-width=".9"/><path d="M${x + 12} ${y - 2} h12 M${x + 12} ${y + 2} h12" stroke="${S.accent}" stroke-width=".7"/>${[0, 1, 2].map(k => `<path d="M${x + 31 + k*3} ${y} q1 12 0 22" stroke="${S.accent}" stroke-width=".7" fill="none"/>`).join("")}`));
+  return "";
 }
 // guests in, or the changeover still to do
 function livedDown(){
   let s = "";
+  const [cx, cy] = at("coffee"), [dx, dy] = at("dining");
   if (ST.occupied) {
-    s += g(D(`<rect x="20" y="572" width="34" height="34" rx="4" style="fill:#C8553D"/>`, `<path d="M30 572 v-6 h14 v6" fill="none" stroke="${INK}" stroke-width="1.6"/><path d="M20 584 h34" stroke="${dk("#C8553D", .25)}" stroke-width="1"/><circle cx="31" cy="596" r="4" fill="#F6E3A1"/><rect x="40" y="590" width="9" height="6" fill="#7FB0CF" transform="rotate(10 44 593)"/><circle cx="25" cy="608" r="2" fill="${INK}"/><circle cx="49" cy="608" r="2" fill="${INK}"/>`));
-    const [bx, by] = tier("coffee") ? [244, 408] : tier("sofa") ? [196, 342] : [226, 438];
-    s += g(`<g transform="rotate(-8 ${bx} ${by})">${D(`<path d="M${bx - 14} ${by} l1 -8 q6 -2 13 1 q7 -3 13 -1 l1 8 q-7 -2 -14 1 q-7 -3 -14 -1z" style="fill:${CREAM}"/>`, `<path d="M${bx} ${by - 7} v8" stroke="${S.accent}" stroke-width="1.6"/>`)}</g>`);
+    s += g(D(`<rect x="184" y="584" width="22" height="20" rx="3" style="fill:#C8553D"/>`, `<path d="M190 584 v-4 h10 v4" fill="none" stroke="${INK}" stroke-width="1.2"/><circle cx="191" cy="594" r="2.4" fill="#F6E3A1"/><rect x="197" y="590" width="6" height="4" fill="#7FB0CF"/><circle cx="187" cy="605" r="1.4" fill="${INK}"/><circle cx="203" cy="605" r="1.4" fill="${INK}"/>`));
+    const [bx, by] = tier("coffee") ? [cx + 8, cy - 20] : [cx + 30, cy - 4];
+    s += scaled("coffee", () => g(`<g transform="rotate(-8 ${bx} ${by})">${D(`<path d="M${bx - 9} ${by} l1 -5 q4 -1 8 1 q4 -2 8 -1 l1 5 q-4 -1 -9 1 q-5 -2 -9 -1z" style="fill:${CREAM}"/>`, `<path d="M${bx} ${by - 4} v5" stroke="${S.accent}" stroke-width="1.2"/>`)}</g>`));
   }
   if (undone("tidy")) {
-    const mug = (x, y, c) => `<rect x="${x - 4}" y="${y - 8}" width="8" height="8" rx="1.5" fill="${c}" stroke="${INK}" stroke-width=".6"/><path d="M${x + 4} ${y - 6} q4 1 0 4" fill="none" stroke="${INK}" stroke-width=".7"/><ellipse cx="${x}" cy="${y - 8}" rx="4" ry="1.2" fill="#8A5A3A"/>`;
-    const plate = (x, y) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="3" fill="${CREAM}" stroke="${INK}" stroke-width=".6"/><circle cx="${x - 2}" cy="${y - .5}" r=".9" fill="#C9A26A"/><circle cx="${x + 3}" cy="${y}" r=".8" fill="#C9A26A"/>`;
-    if (tier("coffee")) s += g(mug(204, 416, S.fabric2) + mug(258, 418, CREAM) + plate(228, 418));
-    if (tier("dining")) s += g(plate(400, 424) + plate(436, 420) + mug(420, 414, S.accent));
-    s += g(Array.from({length: 9}, (_, k) => `<circle cx="${f1(204 + R(k)*50)}" cy="${f1(454 + R(k + 9)*16)}" r="1" fill="#B8956A"/>`).join(""));
-    s += g(D(`<path d="M108 404 q14 -8 28 -2 q4 12 -2 22 q-14 4 -26 -2 q-4 -10 0 -18z" style="fill:${S.fabric}"/>`, `<path d="M116 410 q8 4 14 0" stroke="${lt(S.fabric, .4)}" stroke-width="1" fill="none"/>`));
-    s += g(D(`<path d="M474 524 q-6 -24 4 -34 q10 4 20 0 q8 12 2 34z" style="fill:${S.fabric2}"/>`, `<path d="M478 494 q10 4 20 0" stroke="${INK}" stroke-width="1" fill="none"/><path d="M480 492 q-6 -8 2 -10 q4 6 8 2 q6 -6 8 2" fill="${CREAM}" stroke="${INK}" stroke-width=".6"/>`));
+    const mug = (x, y, c) => `<rect x="${x - 2.6}" y="${y - 5}" width="5.2" height="5" rx="1" fill="${c}" stroke="${INK}" stroke-width=".5"/><path d="M${x + 2.6} ${y - 4} q2.6 1 0 3" fill="none" stroke="${INK}" stroke-width=".5"/>`;
+    const plate = (x, y) => `<ellipse cx="${x}" cy="${y}" rx="6" ry="2" fill="${CREAM}" stroke="${INK}" stroke-width=".5"/><circle cx="${x - 1.4}" cy="${y - .3}" r=".7" fill="#C9A26A"/><circle cx="${x + 2}" cy="${y}" r=".6" fill="#C9A26A"/>`;
+    if (tier("coffee")) s += scaled("coffee", () => g(mug(cx - 14, cy - 19, S.fabric2) + mug(cx + 16, cy - 18, CREAM) + plate(cx, cy - 17)));
+    if (tier("dining")) s += scaled("dining", () => g(plate(dx + 2, dy - 26) + plate(dx + 20, dy - 28) + mug(dx - 2, dy - 30, S.accent)));
+    s += g(Array.from({length: 8}, (_, k) => `<circle cx="${f1(cx - 20 + R(k)*40)}" cy="${f1(cy + 4 + R(k + 9)*12)}" r=".8" fill="#B8956A"/>`).join(""));
+    const [sx, sy] = at("sofa");
+    s += g(D(`<path d="M${sx + 50} ${sy + 10} q8 -5 16 -1 q2 7 -1 12 q-8 3 -15 -1 q-2 -6 0 -10z" style="fill:${S.fabric}"/>`));
+    s += g(D(`<path d="M478 524 q-4 -16 3 -22 q6 3 13 0 q5 8 1 22z" style="fill:${S.fabric2}"/>`, `<path d="M481 502 q6 3 13 0" stroke="${INK}" stroke-width=".8" fill="none"/><path d="M483 501 q-4 -6 1 -7 q3 4 5 1 q4 -4 5 1" fill="${CREAM}" stroke="${INK}" stroke-width=".5"/>`));
   }
   return s;
 }
+// decor that makes the zones: a runner from the front door, a side table by the armchair, a bench for boots by the stairs
+function downDecor(){
+  const runner = D(`<rect x="238" y="430" width="44" height="168" rx="2" style="fill:${S.fabric2}"/>`, `<rect x="243" y="436" width="34" height="156" fill="none" stroke="${S.accent}" stroke-width="1.6"/>${[0, 1, 2, 3, 4, 5, 6].map(k => `<path d="M${252 + (k % 2)*8} ${452 + k*20} l8 6 l-8 6" fill="none" stroke="${S.fabric}" stroke-width="1.2"/>`).join("")}${Array.from({length: 9}, (_, k) => `<path d="M${241 + k*4.8} 430 v-3" stroke="${S.fabric2}" stroke-width="1"/>`).join("")}`);
+  const [ax, ay] = at("armchair");
+  const side = D(`<ellipse cx="${ax - 40}" cy="${ay - 20}" rx="9" ry="3" style="fill:${lt(S.wood, .1)}"/><path d="M${ax - 46} ${ay - 2} h12 l-1 -3 h-10z" style="fill:${dk(S.wood, .2)}"/>`, `<path d="M${ax - 40} ${ay - 18} v14" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M${ax - 44} ${ay - 22} l1 -5 h6 l1 5z" fill="#C8643B"/><ellipse cx="${ax - 42}" cy="${ay - 30}" rx="3" ry="4" fill="#6E9A5A"/><ellipse cx="${ax - 38}" cy="${ay - 31}" rx="2.4" ry="3.4" fill="#88AE6A"/>`);
+  const bench = D(`<rect x="420" y="458" width="62" height="6" rx="1.5" style="fill:${S.wood}"/><path d="M432 478 v-10 q0 -3 4 -3 h4 v13z M446 478 v-10 q0 -3 4 -3 h4 v13z" style="fill:#4E7A5E"/><path d="M458 458 l2 -12 h16 l2 12z" style="fill:#C9A26A"/>`,
+    `<path d="M424 464 v14 M478 464 v14" stroke="${dk(S.wood, .3)}" stroke-width="2"/><path d="M462 450 h12" stroke="#9A7A4A" stroke-width=".7"/><path d="M462 448 q4 -6 8 -2" fill="${S.fabric}" stroke="${INK}" stroke-width=".4"/>`);
+  return g(side + bench);
+}
 function downArt(){
-  return floorArt() + wallArt() + windowArt(226, 46, 48, 80, {curtains: tier("bookshelf") !== 3, seed: 1}) + windowArt(374, 44, 52, 72, {curtains: false, seed: 2}) + sideWall()
-    + chimney() + pieceSpot("rug", rug) + pieceSpot("fireplace", fireplace) + pieceSpot("bookshelf", bookshelf) + calendar() + pieceSpot("kitchen", kitchen) + fridge()
-    + gardenDoor() + pieceSpot("lamp", lamp) + pieceSpot("sofa", sofa) + pieceSpot("armchair", armchair) + pieceSpot("coffee", coffee) + pieceSpot("dining", dining)
-    + accDown() + fruitBowl() + consoleArt() + guestbook() + catalogue() + broom() + livedDown() + stairsUp() + crates() + exitMat();
+  const [kx] = at("kitchen");
+  return floorArt() + wallArt() + windowArt(38, 116, 48, 56, {seed: 1}) + windowArt(kx - 22, 112, 44, 50, {curtains: false, seed: 2}) + sideWall()
+    + chimney() + accDown("prints") + accDown("records") + pieceSpot("fireplace", fireplace) + accDown("candles") + pieceSpot("bookshelf", bookshelf) + calendar() + broomCupboard() + pieceSpot("kitchen", kitchen) + fridge()
+    + gardenDoor() + downDecor() + pieceSpot("rug", rug) + pieceSpot("armchair", armchair) + pieceSpot("coffee", coffee) + pieceSpot("dining", dining) + scaled("dining", () => accDown("flowers") + fruitBowl())
+    + pieceSpot("sofa", sofa) + scaled("sofa", () => accDown("cushions")) + pieceSpot("lamp", lamp)
+    + consoleArt() + guestbook() + catalogue() + accDown("diffuser") + livedDown() + stairsUp() + crates() + exitMat();
 }
 
 /* ====================================================================================================== */
-/* ---------- upstairs ---------- */
-function bed(t){
+/* ---------- upstairs: the bedroom ---------- */
+function bathDoor(){   // the door through to the bathroom, in the left wall
+  const col = ST.c === "bluebell" ? BLUE : lt(S.wood, .1);
+  return otherSpot("bathroom", "Through the door to the bathroom", hovE(30, 352, 26, 10),
+    D(`<path d="M1 270 L18 278 V350 L1 362z" style="fill:${col}"/><path d="M3 362 l17 -10 h20 l-16 12z" style="fill:${S.fabric2}"/>`,
+      `<path d="M5 280 L14 284 V310 L5 307z M5 315 L14 317 V344 L5 350z" fill="none" stroke="${dk(col, .25)}" stroke-width=".8"/><circle cx="15" cy="318" r="1.4" fill="${S.metal}"/><ellipse cx="9" cy="296" rx="3.4" ry="2.2" fill="${CREAM}" stroke="${INK}" stroke-width=".4" transform="rotate(24 9 296)"/>`)
+    + lab(40, 378, "Bathroom", "#DDEBF2", 8));
+}
+// a little rush chair and a basket of spare blankets by the bathroom door
+const doorCorner = () => g(D(`<rect x="40" y="416" width="16" height="4" rx="1" style="fill:#D9B866"/><path d="M38 440 h22 l-2 -16 h-18z" style="fill:#C9A26A"/>`,
+  `<path d="M41 420 v12 M55 420 v12 M41 420 v-14 M41 408 h0" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M41 406 v14 M41 410 h-0" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M42 424 q4 -6 8 -2 q6 -4 8 2" fill="${S.fabric2}" stroke="${INK}" stroke-width=".5"/>`));
+function vanity(t, x, y){
+  if (t === 1) return D(`<rect x="${x - 18}" y="196" width="36" height="3" rx="1" style="fill:${S.wood}"/><circle cx="${x}" cy="176" r="10" style="fill:#DDEEF2"/>`, `<path d="M${x - 14} 199 l3 5 M${x + 14} 199 l-3 5" stroke="${dk(S.wood, .3)}" stroke-width="1.4"/><circle cx="${x}" cy="176" r="10" fill="none" stroke="${S.metal}" stroke-width="1.8"/><path d="M${x - 5} 173 l6 -5" stroke="#FFFFFF" stroke-width="1.6"/><rect x="${x + 6}" y="190" width="5" height="6" rx="1" fill="${S.fabric}"/><rect x="${x - 12}" y="191" width="4" height="5" rx="1" fill="#C9B3E3"/>`);
+  const c = t === 3 ? CREAM : S.wood, w = 24;
+  const mirror = t === 2 ? `<ellipse cx="${x}" cy="${y - 52}" rx="10" ry="13" style="fill:#DDEEF2"/>` : `<rect x="${x - 16}" y="150" width="32" height="34" rx="3" style="fill:#DDEEF2"/>`;
+  let det = `<path d="M${x - w + 2} ${y - 22} h${w*2 - 4}" stroke="${dk(c, .2)}" stroke-width=".8"/><circle cx="${x - 10}" cy="${y - 25}" r="1" fill="${S.metal}"/><circle cx="${x + 10}" cy="${y - 25}" r="1" fill="${S.metal}"/><path d="M${x - w + 3} ${y - 20} v20 M${x + w - 3} ${y - 20} v20" stroke="${dk(S.wood, .2)}" stroke-width="2.2"/>`;
+  det += t === 2 ? `<ellipse cx="${x}" cy="${y - 52}" rx="10" ry="13" fill="none" stroke="${dk(S.wood, .2)}" stroke-width="2"/><path d="M${x - 5} ${y - 56} l6 -6" stroke="#FFFFFF" stroke-width="1.6"/><path d="M${x} ${y - 39} v6" stroke="${dk(S.wood, .2)}" stroke-width="2"/>` : `<path d="M${x - 8} 176 l10 -18" stroke="#FFFFFF" stroke-width="2" opacity=".7"/>`;
+  det += `<rect x="${x + 10}" y="${y - 37}" width="4" height="5" rx="1" fill="${S.fabric}" stroke="${INK}" stroke-width=".3"/><rect x="${x + 15}" y="${y - 36}" width="3.4" height="4" rx="1" fill="#C9B3E3" stroke="${INK}" stroke-width=".3"/>`;
+  let s = D(mirror + `<rect x="${x - w}" y="${y - 30}" width="${w*2}" height="10" rx="1" style="fill:${c}"/><rect x="${x - w - 1}" y="${y - 33}" width="${w*2 + 2}" height="4" rx="1" style="fill:${dk(c, .1)}"/><rect x="${x - 8}" y="${y - 14}" width="16" height="5" rx="2" style="fill:${t === 3 ? S.fabric : S.wood}"/>`, det + `<path d="M${x - 6} ${y - 9} v9 M${x + 6} ${y - 9} v9" stroke="${t === 3 ? S.metal : dk(S.wood, .3)}" stroke-width="1.6"/>`);
+  if (t === 3) s += g([[x - 16, 150], [x + 16, 150], [x - 16, 184], [x + 16, 184], [x - 16, 167], [x + 16, 167], [x, 150]].map(([bx, by]) => { glow(bx, by, 12); return `<circle cx="${bx}" cy="${by}" r="2.4" fill="${NIGHT ? "#FFE8A8" : "#FFF6DA"}" stroke="${INK}" stroke-width=".5"/>`; }).join(""));
+  return s;
+}
+function bedside(t, x, y){
+  const one = bx => {
+    if (t === 1) return D(`<ellipse cx="${bx}" cy="${y - 18}" rx="9" ry="3.4" style="fill:${lt(S.wood, .15)}"/>`, `<path d="M${bx - 6} ${y - 16} l-2 16 M${bx + 6} ${y - 16} l2 16 M${bx} ${y - 15} v15" stroke="${dk(S.wood, .25)}" stroke-width="1.8"/><path d="M${bx - 1.4} ${y - 20} v-6 h3.4 v6" fill="#DDEEF2" stroke="${INK}" stroke-width=".4"/>`);
+    const lampIt = t === 3 ? (glow(bx, y - 38, 28), `<path d="M${bx} ${y - 24} v-10" stroke="${S.metal}" stroke-width="1.4"/><path d="M${bx - 6} ${y - 42} h12 l3 8 h-18z" fill="${NIGHT ? lt(S.fabric2, .5) : S.fabric2}" stroke="${INK}" stroke-width=".6"/><ellipse cx="${bx}" cy="${y - 24}" rx="4" ry="1.4" fill="${S.metal}"/>`) : `<rect x="${bx - 5}" y="${y - 26}" width="8" height="3" fill="${S.accent}" stroke="${INK}" stroke-width=".3"/>`;
+    return D(`<rect x="${bx - 10}" y="${y - 22}" width="20" height="22" rx="1.5" style="fill:${t === 3 ? S.wood : lt(S.wood, .1)}"/>`, `<path d="M${bx - 10} ${y - 13} h20" stroke="${dk(S.wood, .25)}" stroke-width=".8"/><circle cx="${bx}" cy="${y - 17}" r="1" fill="${S.metal}"/><circle cx="${bx}" cy="${y - 7}" r="1" fill="${S.metal}"/>` + lampIt);
+  };
+  return one(x - 46) + one(x + 46);
+}
+function bed(t, x, y){
   const rump = undone("beds"), duv = t === 1 ? S.fabric2 : t === 2 ? S.fabric : lt(S.fabric, .15), quilt = has("linen");
+  const L = x - 32, Rr = x + 32, top = 214, foot = y - 14;
   let head;
-  if (t === 1) head = `<path d="M204 216 V160 q66 -22 132 0 V216" fill="none" stroke="${S.metal}" stroke-width="4"/>${[0, 1, 2, 3, 4, 5].map(k => `<path d="M${222 + k*19} ${156 - (k > 0 && k < 5 ? 6 : 0)} V212" stroke="${S.metal}" stroke-width="2"/>`).join("")}`;
-  else if (t === 2) head = `<path d="M202 216 V160 q0 -14 14 -14 h108 q14 0 14 14 V216z" style="fill:${S.wood}"/>`;
-  else head = `<path d="M200 216 V150 q70 -30 140 0 V216z" style="fill:${S.fabric}"/>`;
-  const posts = t === 3 ? `<rect x="196" y="70" width="8" height="262" style="fill:${dk(S.wood, .1)}"/><rect x="336" y="70" width="8" height="262" style="fill:${dk(S.wood, .1)}"/><rect x="192" y="64" width="156" height="12" rx="2" style="fill:${S.wood}"/>` : "";
-  const drapes = t === 3 ? `<path d="M196 76 q-14 60 -4 120 q8 4 14 0 q-4 -60 2 -120z" fill="${S.fabric2}" stroke="${INK}" stroke-width=".8"/><path d="M344 76 q14 60 4 120 q-8 4 -14 0 q4 -60 -2 -120z" fill="${S.fabric2}" stroke="${INK}" stroke-width=".8"/><path d="M204 76 q66 18 132 0" fill="none" stroke="${S.fabric2}" stroke-width="6"/>` : "";
-  const frame = `<rect x="204" y="206" width="132" height="110" rx="4" style="fill:${CREAM}"/><rect x="200" y="312" width="140" height="14" rx="2" style="fill:${t === 1 ? S.metal : S.wood}"/>`;
+  if (t === 1) head = `<path d="M${L + 2} ${top + 4} V188 q30 -12 60 0 V${top + 4}" fill="none" stroke="${S.metal}" stroke-width="2.6"/>${[0, 1, 2, 3, 4].map(k => `<path d="M${L + 12 + k*10} ${186 - (k > 0 && k < 4 ? 3 : 0)} V${top}" stroke="${S.metal}" stroke-width="1.4"/>`).join("")}`;
+  else if (t === 2) head = `<path d="M${L} ${top + 4} V184 q0 -8 8 -8 h48 q8 0 8 8 V${top + 4}z" style="fill:${S.wood}"/>`;
+  else head = `<path d="M${L} ${top + 4} V178 q32 -18 64 0 V${top + 4}z" style="fill:${S.fabric}"/>`;
+  const frame = `<rect x="${L + 2}" y="${top}" width="60" height="${foot - top}" rx="3" style="fill:${CREAM}"/><rect x="${L}" y="${foot - 2}" width="64" height="12" rx="2" style="fill:${t === 1 ? S.metal : S.wood}"/>`;
   let pillows, cover;
   if (rump) {
-    pillows = `<path d="M214 214 q22 -8 46 2 q2 12 -4 18 q-22 4 -42 -4z" style="fill:${CREAM}" transform="rotate(-12 236 222)"/><path d="M286 220 q22 -6 42 4 q0 12 -6 16 q-20 2 -38 -4z" style="fill:${CREAM}" transform="rotate(16 306 228)"/>`;
-    cover = `<path d="M204 270 q20 -12 36 -2 q16 -14 34 -2 q18 -12 34 0 q14 -6 28 4 V316 H204z" style="fill:${quilt ? S.fabric2 : duv}"/>`;
+    pillows = `<path d="M${L + 6} ${top + 4} q12 -5 24 1 q1 8 -2 11 q-12 2 -22 -2z" style="fill:${CREAM}" transform="rotate(-12 ${L + 18} ${top + 8})"/><path d="M${x + 4} ${top + 7} q12 -4 22 2 q0 8 -3 10 q-11 1 -20 -2z" style="fill:${CREAM}" transform="rotate(16 ${x + 15} ${top + 12})"/>`;
+    cover = `<path d="M${L + 2} ${foot - 30} q10 -7 18 -1 q9 -8 18 -1 q10 -7 18 0 q5 -3 8 2 V${foot} H${L + 2}z" style="fill:${quilt ? S.fabric2 : duv}"/>`;
   } else {
-    pillows = `<rect x="214" y="212" width="50" height="22" rx="8" style="fill:${CREAM}"/><rect x="276" y="212" width="50" height="22" rx="8" style="fill:${CREAM}"/>` + (t === 3 ? `<rect x="234" y="226" width="30" height="18" rx="6" style="fill:${S.accent}"/><rect x="276" y="226" width="30" height="18" rx="6" style="fill:${S.fabric2}"/>` : "");
-    cover = `<rect x="202" y="242" width="136" height="76" rx="4" style="fill:${duv}"/><rect x="202" y="242" width="136" height="12" rx="3" style="fill:${lt(duv, .35)}"/>`;
+    pillows = `<rect x="${L + 6}" y="${top + 3}" width="25" height="12" rx="5" style="fill:${CREAM}"/><rect x="${x + 1}" y="${top + 3}" width="25" height="12" rx="5" style="fill:${CREAM}"/>` + (t === 3 ? `<rect x="${x - 15}" y="${top + 11}" width="14" height="10" rx="4" style="fill:${S.accent}"/><rect x="${x + 1}" y="${top + 11}" width="14" height="10" rx="4" style="fill:${S.fabric2}"/>` : "");
+    cover = `<rect x="${L + 1}" y="${top + 22}" width="62" height="${foot - top - 20}" rx="3" style="fill:${duv}"/><rect x="${L + 1}" y="${top + 22}" width="62" height="7" rx="2" style="fill:${lt(duv, .35)}"/>`;
   }
   let det = "";
-  if (rump) det += `<path d="M216 248 q20 6 40 -2 M262 256 q22 -6 44 4 M224 238 q10 6 26 2" stroke="#D8D0C4" stroke-width="1" fill="none"/>`;
-  if (!rump && quilt) det += Array.from({length: 18}, (_, k) => `<rect x="${206 + (k % 6)*22}" y="${256 + Math.floor(k/6)*20}" width="22" height="20" fill="${[S.fabric, S.fabric2, lt(S.accent, .4), CREAM][(k*5) % 4]}" opacity=".8"/>`).join("") + `<path d="M206 256 h132" stroke="${INK}" stroke-width=".6" stroke-dasharray="2 2"/>`;
-  else if (!rump && t === 2) det += [0, 1, 2].map(r => `<path d="M204 ${268 + r*16} h132" stroke="${dk(duv, .12)}" stroke-width="1"/>`).join("") + [0, 1, 2, 3, 4].map(k => `<path d="M${226 + k*22} 256 v60" stroke="${dk(duv, .12)}" stroke-width="1"/>`).join("");
-  else if (!rump && t === 3) det += `<path d="M204 300 q66 8 132 0" stroke="${S.accent}" stroke-width="2" fill="none"/><ellipse cx="270" cy="272" rx="40" ry="8" fill="#FFFFFF" opacity=".18"/>`;
-  else if (rump && quilt) det += `<path d="M210 290 h120" stroke="${S.fabric}" stroke-width="3" stroke-dasharray="10 6"/>`;
-  if (t === 2) det += `<path d="M216 160 h108" stroke="${dk(S.wood, .2)}" stroke-width="1"/>`;
-  if (t === 3) det += [0, 1, 2, 3].map(k => `<circle cx="${236 + k*22}" cy="${170 - (k === 1 || k === 2 ? 6 : 0)}" r="1.6" fill="${dk(S.fabric, .3)}"/>`).join("");
-  if (ST.occupied && !rump) det += `<g transform="rotate(10 300 300)"><path d="M288 302 l1 -7 q5 -2 11 1 q6 -3 11 -1 l1 7 q-6 -2 -12 1 q-6 -3 -12 -1z" fill="${CREAM}" stroke="${INK}" stroke-width=".6"/><path d="M300 296 v7" stroke="${S.accent}" stroke-width="1.4"/></g>`;
-  return (t === 3 ? D(posts.split("<rect x=\"192\"")[0]) : "") + D(head) + D(frame + pillows + cover, det) + (t === 3 ? D(`<rect x="192" y="64" width="156" height="12" rx="2" style="fill:${S.wood}"/>`, drapes) : "");
-}
-function bedside(t){
-  const one = x => {
-    if (t === 1) return D(`<ellipse cx="${x}" cy="290" rx="14" ry="5" style="fill:${lt(S.wood, .15)}"/>`, `<path d="M${x - 9} 292 l-3 24 M${x + 9} 292 l3 24 M${x} 294 v22" stroke="${dk(S.wood, .25)}" stroke-width="2.4"/><path d="M${x - 2} 288 v-8 h5 v8" fill="#DDEEF2" stroke="${INK}" stroke-width=".5"/>`);
-    const lampIt = t === 3 ? (glow(x, 254, 34), `<path d="M${x} 280 v-18" stroke="${S.metal}" stroke-width="2"/><path d="M${x - 9} 250 h18 l4 13 h-26z" fill="${NIGHT ? lt(S.fabric2, .5) : S.fabric2}" stroke="${INK}" stroke-width=".8"/><ellipse cx="${x}" cy="281" rx="6" ry="2" fill="${S.metal}"/>`) : "";
-    return D(`<rect x="${x - 15}" y="280" width="30" height="36" rx="2" style="fill:${t === 3 ? S.wood : lt(S.wood, .1)}"/>`, `<path d="M${x - 15} 294 h30" stroke="${dk(S.wood, .25)}" stroke-width="1"/><circle cx="${x}" cy="288" r="1.4" fill="${S.metal}"/><circle cx="${x}" cy="304" r="1.4" fill="${S.metal}"/>` + lampIt);
-  };
-  return one(180) + one(360);
-}
-function wardrobe(t){
-  if (t === 1) return D(`<rect x="430" y="246" width="44" height="14" rx="2" style="fill:#C9A26A"/>`, `<path d="M426 262 V168 M482 262 V168 M424 168 h60" stroke="${S.metal}" stroke-width="3"/>${[S.fabric, S.accent, CREAM, S.fabric2, "#7E8FA6"].map((c, k) => `<path d="M${436 + k*9} 168 v5" stroke="${INK}" stroke-width=".8"/><path d="M${430 + k*9} 178 l6 -5 l6 5 l2 ${30 + (k % 2)*14} h-16z" fill="${c}" stroke="${INK}" stroke-width=".7"/>`).join("")}`);
-  if (t === 2) { const c = mix(S.accent, "#FFFFFF", .5);
-    return D(`<rect x="424" y="156" width="60" height="102" rx="2" style="fill:${c}"/><rect x="420" y="150" width="68" height="8" rx="2" style="fill:${dk(c, .1)}"/>`, `<path d="M454 160 v94" stroke="${dk(c, .3)}" stroke-width="1.2"/><rect x="429" y="164" width="21" height="86" fill="none" stroke="${dk(c, .2)}" stroke-width="1"/><rect x="458" y="164" width="21" height="86" fill="none" stroke="${dk(c, .2)}" stroke-width="1"/><circle cx="450" cy="208" r="1.8" fill="${S.metal}"/><circle cx="458" cy="208" r="1.8" fill="${S.metal}"/><path d="M428 258 v4 M480 258 v4" stroke="${INK}" stroke-width="2.4"/><path d="M434 180 q6 -6 12 0 q-6 6 -12 0 M462 180 q6 -6 12 0 q-6 6 -12 0" fill="${S.fabric}"/>`); }
-  return D(`<path d="M418 258 V138 q36 -22 72 0 V258z" style="fill:${S.wood}"/><rect x="438" y="152" width="32" height="92" rx="14" style="fill:#DDEEF2"/>`,
-    `<path d="M436 148 v108 M472 148 v108" stroke="${dk(S.wood, .3)}" stroke-width="1.2"/><rect x="422" y="150" width="12" height="96" fill="none" stroke="${dk(S.wood, .3)}" stroke-width="1"/><rect x="474" y="150" width="12" height="96" fill="none" stroke="${dk(S.wood, .3)}" stroke-width="1"/><path d="M442 230 l20 -64" stroke="#FFFFFF" stroke-width="3" opacity=".6"/><path d="M432 134 q22 -12 44 0" stroke="${S.metal}" stroke-width="2" fill="none"/><circle cx="454" cy="128" r="3" fill="${S.metal}"/><path d="M418 258 h72 v4 h-72z" fill="${dk(S.wood, .3)}"/><circle cx="432" cy="200" r="1.8" fill="${S.metal}"/><circle cx="476" cy="200" r="1.8" fill="${S.metal}"/>`);
+  if (rump) det += `<path d="M${L + 8} ${top + 24} q10 4 20 -1 M${x + 2} ${top + 30} q12 -4 24 2" stroke="#D8D0C4" stroke-width=".8" fill="none"/>`;
+  if (!rump && quilt) det += Array.from({length: 15}, (_, k) => `<rect x="${L + 2 + (k % 5)*12}" y="${top + 30 + Math.floor(k/5)*((foot - top - 30)/3)}" width="12" height="${f1((foot - top - 30)/3)}" fill="${[S.fabric, S.fabric2, lt(S.accent, .4), CREAM][(k*5) % 4]}" opacity=".85"/>`).join("");
+  else if (!rump && t === 2) det += [0, 1].map(r => `<path d="M${L + 2} ${top + 42 + r*14} h60" stroke="${dk(duv, .12)}" stroke-width=".8"/>`).join("") + [0, 1, 2, 3].map(k => `<path d="M${L + 14 + k*12} ${top + 29} v${foot - top - 29}" stroke="${dk(duv, .12)}" stroke-width=".8"/>`).join("");
+  else if (!rump && t === 3) det += `<path d="M${L + 2} ${foot - 10} q30 5 60 0" stroke="${S.accent}" stroke-width="1.6" fill="none"/>`;
+  if (ST.occupied && !rump) det += `<path d="M${x + 8} ${foot - 16} l1 -5 q3 -1 6 1 q3 -2 6 -1 l1 5 q-3 -1 -7 1 q-4 -2 -7 -1z" fill="${CREAM}" stroke="${INK}" stroke-width=".5"/>`;
+  // the four-poster: posts at the corners, a canopy frame and drapes tied back at the foot
+  const backPosts = t === 3 ? D(`<rect x="${L - 1}" y="104" width="4" height="${top - 100}" style="fill:${dk(S.wood, .1)}"/><rect x="${Rr - 3}" y="104" width="4" height="${top - 100}" style="fill:${dk(S.wood, .1)}"/>`) : "";
+  const front = t === 3 ? D(`<rect x="${L - 3}" y="118" width="5" height="${y - 118}" style="fill:${dk(S.wood, .1)}"/><rect x="${Rr - 2}" y="118" width="5" height="${y - 118}" style="fill:${dk(S.wood, .1)}"/><path d="M${L - 3} 118 L${L - 1} 104 H${Rr + 1} L${Rr + 3} 118z" style="fill:${S.wood}"/>`,
+    `<path d="M${L - 2} 122 q-8 30 -2 60 q4 2 7 0 q-2 -30 1 -60z" fill="${S.fabric2}" stroke="${INK}" stroke-width=".6"/><path d="M${Rr + 2} 122 q8 30 2 60 q-4 2 -7 0 q2 -30 -1 -60z" fill="${S.fabric2}" stroke="${INK}" stroke-width=".6"/><path d="M${L} 120 q32 10 64 0" fill="none" stroke="${S.fabric2}" stroke-width="4"/>`) : "";
+  return backPosts + D(head) + D(frame + pillows + cover, det + `<path d="M${L + 2} ${y - 4} v4 M${Rr - 2} ${y - 4} v4" stroke="${dk(S.wood, .3)}" stroke-width="2.4"/>`) + front;
 }
 function seatRecess(){   // the deep window recess the window seat sits in (part of the cottage)
-  const id = `coWin${++CID}`;
-  return g(D(`<rect x="350" y="32" width="88" height="140" rx="2" style="fill:${dk(S.wall2, .06)}"/>`) + `<defs><clipPath id="${id}"><rect x="364" y="44" width="60" height="92"/></clipPath></defs><g clip-path="url(#${id})">${view(364, 44, 60, 92, 3)}</g>`
-    + sk(`<rect x="364" y="44" width="60" height="92" fill="none" style="stroke:${CREAM}" stroke-width="4"/><path d="M394 44 v92 M364 90 h60" style="stroke:${CREAM}" stroke-width="2.6"/>`, `<rect x="364" y="44" width="60" height="92"/>`)
-    + (ST.c === "bluebell" ? D(`<rect x="352" y="42" width="10" height="96" style="fill:${BLUE}"/><rect x="426" y="42" width="10" height="96" style="fill:${BLUE}"/>`, Array.from({length: 11}, (_, k) => `<path d="M353 ${48 + k*8} h8 M427 ${48 + k*8} h8" stroke="${BLUE2}" stroke-width="1"/>`).join("")) : "")
-    + D(`<rect x="350" y="140" width="88" height="20" style="fill:${lt(S.wood, .2)}"/><rect x="350" y="160" width="88" height="12" style="fill:${S.wall2}"/>`, `<path d="M350 160 h88" stroke="${dk(S.wood, .3)}" stroke-width="1"/>`));
+  const [x, y] = at("windowseat"), x0 = x - 32, x1 = x + 32;
+  return g(D(`<rect x="${x0}" y="112" width="64" height="${y - 112}" rx="1" style="fill:${dk(S.wall2, .06)}"/>`) + clip(x0 + 10, 120, 44, 58, view(x0 + 10, 120, 44, 58, 3))
+    + sk(`<rect x="${x0 + 10}" y="120" width="44" height="58" fill="none" style="stroke:${CREAM}" stroke-width="3"/><path d="M${x} 120 v58 M${x0 + 10} 148 h44" style="stroke:${CREAM}" stroke-width="2"/>`, `<rect x="${x0 + 10}" y="120" width="44" height="58"/>`)
+    + (ST.c === "bluebell" ? D(`<rect x="${x0 + 2}" y="118" width="7" height="62" style="fill:${BLUE}"/><rect x="${x1 - 9}" y="118" width="7" height="62" style="fill:${BLUE}"/>`) : "")
+    + D(`<rect x="${x0}" y="182" width="64" height="${y - 194}" style="fill:${lt(S.wood, .2)}"/><rect x="${x0}" y="${y - 12}" width="64" height="12" style="fill:${S.wall2}"/>`));
 }
-function windowseat(t){
-  if (t === 1) return D(`<rect x="362" y="142" width="40" height="16" rx="6" style="fill:${S.fabric}"/>`, `<path d="M366 150 h32" stroke="${lt(S.fabric, .4)}" stroke-width="1"/>`);
-  let s = D(`<rect x="352" y="142" width="84" height="18" rx="5" style="fill:${S.fabric2}"/><rect x="356" y="132" width="20" height="16" rx="5" style="fill:${S.fabric}"/><rect x="412" y="132" width="20" height="16" rx="5" style="fill:${S.accent}"/><path d="M396 146 q14 -4 26 2 l-2 26 q-12 4 -22 0z" style="fill:${lt(S.accent, .45)}"/>`,
-    `${[0, 1, 2].map(k => `<path d="M${401 + k*6} 148 v24" stroke="${S.accent}" stroke-width="1"/>`).join("")}`);
+function windowseat(t, x, y){
+  const x0 = x - 32;
+  if (t === 1) return D(`<rect x="${x0 + 8}" y="${y - 24}" width="24" height="9" rx="4" style="fill:${S.fabric}"/>`);
+  let s = D(`<rect x="${x0 + 1}" y="${y - 26}" width="62" height="13" rx="4" style="fill:${S.fabric2}"/><rect x="${x0 + 4}" y="${y - 34}" width="13" height="11" rx="4" style="fill:${S.fabric}"/><rect x="${x0 + 47}" y="${y - 34}" width="13" height="11" rx="4" style="fill:${S.accent}"/><path d="M${x + 4} ${y - 22} q10 -3 18 1 l-1 20 q-8 3 -16 0z" style="fill:${lt(S.accent, .45)}"/>`,
+    [0, 1, 2].map(k => `<path d="M${x + 7 + k*4} ${y - 20} v18" stroke="${S.accent}" stroke-width=".8"/>`).join(""));
   if (t === 3) {
-    s += D(`<rect x="352" y="161" width="40" height="11" style="fill:${dk(S.wood, .3)}"/>`, books(354, 390, 172, 21, 10));
-    s += g(Array.from({length: 13}, (_, k) => { const a = k/12, x = f1(358 + a*72), y = f1(38 + Math.sin(a*Math.PI*3)*4); if (k % 3 === 0) glow(+x, +y, 16); return `<circle cx="${x}" cy="${y}" r="2.2" fill="${NIGHT ? "#FFE08A" : "#FFF3C8"}" stroke="${INK}" stroke-width=".4"/>`; }).join("")
-      + `<path d="M356 36 q36 8 76 0" fill="none" stroke="#5A6A4A" stroke-width=".8"/>` + [0, 1, 2, 3, 4, 5].map(k => { const y = 50 + k*15; if (k % 2) glow(352, y, 12); return `<circle cx="352" cy="${y}" r="2" fill="${NIGHT ? "#FFE08A" : "#FFF3C8"}" stroke="${INK}" stroke-width=".4"/><circle cx="436" cy="${y}" r="2" fill="${NIGHT ? "#FFE08A" : "#FFF3C8"}" stroke="${INK}" stroke-width=".4"/>`; }).join(""));
+    s += D(`<rect x="${x0 + 2}" y="${y - 11}" width="30" height="10" style="fill:${dk(S.wood, .3)}"/>`, books(x0 + 3, x0 + 31, y - 1, 21, 8));
+    s += g(Array.from({length: 11}, (_, k) => { const a = k/10, lx = f1(x0 + 6 + a*52), ly = f1(116 + Math.sin(a*Math.PI*3)*2.4); if (k % 3 === 0) glow(+lx, +ly, 14); return `<circle cx="${lx}" cy="${ly}" r="1.6" fill="${NIGHT ? "#FFE08A" : "#FFF3C8"}" stroke="${INK}" stroke-width=".3"/>`; }).join("")
+      + [0, 1, 2, 3].map(k => { const ly = 126 + k*16; if (k % 2) glow(x0 + 4, ly, 10); return `<circle cx="${x0 + 4}" cy="${ly}" r="1.5" fill="${NIGHT ? "#FFE08A" : "#FFF3C8"}" stroke="${INK}" stroke-width=".3"/><circle cx="${x0 + 60}" cy="${ly}" r="1.5" fill="${NIGHT ? "#FFE08A" : "#FFF3C8"}" stroke="${INK}" stroke-width=".3"/>`; }).join(""));
   }
   return s;
 }
-function bedrug(t){
-  if (t === 1) return D(`<rect x="188" y="404" width="164" height="64" rx="2" style="fill:${S.fabric2}"/>`, [0, 1, 2, 3].map(k => `<path d="M188 ${414 + k*14} h164" stroke="${S.accent}" stroke-width="2.4"/>`).join("") + Array.from({length: 9}, (_, k) => `<path d="M188 ${406 + k*7.4} h-5 M352 ${406 + k*7.4} h5" stroke="${S.fabric2}" stroke-width="1.2"/>`).join(""));
-  if (t === 2) return D(`<path d="M206 432 q-6 -26 30 -30 q30 -8 64 0 q36 2 38 28 q4 26 -30 34 q-34 8 -68 0 q-38 -4 -34 -32z" style="fill:#F6F2E8"/>`, Array.from({length: 22}, (_, k) => `<path d="M${f1(212 + R(k)*116)} ${f1(410 + R(k + 3)*48)} q3 -3 6 0" stroke="#D8D0C0" stroke-width="1" fill="none"/>`).join(""));
-  return D(`<ellipse cx="270" cy="432" rx="112" ry="38" style="fill:${S.fabric}"/>`, `<ellipse cx="270" cy="432" rx="100" ry="32" fill="none" stroke="${S.fabric2}" stroke-width="5"/><ellipse cx="270" cy="432" rx="70" ry="22" fill="none" stroke="${S.accent}" stroke-width="3" stroke-dasharray="8 4"/><ellipse cx="270" cy="432" rx="34" ry="11" fill="${S.fabric2}"/>`);
+function wardrobe(t, x, y){
+  if (t === 1) return D(`<rect x="${x - 16}" y="${y - 10}" width="32" height="9" rx="1.5" style="fill:#C9A26A"/>`, `<path d="M${x - 20} ${y} V${y - 70} M${x + 20} ${y} V${y - 70} M${x - 22} ${y - 70} h44" stroke="${S.metal}" stroke-width="2.2"/>${[S.fabric, S.accent, CREAM, S.fabric2, "#7E8FA6"].map((c, k) => `<path d="M${x - 14 + k*7} ${y - 70} v3" stroke="${INK}" stroke-width=".6"/><path d="M${x - 18 + k*7} ${y - 64} l4 -3 l4 3 l1.4 ${22 + (k % 2)*10} h-10.8z" fill="${c}" stroke="${INK}" stroke-width=".5"/>`).join("")}`);
+  if (t === 2) { const c = mix(S.accent, "#FFFFFF", .5);
+    return D(`<rect x="${x - 22}" y="${y - 74}" width="44" height="72" rx="1.5" style="fill:${c}"/><rect x="${x - 25}" y="${y - 78}" width="50" height="5" rx="1.5" style="fill:${dk(c, .1)}"/>`, `<path d="M${x} ${y - 72} v68" stroke="${dk(c, .3)}" stroke-width="1"/><rect x="${x - 18}" y="${y - 68}" width="15" height="60" fill="none" stroke="${dk(c, .2)}" stroke-width=".8"/><rect x="${x + 3}" y="${y - 68}" width="15" height="60" fill="none" stroke="${dk(c, .2)}" stroke-width=".8"/><circle cx="${x - 3}" cy="${y - 38}" r="1.3" fill="${S.metal}"/><circle cx="${x + 3}" cy="${y - 38}" r="1.3" fill="${S.metal}"/><path d="M${x - 20} ${y - 2} v2 M${x + 20} ${y - 2} v2" stroke="${INK}" stroke-width="2"/><path d="M${x - 14} ${y - 60} q4 -4 8 0 q-4 4 -8 0 M${x + 6} ${y - 60} q4 -4 8 0 q-4 4 -8 0" fill="${S.fabric}"/>`); }
+  return D(`<path d="M${x - 26} ${y} V${y - 82} q26 -14 52 0 V${y}z" style="fill:${S.wood}"/><rect x="${x - 11}" y="${y - 76}" width="22" height="66" rx="10" style="fill:#DDEEF2"/>`,
+    `<path d="M${x - 13} ${y - 80} v78 M${x + 13} ${y - 80} v78" stroke="${dk(S.wood, .3)}" stroke-width="1"/><path d="M${x - 6} ${y - 20} l12 -44" stroke="#FFFFFF" stroke-width="2" opacity=".6"/><path d="M${x - 14} ${y - 88} q14 -8 28 0" stroke="${S.metal}" stroke-width="1.6" fill="none"/><circle cx="${x}" cy="${y - 92}" r="2.2" fill="${S.metal}"/><circle cx="${x - 18}" cy="${y - 40}" r="1.3" fill="${S.metal}"/><circle cx="${x + 18}" cy="${y - 40}" r="1.3" fill="${S.metal}"/><path d="M${x - 26} ${y - 3} h52" stroke="${dk(S.wood, .3)}" stroke-width="2.4"/>`);
 }
-function vanity(t){
-  if (t === 1) return D(`<rect x="66" y="442" width="52" height="28" style="fill:#C9A26A"/><circle cx="92" cy="426" r="14" style="fill:#DDEEF2"/>`, `<path d="M66 456 h52" stroke="#9A7A4A" stroke-width="1"/><circle cx="92" cy="426" r="14" fill="none" stroke="${S.metal}" stroke-width="2.4"/><path d="M86 420 l8 -6" stroke="#FFFFFF" stroke-width="2"/><rect x="104" y="434" width="7" height="9" rx="1" fill="${S.fabric}"/>`);
-  const c = t === 3 ? CREAM : S.wood;
-  const mirror = t === 2 ? `<ellipse cx="92" cy="400" rx="18" ry="24" style="fill:#DDEEF2"/>` : `<rect x="64" y="374" width="56" height="54" rx="4" style="fill:#DDEEF2"/>`;
-  let det = `<path d="M50 446 h84" stroke="${dk(c, .2)}" stroke-width="1"/><circle cx="70" cy="452" r="1.4" fill="${S.metal}"/><circle cx="114" cy="452" r="1.4" fill="${S.metal}"/><path d="M54 458 v12 M130 458 v12" stroke="${dk(S.wood, .2)}" stroke-width="3"/>`;
-  det += t === 2 ? `<ellipse cx="92" cy="400" rx="18" ry="24" fill="none" stroke="${dk(S.wood, .2)}" stroke-width="3"/><path d="M84 392 l10 -10" stroke="#FFFFFF" stroke-width="2"/>` : `<path d="M74 412 l16 -26" stroke="#FFFFFF" stroke-width="3" opacity=".7"/>`;
-  det += `<rect x="104" y="428" width="6" height="8" rx="1" fill="${S.fabric}" stroke="${INK}" stroke-width=".4"/><rect x="113" y="430" width="5" height="6" rx="1" fill="#C9B3E3" stroke="${INK}" stroke-width=".4"/>`;
-  let s = D(mirror + `<rect x="48" y="436" width="88" height="22" rx="2" style="fill:${c}"/><rect x="46" y="432" width="92" height="5" rx="1" style="fill:${dk(c, .1)}"/>`, det);
-  if (t === 3) {
-    s += g([[64, 374], [120, 374], [64, 428], [120, 428], [64, 401], [120, 401], [82, 374], [102, 374]].map(([x, y]) => { glow(x, y, 14); return `<circle cx="${x}" cy="${y}" r="3.4" fill="${NIGHT ? "#FFE8A8" : "#FFF6DA"}" stroke="${INK}" stroke-width=".6"/>`; }).join(""));
-    s += D(`<rect x="76" y="482" width="32" height="12" rx="5" style="fill:${S.fabric}"/>`, `<path d="M80 494 v8 M104 494 v8" stroke="${S.metal}" stroke-width="2.4"/>`);
-  }
-  return s;
+function bedrug(t, x, y){
+  if (t === 1) return D(`<rect x="${x - 56}" y="${y - 54}" width="112" height="54" rx="2" style="fill:${S.fabric2}"/>`, [0, 1, 2, 3].map(k => `<path d="M${x - 56} ${y - 46 + k*12} h112" stroke="${S.accent}" stroke-width="2"/>`).join("") + Array.from({length: 8}, (_, k) => `<path d="M${x - 56} ${y - 52 + k*7} h-4 M${x + 56} ${y - 52 + k*7} h4" stroke="${S.fabric2}" stroke-width="1"/>`).join(""));
+  if (t === 2) return D(`<path d="M${x - 40} ${y - 18} q-4 -18 22 -22 q20 -6 40 0 q24 2 22 20 q2 16 -22 20 q-22 4 -42 0 q-24 -2 -20 -18z" style="fill:#F6F2E8"/>`, Array.from({length: 14}, (_, k) => `<path d="M${f1(x - 34 + R(k)*68)} ${f1(y - 34 + R(k + 3)*30)} q2 -2 4 0" stroke="#D8D0C0" stroke-width=".8" fill="none"/>`).join(""));
+  return D(`<ellipse cx="${x}" cy="${y - 28}" rx="72" ry="28" style="fill:${S.fabric}"/>`, `<ellipse cx="${x}" cy="${y - 28}" rx="64" ry="23" fill="none" stroke="${S.fabric2}" stroke-width="4"/><ellipse cx="${x}" cy="${y - 28}" rx="46" ry="16" fill="none" stroke="${S.accent}" stroke-width="2.4" stroke-dasharray="6 3"/><ellipse cx="${x}" cy="${y - 28}" rx="22" ry="8" fill="${S.fabric2}"/>`);
 }
 function stairsDown(){   // the top of the stairs, bottom left, going down (like the mill's upstairs)
   return otherSpot("stairs", "Down the stairs to the sitting room", hovE(80, 590, 46, 14),
     sk(`<rect x="36" y="520" width="90" height="96" style="fill:#7A5638"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${40 + i*4}" y="${528 + i*17}" width="${82 - i*8}" height="12" style="fill:#A8754F"/>`).join("")}<path d="M130 520 v96 M126 520 h8" style="stroke:#5A3A2A" stroke-width="3"/>`, `<rect x="36" y="520" width="90" height="96"/>`)
-    + lab(80, 628, "Downstairs", "#F3E1A0", 9));
+    + lab(80, 628, "Downstairs", "#F3E1A0", 8));
 }
-/* ---------- the bedroom's left wall, and the door through to the bathroom ---------- */
-function bathDoor(){
-  const col = ST.c === "bluebell" ? BLUE : lt(S.wood, .1);
-  return otherSpot("bathroom", "Through the door to the bathroom", hovE(56, 344, 32, 14),
-    D(`<path d="M8 236 L48 254 V344 L8 362z" style="fill:${lt(S.wall2, .3)}"/><path d="M12 242 L44 257 V342 L12 356z" style="fill:${col}"/><path d="M14 360 l40 -14 h20 l-36 18z" style="fill:${S.fabric2}"/>`,
-      `<path d="M17 252 L39 262 V292 L17 284z M17 296 L39 302 V334 L17 344z" fill="none" stroke="${dk(col, .25)}" stroke-width="1"/><circle cx="38" cy="304" r="2" fill="${S.metal}"/><ellipse cx="28" cy="270" rx="7" ry="4" fill="${CREAM}" stroke="${INK}" stroke-width=".5" transform="rotate(22 28 270)"/>`)
-    + lab(70, 232, "Bathroom", "#DDEBF2", 9));
-}
-// a little rush chair by the bathroom door, with a folded throw
-const doorChair = () => g(D(`<rect x="94" y="276" width="26" height="7" rx="2" style="fill:#D9B866"/>`, `<path d="M96 300 v-36 M118 300 v-36 M96 268 h22 M96 274 h22" stroke="${dk(S.wood, .2)}" stroke-width="2.6"/><path d="M98 283 l-2 17 M116 283 l2 17" stroke="${dk(S.wood, .2)}" stroke-width="2.4"/><rect x="99" y="270" width="16" height="8" rx="2" fill="${S.fabric}" stroke="${INK}" stroke-width=".5"/>`));
 function accUp(id){
   if (!has(id)) return "";
-  if (id === "mirror") return g(D(`<circle cx="330" cy="96" r="14" style="fill:#DDEEF2"/>`, `<circle cx="330" cy="96" r="14" fill="none" stroke="${S.metal}" stroke-width="3"/><path d="M323 92 l9 -8" stroke="#FFFFFF" stroke-width="2"/><path d="M330 82 l-6 -12 h12z" fill="none" stroke="${INK}" stroke-width=".6"/>`));
-  if (id === "plant") return g(D(`<path d="M456 516 h28 l-3 24 h-22z" style="fill:#C8643B"/>`, [[-22, -40, -30], [18, -46, 24], [-4, -62, -4], [-26, -18, -50], [24, -22, 50]].map(([dx, dy, a]) => `<path d="M470 516 Q${470 + dx*.4} ${516 + dy*.5} ${470 + dx} ${516 + dy}" stroke="#4E7A3E" stroke-width="1.6" fill="none"/><ellipse cx="${470 + dx}" cy="${516 + dy}" rx="13" ry="8" fill="${(dx + dy) % 3 ? "#5E9A4A" : "#6EAA5A"}" stroke="${INK}" stroke-width=".7" transform="rotate(${a} ${470 + dx} ${516 + dy})"/>`).join("") + `<path d="M456 520 h28" stroke="#8E4A2A" stroke-width="2"/>`));
+  const [x, y] = at(id);
+  if (id === "mirror") return g(D(`<circle cx="${x}" cy="${y}" r="11" style="fill:#DDEEF2"/>`, `<circle cx="${x}" cy="${y}" r="11" fill="none" stroke="${S.metal}" stroke-width="2.4"/><path d="M${x - 5} ${y - 3} l7 -6" stroke="#FFFFFF" stroke-width="1.6"/><path d="M${x} ${y - 11} l-5 -9 h10z" fill="none" stroke="${INK}" stroke-width=".5"/>`));
+  if (id === "plant") return g(D(`<path d="M${x - 10} ${y - 16} h20 l-2 16 h-16z" style="fill:#C8643B"/>`, [[-16, -28, -30], [12, -32, 24], [-2, -44, -4], [-18, -14, -50], [16, -16, 50]].map(([dx, dy, a]) => `<path d="M${x} ${y - 16} Q${x + dx*.4} ${y - 16 + dy*.5} ${x + dx} ${y - 16 + dy}" stroke="#4E7A3E" stroke-width="1.2" fill="none"/><ellipse cx="${x + dx}" cy="${y - 16 + dy}" rx="9" ry="5.4" fill="${(dx + dy) % 3 ? "#5E9A4A" : "#6EAA5A"}" stroke="${INK}" stroke-width=".5" transform="rotate(${a} ${x + dx} ${y - 16 + dy})"/>`).join("") + `<path d="M${x - 10} ${y - 13} h20" stroke="#8E4A2A" stroke-width="1.6"/>`));
   return "";
 }
 function livedUp(){
   let s = "";
-  if (ST.occupied) s += g(D(`<ellipse cx="222" cy="352" rx="5" ry="9" style="fill:${S.fabric}"/><ellipse cx="236" cy="354" rx="5" ry="9" style="fill:${S.fabric}"/>`, `<path d="M218 346 q4 -3 8 0 M232 348 q4 -3 8 0" stroke="${CREAM}" stroke-width="2.4" fill="none"/>`));
-  if (undone("beds")) s += g(D(`<path d="M376 342 q-4 -18 12 -22 q10 -10 22 -2 q14 -2 16 12 q6 10 -4 14 q-20 4 -46 -2z" style="fill:${CREAM}"/><path d="M386 336 q8 -10 18 -4 q8 -2 10 6 q-12 4 -28 -2z" style="fill:${S.fabric2}"/>`, `<path d="M384 330 q10 4 18 -2 M396 322 q4 6 12 4" stroke="#D8D0C4" stroke-width="1" fill="none"/>`));
+  const [bx, by] = at("bed");
+  if (ST.occupied) s += g(D(`<ellipse cx="${bx - 18}" cy="${by + 12}" rx="3.4" ry="6" style="fill:${S.fabric}"/><ellipse cx="${bx - 9}" cy="${by + 13}" rx="3.4" ry="6" style="fill:${S.fabric}"/>`, `<path d="M${bx - 21} ${by + 8} q3 -2 6 0 M${bx - 12} ${by + 9} q3 -2 6 0" stroke="${CREAM}" stroke-width="1.8" fill="none"/>`));
+  if (undone("beds")) s += g(D(`<path d="M${bx + 44} ${by + 4} q-3 -12 8 -15 q7 -7 15 -1 q10 -1 11 8 q4 7 -3 9 q-14 3 -31 -1z" style="fill:${CREAM}"/><path d="M${bx + 51} ${by} q5 -7 12 -3 q6 -1 7 4 q-8 3 -19 -1z" style="fill:${S.fabric2}"/>`, `<path d="M${bx + 50} ${by - 4} q7 3 12 -1" stroke="#D8D0C4" stroke-width=".8" fill="none"/>`));
   return s;
 }
+// a bench at the foot of the bed, a reading corner with a chair and a lamp, and a chest of drawers by the bathroom door
+function upDecor(){
+  const [bx, by] = at("bed");
+  let s = tier("bed") ? D(`<rect x="${bx - 24}" y="${by + 2}" width="48" height="6" rx="2" style="fill:${S.fabric2}"/><rect x="${bx - 24}" y="${by + 8}" width="48" height="5" style="fill:${S.wood}"/>`, `<path d="M${bx - 22} ${by + 13} v4 M${bx + 22} ${by + 13} v4" stroke="${dk(S.wood, .3)}" stroke-width="2"/>`) : "";
+  const cx = 432, cy = 504, col = mix(S.fabric, S.accent, .3);
+  glow(462, 462, 30);
+  s += D(`<rect x="${cx - 15}" y="${cy - 34}" width="30" height="22" rx="7" style="fill:${col}"/><rect x="${cx - 19}" y="${cy - 20}" width="8" height="16" rx="3" style="fill:${dk(col, .1)}"/><rect x="${cx + 11}" y="${cy - 20}" width="8" height="16" rx="3" style="fill:${dk(col, .1)}"/><rect x="${cx - 12}" y="${cy - 16}" width="24" height="10" rx="3" style="fill:${lt(col, .15)}"/>`,
+    `<path d="M${cx - 15} ${cy - 4} v4 M${cx + 15} ${cy - 4} v4" stroke="${dk(S.wood, .3)}" stroke-width="2"/><rect x="${cx - 6}" y="${cy - 30}" width="12" height="9" rx="3" fill="${S.fabric2}" stroke="${INK}" stroke-width=".4"/>`)
+    + D(`<ellipse cx="462" cy="484" rx="9" ry="3" style="fill:${lt(S.wood, .1)}"/><path d="M455 461 h14 l3 9 h-20z" style="fill:${NIGHT ? lt(S.fabric2, .5) : S.fabric2}"/>`, `<path d="M462 486 v18 M456 504 h12" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/><path d="M462 481 v-11" stroke="${S.metal}" stroke-width="1.2"/><rect x="452" y="478" width="7" height="3" fill="${S.accent}"/>`)
+    + D(`<rect x="20" y="462" width="36" height="38" rx="1.5" style="fill:${S.wood}"/><rect x="18" y="458" width="40" height="5" rx="1" style="fill:${dk(S.wood, .1)}"/>`, `${[0, 1, 2].map(k => `<path d="M22 ${474 + k*12} h32" stroke="${dk(S.wood, .3)}" stroke-width=".8"/><circle cx="31" cy="${468 + k*12}" r="1" fill="${S.metal}"/><circle cx="45" cy="${468 + k*12}" r="1" fill="${S.metal}"/>`).join("")}<path d="M34 458 q-2 -8 2 -12 h4 q4 4 2 12z" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/><circle cx="36" cy="442" r="2.4" fill="${S.fabric}"/><circle cx="40" cy="444" r="2" fill="#F6E3A1"/>`);
+  return g(s);
+}
 function upArt(){
-  return floorArt() + wallArt() + windowArt(52, 44, 76, 72, {seed: 4}) + seatRecess() + sideWall() + bathDoor() + doorChair()
-    + pieceSpot("windowseat", windowseat) + pieceSpot("wardrobe", wardrobe) + pieceSpot("bedside", bedside) + pieceSpot("bed", bed) + accUp("mirror")
-    + pieceSpot("bedrug", bedrug) + pieceSpot("vanity", vanity) + accUp("plant") + livedUp() + stairsDown() + crates();
+  return floorArt() + wallArt() + windowArt(44, 116, 48, 56, {seed: 4}) + seatRecess() + sideWall() + accUp("mirror")
+    + pieceSpot("windowseat", windowseat) + pieceSpot("wardrobe", wardrobe) + pieceSpot("vanity", vanity) + pieceSpot("bedrug", bedrug) + pieceSpot("bedside", bedside) + pieceSpot("bed", bed)
+    + bathDoor() + doorCorner() + upDecor() + accUp("plant") + livedUp() + stairsDown() + crates();
 }
 
 /* ====================================================================================================== */
 /* ---------- the bathroom (round 237): its own room, through the door off the bedroom ---------- */
 function bathShell(){
-  let s = "";
-  // a checked tile floor in cream and the style's soft wall colour
-  s += `<rect y="200" width="520" height="440" style="fill:${CREAM}"/>`;
-  for (let r = 0; 200 + r*32 < 640; r++) for (let k = 0; k < 17; k++) s += `<rect x="${k*32}" y="${200 + r*32}" width="32" height="32" style="fill:${(r + k) % 2 ? CREAM : mix(S.wall2, CREAM, .15)};stroke:${dk(S.wall2, .12)}" stroke-width=".8"/>`;
-  s += `<rect width="520" height="200" style="fill:${S.wall}"/>`;
+  let s = `<rect y="${FL}" width="520" height="${640 - FL}" style="fill:${CREAM}"/>`;
+  for (let r = 0; FL + r*26 < 640; r++) for (let k = 0; k < 20; k++) s += `<rect x="${k*26}" y="${FL + r*26}" width="26" height="26" style="fill:${(r + k) % 2 ? CREAM : mix(S.wall2, CREAM, .15)};stroke:${dk(S.wall2, .12)}" stroke-width=".6"/>`;
+  s += `<rect y="99" width="520" height="${FL - 99}" style="fill:${S.wall}"/>`;
   // tiles to half height: little brick-laid tiles, a few in the accent, a border along the top
-  for (let r = 0; r < 7; r++) for (let k = 0; k < 28; k++) { const x = k*20 - (r % 2)*10, c = (k*7 + r*3) % 9 === 0 ? lt(S.accent, .35) : (k + r) % 5 === 0 ? lt(S.fabric2, .2) : CREAM;
-    s += `<rect x="${x}" y="${96 + r*13}" width="20" height="13" style="fill:${c};stroke:${dk(S.wall2, .15)}" stroke-width=".6"/>`; }
-  s += `<rect y="90" width="520" height="7" style="fill:${S.accent}"/><path d="M0 90 H520 M0 97 H520" stroke="${dk(S.accent, .3)}" stroke-width=".8"/>`;
-  s += `<rect width="520" height="16" style="fill:${dk(S.wood, .4)}"/><path d="M0 16 H520" style="stroke:${INK}" stroke-width="1.2"/>${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<rect x="${k*72 + 12}" y="14" width="14" height="10" rx="1" style="fill:${dk(S.wood, .5)}"/>`).join("")}`;
-  s += `<rect y="187" width="520" height="13" style="fill:${S.accent}" opacity=".55"/><path d="M0 200 H520" style="stroke:${INK}" stroke-width="1.4"/>`;
-  return g(s);
+  for (let r = 0; r < 6; r++) for (let k = 0; k < 36; k++) { const x = k*15 - (r % 2)*7.5, c = (k*7 + r*3) % 9 === 0 ? lt(S.accent, .35) : (k + r) % 5 === 0 ? lt(S.fabric2, .2) : CREAM;
+    s += `<rect x="${x}" y="${154 + r*9.4}" width="15" height="9.4" style="fill:${c};stroke:${dk(S.wall2, .15)}" stroke-width=".4"/>`; }
+  s += `<rect y="150" width="520" height="5" style="fill:${S.accent}"/><rect y="${FL - 6}" width="520" height="6" style="fill:${S.accent}" opacity=".55"/><path d="M0 ${FL} H520" style="stroke:${INK}" stroke-width="1.3"/>`;
+  return g(ceiling() + s);
 }
-function bathTub(t){
-  if (t === 1) return D(`<rect x="250" y="290" width="100" height="32" rx="2" style="fill:${CREAM}"/><rect x="250" y="320" width="100" height="10" style="fill:${lt(S.wall2, .05)}"/><path d="M252 166 q48 -10 96 0 l-2 4 q-8 60 4 118 h-20 q-10 -60 -4 -118z" style="fill:${S.fabric2}"/>`,
-    `<path d="M262 298 h76" stroke="#C9D4DA" stroke-width="1"/><circle cx="300" cy="308" r="3" fill="#9AA0A6"/><path d="M286 196 v-50 q0 -6 6 -6 h8" stroke="${S.metal}" stroke-width="2.4" fill="none"/><ellipse cx="302" cy="142" rx="7" ry="2.6" fill="${S.metal}"/><path d="M250 164 h100" stroke="${S.metal}" stroke-width="2"/>${[0, 1, 2].map(k => `<path d="M${330 + k*5} 172 q-4 60 4 116" stroke="${dk(S.fabric2, .15)}" stroke-width="1" fill="none"/>`).join("")}`);
+function bathTub(t, x, y){
+  const L = x - 34, Rr = x + 34;
+  if (t === 1) return D(`<rect x="${x - 22}" y="${y - 26}" width="44" height="20" rx="1.5" style="fill:${CREAM}"/><rect x="${x - 22}" y="${y - 7}" width="44" height="7" style="fill:${lt(S.wall2, .05)}"/><path d="M${x - 22} 132 q22 -6 44 0 l-1 3 q-4 40 2 76 h-12 q-6 -40 -2 -76z" style="fill:${S.fabric2}"/>`,
+    `<circle cx="${x}" cy="${y - 15}" r="2" fill="#9AA0A6"/><path d="M${x - 10} ${FL} v-60 q0 -4 4 -4 h5" stroke="${S.metal}" stroke-width="1.8" fill="none"/><ellipse cx="${x}" cy="148" rx="5" ry="1.8" fill="${S.metal}"/><path d="M${x - 24} 131 h48" stroke="${S.metal}" stroke-width="1.6"/>${[0, 1, 2].map(k => `<path d="M${x + 10 + k*3} 136 q-3 40 3 74" stroke="${dk(S.fabric2, .15)}" stroke-width=".8" fill="none"/>`).join("")}`);
   const copper = t === 3, body = copper ? "#C9824A" : CREAM;
-  if (copper) glow(392, 250, 30);
-  return (copper ? D(`<rect x="384" y="258" width="22" height="5" style="fill:${S.wood}"/>`, `<path d="M387 263 v28 M403 263 v28" stroke="${dk(S.wood, .3)}" stroke-width="2"/><rect x="389" y="250" width="7" height="9" fill="${CREAM}"/>${flame(392.5, 250, .45)}<path d="M398 258 l3 -9 h4 l2 9z" fill="#6E9A5A"/>`) : "")
-    + D(`<path d="M214 264 h172 q4 46 -28 58 h-116 q-32 -12 -28 -58z" style="fill:${body}"/><ellipse cx="300" cy="264" rx="86" ry="12" style="fill:${copper ? "#E6A86A" : CREAM}"/><ellipse cx="300" cy="265" rx="78" ry="8" style="fill:#BFE0EA"/>`,
-      `<path d="M238 318 l-6 12 h8 M362 318 l6 12 h-8" stroke="${copper ? INK : S.metal}" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M294 256 v-12 h12 v12 M300 244 v-6" stroke="${S.metal}" stroke-width="2.4" fill="none"/><ellipse cx="270" cy="263" rx="20" ry="2" fill="#FFFFFF" opacity=".5"/>`
-      + (copper ? `<path d="M226 276 q8 30 30 42" stroke="#F2C08A" stroke-width="4" fill="none" opacity=".8"/><rect x="276" y="258" width="48" height="6" rx="1" fill="${S.wood}" stroke="${INK}" stroke-width=".6"/><rect x="284" y="253" width="12" height="5" fill="${S.fabric}"/><rect x="304" y="250" width="6" height="8" fill="${CREAM}"/>` : `<path d="M228 278 q8 26 24 36" stroke="#FFFFFF" stroke-width="2.4" fill="none"/>`));
+  if (copper) glow(Rr + 10, y - 34, 26);
+  return (copper ? D(`<rect x="${Rr + 4}" y="${y - 22}" width="14" height="4" style="fill:${S.wood}"/>`, `<path d="M${Rr + 6} ${y - 18} v18 M${Rr + 16} ${y - 18} v18" stroke="${dk(S.wood, .3)}" stroke-width="1.6"/><rect x="${Rr + 7}" y="${y - 28}" width="5" height="6" fill="${CREAM}"/>${flame(Rr + 9.5, y - 28, .35)}<path d="M${Rr + 13} ${y - 22} l2 -6 h3 l1 6z" fill="#6E9A5A"/>`) : "")
+    + D(`<path d="M${L} ${y - 26} h68 q2 18 -12 22 h-44 q-14 -4 -12 -22z" style="fill:${body}"/><ellipse cx="${x}" cy="${y - 26}" rx="34" ry="6" style="fill:${copper ? "#E6A86A" : CREAM}"/><ellipse cx="${x}" cy="${y - 25.4}" rx="30" ry="3.8" style="fill:#BFE0EA"/>`,
+      `<path d="M${L + 10} ${y - 5} l-3 5 h4 M${Rr - 10} ${y - 5} l3 5 h-4" stroke="${copper ? INK : S.metal}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M${x - 4} ${y - 31} v-6 h8 v6 M${x} ${y - 37} v-3" stroke="${S.metal}" stroke-width="1.6" fill="none"/>`
+      + (copper ? `<path d="M${L + 6} ${y - 20} q4 12 14 15" stroke="#F2C08A" stroke-width="2.4" fill="none" opacity=".8"/><rect x="${x - 14}" y="${y - 30}" width="28" height="3.4" rx="1" fill="${S.wood}" stroke="${INK}" stroke-width=".4"/><rect x="${x - 9}" y="${y - 33}" width="7" height="3" fill="${S.fabric}"/>` : `<path d="M${L + 6} ${y - 19} q4 10 10 13" stroke="#FFFFFF" stroke-width="1.6" fill="none"/>`));
 }
-function basin(t){
-  const mirror = (x, w, h) => `<rect x="${x - w/2}" y="${120}" width="${w}" height="${h}" rx="${w/2}" style="fill:#DDEEF2"/>`;
-  if (t === 1) return D(`<path d="M96 228 h48 q0 14 -24 16 q-24 -2 -24 -16z" style="fill:${CREAM}"/><rect x="114" y="242" width="12" height="20" style="fill:${CREAM}"/>`, `<ellipse cx="120" cy="229" rx="20" ry="3" fill="#DDEEF2"/><path d="M120 226 v-8 q0 -3 4 -3" stroke="${S.metal}" stroke-width="2" fill="none"/>`);
-  if (t === 2) return D(mirror(120, 40, 56) + `<rect x="82" y="226" width="76" height="8" rx="1" style="fill:${lt(S.wood, .1)}"/><rect x="86" y="234" width="68" height="14" style="fill:${S.wood}"/><path d="M102 226 h36 q0 10 -18 11 q-18 -1 -18 -11z" style="fill:${CREAM}"/>`,
-    `<rect x="${100}" y="120" width="40" height="56" rx="20" fill="none" stroke="${S.wood}" stroke-width="3"/><path d="M110 150 l14 -18" stroke="#FFFFFF" stroke-width="2.4"/><path d="M90 248 v14 M150 248 v14" stroke="${dk(S.wood, .25)}" stroke-width="3"/><path d="M120 226 v-8 q0 -3 4 -3" stroke="${S.metal}" stroke-width="2" fill="none"/><path d="M90 241 h60" stroke="${dk(S.wood, .25)}" stroke-width="1"/>`);
-  return D(mirror(88, 32, 50) + mirror(152, 32, 50) + `<rect x="60" y="224" width="120" height="10" rx="1" style="fill:#F2EEE8"/><rect x="64" y="234" width="112" height="28" style="fill:${mix(S.accent, "#FFFFFF", .4)}"/>`,
-    `<rect x="72" y="120" width="32" height="50" rx="16" fill="none" stroke="${S.metal}" stroke-width="2.6"/><rect x="136" y="120" width="32" height="50" rx="16" fill="none" stroke="${S.metal}" stroke-width="2.6"/><path d="M60 228 q30 -3 60 1 q30 3 60 -2" stroke="#C9C0B8" stroke-width=".8" fill="none"/>${[88, 152].map(x => `<ellipse cx="${x}" cy="228" rx="13" ry="2.4" fill="#DDEEF2" stroke="${INK}" stroke-width=".5"/><path d="M${x} 225 v-7 q0 -3 4 -3" stroke="${S.metal}" stroke-width="2" fill="none"/><path d="M${x - 8} 144 l10 -14" stroke="#FFFFFF" stroke-width="2"/>`).join("")}<path d="M120 236 v24" stroke="${dk(S.accent, .2)}" stroke-width="1"/><circle cx="114" cy="248" r="1.6" fill="${S.metal}"/><circle cx="126" cy="248" r="1.6" fill="${S.metal}"/>`);
+function basin(t, x, y){
+  const mirror = (mx, w, h) => `<rect x="${mx - w/2}" y="${134}" width="${w}" height="${h}" rx="${w/2}" style="fill:#DDEEF2"/>`;
+  if (t === 1) return D(`<rect x="${x - 8}" y="146" width="16" height="22" rx="1" style="fill:#DDEEF2"/><path d="M${x - 12} ${y - 32} h24 q0 8 -12 9 q-12 -1 -12 -9z" style="fill:${CREAM}"/><rect x="${x - 4}" y="${y - 24}" width="8" height="24" style="fill:${CREAM}"/>`, `<ellipse cx="${x}" cy="${y - 32}" rx="10" ry="2" fill="#DDEEF2"/><path d="M${x} ${y - 33} v-5 q0 -2 3 -2" stroke="${S.metal}" stroke-width="1.4" fill="none"/>`);
+  if (t === 2) return D(mirror(x, 24, 40) + `<rect x="${x - 20}" y="${y - 34}" width="40" height="5" rx="1" style="fill:${lt(S.wood, .1)}"/><rect x="${x - 18}" y="${y - 29}" width="36" height="9" style="fill:${S.wood}"/><path d="M${x - 10} ${y - 34} h20 q0 6 -10 7 q-10 -1 -10 -7z" style="fill:${CREAM}"/>`,
+    `<rect x="${x - 12}" y="134" width="24" height="40" rx="12" fill="none" stroke="${S.wood}" stroke-width="2.4"/><path d="M${x - 6} 152 l9 -11" stroke="#FFFFFF" stroke-width="1.6"/><path d="M${x - 16} ${y - 20} v20 M${x + 16} ${y - 20} v20 M${x - 16} ${y - 8} h32" stroke="${dk(S.wood, .25)}" stroke-width="1.8"/><path d="M${x} ${y - 35} v-5 q0 -2 3 -2" stroke="${S.metal}" stroke-width="1.4" fill="none"/>`);
+  return D(mirror(x - 15, 20, 38) + mirror(x + 15, 20, 38) + `<rect x="${x - 32}" y="${y - 34}" width="64" height="6" rx="1" style="fill:#F2EEE8"/><rect x="${x - 30}" y="${y - 28}" width="60" height="28" style="fill:${mix(S.accent, "#FFFFFF", .4)}"/>`,
+    `${[x - 15, x + 15].map(mx => `<rect x="${mx - 10}" y="134" width="20" height="38" rx="10" fill="none" stroke="${S.metal}" stroke-width="2"/><path d="M${mx - 5} 150 l7 -9" stroke="#FFFFFF" stroke-width="1.4"/><ellipse cx="${mx}" cy="${y - 32}" rx="8" ry="1.6" fill="#DDEEF2" stroke="${INK}" stroke-width=".4"/><path d="M${mx} ${y - 34} v-5 q0 -2 3 -2" stroke="${S.metal}" stroke-width="1.4" fill="none"/>`).join("")}<path d="M${x} ${y - 26} v24" stroke="${dk(S.accent, .2)}" stroke-width=".8"/><circle cx="${x - 4}" cy="${y - 14}" r="1.2" fill="${S.metal}"/><circle cx="${x + 4}" cy="${y - 14}" r="1.2" fill="${S.metal}"/>`);
 }
-function bathrug(t){
-  if (t === 1) return D(`<rect x="262" y="440" width="76" height="30" rx="4" style="fill:${S.fabric2}"/>`, `<rect x="268" y="445" width="64" height="20" rx="2" fill="none" stroke="${S.accent}" stroke-width="1.4" stroke-dasharray="4 3"/>`);
-  if (t === 2) return D(`<rect x="246" y="438" width="92" height="32" rx="6" style="fill:${S.fabric2}"/><ellipse cx="364" cy="446" rx="14" ry="4" style="fill:${S.wood}"/>`, `${[0, 1, 2].map(k => `<path d="M252 ${446 + k*8} h80" stroke="${S.accent}" stroke-width="1.6"/>`).join("")}<path d="M354 449 l-3 21 M374 449 l3 21" stroke="${dk(S.wood, .25)}" stroke-width="2.6"/><rect x="358" y="436" width="12" height="7" rx="2" fill="${S.fabric}" stroke="${INK}" stroke-width=".5"/>`);
-  return D(`<path d="M232 452 q-6 -22 30 -24 q38 -6 76 2 q30 4 26 24 q-2 18 -40 18 h-60 q-30 -2 -32 -20z" style="fill:${lt(S.fabric2, .45)}"/><rect x="374" y="412" width="30" height="10" rx="3" style="fill:${S.fabric}"/>`,
-    Array.from({length: 18}, (_, k) => `<path d="M${f1(240 + R(k)*120)} ${f1(436 + R(k + 2)*28)} q3 -3 6 0" stroke="#D8D0C0" stroke-width="1" fill="none"/>`).join("") + `<path d="M376 412 v-24 q14 -6 26 0 v24" fill="none" stroke="${dk(S.wood, .2)}" stroke-width="2.6"/><path d="M378 422 l-2 16 M400 422 l2 16" stroke="${dk(S.wood, .2)}" stroke-width="2.6"/>`);
+function bathrug(t, x, y){
+  if (t === 1) return D(`<rect x="${x - 24}" y="${y - 16}" width="48" height="16" rx="3" style="fill:${S.fabric2}"/>`, `<rect x="${x - 20}" y="${y - 13}" width="40" height="10" rx="2" fill="none" stroke="${S.accent}" stroke-width="1" stroke-dasharray="3 2"/>`);
+  if (t === 2) return D(`<rect x="${x - 26}" y="${y - 18}" width="52" height="18" rx="4" style="fill:${S.fabric2}"/><ellipse cx="${x + 40}" cy="${y - 16}" rx="8" ry="2.6" style="fill:${S.wood}"/>`, `${[0, 1].map(k => `<path d="M${x - 22} ${y - 12 + k*6} h44" stroke="${S.accent}" stroke-width="1.2"/>`).join("")}<path d="M${x + 34} ${y - 14} l-2 14 M${x + 46} ${y - 14} l2 14" stroke="${dk(S.wood, .25)}" stroke-width="1.8"/><rect x="${x + 35}" y="${y - 22}" width="9" height="5" rx="1.4" fill="${S.fabric}" stroke="${INK}" stroke-width=".4"/>`);
+  return D(`<path d="M${x - 30} ${y - 9} q-3 -12 18 -13 q22 -3 42 1 q16 2 14 12 q-1 10 -22 10 h-36 q-16 -1 -16 -10z" style="fill:${lt(S.fabric2, .45)}"/><rect x="${x + 36}" y="${y - 22}" width="18" height="7" rx="2" style="fill:${S.fabric}"/>`,
+    Array.from({length: 12}, (_, k) => `<path d="M${f1(x - 26 + R(k)*52)} ${f1(y - 18 + R(k + 2)*14)} q2 -2 4 0" stroke="#D8D0C0" stroke-width=".8" fill="none"/>`).join("") + `<path d="M${x + 37} ${y - 22} v-16 q8 -4 16 0 v16" fill="none" stroke="${dk(S.wood, .2)}" stroke-width="2"/><path d="M${x + 38} ${y - 15} l-1 11 M${x + 52} ${y - 15} l1 11" stroke="${dk(S.wood, .2)}" stroke-width="2"/>`);
 }
-function towelRail(){   // the towel rail on the right, always there; the fluffy towels are an accessory
-  const towels = has("towels") ? `<rect x="414" y="262" width="22" height="40" rx="3" style="fill:${S.fabric2}"/><rect x="440" y="262" width="22" height="36" rx="3" style="fill:${CREAM}"/>` : "";
-  const det = has("towels") ? `<path d="M414 292 h22 M440 290 h22" stroke="${S.accent}" stroke-width="1.6"/><rect x="420" y="312" width="40" height="8" rx="3" fill="${S.fabric}" stroke="${INK}" stroke-width=".6"/><rect x="422" y="306" width="36" height="7" rx="3" fill="${CREAM}" stroke="${INK}" stroke-width=".6"/>` : `<path d="M422 262 v18 h12 v-18" fill="${CREAM}" stroke="${INK}" stroke-width=".6"/>`;
-  return g(sk(`<path d="M408 330 V252 M468 330 V252" style="stroke:${S.metal}" stroke-width="4"/><path d="M406 258 h64 M408 300 h60" style="stroke:${S.metal}" stroke-width="3"/>`, `<path d="M404 330 h8 M464 330 h8"/>`) + D(towels, det));
+function towelRail(){   // the towel rail beside the bath, always there; the fluffy towels are an accessory
+  const [x, y] = at("towels"), t = has("towels");
+  const towels = t ? `<rect x="${x - 14}" y="${y - 44}" width="12" height="26" rx="2" style="fill:${S.fabric2}"/><rect x="${x + 2}" y="${y - 44}" width="12" height="22" rx="2" style="fill:${CREAM}"/>` : "";
+  const det = t ? `<path d="M${x - 14} ${y - 26} h12 M${x + 2} ${y - 26} h12" stroke="${S.accent}" stroke-width="1.2"/><rect x="${x - 12}" y="${y - 8}" width="24" height="5" rx="2" fill="${S.fabric}" stroke="${INK}" stroke-width=".4"/><rect x="${x - 11}" y="${y - 12}" width="22" height="4.4" rx="2" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/>` : `<path d="M${x - 8} ${y - 44} v12 h8 v-12" fill="${CREAM}" stroke="${INK}" stroke-width=".5"/>`;
+  return g(sk(`<path d="M${x - 16} ${y} V${y - 46} M${x + 16} ${y} V${y - 46}" style="stroke:${S.metal}" stroke-width="2.6"/><path d="M${x - 18} ${y - 44} h36 M${x - 16} ${y - 24} h32" style="stroke:${S.metal}" stroke-width="2"/>`, `<path d="M${x - 19} ${y} h6 M${x + 13} ${y} h6"/>`) + D(towels, det));
 }
 function accBath(id){
   if (!has(id)) return "";
-  if (id === "robes") return g(D(`<path d="M424 166 l10 -5 l10 5 l4 64 h-28z" style="fill:${CREAM}"/><path d="M450 168 l10 -5 l10 5 l4 64 h-28z" style="fill:${S.fabric2}"/><rect x="420" y="156" width="56" height="6" rx="2" style="fill:${S.wood}"/>`, `<circle cx="434" cy="161" r="1.8" fill="${S.metal}"/><circle cx="460" cy="163" r="1.8" fill="${S.metal}"/><path d="M426 200 h20 M452 202 h20" stroke="${S.accent}" stroke-width="1.6"/><path d="M434 166 v40 M460 168 v40" stroke="#D8D0C4" stroke-width="1"/>`));
-  if (id === "soaps") return g(D(`<rect x="88" y="206" width="64" height="4" rx="1" style="fill:${S.wood}"/><rect x="92" y="196" width="12" height="10" rx="2" style="fill:#C9B3E3"/><rect x="106" y="198" width="12" height="8" rx="2" style="fill:#F4C7CF"/><path d="M124 206 v-14 h10 v14z" style="fill:#E8F1F0"/><path d="M138 206 v-12 h10 v12z" style="fill:#FFF3D6"/>`, `<path d="M124 196 h10 M138 198 h10" stroke="${S.fabric}" stroke-width="2"/><circle cx="129" cy="201" r="1.4" fill="#C9B3E3"/><circle cx="143" cy="202" r="1.4" fill="#9FB04A"/>`));
-  if (id === "bathplant") return g(D(`<path d="M290 102 h20 l-2 -12 h-16z" style="fill:#C8643B"/>`, [-60, -35, -12, 12, 35, 60].map(a => `<path d="M300 90 q${a*.3} -14 ${a*.5} -10" stroke="#5E8A4A" stroke-width="2.2" fill="none"/>${[1, 2, 3].map(j => `<ellipse cx="${f1(300 + a*.5*j/3)}" cy="${f1(90 - 10*j/3 - (j === 2 ? 3 : 0))}" rx="3" ry="1.6" fill="#6E9A4A"/>`).join("")}`).join("")));
+  const [x, y] = at(id);
+  if (id === "robes") return g(D(`<path d="M${x - 15} ${y - 38} l6 -3 l6 3 l2.4 38 h-16.8z" style="fill:${CREAM}"/><path d="M${x + 1} ${y - 37} l6 -3 l6 3 l2.4 38 h-16.8z" style="fill:${S.fabric2}"/><rect x="${x - 19}" y="${y - 46}" width="38" height="4" rx="1.4" style="fill:${S.wood}"/>`, `<circle cx="${x - 9}" cy="${y - 42}" r="1.2" fill="${S.metal}"/><circle cx="${x + 7}" cy="${y - 41}" r="1.2" fill="${S.metal}"/><path d="M${x - 14} ${y - 20} h14 M${x + 2} ${y - 19} h14" stroke="${S.accent}" stroke-width="1.2"/>`));
+  if (id === "soaps") return g(D(`<rect x="${x - 18}" y="${y - 2}" width="36" height="3" rx="1" style="fill:${S.wood}"/><rect x="${x - 15}" y="${y - 7}" width="7" height="5" rx="1.4" style="fill:#C9B3E3"/><rect x="${x - 7}" y="${y - 6}" width="7" height="4" rx="1.4" style="fill:#F4C7CF"/><path d="M${x + 2} ${y - 2} v-9 h6 v9z" style="fill:#E8F1F0"/><path d="M${x + 10} ${y - 2} v-7 h6 v7z" style="fill:#FFF3D6"/>`, `<path d="M${x + 2} ${y - 9} h6 M${x + 10} ${y - 7} h6" stroke="${S.fabric}" stroke-width="1.4"/>`));
+  if (id === "bathplant") return g(D(`<path d="M${x - 6} ${y - 4} h12 l-1.4 -8 h-9.2z" style="fill:#C8643B"/>`, [-60, -35, -12, 12, 35, 60].map(a => `<path d="M${x} ${y - 12} q${f1(a*.2)} -10 ${f1(a*.34)} -7" stroke="#5E8A4A" stroke-width="1.6" fill="none"/>${[1, 2, 3].map(j => `<ellipse cx="${f1(x + a*.34*j/3)}" cy="${f1(y - 12 - 7*j/3 - (j === 2 ? 2 : 0))}" rx="2" ry="1.1" fill="#6E9A4A"/>`).join("")}`).join("")));
   return "";
 }
-function bathCorners(){   // calm, full edges: a laundry basket bottom left, a little cupboard with a candle bottom right
-  glow(452, 520, 30);
-  return g(D(`<path d="M44 584 h44 l-4 -40 h-36z" style="fill:#C9A26A"/><rect x="424" y="540" width="56" height="44" rx="2" style="fill:${lt(S.wood, .1)}"/><rect x="420" y="534" width="64" height="7" rx="1" style="fill:${dk(S.wood, .1)}"/>`,
-    `${[0, 1, 2, 3].map(k => `<path d="M48 ${552 + k*8} h38" stroke="#9A7A4A" stroke-width=".8"/>`).join("")}<path d="M50 546 q6 -10 14 -4 q8 -8 16 2" fill="${S.fabric2}" stroke="${INK}" stroke-width=".6"/><path d="M452 541 v43" stroke="${dk(S.wood, .25)}" stroke-width="1"/><circle cx="446" cy="560" r="1.6" fill="${S.metal}"/><circle cx="458" cy="560" r="1.6" fill="${S.metal}"/><rect x="434" y="520" width="9" height="14" rx="1" fill="${CREAM}" stroke="${INK}" stroke-width=".5"/>${flame(438.5, 520, .45)}<path d="M456 534 l3 -12 h8 l3 12z" fill="#E8F1F0" stroke="${INK}" stroke-width=".5"/><path d="M462 522 l-3 -10 M464 522 l1 -11 M466 522 l4 -9" stroke="#5A3A2A" stroke-width=".7"/>`));
+function bathCorners(){   // calm, full edges: a laundry basket and a cupboard against the back wall, a plant and a chair by the door
+  glow(462, 186, 26);
+  return g(D(`<path d="M44 240 h28 l-3 -26 h-22z" style="fill:#C9A26A"/><rect x="440" y="196" width="44" height="44" rx="1.5" style="fill:${lt(S.wood, .1)}"/><rect x="437" y="192" width="50" height="5" rx="1" style="fill:${dk(S.wood, .1)}"/>`,
+    `${[0, 1, 2].map(k => `<path d="M47 ${220 + k*6} h24" stroke="#9A7A4A" stroke-width=".7"/>`).join("")}<path d="M48 214 q4 -6 9 -2 q5 -5 10 1" fill="${S.fabric2}" stroke="${INK}" stroke-width=".5"/><path d="M462 197 v42" stroke="${dk(S.wood, .25)}" stroke-width=".8"/><circle cx="458" cy="216" r="1.2" fill="${S.metal}"/><circle cx="466" cy="216" r="1.2" fill="${S.metal}"/><rect x="448" y="182" width="6" height="10" rx="1" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/>${flame(451, 182, .35)}<path d="M464 192 l2 -9 h6 l2 9z" fill="#E8F1F0" stroke="${INK}" stroke-width=".4"/><rect x="474" y="184" width="8" height="8" rx="1" fill="${S.fabric2}" stroke="${INK}" stroke-width=".4"/>`)
+    + D(`<path d="M462 560 h22 l-2 -16 h-18z" style="fill:#C8643B"/>`, [[-12, -26, -30], [10, -30, 24], [-1, -40, -4], [-14, -12, -50], [13, -14, 50]].map(([dx, dy, a]) => `<path d="M473 544 Q${473 + dx*.4} ${544 + dy*.5} ${473 + dx} ${544 + dy}" stroke="#4E7A3E" stroke-width="1.2" fill="none"/><ellipse cx="${473 + dx}" cy="${544 + dy}" rx="8" ry="4" fill="#5E9A4A" stroke="${INK}" stroke-width=".5" transform="rotate(${a} ${473 + dx} ${544 + dy})"/>`).join(""))
+    + D(`<rect x="44" y="548" width="20" height="5" rx="1.4" style="fill:${S.fabric}"/>`, `<path d="M46 553 v12 M62 553 v12 M46 548 v-16 q8 -4 16 0 v16" stroke="${dk(S.wood, .2)}" stroke-width="1.8" fill="none"/>`));
 }
 function livedBath(){
   if (!undone("bath")) return "";
+  const [x, y] = at("bath");
   let s = "";
-  if (tier("bath") > 1) s += g(D(`<path d="M332 258 h24 l2 30 q-8 6 -14 0 q-4 6 -12 0z" style="fill:${S.fabric2}"/>`, `<path d="M334 278 h22" stroke="${S.accent}" stroke-width="1.2"/>`));
-  s += g(D(`<path d="M190 372 q10 -12 28 -8 q14 0 16 10 q-2 10 -22 10 q-20 0 -22 -12z" style="fill:${CREAM}"/><path d="M372 384 q8 -14 26 -10 q10 4 8 12 q-18 8 -34 -2z" style="fill:${S.fabric2}"/>`, `<path d="M200 374 q12 2 24 0" stroke="#D8D0C4" stroke-width="1" fill="none"/><path d="M378 382 h22" stroke="${S.accent}" stroke-width="1"/>`));
+  if (tier("bath") > 1) s += g(D(`<path d="M${x + 12} ${y - 30} h12 l1 16 q-4 4 -7 0 q-3 4 -6 0z" style="fill:${S.fabric2}"/>`, `<path d="M${x + 13} ${y - 20} h11" stroke="${S.accent}" stroke-width="1"/>`));
+  s += g(D(`<path d="M${x - 70} ${y + 30} q6 -8 18 -5 q9 0 10 6 q-1 6 -14 6 q-13 0 -14 -7z" style="fill:${CREAM}"/><path d="M${x + 54} ${y + 50} q5 -9 17 -6 q6 3 5 8 q-12 5 -22 -2z" style="fill:${S.fabric2}"/>`, `<path d="M${x - 64} ${y + 31} q8 2 15 0" stroke="#D8D0C4" stroke-width=".8" fill="none"/>`));
   return s;
 }
 function bedroomDoor(){   // the way back to the bedroom: a mat at the bottom centre
   return otherSpot("bedroom", "Back through to the bedroom", hovE(260, 612, 54, 14),
     sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:${S.fabric2}"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/>`) + `<path d="M222 606 h76 M222 620 h76" stroke="${S.accent}" stroke-width="1.4" pointer-events="none"/>`
-    + lab(260, 590, "Bedroom", "#F3E1A0", 9));
+    + lab(260, 590, "Bedroom", "#F3E1A0", 8));
+}
+// a runner from the door to the bath, a ladder of towels against the side wall, a slipper chair and a plant stand
+function bathDecor(){
+  const runner = D(`<rect x="242" y="302" width="36" height="296" rx="2" style="fill:${lt(S.accent, .45)}"/>`, `<rect x="246" y="306" width="28" height="288" fill="none" stroke="${CREAM}" stroke-width="1.4"/>${Array.from({length: 12}, (_, k) => `<circle cx="260" cy="${320 + k*23}" r="2.4" fill="${CREAM}"/>`).join("")}`);
+  const ladder = D(`<path d="M20 384 L28 296 M38 384 L44 296" style="stroke:${S.wood}" stroke-width="3"/><rect x="22" y="312" width="22" height="12" rx="2" style="fill:${S.fabric2}"/><rect x="21" y="340" width="20" height="10" rx="2" style="fill:${CREAM}"/>`, `${[0, 1, 2, 3].map(k => `<path d="M${27 - k*2} ${308 + k*22} h17" stroke="${dk(S.wood, .2)}" stroke-width="1.6"/>`).join("")}<path d="M22 318 h22" stroke="${S.accent}" stroke-width="1"/>`);
+  const chair = D(`<rect x="420" y="378" width="30" height="20" rx="8" style="fill:${S.fabric}"/><rect x="422" y="396" width="26" height="8" rx="3" style="fill:${lt(S.fabric, .15)}"/>`, `<path d="M424 404 v8 M446 404 v8" stroke="${S.metal}" stroke-width="1.8"/>`)
+    + D(`<ellipse cx="474" cy="390" rx="9" ry="3" style="fill:${lt(S.wood, .1)}"/><path d="M469 389 l1 -7 h8 l1 7z" style="fill:#C8643B"/>`, `<path d="M474 392 v20 M468 412 h12" stroke="${dk(S.wood, .2)}" stroke-width="1.8"/>${[-30, -10, 10, 30].map(a => `<path d="M474 382 q${a*.2} -10 ${a*.4} -14" stroke="#5E8A4A" stroke-width="1.6" fill="none"/><ellipse cx="${474 + a*.4}" cy="368" rx="2.4" ry="4" fill="#6E9A4A"/>`).join("")}`);
+  return g(ladder + chair);
 }
 function bathArt(){
-  glow(250, 70, 26); glow(350, 70, 26);
-  const sconce = x => `<path d="M${x} 64 v10" stroke="${S.metal}" stroke-width="2"/><path d="M${x - 6} 56 h12 l-2 10 h-8z" fill="${NIGHT ? "#FFE8A8" : "#F6EEDA"}" stroke="${INK}" stroke-width=".7"/>`;
-  return bathShell() + windowArt(266, 34, 68, 64, {seed: 5}) + g(sconce(242) + sconce(358)) + accBath("bathplant") + accBath("soaps") + pieceSpot("basin", basin) + accBath("robes")
-    + towelRail() + pieceSpot("bath", bathTub) + pieceSpot("bathrug", bathrug) + bathCorners() + livedBath() + crates() + bedroomDoor();
+  const [wx] = at("bathplant");
+  glow(wx - 40, 128, 24); glow(wx + 40, 128, 24);
+  const sconce = sx => `<path d="M${sx} 124 v8" stroke="${S.metal}" stroke-width="1.6"/><path d="M${sx - 5} 118 h10 l-2 8 h-6z" fill="${NIGHT ? "#FFE8A8" : "#F6EEDA"}" stroke="${INK}" stroke-width=".6"/>`;
+  return bathShell() + sideWall() + bathDecor() + windowArt(wx - 24, 116, 48, 56, {seed: 5}) + g(sconce(wx - 40) + sconce(wx + 40)) + accBath("bathplant") + accBath("robes") + pieceSpot("basin", basin) + accBath("soaps")
+    + bathCorners() + pieceSpot("bath", bathTub) + towelRail() + pieceSpot("bathrug", bathrug) + livedBath() + crates() + bedroomDoor();
 }
 
 /* ====================================================================================================== */
 /* ---------- the back garden ---------- */
+const GW = 214;   // the foot of the garden wall
 function gardenShell(){
-  let s = `<rect width="520" height="70" style="fill:${NIGHT ? "#26325E" : "#CFE6F2"}"/>`;
-  s += NIGHT ? Array.from({length: 14}, (_, k) => `<circle cx="${f1(R(k)*520)}" cy="${f1(6 + R(k + 5)*50)}" r="${f1(.8 + R(k)*.9)}" fill="#FFF3C4"/>`).join("") + `<path d="M84 18 a9 9 0 1 0 9 12 a7 7 0 1 1 -9 -12z" fill="#FFF3C4"/>`
-    : `<ellipse cx="120" cy="26" rx="34" ry="8" fill="#FFFFFF" opacity=".85"/><ellipse cx="380" cy="18" rx="26" ry="6" fill="#FFFFFF" opacity=".8"/>`;
+  let s = `<rect width="520" height="${GW}" style="fill:${NIGHT ? "#26325E" : "#CFE6F2"}"/>`;
+  s += NIGHT ? Array.from({length: 16}, (_, k) => `<circle cx="${f1(R(k)*520)}" cy="${f1(6 + R(k + 5)*90)}" r="${f1(.8 + R(k)*.9)}" fill="#FFF3C4"/>`).join("") + `<path d="M84 26 a9 9 0 1 0 9 12 a7 7 0 1 1 -9 -12z" fill="#FFF3C4"/>`
+    : `<ellipse cx="120" cy="40" rx="34" ry="8" fill="#FFFFFF" opacity=".85"/><ellipse cx="380" cy="28" rx="26" ry="6" fill="#FFFFFF" opacity=".8"/>`;
+  // the neighbours' trees beyond the wall
+  s += Array.from({length: 14}, (_, k) => `<circle cx="${k*40 + 10}" cy="${126 + (k % 3)*6}" r="${22 + (k % 2)*6}" fill="${NIGHT ? "#2E4038" : k % 2 ? "#8FB47A" : "#7FA86A"}"/>`).join("");
   // the grass, mown in stripes, with tufts and daisies
-  s += `<rect y="196" width="520" height="444" style="fill:#A8C77A"/>` + Array.from({length: 10}, (_, k) => k % 2 ? `<rect y="${196 + k*44}" width="520" height="44" style="fill:#B2D088"/>` : "").join("")
-    + Array.from({length: 40}, (_, k) => { const x = f1(R(k*3)*520), y = f1(214 + R(k*7)*380); return `<path d="M${x} ${y} l-2 -5 M${x} ${y} l0 -6 M${x} ${y} l2 -5" stroke="#7FA05A" stroke-width="1"/>`; }).join("")
-    + Array.from({length: 16}, (_, k) => `<circle cx="${f1(R(k*5 + 2)*520)}" cy="${f1(260 + R(k*11 + 1)*320)}" r="2" fill="#FFFFFF"/><circle cx="${f1(R(k*5 + 2)*520)}" cy="${f1(260 + R(k*11 + 1)*320)}" r=".8" fill="#F2C94C"/>`).join("");
+  s += `<rect y="${GW}" width="520" height="${640 - GW}" style="fill:#A8C77A"/>` + Array.from({length: 12}, (_, k) => k % 2 ? `<rect y="${GW + k*36}" width="520" height="36" style="fill:#B2D088"/>` : "").join("")
+    + Array.from({length: 36}, (_, k) => { const x = f1(R(k*3)*520), y = f1(GW + 10 + R(k*7)*380); return `<path d="M${x} ${y} l-1.4 -4 M${x} ${y} l0 -5 M${x} ${y} l1.4 -4" stroke="#7FA05A" stroke-width=".8"/>`; }).join("")
+    + Array.from({length: 16}, (_, k) => `<circle cx="${f1(R(k*5 + 2)*520)}" cy="${f1(GW + 40 + R(k*11 + 1)*340)}" r="1.6" fill="#FFFFFF"/>`).join("");
   if (ST.c === "figtree") {   // Fig Tree: an old brick wall with a stone coping
-    s += `<rect y="62" width="520" height="140" style="fill:#C27A5A"/>` + Array.from({length: 14}, (_, r) => `<path d="M0 ${70 + r*10} H520" stroke="#A8664A" stroke-width="1"/>` + Array.from({length: 18}, (_, k) => `<path d="M${k*30 + (r % 2)*15} ${70 + r*10} v10" stroke="#A8664A" stroke-width="1"/>`).join("")).join("")
-      + Array.from({length: 30}, (_, k) => `<rect x="${f1(R(k)*500)}" y="${70 + Math.floor(R(k + 2)*13)*10}" width="28" height="9" fill="${k % 2 ? "#B46E50" : "#CE8A66"}" opacity=".7"/>`).join("")
-      + `<rect y="56" width="520" height="10" style="fill:#C9BCA4"/><path d="M0 56 H520 M0 66 H520" stroke="${INK}" stroke-width="1.2"/>`;
-  } else {   // Bluebell: a white picket fence with a beech hedge behind
-    s += `<rect y="40" width="520" height="160" style="fill:#7FA05A"/>` + Array.from({length: 26}, (_, k) => `<circle cx="${k*21}" cy="${46 + (k % 3)*4}" r="14" fill="${k % 2 ? "#6E9A4A" : "#88AE5E"}"/>`).join("")
-      + Array.from({length: 30}, (_, k) => `<path d="M${k*18 + 2} 202 V104 l7 -9 l7 9 V202z" fill="#F6F2E8" stroke="#B8B0A0" stroke-width="1"/>`).join("") + `<rect y="126" width="520" height="7" fill="#EDE8DC"/><rect y="178" width="520" height="7" fill="#EDE8DC"/>`;
+    s += `<rect y="150" width="520" height="${GW - 150}" style="fill:#C27A5A"/>` + Array.from({length: 9}, (_, r) => `<path d="M0 ${156 + r*7} H520" stroke="#A8664A" stroke-width=".8"/>` + Array.from({length: 26}, (_, k) => `<path d="M${k*20 + (r % 2)*10} ${156 + r*7} v7" stroke="#A8664A" stroke-width=".8"/>`).join("")).join("")
+      + `<rect y="146" width="520" height="7" style="fill:#C9BCA4"/><path d="M0 146 H520 M0 153 H520" stroke="${INK}" stroke-width="1"/>`;
+  } else {   // Bluebell: a white picket fence in front of a beech hedge
+    s += `<rect y="136" width="520" height="${GW - 136}" style="fill:#7FA05A"/>` + Array.from({length: 30}, (_, k) => `<circle cx="${k*18}" cy="${140 + (k % 3)*3}" r="11" fill="${k % 2 ? "#6E9A4A" : "#88AE5E"}"/>`).join("")
+      + Array.from({length: 44}, (_, k) => `<path d="M${k*12 + 1} ${GW} V166 l5 -6 l5 6 V${GW}z" fill="#F6F2E8" stroke="#B8B0A0" stroke-width=".8"/>`).join("") + `<rect y="176" width="520" height="5" fill="#EDE8DC"/><rect y="200" width="520" height="5" fill="#EDE8DC"/>`;
   }
-  s += `<path d="M0 200 H520" stroke="${INK}" stroke-width="1.2"/>`;
-  // climbing roses along the top and trailing down
-  const roses = [S.fabric, "#E86A7A", "#F4B8C0", "#FFFFFF", "#D9433A"];
-  s += Array.from({length: 24}, (_, k) => { const x = k*22 + 6 + R(k)*8, y = (ST.c === "figtree" ? 60 : 100) + R(k + 4)*10, down = k % 4 === 1 ? 50 : 0;
-    return `<path d="M${f1(x)} ${f1(y)} q${f1(R(k)*10 - 5)} ${down/2} 0 ${down}" stroke="#4E7A3E" stroke-width="1.6" fill="none"/>${[0, 1, 2].map(j => `<ellipse cx="${f1(x - 8 + j*8)}" cy="${f1(y + (j % 2)*4 + (j === 2 ? down*.6 : 0))}" rx="6" ry="4" fill="#5E8A4A"/>`).join("")}<circle cx="${f1(x)}" cy="${f1(y - 1)}" r="4" fill="${roses[k % 5]}" stroke="${INK}" stroke-width=".5"/><circle cx="${f1(x + 6)}" cy="${f1(y + down*.8 + 3)}" r="3.2" fill="${roses[(k + 2) % 5]}" stroke="${INK}" stroke-width=".5"/>`; }).join("");
-  // the stepping-stone path from the back door
-  s += [[258, 584], [222, 570], [188, 556], [160, 538], [142, 514], [136, 488], [142, 462]].map(([x, y], k) => `<ellipse cx="${x}" cy="${y}" rx="${15 - k*.5}" ry="${7 - k*.2}" fill="#C9C2B4" stroke="#8E8678" stroke-width="1"/><path d="M${x - 6} ${y - 1} q5 -2 10 0" stroke="#E0DACC" stroke-width="1" fill="none"/>`).join("");
+  s += `<path d="M0 ${GW} H520" stroke="${INK}" stroke-width="1.2"/>`;
+  // climbing roses along the top of the wall, a few trailing down
+  const roses = [S.fabric, "#E86A7A", "#F4B8C0", "#FFFFFF", "#D9433A"], top = ST.c === "figtree" ? 146 : 160;
+  s += Array.from({length: 30}, (_, k) => { const x = k*18 + 4 + R(k)*6, y = top + R(k + 4)*6, down = k % 4 === 1 ? 34 : 0;
+    return `<path d="M${f1(x)} ${f1(y)} q${f1(R(k)*6 - 3)} ${down/2} 0 ${down}" stroke="#4E7A3E" stroke-width="1.2" fill="none"/>${[0, 1, 2].map(j => `<ellipse cx="${f1(x - 5 + j*5)}" cy="${f1(y + (j % 2)*3 + (j === 2 ? down*.6 : 0))}" rx="4" ry="2.6" fill="#5E8A4A"/>`).join("")}<circle cx="${f1(x)}" cy="${f1(y - 1)}" r="2.8" fill="${roses[k % 5]}" stroke="${INK}" stroke-width=".4"/><circle cx="${f1(x + 4)}" cy="${f1(y + down*.8 + 2)}" r="2.4" fill="${roses[(k + 2) % 5]}" stroke="${INK}" stroke-width=".4"/>`; }).join("");
+  // the stepping-stone path: from the back door up to the fire pit, and on to the table
+  s += [[260, 588], [252, 566], [244, 544], [236, 522], [196, 444], [172, 426], [148, 408]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="10" ry="4.6" fill="#C9C2B4" stroke="#8E8678" stroke-width=".8"/><path d="M${x - 4} ${y - 1} q3 -1.4 7 0" stroke="#E0DACC" stroke-width=".8" fill="none"/>`).join("");
   return g(s);
 }
-function figTree(){
-  if (ST.c !== "figtree") return "";
-  const leaf = (x, y, a, c) => `<path d="M0 0 q-8 -4 -10 -14 q4 -2 6 2 q-2 -8 4 -12 q4 4 2 10 q2 -6 8 -6 q2 6 -4 10 q6 0 8 4 q-6 6 -14 6z" transform="translate(${f1(x)} ${f1(y)}) rotate(${a})" fill="${c}" stroke="${INK}" stroke-width=".6"/>`;
-  return g(D(`<path d="M476 252 q-4 -40 -16 -70 l8 -2 q8 24 14 40 q6 -30 20 -50 l6 4 q-14 26 -16 78z" style="fill:#8E8070"/>`)
-    + Array.from({length: 26}, (_, k) => leaf(420 + R(k)*100, 96 + R(k + 7)*120, R(k + 3)*360, ["#5E8A4A", "#6E9A4A", "#4E7A3E"][k % 3])).join("")
-    + [[446, 170], [470, 140], [500, 186], [438, 128], [492, 112]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="4" ry="5" fill="#6A3A5A" stroke="${INK}" stroke-width=".5"/>`).join(""));
+// the screen of planting round the hot tub: Fig Tree's fig, or Bluebell's tall grasses and bamboo
+function screenPlanting(){
+  const [hx] = at("hottub");
+  const grasses = (x0, n) => Array.from({length: n}, (_, k) => { const x = x0 + k*7; return `<path d="M${x} 330 q${f1(-4 + R(k)*8)} -30 ${f1(-6 + R(k + 3)*12)} -58" stroke="${k % 2 ? "#7FA05A" : "#9AB86A"}" stroke-width="2" fill="none"/>`; }).join("");
+  let s = D(`<rect x="${hx + 40}" y="314" width="44" height="18" rx="1" style="fill:${lt(S.wood, .05)}"/>`, grasses(hx + 44, 6) + `<path d="M${hx + 40} 322 h44" stroke="${dk(S.wood, .2)}" stroke-width=".8"/>`);
+  if (ST.c === "figtree") {
+    const leaf = (x, y, a, c) => `<path d="M0 0 q-6 -3 -7 -10 q3 -1 4 1 q-1 -6 3 -8 q3 3 1 7 q1 -4 6 -4 q1 4 -3 7 q4 0 6 3 q-4 4 -10 4z" transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(a)})" fill="${c}" stroke="${INK}" stroke-width=".5"/>`;
+    s += g(D(`<path d="M488 ${GW + 54} q-3 -30 -12 -50 l6 -2 q6 16 10 28 q4 -22 14 -36 l5 3 q-10 18 -12 57z" style="fill:#8E8070"/>`)
+      + Array.from({length: 26}, (_, k) => leaf(440 + R(k)*80, 118 + R(k + 7)*104, R(k + 3)*360, ["#5E8A4A", "#6E9A4A", "#4E7A3E"][k % 3])).join("")
+      + [[456, 176], [478, 150], [504, 190], [448, 136], [496, 124]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3" ry="3.6" fill="#6A3A5A" stroke="${INK}" stroke-width=".4"/>`).join(""));
+  } else s += g(D(`<path d="M474 ${GW + 52} h40 l-2 -12 h-36z" style="fill:#B8AE9E"/>`, Array.from({length: 9}, (_, k) => `<path d="M${478 + k*4} ${GW + 42} V${150 + (k % 3)*14}" stroke="#7FA05A" stroke-width="2"/>${[0, 1, 2].map(j => `<path d="M${478 + k*4} ${170 + j*22 + (k % 2)*6} l${k % 2 ? 7 : -7} -3" stroke="#6E9A4A" stroke-width="1.4"/>`).join("")}`).join("")));
+  return s;
 }
-function flowerbeds(t){
-  const bluebells = (x, y) => ST.c === "bluebell" ? `<path d="M${x} ${y} q2 -14 8 -18" stroke="#5E8A4A" stroke-width="1.2" fill="none"/>${[0, 1, 2].map(j => `<path d="M${x + 2 + j*3} ${y - 6 - j*4} q-3 4 0 6 q3 -2 0 -6z" fill="#5C6FD0"/>`).join("")}` : "";
-  if (t === 1) return D([150, 196, 242, 288, 334, 380].map(x => `<path d="M${x - 12} 226 h24 l-3 18 h-18z" style="fill:#C8643B"/>`).join(""),
-    [150, 196, 242, 288, 334, 380].map((x, k) => `${[[-6, -8], [0, -12], [6, -8]].map(([dx, dy]) => `<ellipse cx="${x + dx}" cy="${226 + dy}" rx="6" ry="5" fill="#5E8A4A"/>`).join("")}${[[-5, -12], [4, -14], [0, -8]].map(([dx, dy]) => `<circle cx="${x + dx}" cy="${226 + dy}" r="3" fill="${["#D9433A", "#9A7AC8", "#F6E3A1", S.fabric, "#E86A7A", "#FFFFFF"][k]}"/>`).join("")}<path d="M${x - 13} 226 h26" stroke="#8E4A2A" stroke-width="2"/>`).join("") + bluebells(404, 244));
-  const border = D(`<path d="M16 202 H504 V236 q-60 10 -120 4 q-62 -8 -124 2 q-62 8 -124 -2 q-60 -8 -120 4z" style="fill:#8A6A4A"/>`,
-    Array.from({length: 36}, (_, k) => { const x = 22 + k*13.6, h = 18 + R(k)*30, c = ["#C9B3E3", "#E86A7A", "#F6E3A1", S.fabric, "#9A7AC8", "#FFFFFF"][k % 6];
-      return `<path d="M${f1(x)} 236 V${f1(236 - h)}" stroke="#5E8A4A" stroke-width="1.6"/><ellipse cx="${f1(x - 3)}" cy="${f1(236 - h*.4)}" rx="4" ry="2" fill="#6E9A4A"/>${k % 3 === 0 ? [0, 1, 2, 3].map(j => `<circle cx="${f1(x)}" cy="${f1(236 - h + j*5)}" r="2.6" fill="${c}"/>`).join("") : `<circle cx="${f1(x)}" cy="${f1(236 - h)}" r="${k % 2 ? 4 : 3}" fill="${c}" stroke="${INK}" stroke-width=".4"/>`}`; }).join("")
-    + [40, 120, 200, 330, 470].map(x => bluebells(x, 238)).join(""));
+function flowerbeds(t, x, y){
+  const bluebells = (bx, by) => ST.c === "bluebell" ? `<path d="M${bx} ${by} q1 -9 5 -12" stroke="#5E8A4A" stroke-width=".9" fill="none"/>${[0, 1, 2].map(j => `<path d="M${bx + 1.4 + j*2} ${by - 4 - j*2.6} q-2 2.6 0 4 q2 -1.4 0 -4z" fill="#5C6FD0"/>`).join("")}` : "";
+  const pots = [x - 100, x - 60, x - 20, x + 20, x + 60, x + 100];
+  if (t === 1) return D(pots.map(px => `<path d="M${px - 8} ${y - 11} h16 l-2 11 h-12z" style="fill:#C8643B"/>`).join(""),
+    pots.map((px, k) => `${[[-4, -5], [0, -8], [4, -5]].map(([dx, dy]) => `<ellipse cx="${px + dx}" cy="${y - 11 + dy}" rx="4" ry="3.4" fill="#5E8A4A"/>`).join("")}${[[-3, -8], [3, -9], [0, -5]].map(([dx, dy]) => `<circle cx="${px + dx}" cy="${y - 11 + dy}" r="2" fill="${["#D9433A", "#9A7AC8", "#F6E3A1", S.fabric, "#E86A7A", "#FFFFFF"][k]}"/>`).join("")}<path d="M${px - 9} ${y - 11} h18" stroke="#8E4A2A" stroke-width="1.6"/>`).join("") + bluebells(x + 120, y));
+  const border = D(`<path d="M16 ${GW - 2} H504 V${y - 4} q-60 7 -120 3 q-62 -5 -124 1 q-62 5 -124 -1 q-60 -5 -120 3z" style="fill:#8A6A4A"/>`,
+    Array.from({length: 44}, (_, k) => { const fx = 20 + k*11, h = 12 + R(k)*22, c = ["#C9B3E3", "#E86A7A", "#F6E3A1", S.fabric, "#9A7AC8", "#FFFFFF"][k % 6];
+      return `<path d="M${fx} ${y - 6} V${f1(y - 6 - h)}" stroke="#5E8A4A" stroke-width="1.2"/><ellipse cx="${fx - 2}" cy="${f1(y - 6 - h*.4)}" rx="3" ry="1.4" fill="#6E9A4A"/>${k % 3 === 0 ? [0, 1, 2, 3].map(j => `<circle cx="${fx}" cy="${f1(y - 6 - h + j*3.4)}" r="1.8" fill="${c}"/>`).join("") : `<circle cx="${fx}" cy="${f1(y - 6 - h)}" r="${k % 2 ? 2.8 : 2.2}" fill="${c}" stroke="${INK}" stroke-width=".3"/>`}`; }).join("")
+    + [40, 120, 200, 330, 400].map(bx => bluebells(bx, y - 4)).join(""));
   if (t === 2) return border;
-  return border + D(`<rect x="214" y="100" width="7" height="144" style="fill:#F6F2E8"/><rect x="299" y="100" width="7" height="144" style="fill:#F6F2E8"/><path d="M214 104 q46 -50 92 0 l-7 2 q-39 -40 -78 0z" style="fill:#F6F2E8"/>`,
-    Array.from({length: 22}, (_, k) => { const a = Math.PI*(k/21), x = 260 - Math.cos(a)*46, y = 104 - Math.sin(a)*34; return `<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="7" ry="5" fill="#5E8A4A"/>${k % 2 ? `<circle cx="${f1(x + 2)}" cy="${f1(y - 2)}" r="4" fill="${k % 4 === 1 ? S.fabric : "#E86A7A"}" stroke="${INK}" stroke-width=".4"/>` : ""}`; }).join("")
-    + [0, 1, 2, 3, 4, 5].map(k => `<ellipse cx="${k % 2 ? 302 : 218}" cy="${130 + k*18}" rx="6" ry="4" fill="#5E8A4A"/><circle cx="${k % 2 ? 304 : 216}" cy="${134 + k*18}" r="3.4" fill="#E86A7A" stroke="${INK}" stroke-width=".4"/>`).join(""));
+  return border + D(`<rect x="${x - 20}" y="160" width="4" height="${y - 160}" style="fill:#F6F2E8"/><rect x="${x + 16}" y="160" width="4" height="${y - 160}" style="fill:#F6F2E8"/><path d="M${x - 20} 162 q20 -26 40 0 l-4 1 q-16 -20 -32 0z" style="fill:#F6F2E8"/>`,
+    Array.from({length: 18}, (_, k) => { const a = Math.PI*(k/17), ax = x - Math.cos(a)*20, ay = 162 - Math.sin(a)*16; return `<ellipse cx="${f1(ax)}" cy="${f1(ay)}" rx="4.4" ry="3" fill="#5E8A4A"/>${k % 2 ? `<circle cx="${f1(ax + 1)}" cy="${f1(ay - 1)}" r="2.6" fill="${k % 4 === 1 ? S.fabric : "#E86A7A"}" stroke="${INK}" stroke-width=".3"/>` : ""}`; }).join("")
+    + [0, 1, 2, 3, 4, 5].map(k => `<ellipse cx="${k % 2 ? x + 18 : x - 18}" cy="${176 + k*10}" rx="4" ry="2.6" fill="#5E8A4A"/><circle cx="${k % 2 ? x + 19 : x - 19}" cy="${178 + k*10}" r="2.4" fill="#E86A7A" stroke="${INK}" stroke-width=".3"/>`).join(""));
 }
 function festoon(t){
-  const bulb = (x, y, k) => { if (k % 2 === 0) glow(x, y + 3, 18); return `<path d="M${f1(x)} ${f1(y)} v3" stroke="${INK}" stroke-width=".7"/><ellipse cx="${f1(x)}" cy="${f1(y + 6)}" rx="3" ry="4" fill="${NIGHT ? "#FFE08A" : "#FFF6DA"}" stroke="${INK}" stroke-width=".5"/>`; };
-  const string = (x0, y0, x1, y1, sag, n) => { let s = `<path d="M${x0} ${y0} Q${(x0 + x1)/2} ${(y0 + y1)/2 + sag*2} ${x1} ${y1}" fill="none" stroke="#3A3634" stroke-width="1.2"/>`;
+  const bulb = (x, y, k) => { if (k % 2 === 0) glow(x, y + 3, 14); return `<path d="M${f1(x)} ${f1(y)} v2" stroke="${INK}" stroke-width=".6"/><ellipse cx="${f1(x)}" cy="${f1(y + 4)}" rx="2" ry="2.8" fill="${NIGHT ? "#FFE08A" : "#FFF6DA"}" stroke="${INK}" stroke-width=".4"/>`; };
+  const string = (x0, y0, x1, y1, sag, n) => { let s = `<path d="M${x0} ${y0} Q${(x0 + x1)/2} ${(y0 + y1)/2 + sag*2} ${x1} ${y1}" fill="none" stroke="#3A3634" stroke-width="1"/>`;
     for (let k = 1; k < n; k++) { const u = k/n, x = (1 - u)*(1 - u)*x0 + 2*u*(1 - u)*(x0 + x1)/2 + u*u*x1, y = (1 - u)*(1 - u)*y0 + 2*u*(1 - u)*((y0 + y1)/2 + sag*2) + u*u*y1; s += bulb(x, y, k); }
     return s; };
-  const posts = D(`<rect x="24" y="70" width="8" height="150" style="fill:${S.wood}"/><rect x="488" y="70" width="8" height="150" style="fill:${S.wood}"/>`);
-  let s = posts + g(string(28, 76, 492, 76, 24, 16));
-  if (t > 1) s += g(string(28, 100, 492, 76, 30, 14) + string(28, 76, 492, 104, 34, 14));
-  if (t === 3) s += g([[100, 110], [180, 126], [340, 126], [420, 110]].map(([x, y], k) => { glow(x, y + 10, 24); return `<path d="M${x} ${y - 14} v6" stroke="${INK}" stroke-width=".7"/><circle cx="${x}" cy="${y}" r="9" fill="${[S.fabric, S.accent, S.fabric2, S.fabric][k]}" stroke="${INK}" stroke-width=".7"/><path d="M${x - 9} ${y} h18 M${x} ${y - 9} v18" stroke="${INK}" stroke-width=".4" opacity=".5"/>`; }).join("")
-    + [28, 492].map(x => { glow(x, 62, 22); return `<rect x="${x - 6}" y="54" width="12" height="16" rx="2" fill="#FFF3C8" stroke="${INK}" stroke-width=".8"/><path d="M${x - 7} 54 l7 -5 l7 5z" fill="#3A3634"/>`; }).join(""));
+  let s = D(`<rect x="25" y="172" width="5" height="90" style="fill:${S.wood}"/><rect x="490" y="172" width="5" height="90" style="fill:${S.wood}"/>`);
+  s += g(string(28, 176, 492, 176, 18, 20));
+  if (t > 1) s += g(string(28, 190, 492, 176, 24, 18) + string(28, 176, 492, 192, 26, 18));
+  if (t === 3) s += g([[110, 206], [190, 218], [330, 218], [410, 206]].map(([x, y], k) => { glow(x, y + 6, 18); return `<path d="M${x} ${y - 12} v5" stroke="${INK}" stroke-width=".6"/><circle cx="${x}" cy="${y}" r="6.4" fill="${[S.fabric, S.accent, S.fabric2, S.fabric][k]}" stroke="${INK}" stroke-width=".6"/><path d="M${x - 6.4} ${y} h12.8" stroke="${INK}" stroke-width=".3" opacity=".5"/>`; }).join("")
+    + [27.5, 492.5].map(x => { glow(x, 164, 18); return `<rect x="${x - 4.4}" y="158" width="9" height="12" rx="1.4" fill="#FFF3C8" stroke="${INK}" stroke-width=".6"/><path d="M${x - 5.4} 158 l5.4 -4 l5.4 4z" fill="#3A3634"/>`; }).join(""));
   return s;
 }
-function hottub(t){
-  const leaves = undone("hottub"), cx = 370, cy = 280;
+function hottub(t, x, y){
+  const leaves = undone("hottub"), cy = y - 34;
   let s = "";
-  if (t === 3) s += D(`<rect x="306" y="186" width="6" height="96" style="fill:${dk(S.wood, .2)}"/><rect x="428" y="186" width="6" height="96" style="fill:${dk(S.wood, .2)}"/>`);
-  const water = `<ellipse cx="${cx}" cy="${cy + 2}" rx="56" ry="13" style="fill:${t === 3 ? "#7FD8DE" : "#8FCCD6"}"/>`;
-  if (t === 1) s += D(`<path d="M304 ${cy} V322 q66 36 132 0 V${cy}z" style="fill:#A8754F"/><ellipse cx="${cx}" cy="${cy}" rx="66" ry="18" style="fill:#B9875E"/>` + water,
-    Array.from({length: 11}, (_, k) => `<path d="M${312 + k*12} ${cy + 14 + Math.sin(k/10*Math.PI)*12} V${322 + Math.sin(k/10*Math.PI)*16}" stroke="#8A6340" stroke-width="1"/>`).join("") + `<path d="M304 296 q66 34 132 0 M304 316 q66 34 132 0" stroke="#4A4644" stroke-width="2.4" fill="none"/>`);
-  else s += D(`<path d="M304 ${cy} V322 q66 36 132 0 V${cy}z" style="fill:${t === 3 ? dk(S.wood, .25) : "#B7744A"}"/><ellipse cx="${cx}" cy="${cy}" rx="66" ry="18" style="fill:${t === 3 ? dk(S.wood, .1) : "#C98A5E"}"/>` + water
-      + `<rect x="290" y="316" width="30" height="12" rx="1" style="fill:#B7744A"/><rect x="284" y="326" width="36" height="14" rx="1" style="fill:#C98A5E"/>`,
-    [0, 1, 2, 3].map(k => `<path d="M304 ${292 + k*9} q66 ${34} 132 0" stroke="${t === 3 ? dk(S.wood, .4) : "#9A5E3A"}" stroke-width=".8" fill="none"/>`).join(""));
-  if (t === 3) { s += g(Array.from({length: 12}, (_, k) => { const a = Math.PI*(k/11), x = cx - Math.cos(a)*62, y = cy + 4 + Math.sin(a)*16; glow(x, y, 14); return `<circle cx="${f1(x)}" cy="${f1(y)}" r="2" fill="${NIGHT ? "#FFE08A" : "#FFF3C8"}" stroke="${INK}" stroke-width=".4"/>`; }).join(""));
-    if (NIGHT) glow(cx, cy, 70); }
-  if (!leaves) s += g([0, 1, 2].map(k => `<path d="M${346 + k*22} ${cy - 6} q-6 -10 0 -18 q6 -8 0 -16" stroke="#FFFFFF" stroke-width="2" fill="none" opacity=".55"/>`).join(""));
-  else s += g([[340, 280], [372, 286], [398, 278], [356, 274], [410, 284]].map(([x, y], k) => `<path d="M${x} ${y} q5 -5 10 0 q-5 5 -10 0z" fill="${["#D98A3A", "#C8643B", "#9AAE4A"][k % 3]}" stroke="${INK}" stroke-width=".5" transform="rotate(${k*40} ${x + 5} ${y})"/>`).join("")
-      + D(`<path d="M378 ${cy - 18} q34 -2 58 12 q6 14 -4 22 l-40 4 q-14 -14 -14 -38z" style="fill:#6E7A6E"/>`, `<path d="M394 ${cy - 12} q18 4 32 14" stroke="#8E9A8E" stroke-width="1.2" fill="none"/>`));
-  if (t === 3) s += D(`<rect x="300" y="282" width="6" height="64" style="fill:${dk(S.wood, .2)}"/><rect x="434" y="282" width="6" height="64" style="fill:${dk(S.wood, .2)}"/><path d="M290 186 L370 168 L450 186 v10 H290z" style="fill:${S.fabric2}"/>`,
-    `<path d="M290 196 ${Array.from({length: 10}, (_, k) => `q8 8 16 0`).join(" ")}" fill="${S.accent}" opacity=".8"/>` + Array.from({length: 9}, (_, k) => { glow(298 + k*18, 202, 12); return `<circle cx="${298 + k*18}" cy="${202}" r="2" fill="${NIGHT ? "#FFE08A" : "#FFF3C8"}" stroke="${INK}" stroke-width=".4"/>`; }).join("")
-      + `<path d="M303 196 L303 282 M437 196 L437 282" stroke="${dk(S.wood, .2)}" stroke-width="6"/>`);
+  if (t === 3) s += D(`<rect x="${x - 36}" y="${y - 120}" width="4" height="${86}" style="fill:${dk(S.wood, .2)}"/><rect x="${x + 32}" y="${y - 120}" width="4" height="${86}" style="fill:${dk(S.wood, .2)}"/>`);
+  const water = `<ellipse cx="${x}" cy="${cy + 1}" rx="32" ry="8" style="fill:${t === 3 ? "#7FD8DE" : "#8FCCD6"}"/>`;
+  const shell = (side, rim) => `<path d="M${x - 37} ${cy} V${y - 10} q37 20 74 0 V${cy}z" style="fill:${side}"/><ellipse cx="${x}" cy="${cy}" rx="37" ry="11" style="fill:${rim}"/>` + water;
+  if (t === 1) s += D(shell("#A8754F", "#B9875E"), Array.from({length: 9}, (_, k) => `<path d="M${x - 33 + k*8.2} ${f1(cy + 9 + Math.sin(k/8*Math.PI)*2)} V${f1(y - 8 + Math.sin(k/8*Math.PI)*9)}" stroke="#8A6340" stroke-width=".8"/>`).join("") + `<path d="M${x - 37} ${cy + 10} q37 20 74 0 M${x - 37} ${cy + 22} q37 20 74 0" stroke="#4A4644" stroke-width="1.8" fill="none"/>`);
+  else s += D(shell(t === 3 ? dk(S.wood, .25) : "#B7744A", t === 3 ? dk(S.wood, .1) : "#C98A5E") + `<rect x="${x - 50}" y="${y - 18}" width="16" height="8" rx="1" style="fill:#B7744A"/><rect x="${x - 54}" y="${y - 10}" width="20" height="10" rx="1" style="fill:#C98A5E"/>`,
+    [0, 1, 2].map(k => `<path d="M${x - 37} ${cy + 8 + k*7} q37 20 74 0" stroke="${t === 3 ? dk(S.wood, .4) : "#9A5E3A"}" stroke-width=".7" fill="none"/>`).join(""));
+  if (t === 3) { s += g(Array.from({length: 10}, (_, k) => { const a = Math.PI*(k/9), lx = x - Math.cos(a)*34, ly = cy + 2 + Math.sin(a)*9; glow(lx, ly, 10); return `<circle cx="${f1(lx)}" cy="${f1(ly)}" r="1.5" fill="${NIGHT ? "#FFE08A" : "#FFF3C8"}" stroke="${INK}" stroke-width=".3"/>`; }).join(""));
+    if (NIGHT) glow(x, cy, 50); }
+  if (!leaves) s += g([0, 1, 2].map(k => `<path d="M${x - 14 + k*14} ${cy - 4} q-4 -7 0 -12 q4 -6 0 -11" stroke="#FFFFFF" stroke-width="1.6" fill="none" opacity=".55"/>`).join(""));
+  else s += g([[-18, 0], [-4, 4], [10, -1], [-10, -3], [18, 3]].map(([dx, dy], k) => `<path d="M${x + dx} ${cy + dy} q3 -3 6 0 q-3 3 -6 0z" fill="${["#D98A3A", "#C8643B", "#9AAE4A"][k % 3]}" stroke="${INK}" stroke-width=".4" transform="rotate(${k*40} ${x + dx + 3} ${cy + dy})"/>`).join("")
+      + D(`<path d="M${x + 4} ${cy - 11} q22 -1 36 8 q4 9 -3 14 l-25 2 q-8 -9 -8 -24z" style="fill:#6E7A6E"/>`, `<path d="M${x + 14} ${cy - 7} q11 3 20 9" stroke="#8E9A8E" stroke-width="1" fill="none"/>`));
+  if (t === 3) s += D(`<rect x="${x - 40}" y="${y - 100}" width="4" height="${100}" style="fill:${dk(S.wood, .2)}"/><rect x="${x + 36}" y="${y - 100}" width="4" height="${100}" style="fill:${dk(S.wood, .2)}"/><path d="M${x - 48} ${y - 104} L${x} ${y - 124} L${x + 48} ${y - 104} v7 H${x - 48}z" style="fill:${S.fabric2}"/>`,
+    `<path d="M${x - 48} ${y - 97} ${Array.from({length: 8}, () => `q6 6 12 0`).join(" ")}" fill="${S.accent}" opacity=".8"/>` + Array.from({length: 7}, (_, k) => { glow(x - 42 + k*14, y - 92, 10); return `<circle cx="${x - 42 + k*14}" cy="${y - 92}" r="1.5" fill="${NIGHT ? "#FFE08A" : "#FFF3C8"}" stroke="${INK}" stroke-width=".3"/>`; }).join(""));
   return s;
 }
-function patio(t){
-  const chair = (x, y, col, face = 1) => `<path d="M${x - 8} ${y} v-14 M${x + 8} ${y} v-14" stroke="${col}" stroke-width="2.2"/><rect x="${x - 9}" y="${y - 16}" width="18" height="4" rx="1" fill="${col}"/><path d="M${x - 8} ${y - 16} v-14 q8 ${-6*face} 16 0 v14" stroke="${col}" stroke-width="2.2" fill="none"/>`;
-  if (t === 1) return D(`<ellipse cx="160" cy="400" rx="24" ry="8" style="fill:${S.accent}"/>`, `<path d="M160 408 v20 M152 430 h16" stroke="${S.accent}" stroke-width="2.6"/>` + chair(126, 430, S.accent) + chair(194, 430, S.accent) + `<rect x="150" y="390" width="7" height="8" rx="1" fill="${CREAM}" stroke="${INK}" stroke-width=".5"/>`);
+function patio(t, x, y){
+  if (t === 1) return D(`<ellipse cx="${x}" cy="${y - 22}" rx="13" ry="4.6" style="fill:${S.accent}"/>`, `<path d="M${x} ${y - 18} v18 M${x - 5} ${y} h10" stroke="${S.accent}" stroke-width="1.8"/>` + chairSide(x - 26, y, S.accent, 1) + chairSide(x + 26, y, S.accent, -1) + `<rect x="${x - 4}" y="${y - 30}" width="4" height="6" rx="1" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/>`);
   let s = "";
-  if (t === 3) s += D(`<rect x="102" y="300" width="6" height="80" style="fill:${S.wood}"/><rect x="214" y="300" width="6" height="80" style="fill:${S.wood}"/>`);
-  const [x0, x1] = t === 2 ? [116, 204] : [96, 224];
-  s += g([0, 1, 2].slice(0, t === 2 ? 2 : 3).map(k => chair(x0 + 20 + k*(x1 - x0 - 40)/(t === 2 ? 1 : 2), 398, S.wood)).join(""));
-  s += D(`<rect x="${x0}" y="398" width="${x1 - x0}" height="16" rx="2" style="fill:${S.wood}"/><rect x="${x0}" y="414" width="${x1 - x0}" height="4" style="fill:${dk(S.wood, .25)}"/>`, `<path d="M${x0 + 6} 418 v12 M${x1 - 6} 418 v12" stroke="${dk(S.wood, .25)}" stroke-width="3"/>${[0, 1, 2].map(k => `<path d="M${x0 + 2} ${402 + k*4} h${x1 - x0 - 4}" stroke="${dk(S.wood, .15)}" stroke-width=".6"/>`).join("")}<path d="M156 398 l-2 -8 h8 l-2 8z" fill="${CREAM}"/><circle cx="158" cy="388" r="3" fill="${S.fabric}"/>`);
-  s += g([0, 1].map(k => chair(x0 + 18 + k*(x1 - x0 - 36), 446, S.wood, -1)).join(""));
-  if (t === 3) s += D(`<rect x="88" y="326" width="7" height="124" style="fill:${S.wood}"/><rect x="226" y="326" width="7" height="124" style="fill:${S.wood}"/><path d="M80 322 H240 v8 H80z" style="fill:${S.wood}"/><path d="M96 296 H226 v6 H96z" style="fill:${S.wood}"/>`,
-    [0, 1, 2, 3, 4, 5].map(k => `<path d="M${98 + k*24} 300 l-6 26" stroke="${S.wood}" stroke-width="4"/>`).join("") + Array.from({length: 16}, (_, k) => `<ellipse cx="${84 + k*10}" cy="${322 + (k % 3)*2}" rx="6" ry="4" fill="#5E8A4A"/>${k % 3 === 0 ? `<path d="M${84 + k*10} 326 q-2 10 0 16" stroke="#9A7AC8" stroke-width="3" stroke-linecap="round"/>` : ""}`).join(""));
+  const W = t === 2 ? 26 : 36;
+  if (t === 3) s += D(`<rect x="${x - 42}" y="${y - 110}" width="4" height="${74}" style="fill:${S.wood}"/><rect x="${x + 38}" y="${y - 110}" width="4" height="${74}" style="fill:${S.wood}"/>`);
+  s += g((t === 2 ? [x - 12, x + 12] : [x - 22, x, x + 22]).map(cx => chairBack(cx, y - 20, S.wood)).join(""));
+  s += D(`<rect x="${x - W}" y="${y - 30}" width="${W*2}" height="12" rx="1.5" style="fill:${S.wood}"/><rect x="${x - W}" y="${y - 18}" width="${W*2}" height="3" style="fill:${dk(S.wood, .25)}"/>`,
+    `<path d="M${x - W + 4} ${y - 15} v15 M${x + W - 4} ${y - 15} v15" stroke="${dk(S.wood, .25)}" stroke-width="2.4"/>${[0, 1, 2].map(k => `<path d="M${x - W + 2} ${y - 27 + k*3} h${W*2 - 4}" stroke="${dk(S.wood, .15)}" stroke-width=".5"/>`).join("")}<path d="M${x - 2} ${y - 30} l-1 -6 h6 l-1 6z" fill="${CREAM}"/><circle cx="${x}" cy="${y - 37}" r="2.4" fill="${S.fabric}"/>` + chairSide(x - W - 12, y, S.wood, 1) + chairSide(x + W + 12, y, S.wood, -1));
+  if (t === 3) s += D(`<rect x="${x - 48}" y="${y - 84}" width="5" height="${88}" style="fill:${S.wood}"/><rect x="${x + 43}" y="${y - 84}" width="5" height="${88}" style="fill:${S.wood}"/><path d="M${x - 54} ${y - 88} H${x + 54} v5 H${x - 54}z" style="fill:${S.wood}"/><path d="M${x - 44} ${y - 112} H${x + 44} v4 H${x - 44}z" style="fill:${S.wood}"/>`,
+    [0, 1, 2, 3, 4].map(k => `<path d="M${x - 36 + k*18} ${y - 108} l-4 22" stroke="${S.wood}" stroke-width="3"/>`).join("") + Array.from({length: 14}, (_, k) => `<ellipse cx="${x - 52 + k*8}" cy="${y - 86 + (k % 3)*1.6}" rx="4.4" ry="3" fill="#5E8A4A"/>${k % 3 === 0 ? `<path d="M${x - 52 + k*8} ${y - 83} q-1.4 7 0 11" stroke="#9A7AC8" stroke-width="2.4" stroke-linecap="round"/>` : ""}`).join(""));
   return s;
 }
-function hammock(t){
-  if (t === 1) return D(`<path d="M414 520 l8 -30 h20 l-8 30z" style="fill:${S.fabric}"/>`, `<path d="M416 512 l6 -22 M426 520 l6 -30 M434 520 l6 -30" stroke="${CREAM}" stroke-width="3"/><path d="M412 520 l14 -40 M446 520 l-8 -30 M410 506 h36" stroke="${S.wood}" stroke-width="2.4"/>`);
-  let s = D(`<rect x="360" y="440" width="8" height="82" style="fill:${S.wood}"/><rect x="492" y="440" width="8" height="82" style="fill:${S.wood}"/><path d="M376 470 q54 46 108 0 q-54 30 -108 0z" style="fill:${S.fabric2}"/>`,
-    `<path d="M368 452 L376 470 M492 452 L484 470" stroke="#C9B48A" stroke-width="1.4"/>${[0, 1, 2].map(k => `<path d="M${384 + k*30} 474 q4 ${12 + (k === 1 ? 6 : 0)} 0 ${18}" stroke="${S.accent}" stroke-width="2" fill="none"/>`).join("")}<rect x="388" y="476" width="20" height="10" rx="4" fill="${S.fabric}" stroke="${INK}" stroke-width=".6" transform="rotate(14 398 481)"/>`);
-  if (t === 3) s += D(`<rect x="438" y="546" width="74" height="22" rx="6" style="fill:${S.fabric2}"/><rect x="436" y="566" width="78" height="8" rx="2" style="fill:${S.wood}"/><rect x="444" y="534" width="22" height="16" rx="5" style="fill:${S.accent}"/><rect x="484" y="534" width="22" height="16" rx="5" style="fill:${S.fabric}"/>`, `<path d="M440 574 v6 M510 574 v6" stroke="${dk(S.wood, .3)}" stroke-width="3"/>`);
+function hammock(t, x, y){
+  if (t === 1) return D(`<path d="M${x - 8} ${y} l5 -20 h14 l-5 20z" style="fill:${S.fabric}"/>`, `<path d="M${x - 6} ${y - 6} l4 -14 M${x + 1} ${y} l4 -20 M${x + 6} ${y} l4 -20" stroke="${CREAM}" stroke-width="2"/><path d="M${x - 10} ${y} l10 -26 M${x + 14} ${y} l-6 -20 M${x - 10} ${y - 9} h24" stroke="${S.wood}" stroke-width="1.8"/>`);
+  let s = D(`<rect x="${x - 50}" y="${y - 50}" width="5" height="50" style="fill:${S.wood}"/><rect x="${x + 45}" y="${y - 50}" width="5" height="50" style="fill:${S.wood}"/><path d="M${x - 38} ${y - 34} q38 30 76 0 q-38 20 -76 0z" style="fill:${S.fabric2}"/>`,
+    `<path d="M${x - 45} ${y - 44} L${x - 38} ${y - 34} M${x + 45} ${y - 44} L${x + 38} ${y - 34}" stroke="#C9B48A" stroke-width="1.1"/>${[0, 1, 2].map(k => `<path d="M${x - 26 + k*22} ${y - 30} q3 ${8 + (k === 1 ? 4 : 0)} 0 12" stroke="${S.accent}" stroke-width="1.6" fill="none"/>`).join("")}<rect x="${x - 26}" y="${y - 28}" width="13" height="7" rx="3" fill="${S.fabric}" stroke="${INK}" stroke-width=".5" transform="rotate(14 ${x - 20} ${y - 25})"/>`);
+  if (t === 3) s += D(`<rect x="${x + 30}" y="${y + 24}" width="52" height="13" rx="4" style="fill:${S.fabric2}"/><rect x="${x + 28}" y="${y + 36}" width="56" height="5" rx="1.4" style="fill:${S.wood}"/><rect x="${x + 33}" y="${y + 16}" width="14" height="10" rx="3" style="fill:${S.accent}"/><rect x="${x + 63}" y="${y + 16}" width="14" height="10" rx="3" style="fill:${S.fabric}"/>`, `<path d="M${x + 31} ${y + 41} v4 M${x + 81} ${y + 41} v4" stroke="${dk(S.wood, .3)}" stroke-width="2"/>`);
   return s;
 }
-function firepit(t){
-  const fire = (y, s) => { glow(250, y - 10, t === 3 ? 66 : 54); return `<path d="M236 ${y} l28 -4 M238 ${y - 4} l24 4" stroke="#6B4A2E" stroke-width="${4*s}" stroke-linecap="round"/>` + flame(244, y - 3, s) + flame(256, y - 3, s*.8) + flame(250, y - 5, s*1.2); };
-  if (t === 1) return D(`<path d="M228 496 h44 q-4 14 -22 14 q-18 0 -22 -14z" style="fill:#3A3634"/>`, `<path d="M234 506 l-6 18 M266 506 l6 18 M250 510 v14" stroke="#3A3634" stroke-width="2.4"/>${[0, 1, 2, 3].map(k => `<path d="M${234 + k*10} 498 v8" stroke="#6A6664" stroke-width="1"/>`).join("")}` + fire(498, .8));
-  const ring = (rx, ry, cy) => Array.from({length: 14}, (_, k) => { const a = k/14*Math.PI*2; return `<ellipse cx="${f1(250 + Math.cos(a)*rx)}" cy="${f1(cy + Math.sin(a)*ry)}" rx="7" ry="4.6" fill="${k % 2 ? "#B8AE9E" : "#A89C88"}" stroke="${INK}" stroke-width=".7"/>`; }).join("");
-  if (t === 2) return D(`<ellipse cx="250" cy="512" rx="30" ry="10" style="fill:#4A4040"/>`, ring(30, 10, 512) + fire(512, 1));
-  return D(`<ellipse cx="250" cy="510" rx="74" ry="24" style="fill:#C9C2B4"/><ellipse cx="250" cy="510" rx="34" ry="12" style="fill:#3A3434"/><rect x="200" y="466" width="100" height="10" rx="3" style="fill:${S.wood}"/>`,
-    `<path d="M206 476 v8 M294 476 v8" stroke="${dk(S.wood, .3)}" stroke-width="4"/>` + [0, 1, 2, 3, 4].map(k => `<path d="M${190 + k*30} ${492 + (k % 2)*10} l14 ${k % 2 ? -8 : 8}" stroke="#A89C88" stroke-width=".8"/>`).join("") + ring(34, 12, 510) + fire(510, 1.2)
-      + `<rect x="168" y="500" width="12" height="38" rx="3" fill="${S.wood}" stroke="${INK}" stroke-width="1"/>`);
+function firepit(t, x, y){
+  const fire = (fy, sc) => { glow(x, fy - 8, t === 3 ? 54 : 44); return `<path d="M${x - 8} ${fy} l16 -2.4 M${x - 7} ${fy - 2.4} l14 2.4" stroke="#6B4A2E" stroke-width="${2.6*sc}" stroke-linecap="round"/>` + flame(x - 3, fy - 2, sc*.7) + flame(x + 3, fy - 2, sc*.55) + flame(x, fy - 3, sc*.85); };
+  if (t === 1) return D(`<path d="M${x - 14} ${y - 22} h28 q-3 9 -14 9 q-11 0 -14 -9z" style="fill:#3A3634"/>`, `<path d="M${x - 9} ${y - 15} l-4 15 M${x + 9} ${y - 15} l4 15 M${x} ${y - 13} v13" stroke="#3A3634" stroke-width="1.8"/>` + fire(y - 21, .8));
+  const ring = (rx, ry, cy) => Array.from({length: 12}, (_, k) => { const a = k/12*Math.PI*2; return `<ellipse cx="${f1(x + Math.cos(a)*rx)}" cy="${f1(cy + Math.sin(a)*ry)}" rx="5" ry="3.2" fill="${k % 2 ? "#B8AE9E" : "#A89C88"}" stroke="${INK}" stroke-width=".5"/>`; }).join("");
+  if (t === 2) return D(`<ellipse cx="${x}" cy="${y - 10}" rx="20" ry="7" style="fill:#4A4040"/>`, ring(20, 7, y - 10) + fire(y - 9, 1));
+  return D(`<ellipse cx="${x}" cy="${y - 12}" rx="52" ry="18" style="fill:#C9C2B4"/><ellipse cx="${x}" cy="${y - 12}" rx="20" ry="7" style="fill:#3A3434"/><rect x="${x - 32}" y="${y - 44}" width="64" height="6" rx="2" style="fill:${S.wood}"/><rect x="${x - 60}" y="${y - 26}" width="10" height="26" rx="2" style="fill:${S.wood}"/>`,
+    `<path d="M${x - 28} ${y - 38} v6 M${x + 28} ${y - 38} v6" stroke="${dk(S.wood, .3)}" stroke-width="2.6"/>` + [0, 1, 2, 3].map(k => `<path d="M${x - 44 + k*28} ${y - 18 + (k % 2)*8} l10 ${k % 2 ? -5 : 5}" stroke="#A89C88" stroke-width=".6"/>`).join("") + ring(22, 8, y - 12) + fire(y - 11, 1.1));
 }
 function house(){
   const door = ST.c === "bluebell" ? BLUE : "#7E9A68", wall = ST.c === "bluebell" ? "#F2EFE6" : "#E3D3B4";
-  if (NIGHT) { glow(176, 620, 40); glow(344, 620, 40); }
+  if (NIGHT) { glow(178, 610, 34); glow(342, 610, 34); }
   const winC = NIGHT ? "#FFD98A" : "#CFE6F2";
-  return otherSpot("house", "Back inside the cottage", hovE(260, 600, 40, 14),
-    `<rect y="594" width="520" height="46" style="fill:${wall}"/>` + sk("", `<path d="M0 594 H520"/>`) + D(`<rect x="150" y="604" width="52" height="36" style="fill:${winC}"/><rect x="318" y="604" width="52" height="36" style="fill:${winC}"/><path d="M226 640 V588 q34 -24 68 0 V640z" style="fill:${lt(wall, .2)}"/><path d="M234 640 V594 q26 -18 52 0 V640z" style="fill:${door}"/><path d="M218 586 q42 -30 84 0 l-6 4 q-36 -24 -72 0z" style="fill:#6A6E74"/>`,
-      `<path d="M176 604 v36 M150 622 h52 M344 604 v36 M318 622 h52" stroke="${CREAM}" stroke-width="2.4"/><circle cx="278" cy="620" r="2.2" fill="${S.metal}"/><rect x="246" y="600" width="28" height="10" rx="2" fill="${lt(door, .3)}"/>`
-      + (ST.c === "bluebell" ? [134, 204, 302, 372].map(x => `<rect x="${x}" y="602" width="14" height="38" fill="${BLUE}" stroke="${INK}" stroke-width=".8"/>`).join("") : "")
-      + (ST.c === "figtree" ? Array.from({length: 18}, (_, k) => `<path d="M${f1(R(k)*520)} ${f1(600 + R(k + 1)*36)} h22" stroke="#C9B894" stroke-width="1"/>`).join("") : "")
-      + [0, 1, 2, 3, 4, 5, 6].map(k => `<ellipse cx="${222 + (k % 2)*4}" cy="${636 - k*8}" rx="5" ry="3.4" fill="#5E8A4A"/><ellipse cx="${298 - (k % 2)*4}" cy="${636 - k*8}" rx="5" ry="3.4" fill="#6E9A4A"/>`).join(""))
-    + lab(260, 556, "Back inside", "#F3E1A0", 9));
+  return otherSpot("house", "Back inside the cottage", hovE(260, 604, 34, 12),
+    `<rect y="582" width="520" height="58" style="fill:${wall}"/>` + sk("", `<path d="M0 582 H520"/>`)
+    + D(`<rect x="160" y="596" width="36" height="34" style="fill:${winC}"/><rect x="324" y="596" width="36" height="34" style="fill:${winC}"/><path d="M243 640 V584 q17 -12 34 0 V640z" style="fill:${lt(wall, .2)}"/><path d="M246 640 V587 q14 -9 28 0 V640z" style="fill:${door}"/><path d="M236 580 q24 -18 48 0 l-4 3 q-20 -14 -40 0z" style="fill:#6A6E74"/>`,
+      `<path d="M178 596 v34 M160 613 h36 M342 596 v34 M324 613 h36" stroke="${CREAM}" stroke-width="2"/><circle cx="270" cy="616" r="1.6" fill="${S.metal}"/><rect x="252" y="596" width="16" height="7" rx="1.4" fill="${lt(door, .3)}"/>`
+      + (ST.c === "bluebell" ? [148, 196, 312, 360].map(x => `<rect x="${x}" y="594" width="12" height="38" fill="${BLUE}" stroke="${INK}" stroke-width=".6"/>`).join("") : "")
+      + (ST.c === "figtree" ? Array.from({length: 18}, (_, k) => `<path d="M${f1(R(k)*520)} ${f1(588 + R(k + 1)*46)} h18" stroke="#C9B894" stroke-width=".8"/>`).join("") : "")
+      + [0, 1, 2, 3, 4, 5].map(k => `<ellipse cx="${240 + (k % 2)*3}" cy="${636 - k*8}" rx="4" ry="2.6" fill="#5E8A4A"/><ellipse cx="${280 - (k % 2)*3}" cy="${636 - k*8}" rx="4" ry="2.6" fill="#6E9A4A"/>`).join(""))
+    + lab(260, 558, "Back inside", "#F3E1A0", 8));
 }
-function accGarden(){
-  let s = "";
-  if (has("birdbath")) s += g(D(`<path d="M74 300 l2 -30 h8 l2 30z" style="fill:#C9C2B4"/><path d="M60 270 q20 10 40 0 q-4 -8 -20 -8 q-16 0 -20 8z" style="fill:#D8D2C4"/><rect x="68" y="298" width="24" height="5" rx="1" style="fill:#B8AE9E"/>`, `<ellipse cx="80" cy="266" rx="14" ry="3" fill="#9FD0DC"/><path d="M86 258 q4 -6 8 -2 l4 -1 l-3 3 q0 4 -6 4z" fill="#8A6A52"/>`));
-  if (has("blankets")) s += g(D(`<path d="M278 524 h28 l-3 -18 h-22z" style="fill:#C9A26A"/><rect x="280" y="494" width="12" height="14" rx="5" style="fill:${S.fabric}"/><rect x="290" y="496" width="12" height="12" rx="5" style="fill:${S.fabric2}"/>`, `<path d="M284 494 v14 M288 494 v14" stroke="${S.accent}" stroke-width="1"/><path d="M280 514 h24" stroke="#9A7A4A" stroke-width=".8"/>`));
-  if (has("lanterns")) s += g([[106, 566], [124, 540], [176, 598]].map(([x, y]) => { glow(x, y - 8, 26); return D(`<rect x="${x - 6}" y="${y - 16}" width="12" height="16" rx="2" style="fill:${NIGHT ? "#FFE8A8" : "#E8F1F0"}"/><path d="M${x - 7} ${y - 16} l7 -6 l7 6z" style="fill:#3A3634"/>`, `<path d="M${x} ${y - 24} q4 -4 0 -6" stroke="#3A3634" stroke-width="1" fill="none"/><rect x="${x - 2}" y="${y - 10}" width="4" height="6" fill="${CREAM}"/>${flame(x, y - 10, .3)}`); }).join(""));
-  return s;
+function accGarden(id){
+  if (!has(id)) return "";
+  const [x, y] = at(id);
+  if (id === "birdbath") return g(D(`<path d="M${x - 3} ${y} l1.4 -20 h3.2 l1.4 20z" style="fill:#C9C2B4"/><path d="M${x - 13} ${y - 20} q13 7 26 0 q-3 -5 -13 -5 q-10 0 -13 5z" style="fill:#D8D2C4"/><rect x="${x - 8}" y="${y - 2}" width="16" height="3.4" rx="1" style="fill:#B8AE9E"/>`, `<ellipse cx="${x}" cy="${y - 22}" rx="9" ry="2" fill="#9FD0DC"/><path d="M${x + 4} ${y - 26} q3 -4 6 -1 l3 -1 l-2 2 q0 3 -4 3z" fill="#8A6A52"/>`));
+  if (id === "blankets") return g(D(`<path d="M${x - 9} ${y} h18 l-2 -12 h-14z" style="fill:#C9A26A"/><rect x="${x - 8}" y="${y - 20}" width="8" height="9" rx="3.4" style="fill:${S.fabric}"/><rect x="${x - 1}" y="${y - 19}" width="8" height="8" rx="3.4" style="fill:${S.fabric2}"/>`, `<path d="M${x - 6} ${y - 20} v9 M${x - 3} ${y - 20} v9" stroke="${S.accent}" stroke-width=".7"/>`));
+  if (id === "lanterns") return g([[x, y + 12], [x - 6, y - 16], [x - 40, y + 4]].map(([lx, ly]) => { glow(lx, ly - 6, 20); return D(`<rect x="${lx - 4}" y="${ly - 11}" width="8" height="11" rx="1.4" style="fill:${NIGHT ? "#FFE8A8" : "#E8F1F0"}"/><path d="M${lx - 5} ${ly - 11} l5 -4 l5 4z" style="fill:#3A3634"/>`, `<path d="M${lx} ${ly - 16} q3 -3 0 -4" stroke="#3A3634" stroke-width=".8" fill="none"/><rect x="${lx - 1.4}" y="${ly - 7}" width="2.8" height="4" fill="${CREAM}"/>${flame(lx, ly - 7, .22)}`); }).join(""));
+  return "";
+}
+// a raised herb bed and a watering can, geraniums by the back door, and stepping stones from the fire to the hot tub
+function gardenDecor(){
+  let s = D(`<rect x="22" y="498" width="96" height="24" rx="1" style="fill:${S.wood}"/><rect x="22" y="494" width="96" height="6" style="fill:#7A5A3E"/>`, `<path d="M22 510 h96" stroke="${dk(S.wood, .3)}" stroke-width=".8"/>${Array.from({length: 12}, (_, k) => `<ellipse cx="${28 + k*8}" cy="${490 - (k % 3)*2}" rx="4" ry="${5 + (k % 2)*2}" fill="${["#6E9A4A", "#88AE6A", "#5E8A4A"][k % 3]}"/>`).join("")}${[34, 66, 98].map(x => `<circle cx="${x}" cy="484" r="1.6" fill="#C9B3E3"/>`).join("")}`)
+    + D(`<path d="M128 520 h14 l-2 -12 h-10z" style="fill:#7FA0A8"/>`, `<path d="M142 512 l8 -6" stroke="#7FA0A8" stroke-width="2"/><path d="M132 508 q5 -6 10 0" fill="none" stroke="#5E7A82" stroke-width="1.2"/>`);
+  s += [212, 308].map(x => D(`<path d="M${x - 7} 582 h14 l-2 -10 h-10z" style="fill:#C8643B"/>`, `${[-3, 0, 3].map(d => `<circle cx="${x + d}" cy="${566 - Math.abs(d)}" r="2.4" fill="#D9433A"/>`).join("")}<ellipse cx="${x}" cy="571" rx="6" ry="3" fill="#5E8A4A"/>`)).join("");
+  s += [[290, 452], [318, 426], [346, 402]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="4" fill="#C9C2B4" stroke="#8E8678" stroke-width=".8"/>`).join("");
+  return g(s);
 }
 function gardenArt(){
-  return gardenShell() + pieceSpot("beds", flowerbeds) + figTree() + pieceSpot("festoon", festoon) + accGardenOnly("birdbath") + pieceSpot("hottub", hottub) + pieceSpot("patio", patio)
-    + pieceSpot("firepit", firepit) + accGardenOnly("blankets") + pieceSpot("hammock", hammock) + accGardenOnly("lanterns") + crates() + house();
+  return gardenShell() + gardenDecor() + pieceSpot("beds", flowerbeds) + screenPlanting() + pieceSpot("festoon", festoon) + accGarden("birdbath") + pieceSpot("patio", patio) + pieceSpot("hottub", hottub)
+    + pieceSpot("firepit", firepit) + accGarden("blankets") + pieceSpot("hammock", hammock) + accGarden("lanterns") + crates() + house();
 }
-function accGardenOnly(id){ const save = ST.acc; ST.acc = {[id]: has(id)}; const s = accGarden(); ST.acc = save; return s; }
 
 /* ====================================================================================================== */
 export function cottageArt(scene, st = {}){
