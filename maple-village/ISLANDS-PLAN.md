@@ -1,6 +1,6 @@
 # Islands by boat and ferry: the plan (for approval, nothing built yet)
 
-Three new destinations, built one at a time to the destinations playbook (HANDOFF.md): four outdoor screens in a
+Four new destinations, built one at a time to the destinations playbook (HANDOFF.md): four outdoor screens in a
 2×2 grid, at least five interiors, their own art, music, locals with stories, a souvenir collection, local goods
 that feed the kitchen, gelato and bonbons, and new things for your 5-heart friends to do. Day trips only, home the
 same night. Jeju is already done.
@@ -8,7 +8,7 @@ same night. Jeju is already done.
 Every island has a ferry from the foreshore jetty, like Jeju. Every island has four outdoor screens and at least five
 interiors, with something to take part in in two or three of them. Your friends come along instead of family.
 
-Suggested order: **Saltwick Harbour first** (closest, and it gives the boat a job too), then **Hokkaido**, then **Bali**.
+Order (Mel approved, 16 October): **Saltwick Harbour**, then **Puffin Isle**, then **Hokkaido**, then **Bali**.
 Each one is a big round on its own.
 
 ## How you get there
@@ -16,6 +16,7 @@ Each one is a big round on its own.
 | Where | How | Cost | Who comes | Hours |
 |---|---|---|---|---|
 | Saltwick Harbour | **The ferry** from the foreshore jetty, or **your own boat** once you've bought it (the dolphin cruise boat, a 4,500 coin goal) | ferry 30 a person; your boat 15 coins of fuel, friends ride free | any 5-heart friends (your boat: up to 7) | ferry out 7am to 4pm, home by 10pm; your boat daylight only, not on downpour days |
+| Puffin Isle | **The ferry** from the foreshore jetty, or **your own boat** | ferry 40 a person; your boat 20 coins of fuel | any 5-heart friends (your boat: up to 7) | ferry out 8am to 2pm, home by 8pm (it's a small island); not on stormy days |
 | Hokkaido | **The ferry**, tickets at the foreshore jetty (like Jeju's) | 90 a person, return | any 5-heart friends | out 7am to 1pm, last ferry home 10pm |
 | Bali | **The ferry** | 110 a person, return | any 5-heart friends | out 7am to 12 noon, last ferry home 10pm |
 
@@ -68,10 +69,65 @@ lighthouse keeper, who logs every ship in a ledger; Nell at the quay café, who 
 **Friends' new acts:** crabbing, fossil tapping, skimming stones, eating chips on the harbour wall (guarding them from
 the gulls).
 
-**Puffin Isle (Mel's earlier idea):** could be a short extra hop from Saltwick by your boat (one screen: the
-lighthouse keeper, rock pools, seabirds, sea glass). Question below.
+**Puffin Isle** is its own destination (section 2).
 
-## 2. Hokkaido (the ferry)
+## 2. Puffin Isle (the ferry, or your own boat)
+**Inspiration:** the small wild islands off the British coast: the Farne Islands, Skomer and Lundy. A lighthouse, a
+handful of cottages, cliffs full of seabirds, seals on the rocks. Quiet, windy and bright.
+
+**Geography:** a green hump of an island with sheer cliffs on the west and a sheltered landing in the east. Short
+turf, sea pinks and bracken, stone walls, one track from the landing to the lighthouse. Bright greens and whites,
+grey granite, deep blue sea all round (you see water on every screen).
+
+**Layout (arrive bottom right, at the landing):**
+```
+  pi_lighthouse  | pi_village
+  ---------------+---------------
+  pi_cliffs      | pi_landing
+```
+- **Landing:** the jetty and the old boathouse, the seal rocks, the island's little shop and post office.
+- **Village:** a row of white cottages, the tearoom, the walled garden, the island church, the goats.
+- **Lighthouse:** the white lighthouse and the keeper's cottage, the foghorn, the bird hide.
+- **Cliffs:** the puffin burrows in the turf at the cliff top, the gannets and razorbills on the ledges, the sea
+  glass cove at the bottom.
+
+**Interiors (5):**
+- **The keeper's cottage:** a kitchen with a range, charts and a barometer, the logbook.
+- **The lamp room:** up the spiral stairs, the great lens.
+- **The bird hide:** a bench, binoculars, a chalkboard of today's sightings.
+- **The tearoom:** scones and crab sandwiches, jars of sea buckthorn jam.
+- **The island post office:** puffin stamps, postcards, a sea glass workbench at the back.
+
+**Things to take part in:**
+- **The bird hide:** count the puffins (tap them as they land) for the keeper's survey.
+- **The post office:** make a sea glass pendant at the workbench, and post a puffin-stamped card home.
+- **The lamp room:** polish the lens and wind the clockwork with the keeper at dusk.
+
+**Seasons:** puffins only from April to July (they spend the rest of the year at sea; the burrows are empty and the
+keeper tells you when they're due back). Grey seal pups on the beach in October and November. Sea pinks in May.
+Wild, windy winters: no ferry on stormy days.
+
+**Flora and fauna:** puffins, gannets, razorbills, kittiwakes, grey seals, the island's goats, rabbits; sea pinks,
+sea campion, bracken, sea buckthorn.
+
+**Local goods:**
+| Good | Price | Use back home |
+|---|---|---|
+| Sea buckthorn berries | 6 | gelato and bonbons through discovery |
+| Samphire | 4 | a new tapas |
+| Smoked mackerel | 7 | a tapas, a breakfast plate |
+| Goat's cheese from the island goats | 8 | the cheese board, a tapas |
+| Sea glass | 3 | the pendant at the workbench; decor |
+
+**Locals:** Morwenna the lighthouse keeper (she keeps a log of every puffin), Rhodri the warden who counts the seals,
+and Bryony at the tearoom.
+
+**Souvenirs:** puffin stamps, one for each month of the season plus a seal pup stamp (five). The full sheet is framed
+in your house.
+
+**Friends' new acts:** watching through binoculars, feeding the goats, beachcombing for sea glass, waving at the seals.
+
+## 3. Hokkaido (the ferry)
 **Inspiration (Mel's picks):** four corners of Hokkaido, one per screen: Otaru's canal and glassworks, Sapporo with its
 beer factory, a Furano flower farm, and Niseko under Mount Yotei. In real life they're hours apart; here they sit side by
 side, the way Jeju's screens do. Snowy in winter, lavender in summer.
@@ -103,7 +159,7 @@ and northern.
 - **Sapporo ramen shop:** a counter with stools, steam, miso ramen.
 - **Niseko ski lodge:** ski hire, a fire, hot chocolate, boots drying by the stove.
 
-(A sixth, the Furano dairy and cheese house, if you'd like one.)
+- **Furano dairy (sixth room, Mel said yes):** churns, a cheese cellar, soft-serve and milk in glass bottles.
 
 **Things to take part in:**
 - **Otaru glassworks:** blow a glass float and pick its colour.
@@ -138,24 +194,25 @@ forty years, and Aiko the ski instructor in Niseko, who grew up on the slopes un
 **Friends' new acts:** foot bath, soft-serve, snowball fights (winter), lying in the flower fields, a beer garden toast
 (all checked against every earlier town so nothing repeats).
 
-## 3. Bali (the ferry)
-**Inspiration:** Ubud and the rice terraces of central Bali, with a little beach. Green, warm, gentle, with
-offerings everywhere.
+## 4. Bali (the ferry)
+**Inspiration (approved):** four corners of Bali, one per screen: Seminyak's beach, Ubud's village, the Tegallalang rice
+terraces, and Uluwatu's cliff temple. Green, warm, gentle, with offerings everywhere.
 
-**Geography:** steep green terraces stepping down a valley, a river gorge with jungle, a village of carved stone
-gateways and thatched pavilions, and a black-sand beach with outrigger boats. A volcano on the skyline. Warm,
-deep greens, black stone, gold, frangipani white.
+**Geography:** the rice terraces step down a valley in the north-west, Ubud's carved gateways and jungle in the
+north-east, a wide sunset beach in the south-west, and the high limestone cliffs of Uluwatu dropping to the surf in
+the south-east. A volcano on the skyline. Warm, deep greens, black and white stone, gold, frangipani white.
 
-**Layout (arrive bottom left, at the beach):**
+**Layout (arrive bottom left, at Seminyak beach):**
 ```
-  bl_terraces   | bl_temple
-  --------------+---------------
-  bl_beach      | bl_village
+  bl_tegallalang | bl_ubud
+  ---------------+---------------
+  bl_seminyak    | bl_uluwatu
 ```
-- **Beach:** the ferry jetty, the outrigger boats, a warung (little café), a sunset spot.
-- **Village:** the market, the silversmith, the palace courtyard where the dancers practise.
-- **Terraces:** the rice terraces and their water channels, a swing, a coffee and cacao farm.
-- **Temple:** the split gate, the water temple, the monkey forest (they steal snacks).
+- **Seminyak:** the ferry jetty, the beach with beanbags and umbrellas, a warung, the sunset spot.
+- **Ubud:** the market, the silversmith, the palace courtyard where the dancers practise, the monkey forest (they
+  steal snacks).
+- **Tegallalang:** the rice terraces and their water channels, the jungle swing, a coffee and cacao farm.
+- **Uluwatu:** the cliff temple, the path along the cliff edge, the surf far below, the fire dance at sunset.
 
 **Interiors (5):** the market, the silversmith, the warung, a cacao and coffee house, the dance pavilion.
 
@@ -187,9 +244,9 @@ ducks herded through the paddies, kingfishers.
   rather than a money-maker.
 - Saltwick is cheap to reach once you own the boat; Hokkaido and Bali cost more the further they are.
 
-## Questions for you
-1. **Puffin Isle:** add it as a one-screen hop from Saltwick, keep it for later, or drop it?
-2. **Hokkaido seasons:** snow December to March, lavender in July: happy with that? And a sixth room (the Furano dairy)?
-3. **Saltwick and Bali:** are there real places you'd like as screens, like Niseko and Sapporo? (For Bali, say Ubud,
-   Uluwatu's cliff temple, Seminyak's beach, or the Tegallalang rice terraces.)
-4. **Anything you'd swap** in the goods, places or activities?
+## Answered (16 October)
+- Ferries go to every island; Saltwick and Puffin Isle can also be reached by your own boat.
+- Puffin Isle is its own destination, with four screens and five rooms.
+- Hokkaido: Otaru, Sapporo, Niseko and Furano; the seasons as planned; the Furano dairy as a sixth room.
+- Bali: Seminyak, Ubud, Tegallalang and Uluwatu.
+- Everything else as planned.
