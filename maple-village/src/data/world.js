@@ -204,8 +204,8 @@ export const INNER = {
   cocoakitchen: {parent: "cocoa", door: [64, 400], arrive: [450, 440], exit: [486, 440]},
   millup: {parent: "mill", door: [326, 596], arrive: [96, 520], exit: [70, 584]},
   // round 220: the cottages' bedrooms, up the stairs in the corner of the sitting room
-  bluebellup: {parent: "bluebell", door: [96, 600], arrive: [150, 540], exit: [70, 584]},
-  figtreeup: {parent: "figtree", door: [96, 600], arrive: [150, 540], exit: [70, 584]}   // round 154: upstairs in the old mill (the shop, the workbench, tastings)
+  bluebellup: {parent: "bluebell", door: [150, 600], arrive: [150, 540], exit: [70, 584]},
+  figtreeup: {parent: "figtree", door: [150, 600], arrive: [150, 540], exit: [70, 584]}   // round 154: upstairs in the old mill (the shop, the workbench, tastings)
 };
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
 // Each room may place its slots differently via `pos` (falls back to POS). Stations with a null regex are never

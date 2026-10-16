@@ -23,11 +23,12 @@ const dormer = (x, y, trim) => sk(`<rect x="${x-40}" y="${y-50}" width="80" heig
 const tape = (x, y, t) => `<g pointer-events="none"><rect x="${x - t.length*3.2 - 8}" y="${y - 10}" width="${t.length*6.4 + 16}" height="17" rx="2" fill="#F3E1A0" opacity=".95"/><text x="${x}" y="${y + 3}" text-anchor="middle" font-family="Klee One,serif" font-size="10" fill="#3A2E28">${t}</text></g>`;
 function stairsUp(){
   const X = 24, B = 612, RW = 19, RH = 15, N = 6, top = B - N*RH, prof = `M${X} ${B} ${rows(N, k => `V${B - (k + 1)*RH} H${X + (k + 1)*RW}`)} V${B} Z`;
+  // mirrored, so the flight rises to the left towards the wall and you step on at the right-hand end
   return `<g data-letstairs="1" aria-label="Up the stairs to the bedroom"><ellipse class="hov" cx="${X + 60}" cy="${B - 4}" rx="66" ry="12" style="fill:var(--butter)"/>
-    ${sk(`<path d="${prof}" style="fill:#8A6340"/>${rows(N, k => `<rect x="${X + k*RW - 1}" y="${B - (k + 1)*RH - 2}" width="${RW + 3}" height="4" rx="1" style="fill:#B9875E"/>`)}
+    <g transform="translate(${2*X + N*RW} 0) scale(-1 1)">${sk(`<path d="${prof}" style="fill:#8A6340"/>${rows(N, k => `<rect x="${X + k*RW - 1}" y="${B - (k + 1)*RH - 2}" width="${RW + 3}" height="4" rx="1" style="fill:#B9875E"/>`)}
       ${rows(N, k => `<path d="M${X + k*RW + RW/2} ${B - (k + 1)*RH - 2} V${B - (k + 1)*RH - 30}" style="stroke:#6B4A2E" stroke-width="2"/>`)}
       <path d="M${X + 2} ${B - 44} L${X + N*RW + 2} ${top - 32}" style="stroke:#5A3A2A" stroke-width="3.5" stroke-linecap="round"/><rect x="${X - 2}" y="${B - 50}" width="7" height="50" rx="1.5" style="fill:#6B4A2E"/><circle cx="${X + 1.5}" cy="${B - 52}" r="4" style="fill:#5A3A2A"/>`,
-      `<path d="${prof}"/><path d="M${X + 2} ${B - 44} L${X + N*RW + 2} ${top - 32}"/>`)}
+      `<path d="${prof}"/><path d="M${X + 2} ${B - 44} L${X + N*RW + 2} ${top - 32}"/>`)}</g>
     ${tape(X + 60, 628, "Upstairs")}</g>`;
 }
 // and the top of the stairwell upstairs, bottom left, with a rail: the way back down
