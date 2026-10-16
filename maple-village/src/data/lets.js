@@ -30,12 +30,12 @@ export const ESSENTIAL = ["bed", "linen"];
 // the two cottages: their price, the cap on the nightly rate, and their slots (and where each piece stands in the room)
 export const COTTAGES = {
   bluebell: {n: "Bluebell", price: 3000, cap: 70, sleeps: 4, line: "the bigger one, blue shutters, two bedrooms under the eaves",
-    slots: {bed: [120, 262], bed2: [400, 262], linen: [120, 290], linen2: [400, 290], seat: [120, 420], table: [300, 470], shelf: [262, 250], lamp: [196, 400], rug: [262, 420],
-      curtains: [262, 200], picture: [180, 150], plant: [460, 560], touches: [360, 400]},
+    slots: {bed: [110, 336], bed2: [448, 336], linen: [110, 344], linen2: [448, 344], seat: [130, 486], table: [372, 446], shelf: [342, 254], lamp: [236, 476], rug: [262, 420],
+      curtains: [110, 124], picture: [246, 96], plant: [62, 618], touches: [246, 316]},
     cats: {bed2: "bed", linen2: "linen"}},
   figtree: {n: "Fig Tree", price: 2000, cap: 50, sleeps: 2, line: "the little one, a fig tree by the door, one bedroom and a window seat",
-    slots: {bed: [120, 262], linen: [120, 290], seat: [400, 300], table: [300, 470], shelf: [262, 250], lamp: [196, 400], rug: [262, 420],
-      curtains: [400, 200], picture: [180, 150], plant: [460, 560], touches: [360, 400]},
+    slots: {bed: [436, 330], linen: [436, 338], seat: [126, 424], table: [140, 566], shelf: [222, 254], lamp: [232, 404], rug: [296, 452],
+      curtains: [100, 122], picture: [436, 116], plant: [478, 462], touches: [100, 298]},
     cats: {}}
 };
 export const catOf = (cottage, slot) => COTTAGES[cottage].cats[slot] || slot;
