@@ -330,6 +330,30 @@ export const TRACKS = {
   puffin: {name: "Air for a small island", live: true, bpm: 72, steps: 6, tone: "bell", arp: [1, 0, 3, 0, 2, 4], arpVel: .035, mel: .6, up: 12,
     bars: [[43, 55, 62, 67, 71], [41, 53, 60, 65, 69], [43, 55, 62, 67, 71], [48, 55, 60, 64, 67], [43, 55, 62, 67, 71], [41, 53, 57, 65, 69], [45, 52, 57, 64, 69], [43, 55, 62, 67, 71]],
     lines: [[[0, 74], [3, 71]], [[0, 72], [2, 69]], [[0, 67], [3, 71]], [[0, 72], [3, 76]], [[0, 74], [2, 79]], [[0, 77], [3, 74]], [[0, 72], [3, 69]], [[0, 67]]]},
+  // live, all over Hokkaido (round 217): a shakuhachi-ish breathy piano melody over slow open fifths, in A minor
+  // pentatonic, wide and cold and calm like snowfields, a little quicker in spring
+  hokkaido: {name: "Snow on the canal", live: true, bpm: 76, steps: 8, tone: "piano", arp: [1, 3, 5, 3, 2, 4, 3, 2], arpVel: .038, mel: .6,
+    bars: [[45, 57, 64, 67, 72], [43, 55, 62, 67, 71], [41, 53, 60, 64, 69], [40, 52, 59, 64, 67], [45, 57, 64, 69, 72], [48, 55, 60, 64, 67], [43, 50, 55, 62, 67], [45, 57, 64, 67, 72]],
+    lines: [[[0, 76], [2, 79], [3, 76]], [[0, 74], [3, 71]], [[0, 72], [2, 74], [3, 76]], [[0, 76], [3, 72]], [[0, 81], [2, 79]], [[0, 76], [2, 74], [3, 72]], [[0, 74], [3, 71]], [[0, 69]]]},
+  // Round 217: Hokkaido's interiors
+  // the glassworks: the roar of the furnace, low rhodes and a glinting top
+  hk_glass: {name: "Breath in the glass", live: true, bpm: 60, steps: 8, tone: "rhodes", arp: [1, 0, 4, 0, 2, 0, 3, 0], arpVel: .035, mel: .45, up: 12,
+    bars: [[40, 52, 59, 64, 71], [45, 52, 57, 64, 69], [43, 55, 62, 67, 71], [40, 52, 59, 64, 71]]},
+  // the music box hall: a tinkling bell lullaby in 3/4
+  hk_musicbox: {name: "Thirty thousand lullabies", live: true, bpm: 92, steps: 6, tone: "bell", arp: [1, 3, 5, 4, 3, 2], arpVel: .04, mel: .6, up: 24,
+    bars: [[48, 60, 64, 67, 72], [53, 60, 65, 69, 72], [55, 59, 62, 67, 71], [48, 60, 64, 67, 72]]},
+  // the beer factory: a big jolly oompah of a tune, guitar standing in for the brass
+  hk_beer: {name: "Under the red star", live: true, bpm: 120, steps: 8, tone: "guitar", strum: [0, 4], arp: [1, 3, 2, 3, 1, 3, 2, 4], arpVel: .05, mel: .8,
+    bars: [[43, 55, 59, 62, 67], [48, 55, 60, 64, 67], [50, 57, 62, 66, 69], [43, 55, 59, 62, 67]]},
+  // the ramen shop: busy, steamy, a quick little piano shuffle
+  hk_ramen: {name: "Slurp is polite", live: true, bpm: 128, steps: 8, tone: "piano", strum: [0, 4], arp: [1, 2, 3, 5, 3, 2, 4, 3], arpVel: .045, mel: .7,
+    bars: [[45, 57, 60, 64, 69], [50, 57, 62, 65, 69], [52, 56, 59, 64, 68], [45, 57, 60, 64, 69]]},
+  // the ski lodge: the stove roaring, warm and slow, boots steaming
+  hk_lodge: {name: "Boots by the stove", live: true, bpm: 70, steps: 8, tone: "rhodes", arp: [1, 3, 2, 4, 3, 2, 1, 0], arpVel: .038, mel: .5,
+    bars: [[41, 53, 57, 60, 65], [46, 53, 58, 62, 65], [48, 55, 60, 64, 67], [41, 53, 57, 60, 65]]},
+  // the dairy: a bright sunny guitar, cows on the hill
+  hk_dairy: {name: "Soft-serve on the hill", live: true, bpm: 104, steps: 6, tone: "guitar", arp: [1, 3, 4, 2, 3, 4], arpVel: .045, mel: .7,
+    bars: [[50, 62, 66, 69, 74], [55, 62, 67, 71, 74], [57, 61, 64, 69, 73], [50, 62, 66, 69, 74]]},
   // Round 216: Puffin Isle's interiors
   // the keeper's cottage: the range ticking, a warm slow rhodes
   pi_keeper: {name: "The kettle on the range", live: true, bpm: 68, steps: 8, tone: "rhodes", arp: [1, 3, 2, 0, 1, 4, 2, 0], arpVel: .035, mel: .45,

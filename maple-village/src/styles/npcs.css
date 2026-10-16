@@ -276,3 +276,9 @@
 .ch.npc.act-seaglass:not(.walk) .tool{animation:tapT 2.2s ease-in-out infinite alternate}
 .ch.npc.act-sealwave:not(.walk) .armR{animation:luckA .7s ease-in-out infinite alternate}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-goatfeed .perch,.ch.npc.act-seaglass .tool,.ch.npc.act-sealwave .armR{animation:none}}
+/* round 217: Hokkaido: feet in the foot bath (sitting), a soft-serve, lying in the flowers, a toast, skiing (a gentle sway) */
+.ch.npc.act-footbath:not(.walk) .bob,.ch.npc.act-flowerlie:not(.walk) .bob{transform:translateY(10px)}
+.ch.npc.act-softserve:not(.walk) .tool,.ch.npc.act-toast:not(.walk) .tool{animation:tapT 1.8s ease-in-out infinite alternate}
+.ch.npc.act-ski:not(.walk) .bob{animation:skisway 1.6s ease-in-out infinite alternate}
+@keyframes skisway{from{transform:translateX(-4px) rotate(-3deg)}to{transform:translateX(4px) rotate(3deg)}}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-softserve .tool,.ch.npc.act-toast .tool,.ch.npc.act-ski .bob{animation:none}}

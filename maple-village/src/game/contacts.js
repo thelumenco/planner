@@ -22,17 +22,18 @@ import { PEN_RK } from "../data/pen-rk.js";
 import { PEN_JC } from "../data/pen-jc.js";
 import { PEN_SW } from "../data/pen-sw.js";
 import { PEN_PI } from "../data/pen-pi.js";
+import { PEN_HK } from "../data/pen-hk.js";
 
 const D = 24*60*60*1000;
-export const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_OD, ...PEN_RK, ...PEN_JC, ...PEN_SW, ...PEN_PI};   // round 215: Saltwick Harbour   // round 192: Ronda, Kyoto, Jeju, Cinque Terre   // round 191: the Coast Road and the Tablelands
-export const REGIONS = {bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", saltwick: "Saltwick Harbour", puffin: "Puffin Isle", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre"};
+export const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_OD, ...PEN_RK, ...PEN_JC, ...PEN_SW, ...PEN_PI, ...PEN_HK};   // round 215: Saltwick Harbour   // round 192: Ronda, Kyoto, Jeju, Cinque Terre   // round 191: the Coast Road and the Tablelands
+export const REGIONS = {bellbird: "Bellbird Valley", coast: "the Coast Road", tablelands: "the Tablelands", lavender: "the Lavender Hills", saltwick: "Saltwick Harbour", puffin: "Puffin Isle", hokkaido: "Hokkaido", ronda: "Ronda", kyoto: "Kyoto", jeju: "Jeju", cinque: "Cinque Terre"};
 // what a parcel costs to post, and how many days the reply takes (a letter's free)
-export const POSTAGE = {bellbird: 2, coast: 2, tablelands: 4, lavender: 4, saltwick: 4, puffin: 4, ronda: 8, kyoto: 8, jeju: 8, cinque: 8};
+export const POSTAGE = {bellbird: 2, coast: 2, tablelands: 4, lavender: 4, saltwick: 4, puffin: 4, hokkaido: 8, ronda: 8, kyoto: 8, jeju: 8, cinque: 8};
 const DAYS = {2: 1, 4: 2, 8: 3};
 const HELD = [];   // anyone held back from the book (nobody, now)
 const REGION = {};
 [[BB_PEOPLE, "bellbird"], [CR_PEOPLE, "coast"], [TL_PEOPLE, "tablelands"], [LV_PEOPLE, "lavender"]].forEach(([list, r]) => list.forEach(p => { REGION[p.id] = r; }));
-NPCS.forEach(p => { if (["ronda", "kyoto", "jeju", "cinque", "saltwick", "puffin"].includes(p.local)) REGION[p.id] = p.local; });
+NPCS.forEach(p => { if (["ronda", "kyoto", "jeju", "cinque", "saltwick", "puffin", "hokkaido"].includes(p.local)) REGION[p.id] = p.local; });
 const DEF = {}; NPCS.forEach(p => { if (REGION[p.id]) DEF[p.id] = p; });
 export const person = id => DEF[id];
 export const regionOf = id => REGION[id];

@@ -1018,3 +1018,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .pib-seal{width:30px;height:16px;margin-top:10px;background:#8A8C92}
 .pib-pup{width:24px;height:15px;margin-top:11px;background:#FFFDF6}
 .pib-gull{width:20px;height:18px;margin-top:8px;background:#E6E8EA}
+/* round 217: Hokkaido: the glass bubble growing on the blowpipe, between its two marks */
+.hkbubble{position:relative;height:110px;margin:10px 0;border-radius:10px;border:1.4px solid var(--line);background:linear-gradient(180deg,#3A2E28,#5A3A2A);display:flex;align-items:center;justify-content:center}
+.hkbubble span{display:block;border-radius:50%;border:1.4px solid #FFFDF6;opacity:.85;transition:width .4s,height .4s}
+.hkbubble i{position:absolute;bottom:4px;width:2px;height:12px;background:#F3D98A}

@@ -713,7 +713,7 @@ if (want("\ntasting room")) try {
   check(await page.locator('#ctx [data-k="tapas"]').count() === 32 && await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().getAttribute("aria-selected") === "true", "the stove's Local tab offers this season's local tapas (32 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams)");
   check(/from the market deli|from the farm gate|from the garden/.test(await page.locator("#ctx").innerText()), "each missing ingredient says where to get it");
   await page.locator('#ctx [data-k="ktab"][data-id="specials"]').first().click(); await page.waitForTimeout(200);
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 0 && /travel to Ronda, Kyoto, Jeju, Cinque Terre, Saltwick Harbour or Puffin Isle/.test(await page.locator("#ctx").innerText()), "the Specials tab is empty until you've travelled: specials come from the trips");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 0 && /travel to Ronda, Kyoto, Jeju, Cinque Terre, Saltwick Harbour, Puffin Isle or Hokkaido/.test(await page.locator("#ctx").innerText()), "the Specials tab is empty until you've travelled: specials come from the trips");
   await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().click(); await page.waitForTimeout(200);
   await page.click('#ctx [data-k="tapas"][data-id="tortilla"]'); await page.waitForTimeout(200); await page.click('#ctx [data-k="cooktapas"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); return f.vine.tapasList[0].id === "tortilla" && f.vine.tapasList[0].plates === 6 && !f.kitchen.larder.potato && !f.kitchen.larder.egg; }), "today's tapas is chosen and a batch cooked from potatoes and eggs");
@@ -2682,6 +2682,69 @@ if (want("\nPuffin Isle, by the island boat")) try {
   check(await fox().then(f => f.trip.done) && /foreshore/i.test(await page.locator("#sceneName").textContent()), "the boat home from the jetty, back to the foreshore");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nHokkaido, by ferry")) try {
+  console.log("\nHokkaido, by ferry");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), T = tw.TOWNS.hokkaido, hk = await import(new URL("../src/game/hokkaido.js", import.meta.url)), hd = await import(new URL("../src/data/hokkaido.js", import.meta.url));
+  const np = await import(new URL("../src/data/npcs.js", import.meta.url)), kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url));
+  check(T.by === "ferry" && T.screens.join() === "hk_otaru,hk_sapporo,hk_niseko,hk_furano" && T.ferry.arrive[0] === "hk_otaru" && T.ferry.fare === 90 && !T.boat, "Hokkaido: Otaru, Sapporo, Niseko and Furano, one to a screen; the ferry comes into Otaru (top left), 90 a person, too far for your own boat");
+  check(Object.keys(tw.TOWN_PLACES).filter(k => (tw.TOWN_PLACES[k].scene || "").startsWith("hk_")).every(k => /^hk/.test(k)) && T.screens.every(x => tw.TOWN_BOUNDS[x] && tw.TOWN_OBST[x]), "every Hokkaido place starts with hk, and every screen has its bounds and obstacles");
+  check(Object.keys(T.rooms).length === 6 && Object.entries(T.rooms).every(([k, r]) => r.music && tw.TOWN_PLACES[r.door] && tw.TOWN_BOUNDS[k]), "six rooms: the glassworks, the music box hall, the beer factory, the ramen shop, the ski lodge and the Furano dairy, each with its own music");
+  { const used = new Set(["ronda", "kyoto", "jeju", "cinque", "saltwick", "puffin", ...Object.keys(tw.TOWNS).filter(k => k.startsWith("bv_"))].flatMap(k => Object.values(tw.TOWNS[k].acts || {}).flatMap(a => Object.values(a).map(x => x.act))));
+    check(Object.values(T.acts).every(a => Object.values(a).every(x => !used.has(x.act))), "what your friends do in Hokkaido (the foot bath, a soft-serve, lying in the flowers, a toast, skiing) they've done nowhere else"); }
+  { const hl = np.NPCS.filter(n => n.local === "hokkaido"), rooms = Object.keys(T.rooms);
+    check(["hkharuki", "hkkenji", "hkaiko"].every(id => hl.some(n => n.id === id)) && hl.filter(n => n.tourist).length >= 3 && rooms.every(r => hl.filter(n => n.routine.some(x => x.scene === r)).length >= 2), "Haruki, Kenji and Aiko, the shopkeepers and the visitors: at least two people for every room"); }
+  check(Object.entries(tw.TOWN_GOODS).filter(([, g]) => g.shop && /^hk/.test(g.shop)).every(([, g]) => g.sell == null || g.sell <= g.price) && ["hkscallop", "hkcorn", "hkramen"].every(id => kit.TAPAS[id].special === "hokkaido") && sc.INGR.hkmilk && sc.INGR.hkmelon, "Hokkaido's goods sell for less than they cost; three specials for the kitchen; Hokkaido milk and Furano melon for the gelato");
+  check(hd.snowIn("2026-01-10") && !hd.snowIn("2026-07-10") && hd.festivalIn("2026-02-10") && hd.lavenderIn("2026-07-10"), "snow December to March, the snow festival in February, lavender in July");
+  { const F = {coins: 100, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, day = "2026-02-10";
+    const g = hk.glassStart("blue"); hk.blow(g, () => .5); hk.blow(g, () => .5); hk.blow(g, () => .5);
+    const g2 = hk.glassStart("rose"); for (let i = 0; i < 5; i++) hk.blow(g2, () => .9);
+    check(!g.burst && g.size >= hk.GLASS.lo && hk.glassDone(F, g, add, day) && F.inv.h_float === 1 && F.coins === 88 && g2.burst && !hk.glassDone(F, hk.glassStart("blue"), add, day), "blowing a glass float: three gentle breaths and it's a float (12), too many and it bursts; one a day");
+    const b = hk.buyBox(F, add, day); ["2026-04-10", "2026-07-10", "2026-10-10"].forEach(d => hk.buyBox(F, add, d));
+    check(b && b.k === "winter" && !hk.buyBox(F, add, day) && F.inv.h_boxes === 1 && ["spring", "summer", "autumn", "winter"].every(k => F.inv["mb_" + k] === 1), "a music box for each season's tune; all four and they play together");
+    F.coins = 100; const t = hk.tasteStart(F); t.order.forEach(n => hk.tastePick(t, n));
+    check(F.coins === 92 && t.good === 3 && hk.tasteDone(F, t, add, day) && F.inv.h_beerglass === 1, "the beer factory tour (8): match all three beers to their notes and Kenji gives you a glass");
+    const k = hk.skiStart(F, () => .2); k.runs.forEach(run => run.forEach(side => hk.skiTurn(k, side)));
+    check(k.done && k.clean === 3 && hk.skiDone(F, k, add, day) && F.inv.h_skipass === 1 && /Come back when it's white/.test(hk.slopePanel(F, null, "2026-07-10")), "a ski lesson with Aiko in the snow months: clean runs earn your first ski pass (in summer, the slopes are green)");
+    const cv = {step: 0}; check(hk.carveStep(cv, 1) === "oops" && [0, 1, 2].every(i => hk.carveStep(cv, i) === "ok") && cv.done && /fountain/.test(hk.sculptPanel(F, null, "2026-06-10")), "the snow festival in February: pack, carve, smooth (the rest of the year, a fountain)"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await closeFriends(page);
+  page.on("pageerror", e => errors.push(`hokkaido pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
+  await page.addInitScript(() => { if (!/hkcoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 400; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=09:00&date=2026-02-10"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=09:00&date=2026-02-10&hkcoins=1"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(900);
+  await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftown="hokkaido"]', { timeout: 15000 });
+  await page.click('#ctx [data-ftown="hokkaido"]'); await page.waitForSelector('#ctx [data-trip="hokkaido"]', { timeout: 15000 });
+  await page.click('#ctx [data-tpick="tomi"]');
+  check(/180/.test(await page.locator("#ctx [data-trip]").textContent()), "you and Tomi to Hokkaido: 180 coins");
+  await page.click("#ctx [data-trip]");
+  await page.waitForFunction(() => /Hokkaido/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(2000);
+  check(await fox().then(f => f.coins === 220 && f.trip.town === "hokkaido" && f.towns && f.towns.hokkaido) && /Otaru/.test(await page.locator("#sceneName").textContent()) && await ids().then(a => a.includes("tomi")), "off the ferry at Otaru, with Tomi");
+  for (const [gate, want, places] of [["hkToSapporo", "Sapporo", ["hkclocktower", "hkbeer", "hkramen", "hkpark", "hksculpt", "hkgarden"]], ["hkToFurano", "Furano", ["hkflowers", "hkdairy", "hkmelon", "hktree"]], ["hkToNisekoW", "Niseko", ["hkslope", "hkriver", "hklodge", "hkfootbath"]], ["hkToOtaruN", "Otaru", ["hkpier", "hkglass", "hkmusicbox", "hkcanal", "hkmarket", "hkclock"]]]) {
+    await page.locator(`#world [data-place="${gate}"]`).dispatchEvent("click");
+    await page.waitForFunction(w => new RegExp(w).test(document.querySelector("#sceneName").textContent), want, { timeout: 25000 }); await page.waitForTimeout(1200);
+    check(await page.evaluate(ps => ps.every(id => document.querySelector(`#world [data-place="${id}"]`)), places) && await ids().then(a => a.includes("tomi")), `through the gate to ${want} (Tomi follows)`);
+  }
+  await page.locator('#world [data-place="hkglass"]').dispatchEvent("click"); await page.waitForFunction(() => /glassworks/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1000);
+  await page.locator('#world [data-rdspot="hk_glass"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hk="col:blue"]', { timeout: 15000 });
+  await page.click('#ctx [data-hk="col:blue"]'); await page.waitForSelector('#ctx [data-hk="blow"]', { timeout: 5000 });
+  check(await page.locator("#ctx .hkbubble").count() === 1 && await ids().then(a => a.includes("hkharuki")), "at the glassworks: Haruki hands you the blowpipe");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
+  await page.evaluate(() => window.__hbScene("hk_niseko")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="hkslope"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-hk="ski"]', { timeout: 15000 });
+  await page.click('#ctx [data-hk="ski"]'); await page.waitForSelector('#ctx [data-hk="turn:left"]', { timeout: 5000 });
+  check(await fox().then(f => f.coins === 210), "in February: a ski lesson with Aiko on the nursery slope (10)");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
+  await page.evaluate(() => window.__hbScene("hk_otaru")); await page.waitForTimeout(1200);
+  await page.locator('#world [data-place="hkpier"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="ferry"]', { timeout: 15000 });
+  await page.click('#ctx [data-triphome="ferry"]');
+  await page.waitForFunction(() => !/Hokkaido/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
+  check(await fox().then(f => f.trip.done) && /foreshore/i.test(await page.locator("#sceneName").textContent()), "the ferry home from Otaru, back to the foreshore");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nCinque Terre: the five villages (well, four)")) try {
   console.log("\nCinque Terre: the five villages (well, four)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), C = tw.TOWNS.cinque;
@@ -2718,8 +2781,8 @@ if (want("\nCinque Terre: the five villages (well, four)")) try {
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
-    check(sp.length === 35 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
-      "the 35 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(sp.length === 38 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 38 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "ornella"), L = np.NPCS.find(n => n.id === "dario");

@@ -79,5 +79,6 @@ export const GUEST_LINES = {
   jeju: ["No black stones here, but the wind's just as friendly.", "Not one tangerine tree. Farid says he'll fix that."],
   cinque: ["No terraces, no cliffs, and I love it anyway.", "The coffee's different. I'll say no more."],
   saltwick: ["No steps! I keep looking for steps. Your village is so flat and kind.", "I brought kippers. Sid insisted. They're in your fridge, sorry about the smell."],
-  puffin: ["So many trees! And not one puffin. I keep looking at the ground for burrows.", "It's so still here. I keep waiting for the wind to start."]
+  puffin: ["So many trees! And not one puffin. I keep looking at the ground for burrows.", "It's so still here. I keep waiting for the wind to start."],
+  hokkaido: ["It's so warm here! I've taken off two jumpers.", "No soft-serve stand on every corner. How do you live?"]
 };

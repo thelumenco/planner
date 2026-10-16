@@ -236,3 +236,16 @@ check is now clean.
   reading the weather in the lamp room (three right in a row = Morwenna's storm glass), sea glass in the cove (once a
   day) and a pendant at the post office's workbench, and the puffin stamps (one a month in season, five framed).
 - Friends' acts: Hana watching the puffins, Mei feeding the goats, Posy with sea glass, Bo waving at the seals.
+
+## Islands by ferry: Hokkaido (built 2026-10-16)
+- Data in `src/data/hokkaido.js`, people in `src/data/hk-people.js`, letters in `src/data/pen-hk.js`, panels and games
+  in `src/game/hokkaido.js`, art in `src/art/town-hokkaido.js` and `src/art/hokkaido-rooms.js`, music `hokkaido` + one
+  track per room. Ids start `hk`. Ferry only (90, out 7 to 1, home by 10); too far for your own boat.
+- Screens (Mel's picks): Otaru (ferry, canal, glassworks, music box hall, market, steam clock), Sapporo (clock tower,
+  beer factory, ramen shop, the long park and its February snow sculptures, beer garden), Niseko (Mount Yotei, the
+  slopes, the ski lodge, the foot bath, the river), Furano (the flower farm, the dairy, the melon stall, the lone tree).
+  Six rooms: the glassworks, the music box hall, the beer factory, the ramen shop, the ski lodge, the Furano dairy.
+- Things to do: blowing a glass float (one a day), a music box for each season (all four play together), the beer
+  tour and tasting (match three beers), a ski lesson December to March (a first ski pass), carving at the snow festival
+  in February, the foot bath. Friends: Hana in the foot bath, Bo with a soft-serve, Posy in the flowers, Theo's toast in
+  the beer garden, Tomi skiing.
