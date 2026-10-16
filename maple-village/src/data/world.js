@@ -202,7 +202,10 @@ export const INNER = {
   scoopdip: {parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440]},
   // the Cocoa Room's kitchen, through the door on the shop's west wall
   cocoakitchen: {parent: "cocoa", door: [64, 400], arrive: [450, 440], exit: [486, 440]},
-  millup: {parent: "mill", door: [326, 596], arrive: [96, 520], exit: [70, 584]}   // round 154: upstairs in the old mill (the shop, the workbench, tastings)
+  millup: {parent: "mill", door: [326, 596], arrive: [96, 520], exit: [70, 584]},
+  // round 220: the cottages' bedrooms, up the stairs in the corner of the sitting room
+  bluebellup: {parent: "bluebell", door: [96, 600], arrive: [150, 540], exit: [70, 584]},
+  figtreeup: {parent: "figtree", door: [96, 600], arrive: [150, 540], exit: [70, 584]}   // round 154: upstairs in the old mill (the shop, the workbench, tastings)
 };
 export const POS = {A:[120,250], B:[400,250], C:[120,440], D:[400,440], E:[410,598], F:[112,596], G:[292,334], M:[260,400]};
 // Each room may place its slots differently via `pos` (falls back to POS). Stations with a null regex are never
@@ -355,6 +358,8 @@ export const ROOMS = {
     ["lethall","The hall table","H","lethall",null,"The hall table: the catalogue, the guest book, and any parcels from the train.",30]]},
   figtree: {name:"Fig Tree", wall:"#FFF3E3", trim:"#8A6A3A", noBoard:true, pos:{H:[420,540]}, stations:[
     ["lethall","The hall table","H","lethall",null,"The hall table: the catalogue, the guest book, and any parcels from the train.",30]]},
+  bluebellup: {name:"Bluebell: upstairs", wall:"#EEF3FA", trim:"#5E7AB0", noBoard:true, stations:[]},
+  figtreeup: {name:"Fig Tree: upstairs", wall:"#FFF3E3", trim:"#8A6A3A", noBoard:true, stations:[]},
   tomiposy: {name:"Tomi and Posy's", wall:"#F3ECF7", trim:"#8E5B9A", noBoard:true, pos:{G:[110,262], K:[432,261], D:[284,262], S:[110,420], X:[340,470], R:[480,340]}, stations:[
     ["bedroom","Bedroom","R","bedroomdoor",null,"Tomi and Posy's room.",0],
     ["games","Games corner","G","gamingtv",null,"Tomi's games. He says he's 'nearly finished' this one. He's been nearly finished for a month.",36],

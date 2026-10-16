@@ -3191,6 +3191,7 @@ svg.addEventListener("click", ev => {
   const ms = ev.target.closest("[data-millspot]");
   if (ms && scene === "mill" && ms.dataset.millspot === "photo") { go("mill", 150, 260, () => { millOpen = "story"; atSpot = "photo"; sfx("paper", true); ctx(); }); return; }
   // round 154: upstairs (art/millup.js), and the stairs up from the press
+  if (ev.target.closest("[data-letstairs]") && (scene === "bluebell" || scene === "figtree")) { const up = scene + "up", I = INNER[up]; go(scene, I.door[0], I.door[1], () => setScene(up, I.arrive)); return; }   // round 220: up to the cottage's bedrooms
   if (ms && scene === "mill" && ms.dataset.millspot === "stairs") { go("mill", INNER.millup.door[0], INNER.millup.door[1], () => setScene("millup", INNER.millup.arrive)); return; }
   if (ms && scene === "millup") { const k = ms.dataset.millspot, at = {bench: [400, 280], shop: [214, 600], tasting: [260, 440], workshop: [410, 600]}[k] || [260, 470];
     go("millup", at[0], at[1], () => { millOpen = k; atSpot = k; if (k === "tasting") tstSt = null; sfx("paper", true); ctx(); }); return; }

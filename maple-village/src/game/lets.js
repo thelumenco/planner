@@ -12,7 +12,7 @@
 // A piece: {cat, tier (1-3), col}.
 import { esc, dayKey, hash } from "../util.js";
 import { icon } from "../art/icons.js";
-import { TIERS, COLOURS, CATS, ESSENTIAL, COTTAGES, catOf, STAY, GUEST_POOL, REVIEWS } from "../data/lets.js";
+import { TIERS, COLOURS, CATS, ESSENTIAL, COTTAGES, catOf, STAY, GUEST_POOL, REVIEWS, upstairs } from "../data/lets.js";
 
 export const OFFER_HEARTS = 5;
 // off on the live game until the cottage rooms are drawn (?lets=1 turns it on, for the tests)
@@ -140,7 +140,7 @@ export function hallPanel(F, id, st = {}, day = dayKey()){
   if (c.parcels.length) h += `<h3 class="ph3">Parcels in the hall</h3><ul class="hlist wlist">${c.parcels.map((p, i) => unpack(p, "parcel", i)).join("")}</ul>`;
   const spares = L.spare.map((p, i) => [p, i]).filter(([p]) => slotsFor(id, p.cat).length);
   if (spares.length) h += `<h3 class="ph3">In the spare room</h3><ul class="hlist wlist">${spares.map(([p, i]) => unpack(p, "spare", i)).join("")}</ul>`;
-  h += `<h3 class="ph3">In place</h3><ul class="hlist wlist">${Object.keys(C.slots).map(sl => { const p = c.slots[sl]; return `<li><span class="wtxt"><b>${esc(CATS[catOf(id, sl)].n)}${sl.endsWith("2") ? " (room 2)" : ""}</b><small>${p ? `${swatch(p.col)} ${esc(pieceName(p))}` : "Nothing yet"}</small></span>${p && !stay ? `<button class="btn small alt" data-let="out:${sl}">Take out</button>` : ""}</li>`; }).join("")}</ul>`;
+  h += `<h3 class="ph3">In place</h3><ul class="hlist wlist">${Object.keys(C.slots).map(sl => { const p = c.slots[sl]; return `<li><span class="wtxt"><b>${esc(CATS[catOf(id, sl)].n)}${upstairs(id, sl) ? (sl.endsWith("2") ? " (upstairs, room 2)" : " (upstairs)") : ""}</b><small>${p ? `${swatch(p.col)} ${esc(pieceName(p))}` : "Nothing yet"}</small></span>${p && !stay ? `<button class="btn small alt" data-let="out:${sl}">Take out</button>` : ""}</li>`; }).join("")}</ul>`;
   return h + shut;
 }
 // Elena's letter once you're friends

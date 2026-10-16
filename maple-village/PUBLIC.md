@@ -143,8 +143,10 @@ offer: 3,000 for Bluebell (sleeps four, two bedrooms) and 2,000 for Fig Tree (sl
 logic and panels in game/lets.js, the rooms in art/lets-art.js.
 
 Then they're yours to furnish and let, a mini landlord business:
-- Each cottage has fixed places for furniture (Fig Tree 11, Bluebell 13 with a second bed and linen). The hall
-  table inside is where it's all run: the catalogue, the parcels to unpack, the spares and the guest book.
+- Each cottage has fixed places for furniture (Fig Tree 11, Bluebell 13 with a second bed and linen), over two
+  floors like the old mill (round 220, Mel: the one-room version looked messy): the sitting room and table
+  downstairs, with stairs up the left wall; the bed or beds and the little touches upstairs. The hall table
+  downstairs is where it's all run: the catalogue, the parcels to unpack, the spares and the guest book.
 - The catalogue has eleven kinds of piece, each in three tiers (simple, good, fine) and five colours (sage,
   cornflower, rose, ochre, cream). Prices, simple/good/fine: bed 120/260/520, bed linen 30/70/140, armchair or
   sofa 90/200/420, table and chairs 100/220/450, shelves 60/140/300, lamp 25/60/130, rug 30/80/170, curtains

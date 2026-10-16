@@ -4113,6 +4113,7 @@ if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) tr
   lt.LIVE.on = true; const day = "2026-10-12", F = {coins: 9000, inv: {}};
   check(!lt.offerOpen(F, 4) && !lt.buyCottage(F, "figtree", 4, day) && lt.offerOpen(F, 5) && lt.letsMail(F, 5, 1).length === 1 && !lt.letsMail(F, 4, 1).length, "Elena offers the cottages at five hearts (and writes to say so)");
   check(lt.buyCottage(F, "figtree", 5, day) && F.coins === 7000 && lt.owns(F, "figtree") && !lt.letsMail(F, 5, 1).length && !lt.buyCottage(F, "figtree", 5, day), "Fig Tree is yours for 2000");
+  check(["bed", "linen", "bed2", "linen2"].every(sl => ld.upstairs("bluebell", sl)) && ["seat", "table", "shelf", "rug"].every(sl => !ld.upstairs("bluebell", sl) && !ld.upstairs("figtree", sl)) && ld.upstairs("figtree", "bed"), "beds upstairs, the sitting room downstairs, in both cottages");
   check(Object.values(ld.CATS).every(c => c.prices[0] < c.prices[1] && c.prices[1] < c.prices[2]) && np.NPCS && ld.GUEST_POOL.every(g => np.NPCS.some(n => n.id === g)), "simple, good and fine, each dearer than the last; the guests are real visitors");
   check(lt.order(F, "figtree", "bed", 1, "sage", day) && F.coins === 6880 && !lt.order(F, "bluebell", "bed", 1, "sage", day) && !lt.order(F, "figtree", "bed", 4, "sage", day), "a pine bed ordered (120); nothing for a cottage you don't own");
   check(lt.deliver(F, day) === 0 && lt.deliver(F, "2026-10-13") === 1 && F.lets.cottages.figtree.parcels.length === 1, "it comes on the next day's train, a parcel in the hall");
@@ -4154,6 +4155,13 @@ if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) tr
   await page.locator('#world [data-spot="lethall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-let="tab:shop"]', { timeout: 15000 });
   await page.click('#ctx [data-let="tab:shop"]'); await page.click('#ctx [data-let="order:bed:2:sage"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.coins === 3740 && f.lets.orders.length === 1 && f.lets.orders[0].day === "2026-10-13"), "inside, at the hall table: an oak bed from the catalogue (260), coming tomorrow");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
+  await page.locator('#world [data-letstairs]').dispatchEvent("click");
+  await page.waitForFunction(() => /upstairs/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(800);
+  check(await page.locator('#world [data-exit]').count() > 0 && !(await page.locator('#world [data-spot="lethall"]').count()), "up the stairs to the bedroom (the hall table stays downstairs)");
+  await page.locator('#world g[data-exit][aria-label="Down the stairs"]').dispatchEvent("click");
+  await page.waitForFunction(() => /^Fig Tree/.test(document.querySelector("#sceneName").textContent) && !/upstairs/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "and back down to the sitting room");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 await browser.close();

@@ -757,7 +757,8 @@ export function foreArt(id){
 }
 export function roomArt(id){
   const r = ROOMS[id], st = stationsOf(id);
-  let h = LET_SHELLS[id] ? LET_SHELLS[id]() + letFurniture(id, (G.lets && G.lets(id)) || {}, COTTAGES[id].slots, (G.letParcels && G.letParcels(id)) || 0) : roomShell(id);   // round 219: Elena's cottages, furnished as you go
+  const lb = id.replace(/up$/, ""), up = lb !== id;   // round 219: Elena's cottages, furnished as you go (round 220: bedrooms upstairs)
+  let h = LET_SHELLS[id] ? LET_SHELLS[id]() + letFurniture(lb, (G.lets && G.lets(lb)) || {}, COTTAGES[lb].slots, up ? 0 : (G.letParcels && G.letParcels(lb)) || 0, up) : roomShell(id);
   if (id === "market") h += sk(`<rect x="40" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/><rect x="350" y="40" width="130" height="80" rx="3" style="fill:var(--wood)"/>`,
     `<rect x="40" y="40" width="130" height="80" rx="3"/><path d="M40 80 h130"/><rect x="350" y="40" width="130" height="80" rx="3"/><path d="M350 80 h130"/>`) +
     `<g>${[["apple","dumpling","fish","toast"],["tulip","carrot","strawberry","sunflower"]].map((row, r) => row.map((n, i) => iconAt(n, 64 + i*30, 62 + r*38, 26)).join("")).join("")}${[["yarn","ball","brush","crown"],["bath","fort","corn","blueberry"]].map((row, r) => row.map((n, i) => iconAt(n, 374 + i*30, 62 + r*38, 26)).join("")).join("")}</g>`;

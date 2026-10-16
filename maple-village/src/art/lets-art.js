@@ -16,6 +16,25 @@ const windowArt = (x, y, trim, view) => sk(`<rect x="${x-54}" y="${y-64}" width=
     <rect x="${x-60}" y="${y+60}" width="120" height="9" rx="2" style="fill:${CREAM}"/>`,
   `<rect x="${x-54}" y="${y-64}" width="108" height="128" rx="4"/><rect x="${x-48}" y="${y-58}" width="96" height="116" rx="2"/><path d="M${x} ${y-58} v116 M${x-48} ${y} h96"/><rect x="${x-60}" y="${y+60}" width="120" height="9" rx="2"/>`);
 
+const floorBoards = (fill, line) => `<rect width="520" height="640" style="fill:${fill}"/><g opacity=".45" style="stroke:${line}" stroke-width="1.2">${rows(11, i => `<path d="M0 ${262 + i*36} H520"/>`)}${rows(26, i => `<path d="M${(i*71) % 520} ${262 + (i % 11)*36} v36"/>`)}</g>`;
+const dormer = (x, y, trim) => sk(`<rect x="${x-40}" y="${y-50}" width="80" height="96" rx="3" style="fill:${trim}"/><rect x="${x-34}" y="${y-44}" width="68" height="84" rx="2" style="fill:#D6E8F2"/><path d="M${x-34} ${y+14} q20 -14 36 -4 q16 -8 32 -2 v32 h-68z" style="fill:#A9C79A"/><rect x="${x-46}" y="${y+46}" width="92" height="8" rx="2" style="fill:${CREAM}"/>`,
+  `<rect x="${x-40}" y="${y-50}" width="80" height="96" rx="3"/><rect x="${x-34}" y="${y-44}" width="68" height="84" rx="2"/><path d="M${x} ${y-44} v84 M${x-34} ${y-2} h68"/><rect x="${x-46}" y="${y+46}" width="92" height="8" rx="2"/>`);
+// round 220: wooden stairs up the left wall of the sitting room (seen side-on, as at the old mill)
+const tape = (x, y, t) => `<g pointer-events="none"><rect x="${x - t.length*3.2 - 8}" y="${y - 10}" width="${t.length*6.4 + 16}" height="17" rx="2" fill="#F3E1A0" opacity=".95"/><text x="${x}" y="${y + 3}" text-anchor="middle" font-family="Klee One,serif" font-size="10" fill="#3A2E28">${t}</text></g>`;
+function stairsUp(){
+  const X = 24, B = 612, RW = 19, RH = 15, N = 6, top = B - N*RH, prof = `M${X} ${B} ${rows(N, k => `V${B - (k + 1)*RH} H${X + (k + 1)*RW}`)} V${B} Z`;
+  return `<g data-letstairs="1" aria-label="Up the stairs to the bedroom"><ellipse class="hov" cx="${X + 60}" cy="${B - 4}" rx="66" ry="12" style="fill:var(--butter)"/>
+    ${sk(`<path d="${prof}" style="fill:#8A6340"/>${rows(N, k => `<rect x="${X + k*RW - 1}" y="${B - (k + 1)*RH - 2}" width="${RW + 3}" height="4" rx="1" style="fill:#B9875E"/>`)}
+      ${rows(N, k => `<path d="M${X + k*RW + RW/2} ${B - (k + 1)*RH - 2} V${B - (k + 1)*RH - 30}" style="stroke:#6B4A2E" stroke-width="2"/>`)}
+      <path d="M${X + 2} ${B - 44} L${X + N*RW + 2} ${top - 32}" style="stroke:#5A3A2A" stroke-width="3.5" stroke-linecap="round"/><rect x="${X - 2}" y="${B - 50}" width="7" height="50" rx="1.5" style="fill:#6B4A2E"/><circle cx="${X + 1.5}" cy="${B - 52}" r="4" style="fill:#5A3A2A"/>`,
+      `<path d="${prof}"/><path d="M${X + 2} ${B - 44} L${X + N*RW + 2} ${top - 32}"/>`)}
+    ${tape(X + 60, 628, "Upstairs")}</g>`;
+}
+// and the top of the stairwell upstairs, bottom left, with a rail: the way back down
+const stairsDown = () => `<g data-exit="1" aria-label="Down the stairs"><ellipse class="hov" cx="80" cy="590" rx="46" ry="14" style="fill:var(--butter)"/>
+    ${sk(`<rect x="36" y="520" width="90" height="96" style="fill:#7A5638"/>${rows(5, i => `<rect x="${40 + i*4}" y="${528 + i*17}" width="${82 - i*8}" height="12" style="fill:#A8754F"/>`)}<path d="M130 520 v96 M126 520 h8" style="stroke:#5A3A2A" stroke-width="3"/>`, `<rect x="36" y="520" width="90" height="96"/>`)}
+    ${tape(80, 630, "Downstairs")}</g>`;
+
 export const LET_SHELLS = {
   // Bluebell: pale blue-grey walls under the eaves, beams, a stone fireplace, and an arch through to the second bedroom
   bluebell: () => { const [wx, wy] = COTTAGES.bluebell.slots.curtains, trim = "#5E7AB0";
@@ -24,9 +43,7 @@ export const LET_SHELLS = {
     <rect width="520" height="${WALL}" style="fill:#DDE5EC"/>
     <g style="fill:#C2D0DD" opacity=".75">${rows(7, r => rows(14, i => `<path transform="translate(${i*40 + (r % 2)*20 + 10} ${r*32 + 22})" d="M0 0 l-3 -5 M0 0 l3 -5 M0 0 v4" style="stroke:#B4C4D4" stroke-width="1.2" fill="none"/>`))}</g>
     <rect y="${WALL - 14}" width="520" height="14" style="fill:${trim}"/>
-    ${sk(`<path d="M0 0 H150 L0 84z" style="fill:#F3F0E8"/><path d="M370 0 H520 V84z" style="fill:#F3F0E8"/><rect x="146" y="0" width="228" height="12" style="fill:#8A6A52"/>
-      <path d="M0 84 L150 0" style="stroke:#8A6A52" stroke-width="9"/><path d="M370 0 L520 84" style="stroke:#8A6A52" stroke-width="9"/>`,
-      `<path d="M0 84 L150 0 M370 0 L520 84"/><path d="M60 50 L60 0 M450 45 V0" opacity=".45"/><rect x="146" y="0" width="228" height="12"/>`)}
+    ${sk(`<rect width="520" height="20" style="fill:#8A6A52"/>${rows(6, i => `<rect x="${24 + i*92}" y="20" width="14" height="9" style="fill:#8A6A52"/>`)}`, `<rect width="520" height="20"/><path d="M60 10 h70 M300 8 h50" opacity=".4"/>`)}
     ${windowArt(wx, wy, trim, `<path d="M${wx-48} ${wy+20} q30 -22 56 -6 q22 -14 40 -4 v48 h-96z" style="fill:#A9C79A"/><path d="M${wx-48} ${wy+34} q40 -16 96 -6 v30 h-96z" style="fill:#8FB383"/><ellipse cx="${wx+24}" cy="${wy-34}" rx="13" ry="5" style="fill:${CREAM}"/>`)}
     ${sk(`<rect x="196" y="12" width="100" height="${WALL - 12}" style="fill:#E7EDF2"/><rect x="206" y="166" width="80" height="${WALL - 166}" style="fill:#CFC6BA"/>
       <path d="M220 ${WALL} V196 Q246 176 272 196 V${WALL}z" style="fill:#3E302A"/><path d="M226 ${WALL - 4} l18 -8 l18 8z" style="fill:#8A5A3A"/><path d="M234 ${WALL - 10} q6 -18 12 -24 q4 12 12 6 q-2 10 -6 18z" style="fill:#F2A65A"/><path d="M240 ${WALL - 10} q4 -10 7 -14 q3 8 6 14z" style="fill:#F3C969"/>
@@ -35,9 +52,7 @@ export const LET_SHELLS = {
       `<path d="M196 12 V${WALL} M296 12 V${WALL}"/><rect x="206" y="166" width="80" height="${WALL - 166}"/><path d="M220 ${WALL} V196 Q246 176 272 196 V${WALL}"/>
       <path d="M206 186 h14 M272 186 h14 M206 210 h14 M272 210 h14 M230 166 v12 M262 166 v12" opacity=".5"/><rect x="198" y="156" width="96" height="10" rx="2"/><rect x="190" y="${WALL}" width="112" height="12" rx="2"/>
       <rect x="206" y="138" width="7" height="18"/><rect x="279" y="138" width="7" height="18"/>`)}
-    ${sk(`<path d="M384 ${WALL} V122 Q448 64 512 122 V${WALL}z" style="fill:#C3CFDB"/><path d="M392 ${WALL} V126 Q448 74 504 126 V${WALL}z" style="fill:#B6C4D2"/><path d="M392 150 L448 100 L504 150" style="fill:none;stroke:#E3E9EF" stroke-width="3"/>
-      <circle cx="448" cy="132" r="14" style="fill:#D6E8F2"/><rect x="384" y="${WALL}" width="128" height="14" style="fill:#CDBB9C"/><path d="M384 ${WALL} V122 Q448 64 512 122 V${WALL}" style="fill:none;stroke:${trim}" stroke-width="7"/>`,
-      `<path d="M384 ${WALL} V122 Q448 64 512 122 V${WALL}"/><circle cx="448" cy="132" r="14"/><path d="M434 132 h28 M448 118 v28"/>`)}
+    ${stairsUp()}
     `; },
 
   // Fig Tree: warm cream limewash, low beams, a little range in a brick fireplace, and a deep window seat
@@ -60,7 +75,30 @@ export const LET_SHELLS = {
       ${rows(9, i => `<circle cx="${248 + i*12}" cy="${134 + (i % 2)*3}" r="4" style="fill:#B9C98A"/>`)}`,
       `<rect x="250" y="150" width="90" height="${WALL - 150}"/><rect x="266" y="172" width="58" height="${WALL - 172}"/><rect x="276" y="198" width="38" height="${WALL - 198}" rx="2"/><rect x="284" y="208" width="22" height="16" rx="3"/>
       ${rows(4, r => `<path d="M250 ${162 + r*20} h16 M324 ${162 + r*20} h16"/>`)}<path d="M300 196 q0 -12 9 -12 q9 0 9 12z M318 190 l6 -4"/><rect x="240" y="138" width="110" height="16" rx="2"/><rect x="244" y="${WALL}" width="102" height="12" rx="2"/>`)}</g>
-`; }
+    ${stairsUp()}
+`; },
+
+  // round 220: upstairs. Bluebell: two beds under the eaves, a dormer over each and the old roof post between them
+  bluebellup: () => { const trim = "#5E7AB0";
+    return floorBoards("#DCCBAE", "#BFA986") + `<rect width="520" height="${WALL}" style="fill:#DDE5EC"/>
+    <g style="fill:none;stroke:#B4C4D4" stroke-width="1.2" opacity=".75">${rows(6, r => rows(14, i => `<path transform="translate(${i*40 + (r % 2)*20 + 10} ${r*32 + 62})" d="M0 0 l-3 -5 M0 0 l3 -5 M0 0 v4"/>`))}</g>
+    <rect y="${WALL - 14}" width="520" height="14" style="fill:${trim}"/>
+    ${sk(`<path d="M0 0 H520 V40 L470 70 H50 L0 40z" style="fill:#F3F0E8"/><path d="M0 40 L50 70 H470 L520 40" style="fill:none;stroke:#8A6A52" stroke-width="8"/>`, `<path d="M0 40 L50 70 H470 L520 40"/><path d="M120 70 V0 M260 70 V0 M400 70 V0" opacity=".4"/>`)}
+    ${dormer(130, 140, trim)}${dormer(390, 140, trim)}
+    ${sk(`<rect x="250" y="70" width="20" height="${WALL - 70}" style="fill:#9A6E48"/>`, `<rect x="250" y="70" width="20" height="${WALL - 70}"/>`)}
+    ${stairsDown()}`; },
+
+  // Fig Tree upstairs: one bedroom under low beams, a washstand with a jug and bowl
+  figtreeup: () => { const trim = "#C8923A";
+    return floorBoards("#D9BD96", "#BE9E74") + `<rect width="520" height="${WALL}" style="fill:#F5E8CF"/>
+    <g style="fill:#EADBBE" opacity=".7">${rows(7, i => `<ellipse cx="${(i*131) % 500 + 20}" cy="${(i*53) % 150 + 60}" rx="${18 + (i % 3)*8}" ry="${8 + (i % 2)*4}"/>`)}</g>
+    <rect y="${WALL - 14}" width="520" height="14" style="fill:${trim}"/>
+    ${sk(`<path d="M0 0 H520 V30 L440 60 H80 L0 30z" style="fill:${DARK}"/>${rows(5, i => `<rect x="${90 + i*80}" y="60" width="14" height="10" style="fill:${DARK}"/>`)}<rect x="0" y="30" width="14" height="${WALL - 30}" style="fill:#8A6448"/><rect x="506" y="30" width="14" height="${WALL - 30}" style="fill:#8A6448"/>`,
+      `<path d="M0 30 L80 60 H440 L520 30"/><path d="M14 30 V${WALL} M506 30 V${WALL}"/>`)}
+    ${dormer(270, 130, trim)}
+    ${sk(`<rect x="62" y="210" width="76" height="50" rx="3" style="fill:#B07D4A"/><rect x="58" y="204" width="84" height="8" rx="2" style="fill:#9A6E48"/><ellipse cx="100" cy="202" rx="26" ry="6" style="fill:#E3EEF2"/><path d="M86 202 q-2 -22 8 -28 h12 q6 4 4 10 q8 0 6 10 l-6 2 q0 6 -4 6z" style="fill:#F3F0E8"/><path d="M68 260 v20 M132 260 v20" style="stroke:${DARK}" stroke-width="5"/>`,
+      `<rect x="62" y="210" width="76" height="50" rx="3"/><rect x="58" y="204" width="84" height="8" rx="2"/><ellipse cx="100" cy="202" rx="26" ry="6"/><path d="M86 202 q-2 -22 8 -28 h12 q6 4 4 10 q8 0 6 10 l-6 2 q0 6 -4 6z"/><rect x="72" y="222" width="56" height="14" rx="2" opacity=".5"/>`)}
+    ${stairsDown()}`; }
 };
 
 // ---------- the pieces: each takes the slot position, the tier and the tint ----------
@@ -266,8 +304,9 @@ function parcels(n, x, y){
 
 const DRAW = {seat, table, shelf, lamp, rug, curtains, picture, plant: plantP, touches};
 const FLAT = {rug: 0, curtains: 1, picture: 1};   // drawn first, in this order; everything else by how far forward it stands
-export function letFurniture(id, slots, pos, n){
+export function letFurniture(id, slots, pos, n, up = false){
   const C = COTTAGES[id]; if (!C) return "";
+  slots = Object.fromEntries(Object.entries(slots).filter(([s]) => C.up.includes(s) === up));
   const tint = p => (COLOURS[p.col] || COLOURS.cream)[1];
   const items = Object.keys(slots).filter(s => pos[s] && slots[s]).map(s => ({s, cat: catOf(id, s), p: slots[s], at: pos[s]}));
   const bedFor = s => s.replace("linen", "bed");
@@ -282,7 +321,7 @@ export function letFurniture(id, slots, pos, n){
     } else if (it.cat === "linen") { if (!slots[bedFor(it.s)]) h += linen(x, y, t, c, false); }
     else if (DRAW[it.cat]) h += DRAW[it.cat](x, y, t, c);
   }
-  return `<g pointer-events="none">${h}</g>` + parcels(n, 340, 584);
+  return `<g pointer-events="none">${h}</g>` + (up ? "" : parcels(n, 340, 584));
 }
 // the hall table: a console with the guest book, a pen, a little vase and the catalogue
 export const hallTable = (x, y) => sk(`<rect x="${x-50}" y="${y-44}" width="100" height="8" rx="2" style="fill:#9A6E48"/><rect x="${x-46}" y="${y-36}" width="92" height="12" style="fill:${OAK}"/><rect x="${x-10}" y="${y-33}" width="20" height="6" rx="2" style="fill:#C08D58"/>

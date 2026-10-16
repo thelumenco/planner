@@ -30,14 +30,20 @@ export const ESSENTIAL = ["bed", "linen"];
 // the two cottages: their price, the cap on the nightly rate, and their slots (and where each piece stands in the room)
 export const COTTAGES = {
   bluebell: {n: "Bluebell", price: 3000, cap: 70, sleeps: 4, line: "the bigger one, blue shutters, two bedrooms under the eaves",
-    slots: {bed: [110, 336], bed2: [448, 336], linen: [110, 344], linen2: [448, 344], seat: [130, 486], table: [372, 446], shelf: [342, 254], lamp: [236, 476], rug: [262, 420],
-      curtains: [110, 124], picture: [246, 96], plant: [62, 618], touches: [246, 316]},
+    // downstairs: the sitting room and dining table by the fire; upstairs: two little bedrooms either side of the stairs
+    slots: {curtains: [110, 124], picture: [246, 96], shelf: [450, 254], seat: [150, 392], lamp: [52, 360], rug: [262, 414], table: [372, 420], plant: [352, 290],
+      bed: [130, 330], linen: [130, 338], bed2: [390, 330], linen2: [390, 338], touches: [260, 286]},
+    up: ["bed", "linen", "bed2", "linen2", "touches"],
     cats: {bed2: "bed", linen2: "linen"}},
   figtree: {n: "Fig Tree", price: 2000, cap: 50, sleeps: 2, line: "the little one, a fig tree by the door, one bedroom and a window seat",
-    slots: {bed: [436, 330], linen: [436, 338], seat: [126, 424], table: [140, 566], shelf: [222, 254], lamp: [232, 404], rug: [296, 452],
-      curtains: [100, 122], picture: [436, 116], plant: [478, 462], touches: [100, 298]},
+    // downstairs: the window seat, the range, a sofa and a table; upstairs: the bedroom under the beams
+    slots: {curtains: [100, 122], picture: [200, 96], shelf: [450, 254], seat: [150, 400], lamp: [52, 370], rug: [276, 420], table: [380, 430], plant: [222, 300],
+      bed: [270, 330], linen: [270, 338], touches: [430, 300]},
+    up: ["bed", "linen", "touches"],
     cats: {}}
 };
+// which floor a slot is on
+export const upstairs = (cottage, slot) => COTTAGES[cottage].up.includes(slot);
 export const catOf = (cottage, slot) => COTTAGES[cottage].cats[slot] || slot;
 
 // stays: one to five nights; after each stay the cottage needs a tidy before the next booking. The better the last
