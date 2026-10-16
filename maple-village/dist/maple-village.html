@@ -28175,6 +28175,12 @@ Quests finished today: ${S3.doneIds.length}`;
     ]
   };
   Object.assign(OBST, TOWN_OBST);
+  var WATER = { bay: [[0, 0, 154, 308], [0, 428, 154, 640], [0, 308, 100, 428]] };
+  for (const [k, w] of Object.entries(WATER)) OBST[k] = [...OBST[k] || [], ...w];
+  function offWater(scene2, x, y) {
+    const r = (WATER[scene2] || []).find((r2) => x > r2[0] - 6 && x < r2[2] + 6 && y > r2[1] - 6 && y < r2[3] + 6);
+    return r ? [r[2] + 8, y] : [x, y];
+  }
   var PAD = 5;
   var STEP = 24;
   var inside = (x, y, r, p) => x > r[0] - p && x < r[2] + p && y > r[1] - p && y < r[3] + p;
@@ -34742,10 +34748,16 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   function bayStallArt(k, x, y, label2) {
     return `<g data-place="bm${k}" aria-label="${label2}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="30" ry="9" style="fill:var(--butter)"/>
     ${sk(
-      `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2" style="fill:#C9A27E"/><path d="M${x - 30} ${y - 48} h60 l-4 12 h-52z" style="fill:${AWN[k % 3]}"/>${[0, 1, 2].map((i) => `<path d="M${x - 26 + i * 20} ${y - 48} h10 l-1 12 h-10z" style="fill:#FFFDF6"/>`).join("")}<path d="M${x - 26} ${y - 36} v16 M${x + 26} ${y - 36} v16" style="stroke:#8A6A52" stroke-width="2"/>${[0, 1, 2].map((i) => `<rect x="${x - 20 + i * 14}" y="${y - 26}" width="10" height="7" rx="2" style="fill:${["#E8566C", "#9CC27E", "#C9A3E0"][(i + k) % 3]}"/>`).join("")}`,
-      `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2"/><path d="M${x - 30} ${y - 48} h60 l-4 12 h-52z"/>`
+      `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2" style="fill:#C9A27E"/><path d="M${x - 30} ${y - 80} h60 l-4 12 h-52z" style="fill:${AWN[k % 3]}"/>${[0, 1, 2].map((i) => `<path d="M${x - 26 + i * 20} ${y - 80} h10 l-1 12 h-10z" style="fill:#FFFDF6"/>`).join("")}<path d="M${x - 26} ${y - 68} v48 M${x + 26} ${y - 68} v48" style="stroke:#8A6A52" stroke-width="2"/>${[0, 1, 2].map((i) => `<rect x="${x - 20 + i * 14}" y="${y - 26}" width="10" height="7" rx="2" style="fill:${["#E8566C", "#9CC27E", "#C9A3E0"][(i + k) % 3]}"/>`).join("")}`,
+      `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2"/><path d="M${x - 30} ${y - 80} h60 l-4 12 h-52z"/>`
     )}
     ${tapeLabel(x, y + 16, label2, "#F6E3B4", 8.5)}</g>`;
+  }
+  function bayStallFront(k, x, y) {
+    return sk(
+      `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2" style="fill:#C9A27E"/>${[0, 1, 2].map((i) => `<rect x="${x - 20 + i * 14}" y="${y - 26}" width="10" height="7" rx="2" style="fill:${["#E8566C", "#9CC27E", "#C9A3E0"][(i + k) % 3]}"/>`).join("")}`,
+      `<rect x="${x - 26}" y="${y - 20}" width="52" height="20" rx="2"/>`
+    );
   }
   function kiteSellerArt(x, y) {
     return `<g data-place="kites" aria-label="Kites"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="26" ry="8" style="fill:var(--butter)"/>
@@ -53770,7 +53782,7 @@ ${SIGNOFF[t2.who] || ""}`;
   var frontKey = "";
   var fronts = [];
   function stallFronts() {
-    const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null, dine = DINING[scene], key = ev ? dayKey() + ev.kind : dine ? "dine:" + scene : "";
+    const ev = scene === "field" ? eventNow(dayKey(), sgHM()) : null, dine = DINING[scene], fri = !ev && scene === "field" && bayMarketNow(dayKey(), sgHM()), key = ev ? dayKey() + ev.kind : dine ? "dine:" + scene : fri ? "fri:" + dayKey() : "";
     if (key !== frontKey) {
       fronts.forEach(([n]) => n.remove());
       fronts = [];
@@ -53787,6 +53799,13 @@ ${SIGNOFF[t2.who] || ""}`;
         g16.setAttribute("class", "sfront");
         g16.setAttribute("pointer-events", "none");
         g16.innerHTML = stallFront(st6.at, x, y, st6);
+        return [g16, { y: y - 1 }];
+      });
+      if (fri) fronts = BAY_STALLS.map(([x, y], k) => {
+        const g16 = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g16.setAttribute("class", "sfront");
+        g16.setAttribute("pointer-events", "none");
+        g16.innerHTML = bayStallFront(k, x, y);
         return [g16, { y: y - 1 }];
       });
     }
@@ -55632,7 +55651,7 @@ ${SIGNOFF[t2.who] || ""}`;
   }
   function walkTo(x, y) {
     if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-    const b = bounds(), to = [clamp(x, b[0], b[2]), clamp(y, b[1], b[3])];
+    const b = bounds(), to = offWater(scene, clamp(x, b[0], b[2]), clamp(y, b[1], b[3]));
     const pts = outside() || townRoom(scene) ? findPath(scene, [mel.x, mel.y], to, b) : [to];
     const first = pts.shift();
     mel.tx = first[0];
@@ -59102,7 +59121,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
   function evanWalk(speed2, dt) {
     const key = evan.tx + "," + evan.ty;
     if (key !== evan.rk) {
-      evan.rk = key;
+      [evan.tx, evan.ty] = offWater(scene, evan.tx, evan.ty);
+      evan.rk = evan.tx + "," + evan.ty;
       evan.path = outside() || townRoom(scene) ? findPath(scene, [evan.x, evan.y], [evan.tx, evan.ty], bounds()) : [[evan.tx, evan.ty]];
     }
     const p = evan.path && evan.path[0];
