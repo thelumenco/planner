@@ -179,6 +179,8 @@ function tickVillager(def, dt){
 
 const hellos = () => { const t = localHM(); return [t < 720 ? "Morning!" : t < 1080 ? "Afternoon!" : "Evening!", "Hi!", "Hello there!", "Hiya!"]; };
 /* ---------- messengers ---------- */
+// screens with water down the left-hand side, and where the dry land starts
+const WET_LEFT = {shore: 196, bay: 200, field: 200};
 function tickCourier(dt){
   const scene = api.scene(), hero = api.hero;
   if (courier && courier.scene !== scene) { drop(courier.id); courier = null; }
@@ -190,7 +192,8 @@ function tickCourier(dt){
     // reading it does Rosa come and find her there. Everyone else delivers wherever the player is.
     const item = api.unreadMail().find(m => m.from !== "crier" || scene === "village"); if (!item) return;
     const ag = AGENTS[item.from] || AGENTS.postie;
-    const start = outdoors(scene) ? (hero.x < 260 ? [540, 330] : [-20, 330]) : [260, 640];
+    // (round 225, Mel: "the postie walks over water"): on screens with water down the left (the sea, the field's lake), she comes in from the dry right
+    const start = scene === "field" && hero.y > 300 ? [290, 660] : outdoors(scene) ? (hero.x < 260 || WET_LEFT[scene] ? [540, 330] : [-20, 330]) : [260, 640];   // (the field: below the lake, up the path from the orchard gate)
     const id = "agent-" + item.id;
     courier = ents[id] = {id, kind: "agent", item, ag, scene, state: "coming", x: start[0], y: start[1], tx: hero.x, ty: hero.y, dir: 1, moving: true, wait: 0, node: makeNode(id, ag.look, false, true)};
   }
@@ -199,7 +202,7 @@ function tickCourier(dt){
     const side = hero.x > 260 ? -1 : 1;
     // stand beside the player, on whichever side isn't inside something (the well, a stall)
     let [gx, gy] = [[side*44, 2], [-side*44, 2], [side*30, 26], [-side*30, 26], [0, 34]].map(([dx, dy]) => [hero.x + dx, hero.y + dy]).find(([x, y]) => !outdoors(scene) || !blocked(scene, x, y)) || [hero.x + side*44, hero.y + 2];
-    if (scene === "shore") gx = Math.max(gx, 196);   // the player's out paddling: wait at the water's edge
+    if (WET_LEFT[scene]) gx = Math.max(gx, WET_LEFT[scene]);   // the player's out paddling (or by the water): wait at the water's edge
     if (!c.goal || Math.hypot(c.goal[0] - gx, c.goal[1] - gy) > 18) route(c, gx, gy);   // re-route only when the player has moved
     const arrived = walk(c, 150, dt);
     if (arrived && c.state === "coming") {
