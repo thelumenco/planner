@@ -1,7 +1,7 @@
 // The Honeybrook Wiki: the contents drawer on phones, and search over search.json
 (() => {
   const side = document.getElementById("side"), btn = document.getElementById("menuBtn");
-  btn && btn.addEventListener("click", () => { const o = side.classList.toggle("open"); btn.setAttribute("aria-expanded", o); });
+  btn && btn.addEventListener("click", () => { const o = side.classList.toggle("open"); btn.setAttribute("aria-expanded", o); document.body.style.overflow = o ? "hidden" : ""; });   // the page behind stays put while the contents scroll
   document.querySelectorAll(".side a").forEach(a => { if (a.getAttribute("href") === location.pathname.replace(/\.html$/, "") || (a.getAttribute("href") === "/" && location.pathname === "/")) a.classList.add("here"); });
   const q = document.getElementById("q"), hits = document.getElementById("hits"); let idx = null, sel = -1;
   const load = () => idx ? Promise.resolve(idx) : fetch("/search.json").then(r => r.json()).then(j => (idx = j));
