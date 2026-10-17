@@ -2488,16 +2488,20 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   console.log("\nrainy days");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`rain pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-12"); await page.waitForTimeout(900);
+  // round 239 (Mel: "rain should be an hour at most"): a wet day is one shower of up to an hour
+  const VX = await import(new URL("../src/art/village-extras.js", import.meta.url)), sh = VX.showerAt("2026-10-12"), hhmm = m => `${String(Math.floor(m/60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+  { let ok = true; for (let i = 0; i < 730; i++) { const k = new Date(Date.parse("2026-01-01") + i*864e5).toISOString().slice(0, 10); if (VX.rainDay(k)) { const w = VX.showerAt(k); if (w.to - w.from > 60 || w.from < 9*60 || w.to > 20*60) ok = false; } }
+    check(ok && VX.rainDay("2026-10-12") === 1 && !VX.rainyOn("2026-10-12", sh.from - 1) && VX.rainyOn("2026-10-12", sh.from + 5) && !VX.rainyOn("2026-10-12", sh.to), "every shower lasts an hour at most (between 9am and 8pm), and it's dry either side"); }
+  await page.goto(url + `?reset=1&seed=1&time=${hhmm(sh.from + 5)}&date=2026-10-12`); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => { const r = document.getElementById("rain"); return !r.hidden && r.classList.contains("light"); }), "a light shower in October (not just the wet season)");
   check(await page.locator("#melRain .brolly").count() === 1 && await page.evaluate(() => document.getElementById("evan").classList.contains("raincoat")), "Mel under her brolly, Evan in his raincoat and wellies");
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(2500);
   const gear = await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].map(n => n.querySelector(".brolly") ? "b:" + n.querySelector(".brolly > path:nth-of-type(3)").getAttribute("style") : n.querySelector(".rcoat") ? "c:" + n.querySelector(".rcoat").getAttribute("style") : ""));
   check(gear.length > 0 && gear.every(Boolean) && new Set(gear).size > 1, "everyone in town has a brolly or a raincoat, not all the same");
-  await page.goto(url + "?seed=1&time=11:00&date=2026-10-07"); await page.waitForTimeout(900);
+  await page.goto(url + `?seed=1&time=${hhmm(sh.to + 20)}&date=2026-10-12`); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1500);
-  check(await page.evaluate(() => document.getElementById("rain").hidden) && await page.locator("#melRain .brolly, #actors .brolly").count() === 0, "and on a dry day the brollies are put away");
+  check(await page.evaluate(() => document.getElementById("rain").hidden) && await page.locator("#melRain .brolly, #actors .brolly").count() === 0, "and once the shower's passed the brollies are put away");
   await page.close();
 }
 {

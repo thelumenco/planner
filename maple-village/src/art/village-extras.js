@@ -2,7 +2,7 @@
 // rain, and the evening lanterns on the pond. Drawn on top of the village (see villageArt in scenes.js).
 import { sk } from "./scenes.js";
 import { iconAt } from "./icons.js";
-import { hash } from "../util.js";
+import { hash, sgHM } from "../util.js";
 
 /* ---------- upgrades: one more every few quests, kept forever ---------- */
 export const UPGRADES = [
@@ -82,9 +82,14 @@ export function festivalOn(day){
 // Wet season (Nov to Jan): roughly one day in three is a proper downpour, and another one in ten a light shower. The
 // rest of the year a shower blows through about one day in seven: brollies up, nothing called off.
 // rainLevel: 0 dry, 1 a light shower, 2 a downpour (paddling's off).
-export function rainLevel(day){ const h = hash(day + "rain") % 100; return [11, 12, 1].includes(+day.slice(5, 7)) ? (h < 34 ? 2 : h < 44 ? 1 : 0) : (h < 14 ? 1 : 0); }
-export const rainyOn = day => rainLevel(day) > 0;
-export const stormyOn = day => rainLevel(day) === 2;
+// round 239 (Mel: "rain should be an hour at most"): a wet day is one shower, not all day. rainDay says what kind of
+// day it is; showerAt when the shower comes (between 9am and 7pm: 45 to 60 minutes for a downpour, 20 to 40 for a light
+// one); rainLevel / rainyOn / stormyOn are only true while it's actually raining.
+export function rainDay(day){ const h = hash(day + "rain") % 100; return [11, 12, 1].includes(+day.slice(5, 7)) ? (h < 34 ? 2 : h < 44 ? 1 : 0) : (h < 14 ? 1 : 0); }
+export function showerAt(day){ const from = 9*60 + hash(day + "when") % (10*60), len = rainDay(day) === 2 ? 45 + hash(day + "len") % 16 : 20 + hash(day + "len") % 21; return {from, to: from + len}; }
+export function rainLevel(day, hm = sgHM()){ const l = rainDay(day); if (!l) return 0; const w = showerAt(day); return hm >= w.from && hm < w.to ? l : 0; }
+export const rainyOn = (day, hm) => rainLevel(day, hm) > 0;
+export const stormyOn = (day, hm) => rainLevel(day, hm) === 2;
 
 export function festivalArt(f){
   if (!f) return "";

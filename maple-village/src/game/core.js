@@ -4,7 +4,7 @@ import { icon, progressBar, progressBarV } from "../art/icons.js";
 import { VILLAGE, WORK, ROOMS, MAPLE_BED, OUTDOOR, BRIDGES, ARRIVE, INNER, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco, seasonOf, SEASONS } from "../data/items.js";
 import { brollyArt, hoodArt } from "../art/people.js";
-import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLevel, FESTIVALS } from "../art/village-extras.js";
+import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLevel, rainDay, FESTIVALS } from "../art/village-extras.js";
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, orchardArt, flowerFarmArt, setArtContext } from "../art/scenes.js";
 import { vineSpot } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, tapasAll, TAPAS, cookTick, cookLine } from "./kitchen.js";
@@ -634,7 +634,7 @@ function timerHTML(label){
     <div><span class="t" id="tLeft">${fmt(left)}</span><small>${S.timer.pausedLeft != null ? "paused" : esc(label)}</small></div>${timerBtns()}</div>`;
 }
 let lastReady = readyCount(), lastDusk = null, lastFieldEv = null, lastSky = null;
-const skyKey = () => skyWash(sgHM()) + scene;
+const skyKey = () => skyWash(sgHM()) + scene + rainLevel(dayKey());   // round 239: and a shower starting or stopping
 setInterval(() => {
   if (S.sleep && S.sleep.until && Date.now() > S.sleep.until) wakeUp();
   if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6000) $("speech").hidden = true;   // tuck Maple's bubble away
@@ -1736,7 +1736,7 @@ function ctx(){
       : bbRoom === "pots" ? CRA.potsPanel(F, bbSt.pots, {hm: sgHM(), evan: evanOn}) : bbRoom === "penguins" ? CRA.pengPanel(F, bbSt.peng, {hm: sgHM(), evan: evanOn}) : bbRoom === "nippers" ? CRA.nipPanel(F, bbSt.nip, {hm: sgHM(), evan: evanOn}) : TLA.TL_KINDS.includes(bbRoom) ? TLA.tlPanel(F, bbRoom, bbSt, {hm: sgHM(), evan: evanOn}) : LVA.LV_KINDS.includes(bbRoom) ? LVA.lvPanel(F, bbRoom, bbSt, {hm: sgHM(), evan: evanOn}) : bbRoomPanel(F, bbRoom, {evan: evanOn, party: !!tp.length}); }
   else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van"), region: bvRegion});
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
-  else if (railOpen === "boat" && scene === "shore") h = sailPanel(F, tripPick, boatTown, sgHM(), {rough: stormyOn(dayKey()), month: +dayKey().slice(5, 7)});   // round 205: your own boat
+  else if (railOpen === "boat" && scene === "shore") h = sailPanel(F, tripPick, boatTown, sgHM(), {rough: rainDay(dayKey()) === 2, month: +dayKey().slice(5, 7)});   // round 205: your own boat
   else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, ferryTown, sgHM(), "ferry");   // round 127: the Jeju ferry from the jetty (round 226: and the boat towns)
   else if (railOpen && scene === "hlane") h = timetablePanel(dayKey(), sgHM(), true);
   else if (railOpen && townOf(scene)) h = homePanel(F, townOf(scene), sgHM(), railOpen === "ferry" || railOpen === "boat" ? railOpen : "train");
@@ -2476,7 +2476,7 @@ function drawScene(){
   else if (scene === "village" && fest && !fest.vineyard && S.festSaid !== day) { S.festSaid = day; setTimeout(() => speak(`${fest.name} decorations are up in the town square!`, 5000), 1500); }
   else if (scene === "base" && S.hestiaSaid !== day && hestiaCounts().chores) { S.hestiaSaid = day; const n = hestiaCounts().chores; setTimeout(() => speak(`${n} home chore${n > 1 ? "s" : ""} waiting in the cleaning cupboard. No rush.`, 5000), 2600); }
   else if (scene === "base" && isWeekend() && S.weekendSaid !== day) { S.weekendSaid = day; setTimeout(() => speak("Weekend! Home things happen here at home. Any work quests still wait in town.", 5500), 2200); }
-  else if (wet && S.rainSaid !== day) { S.rainSaid = day; const light = rainLevel(day) === 1; setTimeout(() => speak(light ? "A light shower today. Brollies up!" : "Rainy day! Perfect for cosy indoor quests.", 4500), 1500); }
+  else if (wet && S.rainSaid !== day) { S.rainSaid = day; const light = rainLevel(day) === 1; setTimeout(() => speak(light ? "A light shower blowing through. Brollies up! It won't last long." : "A downpour! It'll pass within the hour. Perfect for a cosy indoor quest meanwhile.", 4500), 1500); }
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
   $("sceneArt").innerHTML = coOf(scene) ? cottageArt(scene, coArt()) : scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "porto" ? portoRoomArt(scene) : townOf(scene) === "puffin" ? puffinRoomArt(scene) : townOf(scene) === "bali" ? baliRoomArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoRoomArt(scene) : townOf(scene) === "formentera" ? formenteraRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene): TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene): TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "porto" ? portoArt(scene) : townOf(scene) === "puffin" ? puffinArt(scene) : townOf(scene) === "bali" ? baliArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoArt(scene) : townOf(scene) === "formentera" ? formenteraArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene);
@@ -2629,7 +2629,7 @@ function boatRide(text, home, then, town){
   setTimeout(() => { o.remove(); then(); }, 6000);
 }
 function startTrip(town, by = "train"){
-  const own = by === "boat", r = buyTrip(F, town, tripPick, sgHM(), by, own && stormyOn(dayKey())); if (!r) return;
+  const own = by === "boat", r = buyTrip(F, town, tripPick, sgHM(), by, own && rainDay(dayKey()) === 2);   // round 239: a downpour day keeps the sea rough all day, even after the shower if (!r) return;
   const t = tripOn(F), boat = by === "ferry", land = own ? r.town.boat.arrive : boat ? r.town.ferry.arrive : r.town.arrive; railOpen = false; tripPick = []; ctx(); sfx("chaching"); flash(own ? "Fuel for the boat" : `Tickets to ${r.town.n}`); save(true);
   const ride = own ? (tx, h, then) => boatRide(tx, false, then, town) : boat ? ferryRide : trainRide;
   ride(own ? `Casting off for ${r.town.n}!` : boat ? `All aboard the ferry for ${r.town.n}!` : `All aboard for ${r.town.n}!`, boat ? false : town, () => { if (town === "ronda") rondaVisit(F); setScene(land[0], land[1]);

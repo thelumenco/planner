@@ -2624,3 +2624,9 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - **Second grinder:** it always worked (cocoa.js `slots`), but the grinder panel only described the busy one, so a free second grinder with no roasted beans looked missing. The panel now lists both grinders ("Free: ready for a sack of roasted beans"), says why it can't start (no roasted beans, a sack in the roaster, or no beans), and has a Roast a sack button right there.
 - **The cone at the dip bar:** scoop.js `coneArt(col, fmt, dip, top)` draws the cone or waffle, the scoop in the flavour's colour, the dip's shell with drips, and the topping (each drawn its own way: sprinkles, coconut flakes, hazelnut pieces, mini marshmallows, caramel drizzle with salt, strawberry bits, gula melaka drizzle, popping candy with sparkles), clipped to the shell. It redraws as the chips change.
 - **Tests:** in "Scoop Shack upgrades" (the picture) and "The Cocoa Room's vending machine (round 182)" (the grinder panel).
+
+## Round 239 (Mel: "rain should be an hour at most")
+- art/village-extras.js: `rainDay(day)` is the old daily roll (0 dry, 1 light, 2 downpour; same odds as before). `showerAt(day)` gives the day's one shower between 9am and 8pm: 45 to 60 minutes for a downpour, 20 to 40 for a light one. `rainLevel(day, hm = now)`, `rainyOn` and `stormyOn` are true only during the shower, so the rain overlay, brollies, rain fish, mushrooms, hot chocolate and honey all follow the hour.
+- Sailing your own boat still checks the day (`rainDay(day) === 2`): a downpour day keeps the sea rough all day. Bee time (hfarm.js `beeTime`) only loses the downpour's shower, not the whole day.
+- core.js `skyKey` includes the rain level, so an outdoor screen redraws when the shower starts or stops. Maple's line says it won't last long.
+- Test: "rainy days" checks every shower in two years lasts 60 minutes or less, and it's dry either side.

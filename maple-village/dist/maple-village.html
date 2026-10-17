@@ -16551,12 +16551,22 @@ ${p.sign}` };
     }
     return null;
   }
-  function rainLevel(day) {
+  function rainDay(day) {
     const h3 = hash(day + "rain") % 100;
     return [11, 12, 1].includes(+day.slice(5, 7)) ? h3 < 34 ? 2 : h3 < 44 ? 1 : 0 : h3 < 14 ? 1 : 0;
   }
-  var rainyOn = (day) => rainLevel(day) > 0;
-  var stormyOn = (day) => rainLevel(day) === 2;
+  function showerAt(day) {
+    const from = 9 * 60 + hash(day + "when") % (10 * 60), len = rainDay(day) === 2 ? 45 + hash(day + "len") % 16 : 20 + hash(day + "len") % 21;
+    return { from, to: from + len };
+  }
+  function rainLevel(day, hm12 = sgHM()) {
+    const l = rainDay(day);
+    if (!l) return 0;
+    const w = showerAt(day);
+    return hm12 >= w.from && hm12 < w.to ? l : 0;
+  }
+  var rainyOn = (day, hm12) => rainLevel(day, hm12) > 0;
+  var stormyOn = (day, hm12) => rainLevel(day, hm12) === 2;
   function festivalArt(f5) {
     if (!f5) return "";
     const lanternRow = (x1, x2, y, cols) => {
@@ -34138,7 +34148,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     let rain = 0;
     for (let d = Math.floor(t0 / DAY); d <= Math.floor(now5 / DAY); d++) {
       const k = new Date(d * DAY).toISOString().slice(0, 10);
-      if (stormyOn(k)) rain += Math.max(0, Math.min(now5, (d + 1) * DAY) - Math.max(t0, d * DAY));
+      if (rainDay(k) === 2) {
+        const w = showerAt(k), a = d * DAY + (w.from - 8 * 60) * 6e4, b = d * DAY + (w.to - 8 * 60) * 6e4;
+        rain += Math.max(0, Math.min(now5, b) - Math.max(t0, a));
+      }
     }
     return span - rain / 2;
   }
@@ -50243,7 +50256,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var lastDusk = null;
   var lastFieldEv = null;
   var lastSky = null;
-  var skyKey = () => skyWash(sgHM()) + scene;
+  var skyKey = () => skyWash(sgHM()) + scene + rainLevel(dayKey());
   setInterval(() => {
     if (S3.sleep && S3.sleep.until && Date.now() > S3.sleep.until) wakeUp();
     if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6e3) $("speech").hidden = true;
@@ -52570,7 +52583,7 @@ ${SIGNOFF[t2.who] || ""}`;
       h3 = bbRoom === "balloon" ? balloonPanel(F, bbSt.flight, { hm: sgHM(), party: tp }) : bbRoom === "riddle" ? riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? berriesPanel(F, bbSt.berries, evanOn) : bbRoom === "dip" ? dipPanel(F, bbSt.dip, evanOn) : bbRoom === "joey" ? joeyPanel(F, bbSt.joey, evanOn) : bbRoom === "canoe" ? canoePanel(F, bbSt.canoe, evanOn, bbSt.paid) : bbRoom === "fire" ? firePanel(F, bbSt.bag, { hm: sgHM(), folk: FIRE_FOLK.some(isHere) }) : bbRoom === "surf" ? surfPanel(F, bbSt.surf, evanOn, bbSt.paid) : bbRoom === "whales" ? whalePanel(F, bbSt.whale, evanOn) : bbRoom === "glow" ? glowPanel(F, bbSt.glow, { hm: sgHM(), evan: evanOn }) : bbRoom === "pots" ? potsPanel(F, bbSt.pots, { hm: sgHM(), evan: evanOn }) : bbRoom === "penguins" ? pengPanel(F, bbSt.peng, { hm: sgHM(), evan: evanOn }) : bbRoom === "nippers" ? nipPanel(F, bbSt.nip, { hm: sgHM(), evan: evanOn }) : TL_KINDS.includes(bbRoom) ? tlPanel(F, bbRoom, bbSt, { hm: sgHM(), evan: evanOn }) : LV_KINDS.includes(bbRoom) ? lvPanel(F, bbRoom, bbSt, { hm: sgHM(), evan: evanOn }) : bbRoomPanel(F, bbRoom, { evan: evanOn, party: !!tp.length });
     } else if (bvView) h3 = bvView === "passport" ? passportPanel(F) : mapPanel(F, { pick: tripPick, ownsVan: owns3(F, "van"), region: bvRegion });
     else if (railOpen === "tickets" && scene === "hlane") h3 = ticketPanel(F, tripPick, tripTown);
-    else if (railOpen === "boat" && scene === "shore") h3 = sailPanel(F, tripPick, boatTown, sgHM(), { rough: stormyOn(dayKey()), month: +dayKey().slice(5, 7) });
+    else if (railOpen === "boat" && scene === "shore") h3 = sailPanel(F, tripPick, boatTown, sgHM(), { rough: rainDay(dayKey()) === 2, month: +dayKey().slice(5, 7) });
     else if (railOpen === "ferry" && scene === "shore") h3 = ticketPanel(F, tripPick, ferryTown, sgHM(), "ferry");
     else if (railOpen && scene === "hlane") h3 = timetablePanel(dayKey(), sgHM(), true);
     else if (railOpen && townOf(scene)) h3 = homePanel(F, townOf(scene), sgHM(), railOpen === "ferry" || railOpen === "boat" ? railOpen : "train");
@@ -55355,7 +55368,7 @@ ${SIGNOFF[t2.who] || ""}`;
     } else if (wet2 && S3.rainSaid !== day) {
       S3.rainSaid = day;
       const light4 = rainLevel(day) === 1;
-      setTimeout(() => speak(light4 ? "A light shower today. Brollies up!" : "Rainy day! Perfect for cosy indoor quests.", 4500), 1500);
+      setTimeout(() => speak(light4 ? "A light shower blowing through. Brollies up! It won't last long." : "A downpour! It'll pass within the hour. Perfect for a cosy indoor quest meanwhile.", 4500), 1500);
     }
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
@@ -55646,8 +55659,7 @@ ${SIGNOFF[t2.who] || ""}`;
     }, 6e3);
   }
   function startTrip(town, by = "train") {
-    const own = by === "boat", r = buyTrip(F, town, tripPick, sgHM(), by, own && stormyOn(dayKey()));
-    if (!r) return;
+    const own = by === "boat", r = buyTrip(F, town, tripPick, sgHM(), by, own && rainDay(dayKey()) === 2);
     const t2 = tripOn(F), boat2 = by === "ferry", land2 = own ? r.town.boat.arrive : boat2 ? r.town.ferry.arrive : r.town.arrive;
     railOpen = false;
     tripPick = [];

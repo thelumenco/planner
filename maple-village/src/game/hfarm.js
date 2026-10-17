@@ -12,7 +12,7 @@
 import { esc, dayKey, sgHM, hash } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
-import { stormyOn } from "../art/village-extras.js";
+import { stormyOn, rainDay, showerAt } from "../art/village-extras.js";
 // Round 99, making it a real job:
 //   trust       every bit of help earns Felix and Elena's trust (h.trust); four levels (LEVELS), each giving something:
 //               a hive of Mel's own, new cheeses and honeys, a shelf at the farm stand and a bigger cave
@@ -50,10 +50,10 @@ export function hfState(F){
   h.trust = h.trust || 0; h.mucked = h.mucked || {}; h.since = h.since || dayKey(); h.shelf = h.shelf || {}; h.sold = h.sold || {}; h.swarms = h.swarms || 0;
   return h;
 }
-// how long a hive has been filling, in "bee days": downpour days count half (the bees stay home)
+// how long a hive has been filling, in "bee days": a downpour counts half (the bees stay home; round 239: just the shower)
 const DAY = 864e5;
 function beeTime(t0){ const now = clock(), span = now - t0; if (span <= 0) return 0; let rain = 0;
-  for (let d = Math.floor(t0/DAY); d <= Math.floor(now/DAY); d++) { const k = new Date(d*DAY).toISOString().slice(0, 10); if (stormyOn(k)) rain += Math.max(0, Math.min(now, (d + 1)*DAY) - Math.max(t0, d*DAY)); }
+  for (let d = Math.floor(t0/DAY); d <= Math.floor(now/DAY); d++) { const k = new Date(d*DAY).toISOString().slice(0, 10); if (rainDay(k) === 2) { const w = showerAt(k), a = d*DAY + (w.from - 8*60)*60000, b = d*DAY + (w.to - 8*60)*60000; rain += Math.max(0, Math.min(now, b) - Math.max(t0, a)); } }
   return span - rain/2; }
 const hiveT = (h, i) => i === "mine" ? (h.myHive ? h.myHive.t : clock()) : h.hives[i];
 export const hiveFill = (h, i) => Math.min(1, beeTime(hiveT(h, i))/(HIVE_DAYS*DAY));
