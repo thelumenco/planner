@@ -352,6 +352,32 @@ export function toppingsPanel(F){
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The toppings shelf</h2><p class="sub">Scattered on a dipped cone while it's still warm. ${s.prices.top} ${coin()} extra each (set it on the menu); the more jars on the shelf, the more people go for a dipped one.</p>
     <ul class="hlist wlist">${Object.entries(TOPPINGS).map(([k, t]) => `<li><span class="wpic">${dot(t.col)}</span><span class="wtxt"><b>${esc(t.n)}</b><small>${s.tops[k] ? "on the shelf" : "not yet"}</small></span>${s.tops[k] ? `<span class="hbadge">yours</span>` : buyBtn(F, t.price, `data-gtopbuy="${k}"`)}</li>`).join("")}</ul>` + shut;
 }
+// round 238 (Mel: "the artwork for the toppings and dips changes as I change them, like the presents"): the cone as
+// it's being made at the dip bar: cone or waffle, the scoop in its flavour, the dip's shell with drips, and the topping
+const L = 'stroke="#3b3530" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"';
+const TOP_PTS = [[52, 46], [60, 38], [70, 34], [80, 38], [88, 46], [56, 54], [66, 46], [76, 46], [84, 54], [62, 58], [72, 56], [92, 56], [48, 58], [70, 42]];
+function toppingArt(k){
+  const P = TOP_PTS, rot = i => (i*47) % 180;
+  if (k === "sprinkles") return P.map(([x, y], i) => `<rect x="${x - 3}" y="${y - 1}" width="6" height="2.2" rx="1.1" fill="${["#E8566C", "#7FB8E8", "#F3C969", "#9CC27E", "#C9A3E0", "#FFFDF6"][i % 6]}" transform="rotate(${rot(i)} ${x} ${y})"/>`).join("");
+  if (k === "coconut") return P.map(([x, y], i) => `<path d="M${x - 4} ${y} q4 -3 8 0" fill="none" stroke="#FFFDF6" stroke-width="2.2" stroke-linecap="round" transform="rotate(${rot(i)} ${x} ${y})"/>`).join("");
+  if (k === "nuts") return P.map(([x, y], i) => `<path d="M${x - 3} ${y + 1} l2 -3.5 l3.5 .5 l1 3 l-3 2z" fill="${i % 2 ? "#B98A5A" : "#D4A872"}" stroke="#7A5638" stroke-width=".6"/>`).join("");
+  if (k === "marsh") return P.filter((_, i) => i % 2 === 0).map(([x, y], i) => `<rect x="${x - 3.5}" y="${y - 3}" width="7" height="6" rx="2" fill="${i % 2 ? "#FFFDF6" : "#F4C7CF"}" stroke="#C99AA6" stroke-width=".6"/>`).join("");
+  if (k === "caramel") return `<path d="M44 44 L54 52 L60 38 L68 54 L74 36 L82 52 L88 40 L96 50" fill="none" stroke="#C98A3A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>` + P.filter((_, i) => i % 3 === 0).map(([x, y]) => `<circle cx="${x + 2}" cy="${y - 2}" r="1.1" fill="#FFFDF6"/>`).join("");
+  if (k === "strawb") return P.map(([x, y], i) => `<path d="M${x - 3} ${y} q1 -3 3.5 -2.5 q3 1 1.5 3.5 q-2 2 -5 -1z" fill="${i % 3 ? "#E8566C" : "#F28C9A"}"/>`).join("");
+  if (k === "gula") return `<path d="M42 50 C52 36 58 60 66 42 S80 56 86 40 S96 52 98 46" fill="none" stroke="#7A4420" stroke-width="3.2" stroke-linecap="round"/><path d="M46 56 C56 46 64 62 74 50 S88 60 94 54" fill="none" stroke="#9A5A2E" stroke-width="2.4" stroke-linecap="round"/>`;
+  if (k === "pop") return P.map(([x, y], i) => i % 4 === 0 ? `<path d="M${x} ${y - 3} l1 2 l2 1 l-2 1 l-1 2 l-1 -2 l-2 -1 l2 -1z" fill="#FFFDF6"/>` : `<circle cx="${x}" cy="${y}" r="1.4" fill="${["#9FD3C2", "#F2A0B8", "#7FB8E8"][i % 3]}"/>`).join("");
+  return "";
+}
+export function coneArt(col, fmt, dip, top){
+  const waffle = fmt === "waffle", d = DIPS[dip], dc = d ? d.col : null, light = dc === "#F6EBD2";
+  const cone = waffle
+    ? `<path d="M38 80 H102 L70 162z" fill="#D9A85E" ${L}/><g clip-path="url(#cfc)" stroke="#B5843E" stroke-width="1.2">${[0, 1, 2, 3, 4, 5, 6].map(i => `<path d="M${30 + i*12} 80 L${60 + i*12} 170 M${110 - i*12} 80 L${80 - i*12} 170"/>`).join("")}</g><rect x="35" y="74" width="70" height="10" rx="4" fill="#E8C48E" ${L}/>`
+    : `<path d="M46 80 H94 L70 160z" fill="#E8C48E" ${L}/><g clip-path="url(#cfc)" stroke="#C9A06A" stroke-width="1">${[0, 1, 2, 3, 4].map(i => `<path d="M${40 + i*12} 80 L${66 + i*10} 170 M${100 - i*12} 80 L${74 - i*10} 170"/>`).join("")}</g>`;
+  const clip = `<clipPath id="cfc">${waffle ? `<path d="M38 80 H102 L70 162z"/>` : `<path d="M46 80 H94 L70 160z"/>`}</clipPath>`;
+  const scoop = `<path d="M40 70 a30 30 0 0 1 60 0 q-5 8 -10 2 q-5 7 -10 1 q-5 7 -10 1 q-5 7 -10 1 q-5 7 -10 1 q-5 6 -10 -6z" fill="${col}" ${L}/>`;
+  const shell = dc ? `<path d="M41 60 a29.5 29.5 0 0 1 58 0 q1 4 -2 5 q-3 0 -3 8 q-1 4 -3 0 q-1 -9 -5 -8 q-4 1 -5 12 q-1 4 -3 0 q-1 -12 -6 -10 q-4 1 -5 6 q-2 3 -3 -1 q-2 -6 -6 -5 q-3 1 -4 9 q-1 4 -3 0 q0 -9 -4 -10 q-3 -1 -3 -6z" fill="${dc}" ${light ? 'stroke="#C9B48A" stroke-width="1.2"' : L}/><path d="M50 40 q8 -8 18 -9" fill="none" stroke="#FFFDF6" stroke-width="2.2" stroke-linecap="round" opacity=".5"/>` : "";
+  return `<svg viewBox="0 0 140 170" width="140" height="170" role="img" aria-label="Your ice cream" style="display:block;margin:4px auto 2px"><defs>${clip}<clipPath id="cfd"><path d="M41 64 a29.5 29.5 0 0 1 58 0z"/></clipPath></defs>${cone}${scoop}${shell}${top ? `<g clip-path="url(#cfd)">${toppingArt(top)}</g>` : ""}</svg>`;
+}
 export function dipBarPanel(F, st){
   const s = scoopState(F), tubs = tubList(s);
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The dip bar</h2><p class="sub">Pick a flavour, dip it, top it. Yours are free.</p>`;
@@ -360,7 +386,7 @@ export function dipBarPanel(F, st){
   if (!r) return h + `<ul class="hlist wlist">${tubs.map(x => `<li><span class="wpic">${dot(x.col)}</span><span class="wtxt"><b>${esc(x.name)}</b><small>${s.tubs[x.id]} scoops</small></span><button class="btn small primary" data-gdpick="${esc(x.id)}">Choose</button></li>`).join("")}</ul>` + shut;
   const dip = dipReady(s, st.dip) ? st.dip : "milk", top = st.top && s.tops[st.top] ? st.top : null, fmt = st.fmt === "waffle" ? "waffle" : "cone";
   const chip = (attr, k, on, label, col) => `<button class="gchip${on ? " on" : ""}" ${attr}="${k}" aria-pressed="${on}">${dot(col)}<span>${esc(label)}</span></button>`;
-  h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p>`;
+  h += `<p class="olabel">${dot(r.col)} ${esc(r.name)}</p>${coneArt(r.col, fmt, dip, top)}`;
   h += `<p class="eyebrow" style="margin:10px 0 6px">On a</p><div class="gchips">${["cone", "waffle"].map(f => chip("data-gdfmt", f, f === fmt, FORMATS[f].n, "#E8C48E")).join("")}</div>`;
   h += `<p class="eyebrow" style="margin:10px 0 6px">Dipped in</p><div class="gchips">${Object.keys(DIPS).filter(k => dipReady(s, k)).map(k => chip("data-gddip", k, k === dip, DIPS[k].n, DIPS[k].col)).join("")}</div>`;
   h += `<p class="eyebrow" style="margin:10px 0 6px">Topped with</p><div class="gchips">${chip("data-gdtop", "none", !top, "Nothing", "#FFFDF6")}${Object.keys(TOPPINGS).filter(k => s.tops[k]).map(k => chip("data-gdtop", k, k === top, TOPPINGS[k].n, TOPPINGS[k].col)).join("")}</div>`;

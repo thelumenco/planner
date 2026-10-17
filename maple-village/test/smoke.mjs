@@ -2282,6 +2282,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-spot="gdipbar"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gdpick]", { timeout: 15000 });
   await page.locator("#ctx [data-gdpick]").first().click(); await page.waitForTimeout(200);
   await page.click('#ctx [data-gddip="dark"]'); await page.click('#ctx [data-gdtop="coconut"]'); await page.click('#ctx [data-gdfmt="waffle"]'); await page.waitForTimeout(200);
+  check(await page.locator('#ctx svg[aria-label="Your ice cream"] [clip-path="url(#cfd)"]').count() === 1, "round 238: a picture of the cone as it's made: waffle, dark dip, coconut on top");
   await page.click('#ctx [data-gdmake="give"]'); await page.waitForTimeout(400);
   const dipped = await fox().then(f => Object.keys(f.inv).find(k => k.startsWith("gel_dip_waffle_dark_coconut")));
   check(!!dipped, `a dark-chocolate dipped waffle with coconut, to give (${dipped})`);
@@ -4047,6 +4048,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
 }
 {
   console.log("\nThe Cocoa Room's vending machine (round 182)");
+  { const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), G = {coins: 0, cocoa: {up: {grinder2: true}, beans: 2, roasted: 0}};
+    const h = cc.kitchenPanel(G, "grinder");
+    check(/Second grinder/.test(h) && /Free: ready/.test(h) && /data-cc="roast"/.test(h), "round 238: with two grinders the panel shows both, and offers to roast a sack when there are no roasted beans"); }
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {coins: 500, goals: {cocoa: 1}}, c = cc.cocoaState(F);
   c.bars.dark = 10; c.plan.on = false; check(cc.buyCcUp(F, "vending") && F.coins === 100, "the vending machine, 400 coins from the catalogue");
   const off = globalThis.__mapleOffset, rnd = Math.random, mon = Date.parse("2026-10-12T04:00:00Z");   // Monday noon: the shop's shut
