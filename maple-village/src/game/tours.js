@@ -234,7 +234,7 @@ export const eventNow = (day, hm) => eventOn(day, hm);
 export const stallAt = (day, hm, i) => { const e = eventNow(day, hm); return e ? e.stalls.find(s => s.at === i) || null : null; };
 // shoppers at the event: villagers drifting between the stalls along the top in two waves; in each wave two of them
 // settle on the picnic blankets afterwards with what they bought. The keepers stand by their stalls.
-const FIELD_WALK = [[60, 172], [140, 178], [220, 172], [300, 178], [380, 174], [450, 182], [120, 196]], FIELD_PLAY = [[150, 470], [200, 500], [90, 600], [240, 590], [60, 430]];
+const FIELD_WALK = [[60, 172], [140, 178], [220, 172], [300, 178], [380, 174], [450, 182], [120, 196]], FIELD_PLAY = [[150, 470], [252, 520], [90, 600], [240, 590], [60, 430]];   // (round 228: clear of the Christmas tree)
 const PICNICKERS = [[106, 468], [138, 464], [198, 486], [230, 482]];
 // Stall keepers don't stand still all morning: every half hour each picks something to do. Behind the table, out
 // in front, sitting on the crate, over chatting to shoppers on the path, or off wandering the market (the stall
@@ -253,7 +253,7 @@ function keeperSlot(st, e, day, hm){
   if (pose === "front") return {...base, at: [x + 9, y + 9]};
   const side = st.kind === "scoop" || st.kind === "cocoa" || st.kind === "pets";   // the cart and the pen have their crate on the right
   if (pose === "sit") return {...base, at: [x + (side ? 34 : -17), y + 7], act: "sit", dir: side ? -1 : 1};
-  if (pose === "chat") { const side = k % 2 ? 1 : -1; return {...base, at: [Math.max(30, Math.min(490, x + side*30)), y + 48], dir: -side}; }
+  if (pose === "chat") { const side = k % 2 ? 1 : -1; return {...base, at: [Math.max(30, Math.min(470, x + side*30)), y + 48], dir: -side}; }   // (470: not on the signpost)
   return {...base, wander: FIELD_WALK};
 }
 // round 172: the first night of the Christmas market, everyone gathers round the tree from 5:15 for the lighting
@@ -266,7 +266,7 @@ export const carolsNow = (day, hm) => xmasOn(day) && dow(day) === 5 && hm >= CAR
 export const grottoOn = day => xmasOn(day) && (dow(day) === 0 || dow(day) === 6);
 export const grottoNow = (day, hm) => grottoOn(day) && hm >= GROTTO[0] && hm < GROTTO[1];
 export const lanternWalkNow = (day, hm) => day.slice(5) === "12-24" && hm >= LANTERN_WALK[0] && hm < LANTERN_WALK[1];
-const WALK_ROUTE = [[278, 600], [242, 540], [278, 470], [242, 414], [176, 404], [104, 380], [62, 340], [112, 206], [180, 202], [302, 202], [440, 202]];
+const WALK_ROUTE = [[262, 604], [242, 540], [278, 470], [242, 414], [176, 404], [104, 380], [62, 340], [112, 206], [180, 202], [302, 202], [440, 202]];
 function lightingSlot(id, e, day, hm){
   if (e.kind === "xmas" && carolsNow(day, hm)) { const k = LIGHTERS.filter(x => !e.stalls.some(s => s.id === x)).indexOf(id); if (k >= 0 && k < TREE_RING.length) return {from: CAROLS[0], to: CAROLS[1], scene: "field", at: TREE_RING[k], dir: TREE_RING[k][0] < XMAS_TREE[0] ? 1 : -1, act: "carol"}; }
   if (e.kind === "xmas" && lanternWalkNow(day, hm)) { const k = [...LIGHTERS, ...NIGHT_TOURISTS].indexOf(id); if (k >= 0) return {from: LANTERN_WALK[0], to: LANTERN_WALK[1], scene: "field", wander: WALK_ROUTE, act: "lantern"}; }
@@ -395,7 +395,7 @@ export function dateSlot(id, day, hm){
 // the cellar door to taste and buy. They're picked each month from the regulars and your friends.
 export const CLUB_FROM = 18*60, CLUB_TO = 21*60;
 const CLUB_POOL = ["hana", "okada", "juniper", "bo", "lin", "opal", "theo", "tomi", "posy", "farid", "mei", "marco"];
-const CLUB_WALK = [[200, 360], [300, 380], [380, 430], [250, 460], [420, 340], [170, 430], [330, 560], [200, 560]];
+const CLUB_WALK = [[200, 360], [300, 380], [380, 430], [250, 460], [420, 340], [250, 410], [330, 560], [200, 560]];
 export const wineClubOn = day => { const d = new Date(day + "T00:00:00Z"); return d.getUTCDay() === 5 && d.getUTCDate() <= 7; };
 export const wineClubNow = (day, hm) => wineClubOn(day) && hm >= CLUB_FROM && hm < CLUB_TO;
 export const clubMembers = day => wineClubOn(day) ? groupFor(day + ":club", 8, [], CLUB_POOL) : [];
@@ -410,7 +410,8 @@ export function workshopSlot(id, day, hm){
 // Honeybrook station (game/rail.js): today's tour-goers step off the 9:15 and wander down the lane to the station
 // road; on night market days the crowd comes in on the 5:05 and waits for the 10:30 home. And the holiday lets on the
 // lane (Bluebell and Fig Tree) each have two guests for the week, out on the porch in the mornings and evenings.
-const LANE_WALK = [[330, 176], [236, 300], [232, 440], [236, 540], [280, 600]], PLATFORM_WAIT = [[300, 178], [350, 180], [380, 184], [270, 186], [400, 182]];
+// (round 228: they wait along the fence by the station steps, not up on Bluebell's roof)
+const LANE_WALK = [[330, 148], [236, 300], [232, 440], [236, 540], [280, 600]], PLATFORM_WAIT = [[300, 146], [334, 144], [368, 146], [268, 148], [408, 152]];
 const nightDay = day => [2, 4].includes(dow(day));
 export function trainSlot(id, day, hm){
   if (hm >= 9*60 + 15 && hm < 9*60 + 27 && toursOn(day).flatMap(t => t.group).filter(g => TOURISTS.includes(g)).includes(id)) return {from: 9*60 + 15, to: 9*60 + 27, scene: "hlane", wander: LANE_WALK};
@@ -450,7 +451,7 @@ const DISCO_POOL = ["hana", "juniper", "bo", "opal", "theo", "marco", "ines", "f
 // each other (Hana and Theo; Tomi and Posy once their date night's over at 9), each with their own move. About
 // half drift between their knot and the next one now and then; the rest stay put and dance.
 export const DISCO_MOVES = ["dance", "boogie", "armsup", "twirl", "shuffle", "point"];
-const KNOTS = [[215, 350], [345, 340], [455, 395], [190, 435], [315, 425], [420, 470], [265, 505]];
+const KNOTS = [[215, 350], [345, 340], [440, 385], [260, 428], [372, 410], [458, 494], [300, 540]];   // (round 228: clear of the barrel racks and the high table)
 const COUPLES = [["hana", "theo"], ["tomi", "posy"]];
 export const discoCrowd = day => discoOn(day) ? [...groupFor(day + ":disco", 11, [], DISCO_POOL), ...groupFor(day + ":discot", 5, [], NIGHT_TOURISTS)] : [];
 const floorCache = {};

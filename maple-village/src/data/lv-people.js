@@ -65,7 +65,7 @@ export const LV_PEOPLE = [
     ["The children want to climb every step in Montrose.", "Croissants for breakfast, lunch and tea. Holiday rules.", "From the ramparts you can see three villages!"],
     "Claire. We're here for the summer. The kids have gone completely French.", "Claire's back at the gîte.", {tourist: true}),
   P("lvfamily2", "Léo", "On holiday (and very good at climbing steps)", {skin: "#F2D3BC", hair: "#E8C48E", hairStyle: "spiky", top: "#E8913A", bottom: "#3E6B8C"},
-    [slot("14:00", "16:00", "bv_hpaper", [320, 410], {act: "cards", dow: [6], needs: "paperie", dir: -1}), slot("9:30", "11:30", "hm_square", [[260, 440], [320, 480]]), slot("11:30", "13:00", "bv_hboul", IN), slot("13:00", "16:00", "hm_lanes", [[240, 400], [320, 440]])],
+    [slot("14:00", "16:00", "bv_hpaper", [320, 410], {act: "cards", dow: [6], needs: "paperie", dir: -1}), slot("9:30", "11:30", "hm_square", [[252, 482], [320, 480]]), slot("11:30", "13:00", "bv_hboul", IN), slot("13:00", "16:00", "hm_lanes", [[240, 400], [320, 440]])],
     ["I counted ninety-three steps to the top!", "The fish in the fountain spits water!", "Can I play the ball game with the old men?"],
     "I'm Léo! I'm eight! I know how to say croissant properly!", "Léo's at the gîte.", {tourist: true, kid: true}),
 

@@ -7,7 +7,7 @@ import { hash } from "../util.js";
 
 const VISIT = 14, EVERY = 25;   // a visit takes 14 minutes; one may start every 25 (so visits never overlap)
 export const BROWSE = {
-  cocoa: {door: [300, 586], look: [[430, 362], [130, 330], [380, 350], [170, 340]], till: [[300, 410], [258, 418]]},
+  cocoa: {door: [300, 586], look: [[446, 300], [130, 330], [380, 350], [170, 340]], till: [[300, 410], [258, 418]]},
   giftshop: {door: [478, 476], look: [[120, 330], [262, 330], [414, 330], [180, 520]], till: [[300, 540], [256, 548]]}
 };
 // the visits on a day for one shop, during its open hours [from, to): [{from, ids, look, look2}]

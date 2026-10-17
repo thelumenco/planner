@@ -57,15 +57,15 @@ export const TOWNS = {
     // door: the outdoor place you go in by; music: each room's own live track (audio.js); party: where your friends
     // wander inside; say: a line as you step in
     rooms: {
-      rd_tapas: {door: "tapas", n: "The tapas bar", music: "rd_tapas", party: [[220, 520], [300, 540], [180, 480], [390, 520], [250, 300]],
+      rd_tapas: {door: "tapas", n: "The tapas bar", music: "rd_tapas", party: [[220, 520], [300, 540], [180, 480], [340, 572], [250, 300]],
         say: "Inside the tapas bar: hams hanging from the beams, tiles on the walls, and everyone talking at once."},
       rd_cafe: {door: "dulces", n: "Doña Carmen's café", music: "rd_cafe", party: [[260, 560], [300, 380], [200, 560], [420, 520], [120, 560]],
         say: "Doña Carmen's: cool tiles, a ceiling fan turning, trays of yemas, and the smell of coffee."},
       rd_banos: {door: "banos", n: "The Arab baths", music: "rd_banos", party: [[160, 520], [360, 520], [260, 560], [120, 360], [400, 360]],
         say: "The Arab baths. Cool and quiet under the domes, with little star-shaped holes letting the sun in."},
-      rd_jardin: {door: "jardin", n: "The Moorish garden", music: "rd_jardin", party: [[230, 220], [290, 520], [60, 380], [460, 380], [260, 590]],
+      rd_jardin: {door: "jardin", n: "The Moorish garden", music: "rd_jardin", party: [[230, 220], [290, 520], [60, 380], [460, 380], [300, 590]],
         say: "The Moorish garden: water running down the middle, orange trees, myrtle hedges. It's ten degrees cooler in here."},
-      rd_cuero: {door: "cuero", n: "The leather workshop", music: "rd_cuero", party: [[200, 520], [320, 540], [140, 440], [400, 470]],
+      rd_cuero: {door: "cuero", n: "The leather workshop", music: "rd_cuero", party: [[200, 520], [320, 540], [124, 492], [400, 510]],
         say: "The leather workshop: the smell of new leather, hides hanging on the walls, and Antonio stitching at his bench. Everything here comes from Ubrique, over the hills."},
       rd_mercado: {door: "mercado", n: "The covered market", music: "rd_mercado", party: [[200, 420], [320, 420], [260, 530], [120, 420], [400, 440]],
         say: "The covered market: iron columns, a glass roof, and a hundred voices haggling."}
@@ -203,7 +203,7 @@ export const TOWNS = {
     rooms: {
       jj_haenyeo: {door: "jjhaenyeo", n: "The divers' house", music: "jj_haenyeo", party: [[200, 560], [330, 560], [120, 520], [420, 540]],
         say: "The divers' house: a stone room warm from the stove, wetsuits and nets hung round the walls, orange floats stacked to the ceiling, and a pot of abalone porridge bubbling."},
-      jj_shed: {door: "jjshed", n: "The packing shed", music: "jj_shed", party: [[200, 560], [330, 560], [120, 540], [420, 540]],
+      jj_shed: {door: "jjshed", n: "The packing shed", music: "jj_shed", party: [[260, 545], [380, 495], [120, 540], [420, 540]],
         say: "The packing shed: crates of tangerines everywhere, the sorting table down the middle, a radio playing, and the sweet sharp smell of peel."},
       jj_cafe: {door: "jjcafe", n: "The stone-house café", music: "jj_cafe", party: [[200, 540], [330, 560], [120, 520], [420, 520]],
         say: "The café: black stone walls, old wooden beams, low tables by a window full of sea, and a counter piled with tangerines."},
@@ -253,13 +253,13 @@ export const TOWNS = {
       ct_monterosso: "Monterosso: the beach and its umbrellas, the old town, the giant on the rocks, the lemon shop. North: Vernazza. East: Manarola.",
       ct_manarola: "Manarola: the houses on the rock, the boats in the street, the pesto kitchen, the gelateria, the swimming rocks. North: Corniglia. West: Monterosso."},
     spots: {
-      hana: {ct_vernazza: [[300, 300], [360, 460]], ct_corniglia: [[260, 360], [200, 460]], ct_monterosso: [[300, 300], [380, 460]], ct_manarola: [[260, 360], [320, 470]]},
-      theo: {ct_vernazza: [[260, 330], [400, 440]], ct_corniglia: [[300, 330], [220, 420]], ct_monterosso: [[260, 330], [420, 300]], ct_manarola: [[300, 330], [240, 440]]},
-      farid: {ct_vernazza: [[330, 330], [300, 440]], ct_corniglia: [[240, 380], [300, 460]], ct_monterosso: [[330, 280], [260, 360]], ct_manarola: [[280, 380], [330, 460]]},
-      mei: {ct_vernazza: [[330, 380], [340, 390]], ct_corniglia: [[260, 420], [270, 430]], ct_monterosso: [[300, 330], [310, 340]], ct_manarola: [[290, 420], [300, 430]]},
+      hana: {ct_vernazza: [[300, 300], [380, 474]], ct_corniglia: [[260, 360], [200, 460]], ct_monterosso: [[300, 300], [380, 460]], ct_manarola: [[260, 360], [320, 470]]},
+      theo: {ct_vernazza: [[246, 346], [400, 440]], ct_corniglia: [[300, 330], [220, 420]], ct_monterosso: [[260, 330], [420, 300]], ct_manarola: [[300, 330], [240, 440]]},
+      farid: {ct_vernazza: [[330, 330], [320, 478]], ct_corniglia: [[240, 380], [300, 460]], ct_monterosso: [[330, 280], [260, 360]], ct_manarola: [[280, 380], [330, 460]]},
+      mei: {ct_vernazza: [[318, 396], [340, 396]], ct_corniglia: [[260, 420], [270, 430]], ct_monterosso: [[300, 330], [310, 340]], ct_manarola: [[290, 420], [300, 430]]},
       bo: {ct_vernazza: [[400, 330], [280, 480]], ct_corniglia: [[330, 300], [200, 360]], ct_monterosso: [[420, 330], [280, 300]], ct_manarola: [[330, 300], [260, 470]]},
-      tomi: {ct_vernazza: [[420, 480], [260, 300]], ct_corniglia: [[280, 460], [340, 380]], ct_monterosso: [[440, 300], [260, 380]], ct_manarola: [[420, 480], [260, 330]]},
-      posy: {ct_vernazza: [[440, 300], [300, 360]], ct_corniglia: [[240, 330], [300, 420]], ct_monterosso: [[300, 400], [360, 300]], ct_manarola: [[440, 330], [300, 360]]}
+      tomi: {ct_vernazza: [[396, 480], [244, 314]], ct_corniglia: [[280, 460], [340, 380]], ct_monterosso: [[440, 300], [260, 380]], ct_manarola: [[390, 400], [260, 330]]},
+      posy: {ct_vernazza: [[440, 300], [300, 360]], ct_corniglia: [[240, 330], [300, 420]], ct_monterosso: [[300, 400], [360, 300]], ct_manarola: [[440, 362], [300, 360]]}
     },
     // what they do (round 134, nothing they did in Ronda, Kyoto or Jeju): Hana sunbathes on the Manarola rocks, Theo fishes
     // off the Vernazza harbour, Farid knits, Mei plays bocce with Nino, Bo hikes with poles, Tomi rows,

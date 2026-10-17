@@ -32,7 +32,7 @@ export const SW_PEOPLE = [
   // Nell: fifties, came from Leeds for a long weekend twenty years ago, met the café's old owner, and stayed.
   // Knows everyone's order. Feeds the harbour cat when she thinks nobody's looking. Everyone's looking.
   P("swnell", "Nell", "Runs the quay café. Came for a weekend twenty years ago and stayed", {skin: "#EAC4A0", hair: "#8A4A3A", hairStyle: "curly", top: "#C9483A", bottom: "#2F2B28", extra: "apron"},
-    [slot("8:00", "17:00", "sw_cafe", [404, 314], {dir: -1}), slot("17:00", "19:00", "sw_wynds", [[262, 300], [250, 460]])],
+    [slot("8:00", "17:00", "sw_cafe", [404, 314], {dir: -1}), slot("17:00", "19:00", "sw_wynds", [[262, 300], [262, 486]])],
     ["Jam first, then cream. I'll hear no arguments in this café.", "I came for a long weekend in 2006. I'm still here. The weekend's going very well.", "Crab sandwich, brown bread, lemon. Anything else is showing off.", "The cat? I don't feed the cat. (I feed the cat.)", "Tea's the answer. I don't always know what the question is, but tea's the answer."],
     "Hiya, love! Sit anywhere. Window seat's the best: you can see the boats come in. I'll bring you a pot.", "The café's shut. Nell's walking on the clifftop, like every evening."),
   P("swwalter", "Walter", "Has the chandlery. Nothing's been thrown away since 1931", {skin: "#E2B590", hair: "#9A928A", hairStyle: "short", top: "#5E6A4A", bottom: "#3A3430", extra: "glasses"},

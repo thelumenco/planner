@@ -4309,6 +4309,68 @@ if (want("\nA surprise bouquet from the creator (round 228)")) try {
   check(await page.evaluate(() => /#E8728A/i.test(document.getElementById("world").innerHTML)), "and there it is, on the bedroom table, in its own colours");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nNobody stands on tables or stalls (round 228)")) try {
+  console.log("\nNobody stands on tables or stalls (round 228)");
+  // Everyone's spots (their routines over a varied fortnight, the house guests, the day-trip towns and their rooms)
+  // against the furniture drawn in each scene: the shapes inside every piece of furniture, stall and place you can tap.
+  // A seat by a table is fine; a feet point inside a table, counter, shelf or stall top is not.
+  const SEATED = ["sit", "doze", "beanbag", "footbath", "wheel", "sunbathe"];
+  // ground, seats and walkways that are drawn as places (decks, rugs, lawns, paths, platforms, pens, a stage for the
+  // performers), and shopkeepers standing behind their counters (the counter's front is drawn below their feet)
+  const OPEN = new Set(["deck", "picnic", "exlawn", "pround", "jardin", "bvhpiste", "bvboardwalk", "ctpadlock", "kttorii", "bandstand", "bvhmeadow", "stairs", "pigoats",
+    "bvtplatypus", "cttrain", "basubak", "run", "bvplayground", "bvbeanbags", "bvrows", "bvbellbirds", "bvballoons", "bvswing", "bvnippers", "bvkoalas", "ctbeach",
+    "bvsurf", "swscar", "bvtrock", "bvttrees", "bvtpark", "ctboats", "flamenco", "market:stall", "hk_ramen:hk_ramen",
+    "hk_glass:hk_glass", "pi_post:pi_post", "sw_chandlery:sw_chandlery"]);
+  const furniture = () => { const art = document.getElementById("sceneArt"), inv = art.getCTM().inverse(), out = [], SEL = "[data-spot],[data-millspot],[data-place],[data-rdspot],[data-tspot]";
+    const groups = [...art.querySelectorAll(SEL)].filter(g => !g.parentElement.closest(SEL)).concat([...document.querySelectorAll("#actors .sfront")]);
+    for (const g of groups) { const id = g.dataset.spot || g.dataset.millspot || g.dataset.place || g.dataset.rdspot || g.dataset.tspot || "sfront";
+      for (const el of g.querySelectorAll("rect,path,ellipse,circle,polygon,polyline,image,use")) {
+        if (el.closest(".hov") || el.closest('[filter="url(#wob)"][fill="none"]')) continue;   // the hover glow and the ink outlines
+        let lab = false; for (let a = el.parentElement; a && a !== g.parentElement; a = a.parentElement) if (a.querySelector(":scope > text")) lab = true; if (lab) continue;   // name tapes
+        const cs = getComputedStyle(el); if (/^(none|transparent)$|rgba\(.*, 0\)|url\(/.test(cs.fill) || cs.display === "none" || cs.visibility === "hidden" || +cs.opacity < .2) continue;   // tap areas, glows
+        let b; try { b = el.getBBox(); } catch { continue; } if (b.width < 4 || b.height < 4) continue;
+        const m = inv.multiply(el.getCTM()), c = [[b.x, b.y], [b.x + b.width, b.y], [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]].map(([x, y]) => [m.a*x + m.c*y + m.e, m.b*x + m.d*y + m.f]);
+        out.push({id, x0: Math.min(...c.map(p => p[0])), y0: Math.min(...c.map(p => p[1])), x1: Math.max(...c.map(p => p[0])), y1: Math.max(...c.map(p => p[1]))}); } }
+    return out; };
+  const setUp = () => { const g = window.__hbGame, F = g.F();   // everything built, so every shop, class and club has its people
+    F.goals = Object.assign(F.goals || {}, {cocoa: 1, giftshop: 1, millshop: 1, cellar: 1, greenhouse: 1, mill: 1, paperie: 1, paperkeeper: 1});
+    F.vine = Object.assign(F.vine || {}, {terrace: 1}); F.cocoa = Object.assign(F.cocoa || {}, {up: {assistant: 1, cart: 1, workshop: 1}});
+    F.fam = F.fam || {}; F.fam.owned = Object.assign(F.fam.owned || {}, {grove: 1, olive: 1}); g.save(); };
+  // every spot people are put at or stroll between, on these days between these times
+  const spots = ([days, from, to, only, extras]) => { const H = window.__hbSlots, out = new Map(), add = (scene, [x, y], who, act) => { if (only && scene !== only) return;
+      const k = `${scene}|${x}|${y}|${act || ""}`; if (!out.has(k)) out.set(k, {scene, x, y, who, act: act || ""}); };
+    days.forEach(day => { for (let t = from; t < to; t += 30) H.at(day, t).forEach(([id, s]) => { if (s.at) add(s.scene, s.at, id, s.act); (s.wander || []).forEach(w => add(s.scene, w, id, s.act)); }); });
+    if (extras) { Object.values(H.towns()).forEach(T => { Object.entries(T.spots || {}).forEach(([id, sp]) => Object.entries(sp).forEach(([sc, l]) => (l || []).forEach(w => add(sc, w, id))));
+        Object.entries(T.acts || {}).forEach(([id, a]) => Object.entries(a).forEach(([sc, x]) => x.at && add(sc, x.at, id, x.act)));
+        Object.entries(T.rooms || {}).forEach(([sc, r]) => (r.party || []).forEach(w => add(sc, w, "your friends"))); });
+      Object.values(H.guests()).flat(3).filter(s => s && s.scene).forEach(s => { if (s.at) add(s.scene, s.at, "a house guest", s.act); (s.wander || []).forEach(w => add(s.scene, w, "a house guest", s.act)); }); }
+    return [...out.values()]; };
+  const offenders = [];
+  const checkScene = async (page, scene, pts, label) => {
+    await page.evaluate(s => window.__hbScene(s, [20, 620]), scene);   // (it fades out, then draws the new scene)
+    await page.waitForFunction(() => !document.getElementById("world").classList.contains("fading"), null, { timeout: 5000 }); await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))); if (scene === "field") await page.waitForTimeout(400);
+    const boxes = await page.evaluate(furniture);
+    for (const p of pts) { if (SEATED.includes(p.act)) continue;
+      const b = boxes.find(b => p.x > b.x0 + 1 && p.x < b.x1 - 1 && p.y > b.y0 + 1 && p.y < b.y1 - 1 && !OPEN.has(b.id) && !OPEN.has(scene + ":" + b.id)
+        && !(/^(mstall\d|sfront)$/.test(b.id) && p.y < b.y1));   // a keeper behind their stall (its front is drawn over them)
+      if (b) offenders.push(`${p.who} at ${scene} [${p.x}, ${p.y}]${p.act ? " (" + p.act + ")" : ""} on ${b.id}${label ? " " + label : ""}`); } };
+  const DAYS = ["2026-10-12", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-24", "2026-10-31", "2026-11-06", "2026-11-20", "2026-11-28", "2026-12-24", "2026-04-11", "2026-07-11", "2026-02-14"];
+  { const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    page.on("pageerror", e => errors.push(`tables pageerror: ${e.message}`));
+    await page.goto(url + "?reset=1&seed=1&time=14:30&date=2026-10-17"); await page.waitForTimeout(1000); await page.evaluate(setUp);
+    const pts = await page.evaluate(spots, [DAYS, 6*60, 23*60 + 30, null, true]), scenes = [...new Set(pts.map(p => p.scene))].filter(s => s !== "field");
+    check(pts.length > 2000 && scenes.length > 150, `everyone's spots gathered (${pts.length} spots in ${scenes.length} scenes)`);
+    for (const sc of scenes) await checkScene(page, sc, pts.filter(p => p.scene === sc));
+    await page.close(); }
+  // the field on its market, fair, night market and Christmas market days, with the stalls up
+  for (const [day, hm, from, to] of [["2026-10-18", "10:30", 8*60, 13*60], ["2026-10-31", "12:00", 10*60, 16*60], ["2026-10-20", "19:00", 17*60 + 30, 22*60], ["2026-11-27", "19:00", 17*60, 21*60]]) {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    page.on("pageerror", e => errors.push(`tables pageerror: ${e.message}`));
+    await page.goto(url + `?reset=1&seed=1&time=${hm}&date=${day}`); await page.waitForTimeout(1000); await page.evaluate(setUp);
+    await checkScene(page, "field", await page.evaluate(spots, [[day], from, to, "field", false]), `(${day})`);
+    await page.close(); }
+  check(!offenders.length, "nobody's feet are on a table, counter, shelf or stall" + (offenders.length ? ` (${offenders.length}: ${offenders.slice(0, 40).join("; ")})` : ""));
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

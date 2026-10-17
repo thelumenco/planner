@@ -25,7 +25,7 @@ export const BL_PEOPLE = [
     ["Best nasi goreng on the coast. I say so. My customers say so. My mother says so.", "Twenty years on this beach. The surfers get older. I don't.", "Es kelapa! The coconut tells you when it's ready. It goes heavy and quiet."],
     "Made! Sit, sit. You're hungry, I can tell. Nasi goreng? Of course nasi goreng.", "The warung's shutters are down. Made's gone to the market."),
   P("blsari", "Ibu Sari", "Folds offerings at Ubud market, every morning since she was a girl", {skin: "#C99A78", hair: "#E6E2DA", hairStyle: "bun", top: "#F4C7CF", bottom: "#3E6BAE"},
-    [slot("6:00", "14:00", "ba_market", [262, 330], {dir: 1}), slot("14:00", "16:00", "ba_ubud", [[220, 250], [300, 250]])],
+    [slot("6:00", "14:00", "ba_market", [262, 288], {dir: 1}), slot("14:00", "16:00", "ba_ubud", [[220, 250], [300, 250]])],
     ["Every morning, a thank-you. For the sun, for the rice, for the day. It takes a minute. It changes everything.", "Each colour has its direction, each direction has its god. Simple. Beautiful.", "My granddaughter folds faster than me now. I pretend I'm letting her win."],
     "Om swastiastu! I am Sari. Sit with me. I teach you canang. Your hands will remember.", "Ibu Sari's gone home to rest. Her little stool is still by the door."),
   P("blgede", "Pak Gede", "Carves animals at Ubud market, a different one each day", {skin: "#A8754F", hair: "#9A928A", hairStyle: "short", top: "#5E8A48", bottom: "#5A4A3E"},

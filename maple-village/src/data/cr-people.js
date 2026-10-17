@@ -31,7 +31,7 @@ export const CR_PEOPLE = [
     ["Glassy this morning. Like a mirror.", "Pie after a surf is the law.", "Watch out for the rip by the rocks."],
     "Kai-Lee. Surf before work, every day. Best way to start anything.", "Kai-Lee's out the back, waiting for a set.", {tourist: true}),
   P("crdad", "Gav", "On a road trip with his twins", {skin: "#F2D3BC", hair: "#8A5A3A", hairStyle: "short", top: "#E8913A", bottom: "#4F5A6A", hat: "cap"},
-    [slot("9:00", "11:00", "cw_beach", [[220, 300], [300, 320]]), slot("11:00", "12:30", "bv_chippy", [[200, 500], [330, 510]]), slot("12:30", "14:30", "cw_street", [[250, 420], [200, 360]])],
+    [slot("9:00", "11:00", "cw_beach", [[220, 300], [300, 320]]), slot("11:00", "12:30", "bv_chippy", [[200, 500], [330, 510]]), slot("12:30", "14:30", "cw_street", [[250, 446], [200, 360]])],
     ["Fish and chips for lunch. Fish and chips for dinner. Holiday rules.", "The twins want to surf. I want a nap.", "Those gulls! One took my whole potato cake."],
     "Gav. Road trip with the twins. They've been in the sea four times and it's ten o'clock.", "Gav's taken the twins up the coast.", {tourist: true}),
 
@@ -45,7 +45,7 @@ export const CR_PEOPLE = [
     ["The lighthouse models light up. Batteries included. I insisted.", "The wind chimes are made by a lady down the road. Every shell's from the beach.", "Tea towels are our bestseller. Nobody uses them. Everybody buys them."],
     "Hamish. Gifts, postcards, things with lighthouses on them. Have a browse.", "The gift shop's shut. Hamish is walking his dog on the cliff."),
   P("crwhaler", "Ingrid", "Here for the whales, with binoculars", {skin: "#F6D9C4", hair: "#E8D3A0", hairStyle: "bob", top: "#C8432F", bottom: "#3A3430", hat: "sunhat"},
-    [slot("8:00", "12:00", "cl_cliff", [300, 300], {act: "photo", dir: 1}), slot("12:00", "13:00", "bv_tearoom", [[200, 500], [320, 520]]), slot("13:00", "16:00", "cl_cliff", [300, 310], {act: "photo", dir: 1})],
+    [slot("8:00", "12:00", "cl_cliff", [296, 330], {act: "photo", dir: 1}), slot("12:00", "13:00", "bv_tearoom", [[200, 500], [320, 520]]), slot("13:00", "16:00", "cl_cliff", [304, 334], {act: "photo", dir: 1})],
     ["A spout! Did you see? There, past the third wave.", "I've come from Norway to see these whales. Worth every hour on the plane.", "Patience. The sea gives you whales when it wants to."],
     "Ingrid. From Bergen. I follow whales. This is the best place I know to see southern rights.", "Ingrid's gone further along the cliff.", {tourist: true}),
 

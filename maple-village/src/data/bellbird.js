@@ -24,8 +24,8 @@ export const BB_TOWNS = {
     blurb: "The turn-off into Bellbird Valley: a big timber sign, a farm-gate stand with an honesty box, the general store, and an old bridge over the creek.",
     arriveLine: "Bellbird Valley! A big timber sign at the turn-off, gum trees, golden grass, and a sound like little bells in the trees: the bellbirds.",
     hints: {bg_gate: "Valley Gate: the turn-off, the general store, the farm-gate shed, and the van. East: the old bridge.", bg_bridge: "The old bridge over the creek, the church-hall op shop, and the bellbirds. West: back to the van."},
-    spots: fam({hana: {bg_gate: [[260, 440], [320, 470]], bg_bridge: [[300, 420], [200, 470]]}, theo: {bg_gate: [[220, 470], [360, 430]], bg_bridge: [[360, 330], [240, 480]]},
-      farid: {bg_gate: [[300, 460], [250, 420]], bg_bridge: [[380, 460], [300, 500]]}, mei: {bg_gate: [[230, 520], [240, 530]], bg_bridge: [[260, 520], [270, 530]]},
+    spots: fam({hana: {bg_gate: [[260, 440], [320, 470]], bg_bridge: [[300, 420], [200, 470]]}, theo: {bg_gate: [[220, 470], [360, 430]], bg_bridge: [[360, 330], [170, 480]]},
+      farid: {bg_gate: [[300, 460], [250, 420]], bg_bridge: [[380, 460], [320, 500]]}, mei: {bg_gate: [[230, 520], [240, 530]], bg_bridge: [[170, 520], [180, 530]]},
       bo: {bg_gate: [[380, 480], [180, 440]], bg_bridge: [[200, 360], [420, 480]]}, tomi: {bg_gate: [[420, 440], [300, 520]], bg_bridge: [[440, 380], [300, 460]]},
       posy: {bg_gate: [[340, 520], [280, 400]], bg_bridge: [[330, 480], [420, 420]]}}),
     acts: {   // round 144: what your friends do here (and nowhere else)
@@ -33,7 +33,7 @@ export const BB_TOWNS = {
       mei: {bg_bridge: {act: "binoculars", at: [150, 470], dir: -1}},
       posy: {bg_gate: {act: "crown", at: [150, 372], dir: -1}}
     }, rooms: {
-      bv_store: {door: "bvstore", n: "Dunn's General Store", music: "bv_store", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The general store: shelves to the ceiling, jars of lollies, a post office counter in the corner, and Mrs Dunn behind the till."},
+      bv_store: {door: "bvstore", n: "Dunn's General Store", music: "bv_store", party: [[200, 560], [330, 560], [120, 540], [376, 540]], say: "The general store: shelves to the ceiling, jars of lollies, a post office counter in the corner, and Mrs Dunn behind the till."},
       bv_shed: {door: "bvshed", n: "The farm-gate shed", music: "bv_shed", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The farm-gate shed: crates of apples, trays of eggs, honey and jam on a plank shelf, buckets of flowers, and a tin for the money."},
       bv_opshop: {door: "bvopshop", n: "The op shop", music: "bv_opshop", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The op shop: racks of cardigans, shelves of china, old records, a box of board games, and Joan and Marg drinking tea behind the counter."}},
     lines: {hana: ["Listen! The bellbirds. Like a hundred tiny bells.", "An honesty box! Nobody does that any more. I love it here already."],
@@ -94,7 +94,7 @@ export const BB_TOWNS = {
     }, rooms: {
       bv_tasting: {door: "bvtasting", n: "The tasting room", music: "bv_tasting", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The tasting room: a long timber bar, bottles in racks to the ceiling, and a window onto the vines."},
       bv_cave: {door: "bvcave", n: "The barrel cave", music: "bv_cave", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The barrel cave: cool and dim, barrels in rows, and racks of sparkling wine tilted neck-down, waiting to be turned."},
-      bv_restaurant: {door: "bvrestaurant", n: "The Long Table", music: "bv_restaurant", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The Long Table: one huge table down the middle, white cloths, jugs of wildflowers, and a view of the vines."}},
+      bv_restaurant: {door: "bvrestaurant", n: "The Long Table", music: "bv_restaurant", party: [[200, 560], [330, 560], [120, 540], [370, 530]], say: "The Long Table: one huge table down the middle, white cloths, jugs of wildflowers, and a view of the vines."}},
     lines: {hana: ["A tasting! Only a little one. Maybe two.", "That dog's adopted us."],
       theo: ["Pinot Noir and Chardonnay. Cool climate, they said. Like home, with more sunshine.", "They make sparkling the old way here. In the bottle."],
       farid: ["I'll have the grape juice, please.", "A long lunch on the lawn. I approve of this country."],
@@ -116,14 +116,14 @@ export const BB_TOWNS = {
     spots: fam({hana: {bb_rows: [[300, 460], [240, 500]], bb_choc: [[260, 420], [320, 460]]}, theo: {bb_rows: [[380, 480], [260, 530]], bb_choc: [[200, 440], [380, 470]]},
       farid: {bb_rows: [[220, 470], [300, 520]], bb_choc: [[300, 480], [240, 440]]}, mei: {bb_rows: [[200, 540], [210, 550]], bb_choc: [[230, 500], [240, 510]]},
       bo: {bb_rows: [[420, 460], [330, 540]], bb_choc: [[420, 440], [300, 520]]}, tomi: {bb_rows: [[400, 530], [280, 450]], bb_choc: [[400, 500], [340, 420]]},
-      posy: {bb_rows: [[340, 540], [260, 440]], bb_choc: [[440, 460], [280, 520]]}}),
+      posy: {bb_rows: [[340, 540], [260, 440]], bb_choc: [[440, 488], [280, 520]]}}),
     acts: {
       theo: {bb_choc: {act: "juggle", at: [210, 520], dir: -1}},
       farid: {bb_rows: {act: "fan", at: [430, 560], dir: -1}},
       bo: {bb_rows: {act: "carry", at: [250, 566], dir: 1}}
     }, rooms: {
-      bv_berrycafe: {door: "bvberrycafe", n: "The Berry Barn café", music: "bv_berrycafe", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The Berry Barn: scones and jam and cream, berry smoothies, gingham tablecloths and a dresser of jam jars."},
-      bv_jam: {door: "bvjam", n: "The jam kitchen", music: "bv_jam", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The jam kitchen: copper pots bubbling, jars cooling on the sill, and the whole room smelling of hot strawberries."},
+      bv_berrycafe: {door: "bvberrycafe", n: "The Berry Barn café", music: "bv_berrycafe", party: [[200, 560], [330, 560], [120, 540], [380, 500]], say: "The Berry Barn: scones and jam and cream, berry smoothies, gingham tablecloths and a dresser of jam jars."},
+      bv_jam: {door: "bvjam", n: "The jam kitchen", music: "bv_jam", party: [[200, 560], [330, 560], [120, 540], [370, 520]], say: "The jam kitchen: copper pots bubbling, jars cooling on the sill, and the whole room smelling of hot strawberries."},
       bv_choc: {door: "bvchoc", n: "The chocolaterie", music: "bv_choc", party: [[200, 560], [330, 560], [120, 540], [420, 540]], say: "The chocolaterie: counters of chocolate as far as you can see, a chocolate fountain, and free tastings. Free!"}},
     lines: {hana: ["One for the basket, one for me. That's the rule.", "Free chocolate tastings. Free! I'm going in."],
       theo: ["Raspberries straight off the cane. Nothing like them.", "They'd grow at home, you know. In a sunny corner."],
@@ -142,8 +142,8 @@ export const BB_TOWNS = {
     blurb: "A wildlife sanctuary in the bush: kangaroos and wombats, koalas on a boardwalk, the platypus house, and a wildlife hospital.",
     arriveLine: "Gum Creek Sanctuary: tall gums, a mob of kangaroos lazing in the shade, and a kookaburra laughing its head off in a tree.",
     hints: {bk_bush: "The bush walk: kangaroos, wombats, the visitor centre, and the van. East: the koala boardwalk.", bk_koala: "The koala boardwalk, the platypus pool and house, and the wildlife hospital. West: the bush walk."},
-    spots: fam({hana: {bk_bush: [[300, 440], [240, 490]], bk_koala: [[260, 440], [320, 480]]}, theo: {bk_bush: [[380, 480], [260, 530]], bk_koala: [[200, 460], [380, 470]]},
-      farid: {bk_bush: [[220, 470], [300, 520]], bk_koala: [[300, 500], [240, 440]]}, mei: {bk_bush: [[200, 540], [210, 550]], bk_koala: [[230, 520], [240, 530]]},
+    spots: fam({hana: {bk_bush: [[300, 440], [240, 490]], bk_koala: [[260, 440], [330, 540]]}, theo: {bk_bush: [[380, 480], [260, 530]], bk_koala: [[200, 460], [380, 470]]},
+      farid: {bk_bush: [[220, 470], [300, 520]], bk_koala: [[206, 500], [240, 440]]}, mei: {bk_bush: [[200, 540], [210, 550]], bk_koala: [[230, 520], [240, 530]]},
       bo: {bk_bush: [[420, 460], [330, 540]], bk_koala: [[420, 440], [300, 520]]}, tomi: {bk_bush: [[400, 530], [280, 450]], bk_koala: [[400, 500], [340, 420]]},
       posy: {bk_bush: [[340, 540], [260, 440]], bk_koala: [[440, 460], [280, 520]]}}),
     acts: {
@@ -174,7 +174,7 @@ export const BB_TOWNS = {
     hints: {br_park: "The caravan park: the other campervans, the camp kitchen, the camp store, and your van. South: the river.", br_river: "The river: the swimming hole, the rope swing, the canoe shed. North: the camp."},
     spots: fam({hana: {br_park: [[300, 440], [240, 490]], br_river: [[260, 300], [320, 340]]}, theo: {br_park: [[380, 480], [260, 530]], br_river: [[200, 320], [380, 330]]},
       farid: {br_park: [[220, 470], [300, 520]], br_river: [[300, 360], [240, 300]]}, mei: {br_park: [[200, 540], [210, 550]], br_river: [[230, 330], [240, 340]]},
-      bo: {br_park: [[420, 460], [330, 540]], br_river: [[420, 300], [300, 360]]}, tomi: {br_park: [[400, 530], [280, 450]], br_river: [[400, 340], [340, 300]]},
+      bo: {br_park: [[420, 482], [330, 540]], br_river: [[420, 300], [300, 360]]}, tomi: {br_park: [[400, 530], [280, 450]], br_river: [[400, 340], [340, 300]]},
       posy: {br_park: [[340, 540], [260, 440]], br_river: [[440, 320], [280, 360]]}}),
     acts: {
       theo: {br_park: {act: "bbq", at: [196, 300], dir: 1, hours: [[11*60 + 30, 13*60 + 30], [17*60 + 30, 19*60 + 30]]}},

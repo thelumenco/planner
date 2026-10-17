@@ -50,7 +50,7 @@ export const NPCS = [
     intro: "Okada. Forty years delivering letters. Retired now, but I still can't stop sorting things. Even the pebbles by the well.",
     look: {skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses"},
     routine: [slot("7:15", "7:30", "hlane", [[250, 300], [250, 180], [460, 186]], {dow: [2, 4]}), slot("7:30", "9:00", "hwoods", WOODS_WALK, {dow: [2, 4]}), slot("6:30", "9:00", "field", [96, 352], {act: "fish", dow: [0], dir: 1}), slot("14:00", "15:00", "lane", LANE, {dow: [1, 3, 5]}),
-      slot("19:30", "21:00", "wineshop", [313, 518], {act: "sit", dow: [1, 3, 4, 5]}), slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566])],
+      slot("19:30", "21:00", "wineshop", [313, 518], {act: "sit", dow: [1, 3, 4, 5]}), slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566], {act: "sit"})],
     lines: ["Wilf Song and I played draughts on this bench for twenty years. He cheated. Charmingly.", "Letters used to come in sacks. Now it's all on your little phone.", "The well water is sweeter in the afternoon. Don't ask me why.", "I've sorted the pebbles by colour. Then by size. Then by colour again.",
       "A tidy inbox is a tidy mind. Mine is a shoebox.", "The river's high today. Good for the ducks."],
     react: {inbox: "An email quest! Just like the old days. Stamp it and send it.", water: "Good, drink up. Forty years of walking taught me that.", quests3: "Steady work. That's the postmaster's way."}
@@ -71,7 +71,7 @@ export const NPCS = [
     intro: "Bo! Carpenter. If it creaks, wobbles or falls off, I'm your guy. Built half this village. *hums*",
     look: {skin: "#E2B590", hair: "#3B2A1E", hairStyle: "short", top: "#E9C46A", bottom: "#4F6B8A", extra: "cap"},
     routine: [slot("12:30", "13:30", "bay", [[180, 420], [240, 430], [300, 420]], {dow: [3, 5]}), slot("8:00", "10:00", "hwoods", WOODS_RIDE, {dow: [6], look: BIKE}), slot("12:30", "13:30", "lane", LANE, {dow: [2, 4]}),
-      slot("18:30", "20:00", "wineshop", [227, 518], {act: "sit", dow: [0, 1, 3, 4, 5]}), slot("8:00", "12:30", "carpentry", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566]),
+      slot("18:30", "20:00", "wineshop", [227, 518], {act: "sit", dow: [0, 1, 3, 4, 5]}), slot("8:00", "12:30", "carpentry", [[150, 330], [210, 320], [120, 340]]), slot("12:30", "13:30", "village", [346, 566], {act: "sit"}),
       slot("13:30", "18:00", "village", [[170, 300], [400, 280], [300, 450], [150, 520], [440, 560]])],
     lines: ["I built those trellis posts for Wilf, back in the day. They've leaned a bit since. We'll fix them.", "*hums a tune* Fixed the market's wobbly leg this morning.", "Measure twice, cut once. Or just cut and laugh.", "The workshop smells like sawdust and big ideas.",
       "Shipping is just building, but braver.", "Need a shelf? I always need a shelf."],
@@ -81,7 +81,7 @@ export const NPCS = [
     id: "lin", pitch: 0.95, name: "Auntie Lin", job: "Gardener",
     intro: "Auntie Lin. I have opinions about soil, and they're all correct. Plant something and I'll tell you what you did wrong. Lovingly.",
     look: {skin: "#E9C2A0", hair: "#7C7570", hairStyle: "bun", top: "#9EBE8C", bottom: "#8A6A52", extra: "sunhat"},
-    routine: [slot("6:30", "9:30", "farm", [[45, 250], [475, 400], [250, 560]]), slot("11:30", "14:00", "base", [360, 556]), slot("16:00", "19:00", "farm", [[45, 250], [475, 400], [250, 560]])],
+    routine: [slot("6:30", "9:30", "farm", [[45, 250], [475, 400], [250, 560]]), slot("11:30", "14:00", "base", [340, 526]), slot("16:00", "19:00", "farm", [[45, 250], [475, 400], [250, 560]])],
     lines: ["Water in the morning, not at night. The roots know.", "Tulips are for beginners. That's a compliment.", "Strawberries take a whole day. Patience is a fertiliser.",
       "Your soil is lovely. Mine is better, but yours is lovely.", "I came to feed your ducks. They're practically mine now.", "Talk to your plants. They're good listeners."],
     gift: "tulip_seed",
@@ -265,7 +265,7 @@ export const NPCS = [
   // round 221: Hettie keeps house for the holiday cottages on the lane, and does your changeovers if you hire her (lets.js)
   {id: "hettie", pitch: 1.1, name: "Hettie", job: "Keeps house for the cottages on the lane",
     look: {skin: "#E8C2A0", hair: "#B8B0A8", hairStyle: "bun", top: "#7FA0D0", bottom: "#5A4636", extra: "apron"},
-    routine: [slot("8:30", "10:00", "hlane", [[300, 300], [250, 420], [360, 470]]), slot("15:00", "17:30", "hlane", [[250, 300], [300, 480], [380, 420]])],
+    routine: [slot("8:30", "10:00", "hlane", [[300, 300], [250, 420], [360, 470]]), slot("15:00", "17:30", "hlane", [[250, 300], [300, 480], [414, 456]])],
     intro: "I'm Hettie. I've kept the cottages on this lane spick and span for thirty years. Fresh sheets, a jug of flowers, and never a crumb under the sofa.",
     lines: ["A good changeover is all in the order: windows open first, beds last.", "I can tell a lot about guests from how they leave the teaspoons.", "Lavender in the linen cupboard. Keeps the moths guessing.", "Elena says I fuss. I say a cottage notices.", "Somebody left a whole jar of honey once. Unopened! I gave it a good home."],
     hellos: ["Morning! Lovely day for drying sheets.", "Hello, love. Mind the wet floor."], away: "Hettie's gone home with her feet up."},
@@ -282,7 +282,7 @@ export const NPCS = [
     // round 177 (he studies at night, at evening classes, and works at your shop during the day), round 180
     // (he works Mondays too): Monday to Saturday 9:30 to 4:30 in the kitchen; food science at the poly on Monday and Tuesday evenings (off the map, 6 to 9),
     // then home to his textbooks
-    routine: [slot("08:30", "09:15", "hlane", [[200, 320], [236, 450], [330, 180]]),
+    routine: [slot("08:30", "09:15", "hlane", [[200, 320], [236, 450], [330, 148]]),
       slot("09:30", "16:30", "cocoakitchen", [[250, 330], [410, 330], [180, 500], [360, 500]], {dow: [1, 2, 3, 4, 5, 6], needs: "cocoa"}),
       slot("21:15", "22:30", "honeysuckle", [300, 470], {act: "read", dow: [1, 2]}),
       slot("17:00", "20:30", "hlane", [186, 298], {act: "sit", dow: [0, 3, 4, 5, 6]}), slot("20:30", "22:30", "honeysuckle", [300, 470], {act: "sit", dow: [0, 3, 4, 5, 6]})],   // home: Honeysuckle, with Lila
@@ -299,7 +299,7 @@ export const NPCS = [
     hellos: ["Hi!", "Morning, boss!"], away: "Lila's not on today."},
   // Noor runs the pet adoption corner at the Sunday farmers market and the field fair (tours.js); no routine otherwise
   // Noor lives at Clover on the cottage lane, with a pen of rescues in the garden
-  {id: "noor", pitch: 1.1, name: "Noor", job: "Finds homes for rescued pets", routine: [slot("18:30", "19:30", "clover", [262, 470], {act: "sit"}), slot("08:00", "12:00", "hlane", [[198, 456], [150, 470], [236, 470]], {dow: [1, 2, 3, 4, 5, 6]}), slot("16:00", "19:30", "hlane", [176, 456], {act: "sit"})],
+  {id: "noor", pitch: 1.1, name: "Noor", job: "Finds homes for rescued pets", routine: [slot("18:30", "19:30", "clover", [188, 478], {act: "sit", dir: 1}), slot("08:00", "12:00", "hlane", [[198, 456], [150, 470], [236, 470]], {dow: [1, 2, 3, 4, 5, 6]}), slot("16:00", "19:30", "hlane", [176, 456], {act: "sit"})],
     look: {skin: "#C99A78", hair: "#2A211D", hairStyle: "long", top: "#9FD3C2", bottom: "#4A5568", extra: "apron"},
     intro: "Hi, I'm Noor! I find homes for little ones who need them. Kittens, puppies, bunnies... everyone deserves a cuddle.",
     lines: ["This one loves a chin scratch.", "Every pet that goes home, I cry a little. Happy tears.", "Ask me anything about looking after them!", "The duckling follows everyone. It thinks we're all its mum."],
@@ -644,10 +644,10 @@ export const NPCS = [
       [slot("9:00", "11:00", "jj_shore", [[280, 330], [440, 470]]), slot("11:00", "13:00", "jj_cafe", [420, 520], {act: "sit"}), slot("13:00", "15:00", "jj_farms", [[282, 370], [320, 520]]), slot("15:00", "17:00", "jj_dye", [[300, 460], [360, 520]]), slot("17:00", "19:00", "jj_village", [[260, 330], [320, 430]])],
       ["I want a persimmon dress. Mr Moon says three days. We fly home tomorrow!", "The divers are so strong. I want to be like that at seventy.", "Everything here is orange. My new favourite colour."]],
     ["takeshi", "Takeshi", {skin: "#EAC4A0", hair: "#1E1A18", hairStyle: "short", top: "#E8B13A", bottom: "#2F2B28", hat: "helmet"}, "Cycling round the whole island", "Takeshi, from Osaka! I'm cycling round the island. Two hundred and thirty kilometres. Day three. My legs have opinions.",
-      [slot("9:00", "11:00", "jj_harbour", [[300, 300], [420, 480]]), slot("11:00", "13:00", "jj_market", [[300, 520], [200, 480]]), slot("13:00", "15:00", "jj_shed", [[200, 540], [320, 540]]), slot("15:00", "17:00", "jj_shore", [[420, 340], [300, 520]]), slot("17:00", "19:00", "jj_cafe", [110, 516], {act: "sit"})],
+      [slot("9:00", "11:00", "jj_harbour", [[300, 300], [420, 480]]), slot("11:00", "13:00", "jj_market", [[300, 520], [200, 480]]), slot("13:00", "15:00", "jj_shed", [[256, 540], [300, 505]]), slot("15:00", "17:00", "jj_shore", [[420, 340], [300, 520]]), slot("17:00", "19:00", "jj_cafe", [110, 516], {act: "sit"})],
       ["The coast road has a stamp booth every twenty kilometres. I've got eleven.", "Headwind. Always headwind. How is it headwind both ways?", "Tangerine juice is a sports drink. I've decided."]],
     ["bronwyn", "Bronwyn", {skin: "#F6D9C4", hair: "#C9A06A", hairStyle: "bob", top: "#5E8A48", bottom: "#8A6A52", extra: "satchel", hat: "sunhat"}, "Walking the Olle trail, from Brisbane", "Bronwyn, from Brisbane! I'm walking the Olle trail: follow the blue and orange ribbons. Twenty-seven routes. I'm on route seven. Ish.",
-      [slot("8:30", "10:30", "jj_farms", [[262, 300], [300, 460]]), slot("10:30", "12:30", "jj_shed", [[140, 520], [380, 530]]), slot("12:30", "14:30", "jj_haenyeo", [[200, 540], [320, 560]]), slot("14:30", "16:30", "jj_shore", [[260, 300], [440, 440]]), slot("16:30", "18:30", "jj_dye", [[240, 480], [340, 470]])],
+      [slot("8:30", "10:30", "jj_farms", [[262, 300], [300, 460]]), slot("10:30", "12:30", "jj_shed", [[140, 520], [396, 500]]), slot("12:30", "14:30", "jj_haenyeo", [[200, 540], [320, 560]]), slot("14:30", "16:30", "jj_shore", [[260, 300], [440, 440]]), slot("16:30", "18:30", "jj_dye", [[240, 480], [340, 470]])],
       ["Follow the ribbons. Blue goes forward, orange goes back. Or the other way. Look, I'm here, aren't I.", "Mr Ko let me sort tangerines. He said I'm 'acceptable'. Highest praise.", "The divers whistled at me. I whistled back. Now we're friends."]],
     ["lukas", "Lukas", {skin: "#F6D9C4", hair: "#8A5A3A", hairStyle: "short", top: "#3E5E7A", bottom: "#5A4A3E", extra: "satchel", hat: "glasses"}, "A geology student from Munich", "Lukas, from Munich. I'm studying the crater. It's a tuff cone, from an eruption under the sea. Sorry. I get excited.",
       [slot("8:30", "11:00", "jj_shore", [[230, 260], [180, 300]]), slot("11:00", "13:00", "jj_market", [[260, 520], [200, 400]]), slot("13:00", "15:00", "jj_village", [[230, 260], [300, 300]]), slot("15:00", "17:00", "jj_cafe", [430, 376], {act: "sit"}), slot("17:00", "19:00", "jj_harbour", [[300, 260], [400, 400]])],
@@ -838,7 +838,7 @@ export const NPCS = [
       [slot("9:30", "11:30", "ct_monterosso", [[230, 480], [300, 440]]), slot("11:30", "13:00", "ct_limoni", [[200, 520], [320, 540]]), slot("13:00", "15:00", "ct_gelato", [[200, 500], [320, 520]]), slot("15:00", "17:30", "ct_monterosso", [[180, 470], [260, 500]]), slot("17:30", "19:00", "ct_vernazza", [[300, 360], [260, 320]])],
       ["My nonna knows Nonna Pina. Everyone's nonna knows Nonna Pina.", "The beach at Monterosso is the only proper sandy one. Fight for an umbrella.", "In Milan it's all grey. Here, look: every colour."]],
     ["ravi", "Ravi", {skin: "#B9825E", hair: "#1E1A18", hairStyle: "short", top: "#FFFDF6", bottom: "#5A6A7A"}, "On honeymoon, from Bangalore", "Ravi! On our honeymoon. Anika planned everything. I carry the water and say 'wow'. Wow.",
-      [slot("9:00", "11:00", "ct_manarola", [[300, 460], [240, 440]]), slot("11:00", "13:00", "ct_monterosso", [[300, 470], [360, 450]]), slot("13:00", "15:00", "ct_cantina", [[200, 520], [320, 540]]), slot("15:00", "17:00", "ct_vernazza", [[320, 400], [280, 330]]), slot("17:00", "19:30", "ct_manarola", [[236, 470], [280, 460]])],
+      [slot("9:00", "11:00", "ct_manarola", [[300, 460], [240, 440]]), slot("11:00", "13:00", "ct_monterosso", [[300, 470], [360, 450]]), slot("13:00", "15:00", "ct_cantina", [[200, 520], [320, 540]]), slot("15:00", "17:00", "ct_vernazza", [[320, 400], [270, 346]]), slot("17:00", "19:30", "ct_manarola", [[236, 470], [280, 460]])],
       ["We put a padlock on the lovers' path. Anika made me write our names neatly.", "Sciacchetrà tastes like honey and apricots and a very good decision.", "Sunset from the rocks at Manarola. That's tonight's plan. That's every night's plan."]],
     ["anika", "Anika", {skin: "#B9825E", hair: "#2A211D", hairStyle: "long", top: "#C9483A", bottom: "#FFFDF6", hat: "sunhat"}, "On honeymoon, from Bangalore", "Anika! Honeymoon. I made a spreadsheet. Ravi lost it on day one. It's been the best trip ever.",
       [slot("9:00", "11:00", "ct_manarola", [[320, 470], [260, 450]]), slot("11:00", "13:00", "ct_monterosso", [[320, 480], [380, 460]]), slot("13:00", "15:00", "ct_cantina", [[220, 530], [340, 540]]), slot("15:00", "17:00", "ct_vernazza", [[340, 410], [300, 340]]), slot("17:00", "19:30", "ct_manarola", [[250, 480], [300, 470]])],
@@ -897,9 +897,9 @@ export const NPCS = [
     id: "ada", pitch: 1.1, name: "Ada", job: "Runs the haberdashery on Makers' Lane",
     intro: "Ada. Haberdasher. Fabric by the piece, buttons by the card, and advice for nothing. Gingham's half the reason I get up in the morning.",
     look: {skin: "#F2D3BC", hair: "#D9D4CC", hairStyle: "bun", top: "#C98AA8", bottom: "#4F5A6A", extra: "glasses"},
-    routine: [slot("9:30", "17:30", "haberdash", [[400, 500], [260, 420], [420, 300]], {dow: [1, 2, 3, 4, 5, 6]}), slot("7:30", "9:00", "village", [[362, 372], [340, 380]], {dow: [1, 2, 3, 4, 5, 6]}),
+    routine: [slot("9:30", "17:30", "haberdash", [[400, 470], [260, 420], [420, 300]], {dow: [1, 2, 3, 4, 5, 6]}), slot("7:30", "9:00", "village", [[362, 372], [340, 380]], {dow: [1, 2, 3, 4, 5, 6]}),
       slot("10:00", "12:00", "market", [[200, 470], [320, 480]], {dow: [0]}), slot("14:00", "16:00", "flowers", [[160, 300], [260, 380]], {dow: [0]}),
-      slot("17:30", "19:00", "lane", [[262, 400], [200, 380], [330, 390]]), slot("19:00", "22:00", "haberdash", [130, 500], {act: "sit"})],
+      slot("17:30", "19:00", "lane", [[262, 400], [200, 380], [330, 390]]), slot("19:00", "22:00", "haberdash", [196, 524], {act: "sit", dir: -1})],
     lines: ["Linen creases. That's how you know it's linen.", "Every button in that jar has a story. Most of them are about coats.", "Gingham never goes out of fashion. It never came in, either. It just stayed.",
       "Measure twice. Then ask me, and I'll measure a third time.", "Idris next door makes the clothes. I make the decisions about the fabric."],
     away: "Ada's shut the haberdashery for the day. The window display's still lit."
@@ -908,9 +908,9 @@ export const NPCS = [
     id: "idris", pitch: 0.8, name: "Idris", job: "The tailor on Makers' Lane",
     intro: "Idris. Tailor. I make things that fit. Bring me fabric from Ada next door, tell me what you'd like, and come back tomorrow.",
     look: {skin: "#8D5B3E", hair: "#1E1A18", hairStyle: "short", top: "#3E4A5C", bottom: "#2F2B28", extra: "tie"},
-    routine: [slot("9:30", "17:30", "tailor", [[400, 500], [130, 500], [260, 430]], {dow: [1, 2, 3, 4, 5, 6]}), slot("7:00", "8:30", "hwoods", [[100, 330], [200, 318], [300, 300]], {dow: [1, 2, 3, 4, 5, 6]}),
+    routine: [slot("9:30", "17:30", "tailor", [[476, 512], [196, 524], [260, 430]], {dow: [1, 2, 3, 4, 5, 6]}), slot("7:00", "8:30", "hwoods", [[100, 330], [200, 318], [300, 300]], {dow: [1, 2, 3, 4, 5, 6]}),
       slot("11:00", "13:00", "bay", [[180, 420], [240, 430]], {dow: [0]}), slot("15:00", "17:00", "village", [[362, 372], [226, 420]], {dow: [0]}),
-      slot("17:30", "18:30", "village", [[362, 372], [330, 380]]), slot("18:30", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [5, 6]}), slot("19:00", "22:00", "tailor", [130, 500], {act: "sit"})],
+      slot("17:30", "18:30", "village", [[362, 372], [330, 380]]), slot("18:30", "20:00", "wineshop", [[300, 500], [360, 520]], {dow: [5, 6]}), slot("19:00", "22:00", "tailor", [196, 524], {act: "sit", dir: -1})],
     lines: ["A good hem is invisible. That's the whole point of it.", "I don't hurry. Clothes can tell.", "Stand up straight. No, that's very good. I was talking to the mannequin.",
       "Buttons first, then the buttonholes. Never the other way round.", "Ada chooses the fabric. I just do what it tells me."],
     away: "Idris has put the needle down for the day. Back at half past nine."
@@ -957,7 +957,7 @@ for (const [id, slots] of Object.entries(FIRST)) { const n = NPCS.find(x => x.id
 // round 154: Grace, staying the season with her gran Hazel, has a week too (her Sunday stall comes from tours.js)
 { const g = NPCS.find(n => n.id === "grace"); if (g) g.routine = [slot("9:00", "10:30", "village", [[362, 372], [392, 360], [340, 380]], {dow: [1, 2, 3, 4, 5, 6]}),
   slot("11:00", "12:00", "hlane", [[250, 300], [300, 320]], {dow: [1, 2, 3, 4, 5, 6]}),
-  slot("14:00", "16:00", "shore", [[214, 300], [200, 380], [220, 520]], {dow: [1, 3, 5]}), slot("14:00", "16:00", "cocoa", [[200, 450], [320, 470]], {dow: [2, 4, 6]})]; }
+  slot("14:00", "16:00", "shore", [[214, 300], [200, 380], [244, 536]], {dow: [1, 3, 5]}), slot("14:00", "16:00", "cocoa", [[200, 450], [320, 470]], {dow: [2, 4, 6]})]; }
 export const AGENTS = {
   crier:    {name: "Rosa the town crier", look: {skin: "#EDC6A6", hair: "#8A3B2A", hairStyle: "bun", top: "#C2505F", bottom: "#3A2E28", extra: "bell"}, hello: "Hear ye! The weekend paper!", helloTown: "Hear ye! Your paper's still in your letterbox, so I've brought the news to town!"},
   postie:   {name: "Penny the postie", look: {skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#6E9FD6", bottom: "#2F3B73", extra: "cap"}, hello: "Post! A letter for you."},

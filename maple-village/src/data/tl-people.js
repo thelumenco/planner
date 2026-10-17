@@ -106,7 +106,7 @@ export const TL_PEOPLE = [
     ["Chocolate malted. Trust me.", "This morning's milk. Still cold from the vat.", "Bill says I'm in charge of the shop. Meg says I'm in charge of Bill."],
     "Rosa! Milkshake? We do them so thick the straw stands up.", "The farm shop's shut. Rosa's helping with the milking."),
   P("tlnoah", "Noah", "Looks after the calves", {skin: "#F2D3BC", hair: "#C9785A", hairStyle: "spiky", top: "#9CC27E", bottom: "#4F9CC4", hat: "cap"},
-    [slot("8:00", "12:00", "td_paddock", [[360, 430], [420, 440]]), slot("12:00", "15:00", "td_yard", [[240, 400], [300, 460]]), slot("15:00", "17:00", "td_paddock", [[370, 440], [410, 430]])],
+    [slot("8:00", "12:00", "td_paddock", [[360, 430], [420, 440]]), slot("12:00", "15:00", "td_yard", [[240, 400], [300, 482]]), slot("15:00", "17:00", "td_paddock", [[370, 440], [410, 430]])],
     ["That's Buttercup. She sucks your fingers.", "I feed the calves every morning before school. And after.", "When I grow up I'm having two hundred cows."],
     "I'm Noah! I look after the calves! Want to feed one?", "Noah's at school.", {kid: true}),
   P("tlfamily", "Rhys", "Bringing his kids to see the cows", {skin: "#C99A78", hair: "#2A211D", hairStyle: "short", top: "#E8913A", bottom: "#4F5A6A"},

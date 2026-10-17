@@ -17,7 +17,7 @@ export const GUEST_DAYS = {
     at("12:30", "14:00", "bay", [[180, 420], [262, 380]], "Lunch on the deck at the bay"),
     at("14:00", "15:30", "guestroom", [[300, 460], [200, 420]], "Unpacking in the guest room"),
     at("15:30", "17:30", "orchard", [[160, 330], [260, 420], [360, 510]], "A wander round the orchard with Farid"),
-    at("17:30", "19:00", "base", [[230, 350], [360, 556]], "Sitting out in your garden"),
+    at("17:30", "19:00", "base", [[230, 350], [340, 526]], "Sitting out in your garden"),
     at("19:00", "21:00", "wineshop", [[300, 500], [227, 518]], "Supper at the wine shop"),
     at("21:00", "22:30", "home", [[200, 330], [300, 460]], "Tea and talking in the living room"),
     ...NIGHT],
@@ -41,7 +41,7 @@ export const GUEST_DAYS = {
     at("14:00", "16:00", "guestroom", [[300, 460], [200, 420]], "A nap and a book in the guest room"),
     at("16:00", "18:00", "lane", [[262, 600], [200, 560], [320, 580]], "Poking round Makers' Lane"),
     at("18:00", "21:00", "wineshop", [[300, 500], [227, 518]], "A long supper at the wine shop"),
-    at("21:00", "22:30", "base", [[230, 350], [360, 556]], "Stars from your garden"),
+    at("21:00", "22:30", "base", [[230, 350], [340, 526]], "Stars from your garden"),
     ...NIGHT],
   // the last morning: breakfast, a present to take home, the 11 o'clock train
   leave: [

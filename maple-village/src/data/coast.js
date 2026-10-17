@@ -15,7 +15,7 @@ const VAN = {by: "van", fare: 0, free: [], outFrom: 7*60, outTo: 18*60, backTo: 
 const FAM = ["hana", "theo", "farid", "mei", "bo", "tomi", "posy"];
 // your friends' wander points: two each per screen, picked from a screen's open ground
 const famSpots = per => Object.fromEntries(FAM.map((id, i) => [id, Object.fromEntries(Object.entries(per).map(([sc, pts]) => [sc, [pts[i % pts.length], pts[(i + 3) % pts.length]]]))]));
-const room = (door, n, say) => ({door, n, music: door.replace(/^bv/, "bv_"), party: [[200, 560], [330, 560], [120, 540], [420, 540]], say});
+const room = (door, n, say, party = [[200, 560], [330, 560], [120, 540], [420, 540]]) => ({door, n, music: door.replace(/^bv/, "bv_"), party, say});   // (round 228: a room whose furniture sits on the usual spots passes its own party spots)
 
 export const CR_TOWNS = {
   bv_breakwater: {...VAN, n: "Breakwater", region: "coast", screens: ["cw_beach", "cw_street"], arrive: ["cw_beach", [130, 560]], station: "bvvan_breakwater", music: "bb_breakwater",
@@ -27,7 +27,7 @@ export const CR_TOWNS = {
       tomi: {cw_beach: {act: "bodyboard", at: [220, 300], dir: 1}},
       hana: {cw_beach: {act: "yoga", at: [96, 400], dir: 1, hours: [[7*60, 11*60], [16*60, 18*60 + 30]]}}
     }, rooms: {
-      bv_surfshop: room("bvsurfshop", "Swell Surf Shop", "The surf shop: boards in racks to the ceiling, wetsuits on hangers, a wall of photos of big waves, and a dog asleep on a pile of towels."),
+      bv_surfshop: room("bvsurfshop", "Swell Surf Shop", "The surf shop: boards in racks to the ceiling, wetsuits on hangers, a wall of photos of big waves, and a dog asleep on a pile of towels.", [[200, 560], [330, 560], [150, 530], [420, 540]]),
       bv_chippy: room("bvchippy", "The Golden Gull", "The fish and chip shop: a hissing fryer, a chalkboard of today's catch, butcher's paper, and salt and vinegar on every table."),
       bv_bakery: room("bvbakery", "Crumb & Co. bakery", "The bakery: pies in the warmer, vanilla slices, cinnamon scrolls, and a queue of sandy surfers out the door.")},
     lines: {hana: ["The sea air! I can feel my skin thanking me.", "Look at the little kids on the foam boards. So brave."],
@@ -47,7 +47,7 @@ export const CR_TOWNS = {
     blurb: "A white lighthouse with a red cap on a headland of heath and wildflowers, the old keeper's cottage, and a cliff walk where the whales go by in winter.",
     arriveLine: "Up on the headland: the white lighthouse with its red cap, the wind in the heath, and the whole ocean spread out below, glittering.",
     hints: {cl_light: "Lighthouse Point: the lighthouse, the keeper's cottage tearoom and the van. South: the cliff walk.", cl_cliff: "The cliff walk: the whale lookout, the heath and the gift shop. North: back to the lighthouse."},
-    spots: famSpots({cl_light: [[260, 420], [320, 470], [220, 380], [300, 340], [380, 430], [200, 470]], cl_cliff: [[200, 380], [260, 440], [180, 300], [300, 300], [220, 520], [280, 560]]}),
+    spots: famSpots({cl_light: [[260, 420], [320, 470], [220, 380], [300, 340], [380, 430], [200, 470]], cl_cliff: [[200, 380], [260, 440], [180, 300], [262, 326], [220, 520], [280, 560]]}),
     acts: {
       mei: {cl_cliff: {act: "telescope", at: [262, 372], dir: 1}},
       posy: {cl_light: {act: "paint", at: [240, 430], dir: 1}}
@@ -78,7 +78,7 @@ export const CR_TOWNS = {
     }, rooms: {
       bv_rangerhut: room("bvrangerhut", "The ranger's hut", "The ranger's hut: maps and pinned-up leaves, a jar of lost things, a lyrebird feather, and the treetop-walk tickets."),
       bv_mushcafe: room("bvmushcafe", "The Toadstool café", "The Toadstool café: mismatched chairs, mushroom soup and toasted sandwiches, and a wood stove that's always lit."),
-      bv_grotto: room("bvgrotto", "The glow-worm grotto", "The glow-worm grotto: a low overhang in the cliff, cool and dripping. In the dark, the ceiling is speckled with tiny blue-green stars.")},
+      bv_grotto: room("bvgrotto", "The glow-worm grotto", "The glow-worm grotto: a low overhang in the cliff, cool and dripping. In the dark, the ceiling is speckled with tiny blue-green stars.", [[200, 510], [340, 515], [120, 540], [420, 540]])},
     lines: {hana: ["Smell that! Wet earth and ferns.", "A beach at the bottom of a rainforest. How is that real?"],
       theo: ["Look at the fungi on that log. Orange, like little shelves.", "Mountain ash. The tallest flowering trees in the world."],
       farid: ["So cool and green. I've said hello to every fern.", "Mushroom soup in the café. I'm asking for the recipe."],

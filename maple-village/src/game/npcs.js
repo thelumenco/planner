@@ -19,7 +19,8 @@ import { SEA } from "../data/npcs.js";
 import { findPath, blocked } from "./paths.js";
 import { tripSlot, townLine } from "./trips.js";
 import { guestSlot, guestLine } from "./guests.js";
-import { townOf, townRoom } from "../data/towns.js";
+import { GUEST_DAYS } from "../data/guests.js";
+import { townOf, townRoom, TOWNS } from "../data/towns.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
@@ -305,3 +306,6 @@ export function rideBy(look, pts){
     g.setAttribute("transform", `translate(${x.toFixed(1)} ${(y + bob).toFixed(1)})`); if (now - t0 < ms && g.isConnected) requestAnimationFrame(step); else g.remove(); };
   requestAnimationFrame(step); return g;
 }
+// dev builds only: where everyone is at a given day and time, the day-trip towns' and the house guests' spots, and the
+// walking obstacles (round 228: a test checks nobody's put standing on a table, a stall or a roof)
+if (globalThis.__hbDevStub) globalThis.__hbSlots = {at: (day, t) => NPCS.map(d => [d.id, slotAt(d, day, t, false)]).filter(([, s]) => s), towns: () => TOWNS, guests: () => GUEST_DAYS, blocked};

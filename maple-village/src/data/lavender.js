@@ -15,7 +15,7 @@
 const VAN = {by: "van", fare: 0, free: [], outFrom: 7*60, outTo: 18*60, backTo: 22*60};
 const FAM = ["hana", "theo", "farid", "mei", "bo", "tomi", "posy"];
 const famSpots = per => Object.fromEntries(FAM.map((id, i) => [id, Object.fromEntries(Object.entries(per).map(([sc, pts]) => [sc, [pts[i % pts.length], pts[(i + 3) % pts.length]]]))]));
-const room = (door, n, say) => ({door, n, music: door.replace(/^bv/, "bv_"), party: [[200, 560], [330, 560], [120, 540], [420, 540]], say});
+const room = (door, n, say, party = [[200, 560], [330, 560], [120, 540], [420, 540]]) => ({door, n, music: door.replace(/^bv/, "bv_"), party, say});   // (round 228: a room whose furniture sits on the usual spots passes its own party spots)
 
 export const LV_TOWNS = {
   bv_lavender: {...VAN, n: "Lavender Ridge", region: "lavender", screens: ["hv_rows", "hv_still"], arrive: ["hv_rows", [150, 560]], station: "bvvan_lavender", music: "bb_lavender",
@@ -49,7 +49,7 @@ export const LV_TOWNS = {
       bv_hnougat: room("bvhnougat", "The nougat shop", "The nougat shop: great slabs of white nougat studded with almonds, little calissons in rows, and Madame cutting slices with a big knife."),
       bv_hcafe: room("bvhcafe", "Café de la Place", "The café: little round tables, wicker chairs, a zinc bar, citron pressé, and everyone watching the pétanque through the window."),
       // round 183: your paperie (goals.js "paperie"), up in the lanes: empty and for sale until you buy it
-      bv_hpaper: room("bvhpaper", "The paperie", "The paperie: stone walls, a long drying line, a vat by the back wall, and paper in every colour on the shelves.")},
+      bv_hpaper: room("bvhpaper", "The paperie", "The paperie: stone walls, a long drying line, a vat by the back wall, and paper in every colour on the shelves.", [[200, 560], [330, 560], [215, 520], [370, 545]])},
     lines: {hana: ["Everything's the colour of honey here.", "Those blue shutters! I want blue shutters."],
       theo: ["These walls are seven hundred years old. Seven hundred.", "From the ramparts you can see the lavender, the sunflowers and the river."],
       farid: ["A baguette. I'll carry it. I'll also eat the end.", "Nougat! My teeth say no. I say yes."],

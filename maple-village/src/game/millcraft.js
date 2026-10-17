@@ -236,7 +236,7 @@ export function millSlot(id, day, hm, open, tourists, busy = []){
   if (!open) return null; const pool = tourists.filter(t => !busy.includes(t)), t0 = tastingNow(day, hm);
   if (t0 != null) { const w = [t0, t0 + TASTE.dur]; if (id === "hazel") return {from: w[0], to: w[1], scene: "millup", at: [150, 356], dir: 1, act: "point", tasting: true};
     const k = pickN(pool, TASTE.size, day + "taste" + t0).indexOf(id); if (k >= 0) { const [x, y, d] = TASTE_SEATS[[0, 3, 4, 7][k]]; return {from: w[0], to: w[1], scene: "millup", at: [x, y], dir: d, act: "sit", tasting: true}; } }
-  if (workshopNow(day, hm)) { const w = [WORKSHOP.from, WORKSHOP.to]; if (id === "hazel") return {from: w[0], to: w[1], scene: "millup", at: [410, 508], dir: -1, act: "point", workshop: true};
+  if (workshopNow(day, hm)) { const w = [WORKSHOP.from, WORKSHOP.to]; if (id === "hazel") return {from: w[0], to: w[1], scene: "millup", at: [346, 514], dir: 1, act: "point", workshop: true};   // (at the end of the table, not on it)
     const k = pickN(pool, WORKSHOP.size, day + "work").indexOf(id); if (k >= 0) { const [x, y, d] = WORK_SEATS[k]; return {from: w[0], to: w[1], scene: "millup", at: [x, y], dir: d, act: "sit", workshop: true}; } }
   const dw = new Date(day + "T00:00:00Z").getUTCDay(); if (!tourists.includes(id) || SHOPKEEP.closed.includes(dw)) return null;
   const visits = weekend(day) ? MILL_VISITS : MILL_WEEKDAY;   // round 181: weekday browsers too, fewer
