@@ -206,4 +206,4 @@ export function requestRows(F, have, where){
     return `<li class="req"><span><b>${esc(r.name)} needs ${esc(reqLine(r))} ${esc(dueLine(r))}</b><small>${esc(r.why[0].toUpperCase() + r.why.slice(1))}. ${r.n*r.each} coins and a heart. You have ${got} of ${r.n}.</small>${heartRow(hearts(F, r.who))}</span>
       ${w ? `<button class="next" data-find="${esc(r.who)}">${got >= r.n ? "hand over" : "find " + esc(r.name)}</button>` : `<span class="hbadge">at home</span>`}</li>`; }).join("");
 }
-export const payLine = F => { const n = paidToday(F); return n >= PAID_PER_DAY ? `You've had today's ${PAID_PER_DAY} paid ticks. Keep ticking for the joy of it.` : `Each task you tick pays ${TASK_PAY} coins (${PAID_PER_DAY - n} more paid ticks today).`; };
+export const payLine = F => { const n = paidToday(F); return n >= PAID_PER_DAY ? `You've had today's ${PAID_PER_DAY} paid ticks. Keep ticking for the joy of it.` : `Each task you tick pays ${TASK_PAY} coins, or ${TASK_PAY + 1} done in its place. The first ${PAID_PER_DAY} ticks each day pay: ${PAID_PER_DAY - n} left today.`; };

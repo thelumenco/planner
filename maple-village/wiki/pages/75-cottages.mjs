@@ -24,7 +24,8 @@ const IDLE_TEXT = BOOK.idle.map((d, k) => [k, d]).slice(1);
 function html(){
   const floors = IDS.map(id => { const C = COTTAGES[id], by = {down: [], up: [], bath: []};
     slotsOf(id).forEach(s => by[floorOf(id, s)].push(CATS[catOf(id, s)].n));
-    return `<h3>${esc(C.n)}</h3>${table(["Floor", "Places for"], Object.entries(by).filter(([, l]) => l.length).map(([f, l]) => [`<b>${FLOOR[f]}</b>`, esc(l.join(", "))]))}`; }).join("");
+    const list = l => [...new Set(l)].map(x => { const k = l.filter(y => y === x).length; return k > 1 ? `${x} (${k})` : x; }).join(", ");
+    return `<h3>${esc(C.n)}</h3>${table(["Floor", "Places for"], Object.entries(by).filter(([, l]) => l.length).map(([f, l]) => [`<b>${FLOOR[f]}</b>`, esc(list(l))]))}`; }).join("");
   const examples = IDS.map(id => { const C = COTTAGES[id], all = slotsOf(id).length, ess = essentialSlots(id).length;
     const rows = [["Just a bed, linen and a bath, all simple", sums(id, ess, ess)], ...[1, 2, 3].map(t => [`Every place filled, all ${TIERS[t].n.toLowerCase()}`, sums(id, all, all*t)]), ["Every place fine, and every garden extra", sums(id, all, all*3, extrasAdd)]];
     return `<h3>${esc(C.n)}</h3>${table(["Furnished with", "A night", "Stars"], rows.map(([w, s]) => [esc(w), coin(s.rate), stars(s.stars)]))}`; }).join("");
@@ -39,7 +40,7 @@ function html(){
     ${floors}
   <h2>${ico("bed", 22)} The catalogue</h2>
     <p>Order at the hall table. Every piece comes in three tiers and five colours. Nothing is instant: an order comes on the next day's train, as a parcel in the hall, to unpack into its place. Swapping a piece out puts the old one in the spare room, to put back later or use in the other cottage.</p>
-    ${table(["Piece", "Simple", "Good", "Fine"], Object.values(CATS).map(c => [`<b>${esc(c.n)}</b>`, ...c.tiers.map((t, i) => `${esc(t)}<br>${coin(c.prices[i])}`)]))}
+    ${table(["Piece", "Simple", "Good", "Fine"], Object.values(CATS).map(c => [`<b>${esc(c.n)}</b><br><small class="muted">${c.tiers.map((t, i) => `${TIERS[i + 1].n}: ${esc((x => x[0].toUpperCase() + x.slice(1))(t.replace(/^(A|An) /, "")))}`).join("<br>")}</small>`, ...c.prices.map(x => coin(x))]))}
     <p><b>Colours:</b> ${Object.values(COLOURS).map(c => `<span style="white-space:nowrap;margin-right:12px">${swatch(c)}${esc(c[0])}</span>`).join(" ")}</p>
     ${table(["Cottage", "Every place simple", "Every place good", "Every place fine"], IDS.map(id => [`<b>${esc(COTTAGES[id].n)}</b>`, coin(priceAll(id, 1)), coin(priceAll(id, 2)), coin(priceAll(id, 3))]))}
   <h2>${ico("coin", 22)} The nightly rate and the stars</h2>

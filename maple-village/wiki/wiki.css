@@ -1,5 +1,5 @@
 /* The Honeybrook Wiki: calm, one column, the game's colours */
-:root{--bg:#F2EEE7;--card:#F9F7F2;--edge:rgba(120,104,84,.16);--ink:#2F2B28;--soft:#8A8279;--line:#3A2E28;--navy:#2F3B73;--butter:#F6E3A1;--honey:#F3C969;--sage:#B9D2A6;--rule:#E4DDD2;--blush:#F4C7CF}
+:root{--sock:#4A3029;--bg:#F2EEE7;--card:#F9F7F2;--edge:rgba(120,104,84,.16);--ink:#2F2B28;--soft:#8A8279;--line:#3A2E28;--navy:#2F3B73;--butter:#F6E3A1;--honey:#F3C969;--sage:#B9D2A6;--rule:#E4DDD2;--blush:#F4C7CF}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1E1C22;--card:#28252C;--edge:rgba(255,255,255,.08);--ink:#F1ECE5;--soft:#ABA29A;--navy:#BFC9F0;--rule:#3A3540}}
 :root[data-theme="dark"]{--bg:#1E1C22;--card:#28252C;--edge:rgba(255,255,255,.08);--ink:#F1ECE5;--soft:#ABA29A;--navy:#BFC9F0;--rule:#3A3540}
 *,*::before,*::after{box-sizing:border-box}
@@ -45,3 +45,4 @@ ul.plain{padding-left:1.1em}
   .side{position:fixed;top:57px;left:0;bottom:0;width:min(300px,86vw);height:auto;background:var(--bg);z-index:6;transform:translateX(-102%);transition:transform .2s ease;box-shadow:0 0 40px rgba(0,0,0,.15)}
   .side.open{transform:none}.main{padding:16px 16px 50px}.brand span{display:none}h1{font-size:1.6rem}
 }
+.face{flex:none}.card .face{margin:-6px 0}

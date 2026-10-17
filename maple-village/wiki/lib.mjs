@@ -4,6 +4,7 @@
 import { icon as gameIcon } from "../src/art/icons.js";
 import { itemIco, ITEMS } from "../src/data/items.js";
 import { VILLAGE, ROOMS } from "../src/data/world.js";
+import { personArt } from "../src/art/people.js";
 
 export const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 export const slugify = s => String(s).toLowerCase().replace(/&/g, "and").replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -27,6 +28,8 @@ export const table = (head, rows, cls = "") => rows.length ? `<div class="tw"><t
 export const spoiler = (label, html) => `<details class="spoil"><summary>${esc(label)} <span class="muted">(tap to reveal)</span></summary>${html}</details>`;
 export const link = (slug, text) => `<a href="/${slug === "index" ? "" : slug}">${text}</a>`;
 export const card = (slug, title, sub, iconName) => `<a class="card" href="/${slug}">${iconName ? ico(iconName, 30) : ""}<span><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ""}</span></a>`;
+// a villager, drawn by the game's own art (personArt), standing on a little circle
+export const portrait = (look, size = 64) => `<svg class="face" viewBox="-26 -72 52 78" width="${size*52/78}" height="${size}" aria-hidden="true">${personArt(look || {})}</svg>`;
 export const lede = t => `<p class="lede">${t}</p>`;
 
 // the contents menu: sections in order (each page names its section)
@@ -38,6 +41,7 @@ export const SECTIONS = [
 
 // the page itself
 const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<filter id="wob" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="2.4"/></filter>
 <filter id="wobS" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.25" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale=".7"/></filter>
 <filter id="markerS" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.2" numOctaves="2" seed="9" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale=".9" result="d"/><feTurbulence type="fractalNoise" baseFrequency="2.4 .3" numOctaves="2" seed="2" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 .35  0 0 0 0 .16  0 0 0 0 .06  0 0 0 1.1 -.5" result="ga"/><feComposite in="ga" in2="d" operator="in" result="streaks"/><feMerge><feMergeNode in="d"/><feMergeNode in="streaks"/></feMerge></filter>
 </defs></svg>`;
