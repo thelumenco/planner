@@ -10,7 +10,7 @@ import { petSvg } from "./10-start.mjs";
 const h2 = (id, t, icon) => `<h2 id="${id}">${icon ? ico(icon, 22) + " " : ""}${esc(t)}</h2>`;
 const pace = p => p < .7 ? "ambles behind you, slowly" : p < 1 ? "takes its time" : p > 1 ? "bounds along" : "trots along at your heels";
 const sleepy = s => s > 1.3 ? "naps longest of all" : s > 1 ? "naps a little longer" : s < 1 ? "is up again quickest after a nap" : "naps now and then";
-const sayOf = it => (it.say || "").replace(/\{kind\}/g, "pet");
+const sayOf = it => (it.say || "").replace(/\{kind\}/g, "pet").replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F]/gu, "").trim();
 
 export async function pages(){
   const portraits = await Promise.all(KINDS.map(async k => [k, await petSvg(k, 72)]));
@@ -32,7 +32,7 @@ export async function pages(){
   + `<p>Open your backpack to see your pet on its rug ("Spoil ${"&lt;name&gt;"}"). Treats are eaten; care things like the brush, the ball and the yarn are kept and can be used again (they give XP at most every 20 minutes); a bubble bath, a flower crown and a fort kit are used up. All of it is at the market: treats in the Treats tab, the rest in Care. Each brings friendship XP.</p>`
   + table(["Treat", "Price", "What your pet says"], treats.map(([id, it]) => [`${itemIcon(id, 24)}<b>${esc(it.n)}</b>`, coin(it.price) + unlock(it), `<span class="muted">"${esc(sayOf(it))}"</span>`]))
   + table(["Care", "Price", "Kept?", "What your pet says"], care.map(([id, it]) => [`${itemIcon(id, 24)}<b>${esc(it.n)}</b>`, coin(it.price) + unlock(it), it.kind === "tool" ? "Kept" : "Used up", `<span class="muted">"${esc(sayOf(it))}"</span>`]))
-  + `<p>Your pet will also eat what you grow and pick: ${fruit.map(id => `<span title="${esc(ITEMS[id].n)}">${itemIcon(id, 22)}</span>`).join(" ")} <span class="muted">(${esc(fruit.map(id => ITEMS[id].n.toLowerCase()).join(", "))})</span>.</p>
+  + `<p>Your pet will also eat what you grow, pick and collect: ${fruit.map(id => `<span title="${esc(ITEMS[id].n)}">${itemIcon(id, 22)}</span>`).join(" ")} <span class="muted">(${esc(fruit.map(id => ITEMS[id].n.toLowerCase()).join(", "))})</span>.</p>
   <p><b>Play for free:</b> a pat, a game of hide and seek, or a nap together.</p>`
   + h2("friendship", "Friendship levels", "heart")
   + `<p>Friendship grows with XP: from looking after your pet, and from your day in Honeybrook (ticking tasks, feeding the animals, giving gifts, and 5 XP the first time you earn coins each day). Some levels bring a present for the rug.</p>`

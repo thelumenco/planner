@@ -15,7 +15,7 @@ import { ITEMS, CROPS, seasonOf } from "../data/items.js";
 import { NPCS } from "../data/npcs.js";
 import { PLACES, placeFor, placeOf } from "../data/places.js";
 
-export const TASK_PAY = 3, PAID_PER_DAY = 10, MAX_REQ = 3, MAX_HEARTS = 5;
+export const TASK_PAY = 5, PAID_PER_DAY = 10, MAX_REQ = 3, MAX_HEARTS = 5;
 // closeness is hearts: friends (3+) can be sent presents and Christmas hampers; at 5 they'll come on a day trip
 export const FRIEND_HEARTS = 3, TRIP_HEARTS = 5;
 const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

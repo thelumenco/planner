@@ -99,7 +99,7 @@ if (want("core loop")) for (const vp of [{ name: "phone", width: 390, height: 84
   const coins0 = +(await page.locator("#coins").textContent());
   await page.click('#journal [data-tick="tseed2"]');
   await page.waitForTimeout(300);
-  check(+(await page.locator("#coins").textContent()) === coins0 + 3, "ticking a task pays 3 coins");
+  check(+(await page.locator("#coins").textContent()) === coins0 + 5, "ticking a task pays 5 coins");
   check(await page.locator("#journal h1").textContent().then(t => /2 tasks to go/.test(t)), "the note counts down what's left");
   await page.click("#undoBtn"); await page.waitForTimeout(300);
   check(+(await page.locator("#coins").textContent()) === coins0 && await page.locator("#journal h1").textContent().then(t => /3 tasks to go/.test(t)), "undo unticks it and takes the coins back");
@@ -151,8 +151,8 @@ if (want("\nquest board rules")) try {
   const F = {inv: {}};
   const ids = Array.from({length: 11}, (_, i) => QB.addTask(F, "Task " + i, i === 0).id);
   const pays = ids.map(id => QB.tickTask(F, id).coins);
-  check(pays.slice(0, 10).every(c => c === 3) && pays[10] === 0, "the first 10 ticks of a day pay 3 coins each, the 11th pays nothing");
-  check(QB.untickTask(F, ids[3]) === 3 && QB.tickTask(F, ids[3]).coins === 3, "unticking gives the coins back, and ticking again pays again (still 10 a day)");
+  check(pays.slice(0, 10).every(c => c === 5) && pays[10] === 0, "the first 10 ticks of a day pay 5 coins each, the 11th pays nothing");
+  check(QB.untickTask(F, ids[3]) === 5 && QB.tickTask(F, ids[3]).coins === 5, "unticking gives the coins back, and ticking again pays again (still 10 a day)");
   check(QB.untickTask(F, ids[10]) === 0, "unticking an unpaid tick takes nothing");
   const tomorrow = new Date(Date.parse(dayKey() + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
   const next = QB.myTasks(F, tomorrow);

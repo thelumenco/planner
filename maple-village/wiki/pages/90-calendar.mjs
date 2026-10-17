@@ -14,6 +14,7 @@ const h2 = (id, t, icon) => `<h2 id="${id}">${icon ? ico(icon, 22) + " " : ""}${
 const h3 = (id, t) => `<h3 id="${id}">${esc(t)}</h3>`;
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const months = a => a.map(m => MONTHS[m - 1]).join(", ");
+const VISITED = {bellbird: "Bellbird Valley", cinque: "Cinque Terre"};
 const SEASON_MONTHS = {spring: "March to May", summer: "June to August", autumn: "September to November", winter: "December to February"};
 const t2 = ([a, b]) => `${hm(a)} to ${hm(b % (24*60))}`;
 const fmtD = k => new Date(k + "T00:00:00Z").toLocaleDateString("en-GB", {day: "numeric", month: "long", year: "numeric", timeZone: "UTC"});
@@ -28,7 +29,7 @@ function seasonsHTML(){
   + h2("seasons", "The seasons", "sprout")
   + `<p>Seasons follow the real months. When the season turns, Hana's seed packets change (anything already bought or planted carries on), the orchard and the flower farm come into their own seasons, and the tapas of the day change too. A greenhouse grows anything all year round.</p>`
   + Object.entries(SEASONS).map(([s, S]) => h3(s, `${S.n}: ${SEASON_MONTHS[s]}`) + `<p class="muted">${esc(S.line)}.</p>`
-    + table(["", ""], [["<b>Seeds at the market</b>", icoList(seeds(s))], ["<b>Orchard fruit</b>", icoList(trees(s))], ["<b>Flower farm</b>", icoList(flowers(s)).replace(/Bouquet of /g, "")]])).join("")
+    + table(["", "In season"], [["<b>Seeds at the market</b>", icoList(seeds(s)) + (seeds(s).some(id => ITEMS[id].visited) ? `<br><small class="muted">${seeds(s).filter(id => ITEMS[id].visited).map(id => `${esc(ITEMS[id].n)} once you've visited ${esc(VISITED[ITEMS[id].visited] || ITEMS[id].visited)}`).join("; ")}.</small>` : "")], ["<b>Orchard fruit</b>", icoList(trees(s))], ["<b>Flower farm</b>", icoList(flowers(s)).replace(/Bouquet of (\w)/g, (m, c) => c.toUpperCase())]])).join("")
   + h3("weather", "The weather")
   + `<p>The rainy months are November to January: roughly one day in three is a proper downpour (paddling's off), and another one in ten a light shower. The rest of the year a shower blows through about one day in seven: brollies up, nothing called off.</p>`
   + h3("travel-seasons", "Seasons away from home")
@@ -52,7 +53,7 @@ function weekHTML(){
     ["Thursday", [`<a href="/markets#night-market">Night market</a>, ${t2([17*60 + 30, 22*60])}`, `Bo's orchard tour, ${t2([17*60 + 45, 18*60 + 30])}`, `${OCC.paint.n} on the terrace with Theo, ${t2([OCC.paint.from, OCC.paint.to])}`]],
     ["Friday", [`Aperitivo hour at the wine shop, ${t2(APERITIVO)}`, `<a href="/markets#friday-market">Friday market</a> on the field, ${t2(BAYMKT)}`, `The fishmonger's van at the bay, ${t2(VAN)}`, `Sunset fishing off the beach, ${t2([17*60, 20*60])}`,
       `First Friday of the month: the wine club at the cellar door, ${t2([CLUB_FROM, CLUB_TO])}`, `Last Friday of the month: movie night on the field, ${t2(MOVIE)}`, `In the Christmas season: carols by the Christmas tree, 7pm`]],
-    ["Saturday", [`Orchard tours at 10am, 11:30am, 2pm and 4pm`, `Disco night at the cellar door, ${t2([DISCO_FROM, DISCO_TO])}`, `Bonbon workshop at the Cocoa Room, ${t2([WS_FROM, WS_TO])} (an upgrade)`, `Card-making class at the paperie, ${t2([CARD_CLASS.from, CARD_CLASS.to])}`,
+    ["Saturday", [`Orchard tours at 10am, 11:30am, 2pm and 4pm`, `Disco night at the cellar door, ${t2([DISCO_FROM, DISCO_TO])}`, `Bonbon workshop at the Cocoa Room, ${t2([WS_FROM, WS_TO])} (an upgrade)`, `Card-making class at your paperie in Montrose, ${t2([CARD_CLASS.from, CARD_CLASS.to])}`,
       `Date night: Tomi and Posy in the tasting room, ${t2([DATE_FROM, DATE_TO])}`, `Second Saturday of the month (and the fourth too, October to March): a wedding on the terrace, ${t2([OCC.wedding.from, OCC.wedding.to])}`, `Last Saturday of the month: the <a href="/markets#field-fair">field fair</a>, ${t2([10*60, 16*60])}`,
       `In the Christmas season: Santa's grotto on the field, 5 to 8pm`]]
   ];
@@ -62,13 +63,13 @@ function weekHTML(){
 }
 
 function occasionsHTML(){
-  const fests = FESTIVALS.map(f => [`<b id="${f.id}">${esc(f.name)}</b>`, f.dates.map(k => fmtD(k)).join("<br>"), `Decorations up ${f.before} day${f.before === 1 ? "" : "s"} before${f.after ? `, down ${f.after} day${f.after === 1 ? "" : "s"} after` : ""}${f.vineyard ? ". Bunting over the vines, and every bunch you pick is a big one" : ""}`]);
+  const fests = FESTIVALS.map(f => [`<b id="${f.id}">${esc(f.name)}</b>`, f.dates.map(k => `<span style="white-space:nowrap">${fmtD(k)}</span>`).join("<br>"), `Decorations up ${f.before} day${f.before === 1 ? "" : "s"} before${f.after ? `, down ${f.after} day${f.after === 1 ? "" : "s"} after` : ""}${f.vineyard ? ". Bunting over the vines, and every bunch you pick is a big one" : ""}`]);
   const occ = [
     [OCC.valentine.n, "14 February", t2([OCC.valentine.from, OCC.valentine.to]), "Candles and couples on the terrace."],
     ["Mother's Day long lunch", "The second Sunday in May", "12 to 3pm", "The Sunday long lunch, with a toast to everyone who mothers us."],
     [OCC.christmas.n, "25 December", t2([OCC.christmas.from, OCC.christmas.to]), "All your closest friends at the long table, crackers and paper crowns."],
     [OCC.nye.n, "31 December", t2([OCC.nye.from, OCC.nye.to]), "Dancing and a countdown on the terrace."]
-  ].map(([n, d, t, w]) => [`<b>${esc(n)}</b>`, esc(d), esc(t), esc(w)]);
+  ].map(([n, d, t, w]) => [`<b>${esc(n)}</b>`, esc(d), `<span style="white-space:nowrap">${esc(t)}</span>`, esc(w)]);
   return h2("occasions", "Occasions on the terrace", "wine_rose")
   + `<p>Once the wine shop has its terrace, these special days take it over (they win over the usual weekly nights).</p>`
   + table(["Occasion", "When", "Time", ""], occ)

@@ -48,7 +48,7 @@ The clock: day and time of day now follow the player's own timezone (util.js `LO
 
 The quest board (game/quests.js, state in `F.board`):
 - Your tasks: typed in, one-off or daily. Tick on the board or straight from the quest note on the map. A tick pays
-  3 coins (and grows the garden a little, like a finished quest always did); only the first 10 ticks a day pay. Undo
+  5 coins (3 until round 226; Mel: "increase the coins per task to 5") (and grows the garden a little, like a finished quest always did); only the first 10 ticks a day pay. Undo
   gives the coins back. Daily tasks come back fresh at midnight; one-offs stay until ticked, then go the next day.
 - Village requests: up to three at once from Honeybrook villagers (quests.js `ASKERS`), two on the very first day and
   one most days after. They only ask for in-season garden crops or things you've had in your backpack that you make

@@ -21,6 +21,7 @@ const h2 = (id, t, icon) => `<h2 id="${id}">${icon ? ico(icon, 22) + " " : ""}${
 const h3 = (id, t) => `<h3 id="${id}">${esc(t)}</h3>`;
 const G = id => ITEMS[id] || TOWN_GOODS[id] || {n: id};
 const named = (id, size = 24) => `${ico(G(id).ico || id, size)}<b>${esc(G(id).n)}</b>`;
+const capF = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 const nm = id => (NPCS.find(n => n.id === id) || {name: id}).name;
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 // which town a shop (a room or a place on a town screen) is in
@@ -50,19 +51,19 @@ export const pages = () => {
   + h2("trophies", "Trophies", "sparkle")
   + `<p>Milestones earn trophies, kept in the courtyard through the archway in the town hall. The newest ${PEDESTALS} stand on pedestals; when they're full, the oldest moves into the trophy book on the lectern, with a page each saying what it was for and when. Each kind of milestone has its own trophy, with the number on its plinth.</p>`
   + table(["", "Trophy", "How", "Milestones"], fams.map(f => { const list = tro.filter(t => t.fam === f), last = list[list.length - 1] || {fam: f, short: ""};
-    return [trophySVG(last, 40), `<b>${esc(FAM_N[f] || f)}</b>`, esc(FAM_HOW[f] || ""), esc(list.map(t => f === "chum" ? t.label.replace("Friendship: ", "") : t.short).join(", "))]; }))
+    return [trophySVG(last, 40), `<b>${esc(FAM_N[f] || f)}</b>`, esc(FAM_HOW[f] || ""), esc(list.map(t => f === "chum" ? t.label.replace("Friendship: ", "") : /d$/.test(t.short) ? t.n + " days" : t.short).join(", "))]; }))
   + h2("souvenir-sets", "Souvenir sets from your travels", "kite")
   + `<p>Some places you visit have a set to collect. Finish a set and it becomes something special for home. See <a href="/trips">Trips</a> and <a href="/islands">Islands</a>.</p>`
   + h3("stamp-book", "The Kyoto stamp book") + `<p>Collect a stamp at each of these places in <a href="/trips/kyoto">Kyoto</a>. A full book puts a stone lantern by the pond at home.</p>`
     + table(["Stamp"], Object.values(KT_STAMPS).map(([n, col]) => [`<span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:${esc(col)};vertical-align:-2px;margin-right:8px"></span>${esc(n)}`]))
   + h3("ammonites", "Ammonites from Saltwick") + `<p>Split stones on the scar at <a href="/trips/saltwick">Saltwick Harbour</a>: three a day, and a stone may hold an ammonite you haven't found yet. All six go into ${named("s_case", 22)}.</p>`
-    + table(["Ammonite", ""], Object.keys(AMMONITES).map(k => [named("am_" + k), esc(AMMONITES[k][1])]))
+    + table(["Ammonite", ""], Object.keys(AMMONITES).map(k => [named("am_" + k), esc(capF(AMMONITES[k][1]))]))
   + h3("puffin-stamps", "Puffin stamps") + `<p>The island post office on <a href="/trips/puffin">Puffin Isle</a> sells one stamp a month in season (${coin(STAMP_PRICE)} each). All five are framed as ${named("p_stamps", 22)}.</p>`
-    + table(["Stamp", ""], Object.keys(PI_STAMPS).map(k => [named("ps_" + k), esc(PI_STAMPS[k][1])]))
+    + table(["Stamp", ""], Object.keys(PI_STAMPS).map(k => [named("ps_" + k), esc(capF(PI_STAMPS[k][1]))]))
   + h3("music-boxes", "Music boxes from Otaru") + `<p>The music box hall in <a href="/trips/hokkaido">Hokkaido</a> has a box for each season (${coin(BOX_PRICE)} each), one for the season you're in. Collect all four for ${named("h_boxes", 22)}: they all play together at home.</p>`
-    + table(["Season", "Music box", ""], Object.entries(MUSICBOXES).map(([s, [n, what]]) => [esc(s[0].toUpperCase() + s.slice(1)), named("mb_" + s), esc(what)]))
+    + table(["Season", "Music box", ""], Object.entries(MUSICBOXES).map(([s, [n, what]]) => [esc(s[0].toUpperCase() + s.slice(1)), named("mb_" + s), esc(capF(what))]))
   + h3("carvings", "Carved animals from Ubud") + `<p>At the market in <a href="/trips/bali">Bali</a>, Pak Gede carves a different animal each day of the week (${coin(CARVE_PRICE)} each). All seven make ${named("b_ark", 22)}.</p>`
-    + table(["Day", "Carving", ""], CARVE_DAYS.map((k, d) => [DAYS[d], named("bc_" + k), esc(CARVINGS[k])]))
+    + table(["Day", "Carving", ""], CARVE_DAYS.map((k, d) => [DAYS[d], named("bc_" + k), esc(capF(CARVINGS[k]))]))
   + h2("keepsakes", "Keepsakes", "k_snowglobe")
   + `<p>Keepsakes are little things to put on a shelf. Tap one in your backpack to choose where it goes; putting one where another stands sends the old one back to your backpack, and a placed one can be taken down again. Souvenirs you've chosen to keep can go up too.</p>
   <p><b>Shelves:</b> ${esc(Object.values(KEEP_SPOTS).filter(s => !s.only).map(s => s.n).join("; "))}. Fridge magnets go on the fridge at home (${Object.values(KEEP_SPOTS).filter(s => s.only).length} spots).</p>`
