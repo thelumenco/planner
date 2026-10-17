@@ -2,3 +2,4 @@ node_modules/
 dist/dev.html
 test/shots/
 dist/hosting/
+dist/wiki/
