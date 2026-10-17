@@ -25,7 +25,7 @@ const capF = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 const nm = id => (NPCS.find(n => n.id === id) || {name: id}).name;
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 // which town a shop (a room or a place on a town screen) is in
-const townOfShop = s => { const t = TOWN_SCENES[s] || (TOWN_PLACES[s] && TOWN_SCENES[TOWN_PLACES[s].scene]); return t && TOWNS[t] ? TOWNS[t].n : ""; };
+const townOfShop = s => { const t = TOWN_SCENES[s] || (TOWN_PLACES[s] && TOWN_SCENES[TOWN_PLACES[s].scene]); if (t && TOWNS[t]) return TOWNS[t].n; const k = Object.keys(TOWNS).find(id => JSON.stringify(TOWNS[id]).includes(`"${s}"`)); return k ? TOWNS[k].n : ""; };
 
 // every trophy there is: reached() for a save that has done everything
 function allTrophies(){
@@ -41,7 +41,7 @@ export const pages = () => {
   const tro = allTrophies(), fams = Object.keys(LOOKS);
   const keepsakes = Object.entries(ITEMS).filter(([, it]) => it.kind === "keepsake");
   const sellerOf = id => { for (const [ev, pools] of Object.entries(POOLS)) for (const [who, list] of Object.entries(pools)) if (list.includes(id)) return `${nm(who)}'s stall at the ${ev === "market" ? "Sunday farmers market" : ev === "night" ? "night market" : "fair"}`; return ""; };
-  const market = keepsakes.filter(([id]) => /^k_/.test(id)), xmas = keepsakes.filter(([id]) => /^xm_/.test(id)), story = keepsakes.filter(([id]) => /^s_/.test(id));
+  const market = keepsakes.filter(([id]) => /^k_/.test(id) && sellerOf(id)), xmas = keepsakes.filter(([id]) => /^xm_/.test(id)), story = keepsakes.filter(([id]) => /^s_/.test(id));
   const travel = Object.entries(TOWN_GOODS).filter(([, g]) => g.kind === "keepsake" || g.keep);
   const bought = travel.filter(([, g]) => g.price > 0 && g.shop && !g.magnet), magnets = travel.filter(([, g]) => g.magnet);
   const earnedList = travel.filter(([id, g]) => !(g.price > 0) && !g.magnet && !/^(am_|ps_|mb_|bc_)/.test(id)).filter(([, g], i, a) => a.findIndex(([, x]) => x.n === g.n) === i);
