@@ -4,6 +4,7 @@ import { ink, esc } from "../util.js";
 import { sk, tapeLabel, tree, flowers, house, artCtx } from "./scenes.js";
 import { streetLamp, lampDefs } from "./village-extras.js";
 import { TREES, FLOWERS, TREE_ROWS, TREE_XS, BUSH_Y, BED_ROWS, FLOWER_XS } from "../data/orchard.js";
+import { crBouquet } from "../data/bouquets.js";
 import { orchState, stateOf } from "../game/orchard.js";
 import { orchardRiver } from "./field.js";
 
@@ -50,7 +51,9 @@ export const flowerPic = (id, stage, bush, size = 60, off) => pictureBox(bush ? 
 /* ---------- potted flowers around the village ---------- */
 // style: "box" (window box), "basket" (hanging basket), "pot" (terracotta pot), "vase" (glass vase)
 export function potArt(x, y, flower, style){
-  const c = (FLOWERS[flower] || {col: "#E86A7C"}).col;
+  const c = (FLOWERS[flower] || {col: "#E86A7C"}).col, bq = crBouquet(flower);
+  // round 228: the creator's bouquet in the vase: a fuller bunch, in its own colours
+  if (bq && style === "vase") return `<g ${W} pointer-events="none"><path d="M${x} ${y-12} v-12 M${x-5} ${y-12} l-5 -12 M${x+5} ${y-12} l5 -12 M${x-2} ${y-12} l-2 -16 M${x+2} ${y-12} l2 -16" fill="none" style="stroke:var(--moss2)"/>${[[-11, -24], [11, -24], [0, -30], [-5, -28], [6, -27]].map(([dx, dy], i) => `<circle cx="${x + dx}" cy="${y + dy}" r="4" style="fill:${bq.cols[i]}"/><circle cx="${x + dx}" cy="${y + dy}" r="1.3" style="fill:#FFF0B8"/>`).join("")}<path d="M${x-7} ${y} q-2 -8 2 -13 h10 q4 5 2 13z" style="fill:#CFE3EC" opacity=".9"/></g>`;
   const heads = (pts, r) => pts.map(([dx, dy]) => `<circle cx="${x + dx}" cy="${y + dy}" r="${r}" style="fill:${c}"/><circle cx="${x + dx}" cy="${y + dy}" r="${r*.35}" style="fill:#FFF0B8"/>`).join("");
   if (style === "box") return `<g ${W} pointer-events="none"><path d="M${x-14} ${y-4} h28 l-2 8 h-24z" style="fill:#C46A4A"/>${heads([[-9, -8], [0, -10], [9, -8]], 3.4)}</g>`;
   if (style === "basket") return `<g ${W} pointer-events="none"><path d="M${x} ${y-26} L${x-8} ${y-8} M${x} ${y-26} L${x+8} ${y-8}" fill="none" stroke-width="1"/><path d="M${x-10} ${y-8} q10 12 20 0z" style="fill:#B98A5A"/>${heads([[-6, -11], [0, -14], [6, -11]], 3)}<path d="M${x-7} ${y-6} q-2 6 -1 9 M${x+6} ${y-6} q2 6 1 8" fill="none" style="stroke:var(--moss2)"/></g>`;

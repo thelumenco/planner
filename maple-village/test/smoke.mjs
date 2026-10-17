@@ -4277,6 +4277,12 @@ if (want("\nA surprise bouquet from the creator (round 228)")) try {
     { const H = {creator: {next: t0, sent: []}}; const bodies = []; let t = t0; for (let i = 0; i < cr.NOTES.length + 1; i++) { const x = cr.creatorPost(H, t + 1000, 10*60, "2026-11-20", r, none); bodies.push(cr.creatorMail(H).find(m => m.id === x.id).body); t = H.creator.next; }
       check(new Set(bodies.slice(0, cr.NOTES.length)).size === cr.NOTES.length && bodies[cr.NOTES.length] === bodies[0], `the regular notes take turns: ${cr.NOTES.length} different ones before any comes again`);
       check(cr.NOTES.every(n => !/\u2014/.test(n) && /Honeybrook|village|flowers|bouquet/i.test(n)), "every note is in the game's voice (no em dashes)"); }
+    { const bq = await import(new URL("../src/data/bouquets.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url));
+      check(bq.CR_BOUQUETS.length === cr.NOTES.length && new Set(bq.CR_BOUQUETS.map(b => b.cols.join())).size === bq.CR_BOUQUETS.length && new Set(bq.CR_BOUQUETS.map(b => b.n)).size === bq.CR_BOUQUETS.length && bq.CR_BOUQUETS.every(b => ic.icon(b.id, 24).includes(b.cols[0])), "a bouquet for each note, each in its own colours, with its own name and picture");
+      const H = {creator: {next: t0, sent: []}}; let t = t0; const got = []; for (let i = 0; i < 3; i++) { const x = cr.creatorPost(H, t + 1000, 10*60, "2026-11-20", r, none); got.push(x.item); t = H.creator.next; }
+      check(got.join() === "cr_bouquet,cr_bouquet2,cr_bouquet3", "each regular note comes with its own bouquet");
+      const J = {}; cr.creatorPost(J, t0, 10*60, "2026-10-20", r, [{id: "hi", from: "2026-10-01", until: "2026-10-31", title: "Hi", note: cr.NOTES[0]}]); J.creator.next = t0; const nx = cr.creatorPost(J, t0 + 1000, 10*60, "2026-10-20", r, []);
+      check(nx.note === 1 && nx.item === "cr_bouquet2", "after the hello (the first note), the regular ones start at the second, so nobody gets the same note twice"); }
     check(cr.SPECIALS.every(x => x.id && /^\d{4}-\d\d-\d\d$/.test(x.from) && /^\d{4}-\d\d-\d\d$/.test(x.until) && x.from <= x.until && x.title && x.note), "every special the creator has set has its dates, title and note"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`creator pageerror: ${e.message}`));
@@ -4291,8 +4297,15 @@ if (want("\nA surprise bouquet from the creator (round 228)")) try {
   check(/Honeybrook's creator/.test(await page.locator("#mailList").innerText()), "signed from Honeybrook's creator");
   await page.evaluate(() => { const t = [...document.querySelectorAll("#mailList [data-mail]")].find(x => /Flowers for you/.test(x.textContent)); t && t.click(); }); await page.waitForTimeout(600);
   check(await page.locator("#nbPage .nbencit svg").count() === 2 && /Surprise bouquet/.test(await page.locator("#nbPage .nbenc").innerText()) && /50 coins/.test(await page.locator("#nbPage .nbenc").innerText()), "the note shows the bouquet and the coins tucked in it");
+  check(/vase on your bedroom table/.test(await page.locator("#nbPage .nbenc").innerText()), "and says the bouquet can go in the vase on your bedroom table");
   check(await page.evaluate(() => window.__hbGame.F().inv.cr_bouquet) === 1 && await page.evaluate(() => window.__hbGame.F().coins) === c0 + 50, "and opening it puts them in the backpack and the purse (once)");
   check(await page.evaluate(() => { const it = window.__hbGame.items().cr_bouquet; return it.kind === "bouquet" && it.sell > 0 && !it.price; }), "the bouquet can be given to a villager like any bouquet, or sold (and isn't for sale anywhere)");
+  await page.click('#nbPage [data-nb="close"]').catch(() => {}); await page.waitForTimeout(300); await page.evaluate(() => { if (!document.getElementById("panel").hidden) document.querySelector('[data-open="mail"]').click(); }); await page.waitForTimeout(300);
+  await page.click('[data-open="bag"]'); await page.waitForSelector('#bag .item[data-id="cr_bouquet"]', { timeout: 10000 }); await page.click('#bag .item[data-id="cr_bouquet"]');
+  await page.waitForSelector('#bag [data-tovase]', { timeout: 5000 }); await page.click('#bag [data-tovase]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => window.__hbGame.F().pots.vase === "cr_bouquet" && !window.__hbGame.F().inv.cr_bouquet), "it can go in the vase in your room");
+  await page.evaluate(() => window.__hbScene("room")); await page.waitForTimeout(1200);
+  check(await page.evaluate(() => /#E8728A/i.test(document.getElementById("world").innerHTML)), "and there it is, on the bedroom table, in its own colours");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {

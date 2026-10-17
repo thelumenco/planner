@@ -752,7 +752,7 @@ const unreadMail = () => { const stale = stalePapers(); return allMail().filter(
 const paperName = () => (F.paperName || "").trim() || "The Honeybrook Times";
 const paperWaiting = () => unreadMail().find(m => m.from === "crier");
 function markRead(item){
-  if (item.from === "creator") { const n = collectCreator(F, item.id); if (n) { sfx("coin"); flash(`${ITEMS[CREATOR_GIFT.item].n}${n > 1 ? ` and ${n} coins` : ""}`); setTimeout(() => render(), 50); } }   // round 228: what's tucked in the creator's note
+  if (item.from === "creator") { const n = collectCreator(F, item.id); if (n) { sfx("coin"); flash(`${((ITEMS[((F.creator.sent || []).find(g => g.id === item.id) || {}).item] || ITEMS[CREATOR_GIFT.item]).n)}${n > 1 ? ` and ${n} coins` : ""}`); setTimeout(() => render(), 50); } }   // round 228: what's tucked in the creator's note
   if (!F.mailRead[item.id]) {
     F.mailRead[item.id] = Date.now();
     const ids = Object.keys(F.mailRead).sort((a, b) => F.mailRead[b] - F.mailRead[a]);
@@ -952,7 +952,7 @@ let giftPick = null, postPick = false;
 const postPickHTML = it => `<p style="margin-top:10px"><b>Post it to…</b></p><div class="actions">${BK.contacts(F).map(id => `<button class="btn small alt" data-postto="${id}" ${F.coins >= BK.postage(id) && !it.gel ? "" : "disabled"}>${esc(BK.person(id).name)}<small> · ${BK.postage(id)} coins</small></button>`).join("")}</div>${it.gel ? `<p class="muted">Ice cream would melt in the post.</p>` : ""}`;
 function giftPickHTML(id){
   const it = ITEMS[id], who = it && recipients(it); if (!it || !F.inv[id]) return "";
-  return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p>${who.length ? "" : `<p class="muted">${NO_FRIENDS}</p>`}<div class="actions">${who.map(w => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}${canKeep(it) ? `<button class="btn small alt" data-keepit="1">Keep it${it.magnet ? "<small> · for the fridge</small>" : "<small> · on a shelf</small>"}</button>` : ""}${BK.contacts(F).length ? `<button class="btn small alt" data-bypost="1">By post…</button>` : ""}<button class="btn small alt" data-giveto="">Cancel</button></div>${postPick ? postPickHTML(it) : ""}
+  return `<div class="giftpick" style="grid-column:1/-1"><p><b>Give the ${esc(it.n.toLowerCase())} to…</b></p>${who.length ? "" : `<p class="muted">${NO_FRIENDS}</p>`}<div class="actions">${who.map(w => `<button class="btn small ${w === "near" || giftPos(w) ? "primary" : "alt"}" data-giveto="${w}">${esc(recipName(w))}<small>${giftPos(w) ? " · here" : " · send it"}</small></button>`).join("")}${it.vase ? `<button class="btn small alt" data-tovase="1">Put it in the vase<small> · in your room</small></button>` : ""}${canKeep(it) ? `<button class="btn small alt" data-keepit="1">Keep it${it.magnet ? "<small> · for the fridge</small>" : "<small> · on a shelf</small>"}</button>` : ""}${BK.contacts(F).length ? `<button class="btn small alt" data-bypost="1">By post…</button>` : ""}<button class="btn small alt" data-giveto="">Cancel</button></div>${postPick ? postPickHTML(it) : ""}
     <p class="muted">Anyone who isn't here gets it sent round, and their thank-you note comes to your mailbox.${canKeep(it) ? " Or keep it, and put it up somewhere of yours." : ""}</p></div>`;
 }
 function giveTo(id, w){
@@ -1750,6 +1750,9 @@ function bag(){
   $("bag").querySelectorAll("[data-bypost]").forEach(b => b.onclick = ev => { ev.stopPropagation(); postPick = !postPick; bag(); });
   $("bag").querySelectorAll("[data-postto]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const to = b.dataset.postto, r = BK.postTo(F, to, {item: giftPick}); if (r.err) { flash(r.err); return; }
     postPick = false; giftPick = null; sfx("chime"); flash(`Posted to ${BK.person(to).name}`); speak(`Wrapped in brown paper and off to ${BK.REGIONS[BK.regionOf(to)]}. Watch your mailbox for a thank-you.`, 4500); save(); bag(); });
+  // round 228: the creator's bouquet in the vase on your bedroom table (whatever was in it before makes way)
+  $("bag").querySelectorAll("[data-tovase]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const id = giftPick; if (!id || !F.inv[id]) return; addInv(id, -1); F.pots = F.pots || {}; F.pots.vase = id; giftPick = null; sfx("chime");
+    flash(`The ${ITEMS[id].n.toLowerCase()} is in the vase in your room`); speak("In the vase on your bedroom table. The whole room smells lovely.", 4000); save(true); if (scene === "room") drawScene(); render(); });
   $("bag").querySelectorAll("[data-keepit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); keepItem = giftPick; giftPick = null; openView = null; render(); });   // a souvenir kept: off to the shelf chooser
   $("bag").querySelectorAll(".item").forEach(b => b.onclick = ev => { const k = ev.target.closest("[data-kit]"); if (k) { ev.stopPropagation(); toKitchen(k.dataset.kit); return; } useItem(b.dataset.id); });
   $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome bag of seeds is in here. Plant them in the garden, just along from the house." : "";

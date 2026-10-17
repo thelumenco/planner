@@ -222,7 +222,7 @@ export function plantAny(F, where, id, today){
 export function potPanel(F, item){
   const it = ITEMS[item]; orchState(F);
   return `<span class="tape stripe" aria-hidden="true"></span><h2>${esc(it ? it.n : "A pot")}</h2><p class="sub">Where shall it go?</p>
-    <div class="vhelp">${Object.keys(POT_SPOTS).map(s => `<button class="vhelpi orspot" data-or="place" data-k="${s}"><span><b>${esc(POT_SPOTS[s].n[0].toUpperCase() + POT_SPOTS[s].n.slice(1))}</b><small>${F.pots[s] ? `${FLOWERS[F.pots[s]].n} there now` : "empty"}</small></span></button>`).join("")}</div>
+    <div class="vhelp">${Object.keys(POT_SPOTS).map(s => `<button class="vhelpi orspot" data-or="place" data-k="${s}"><span><b>${esc(POT_SPOTS[s].n[0].toUpperCase() + POT_SPOTS[s].n.slice(1))}</b><small>${F.pots[s] ? `${(FLOWERS[F.pots[s]] || ITEMS[F.pots[s]] || {n: "Flowers"}).n} there now` : "empty"}</small></span></button>`).join("")}</div>
     <div class="actions">${close}</div>`;
 }
 export function teaPanel(F, today, home){
