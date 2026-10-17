@@ -33084,7 +33084,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     if (workshopNow(day, hm12)) {
       const w = [WORKSHOP2.from, WORKSHOP2.to];
-      if (id === "hazel") return { from: w[0], to: w[1], scene: "millup", at: [410, 508], dir: -1, act: "point", workshop: true };
+      if (id === "hazel") return { from: w[0], to: w[1], scene: "millup", at: [346, 508], dir: 1, act: "point", workshop: true };
       const k = pickN(pool2, WORKSHOP2.size, day + "work").indexOf(id);
       if (k >= 0) {
         const [x, y, d] = WORK_SEATS[k];

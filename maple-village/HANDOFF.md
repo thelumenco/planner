@@ -2630,3 +2630,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - Sailing your own boat still checks the day (`rainDay(day) === 2`): a downpour day keeps the sea rough all day. Bee time (hfarm.js `beeTime`) only loses the downpour's shower, not the whole day.
 - core.js `skyKey` includes the rain level, so an outdoor screen redraws when the shower starts or stops. Maple's line says it won't last long.
 - Test: "rainy days" checks every shower in two years lasts 60 minutes or less, and it's dry either side.
+
+## Round 240 (Mel: "check that nobody stands on tables or market stalls")
+- millcraft.js: Hazel stood at [410, 508], the middle of the soap workshop table; she now teaches from the open floor at its left end, [346, 508], facing the table. Test in "Mulled wine, and the mill workshop and shop (round 153)".
+- Checked by screenshot, with people in place: the mill's tasting table and workshop, the Sunday market, the night market, the Christmas market, the terrace long lunch, the wine shop, the Cocoa Room and disco night at the cellar. Stall keepers are behind their counters (stallFronts), diners are seated, nobody else is on a table.
