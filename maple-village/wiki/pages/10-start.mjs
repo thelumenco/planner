@@ -103,7 +103,7 @@ async function gettingStarted(){
 }
 
 function questBoard(){
-  const placeRows = Object.entries(PLACES).map(([id, p]) => [`<b>${esc(p.n[0].toUpperCase() + p.n.slice(1))}</b>`, `<span class="muted">${esc(p.doing)}</span>`,
+  const placeRows = Object.entries(PLACES).map(([id, p]) => [`<b>${esc(p.n[0].toUpperCase() + p.n.slice(1))}</b><br><small class="muted">${esc(p.doing)}</small>`,
     id === DEFAULT_PLACE ? "<i>anything that matches nothing else</i>" : esc([...p.words, ...p.verbs].join(", "))]);
   const askers = Object.entries(ASKERS).map(([id, a]) => [`<a href="/villagers/${id}">${esc(nm(id))}</a>`, a.likes.filter(x => ITEMS[x]).map(x => `<span title="${esc(ITEMS[x].n)}">${itemIcon(x, 22)}</span>`).join(" ") + `<br><small class="muted">${esc(a.likes.filter(x => ITEMS[x]).map(x => ITEMS[x].n).join(", "))}</small>`]);
   const ex = ["carrot", "egg", "pumpkin", "loaf", "oliveoil"].filter(x => ITEMS[x]).map(x => [`${itemIcon(x, 22)}${esc(ITEMS[x].n)}`, String(howMany(x)), coin(payEach(x)), coin(howMany(x)*payEach(x))]);
@@ -118,7 +118,7 @@ function questBoard(){
   + `<p>Each task goes to a place in the village, chosen by the words in it. A specific word (what the task is about, like "email", "laundry" or "tax") beats a general one (how you'll do it, like "write", "send" or "sort"). Between two equal words, the one that comes first wins. If nothing matches, the task goes to your desk at home.</p>
   <p>Every task shows its place in a little picker, so you can choose somewhere else (your choice sticks), and a "go" button walks you there. Going is optional: you can tick anywhere. But doing it in its place pays <b>a coin more</b>, within the day's ${PAID_PER_DAY} paid ticks.</p>
   <p class="muted">Examples: "write an email" goes to the post office; "write my essay" goes to the library desk.</p>`
-  + table(["Place", "", "Words that send a task there"], placeRows)
+  + table(["Place", "Words that send a task there"], placeRows)
   + h2("village-requests", "Village requests", "board")
   + `<ul class="plain"><li>Up to ${MAX_REQ} requests can be up at once. On your very first day two villagers pin one up, and after that a new one goes up most mornings (now and then there's a quiet day).</li>
     <li>Villagers only ask for in-season garden crops, or for things you've already had in your backpack that you make yourself (never something Hana sells over the counter).</li>

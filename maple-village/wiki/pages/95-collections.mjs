@@ -43,15 +43,15 @@ export const pages = () => {
   const sellerOf = id => { for (const [ev, pools] of Object.entries(POOLS)) for (const [who, list] of Object.entries(pools)) if (list.includes(id)) return `${nm(who)}'s stall at the ${ev === "market" ? "Sunday farmers market" : ev === "night" ? "night market" : "fair"}`; return ""; };
   const market = keepsakes.filter(([id]) => /^k_/.test(id) && sellerOf(id)), xmas = keepsakes.filter(([id]) => /^xm_/.test(id)), story = keepsakes.filter(([id]) => /^s_/.test(id));
   const travel = Object.entries(TOWN_GOODS).filter(([, g]) => g.kind === "keepsake" || g.keep);
-  const bought = travel.filter(([, g]) => g.price > 0 && g.shop && !g.magnet), magnets = travel.filter(([, g]) => g.magnet);
+  const bought = travel.filter(([, g]) => g.price > 0 && g.shop && !g.magnet && townOfShop(g.shop)), magnets = travel.filter(([, g]) => g.magnet);
   const earnedList = travel.filter(([id, g]) => !(g.price > 0) && !g.magnet && !/^(am_|ps_|mb_|bc_)/.test(id)).filter(([, g], i, a) => a.findIndex(([, x]) => x.n === g.n) === i);
   const html = lede("Things to collect in Honeybrook: trophies for your milestones, souvenir sets from your travels, keepsakes for the shelves at home and in your shops, fridge magnets, and paintings on the gift shop's gallery wall.")
-  + `<div class="cards">${[["trophies", "Trophies", "sparkle"], ["stamp-book", "Kyoto stamp book", "sakura"], ["ammonites", "Ammonites", "s_case"], ["puffin-stamps", "Puffin stamps", "p_stamps"], ["music-boxes", "Music boxes", "h_boxes"], ["carvings", "Carved animals", "b_ark"], ["keepsakes", "Keepsakes", "k_snowglobe"], ["fridge-magnets", "Fridge magnets", "iman"], ["gallery-wall", "Gallery wall", "painting"]]
+  + `<div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${[["trophies", "Trophies", "sparkle"], ["stamp-book", "Kyoto stamp book", "sakura"], ["ammonites", "Ammonites", "s_case"], ["puffin-stamps", "Puffin stamps", "p_stamps"], ["music-boxes", "Music boxes", "h_boxes"], ["carvings", "Carved animals", "b_ark"], ["keepsakes", "Keepsakes", "k_snowglobe"], ["fridge-magnets", "Fridge magnets", "iman"], ["gallery-wall", "Gallery wall", "painting"]]
     .map(([a, t, i]) => `<a class="card" href="#${a}">${ico(i, 28)}<span><b>${esc(t)}</b></span></a>`).join("")}</div>`
   + h2("trophies", "Trophies", "sparkle")
   + `<p>Milestones earn trophies, kept in the courtyard through the archway in the town hall. The newest ${PEDESTALS} stand on pedestals; when they're full, the oldest moves into the trophy book on the lectern, with a page each saying what it was for and when. Each kind of milestone has its own trophy, with the number on its plinth.</p>`
-  + table(["", "Trophy", "How", "Milestones"], fams.map(f => { const list = tro.filter(t => t.fam === f), last = list[list.length - 1] || {fam: f, short: ""};
-    return [trophySVG(last, 40), `<b>${esc(FAM_N[f] || f)}</b>`, esc(FAM_HOW[f] || ""), esc(list.map(t => f === "chum" ? t.label.replace("Friendship: ", "") : /d$/.test(t.short) ? t.n + " days" : t.short).join(", "))]; }))
+  + table(["", "Trophy", "Milestones"], fams.map(f => { const list = tro.filter(t => t.fam === f), last = list[list.length - 1] || {fam: f, short: ""};
+    return [trophySVG(last, 40), `<b>${esc(FAM_N[f] || f)}</b><br><small class="muted">${esc(FAM_HOW[f] || "")}</small>`, esc(list.map(t => f === "chum" ? t.label.replace("Friendship: ", "") : /d$/.test(t.short) ? t.n + " days" : t.short).join(", "))]; }))
   + h2("souvenir-sets", "Souvenir sets from your travels", "kite")
   + `<p>Some places you visit have a set to collect. Finish a set and it becomes something special for home. See <a href="/trips">Trips</a> and <a href="/islands">Islands</a>.</p>`
   + h3("stamp-book", "The Kyoto stamp book") + `<p>Collect a stamp at each of these places in <a href="/trips/kyoto">Kyoto</a>. A full book puts a stone lantern by the pond at home.</p>`
@@ -74,7 +74,7 @@ export const pages = () => {
   + (story.length ? h3("story-keepsakes", "From villagers' stories") + spoiler("Story keepsakes", table(["Keepsake"], story.map(([id]) => [named(id)]))) : "")
   + h2("fridge-magnets", "Fridge magnets", "iman")
   + `<p>A magnet from each place, ${coin(3)} each, for the fridge at home (or give one as a present).</p>`
-  + table(["Magnet", "Where"], magnets.map(([id, g]) => [named(id), esc(townOfShop(g.shop))]))
+  + table(["Magnet", "Where"], magnets.map(([id, g]) => [named(id), esc(g.n.replace(/ fridge magnet$/, ""))]))
   + h2("gallery-wall", "The gallery wall", "painting")
   + `<p>The <a href="/gift-shop">gift shop</a> has ${FRAMES} frames between its windows. Local painters bring a new painting on Mondays to fill an empty frame. When one sells, you keep a token ${coin(TOKEN)} and the rest goes to the painter, who writes to you about it a week later. You can hang your own sip-and-paint paintings there too: never for sale, and they come down whenever you like.</p>`
   + table(["Painter", "Paints", "Paintings"], Object.values(PAINTERS).map(p => [`<b>${esc(p.name)}</b>`, esc(p.what), p.works.map(w => `${esc(w[0])} ${coin(w[1])}`).join("<br>")]))
@@ -82,7 +82,7 @@ export const pages = () => {
   + table(["Maker", "What"], Object.values(MAKERS).map(m => [esc(m.name), named(m.item)]))
   + h2("more-collections", "More to collect", "bag")
   + `<ul class="plain"><li>The wine wall at the cellar door keeps a bottle of every wine you've made (see <a href="/vineyard-and-wine">Vineyard and wine</a>).</li>
-    <li>Every new gelato flavour, bonbon and mulled wine mix you discover is named and kept (see <a href="/scoop-shack">Scoop Shack</a>, <a href="/cocoa-room">Cocoa Room</a> and <a href="/kitchen-and-tapas">Kitchen and tapas</a>).</li>
+    <li>Every new gelato flavour and mulled wine mix you discover is named and kept, to make again (see <a href="/scoop-shack">Scoop Shack</a> and <a href="/kitchen-and-tapas">Kitchen and tapas</a>).</li>
     <li>Villagers' stories are kept chapter by chapter in the friends panel's Stories tab (see <a href="/hearts-and-gifts">Hearts and gifts</a>).</li></ul>`;
   const search = [{t: "Trophies", d: "Milestones in the town hall courtyard", a: "/collections#trophies"}, {t: "Trophy book", d: "Older trophies", a: "/collections#trophies"},
     {t: "Kyoto stamp book", d: "Eight stamps, then a lantern at home", a: "/collections#stamp-book"}, {t: "Ammonites", d: "Six from Saltwick's scar", a: "/collections#ammonites"},

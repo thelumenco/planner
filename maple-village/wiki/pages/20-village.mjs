@@ -22,7 +22,7 @@ const goal = k => `Once you've bought ${GOALS[k].n.replace(/^The /, "the ")} (${
 
 // the outdoor screens, in walking order, with what's there
 const AREAS = [
-  {scene: "base", id: "home", n: "Home", icon: "home", more: "/garden-and-crops", line: "Uncle Wilf's old house and garden, over the river from the town square: the pond, the shed, the animal run, the tree swing and your little jetty."},
+  {scene: "base", id: "home", n: "Home", icon: "home", line: "Uncle Wilf's old house and garden, over the river from the town square: the pond, the shed, the animal run, the tree swing and your little jetty."},
   {scene: "village", id: "town-square", n: "The town square", icon: "hall", line: "The middle of Honeybrook: the town hall, the bank, the library, the post office, the market and the quest board, with paths out to everywhere."},
   {scene: "lane", id: "makers-lane", n: "Makers' Lane", icon: "carpentry", line: "Through the gate from the town square: Bo's workshop, Ada's haberdashery, Idris the tailor's and Mr Okada's house."},
   {scene: "vineyard", id: "the-vineyard", n: "The vineyard", icon: "grape_red", more: "/vineyard-and-wine", line: "Over the footbridge from home: your vines, the barrel shed, the vineyard stall, the wine shop and a playground."},
@@ -126,7 +126,7 @@ function placesPage(){
     for (const [id] of blds) for (const r of innerOf(id)) if (ROOMS[r] || ROOM_N[r]) search.push({t: roomName(r), d: `Inside ${VILLAGE[id].name}`, a: "/places#" + anchor(r)});
   }
   search.push({t: "Train times", d: "Honeybrook station's timetable", a: "/places#train-times"}, {t: "River taxi", d: `${hm(TAXI_FROM)} to ${hm(TAXI_TO)}, ${TAXI_FEE} coins`, a: "/places#" + anchor("taxilane")}, {t: "Bike hire", d: `${BIKE_FEE} coins for ${BIKE_MINS} minutes`, a: "/places#" + anchor("bikesvillage")});
-  const contents = `<div class="cards">${AREAS.map(a => `<a class="card" href="#${a.id}">${ico(a.icon, 26)}<span><b>${esc(a.n)}</b></span></a>`).join("")}</div>`;
+  const contents = `<div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${AREAS.map(a => `<a class="card" href="#${a.id}">${ico(a.icon, 26)}<span><b>${esc(a.n)}</b></span></a>`).join("")}</div>`;
   const html = lede("Every place in Honeybrook, screen by screen: the buildings and the rooms inside them, what there is to do, and opening hours where a place keeps them. Places that need something bought first say so.")
     + contents
     + `<p class="muted">Getting about: walk between screens through the gates and paths, hire a bike (${coin(BIKE_FEE)} for an hour), take the river taxi (${coin(TAXI_FEE)}, ${hm(TAXI_FROM)} to ${hm(TAXI_TO)}), paddle the river, or save up for a scooter or a car.</p>`
@@ -151,7 +151,7 @@ const goodsCell = (st, pool) => {
   return [...new Set(ids)].map(id => `${goodIcon(id)}${esc(goodName(id))}`).join("<br>");
 };
 const keeper = st => st.kind === "mine" ? "You" : nm(st.id);
-const stallTable = (list, pool) => table(["Stall", "Kept by", "What's on it"], list.map(st => [`<b>${esc(st.n)}</b>${st.line ? `<br><small class="muted">"${esc(st.line)}"</small>` : ""}`, esc(keeper(st)) + (st.needs ? ` <span class="muted">(once it's yours)</span>` : ""), goodsCell(st, pool)]));
+const stallTable = (list, pool) => table(["Stall", "Kept by", "What it can have"], list.map(st => [`<b>${esc(st.n)}</b>${st.line ? `<br><small class="muted">"${esc(st.line)}"</small>` : ""}`, esc(keeper(st)) + (st.needs ? ` <span class="muted">(once it's yours)</span>` : ""), goodsCell(st, pool)]));
 function marketsPage(){
   // times straight from the game's own events (a Sunday, the last Saturday of a month, a Tuesday, a December day)
   const ev = (day, kind) => eventsOn(day).find(e => e.kind === kind);
