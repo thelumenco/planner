@@ -4259,6 +4259,29 @@ if (want("\nPicked flowers stay in the backpack (round 228)")) try {
   check(await page.evaluate(() => window.__hbGame.F().inv.tulip) === 2 && /stand by a villager/.test(await page.evaluate(() => document.getElementById("speech").textContent)), "tapping them with nobody about keeps them, and says how to give one");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nA surprise bouquet from the creator (round 228)")) try {
+  console.log("\nA surprise bouquet from the creator (round 228)");
+  const cr = await import(new URL("../src/game/creator.js", import.meta.url)), D = 864e5, t0 = Date.UTC(2026, 9, 17, 3);
+  { const F = {}; const r = () => .5; const c = cr.creatorState(F, t0, r);
+    check(c.next - t0 >= 6*D && c.next - t0 <= 9*D, "the first bouquet comes about a week into the game");
+    check(!cr.creatorPost(F, c.next - 60000, 12*60, r) && !cr.creatorPost(F, c.next + 1000, 22*60, r), "not before it's due, and never at night");
+    const g = cr.creatorPost(F, c.next + 1000, 11*60, r); check(g && F.creator.next - g.at >= 8*D && F.creator.next - g.at <= 13*D, "then one in the post, and the next booked 8 to 13 days on");
+    F.coins = 10; check(cr.collectCreator(F) === 1 && F.coins === 60 && F.inv.cr_bouquet === 1 && cr.collectCreator(F) === 0, "50 coins and the bouquet, handed over once");
+    const m = cr.creatorMail(F)[0]; check(/Thanks? (you )?for playing Honeybrook/.test(m.body) && /From the creator/.test(m.body) && m.from === "creator", "with a note: thank you for playing Honeybrook, from the creator"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`creator pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-17"); await page.waitForTimeout(1200);
+  const c0 = await page.evaluate(() => window.__hbGame.F().coins);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.creator = {next: Date.now() - 1000, sent: []}; window.__hbGame.save(); });
+  await page.waitForFunction(() => (window.__hbGame.F().inv || {}).cr_bouquet === 1, null, { timeout: 20000 });
+  check(await page.evaluate(() => window.__hbGame.F().coins) === c0 + 50, "in the game: it arrives with 50 coins");
+  check(await page.evaluate(() => window.__hbGame.mail().unread.some(id => /^creator-/.test(id))), "and the note's in the letterbox, unread");
+  await page.click('[data-open="mail"]'); await page.waitForTimeout(500);
+  check(/Honeybrook's creator/.test(await page.locator("#mailList").innerText()), "signed from Honeybrook's creator");
+  await page.evaluate(() => { const b = document.querySelector('[data-open="mail"]'); b && b.click(); });
+  check(await page.evaluate(() => { const it = window.__hbGame.items().cr_bouquet; return it.kind === "bouquet" && it.sell > 0 && !it.price; }), "the bouquet can be given to a villager like any bouquet, or sold (and isn't for sale anywhere)");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

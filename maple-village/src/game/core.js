@@ -96,6 +96,7 @@ import { tablelandsRoomArt } from "../art/tablelands-rooms.js";
 import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH, setCloseFriends } from "./lunch.js";
 import { craftState, craft as millCraft, renderWax, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
 import { hamperSeason, xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
+import { creatorPost, collectCreator, creatorMail, GIFT as CREATOR_GIFT } from "./creator.js";
 import * as BK from "./contacts.js";
 import * as GAL from "./gallery.js";
 import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair, putWrapped, takeWrapped, giftState, takeBottle, registerBottles } from "./giftshop.js";
@@ -531,6 +532,8 @@ setInterval(() => {
   bedtimeTick(); vineTick(); orchardTick();
   if (scene === "field" && countdownDue(F, dayKey(), localHM())) treeCountdown();
   { const got = collectReplies(F, Date.now() + (globalThis.__hbOffset || 0)); if (got.length) { save(); got.forEach((g, k) => setTimeout(() => { if (g.gift) { flash(ITEMS[g.gift] ? ITEMS[g.gift].n : "A little something"); speak(`A parcel from ${g.from}, with a postcard. It's in your backpack, and the postcard's in your letterbox.`, 5500); } else speak(`${g.from} wrote to say thank you for the hamper, and they've pinned up an order for another at the post office.`, 5500); }, 1500 + k*6000)); } }
+  // round 228: now and then, a surprise bouquet (and 50 coins) in the post from Honeybrook's creator
+  if (creatorPost(F, Date.now() + (globalThis.__hbOffset || 0), localHM()) || (F.creator && (F.creator.sent || []).some(g => !g.given))) { if (collectCreator(F)) { save(true); sfx("chime"); flash(`A surprise bouquet and ${CREATOR_GIFT.coins} coins`); setTimeout(() => speak(`Flowers in the post! A bouquet and ${CREATOR_GIFT.coins} coins, with a note from Honeybrook's creator in your letterbox.`, 6000), 1200); render(); } }
   if (S.day !== dayKey()) { S = freshToday(); say = null; save(true); speak(defaultLine()); return; }
   // the morning's village requests go up once the save has loaded (so a cloud copy can't wipe them straight away)
   if (QB.board(F).lastPost !== dayKey() && (!refs || synced.fox)) { if (postRequests()) save(true); else persist("fox"); }
@@ -682,7 +685,7 @@ const sgAt = (day, h, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1,
 const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 let localCache = {key: "", items: []};
 function localMail(){
-  const day = dayKey(), hm = localHM(), key = `${day}:${Math.floor(hm/10)}:${doneToday()}:${QB.villageLetters(F).length}:${thanksMail().length}:${slowMail(F).length}:${PP.bloomMail(F).length}:${BK.bookMail(F).length}:${GAL.galleryMail(F, Date.now()).length}`;
+  const day = dayKey(), hm = localHM(), key = `${day}:${Math.floor(hm/10)}:${doneToday()}:${QB.villageLetters(F).length}:${thanksMail().length}:${slowMail(F).length}:${PP.bloomMail(F).length}:${BK.bookMail(F).length}:${GAL.galleryMail(F, Date.now()).length}:${((F.creator || {}).sent || []).length}`;
   if (key === localCache.key) return localCache.items;
   const out = [], wd = new Date(day + "T00:00:00Z").getUTCDay();
   if ((wd === 5 && hm >= 900) || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
@@ -691,7 +694,7 @@ function localMail(){
   { const gl = GU.thanksLetter(F, dearMe(F)); if (gl) out.push(gl); }
   out.push(...LT.letsMail(F, QB.hearts(F, "elena"), (F.lets && F.lets.offerAt) || 0));   // round 219: Elena's offer
   if (F.welcomeAt) out.push(welcomeLetter(F.welcomeAt));   // round 225: Hana's welcome, with how coins come in
-  out.push(...QB.villageLetters(F), ...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__hbOffset || 0)), ...PP.bloomMail(F), ...BK.bookMail(F), ...GAL.galleryMail(F, Date.now()));   // round 129: Jeju's slow-post postcards, two weeks on
+  out.push(...QB.villageLetters(F), ...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__hbOffset || 0)), ...PP.bloomMail(F), ...BK.bookMail(F), ...GAL.galleryMail(F, Date.now()), ...creatorMail(F));   // round 129: Jeju's slow-post postcards, two weeks on
   return (localCache = {key, items: out}).items;
 }
 const allMail = () => localMail();
@@ -756,7 +759,7 @@ function markRead(item){
   }
   courierDelivered(item.id);
 }
-const agentName = from => (AGENTS[from] && AGENTS[from].name) || (NPCS.find(n => n.id === from) || {}).name || from || "the postie";   // (round 225: a villager's letter shows their name)
+const agentName = from => from === "creator" ? "Honeybrook's creator" : (AGENTS[from] && AGENTS[from].name) || (NPCS.find(n => n.id === from) || {}).name || from || "the postie";   // (round 225: a villager's letter shows their name)
 function mailCard(){
   const items = allMail().filter(m => m && m.id).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
   const unread = items.filter(m => !F.mailRead[m.id]).length;

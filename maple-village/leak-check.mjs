@@ -26,7 +26,9 @@ if (!existsSync(bundle)) { console.error("Build first: node build.mjs"); process
 const text = readFileSync(bundle, "utf8");
 // The opening story (a tired office worker in Singapore inherits a vineyard) is the one place Singapore is allowed:
 // its two files may use the word, and the game may carry exactly as many as they do. Nowhere else.
-const ALLOW = {"Singapore": ["src/game/intro.js", "src/art/intro.js"]};
+// Round 228: the creator signs her surprise bouquet's note ("From the creator, Mel"), at her own request: that one
+// file may carry the name (it has it once, in the note).
+const ALLOW = {"Singapore": ["src/game/intro.js", "src/art/intro.js"], "Mel": ["src/game/creator.js"]};
 const allowed = label => (ALLOW[label] || []).reduce((n, f) => n + (readFileSync(join(root, f), "utf8").match(TERMS.find(t => t[0] === label)[1]) || []).length, 0);
 const hits = TERMS.map(([label, re]) => [label, Math.max(0, (text.match(re) || []).length - allowed(label))]).filter(([, n]) => n > 0);
 

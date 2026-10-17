@@ -336,6 +336,10 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
       `<path d="M7 14h10l-1.5 7h-7zM6.5 14h11"/>${headL(8.5, 9.5, 2.6)}${headL(15.5, 9.5, 2.6)}${headL(12, 6, 2.8)}<path d="M12 9v5"/>`]; });
 }
 
+// round 228: the creator's surprise bouquet: roses, sweet peas and lavender in brown paper with a ribbon
+I.cr_bouquet = [`<path d="M7.5 12.5l4.5 9.5 4.5-9.5z" ${f("#E8D3B0")}/>${[[8.5, 9, "#E8728A"], [15.5, 9, "#F2B8C8"], [12, 6, "#D9435A"], [10.5, 11.5, "#B9A3E0"], [13.8, 11.8, "#F6E3A1"]].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="2.7" ${f(c)}/>`).join("")}<path d="M9.5 16h5" stroke-width="2" style="stroke:var(--rose)"/>`,
+  `<path d="M7.5 12.5l4.5 9.5 4.5-9.5z"/>${[[8.5, 9], [15.5, 9], [12, 6]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.7"/>`).join("")}<path d="M10 16l2 1.5 2-1.5"/>`];
+
 // The market stalls' extra goods (data/stall-goods.js): each names a shape and its colours, drawn here
 {
   const S = {
