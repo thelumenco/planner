@@ -184,7 +184,7 @@ Then they're yours to furnish and let, a mini landlord business:
   on a rug, a kitchen corner with the fridge, beds centred under their windows with bedside tables). The bedrooms and
   bathrooms are smaller rooms (walkable y 176 to 430, LET_ROOM in core.js), with the front of the cottage drawn below
   them like an open doll's house.
-- Switched off on the live game (LIVE in game/lets.js) until it's finished; ?lets=1 turns it on.
+- Switched on for everyone in round 223 (LIVE in game/lets.js).
 
 ## The opening story (2026-10-14)
 A new game starts with a short story told through your own eyes (game/intro.js, pictures in art/intro.js): a tired

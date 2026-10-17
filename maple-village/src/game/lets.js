@@ -20,8 +20,8 @@ import { ITEMS } from "../data/items.js";
 import { TIERS, COLOURS, CATS, ESSENTIAL, COTTAGES, catOf, STAY, GUEST_POOL, REVIEWS, floorOf, EXTRAS, BOOK, WELCOME, FRIDGE, UNTIDY, KEEPER } from "../data/lets.js";
 
 export const OFFER_HEARTS = 5;
-// off on the live game until the cottages are finished (?lets=1 turns it on, for the tests)
-export const LIVE = {on: false};
+// a switch for the whole feature: on (round 223, Mel: "let's switch on")
+export const LIVE = {on: true};
 const D = 864e5;
 export const addDays = (day, n) => new Date(Date.parse(day + "T00:00:00Z") + n*D).toISOString().slice(0, 10);
 const daysBetween = (a, b) => Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z"))/D);
