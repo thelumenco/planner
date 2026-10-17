@@ -154,7 +154,7 @@ function migrate(){
   if (S.waterMl == null) { S.waterMl = (S.water || 0)*250; S.waterPaid = Math.min(4, S.water || 0); }
   // round 225 (Mel: "there's nothing to start"): a new game starts with 100 coins and a bag of seeds for the season
   if (F.coins == null) F.coins = F.inv ? (S.berries || 0) : START_COINS;
-  if (!F.inv) { F.inv = starterSeeds(dayKey()); F.gift = true; }
+  if (!F.inv) { F.inv = starterSeeds(dayKey()); F.gift = true; F.welcomeAt = Date.now(); }
   if (!F.tools) F.tools = {};
   if (!F.fam) F.fam = {owned: {}, gifts: {bo: 0}};
   ensurePets(F);
@@ -682,10 +682,13 @@ function localMail(){
     title: "Time to close the day", body: "Meet me at the pond. Each of today's wins gets a lantern on the water."});
   { const gl = GU.thanksLetter(F, dearMe(F)); if (gl) out.push(gl); }
   out.push(...LT.letsMail(F, QB.hearts(F, "elena"), (F.lets && F.lets.offerAt) || 0));   // round 219: Elena's offer
+  if (F.welcomeAt) out.push(welcomeLetter(F.welcomeAt));   // round 225: Hana's welcome, with how coins come in
   out.push(...QB.villageLetters(F), ...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__hbOffset || 0)), ...PP.bloomMail(F), ...BK.bookMail(F), ...GAL.galleryMail(F, Date.now()));   // round 129: Jeju's slow-post postcards, two weeks on
   return (localCache = {key, items: out}).items;
 }
 const allMail = () => localMail();
+// round 225 (Mel: quick wins, and say how quests give coins): Hana's letter on your first day
+const welcomeLetter = at => ({id: "welcome", from: "hana", at, title: "Welcome to Honeybrook!", body: `Hello love, and welcome!\n\nA few things that helped Wilf when he was starting out.\n\nCoins come in three ways. First, your own to-dos: open the quest board (the pinboard at the top of the screen), add the real things you mean to do today, and every one you tick pays ${QB.TASK_PAY} coins, up to ${QB.PAID_PER_DAY} a day. Second, village requests, on the same board: when one of us needs something, bring it over and you'll get coins and a heart. And third, anything you grow or make, sold at my market or in the shops.\n\nYour seeds want planting in the garden behind the house. They grow in real hours, so plant them today and they'll be ready later on.\n\nPop into the market and say hello. I'll put the kettle on.\n\nHana`});
 function weeklyPaper(fri){
   noteHistory();
   const days = Array.from({length: 7}, (_, i) => { let d = fri; for (let k = 0; k < 6 - i; k++) d = prevDay(d); return d; });
@@ -745,7 +748,7 @@ function markRead(item){
   }
   courierDelivered(item.id);
 }
-const agentName = from => (AGENTS[from] && AGENTS[from].name) || from || "the postie";
+const agentName = from => (AGENTS[from] && AGENTS[from].name) || (NPCS.find(n => n.id === from) || {}).name || from || "the postie";   // (round 225: a villager's letter shows their name)
 function mailCard(){
   const items = allMail().filter(m => m && m.id).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
   const unread = items.filter(m => !F.mailRead[m.id]).length;
@@ -3427,6 +3430,6 @@ function showTitle(){
 { let skip = false; try { skip = !!sessionStorage.getItem("hb.skipTitle"); sessionStorage.removeItem("hb.skipTitle"); } catch {}
   if (skip || (window.__hbDevStub && !/[?&]title=1/.test(location.search))) needSetup(); else showTitle(); }
 render(true);
-if (F.gift) setTimeout(() => speak("A welcome gift from the village: a bag of seeds and 100 coins to get you started. The seeds are in your backpack 🌷", 6000), 1200);
+if (F.gift) setTimeout(() => speak("Your savings, 100 coins, are in your purse, and the village has left you a welcome bag of seeds 🌷 There's a letter from Hana in the mailbox, too.", 6500), 1200);
 requestAnimationFrame(frame);
 initDb();
