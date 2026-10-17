@@ -688,7 +688,7 @@ function localMail(){
 }
 const allMail = () => localMail();
 // round 225 (Mel: quick wins, and say how quests give coins): Hana's letter on your first day
-const welcomeLetter = at => ({id: "welcome", from: "hana", at, title: "Welcome to Honeybrook!", body: `Hello love, and welcome!\n\nA few things that helped Wilf when he was starting out.\n\nCoins come in three ways. First, your own to-dos: open the quest board (the pinboard at the top of the screen), add the real things you mean to do today, and every one you tick pays ${QB.TASK_PAY} coins, up to ${QB.PAID_PER_DAY} a day. Second, village requests, on the same board: when one of us needs something, bring it over and you'll get coins and a heart. And third, anything you grow or make, sold at my market or in the shops.\n\nYour seeds want planting in the garden behind the house. They grow in real hours, so plant them today and they'll be ready later on.\n\nPop into the market and say hello. I'll put the kettle on.\n\nHana`});
+const welcomeLetter = at => ({id: "welcome", from: "hana", at, title: "Welcome to Honeybrook!", body: `Hello love, and welcome!\n\nA few things that helped Wilf when he was starting out.\n\nCoins come in three ways. First, your own to-dos: open the quest board (the pinboard at the top of the screen), add the real things you mean to do today, and every one you tick pays ${QB.TASK_PAY} coins, up to ${QB.PAID_PER_DAY} a day. Second, village requests, on the same board: when one of us needs something, bring it over and you'll get coins and a heart. And third, anything you grow or make, sold at my market or in the shops.\n\nYour seeds want planting in the garden, just along from the house (follow the Garden sign). They grow in real hours, so plant them today and they'll be ready later on.\n\nPop into the market and say hello. I'll put the kettle on.\n\nHana`});
 function weeklyPaper(fri){
   noteHistory();
   const days = Array.from({length: 7}, (_, i) => { let d = fri; for (let k = 0; k < 6 - i; k++) d = prevDay(d); return d; });
@@ -1732,7 +1732,7 @@ function bag(){
     postPick = false; giftPick = null; sfx("chime"); flash(`Posted to ${BK.person(to).name}`); speak(`Wrapped in brown paper and off to ${BK.REGIONS[BK.regionOf(to)]}. Watch your mailbox for a thank-you.`, 4500); save(); bag(); });
   $("bag").querySelectorAll("[data-keepit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); keepItem = giftPick; giftPick = null; openView = null; render(); });   // a souvenir kept: off to the shelf chooser
   $("bag").querySelectorAll(".item").forEach(b => b.onclick = ev => { const k = ev.target.closest("[data-kit]"); if (k) { ev.stopPropagation(); toKitchen(k.dataset.kit); return; } useItem(b.dataset.id); });
-  $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome bag of seeds is in here. Plant them in the garden, out the back of the house." : "";
+  $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome bag of seeds is in here. Plant them in the garden, just along from the house." : "";
   $("play").innerHTML = [["pet","Pet"],["hide","Hide-and-seek"],["nap","Nap together"]].map(([k, n]) => `<button class="btn alt small" data-play="${k}">${n}</button>`).join("");
   $("play").querySelectorAll("[data-play]").forEach(b => b.onclick = () => playFree(b.dataset.play));
 }
