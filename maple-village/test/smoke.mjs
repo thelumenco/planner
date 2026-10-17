@@ -4231,6 +4231,14 @@ if (want("\nTomi presses 10 to 5, Monday to Saturday, even while you're away (ro
   const H = {}, h = {tomiAt: Date.parse("2026-10-20T17:30:00Z")}, x = {oliveCrate: 9};
   check(!mc.tomiCatchUp(H, h, x, Date.parse("2026-10-21T09:30:00Z"), 0).started && x.oliveCrate === 9, "nothing overnight, outside his hours");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe wiki covers every destination (round 227)")) try {
+  console.log("\nThe wiki covers every destination (round 227)");
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));
+  const towns = Object.keys(tw.TOWNS).filter(k => !tw.TOWNS[k].soon), slugs = new Set((await tp.pages({})).map(p => p.slug));
+  const noPage = towns.filter(k => !slugs.has("trips/" + k)), noActs = towns.filter(k => !(tp.ACTS[k] && tp.ACTS[k].length));
+  check(!noPage.length, "every destination has its own wiki page" + (noPage.length ? " (missing: " + noPage.join(", ") + ")" : ""));
+  check(!noActs.length, "every destination has its things to do in the wiki (wiki/pages/70-trips.mjs ACTS)" + (noActs.length ? " (missing: " + noActs.join(", ") + ")" : ""));
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

@@ -289,3 +289,9 @@ check is now clean.
   patterns: a little gong), a silver ring with Wayan, Pak Gede's carved animal of the day (seven, then a shelf), the
   kecak fire dance at sunset, the jungle swing, the monkeys (who sometimes take your sunglasses). Friends: Hana on a
   beanbag, Farid planting rice, Tomi on the swing, Bo with a coconut, Posy's offering, Theo at the gamelan.
+
+## The wiki (honeybrookwiki.web.app, round 224 on)
+Built from the game's own data by `node wiki/build-wiki.mjs` (part of `npm run build:public`, so every deploy rebuilds
+it, and the leak check covers it strictly). A new villager, item, recipe or destination appears on its own. The one
+hand-written piece per destination is its "Things to do" list (ACTS in wiki/pages/70-trips.mjs): the test "The wiki
+covers every destination" fails until a new place has one.
