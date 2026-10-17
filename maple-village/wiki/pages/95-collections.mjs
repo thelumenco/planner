@@ -25,7 +25,8 @@ const capF = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 const nm = id => (NPCS.find(n => n.id === id) || {name: id}).name;
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 // which town a shop (a room or a place on a town screen) is in
-const townOfShop = s => { const t = TOWN_SCENES[s] || (TOWN_PLACES[s] && TOWN_SCENES[TOWN_PLACES[s].scene]); if (t && TOWNS[t]) return TOWNS[t].n; const k = Object.keys(TOWNS).find(id => JSON.stringify(TOWNS[id]).includes(`"${s}"`)); return k ? TOWNS[k].n : ""; };
+const SHOP_TOWN = {ceramica: "ronda", postales: "ronda", especias: "ronda", dulces: "ronda"};   // Ronda's corners and stands, named in game/ronda.js
+const townOfShop = s => { if (SHOP_TOWN[s] && TOWNS[SHOP_TOWN[s]]) return TOWNS[SHOP_TOWN[s]].n; const t = TOWN_SCENES[s] || (TOWN_PLACES[s] && TOWN_SCENES[TOWN_PLACES[s].scene]); if (t && TOWNS[t]) return TOWNS[t].n; const k = Object.keys(TOWNS).find(id => JSON.stringify(TOWNS[id]).includes(`"${s}"`)); return k ? TOWNS[k].n : ""; };
 
 // every trophy there is: reached() for a save that has done everything
 function allTrophies(){

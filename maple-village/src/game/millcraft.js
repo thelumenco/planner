@@ -125,7 +125,17 @@ export function toBasket(F, herb, n = 99){ const c = craftState(F), k = Math.min
 /* ---------- Tomi at the press, and Hazel at the shop (both on the clock) ---------- */
 // Tomi (10 to 5, not Sundays, once the mill's open) has three jobs and only three (round 200: "take the olives from the
 // crate, press it into bottles of olive oil, and then put them into the basket upstairs... That's it"). Nothing else upstairs.
-export const PRESSER = {from: 14*60, to: 17*60 + 30}, SHOPKEEP = {from: 10*60, to: 17*60, closed: [1]};
+export const PRESSER = {from: 10*60, to: 17*60, days: [1, 2, 3, 4, 5, 6]}, SHOPKEEP = {from: 10*60, to: 17*60, closed: [1]};
+// round 226 (Mel: "he collects the olives from the crate, presses them, bottles them, puts them in the basket upstairs,
+// and repeats"): his working hours, run forward since the last look, so the pressing carries on while you're away.
+// loc: the player's local offset in ms (util.js LOC). At most the last three days.
+export function tomiCatchUp(F, m, v, now = Date.now(), loc = 0){
+  let from = Math.max(m.tomiAt || now, now - 3*864e5), out = {pressed: 0, started: 0};
+  for (let t = from + 10*60e3; t <= now; t += 10*60e3) { const d = new Date(t + loc), hm = d.getUTCHours()*60 + d.getUTCMinutes();
+    if (!PRESSER.days.includes(d.getUTCDay()) || hm < PRESSER.from || hm >= PRESSER.to) continue;
+    const r = inesStep(F, m, v, t); out.pressed += r.pressed || 0; out.started += r.started || 0; }
+  m.tomiAt = Math.max(from, now - (now - from) % (10*60e3)); return out;
+}
 export function inesStep(F, m, v, t = Date.now()){
   const c = craftState(F), did = {};
   // any finished pressing (his, or one the player left going) is bottled and carried up to the basket, then he presses

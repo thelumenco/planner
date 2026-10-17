@@ -4220,6 +4220,17 @@ if (want("\nThe second grinder says so, and the dip bar shows your cone (round 2
   const a = si.dipIco("cone", "#F4C7CF", "dark", "sprinkles"), b = si.dipIco("waffle", "#C3E8B8", "white", "none");
   check(a === "dpc_cone_F4C7CF_dark_sprinkles" && si.dipIcon(a) && si.dipIcon(b) && si.dipIcon(a)[0] !== si.dipIcon(si.dipIco("cone", "#F4C7CF", "milk", "sprinkles"))[0] && si.dipIcon(a)[0] !== si.dipIcon(si.dipIco("cone", "#F4C7CF", "dark", "nuts"))[0] && ic.icon(a, 40) !== ic.icon("sparkle", 40), "the dip bar's picture changes with the dip and the topping (and the cone or the waffle)");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nTomi presses 10 to 5, Monday to Saturday, even while you're away (round 226)")) try {
+  console.log("\nTomi presses 10 to 5, Monday to Saturday, even while you're away (round 226)");
+  const mc = await import(new URL("../src/game/millcraft.js", import.meta.url));
+  const F = {}, m = {tomiAt: Date.parse("2026-10-19T09:00:00Z")}, v = {oliveCrate: 30};
+  const r = mc.tomiCatchUp(F, m, v, Date.parse("2026-10-19T18:00:00Z"), 0);
+  check(mc.PRESSER.from === 600 && mc.PRESSER.to === 1020 && r.pressed === 10 && v.oliveCrate === 0 && mc.craftState(F).basket.oliveoil === 10, "a Monday: the crate's olives pressed, bottled and carried up to the basket (10 bottles)");
+  const G = {}, g = {tomiAt: Date.parse("2026-10-18T09:00:00Z")}, w = {oliveCrate: 30};
+  check(!mc.tomiCatchUp(G, g, w, Date.parse("2026-10-18T18:00:00Z"), 0).pressed && w.oliveCrate === 30, "Sundays off");
+  const H = {}, h = {tomiAt: Date.parse("2026-10-20T17:30:00Z")}, x = {oliveCrate: 9};
+  check(!mc.tomiCatchUp(H, h, x, Date.parse("2026-10-21T09:30:00Z"), 0).started && x.oliveCrate === 9, "nothing overnight, outside his hours");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

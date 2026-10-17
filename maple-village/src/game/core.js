@@ -98,7 +98,7 @@ import * as WR from "./wrap.js";
 import { setPaperArtF } from "../art/paperie-room.js";
 import { storePanel, putAway, takeOut, sendOff, placeFor, homeNote, SHOPS as STORE_SHOPS, storeState } from "./storage.js";
 import { millUpArt } from "../art/millup.js";
-import { tastePanel, tasteStart, tastePick, tasteNext, tasteDone, finishTaste, tastingNow, workshopNow, workshopPanel, helpWorkshop, WORKSHOP } from "./millcraft.js";
+import { tomiCatchUp, tastePanel, tasteStart, tastePick, tasteNext, tasteDone, finishTaste, tastingNow, workshopNow, workshopPanel, helpWorkshop, WORKSHOP } from "./millcraft.js";
 import { mullPanel, mullStart, mullTick, mullState, mulledSeason, MULL, ADDS as MULL_ADDS, toRack, fromRack } from "./mulled.js";
 import { occasionOn, occasionNow, OCC, weddingOn, WED, dancingNow, triviaPanel, triviaStart, triviaAnswer, triviaNext, finishTrivia, TEAM_NAMES, QUIZ, paintPanel, paintStart, paintStep, paintDone, finishPaint, PAINT_PRICE, PAINT_SUBJECTS, comingUpHTML, mothersDay } from "./occasions.js";
 import { swPanel, swState, splitStone, crabStart, dropLine, pullUp, crabDone, cafeTreat as swCafe, teaStep, teaDone, lampStart, lampStep, lampDone } from "./saltwick.js";
@@ -2523,7 +2523,8 @@ function crateTick(){
 }
 function millTick(){
   const c = craftState(F), done = craftDone(F); if (done.length) { save(); const msg = done.map(d => `${d.n} ${d.recipe.name.toLowerCase()}`).join(", "); if ((scene === "mill" || scene === "millup") && !quietNow()) speak(`Ready, and onto the shelves: ${msg}.`, 5000); else flash(`At the mill: ${msg}`); }
-  if (owns(F, "mill") && whereIs("tomi") === "mill") { const d = inesStep(F, millState(F), vineState(F)); if (d.started || d.pressed) { save(); if (scene === "mill" && isHere("tomi") && !quietNow()) npcSay("tomi", d.started ? "The crate was full, so in they go. An hour under the stone." : `Bottled! ${d.pressed} up to the basket for you.`); else if (d.pressed && scene === "millup") flash(`Tomi's brought up ${d.pressed} bottle${d.pressed > 1 ? "s" : ""} of olive oil: they're in the basket`); } }
+  // round 226: Tomi's hours (10 to 5, Monday to Saturday) run forward since the last look, so the pressing carries on while you're away
+  if (owns(F, "mill")) { const d = tomiCatchUp(F, millState(F), vineState(F), Date.now() + (globalThis.__hbOffset || 0), LOC()); if (d.started || d.pressed) { save(); if (scene === "mill" && isHere("tomi") && !quietNow()) npcSay("tomi", d.pressed ? `Bottled! ${d.pressed} up to the basket for you.` : "The crate was full, so in they go. An hour under the stone."); else if (d.pressed && scene === "millup") flash(`Tomi's brought up ${d.pressed} bottle${d.pressed > 1 ? "s" : ""} of olive oil: they're in the basket`); } }
   { const day = dayKey(), hm = localHM(); if (owns(F, "millshop") && WORKSHOP.dow.includes(new Date(day + "T00:00:00Z").getUTCDay()) && hm >= WORKSHOP.to && c.workshopPaid !== day) {   // round 154: the workshop's tickets
     c.workshopPaid = day; const fee = WORKSHOP.fee*WORKSHOP.size; F.coins += fee; save(); if (scene === "millup") { sfx("coin"); flash(`+${fee}: the soap workshop`); } } }
   // sales, minute by minute since the last look (at most a day): the Mill Shop, or the wine shop's little shelf
