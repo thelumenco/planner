@@ -4274,6 +4274,9 @@ if (want("\nA surprise bouquet from the creator (round 228)")) try {
     check(s1 && s1.special === "xmas-test" && !cr.creatorPost(F, t0 + 70*D + 60000, 10*60, "2026-12-25", r, xmas) && F.creator.next >= s1.at + 3*D && F.creator.next >= before, "a special one comes once in its dates, and the next regular one waits a few days");
     { const G = {creator: {next: t0 + 99*D}}; check(!cr.creatorPost(G, t0, 10*60, "2026-12-27", r, xmas) && !cr.creatorPost(G, t0, 10*60, "2026-12-23", r, xmas), "and not outside its dates"); }
     const sm = cr.creatorMail(F, xmas).find(x => x.id === s1.id); check(sm.title === "Happy Christmas!" && /Merry Christmas/.test(sm.body) && /From the creator/.test(sm.body) && /100 coins/.test(sm.enclosed[1].n), "with its own title, note and coins");
+    { const H = {creator: {next: t0, sent: []}}; const bodies = []; let t = t0; for (let i = 0; i < cr.NOTES.length + 1; i++) { const x = cr.creatorPost(H, t + 1000, 10*60, "2026-11-20", r, none); bodies.push(cr.creatorMail(H).find(m => m.id === x.id).body); t = H.creator.next; }
+      check(new Set(bodies.slice(0, cr.NOTES.length)).size === cr.NOTES.length && bodies[cr.NOTES.length] === bodies[0], `the regular notes take turns: ${cr.NOTES.length} different ones before any comes again`);
+      check(cr.NOTES.every(n => !/\u2014/.test(n) && /Honeybrook|village|flowers|bouquet/i.test(n)), "every note is in the game's voice (no em dashes)"); }
     check(cr.SPECIALS.every(x => x.id && /^\d{4}-\d\d-\d\d$/.test(x.from) && /^\d{4}-\d\d-\d\d$/.test(x.until) && x.from <= x.until && x.title && x.note), "every special the creator has set has its dates, title and note"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`creator pageerror: ${e.message}`));
