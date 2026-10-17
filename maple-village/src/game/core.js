@@ -829,8 +829,11 @@ function useItem(id){
     if (!F.cool[id] || Date.now() - F.cool[id] > 20*M) { F.cool[id] = Date.now(); gainXp(1); }
     save(); return;
   }
+  // a flower you've picked is for giving (or the kitchen, or the mill): a tap with nobody to give it to only has a sniff,
+  // and it stays in the backpack (before, the tap used it up, and picked tulips seemed to vanish)
+  if (it.kind === "flower") { act("flower", it); speak("Mmm, lovely. To give it, stand by a villager, open your backpack and tap \"Give them something\". It keeps in here till then.", 5000); return; }
   addInv(id, -1); gainXp(it.xp || 1); sfx("purr");
-  act(it.kind === "food" ? "eat" : it.kind === "flower" ? "flower" : it.act, it); speak(it.say, 4500); save();
+  act(it.kind === "food" ? "eat" : it.act, it); speak(it.say, 4500); save();
 }
 // Arriving at the orchard or flower farm: Farid hands over the farm shop's takings and says hello (or calls you in
 // for tea in the afternoon)

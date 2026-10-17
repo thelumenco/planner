@@ -4242,6 +4242,23 @@ if (want("\nTomi presses 10 to 5, Monday to Saturday, even while you're away (ro
   const H = {}, h = {tomiAt: Date.parse("2026-10-20T17:30:00Z")}, x = {oliveCrate: 9};
   check(!mc.tomiCatchUp(H, h, x, Date.parse("2026-10-21T09:30:00Z"), 0).started && x.oliveCrate === 9, "nothing overnight, outside his hours");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nPicked flowers stay in the backpack (round 228)")) try {
+  // a friend's report: tulips picked in the garden "didn't appear in her backpack". They did, but a tap on them there
+  // (they say "give") used one up when nobody was about to give it to. Now a tap keeps it.
+  console.log("\nPicked flowers stay in the backpack (round 228)");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`flowers pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-17"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.plots[0] = {crop: "tulip", seed: "tulip_seed", plantedAt: Date.now() - 864e5, wateredAt: Date.now() - 864e5}; window.__hbGame.save(); });
+  await page.evaluate(() => window.__hbScene("farm")); await page.waitForTimeout(1000);
+  await page.locator('#world [data-plot="0"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-farm="pick"], #ctx [data-farm]:not([data-farm="water"])', { timeout: 15000 });
+  await page.click('#ctx [data-farm]:not([data-farm="water"])'); await page.waitForTimeout(500);
+  check(await page.evaluate(() => window.__hbGame.F().inv.tulip) === 2, "picking the tulips puts both in the backpack");
+  await page.click('[data-open="bag"]'); await page.waitForSelector('#bag .item[data-id="tulip"]', { timeout: 10000 });
+  await page.click('#bag .item[data-id="tulip"]'); await page.waitForTimeout(300); await page.click('#bag .item[data-id="tulip"]').catch(() => {}); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().inv.tulip) === 2 && /stand by a villager/.test(await page.evaluate(() => document.getElementById("speech").textContent)), "tapping them with nobody about keeps them, and says how to give one");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));
