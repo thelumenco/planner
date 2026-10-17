@@ -1737,7 +1737,9 @@ function bag(){
   $("bag").innerHTML = ids.map(id => { const it = ITEMS[id];
     const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? "give to someone" : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed your pet" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
     // kitchen ingredients can go to the wine shop's larder instead (food can still be fed to the pet)
-    const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
+    // (not on flowers: a friend's picked tulips kept "vanishing" from the backpack, sent off to the kitchen larder by one
+    // tap on this little chip. Flowers still go to the kitchen from the larder itself, or by the delivery bike.)
+    const kit = isGood(id) && it.kind !== "ingredient" && it.kind !== "flower" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
     return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");
   if (giftPick && F.inv[giftPick]) $("bag").insertAdjacentHTML("afterbegin", giftPickHTML(giftPick)); else giftPick = null;
   { const nv = nearestVillager(); if (!nv || (giveMode && giveMode !== nv.def.id)) giveMode = null;

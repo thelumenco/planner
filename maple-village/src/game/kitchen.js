@@ -259,7 +259,7 @@ const cookLog = (k, line) => { k.log = [line, ...(k.log || [])].slice(0, 4); };
 export function cookTick(F, today){
   const k = kitchenState(F), v = vineState(F), help = v.help || {}, done = [];
   if (help.cook === false) return done;
-  if (help.fetch) { const moved = backpackGoods(F).map(x => [x, sendToKitchen(F, x, 0, false)]).filter(([, n]) => n); if (moved.length) done.push(`brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")} from your backpack`); }
+  if (help.fetch) { const moved = backpackGoods(F).filter(x => (ITEMS[x] || {}).kind !== "flower").map(x => [x, sendToKitchen(F, x, 0, false)]).filter(([, n]) => n); if (moved.length) done.push(`brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")} from your backpack`); }
   if (k.oven && !left(k.oven)) { takeLoaves(F); done.push("took two loaves out of the oven"); }
   if (k.press && !left(k.press)) { takeCheese(F); done.push("unwrapped a new cheese"); }
   if (!k.press && !k.pilarNo.press && canSpare(k, {milk: 2})) { useSpare(k, {milk: 2}); k.press = {start: Date.now(), dur: PRESS}; done.push("started a cheese in the press"); }

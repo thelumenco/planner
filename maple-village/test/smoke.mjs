@@ -4255,6 +4255,7 @@ if (want("\nPicked flowers stay in the backpack (round 228)")) try {
   await page.click('#ctx [data-farm]:not([data-farm="water"])'); await page.waitForTimeout(500);
   check(await page.evaluate(() => window.__hbGame.F().inv.tulip) === 2, "picking the tulips puts both in the backpack");
   await page.click('[data-open="bag"]'); await page.waitForSelector('#bag .item[data-id="tulip"]', { timeout: 10000 });
+  check(await page.locator('#bag .item[data-id="tulip"] [data-kit]').count() === 0, "no little \"to the kitchen\" chip on picked flowers (one stray tap sent them all off)");
   await page.click('#bag .item[data-id="tulip"]'); await page.waitForTimeout(300); await page.click('#bag .item[data-id="tulip"]').catch(() => {}); await page.waitForTimeout(300);
   check(await page.evaluate(() => window.__hbGame.F().inv.tulip) === 2 && /stand by a villager/.test(await page.evaluate(() => document.getElementById("speech").textContent)), "tapping them with nobody about keeps them, and says how to give one");
   await page.close();
