@@ -71,15 +71,16 @@ export const tourNow = (day, hm) => toursOn(day).find(t => hm >= t.from && hm < 
 
 // The field: picnickers at lunchtime, someone feeding the swans in the early evening, Pip playing football after school
 // (and on weekend mornings), and Farid and Mei strolling round the lake on Friday afternoons and Sunday mornings.
-const PICNIC = [[106, 468], [138, 464]], LAKESIDE = [[196, 384], [236, 388], [272, 380]], PITCH = [[96, 560], [150, 548], [204, 566], [130, 574]], STROLL = [[60, 330], [100, 380], [300, 380], [70, 250]];
+const PICNIC = [[106, 468], [138, 464]], LAKESIDE = [[196, 384], [236, 388], [272, 380]], PITCH = [[96, 560], [150, 548], [204, 566], [130, 574]], WINTER_PITCH = [[424, 580], [462, 566], [446, 600], [480, 596]], STROLL = [[60, 330], [100, 380], [300, 380], [70, 250]];
 export function fieldVisits(day){
   const d = dow(day), we = d === 0 || d === 6, busy = [...toursOn(day).flatMap(t => [t.guide, ...t.group]), ...visitsOn(day).map(v => v.id)];
   const pool = seed => groupFor(day + seed, 2, [...busy, "pip"]);
   const [p1, p2] = pool("pic"), [s1] = groupFor(day + "swan", 1, [...busy, "pip", p1, p2]);
   const out = [{id: p1, from: 12*60, to: 13*60 + 30, at: PICNIC[0], act: "sit"}, {id: p2, from: 12*60, to: 13*60 + 30, at: PICNIC[1], act: "sit"},
     {id: s1, from: 17*60 + 30, to: 18*60 + 30, wander: LAKESIDE}];
-  if (we) out.push({id: "pip", from: 10*60, to: 11*60 + 30, wander: PITCH}, {id: "pip", from: 15*60, to: 16*60 + 30, wander: PITCH});
-  else out.push({id: "pip", from: 15*60 + 30, to: 16*60 + 30, wander: PITCH});
+  const pitch = xmasOn(day) ? WINTER_PITCH : PITCH;   // (the Christmas tree stands on the pitch all season: Pip kicks about on the lawn by the river)
+  if (we) out.push({id: "pip", from: 10*60, to: 11*60 + 30, wander: pitch}, {id: "pip", from: 15*60, to: 16*60 + 30, wander: pitch});
+  else out.push({id: "pip", from: 15*60 + 30, to: 16*60 + 30, wander: pitch});
   if (d === 5) out.push({id: "farid", from: 16*60, to: 17*60 + 30, wander: STROLL}, {id: "mei", from: 16*60, to: 17*60 + 30, wander: STROLL});
   if (d === 0) out.push({id: "farid", from: 8*60, to: 9*60 + 30, wander: STROLL}, {id: "mei", from: 8*60, to: 9*60 + 30, wander: STROLL});
   return out;
@@ -139,7 +140,7 @@ const PLAY = [[110, 604], [262, 600], [410, 608], [188, 584], [330, 590], [470, 
 export function familyVisits(day){
   const d = dow(day), we = d === 0 || d === 6, h = hash(day), fam = k => FAMILIES[(h + k) % FAMILIES.length], out = [];
   const add = (f, from, to, scene = "vineyard") => { out.push({id: f.parent, from, to, scene, wander: scene === "vineyard" ? WATCH : FIELD_WALK});
-    f.kids.forEach(k => out.push({id: k, from, to, scene, wander: scene === "vineyard" ? PLAY : FIELD_PLAY})); };
+    f.kids.forEach(k => out.push({id: k, from, to, scene, wander: scene === "vineyard" ? PLAY : fieldPlay(day)})); };
   if (we) { add(fam(0), 10*60, 12*60); add(fam(1), 10*60 + 30, 12*60 + 30); add(fam(2), 12*60 + 45, 14*60 + 45); add(fam(3), 15*60, 17*60 + 30); add(fam(0), 15*60 + 30, 17*60 + 30);
     // on market and fair days, a couple of the families go to the field first
     const ev = eventsOn(day).find(e => e.kind !== "xmas"); if (ev) { out.splice(0, out.length); add(fam(0), ev.from, ev.from + 120, "field"); add(fam(1), ev.from + 60, ev.from + 180, "field");
@@ -158,7 +159,7 @@ export function familySlot(id, day, hm){
 // from the shop's own shelves) and so does Farid (fruit and flowers from the orchard's farm shop stock).
 // at: which of the six stall places along the top it stands in
 // (place 8 isn't on the top row: it's the Scoop Shack's cart on the grass between the path and the river)
-export const STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128], [306, 520], [196, 520]];
+export const STALL_SPOTS = [[36, 128], [96, 128], [156, 128], [216, 128], [276, 128], [336, 128], [396, 128], [456, 128], [306, 520], [318, 430]];   // (the Cocoa Room cart: just above Noor's pen, clear of the Christmas tree and the picnic blankets)
 // produce: the stall sells whatever vegetables and berries are in season (core.js works out which)
 export const MARKET = [{id: "elena", at: 0, short: "Cheese", n: "Cheese and olives", items: ["cheese", "olives"], col: "#F3C969", line: "Aged on a farm up the hill. Try a slice!"},
   {id: "felix", at: 1, short: "Honey", n: "Honey and bee things", items: ["honey", "honeycomb", "beecandle", "toast"], col: "#E3A23A", line: "Wildflower honey, from my own bees. The candles are pure beeswax."},
@@ -234,7 +235,9 @@ export const eventNow = (day, hm) => eventOn(day, hm);
 export const stallAt = (day, hm, i) => { const e = eventNow(day, hm); return e ? e.stalls.find(s => s.at === i) || null : null; };
 // shoppers at the event: villagers drifting between the stalls along the top in two waves; in each wave two of them
 // settle on the picnic blankets afterwards with what they bought. The keepers stand by their stalls.
-const FIELD_WALK = [[60, 172], [140, 178], [220, 172], [300, 178], [380, 174], [450, 182], [120, 196]], FIELD_PLAY = [[150, 470], [252, 520], [90, 600], [240, 590], [60, 430]];   // (round 228: clear of the Christmas tree)
+const FIELD_WALK = [[60, 172], [140, 178], [220, 172], [300, 178], [380, 174], [450, 182], [120, 196]], FIELD_PLAY = [[150, 470], [252, 520], [90, 600], [240, 590], [60, 430]];
+// (from late November the Christmas tree stands bottom left: the children play between the picnic spot and the path instead, never through the tree)
+const XMAS_PLAY = [[60, 430], [150, 470], [252, 520], [262, 468]], fieldPlay = day => xmasOn(day) ? XMAS_PLAY : FIELD_PLAY;   // (round 228: clear of the Christmas tree)
 const PICNICKERS = [[106, 468], [138, 464], [198, 486], [230, 482]];
 // Stall keepers don't stand still all morning: every half hour each picks something to do. Behind the table, out
 // in front, sitting on the crate, over chatting to shoppers on the path, or off wandering the market (the stall
@@ -285,7 +288,7 @@ export function eventSlot(id, day, hm){
   const crowd = groupFor(day + "ev" + wave, 4, ["pip", ...e.stalls.map(s => s.id), ...toursOn(day).flatMap(t => [t.guide, ...t.group])], [...VISITORS, ...TOURISTS, "sam", "priya"]);
   const k = crowd.indexOf(id);
   if (k >= 2 && hm >= start + half) return {from: start + half, to: wave ? e.to : mid, scene: "field", at: PICNICKERS[wave ? k : k - 2], act: "sit"};
-  if (k >= 0 || id === "pip") return {from: start, to: wave ? e.to : mid, scene: "field", wander: id === "pip" ? FIELD_PLAY : FIELD_WALK};
+  if (k >= 0 || id === "pip") return {from: start, to: wave ? e.to : mid, scene: "field", wander: id === "pip" ? fieldPlay(day) : FIELD_WALK};
   return null;
 }
 // Round 104: your friends go to the night market and the fair too (the Sunday market they already do in their routines).
