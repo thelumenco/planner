@@ -25,9 +25,15 @@ import { COTTAGES as LET_COTTAGES } from "../data/lets.js";
 import * as SL from "./shopping.js";
 import { colourOf } from "../art/garments.js";
 import { journalCount } from "./myroom.js";
-import { attachMyDocs, journalPanel, wireJournal } from "./myroom.js";
+import { attachMyDocs, journalPanel, wireJournal, addEntry } from "./myroom.js";
 import { reached, award, onPedestals, nextUp, pedestalPanel, bookPanel, wireTrophies, PEDESTALS } from "./trophies.js";
 import { attachRoutines, routinesPanel, wireRoutines, rv, todaysSteps, checklistLeft } from "./routines.js";
+// round 227: kind words, affirmations, the savings vaults and the emotion jars, back in the game (saved in F)
+import * as KD from "./kudos.js";
+import * as AF from "./affirm.js";
+import * as VB from "./bank.js";
+import * as EJ from "./jars.js";
+import * as LTR from "./letters.js";   // and the letters: Dear future me, Dear Universe
 import { myName, dearMe } from "./me.js";
 import * as GU from "./guests.js";
 import * as TL from "./tailor.js";
@@ -185,7 +191,7 @@ function renameIds(F){
 }
 migrate();
 setPaperArtF(() => F);
-setArtContext({lets: id => ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).slots || {}, letParcels: id => (((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).parcels || []).length, letExtras: id => ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).extras || {}, letWelcome: id => { const r = ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).ready || {}, n = o => Object.values(o || {}).reduce((a, b) => a + b, 0); return {fruit: n(r.fruit), fridge: n(r.fridge)}; }, cocoa: () => cocoaState(F), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, boardCount: () => QB.tasksLeft(F) + QB.board(F).reqs.length, growth:p => growth(p), stats:() => ({}), day:() => dayKey(), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns(F, "giftshop") && GAL.stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey()), upsDone: id => id === "scoopshop" ? Object.keys(SC_UPGRADES).every(k => hasUp(scoopState(F), k)) : id === "cocoa" ? Object.keys(CC_UPS).every(k => ccUp(cocoaState(F), k)) : false});
+setArtContext({kudos: () => KD.kudosCount(F), jars: () => EJ.shelf(F), vault: x => { const i = stationsOf("bank").filter(s => s.kind === "vaultjar").findIndex(s => s.x === x); return i < 0 ? null : VB.jarAt(F, i); }, lets: id => ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).slots || {}, letParcels: id => (((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).parcels || []).length, letExtras: id => ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).extras || {}, letWelcome: id => { const r = ((F.lets && F.lets.cottages && F.lets.cottages[id]) || {}).ready || {}, n = o => Object.values(o || {}).reduce((a, b) => a + b, 0); return {fruit: n(r.fruit), fridge: n(r.fridge)}; }, cocoa: () => cocoaState(F), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, boardCount: () => QB.tasksLeft(F) + QB.board(F).reqs.length, growth:p => growth(p), stats:() => ({}), day:() => dayKey(), lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns(F, "giftshop") && GAL.stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey()), upsDone: id => id === "scoopshop" ? Object.keys(SC_UPGRADES).every(k => hasUp(scoopState(F), k)) : id === "cocoa" ? Object.keys(CC_UPS).every(k => ccUp(cocoaState(F), k)) : false});
 function isDusk(){ const t = localHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, selPlot = null, shopTab = "seeds";
@@ -354,6 +360,8 @@ let keepItem = null, keepSpot = null, adoptItem = null, adoptSt = {}, petView = 
 let goalView = null, paddling = false, scView = null, scSt = {pick: null, sel: []}, lastScoop = 0;
 // the Scoop Shack's rooms, and its panels that open from anywhere (the catalogue, the honesty freezer, the delivery bike)
 const SCOOP_IN = ["scoopshop", "scoopkitchen", "scoopdip"], SC_ANY = ["upgrade", "honesty", "deliver", "trolley"];   // a big goal's "save up for it" card ("garagepick": the garage's ride chooser)
+// round 227: "kudos" / "affirm" (the courtyard), "vault" / "bank" (the bank), "jars" (your room); selfSt is its view state
+let selfView = null, selfSt = {}, selfForce = false;
 let fieldView = null, orView = null, orAt = null, orTab = null, potItem = null, kView = null, vyView = null, vyAt = null, trophyView = null, routOpen = false, shedOpen = false, runOpen = false, wardOpen = false, bedOpen = false, journalOpen = false, calmOpen = false, recOpen = false;
 // Guided breathing in the calm corner: a ring grows as she breathes in (4 s), holds (2 s) and shrinks as she breathes out (6 s)
 const BREATH = [[4, "Breathe in"], [2, "Hold"], [6, "Breathe out"]], CYCLE = 12;
@@ -1095,7 +1103,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 /* ---------- storage at home (round 166, game/storage.js): the fridge's "Stored" tab, and the garage shelf ---------- */
 // the fridge: what's stored for the shops (storage.js), and the shopping list on the door (shopping.js)
@@ -1148,6 +1156,7 @@ function itemBtn(id, label, disabled, extra){
   return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${icon(it.ico, 34)}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra || ""}</button>`;
 }
 function ctx(){
+  if (selfView && !selfForce && !$("panel").hidden && !openView && (selfSt.pouring || (document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && $("ctx").contains(document.activeElement)))) return;   // never mid-pour or mid-sentence
   const c = $("ctx"); let h = "";
   if (guestView && scene === "guestroom") h = GU.guestBookHTML(F);
   else if (habView && scene === "haberdash") h = TL.haberdasheryHTML(F, habSt, sewOpen());
@@ -1211,6 +1220,7 @@ function ctx(){
   else if (loftView && scene === "vineyard") h = loftPanel(F);
   else if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) h = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F)
     : vyView === "mcrate" ? wineCratePanel(F, dayKey()) : vyView === "shelf" ? shelfPanel(F) : vyView === "menu" ? menuPanel(F, dayKey()) : vyView === "counter" ? counterPanel(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter(n => n.id !== "celeste" && isHere(n.id)).map(n => n.name), dayKey());
+  else if (selfView && selfHere()) h = selfPanel();
   else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
   else if (routOpen && scene === "room") h = routinesPanel();
   else if (fieldView && scene === "giftshop") h = giftPanel(F, fieldView, giftOpts());   // round 178
@@ -1277,7 +1287,7 @@ function ctx(){
       ? `<div class="breathe"><div class="ring" style="animation-delay:-${((Date.now() - breath.start)/1000 % CYCLE).toFixed(2)}s"></div><p class="cue" id="breathCue">Breathe in</p></div><p class="sub" style="text-align:center"><span id="breathLeft"></span> left</p><div class="actions" style="justify-content:center"><button class="btn alt small" data-calm="stop">Stop</button></div>`
       : `<p class="sub">Cushions, ${(F.decor || {}).r_candle ? "a candle, " : ""}one slow breath.</p><p class="eyebrow">Guided breathing</p><div class="actions">${[1, 3, 5].map(m => `<button class="btn ${m === 3 ? "primary" : "alt"} small" data-calm="${m}">${m} min</button>`).join("")}</div>`);
   } else if (journalOpen && scene === "room") {
-    h = journalPanel();
+    h = journalPanel().replace("</h2>", `</h2><div class="actions"><button class="btn alt small" data-letters="1">Write a letter...</button></div>`);   // round 227: letters
   } else if (wardOpen && scene === "room") {
     h = wardrobePanel(F);
   } else if (runOpen && scene === "base") {
@@ -1656,7 +1666,8 @@ function ctx(){
     tab: k => { orTab = k; ctx(); }, placed: () => { orView = null; potItem = null; ctx(); drawScene(); }, tea: haveTea});
   if (vyView && (scene === "vineyard" || scene === "wineshop")) wireVine(c, F, {harvest: (festivalOn(dayKey()) || {}).id === "harvest", save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, r: vyAt && vyAt.r, i: vyAt && vyAt.i});
   if (routOpen && scene === "room") wireRoutines(c, {rerender: () => ctx(), undoable, done: routineCoins});
-  if (trophyView && scene === "trophy") { wireTrophies(c, F, {save: () => save(true), undoable, rerender: () => { ctx(); drawScene(); }, close: () => { trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); drawScene(); }}); }
+  if (selfView && selfHere()) wireSelf(c);
+  if (trophyView && scene === "trophy") { wireTrophies(c, F, {save: () => save(true), undoable, rerender: () => { ctx(); drawScene(); }, close: () => { trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); drawScene(); }}); }
   showPanel(!!h, (homeView === "shoplist" || homeView === "stored") && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
   c.querySelectorAll("[data-shop]").forEach(b => b.onclick = () => { shopTab = b.dataset.shop; ctx(); });
   c.querySelectorAll("[data-decor]").forEach(b => b.onclick = () => decorClick(b.dataset.decor));
@@ -1692,7 +1703,7 @@ function ctx(){
     else if (a === "fill") { const [oid, hid] = v0.split("|"), pay = fillOrder(F, oid, hid, dayKey()); if (pay) { sfx("coin"); gainXp(2); flash(`+${pay}: a hamper order`); speak("Penny takes the hamper and the envelope of coins, and crosses the order off. \"They'll be thrilled.\"", 5000); } }
     else if (a === "tie") { const hp = packTie(F); if (hp) { sfx("chime"); hearts(2); gainXp(2); flash(`${hp.name} hamper`); speak(`Penny ties a fat red bow on top and writes the tag: "${hp.name}". It's in your backpack.`, 5500); } }
     save(true); ctx(); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { gsPk = null; ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { gsPk = null; ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; scView = null; scSt.pick = null; boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
   c.querySelectorAll('[data-rec="stop"]').forEach(b => b.onclick = () => { setMusic(false); speak("Needle up. Quiet time.", 2500); ctx(); drawScene(); });
@@ -1700,6 +1711,7 @@ function ctx(){
   c.querySelectorAll("[data-calm]").forEach(b => b.onclick = () => { const k = b.dataset.calm;
     if (k === "stop") stopBreath(false); else startBreath(+k); });
   if (breath) tickBreath();
+  c.querySelectorAll("[data-letters]").forEach(b => b.onclick = () => { journalOpen = false; openSelf("letters", LTR.freshView()); });
   if (journalOpen && scene === "room") wireJournal(c, undoable, e => { if (e) { sfx("chime"); speak("Page kept. Lovely.", 3500); } ctx(); });
   c.querySelectorAll("[data-acc]").forEach(b => b.onclick = () => { const k = b.dataset.acc, on = !wearing(F, k), n = (ACCESSORIES.find(a => a[0] === k) || [])[2] || "it";
     if (on) F.decor[k] = "on"; else delete F.decor[k]; sfx("paper", true); save(); render(); drawScene();
@@ -2249,7 +2261,7 @@ function setScene(id, at){
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scView = null; scSt.pick = null; scSt.dpick = null; ppView = null;
-    GU.signBook(F); scene = id; cam.snap = true; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; resetNpcs();
+    GU.signBook(F); scene = id; cam.snap = true; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; resetNpcs();
     const p = at || [260, 596];
     hero.x = hero.tx = p[0]; hero.y = hero.ty = p[1]; hero.path = []; chum.x = chum.tx = p[0] - 22; chum.y = chum.ty = p[1] + 2;
     render(true); w.classList.remove("fading");
@@ -2303,7 +2315,7 @@ function go(target, x, y, fn){
     if (INNER[target]) { const I = INNER[target]; legs.push({scene:I.parent, x:I.door[0], y:I.door[1], fn:() => setScene(target, I.arrive)}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -2355,6 +2367,7 @@ function arriveSpot(id){
     speak(first ? "A tasting flight: a splash of each of your wines, lined up on the bar. Honestly? They're good." : "Another little pour. Just to be sure.", 4500); render(); return; }
   if (scene === "tomiposy" && id === "games") { speak("A games console and two controllers. Tomi's high score is taped to the side of the telly.", 4000); render(); return; }
   if (id === "guestdoor") { setScene("guestroom", INNER.guestroom.arrive); return; }
+  if (scene === "room" && id === "jars") { openSelf("jars", EJ.freshView()); return; }
   if (id === "routines") { routOpen = true; rv.edit = false; sfx("paper", true); render(); return; }
   if (id === "bed") { bedOpen = true; sfx("paper", true); render(); return; }
   if (id === "window") { const shut = F.curtains ? F.curtains === "closed" : (isDusk() || !!S.sleep); F.curtains = shut ? "open" : "closed"; sfx("paper", true); speak(shut ? "Curtains open. Hello, sky." : "Curtains closed. Cosy.", 2500); save(true); return; }
@@ -2371,8 +2384,8 @@ function arriveSpot(id){
   if (scene === "garage" && id === "cupboard") { speak(pick(["Mops, a bucket and a lot of cloths.", "The cleaning cupboard. Tidy, for once."]), 3000); return; }
   if (scene === "garage" && id === "gshelf") { homeView = "shelf"; sfx("paper", true); render(); return; }
   if (scene === "office" && id === "desk") { speak(pick(["A tidy desk, a lamp and a cup of pens.", "Your desk. A good spot for writing lists."]), 3000); return; }
-  if (scene === "bank" && /^vault\d$/.test(id)) { speak(pick(["A tall glass vault jar, polished till it shines.", "Opal's vault jars. Empty, and very shiny."]), 3000); return; }
-  if (scene === "bank" && id === "counter") { if (!npcSay("opal", pick(["Lovely to see you! The vaults are polished and the pens all work.", "Every coin counts. Even the little ones.", "Quiet day at the bank. I've been alphabetising the pens."]))) speak("The bank counter. Opal's out just now.", 3000); return; }
+  if (scene === "bank" && /^vault\d$/.test(id)) { const slot = +id.slice(5); openSelf("vault", Object.assign(VB.freshView(slot), {mode: VB.jarAt(F, slot) ? "jar" : "setup"})); return; }
+  if (scene === "bank" && id === "counter") { openSelf("bank", VB.freshView()); if (!npcSay("opal", pick(["Lovely to see you! The vaults are polished and the pens all work.", "Every coin counts. Even the little ones.", "Quiet day at the bank. I've been alphabetising the pens."]))) speak("The bank counter. Opal's out just now.", 3000); return; }
   if (id === "trophydoor") { setScene("trophy", INNER.trophy.arrive); return; }
   if (id === "kdoor") { setScene("kitchen", INNER.kitchen.arrive); return; }
   // round 146: the glass doors out to the terrace, and the bookings book on the counter
@@ -2403,9 +2416,9 @@ function arriveSpot(id){
   if (scene === "trophy" && id === "bench") { hero.sitting = true; nodes.hero.classList.add("sit"); hero.dir = 1; sfx("paper", true); speak(pick(["Ahh. Sun on your face. Stay as long as you like.", "A little sit. The fountain's doing all the talking.", "Nowhere to be for a minute."]), 4000); render(); return; }
   if (scene === "trophy" && id === "fountain") { speak(pick(["The fountain burbles away. Someone's dropped a button in it.", "Cool water and a little stone frog. Lovely.", "You dip your fingers in. Cold!"]), 3500); return; }
   if (scene === "trophy" && id === "tbook") { trophyView = "book"; sfx("paper", true); render(); return; }
-  if (scene === "trophy" && id === "affirm") { speak(pick(["A sunny bench. Sit for a minute.", "The bench is warm from the sun."]), 3000); return; }
+  if (scene === "trophy" && id === "affirm") { openSelf("affirm", AF.freshView()); return; }
   if (scene === "trophy" && /^ped\d$/.test(id)) { trophyView = id; const t = onPedestals(F)[+id.slice(3)]; sfx(t ? "chime" : "paper", true); render(); return; }
-  if (scene === "trophy" && id === "kudos") { speak(pick(["A corkboard of village notices. The bake sale was a triumph, apparently.", "Lost: one glove, green. Found: one glove, green. Well done, everyone."]), 4000); return; }
+  if (scene === "trophy" && id === "kudos") { openSelf("kudos", KD.freshView()); speak(KD.kudosCount(F) ? "All the lovely things people have said to you." : "Pin up the nice things people say to you. Future you will be glad.", 3500); return; }
   if (scene === "hall" && id === "whiteboard") { speak(pick(["A whiteboard with half a sum on it. Theo's, probably.", "Fresh marker, blank board."]), 3000); return; }
   const s = spotObj(scene, id); if (s) speak(s.line, 3500); render();
 }
@@ -2477,6 +2490,7 @@ function arriveVillageSpot(id){
     if (morning && S.dolphinDay !== dayKey()) { S.dolphinDay = dayKey(); gainXp(1); setTimeout(() => { speak(pick(["There! Dolphins, three of them, just past the jetty.", "A fin! Then another. The dolphins are out this morning."]), 5000); [0, 300].forEach((d, k) => setTimeout(() => mprop("heart", 90 + k*30, 220, 1800), d)); ; }, 2400); save(); }
     speak(morning ? "A sit on the bench, looking out to sea. The dolphins come by most mornings." : pick(["The sea's all sparkly. Nothing to do but look at it for a minute.", "Sea breeze. A pelican going past. A proper break."]), 4500); render(); return; }
   if (id === "swing") { speak(v.line, 3500); render(); return; }
+  if (id === "letterbox" && LTR.arrived(F).length) { LTR.announce(F); openSelf("letters", LTR.freshView()); speak("Post! Letters for you.", 3000); save(); return; }   // round 227
   if (id === "letterbox") { const p = paperWaiting() || unreadMail()[0]; if (p) { sfx("paper"); openMail(p); } else speak(`Nothing in the letterbox. ${paperName()} comes on Fridays.`, 3800); render(); return; }
   if (id === "news") { newsOpen = true; newsTab = "wins"; sfx("paper"); speak(pick(["Pancake the village dog opens one eye. Here's what's new.", "The good news board. Pancake's guarding it."]), 3500); render(); return; }
   if (id === "cacao") { const c = cocoaState(F), h = Math.max(1, Math.round(((c.treeAt || Date.now()) + 2*864e5 - Date.now() - (globalThis.__hbOffset || 0))/36e5));
@@ -3161,6 +3175,41 @@ $("setBed").onchange = e => { F.bedLock = e.target.checked; save(); bedtimeTick(
 ["keydown", "click", "pointerdown"].forEach(t => document.addEventListener(t, ev => { if (document.body.classList.contains("bedlocked") && !ev.target.closest("#bedLock")) { ev.stopPropagation(); ev.preventDefault(); } }, {capture: true}));
 
 /* ---------- Trophies ---------- */
+/* ---------- round 227: kind words, affirmations, savings vaults and emotion jars (kudos.js, affirm.js, bank.js, jars.js) ---------- */
+const SELF_AT = {kudos: "trophy", affirm: "trophy", vault: "bank", bank: "bank", jars: "room", letters: "room|base"};
+const selfHere = () => !!SELF_AT[selfView] && SELF_AT[selfView].split("|").includes(scene);
+function openSelf(view, st){ selfView = view; selfSt = st; sfx("paper", true); render(); }
+function selfRerender(redraw){ selfForce = true; try { ctx(); } finally { selfForce = false; } if (redraw) drawScene(); }
+function selfSave(){ selfForce = true; try { save(true); } finally { selfForce = false; } }
+function selfPanel(){
+  if (selfView === "kudos") return KD.kudosPanel(F, selfSt);
+  if (selfView === "affirm") return AF.affirmPanel(F, selfSt);
+  if (selfView === "vault") return VB.vaultPanel(F, selfSt);
+  if (selfView === "bank") return VB.bankOverview(F, isHere("opal"));
+  if (selfView === "jars") return EJ.jarsPanel(F, selfSt);
+  if (selfView === "letters") return LTR.lettersPanel(F, selfSt);
+  return "";
+}
+function wireSelf(c){
+  const base = {rerender: () => selfRerender(true), save: selfSave, undoable, sfx};
+  if (selfView === "kudos") KD.wireKudos(c, F, selfSt, {...base, done: () => { sfx("chime"); hearts(2); speak("Pinned up. That one's a keeper.", 3000); }});
+  if (selfView === "affirm") AF.wireAffirm(c, F, selfSt, {...base, kept: on => { sfx(on ? "chime" : "tap"); if (on) hearts(1); }, added: () => { sfx("chime"); speak("Yours, on the board. It'll come round in the daily five.", 3500); }});
+  if (selfView === "vault" || selfView === "bank") VB.wireVault(c, F, selfSt, {...base,
+    open: () => { selfView = "vault"; sfx("paper", true); selfRerender(); },
+    close: () => { selfView = null; selfSt = {}; ctx(); drawScene(); },
+    took: (j, n) => speak(`${VB.money(n, VB.currency(F))} out of ${j.label}. It's there when you need it.`, 3500),
+    poured: (j, nowFull) => { if (nowFull) { sfx("yay"); flash(`${j.label} is full!`); speak(`Your ${j.label} vault is full! Look at it sparkle. That's ${VB.money(j.amount, VB.currency(F))} saved.`, 7000, true); }
+      else speak(pick(["Capped and back in the vault.", "Clink clink. Back in the vault it goes.", "Another handful of jewels. Lovely."]), 3000); }});
+  if (selfView === "letters") LTR.wireLetters(c, F, selfSt, {...base, name: () => myName(F),
+    toJournal: t => { const e = addEntry(t, "letter"); if (e) { sfx("chime"); flash("Copied into your journal"); } return !!e; },
+    sent: (k, e) => { sfx("paper"); speak(k === "universe" ? "Posted. The Universe always writes back. Keep an eye on the letterbox at home." : `Sealed. It'll arrive in your letterbox on ${LTR.longDate(e.deliver)}.`, 5000); }});
+  if (selfView === "jars") EJ.wireJars(c, F, selfSt, {...base, placed: j => { sfx("chime");
+    const heavy = j.blobs.filter(x => ["anger", "sad", "fear", "anxious", "tired"].includes(x)).length >= Math.ceil(j.blobs.length/2);
+    speak(heavy ? "That's a big feeling. Be gentle with yourself today." : j.blobs.filter(x => ["joy", "love", "proud", "calm"].includes(x)).length > j.blobs.length/2 ? "A happy one. Lovely." : "Kept safe on the shelf.", 4500); }});
+}
+// letters arriving (a reply from the Universe, a letter from your past self): announced once, wherever you are
+setInterval(() => { if (!F || !F.letters) return; const n = LTR.announce(F); if (!n.length) return; save(); sfx("chime");
+  speak(n.some(e => e.kind === "universe") ? "A letter from the Universe has arrived. It's in your letterbox at home." : "A letter from your past self has arrived in your letterbox at home.", 6000); }, 20e3);
 const trophyCtx = () => ({F, levels: LEVELS, levelIndex: level(), journal: journalCount(), water: waterGoal(), steps: stepGoal()});
 function checkTrophies(){
   const {fresh, first, moved} = award(F, reached(trophyCtx()));

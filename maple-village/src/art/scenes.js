@@ -14,6 +14,8 @@ import { TABLES, SEATS, halfW } from "../data/dining.js";
 import { runArt } from "../game/pets.js";
 import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDefs } from "./village-extras.js";
 import { trophySVG } from "../game/trophies.js";
+import { jarArt as emoJarArt } from "../game/jars.js";   // round 227: the emotion shelf
+import { jarArt as vaultArt, isFull as vaultFull } from "../game/bank.js";   // round 227: the vault jars
 import { bankBuilding } from "./buildings.js";
 import { archGate } from "./orchard.js";
 import { STYLES as VAN_STYLES } from "../game/van.js";
@@ -466,7 +468,8 @@ export function furn(kind, x, y){
         `<rect x="${x-28}" y="${y-48}" width="56" height="9" rx="2"/><rect x="${x-22}" y="${y-39}" width="44" height="32"/><path d="M${x-12} ${y-37} v28 M${x} ${y-37} v28 M${x+12} ${y-37} v28" opacity=".35"/><rect x="${x-28}" y="${y-7}" width="56" height="7" rx="2"/>`)
         + (t ? trophySVG(t, 56).replace("<svg ", `<svg x="${x-28}" y="${y-48-63}" class="ptrophy" `) : `<ellipse cx="${x}" cy="${y-50}" rx="15" ry="3" fill="#000" opacity=".06"/>`); }
     // the bank: a tall glass vault jar (savings), and Opal's counter
-    case "vaultjar": { 
+    case "vaultjar": { const j = G.vault ? G.vault(x) : null;
+      if (j) return `<svg x="${x-34}" y="${y-300}" width="80" height="300" overflow="visible" class="${vaultFull(j) ? "vfull" : ""}">${vaultArt(j, 68, 300, {id: "f" + j.slot, sparkle: vaultFull(j), markers: false})}</svg>`;
       return `<g opacity=".75">${sk(`<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" style="fill:rgba(220,235,245,.35)"/>`, `<rect x="${x-26}" y="${y-282}" width="52" height="280" rx="12" stroke-dasharray="5 5"/><path d="M${x} ${y-152} v20 M${x-10} ${y-142} h20" stroke-width="2"/>`)}</g>`; }
     // the town hall's weekly review desk: a small table with an open scrapbook, photos and washi tape
     case "scrapbook": return sk(`<rect x="${x-48}" y="${y-30}" width="96" height="22" rx="3" style="fill:var(--wood)"/>
@@ -681,8 +684,8 @@ export function furn(kind, x, y){
         <circle cx="${x+30}" cy="${y-72}" r="6" style="fill:var(--rose)"/><circle cx="${x+40}" cy="${y-66}" r="5" style="fill:var(--butter)"/><circle cx="${x+22}" cy="${y-65}" r="5" style="fill:var(--peri)"/><circle cx="${x+30}" cy="${y-72}" r="2" style="fill:var(--honey)"/>`,
       `<rect x="${x-62}" y="${y-34}" width="124" height="26" rx="4"/><path d="M${x-56} ${y-8} v14 M${x+56} ${y-8} v14 M${x-56} ${y-21} h112" opacity=".4"/><path d="M${x-40} ${y-44} l26 -4 l26 4 v9 l-26 -3 l-26 3z M${x-14} ${y-48} v9 M${x-34} ${y-42} h14 M${x-8} ${y-42} h14" />
         <path d="M${x+30} ${y-44} q-6 -2 -5 -10 q1 -8 9 -8 q8 0 9 8 q1 8 -5 10z"/><path d="M${x+30} ${y-62} v-4 M${x+32} ${y-62} q4 -2 7 -3 M${x+28} ${y-62} q-3 -1 -5 -2" style="stroke:var(--moss2)"/><circle cx="${x+30}" cy="${y-72}" r="6"/><circle cx="${x+40}" cy="${y-66}" r="5"/><circle cx="${x+22}" cy="${y-65}" r="5"/>`);
-    case "jarshelf": { const js = [], W = 176, x0 = x - W/2;
-      const mini = () => "";
+    case "jarshelf": { const js = (G.jars && G.jars()) || [], W = 176, x0 = x - W/2;
+      const mini = (j, i) => { const cx = x0 + 16 + (i % 5)*36, top = y - (i < 5 ? 66 : 32) - 22; return j ? `<svg x="${cx - 11}" y="${top}" width="22" height="29" viewBox="0 0 60 80">${emoJarArt(j)}</svg>` : ""; };
       return sk(`<rect x="${x0}" y="${y-70}" width="${W}" height="70" rx="3" style="fill:#E2CBA8"/><rect x="${x0}" y="${y-38}" width="${W}" height="6" style="fill:var(--wood)"/><rect x="${x0}" y="${y-6}" width="${W}" height="6" style="fill:var(--wood)"/>`,
         `<rect x="${x0}" y="${y-70}" width="${W}" height="70" rx="3"/><path d="M${x0} ${y-38} h${W} M${x0} ${y-32} h${W} M${x0} ${y-6} h${W}"/>`) + `<g pointer-events="none">${js.map(mini).join("")}</g>`; }
     case "chartstand": return sk(`<rect x="${x-36}" y="${y-96}" width="72" height="58" rx="2" style="fill:#FFFDF6"/><rect x="${x-26}" y="${y-60}" width="10" height="16" style="fill:#7FB069"/><rect x="${x-12}" y="${y-70}" width="10" height="26" style="fill:#7FB069"/><rect x="${x+2}" y="${y-66}" width="10" height="22" style="fill:#7FB069"/><rect x="${x+16}" y="${y-84}" width="10" height="40" style="fill:#4E9A4A"/>`,

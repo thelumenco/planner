@@ -71,6 +71,22 @@ Mr Okada early in the morning too): data/npcs.js `HOMES`. The Fresh Pages librar
 Tests: `node test/smoke.mjs` has new sections for the quest board rules and a request handed over in the game; the
 sections for removed features are gone. Each section now records a failure and carries on instead of stopping the run.
 
+Round 227 (Mel: "these are things that the player needs to fill in themselves"): five of the room tools are back, made
+for any player and saved in the game state `F` (so in the browser and the cloud save slot like everything else; no
+private docs, no Claude):
+- Kind words (the courtyard corkboard, game/kudos.js, `F.kudos`): pin up kind things people have said, read one at
+  random, take one down with Undo. Never a quest spot.
+- Affirmations (the courtyard, game/affirm.js, `F.affirm`): five a day from a list of 30 general ones, plus your own
+  (they take turns in the daily five); a heart keeps a favourite.
+- Savings vaults (the bank, game/bank.js, `F.vaults`): your real-life savings, not coins, in five jewel jars. A label,
+  a goal, markers, a colour, a currency picked once (£, $, €, ¥, S$, A$, ₹ or none); add, take out, empty or remove
+  (with Undo), a little history; Opal's counter shows the passbook with the total.
+- Emotion jars (the shelf in your room, game/jars.js, `F.jars`): up to 10 blobs from up to 4 feelings (your own
+  feelings too), a note, ten jars on the shelf.
+- Letters (the writing desk's journal, game/letters.js, `F.letters`): Dear future me (sealed until the day you pick,
+  then in the letterbox at home) and Dear Universe (a pen pal who always writes back 3 to 6 hours later, or with the
+  morning post, from a bank of warm replies picked by what your letter is about). Any letter copies into the journal.
+
 ## Phase 3: no family (done)
 Who's in the family's places (ids swapped in code, every line rewritten in the villager's own voice):
 - Hana (the market) and Theo (town clerk, piano, double bass, sketching) live in the blue house on the foreshore
