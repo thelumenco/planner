@@ -5,6 +5,7 @@ import { icon as gameIcon } from "../src/art/icons.js";
 import { itemIco, ITEMS } from "../src/data/items.js";
 import { VILLAGE, ROOMS } from "../src/data/world.js";
 import { personArt } from "../src/art/people.js";
+import { titleArt } from "../src/art/title.js";
 
 export const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 export const slugify = s => String(s).toLowerCase().replace(/&/g, "and").replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -30,6 +31,9 @@ export const link = (slug, text) => `<a href="/${slug === "index" ? "" : slug}">
 export const card = (slug, title, sub, iconName) => `<a class="card" href="/${slug}">${iconName ? ico(iconName, 30) : ""}<span><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ""}</span></a>`;
 // a villager, drawn by the game's own art (personArt), standing on a little circle
 export const portrait = (look, size = 64) => `<svg class="face" viewBox="-26 -72 52 78" width="${size*52/78}" height="${size}" aria-hidden="true">${personArt(look || {})}</svg>`;
+// the login screen's picture: Honeybrook at golden hour (art/title.js), as a banner, or a little round badge for the header
+export const scene = () => titleArt().replace('class="ttpic"', 'class="wscene"');
+export const sceneBadge = () => titleArt().replace('class="ttpic"', 'class="wbadge"').replace(/id="tt(Sky|Sun)"/g, 'id="tb$1"').replace(/url\(#tt(Sky|Sun)\)/g, 'url(#tb$1)');
 export const lede = t => `<p class="lede">${t}</p>`;
 
 // the contents menu: sections in order (each page names its section)
@@ -41,6 +45,7 @@ export const SECTIONS = [
 
 // the page itself
 const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<filter id="marker" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="9" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="4" result="d"/><feTurbulence type="fractalNoise" baseFrequency="0.9 0.08" numOctaves="2" seed="2" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 .35  0 0 0 0 .16  0 0 0 0 .06  0 0 0 1.1 -.42" result="ga"/><feComposite in="ga" in2="d" operator="in" result="streaks"/><feMerge><feMergeNode in="d"/><feMergeNode in="streaks"/></feMerge></filter>
 <filter id="wob" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="2.4"/></filter>
 <filter id="wobS" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.25" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale=".7"/></filter>
 <filter id="markerS" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.2" numOctaves="2" seed="9" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale=".9" result="d"/><feTurbulence type="fractalNoise" baseFrequency="2.4 .3" numOctaves="2" seed="2" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 .35  0 0 0 0 .16  0 0 0 0 .06  0 0 0 1.1 -.5" result="ga"/><feComposite in="ga" in2="d" operator="in" result="streaks"/><feMerge><feMergeNode in="d"/><feMergeNode in="streaks"/></feMerge></filter>
@@ -53,7 +58,7 @@ export function layout(p, nav){
 <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Mulish:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/wiki.css"><link rel="icon" href="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#F3C969"/><path d="M8 13q4 4 8 0" stroke="#3A2E28" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>')}"></head>
 <body>${DEFS}
-<header class="top"><button class="menu" id="menuBtn" aria-label="Contents" aria-expanded="false">☰</button><a class="brand" href="/">${ico("sparkle", 22)}<span>Honeybrook Wiki</span></a>
+<header class="top"><button class="menu" id="menuBtn" aria-label="Contents" aria-expanded="false">☰</button><a class="brand" href="/">${sceneBadge()}<span>Honeybrook Wiki</span></a>
 <div class="search"><input id="q" type="search" placeholder="Search the wiki" autocomplete="off" aria-label="Search the wiki"><ul id="hits" hidden></ul></div></header>
 <div class="shell"><nav class="side" id="side" aria-label="Contents">${nav}<p class="play"><a href="https://honey-brook.web.app">Play Honeybrook →</a></p></nav>
 <main class="main">${p.slug === "index" ? "" : `<p class="crumb">${link("index", "Wiki")} › ${esc((SECTIONS.find(s => s[0] === p.section) || [, ""])[1])}</p><h1>${esc(p.title)}</h1>`}${p.html}
