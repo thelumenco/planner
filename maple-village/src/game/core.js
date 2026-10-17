@@ -3316,7 +3316,8 @@ function placeNode(n, e){
 // follows the player at full height; "zoomed out" (cam.fit) shows the whole map at once. Panning slides the already-drawn
 // SVG with a GPU transform: re-filtering the hand-drawn scene every frame made phones flicker and drop outlines.
 const cam = {x: 0, s: 1, ox: 0, oy: 0, top: 0, snap: true, key: "", fit: false, canFollow: false};
-try { cam.fit = localStorage.getItem("fox.zoom") === "out"; } catch {}
+// the game opens zoomed out (the whole map at once) unless the player has zoomed in on this device ("fox.view")
+cam.fit = true; try { cam.fit = localStorage.getItem("fox.view") !== "in"; } catch {}
 function updateCam(dt){
   const m = $("map"), cw = m.clientWidth, ch = m.clientHeight; if (!cw || !ch) return;
   cam.canFollow = cw/ch < W/HH - .005;
@@ -3337,7 +3338,7 @@ function updateCam(dt){
     const z = $("zoomBtn"); if (z) { z.hidden = !cam.canFollow; z.setAttribute("aria-label", cam.fit ? "Zoom in" : "Zoom out to see the whole map"); z.innerHTML = icon(cam.fit ? "zoomIn" : "zoomOut", 26); }
   }
 }
-function toggleZoom(){ cam.fit = !cam.fit; cam.snap = true; cam.key = ""; try { localStorage.setItem("fox.zoom", cam.fit ? "out" : "in"); } catch {} }
+function toggleZoom(){ cam.fit = !cam.fit; cam.snap = true; cam.key = ""; try { localStorage.setItem("fox.view", cam.fit ? "out" : "in"); } catch {} }
 function measureHud(){
   const sb = document.querySelector(".scenebar"), m = $("map");
   cam.top = getComputedStyle(sb).position === "fixed" ? Math.max(0, sb.getBoundingClientRect().bottom - m.getBoundingClientRect().top + 4) : 0;

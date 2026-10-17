@@ -28,7 +28,9 @@ const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM 
 // Pages are tracked so a section that throws before its page.close() doesn't leave its page open for the rest of the
 // run (dozens of leaked pages once crashed the browser near the end): each new section closes any left over.
 const openPages = new Set();
-{ const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); openPages.add(pg); pg.on("close", () => openPages.delete(pg)); if (!resume) await pg.addInitScript(() => { window.__hbNoResume = true; });
+{ const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, zoomOut, ...rest } = o; const pg = await np(rest); openPages.add(pg); pg.on("close", () => openPages.delete(pg)); if (!resume) await pg.addInitScript(() => { window.__hbNoResume = true; });
+  // the game opens zoomed out; the checks tap the map close up, so their pages start zoomed in (the core loop checks the real start)
+  if (!zoomOut) await pg.addInitScript(() => { try { if (!localStorage.getItem("fox.view")) localStorage.setItem("fox.view", "in"); } catch {} });
   // a click that times out leaves a screenshot and says what's on top of the target (to catch the odd blocked click)
   const click = pg.click.bind(pg); let shot = 0; pg.click = async (sel, opts) => { try { return await click(sel, opts); } catch (e) {
     const f = join(shots, `stuck-click-${Date.now()}-${shot++}.png`); await pg.screenshot({path: f}).catch(() => {});
@@ -49,7 +51,7 @@ const check = (cond, msg) => { if (!cond) { errors.push("FAIL: " + msg); console
 
 if (want("core loop")) for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop", width: 1280, height: 900 }]) {
   console.log(`\n${vp.name}`);
-  const page = await browser.newPage({ viewport: vp });
+  const page = await browser.newPage({ viewport: vp, zoomOut: true });
   page.on("pageerror", e => errors.push(`${vp.name} pageerror: ${e.message}`));
   page.on("console", m => { if (m.type() === "error" && !/Failed to load resource/.test(m.text())) errors.push(`${vp.name} console: ${m.text()}`); });
   await page.goto(url + "?reset=1&seed=1&time=10:15");
@@ -68,10 +70,12 @@ if (want("core loop")) for (const vp of [{ name: "phone", width: 390, height: 84
     check(trk.right < 20 && trk.tall, "trackers are a vertical column on the right");
     check(await page.locator("#zoomBtn").isVisible(), "there's a zoom button on the phone");
     await page.click('#journal [data-qn="min"]');
+    const whole = () => page.evaluate(() => { const r = document.querySelector("#world").getBoundingClientRect(); return r.width <= innerWidth + 1 && r.left >= -1; });
+    check(await whole(), "the game opens zoomed out, showing the whole map");
     await page.click("#zoomBtn"); await page.waitForTimeout(300);
-    const fit = await page.evaluate(() => { const r = document.querySelector("#world").getBoundingClientRect(); return r.width <= innerWidth + 1 && r.left >= -1; });
-    check(fit, "zooming out shows the whole map");
+    check(!(await whole()), "zooming in follows the player close up");
     await page.click("#zoomBtn"); await page.waitForTimeout(300);
+    check(await whole(), "zooming out shows the whole map again");
     await page.click('#journal [data-qn="open"]');
     check(await page.locator(".scenebar .hbtn").count() === 5, "five drawn icons in the corner (quests, backpack, friendship, letters, settings)");
     check(!(await page.locator(".hbtn").first().textContent()).match(/\p{Extended_Pictographic}/u), "corner icons are drawn, not emoji");

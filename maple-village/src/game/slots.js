@@ -3,7 +3,7 @@
 // settings, which every slot shares). Switching puts the playing slot away, takes the chosen one out, and the page
 // reloads into it. A save from before slots existed simply becomes slot 1.
 export const SLOTS = 3;
-const DEVICE = ["fox.sound", "fox.zoom"];   // sound and zoom belong to the device, not to a game
+const DEVICE = ["fox.sound", "fox.zoom", "fox.view"];   // sound and zoom belong to the device, not to a game
 const isGame = k => k.startsWith("fox.") && !DEVICE.includes(k);
 const ls = () => { try { return window.localStorage; } catch { return null; } };
 export const activeSlot = () => { const n = +((ls() && ls().getItem("hb.active")) || 1); return n >= 1 && n <= SLOTS ? n : 1; };
