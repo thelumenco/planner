@@ -3,12 +3,12 @@ import { NPCS } from "../../src/data/npcs.js";
 import { lovesOf } from "../../src/data/loves.js";
 import { ITEMS } from "../../src/data/items.js";
 import { STORIES } from "../../src/data/stories.js";
-import { esc, table, hm, daysText, placeName, itemIcon, spoiler, lede, portrait } from "../lib.mjs";
+import { esc, table, hm, daysText, placeName, itemIcon, spoiler, lede, portrait, thingName } from "../lib.mjs";
 
 const VILLAGERS = NPCS.filter(n => !n.tourist && !n.local && !n.kid);
 const NEEDS = {mill: "once you've restored the old mill", millshop: "once the Mill Shop is open", cocoa: "once the Cocoa Room is open", giftshop: "once the gift shop is open", scoop: "once the Scoop Shack is open", cellar: "once the cellar door is built", terrace: "once the terrace is built"};
 const badge = (n, size = 56) => portrait(n.look, size);   // the villager as the game draws them
-const loveName = l => l.id ? (ITEMS[l.id] ? ITEMS[l.id].n : l.id) : (l.what || "Something special");
+const loveName = l => l.id ? thingName(l.id) : (l.what || "Something special");
 const loveRow = l => [l.id && ITEMS[l.id] ? itemIcon(l.id, 22) + esc(loveName(l)) : esc(loveName(l)), l.thanks ? `<span class="muted">"${esc(l.thanks)}"</span>` : ""];
 function routine(n){
   const rows = (n.routine || []).slice().sort((a, b) => a.from - b.from).map(s => [`${hm(s.from)} to ${hm(s.to)}`, esc(placeName(s.scene)),

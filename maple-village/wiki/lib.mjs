@@ -6,12 +6,18 @@ import { itemIco, ITEMS } from "../src/data/items.js";
 import { VILLAGE, ROOMS } from "../src/data/world.js";
 import { personArt } from "../src/art/people.js";
 import { titleArt } from "../src/art/title.js";
+import "../src/data/bellbird.js";   // merges every trip's shop goods into TOWN_GOODS
+import { TOWN_GOODS } from "../src/data/towns.js";
+import { HERB } from "../src/game/millcraft.js";
+import { TREATS as XM_TREATS } from "../src/game/xmas.js";
 
 export const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 export const slugify = s => String(s).toLowerCase().replace(/&/g, "and").replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 // an icon from the game (the hand-drawn look comes from the filters in the page's <svg> defs)
 export const ico = (name, size = 24) => gameIcon(name, size, "wico");
 export const itemIcon = (id, size = 24) => ico(ITEMS[id] ? (ITEMS[id].ico || itemIco(id)) : id, size);
+// any thing's name, wherever the game keeps it: items, trip souvenirs, the mill's honeys, the Christmas market's hot treats
+export const thingName = id => (ITEMS[id] || TOWN_GOODS[id] || HERB[id] || XM_TREATS[id] || {}).n || id;
 export const coin = n => `<span class="coin">${ico("coin", 15)}${typeof n === "number" ? n.toLocaleString("en-GB") : esc(n)}</span>`;
 // minutes since midnight -> "9:30am"
 export const hm = m => { const h = Math.floor(m/60) % 24, mm = m % 60; return `${h % 12 || 12}${mm ? ":" + String(mm).padStart(2, "0") : ""}${h < 12 ? "am" : "pm"}`; };

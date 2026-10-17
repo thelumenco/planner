@@ -12,6 +12,8 @@ import { TAXI_FEE, TAXI_FROM, TAXI_TO, BIKE_FEE, BIKE_MINS } from "../../src/gam
 import { TRAINS } from "../../src/game/rail.js";
 import { MARKET, FAIR, NIGHT, XMAS, eventsOn, XMAS_FROM, XMAS_TO } from "../../src/game/tours.js";
 import { POOLS } from "../../src/data/stall-goods.js";
+import { TREATS as XM_TREATS } from "../../src/game/xmas.js";
+import { thingName } from "../lib.mjs";
 import { esc, table, ico, itemIcon, coin, lede, hm, slugify } from "../lib.mjs";
 
 const h2 = (id, t, icon) => `<h2 id="${id}">${icon ? ico(icon, 22) + " " : ""}${esc(t)}</h2>`;
@@ -135,8 +137,9 @@ function placesPage(){
 }
 
 // the markets on the field
-const goodName = id => ITEMS[id] ? ITEMS[id].n : DECOR[id] ? DECOR[id].n : id;
-const goodIcon = id => ITEMS[id] ? itemIcon(id, 22) : DECOR[id] ? ico(DECOR[id].ico, 22) : "";
+// (the Christmas market's hot treats live in xmas.js: eaten on the spot, so they aren't items)
+const goodName = id => DECOR[id] && !ITEMS[id] ? DECOR[id].n : XM_TREATS[id] ? `${XM_TREATS[id].n} (${XM_TREATS[id].price} coins)` : thingName(id);
+const goodIcon = id => ITEMS[id] ? itemIcon(id, 22) : DECOR[id] ? ico(DECOR[id].ico, 22) : XM_TREATS[id] ? ico(id, 22) : "";
 const goodsCell = (st, pool) => {
   const ids = [...(st.items || []), ...(st.treats || []), ...(st.decor || []), ...((pool || {})[st.id] || [])];
   if (st.produce) return "Whatever vegetables and berries are in season";

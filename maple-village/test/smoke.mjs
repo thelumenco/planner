@@ -4242,6 +4242,11 @@ if (want("\nThe wiki covers every destination (round 227)")) try {
   const noPage = towns.filter(k => !slugs.has("trips/" + k)), noActs = towns.filter(k => !(tp.ACTS[k] && tp.ACTS[k].length));
   check(!noPage.length, "every destination has its own wiki page" + (noPage.length ? " (missing: " + noPage.join(", ") + ")" : ""));
   check(!noActs.length, "every destination has its things to do in the wiki (wiki/pages/70-trips.mjs ACTS)" + (noActs.length ? " (missing: " + noActs.join(", ") + ")" : ""));
+  // no page shows a thing's raw id (xm_hotchoc, b_calissons...) where its name should be
+  { const { readdirSync, readFileSync, statSync } = await import("node:fs"); execSync("node wiki/build-wiki.mjs", {cwd: new URL("..", import.meta.url).pathname, stdio: "ignore"}); const root = new URL("../dist/wiki/", import.meta.url).pathname, raw = [];
+    const walk = d => readdirSync(d).forEach(f => { const q = d + f; if (statSync(q).isDirectory()) return walk(q + "/"); if (!f.endsWith(".html")) return;
+      (readFileSync(q, "utf8").match(/>[^<>]*\b[a-z]+_[a-z0-9_]+\b[^<>]*</g) || []).forEach(m => raw.push(q.slice(root.length) + ": " + m.slice(1, -1).trim())); });
+    walk(root); check(!raw.length, "every thing in the wiki shows its name, never its id" + (raw.length ? " (" + raw.slice(0, 4).join("; ") + ")" : "")); }
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nKind words, affirmations, savings vaults and emotion jars (round 227)")) try {
   console.log("\nKind words, affirmations, savings vaults and emotion jars (round 227)");
