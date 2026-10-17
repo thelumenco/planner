@@ -38,6 +38,8 @@ export function haberdasheryHTML(F, st, open){
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Ada's haberdashery</h2>`;
   if (!open) return h + `<p class="sub">Shut. Ada opens nine thirty to half past five, every day but Sunday. There's a bolt of gingham in the window, waiting.</p>` + basketHTML(F) + shut;
   h += `<p class="sub">Bolts of fabric to the ceiling, a jar of buttons on the counter, and Ada with a tape measure round her neck. You have ${coin(F.coins)}.</p>`;
+  // round 225: Ada always has every fabric and button in stock; say so plainly when you can't afford anything yet
+  if (F.coins < Math.min(...Object.values(MATERIALS).map(m => m.price || 99), ...Object.values(BUTTONS).map(b => b.price))) h += `<p class="muted">Ada keeps every fabric, colour and button in stock, so there's always something here. You'll need a few coins first: earn them from your tasks and village requests, or by selling what you grow.</p>`;
   h += `<div class="tabs" role="tablist">${[["fabric", "Fabric"], ["buttons", "Buttons"], ["basket", "Your basket"]].map(([t, n]) => `<button role="tab" data-sew="tab:${t}" aria-selected="${t === tab}">${n}</button>`).join("")}</div>`;
   if (tab === "fabric") {
     h += `<p class="sulabel">Material</p><div class="gchips">${Object.entries(MATERIALS).map(([m, d]) => chip("mat", m, m === mat, `${d.n} · ${d.price}`)).join("")}</div>

@@ -18,7 +18,9 @@ export const SCREENS = [
     letter: "My dear,\n\nIf this has found you, then the old place is yours: the house, the vineyard, and every crooked post. I never had children of my own, but I kept every card you ever sent me. They're still on the kitchen wall.\n\nWhen I left Singapore, I was about your age, and just as tired. Honeybrook fixed that. I hope it does the same for you.\n\nThe vines have had a hard few years without me. They're tougher than they look, and so, I suspect, are you. Plant them again and they'll pay you back in sunshine.\n\nI only ask two things. Look after the vineyard. And look after my dear companion, who will be waiting for you. Don't worry: you'll know each other the moment you meet.\n\nThe village will help. They always helped me.\n\nWith all my love,\nUncle Wilf"},
   {art: "leaving", title: "Leaving", text: "You read the note four more times. The next morning, your pass goes in the drawer and your notice goes in. Then you book a flight, and a train."},
   {train: true, title: "The train to Honeybrook", text: "All aboard for Honeybrook!"},
-  {art: "arrive", title: "Honeybrook", text: "Nothing's growing. The posts lean, the wire sags, and the paint on the house has given up. But it's quiet, and the light is gold, and something just rustled by the porch..."}
+  {art: "arrive", title: "Honeybrook", text: "Nothing's growing. The posts lean, the wire sags, and the paint on the house has given up. But it's quiet, and the light is gold, and something just rustled by the porch..."},
+  // round 225 (Mel): say plainly that time here keeps pace with the player's own day: a slow game
+  {art: "arrive", title: "Honeybrook time", text: "One more thing, before you go in. Time in Honeybrook passes just as it does in your own day: morning here is your morning, and night is your night. Seeds take real hours to grow, the shops keep their hours, and your friends keep to their days. There's no rush. Come back a little each day, and watch the place come to life."}
 ];
 
 let at = -1, opts = null;

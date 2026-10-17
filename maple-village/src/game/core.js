@@ -145,11 +145,16 @@ const freshToday = () => ({day:dayKey(), berries:0, earned:0, steps:0, stepMs:0,
 const freshFox = () => ({name:"", xp:0, days:0, streak:0, lastActive:null, coins:null, inv:null, plots:null, cool:{}, met:{}, gifts:{}, mailRead:{}, updatedAt:0});
 const load = (k, f) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ? Object.assign(f(), v) : f(); } catch { return f(); } };
 let S = load("fox.today", freshToday), F = load("fox.fox", freshFox);
+const START_COINS = 100;
+// the bag of seeds: three packets each of the three cheapest garden seeds that grow this season
+export const starterSeeds = day => { const season = seasonOf(day);
+  return Object.fromEntries(Object.keys(ITEMS).filter(k => ITEMS[k].kind === "seed" && ITEMS[k].price && !k.startsWith("gh_") && (ITEMS[k].seasons || []).includes(season)).sort((a, b) => ITEMS[a].price - ITEMS[b].price).slice(0, 3).map(k => [k, 3])); };
 function migrate(){
   if (S.day !== dayKey()) S = freshToday();
   if (S.waterMl == null) { S.waterMl = (S.water || 0)*250; S.waterPaid = Math.min(4, S.water || 0); }
-  if (F.coins == null) F.coins = S.berries || 0;
-  if (!F.inv) { F.inv = {tulip_seed:2, carrot_seed:1}; F.gift = true; }
+  // round 225 (Mel: "there's nothing to start"): a new game starts with 100 coins and a bag of seeds for the season
+  if (F.coins == null) F.coins = F.inv ? (S.berries || 0) : START_COINS;
+  if (!F.inv) { F.inv = starterSeeds(dayKey()); F.gift = true; }
   if (!F.tools) F.tools = {};
   if (!F.fam) F.fam = {owned: {}, gifts: {bo: 0}};
   ensurePets(F);
@@ -1724,7 +1729,7 @@ function bag(){
     postPick = false; giftPick = null; sfx("chime"); flash(`Posted to ${BK.person(to).name}`); speak(`Wrapped in brown paper and off to ${BK.REGIONS[BK.regionOf(to)]}. Watch your mailbox for a thank-you.`, 4500); save(); bag(); });
   $("bag").querySelectorAll("[data-keepit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); keepItem = giftPick; giftPick = null; openView = null; render(); });   // a souvenir kept: off to the shelf chooser
   $("bag").querySelectorAll(".item").forEach(b => b.onclick = ev => { const k = ev.target.closest("[data-kit]"); if (k) { ev.stopPropagation(); toKitchen(k.dataset.kit); return; } useItem(b.dataset.id); });
-  $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome gift of seeds is in here. Plant them in the garden." : "";
+  $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome bag of seeds is in here. Plant them in the garden, out the back of the house." : "";
   $("play").innerHTML = [["pet","Pet"],["hide","Hide-and-seek"],["nap","Nap together"]].map(([k, n]) => `<button class="btn alt small" data-play="${k}">${n}</button>`).join("");
   $("play").querySelectorAll("[data-play]").forEach(b => b.onclick = () => playFree(b.dataset.play));
 }
@@ -3422,6 +3427,6 @@ function showTitle(){
 { let skip = false; try { skip = !!sessionStorage.getItem("hb.skipTitle"); sessionStorage.removeItem("hb.skipTitle"); } catch {}
   if (skip || (window.__hbDevStub && !/[?&]title=1/.test(location.search))) needSetup(); else showTitle(); }
 render(true);
-if (F.gift) setTimeout(() => speak("A welcome gift! Seeds are in your backpack 🌷", 5000), 1200);
+if (F.gift) setTimeout(() => speak("A welcome gift from the village: a bag of seeds and 100 coins to get you started. The seeds are in your backpack 🌷", 6000), 1200);
 requestAnimationFrame(frame);
 initDb();
