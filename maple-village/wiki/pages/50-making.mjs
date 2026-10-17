@@ -35,7 +35,7 @@ function vineyardPage(){
   const styles = Object.entries(VY.STYLES).map(([k, s]) => ({id: "wine-" + k, cells: [`${ico("wine_" + (["red", "rose", "white", "sparkling"].includes(k) ? k : k === "chardonnay" ? "white" : "red"), 22)} <b>${esc(s.n)}</b>`, esc(nameOf("grape_" + s.grape)),
     dur(s.dur) + (s.dur2 ? `, then ${dur(s.dur2)} more for the bubbles` : ""), coin(s.price), coin(Math.max(1, Math.round(s.price/4)))]}));
   const barrelPrices = [2, 3, 4, 5, 6].map(n => coin(VY.shopPrice({barrels: Array(n - 1)}, "barrel"))).join(", ");
-  const stall = Object.entries(VY.SHOP).map(([id, it]) => ({id: "stall-" + id, cells: [`<b>${esc(it.n)}</b>`, id === "barrel" ? `${barrelPrices}; ${coin(VY.BARRELS.cellarPrice)} on the cellar racks` : coin(it.price), esc(it.say)]}));
+  const stall = Object.entries(VY.SHOP).map(([id, it]) => ({id: "stall-" + id, cells: [`<b>${esc(it.n)}</b>`, id === "barrel" ? `${barrelPrices} (the 2nd to the 6th); ${coin(VY.BARRELS.cellarPrice)} each on the cellar racks` : coin(it.price), esc(it.say)]}));
   const help = VY.HELP.map(([id, n, d]) => [`<b>${esc(n)}</b>`, esc(cap(d)), id === "fetch" ? "Off" : "On"]);
   const html = lede(`The vineyard east of home, left to you by your great-uncle Wilf with the house. Grow grapes on trellised vines, ferment them in oak barrels, bottle and name your wines, and sell them at your own wine shop. It all runs on real time: vines ripen and barrels ferment while you're away.`)
     + h2("vines", "Vines and grapes", "grape_red")
@@ -62,7 +62,7 @@ function vineyardPage(){
     + h2("olives", "Olives", "olives")
     + `<p>The olive tree by the path is ripe every ${dur(VY.OLIVE)}: ${VY.TREE_JARS} jars of olives. The grove along the top terrace gives ${VY.GROVE_JARS} jars a picking (twice that with the second row). Marco and Ines pick them on their shifts into the olive crate; take the crate for the kitchen, gelato, or the <a href="/olive-mill">olive mill</a>, which presses three jars into a bottle of oil.</p>`
     + h2("cellar", "The cellar door", "wine_sparkling")
-    + `<p>${goal("cellar")}. ${esc(GOALS.cellar.line)} It adds barrel racks, a tasting bar and a wall of every wine you've made, and a few more visitors come by.</p>`
+    + `<p>${goal("cellar")}. ${esc(GOALS.cellar.line)}</p>`
     + h2("evenings", "Busy times", "calendar")
     + T(["When", "What happens"], [
       ["Sunday mornings", "The wine stall at the <a href=\"/field#sunday-market\">farmers market</a>, minded by Ines, selling from the shop's shelves. Serve there yourself and more people stop."],
@@ -124,7 +124,7 @@ function kitchenPage(){
   const local = Object.entries(K.TAPAS).filter(([, t]) => !t.special);
   const tap = ([id, t]) => ({id: "tapa-" + id, cells: [`<b>${esc(t.n)}</b>`, kNeeds(t.need), coin(t.price), seasonsText(t.seasons)]});
   const towns = [...new Set(Object.values(K.SPECIALS).map(([town]) => town))];
-  const specials = towns.map(town => h3("specials-" + town, `From ${cap(K.TOWN_NAME[town])}`) + T(["Special", "Ingredients", "A plate", "Season"], Object.entries(K.TAPAS).filter(([, t]) => t.special === town).map(tap))).join("");
+  const specials = towns.map(town => h3("specials-" + town, `From ${K.TOWN_NAME[town]}`) + T(["Special", "Ingredients", "A plate", "Season"], Object.entries(K.TAPAS).filter(([, t]) => t.special === town).map(tap))).join("");
   const src = Object.entries(K.SOURCE).map(([id, w]) => [named(kIco(id), 20, cap(kName(id, 2))), esc(w)]);
   const SPECIAL_MULL = literal("game/mulled.js", "SPECIAL") || {};
   const mulls = Object.entries(SPECIAL_MULL).map(([key, n]) => { const adds = key.split("+"); return [`<b>${esc(n)}</b>`, adds.map(a => named(a, 20, MU.ADDS[a].n)).join(" + "), coin(MU.cupPrice(adds))]; });
@@ -161,11 +161,11 @@ function kitchenPage(){
 
 /* ---------- the Scoop Shack ---------- */
 function scoopPage(){
-  const groups = [["Dairy bases (make it a gelato)", id => ["milk", "goatmilk", "yoghurt", "hkmilk"].includes(id)], ["From Hana's deli shelf", id => ITEMS[id] && ITEMS[id].tab === "deli"],
-    ["From the garden and greenhouse", id => !!CROPS[id] || ["egg", "syrup"].includes(id)], ["From the orchard", id => Object.values(TREES).some(t => t.fruit === id)], ["Flower stems from the flower farm", id => id.startsWith("fl_")],
+  const groups = [["Dairy bases (make it a gelato)", id => ["milk", "goatmilk", "yoghurt"].includes(id)], ["From Hana's deli shelf", id => ITEMS[id] && ITEMS[id].tab === "deli"],
+    ["From the garden, the greenhouse and the kitchen", id => !!CROPS[id] || id === "syrup"], ["From the orchard", id => Object.values(TREES).some(t => t.fruit === id)], ["Flower stems from the flower farm", id => id.startsWith("fl_")],
     ["Grapes from the vineyard", id => id.startsWith("grape_")], ["Honey", id => /^honey|euchoney/.test(id)], ["Everything else: the woods, your shops and your trips", () => true]];
   const left = new Set(Object.keys(SC.INGR)); const chip = id => `<span style="white-space:nowrap;display:inline-block;margin:2px 10px 2px 0">${icon(id.startsWith("fl_") ? "bq_" + id.slice(3) : id, 22)}${esc(SC.INGR[id][0])}</span>`;
-  const ingr = groups.map(([n, f]) => { const ids = [...left].filter(f); ids.forEach(i => left.delete(i)); return ids.length ? `${h3("ingr-" + n.split(" ")[0].toLowerCase(), n)}<p>${ids.map(chip).join(" ")}</p>` : ""; }).join("");
+  const ingr = groups.map(([n, f], k) => { const ids = [...left].filter(f); ids.forEach(i => left.delete(i)); return ids.length ? `${h3("ingredients-" + (k + 1), n)}<p>${ids.map(chip).join(" ")}</p>` : ""; }).join("");
   const fmt = Object.entries(SC.FORMATS).map(([k, f]) => [`${ico("ic_" + k, 22)} <b>${esc(f.n)}</b>`, coin(f.p)]);
   const dips = Object.entries(SC.DIPS).map(([k, d]) => ({id: "dip-" + k, cells: [`<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${d.col};border:1px solid var(--line);vertical-align:-2px;margin-right:6px"></span><b>${esc(d.n)}</b>`, d.house ? "From the Cocoa Room" : d.price ? coin(d.price) : "Comes with the dip station"]}));
   const tops = Object.entries(SC.TOPPINGS).map(([k, d]) => ({id: "topping-" + k, cells: [`<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${d.col};border:1px solid var(--line);vertical-align:-2px;margin-right:6px"></span><b>${esc(d.n)}</b>`, d.price ? coin(d.price) : "Comes with the dip station"]}));
@@ -209,7 +209,7 @@ function cocoaPage(){
   const wineFills = Object.entries(CC.WINE_FILL).map(([id, w]) => esc(w[0])).join(", ");
   const ups = Object.entries(CC.CC_UPS).map(([k, u]) => ({id: "upgrade-" + k, cells: [`<b>${esc(u.n)}</b>`, coin(u.price), esc(u.line)]}));
   const specials = Object.values(CC.SPECIALS).map(s => ({id: s.id, cells: [named(s.id, 22, s.n), `${s.use} pieces of ${s.kind} chocolate make ${s.make}`, coin(s.price), esc(s.line)]}));
-  const boxes = ["box4", "box9", "box16"].filter(id => ITEMS[id]).map(id => [named(id, 22), coin(ITEMS[id].price), sell(id)]);
+  const boxes = ["box4", "box9", "box16"].filter(id => ITEMS[id]).map(id => [named(id, 22), coin(ITEMS[id].price)]);
   const html = lede(`Your chocolate shop on the bay, in what was a boarded-up shopfront. ${goal("cocoa")}. You make everything yourself, bean to bar: a wall of bars, a case of bonbons, and a kitchen out the back. ${who("amara")} serves at the counter; ${who("mateo")} is the kitchen hand.`)
     + h2("hours", "Opening hours", "clock")
     + `<p>${hm(CC.OPEN)} to ${hm(CC.CLOSE)}, Tuesday to Sunday (Mondays too, once Lila joins). Customers buy bars off the wall and bonbons from the case, more often while you're serving. Bars start at ${coin(6)} and bonbons at ${coin(3)} each; set your own prices at the counter.</p>
@@ -225,7 +225,7 @@ function cocoaPage(){
     + h3("fillings", "Fillings") + `<p>The fillings shelf is stocked from your backpack or straight off the orchard's farm shop shelves, like the gelato fridge. Almost anything sweet that goes in gelato goes in a bonbon:</p><p>${fills}</p>
       <p>And wine: a bottle of your own off the wine shop's shelves opens into ${CC.WINE_FILLS} wine fillings (${wineFills}).</p>`
     + h3("boxes", "Gift boxes") + `<p>Pack a box of 4 or 9 from the case (a grand box of 16 with the gift wrapping station), choosing the bonbons or letting the game fill it. All dark shells makes it dairy-free. A <b>pairing box</b> is a bottle of your wine and 4 bonbons, ribboned together, for the <a href="/gift-shop#pairing">gift shop</a>.</p>`
-    + T(["Box", "Price", "Sells for"], boxes)
+    + T(["Box", "Price"], boxes)
     + h3("specials", "Festival specials and little extras")
     + `<p>Around Christmas, Chinese New Year, Deepavali and the Mid-Autumn Festival, the bonbon table makes that festival's special, sold beside the case while the festival's on (or to give).</p>`
     + T(["Special", "Makes", "Price", ""], specials)
@@ -234,7 +234,7 @@ function cocoaPage(){
     + `<p>Send ${CC.SEND} pieces of loose dark chocolate to the <a href="/scoop-shack">Scoop Shack</a>: ${CC.TO_FRIDGE} of "Cocoa Room chocolate" for the gelato fridge, or (with its dip station) ${CC.TO_DIPS} dips of house-made dark. The supply deal upgrade does it every morning.</p>`
     + h2("upgrades", "Upgrades", "sparkle")
     + T(["Upgrade", "Price", ""], ups)
-    + `<p class="muted">The vending machine's coins wait in it for you. The workshops pay ${coin(CC.WORKSHOP_FEE)} each for a class of ${CC.WORKSHOP}. On wine club nights the members buy chocolates too, and with the <a href="/scoop-shack#bike">delivery bike</a> Tomo takes chocolates round.</p>`;
+    + `<p class="muted">On wine club nights the members buy chocolates too, and with the <a href="/scoop-shack#bike">delivery bike</a> Tomo takes chocolates round.</p>`;
   const search = [...Object.entries(CC.CC_UPS).map(([k, u]) => ({t: u.n, d: `Cocoa Room upgrade, ${u.price} coins`, a: "/cocoa-room#upgrade-" + k})),
     ...Object.values(CC.SPECIALS).map(s => ({t: s.n, d: "Cocoa Room festival special", a: "/cocoa-room#" + s.id})),
     {t: "Bonbons", d: "Made at the Cocoa Room", a: "/cocoa-room#bonbons"}, {t: "Chocolate bars", d: "Bean to bar at the Cocoa Room", a: "/cocoa-room#bean-to-bar"}, {t: "Pairing box", d: "A bottle of your wine and 4 bonbons", a: "/cocoa-room#boxes"}];
