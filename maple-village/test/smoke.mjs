@@ -3495,7 +3495,7 @@ if (want("\ntask places")) try {
   await page.click('#list [data-tgo="tp1"]');
   await page.waitForFunction(() => { const t = window.__hbGame.F().board.tasks.find(x => x.id === "tp1"); return t && t.doneDay; }, null, { timeout: 40000 });
   const c1 = await page.evaluate(() => window.__hbGame.F().coins);
-  check(c1 - c0 === 4 && /Post office/i.test(await page.locator("#sceneName").textContent()), "go: you walk to the post office counter and it's done there, with a coin more (+" + (c1 - c0) + ")");
+  check(c1 - c0 === QB.TASK_PAY + 1 && /Post office/i.test(await page.locator("#sceneName").textContent()), "go: you walk to the post office counter and it's done there, with a coin more (+" + (c1 - c0) + ")");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nan old save, from before the names changed")) try {
