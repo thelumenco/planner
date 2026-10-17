@@ -6,8 +6,9 @@
     "build": "node build.mjs",
     "dev": "node build.mjs --dev",
     "check": "node --check build.mjs && node test/smoke.mjs",
-    "build:public": "node build.mjs && node leak-check.mjs",
-    "leaks": "node build.mjs && node leak-check.mjs"
+    "build:public": "node build.mjs && node wiki/build-wiki.mjs && node leak-check.mjs",
+    "leaks": "node build.mjs && node leak-check.mjs",
+    "wiki": "node wiki/build-wiki.mjs && node wiki/serve.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0"

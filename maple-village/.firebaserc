@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "honey-brook"
+  },
+  "targets": {
+    "honey-brook": {
+      "hosting": {
+        "game": [
+          "honey-brook"
+        ],
+        "wiki": [
+          "honeybrookwiki"
+        ]
+      }
+    }
   }
 }

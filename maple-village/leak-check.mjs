@@ -30,8 +30,14 @@ const ALLOW = {"Singapore": ["src/game/intro.js", "src/art/intro.js"]};
 const allowed = label => (ALLOW[label] || []).reduce((n, f) => n + (readFileSync(join(root, f), "utf8").match(TERMS.find(t => t[0] === label)[1]) || []).length, 0);
 const hits = TERMS.map(([label, re]) => [label, Math.max(0, (text.match(re) || []).length - allowed(label))]).filter(([, n]) => n > 0);
 
+// round 224: the wiki (dist/wiki, honeybrookwiki.web.app) is checked too, strictly: not even the opening story's Singapore
+const wikiDir = join(root, "dist", "wiki"), wikiFiles = []; const wwalk = d => existsSync(d) && readdirSync(d).forEach(f => { const p = join(d, f); statSync(p).isDirectory() ? wwalk(p) : /\.(html|json|css|js)$/.test(f) && wikiFiles.push(p); });
+wwalk(wikiDir);
+const wikiText = wikiFiles.map(f => readFileSync(f, "utf8")).join("\n");
+const wikiHits = TERMS.map(([label, re]) => [label, (wikiText.match(re) || []).length]).filter(([, n]) => n > 0);
+if (wikiHits.length) { console.log("leak check: the wiki has personal references: " + wikiHits.map(([l, n]) => `${l} (${n})`).join(", ")); for (const [l] of wikiHits) { const re = TERMS.find(t => t[0] === l)[1]; console.log("     " + wikiFiles.filter(f => re.test(readFileSync(f, "utf8"))).map(f => relative(root, f)).slice(0, 8).join(", ")); re.lastIndex = 0; } process.exit(1); }
 const summary = process.argv.includes("--summary");
-if (!hits.length) { console.log("leak check: clean. Nothing personal in the public game."); process.exit(0); }
+if (!hits.length) { console.log(`leak check: clean. Nothing personal in the public game${wikiFiles.length ? " or the wiki" : ""}.`); process.exit(0); }
 console.log(`leak check: ${hits.reduce((a, [, n]) => a + n, 0)} personal references left in the public game\n`);
 const files = []; const walk = d => readdirSync(d).forEach(f => { const p = join(d, f); statSync(p).isDirectory() ? walk(p) : /\.(js|html|css)$/.test(f) && files.push(p); });
 walk(join(root, "src"));
