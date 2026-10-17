@@ -16,6 +16,7 @@
 //                each bought separately, for dipped cones and waffles
 import { esc, dayKey, localHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
+import { dipIco } from "../art/scoop-icons.js";
 import { ITEMS } from "../data/items.js";
 import { TREES, FLOWERS } from "../data/orchard.js";
 
@@ -284,7 +285,7 @@ function registerDip(s, id){
   const m = /^gel_dip_(\w+?)_(\w+?)_(\w+?)_(.+)$/.exec(id); if (!m || !FORMATS[m[1]] || !DIPS[m[2]]) return;
   const r = s.recipes.find(x => x.id.replace(/[^a-z0-9]+/g, "-") === m[4]); if (!r) return;
   const top = m[3] === "none" ? null : m[3], dairy = r.dairy || DAIRY_DIP.includes(m[2]);
-  ITEMS[id] = {n: dipName(r, m[1], m[2], top), kind: "gift", to: dairy ? NO_DAIRY : "family", ...(dairy ? {dairy: true} : {}), tab: "scoop", ico: "ic_" + m[1], gel: true, dip: true, ings: [...r.ings],
+  ITEMS[id] = {n: dipName(r, m[1], m[2], top), kind: "gift", to: dairy ? NO_DAIRY : "family", ...(dairy ? {dairy: true} : {}), tab: "scoop", ico: dipIco(m[1], r.col, m[2], top), gel: true, dip: true, ings: [...r.ings],
     say: `Dipped AND topped? You spoil me. ${r.name}, wow.`, says: {tomi: "Dark choc and sorbet, so no tummy trouble. Legend.", farid: "So fancy! I shall eat it slowly and make it last.", theo: "Now that is an ice cream. Hana wants a bite. Officially, she can't have one."}};
 }
 export function registerItems(F){
@@ -363,7 +364,7 @@ export function dipBarPanel(F, st){
   h += `<p class="eyebrow" style="margin:10px 0 6px">On a</p><div class="gchips">${["cone", "waffle"].map(f => chip("data-gdfmt", f, f === fmt, FORMATS[f].n, "#E8C48E")).join("")}</div>`;
   h += `<p class="eyebrow" style="margin:10px 0 6px">Dipped in</p><div class="gchips">${Object.keys(DIPS).filter(k => dipReady(s, k)).map(k => chip("data-gddip", k, k === dip, DIPS[k].n, DIPS[k].col)).join("")}</div>`;
   h += `<p class="eyebrow" style="margin:10px 0 6px">Topped with</p><div class="gchips">${chip("data-gdtop", "none", !top, "Nothing", "#FFFDF6")}${Object.keys(TOPPINGS).filter(k => s.tops[k]).map(k => chip("data-gdtop", k, k === top, TOPPINGS[k].n, TOPPINGS[k].col)).join("")}</div>`;
-  h += `<p class="muted">${esc(dipName(r, fmt, dip, top))}</p>`;
+  h += `<div class="ppbatch">${icon(dipIco(fmt, r.col, dip, top), 96)}</div><p class="muted" style="text-align:center">${esc(dipName(r, fmt, dip, top))}</p>`;   // round 223: the picture changes as you pick
   return h + `<div class="actions"><button class="btn primary" data-gdmake="eat">Have it now</button><button class="btn alt" data-gdmake="give">Make one to give</button></div><div class="actions"><button class="btn alt small" data-gdback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 // the delivery bike: pick a flavour and a type, then who it's for (st.who: [[id, name]] from the game)

@@ -4209,6 +4209,16 @@ if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) tr
   check(true, "and through the bedroom to the bathroom");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe second grinder says so, and the dip bar shows your cone (round 223)")) try {
+  console.log("\nThe second grinder says so, and the dip bar shows your cone (round 223)");
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), si = await import(new URL("../src/art/scoop-icons.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url));
+  const F = {coins: 0, inv: {}}, c = cc.cocoaState(F); c.up = {grinder2: 1}; c.beans = 4; c.roasted = 0; c.grind = {kind: "dark", done: Date.now() + 7200000};
+  const p = cc.kitchenPanel(F, "grinder");
+  check(/First grinder/.test(p) && /Second grinder/.test(p) && /Free: ready for a pot/.test(p) && /in the second grinder/.test(p) && /data-cc="roast"/.test(p), "two grinders, each on its own line; the free one says so, and there's a roast button when nothing's roasted");
+  c.roasted = 1; check(!/data-cc="roast"/.test(cc.kitchenPanel(F, "grinder")) && /data-cc="grind" data-k="milk" >/.test(cc.kitchenPanel(F, "grinder").replace(/\s+>/g, " >")), "with roasted beans, the buttons start a pot in the second grinder");
+  const a = si.dipIco("cone", "#F4C7CF", "dark", "sprinkles"), b = si.dipIco("waffle", "#C3E8B8", "white", "none");
+  check(a === "dpc_cone_F4C7CF_dark_sprinkles" && si.dipIcon(a) && si.dipIcon(b) && si.dipIcon(a)[0] !== si.dipIcon(si.dipIco("cone", "#F4C7CF", "milk", "sprinkles"))[0] && si.dipIcon(a)[0] !== si.dipIcon(si.dipIco("cone", "#F4C7CF", "dark", "nuts"))[0] && ic.icon(a, 40) !== ic.icon("sparkle", 40), "the dip bar's picture changes with the dip and the topping (and the cone or the waffle)");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

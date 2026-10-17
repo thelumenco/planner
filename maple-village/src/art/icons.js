@@ -1,5 +1,6 @@
 import { TOWN_GOODS } from "../data/towns.js";
 import { paperIcon, wrapIcon } from "./paper-icons.js";
+import { dipIcon } from "./scoop-icons.js";
 import { lipIcon } from "./lip-icons.js";
 import { TREES, FLOWERS } from "../data/orchard.js";
 import { GOODS } from "../data/stall-goods.js";
@@ -120,6 +121,7 @@ const art = name => {
   }
   if (!I[name] && name.startsWith("pp")) { const pi = paperIcon(name); if (pi) return pi; }
   if (!I[name] && /^(wrp_|rb_|tag_|stamp_|gw_)/.test(name)) { const wi = wrapIcon(name); if (wi) return wi; }   // round 185: wrapping
+  if (!I[name] && name.startsWith("dpc_")) { const di = dipIcon(name); if (di) return di; }   // round 223: a dipped cone or waffle, as picked at the dip bar
   if (!I[name] && /^(balm_|lipoil_|beeswax$)/.test(name)) { const li = lipIcon(name); if (li) return li; }   // round 187: lip balms and oils   // round 183: the paperie's batch at every step
   return I[name] || I.sparkle;
 };
