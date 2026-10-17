@@ -4262,23 +4262,33 @@ if (want("\nPicked flowers stay in the backpack (round 228)")) try {
 if (want("\nA surprise bouquet from the creator (round 228)")) try {
   console.log("\nA surprise bouquet from the creator (round 228)");
   const cr = await import(new URL("../src/game/creator.js", import.meta.url)), D = 864e5, t0 = Date.UTC(2026, 9, 17, 3);
-  { const F = {}; const r = () => .5; const c = cr.creatorState(F, t0, r);
+  { const F = {}; const r = () => .5, none = [], day = "2026-10-20"; const c = cr.creatorState(F, t0, r);
     check(c.next - t0 >= 6*D && c.next - t0 <= 9*D, "the first bouquet comes about a week into the game");
-    check(!cr.creatorPost(F, c.next - 60000, 12*60, r) && !cr.creatorPost(F, c.next + 1000, 22*60, r), "not before it's due, and never at night");
-    const g = cr.creatorPost(F, c.next + 1000, 11*60, r); check(g && F.creator.next - g.at >= 8*D && F.creator.next - g.at <= 13*D, "then one in the post, and the next booked 8 to 13 days on");
-    F.coins = 10; check(cr.collectCreator(F) === 1 && F.coins === 60 && F.inv.cr_bouquet === 1 && cr.collectCreator(F) === 0, "50 coins and the bouquet, handed over once");
-    const m = cr.creatorMail(F)[0]; check(/Thanks? (you )?for playing Honeybrook/.test(m.body) && /From the creator/.test(m.body) && m.from === "creator", "with a note: thank you for playing Honeybrook, from the creator"); }
+    check(!cr.creatorPost(F, c.next - 60000, 12*60, day, r, none) && !cr.creatorPost(F, c.next + 1000, 22*60, day, r, none), "not before it's due, and never at night");
+    const g = cr.creatorPost(F, c.next + 1000, 11*60, day, r, none); check(g && F.creator.next - g.at >= 8*D && F.creator.next - g.at <= 13*D, "then one by post, and the next booked 8 to 13 days on");
+    F.coins = 10; check(cr.collectCreator(F, g.id) === 50 && F.coins === 60 && F.inv.cr_bouquet === 1 && cr.collectCreator(F, g.id) === 0, "50 coins and the bouquet, handed over once");
+    const m = cr.creatorMail(F)[0]; check(/Thank you for playing Honeybrook/.test(m.body) && /From the creator/.test(m.body) && m.from === "creator" && m.enclosed.length === 2, "with a note: thank you for playing Honeybrook, from the creator, and the bouquet and coins tucked in");
+    // the creator's own: dated, with their own note and coins, once each, on top of the regular ones
+    const xmas = [{id: "xmas-test", from: "2026-12-24", until: "2026-12-26", title: "Happy Christmas!", note: "Merry Christmas from Honeybrook.", coins: 100}];
+    const before = F.creator.next, s1 = cr.creatorPost(F, t0 + 70*D, 10*60, "2026-12-25", r, xmas);
+    check(s1 && s1.special === "xmas-test" && !cr.creatorPost(F, t0 + 70*D + 60000, 10*60, "2026-12-25", r, xmas) && F.creator.next >= s1.at + 3*D && F.creator.next >= before, "a special one comes once in its dates, and the next regular one waits a few days");
+    { const G = {creator: {next: t0 + 99*D}}; check(!cr.creatorPost(G, t0, 10*60, "2026-12-27", r, xmas) && !cr.creatorPost(G, t0, 10*60, "2026-12-23", r, xmas), "and not outside its dates"); }
+    const sm = cr.creatorMail(F, xmas).find(x => x.id === s1.id); check(sm.title === "Happy Christmas!" && /Merry Christmas/.test(sm.body) && /From the creator/.test(sm.body) && /100 coins/.test(sm.enclosed[1].n), "with its own title, note and coins");
+    check(cr.SPECIALS.every(x => x.id && /^\d{4}-\d\d-\d\d$/.test(x.from) && /^\d{4}-\d\d-\d\d$/.test(x.until) && x.from <= x.until && x.title && x.note), "every special the creator has set has its dates, title and note"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`creator pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-17"); await page.waitForTimeout(1200);
   const c0 = await page.evaluate(() => window.__hbGame.F().coins);
-  await page.evaluate(() => { const F = window.__hbGame.F(); F.creator = {next: Date.now() - 1000, sent: []}; window.__hbGame.save(); });
-  await page.waitForFunction(() => (window.__hbGame.F().inv || {}).cr_bouquet === 1, null, { timeout: 20000 });
-  check(await page.evaluate(() => window.__hbGame.F().coins) === c0 + 50, "in the game: it arrives with 50 coins");
-  check(await page.evaluate(() => window.__hbGame.mail().unread.some(id => /^creator-/.test(id))), "and the note's in the letterbox, unread");
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.creator = {next: Date.now() - 1000, sent: [], specials: {"hello-2026-10": true}}; F.mailRead = F.mailRead || {}; window.__hbGame.mail().unread.forEach(id => { F.mailRead[id] = Date.now(); }); window.__hbGame.save(); });
+  await page.waitForFunction(() => window.__hbGame.mail().unread.some(id => /^creator-/.test(id)), null, { timeout: 20000 });
+  check(!(await page.evaluate(() => (window.__hbGame.F().inv || {}).cr_bouquet)) && await page.evaluate(() => window.__hbGame.F().coins) === c0, "in the game: the note comes by post, the gift still tucked inside it");
+  await page.waitForFunction(() => [...document.querySelectorAll("#actors .npc, #actors [data-npc]")].some(n => /agent-creator-/.test(n.id || n.dataset.npc || "")) || /Flowers for you!/.test((document.getElementById("npcSay") || {}).textContent || "") || document.querySelector('[id^="agent-creator-"]'), null, { timeout: 25000 }).catch(() => {});
+  check(await page.evaluate(() => !!document.querySelector('[id*="agent-creator-"], [data-npc*="agent-creator-"]')), "the postie brings it to you");
   await page.click('[data-open="mail"]'); await page.waitForTimeout(500);
   check(/Honeybrook's creator/.test(await page.locator("#mailList").innerText()), "signed from Honeybrook's creator");
-  await page.evaluate(() => { const b = document.querySelector('[data-open="mail"]'); b && b.click(); });
+  await page.evaluate(() => { const t = [...document.querySelectorAll("#mailList [data-mail]")].find(x => /Flowers for you/.test(x.textContent)); t && t.click(); }); await page.waitForTimeout(600);
+  check(await page.locator("#nbPage .nbencit svg").count() === 2 && /Surprise bouquet/.test(await page.locator("#nbPage .nbenc").innerText()) && /50 coins/.test(await page.locator("#nbPage .nbenc").innerText()), "the note shows the bouquet and the coins tucked in it");
+  check(await page.evaluate(() => window.__hbGame.F().inv.cr_bouquet) === 1 && await page.evaluate(() => window.__hbGame.F().coins) === c0 + 50, "and opening it puts them in the backpack and the purse (once)");
   check(await page.evaluate(() => { const it = window.__hbGame.items().cr_bouquet; return it.kind === "bouquet" && it.sell > 0 && !it.price; }), "the bouquet can be given to a villager like any bouquet, or sold (and isn't for sale anywhere)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }

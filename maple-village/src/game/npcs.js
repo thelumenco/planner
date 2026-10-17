@@ -207,7 +207,7 @@ function tickCourier(dt){
     const arrived = walk(c, 150, dt);
     if (arrived && c.state === "coming") {
       c.state = "waiting"; c.dir = -side;
-      if (!greeted.has(c.item.id)) { greeted.add(c.item.id); say(c, `${c.item.from === "crier" && c.ag.helloTown ? c.ag.helloTown : c.ag.hello} Tap me for the note.`, 6000); }
+      if (!greeted.has(c.item.id)) { greeted.add(c.item.id); say(c, `${c.item.hello || (c.item.from === "crier" && c.ag.helloTown ? c.ag.helloTown : c.ag.hello)} Tap me for the note.`, 6000); }
     }
   } else if (c.state === "leaving") {
     if (walk(c, 140, dt)) { drop(c.id); courier = null; }

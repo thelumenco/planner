@@ -90,6 +90,7 @@ function mailPage(item){
     <p class="nbmeta">a note from ${esc(api.agentName(item.from))}${item.at ? ` · ${timeOf(item.at)}` : ""}</p>
     <h2 id="nbTitle">${esc(item.title || "A note for you")}</h2>
     <div class="nbbody">${item.body ? `<div class="nbnotes">${notesHTML(item.body)}</div>` : ""}${sectionsHTML(item.sections)}
+    ${(item.enclosed || []).length ? `<div class="nbenc"><p class="nbmeta">Tucked in with the note</p><div class="nbencrow">${item.enclosed.map(e => `<span class="nbencit">${icon(e.ico, 44)}<small>${esc(e.n)}</small></span>`).join("")}</div><p class="muted nbencnote">In your backpack and your purse now.</p></div>` : ""}
     ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Open the full thing ↗</a></div>` : ""}</div>
     <div class="nbactions">${(item.pond = item.pond || item.from === "winddown") ? `<button class="btn primary" data-nb="pond">Walk to the pond</button>` : ""}<button class="btn ${item.pond ? "alt" : "yes"}" data-nb="thanks">${item.pond ? "Later" : "Thanks!"}</button></div>`;
 }

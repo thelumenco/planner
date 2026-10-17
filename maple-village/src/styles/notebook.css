@@ -146,3 +146,10 @@ button.subname[aria-expanded="true"]::after{content:"▴"}
 .suball{font-family:"Klee One",serif;color:#5E7A4E;margin:6px 0!important}
 .nbbody a.lchip{display:inline-block;padding:0 10px;margin:1px 2px;border-radius:999px;background:#E6E9F5;color:#2F3B73;font-size:.82rem;font-weight:700;line-height:1.75;text-decoration:none;white-space:nowrap;word-break:normal;vertical-align:1px}
 .nbbody a.lchip:hover{background:#D9DEF2}
+/* round 228: what came tucked in with a note (the creator's bouquet and coins) */
+.nbenc{margin:18px 0 4px;padding:12px 14px;border:1.5px dashed rgba(138,130,121,.45);border-radius:14px;background:rgba(246,227,161,.25)}
+.nbenc .nbmeta{margin:0 0 8px}
+.nbencrow{display:flex;gap:22px;flex-wrap:wrap}
+.nbencit{display:flex;flex-direction:column;align-items:center;gap:4px;font-weight:600}
+.nbencit small{font-size:.85rem}
+.nbencnote{margin:8px 0 0;font-size:.85rem}

@@ -533,7 +533,8 @@ setInterval(() => {
   if (scene === "field" && countdownDue(F, dayKey(), localHM())) treeCountdown();
   { const got = collectReplies(F, Date.now() + (globalThis.__hbOffset || 0)); if (got.length) { save(); got.forEach((g, k) => setTimeout(() => { if (g.gift) { flash(ITEMS[g.gift] ? ITEMS[g.gift].n : "A little something"); speak(`A parcel from ${g.from}, with a postcard. It's in your backpack, and the postcard's in your letterbox.`, 5500); } else speak(`${g.from} wrote to say thank you for the hamper, and they've pinned up an order for another at the post office.`, 5500); }, 1500 + k*6000)); } }
   // round 228: now and then, a surprise bouquet (and 50 coins) in the post from Honeybrook's creator
-  if (creatorPost(F, Date.now() + (globalThis.__hbOffset || 0), localHM()) || (F.creator && (F.creator.sent || []).some(g => !g.given))) { if (collectCreator(F)) { save(true); sfx("chime"); flash(`A surprise bouquet and ${CREATOR_GIFT.coins} coins`); setTimeout(() => speak(`Flowers in the post! A bouquet and ${CREATOR_GIFT.coins} coins, with a note from Honeybrook's creator in your letterbox.`, 6000), 1200); render(); } }
+  // (the postie brings the note; the bouquet and coins tucked in it are yours when it's opened: markRead)
+  if (creatorPost(F, Date.now() + (globalThis.__hbOffset || 0), localHM(), dayKey())) { save(true); render(); }
   if (S.day !== dayKey()) { S = freshToday(); say = null; save(true); speak(defaultLine()); return; }
   // the morning's village requests go up once the save has loaded (so a cloud copy can't wipe them straight away)
   if (QB.board(F).lastPost !== dayKey() && (!refs || synced.fox)) { if (postRequests()) save(true); else persist("fox"); }
@@ -751,6 +752,7 @@ const unreadMail = () => { const stale = stalePapers(); return allMail().filter(
 const paperName = () => (F.paperName || "").trim() || "The Honeybrook Times";
 const paperWaiting = () => unreadMail().find(m => m.from === "crier");
 function markRead(item){
+  if (item.from === "creator") { const n = collectCreator(F, item.id); if (n) { sfx("coin"); flash(`${ITEMS[CREATOR_GIFT.item].n}${n > 1 ? ` and ${n} coins` : ""}`); setTimeout(() => render(), 50); } }   // round 228: what's tucked in the creator's note
   if (!F.mailRead[item.id]) {
     F.mailRead[item.id] = Date.now();
     const ids = Object.keys(F.mailRead).sort((a, b) => F.mailRead[b] - F.mailRead[a]);
@@ -2196,7 +2198,7 @@ function render(redraw){
   QB.noteSeen(F); dressMel();
   if (redraw) drawScene();
   const L = level(), next = LEVELS[L+1];
-  $("title").firstChild.textContent = `${F.name}'s village`;
+  $("title").firstChild.textContent = (F.name || "").trim() ? `${F.name.trim()}'s village` : "Your village";   // (no name yet: "Your village", not "'s village")
   $("trayName").textContent = F.name; if (document.activeElement !== $("paperNameIn")) $("paperNameIn").placeholder = paperName();
   const d = new Date(now() + LOC());
   $("dateLine").textContent = d.toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long", timeZone:"UTC"}) + (F.streak >= 2 && F.lastActive === dayKey() ? ` · ${F.streak} cosy days in a row` : "");
