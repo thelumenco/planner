@@ -84,7 +84,7 @@ body.nb-open{overflow:hidden}
 .shelf .status{margin:0 0 16px}
 .shelf .status b{color:var(--navy)}
 
-/* ---------- The Morning Crier: newsprint, not notebook ---------- */
+/* ---------- The Honeybrook Times: newsprint, not notebook ---------- */
 .nbpage.news{background:#F2EEE4;background-image:var(--fibre);color:#1F1C1A;transform:none;border-radius:1px;padding:22px 24px 0;clip-path:none;
   box-shadow:0 1px 0 #E2DCCF,0 2px 0 #F7F4EC,0 3px 0 #DDD6C8,0 30px 60px -30px rgba(40,30,20,.55);animation:nbunfold .35s ease}
 @keyframes nbunfold{from{transform:scaleY(.6) translateY(30px);opacity:.3}to{transform:none}}

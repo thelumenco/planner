@@ -729,7 +729,7 @@ function stalePapers(){
 }
 const unreadMail = () => { const stale = stalePapers(); return allMail().filter(m => m && m.id && !F.mailRead[m.id] && !stale.has(m.id) && (!m.at || now() - m.at < (m.from === "crier" ? 72 : 36)*H)).sort((a, b) => (a.at || 0) - (b.at || 0)); };
 // The village paper's name: the player can rename it in Settings (kept with the fox doc, so it follows them across devices).
-const paperName = () => (F.paperName || "").trim() || "The Morning Crier";
+const paperName = () => (F.paperName || "").trim() || "The Honeybrook Times";
 const paperWaiting = () => unreadMail().find(m => m.from === "crier");
 function markRead(item){
   if (!F.mailRead[item.id]) {
@@ -3363,7 +3363,7 @@ function frame(now){
 
 /* =================== WIRING =================== */
 document.querySelectorAll("[data-track]").forEach(b => b.onclick = () => openTracker(b.dataset.track));
-$("paperSave").onclick = () => { const v = $("paperNameIn").value.trim(); F.paperName = v; $("paperNameIn").value = ""; $("paperNameIn").placeholder = paperName(); sfx("paper"); speak(v ? `Hot off the press: ${v}!` : "Back to The Morning Crier.", 4000); save(); };
+$("paperSave").onclick = () => { const v = $("paperNameIn").value.trim(); F.paperName = v; $("paperNameIn").value = ""; $("paperNameIn").placeholder = paperName(); sfx("paper"); speak(v ? `Hot off the press: ${v}!` : "Back to The Honeybrook Times.", 4000); save(); };
 $("paperNameIn").placeholder = paperName();
 $("nameSave").onclick = () => { const v = $("nameIn").value.trim(); if (v) { F.name = v.slice(0, 20); $("nameIn").value = ""; act("cheer"); speak(`Hi! I'm ${F.name} now.`, 4000); save(); } };
 $("meSave").onclick = () => { const v = $("meIn").value.trim(); if (v) { F.me = {...(F.me || {}), name: v.slice(0, 24)}; $("meIn").value = ""; sfx("chime"); speak(`Nice to meet you, ${F.me.name}.`, 4000); save(); } };
