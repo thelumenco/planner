@@ -665,6 +665,7 @@ if (want("\njournal, bedtime, backup")) try {
   check(await page.evaluate(() => window.__download && /honeybrook-backup-.*\.json/.test(window.__download.filename) && window.__download.size > 200), "Settings can download a backup of the whole game");
   check(await page.locator("#setBed").isChecked(), "Stay in bed is on by default");
   check(await page.locator("#setMail").getAttribute("href").then(h => /^mailto:hi@ambidextrouslabs\.com/.test(h)), "Settings has an Email us button for bugs, ideas and places to visit");
+  check(await page.locator("#setTip").getAttribute("href").then(h => h === "https://ko-fi.com/melodybay") && await page.locator("#setTip").getAttribute("target") === "_blank", "and a tip jar: Leave a tip, on Ko-fi, in a new tab");
   await page.click("#pclose");
   await page.addInitScript(() => { window.__said = []; new MutationObserver(() => { const t = document.getElementById("speech"); if (t) window.__said.push(t.textContent); }).observe(document, {subtree: true, childList: true, characterData: true}); });
   await page.goto(url + "?seed=1&time=23:02"); await page.waitForTimeout(14000);

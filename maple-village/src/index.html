@@ -249,6 +249,11 @@
           <h3 class="ph3">Write to us</h3>
           <p class="muted">Found a bug, or wish the game did something? Somewhere you'd love to visit next? We read every email.</p>
           <div class="setrow"><a class="btn small alt" id="setMail" href="mailto:hi@ambidextrouslabs.com?subject=Honeybrook" target="_blank" rel="noopener">Email us</a><span class="muted">hi@ambidextrouslabs.com</span></div>
+          <!-- round 224: the tip jar (web only: hidden when window.__hbApp is set, for the App Store and Google Play builds, which can't link out to payments) -->
+          <div id="setTipBox"><h3 class="ph3">Support Honeybrook</h3>
+          <p class="muted">Honeybrook is made by one person. If it brings you a calm moment, a tip helps keep it growing. Entirely optional, and the whole game stays free.</p>
+          <div class="setrow"><a class="btn small alt" id="setTip" href="https://ko-fi.com/melodybay" target="_blank" rel="noopener">☕ Leave a tip</a><span class="muted">on Ko-fi</span></div></div>
+          <script>if (window.__hbApp) document.getElementById("setTipBox").remove();</script>
           <h3 class="ph3">Your newspaper</h3>
           <div class="row">
             <label class="sr" for="paperNameIn">Newspaper name</label>
