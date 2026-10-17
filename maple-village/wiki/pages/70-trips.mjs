@@ -158,7 +158,7 @@ function tripsPage(){
       <li><b>Who can come:</b> any villager at ${TRIP_HEARTS} hearts. They take the day off from whatever they usually do and follow you round, settling at their favourite spots (and some do things there they do nowhere else). Your pet rides in your bag, free. See <a href="/hearts-and-gifts">Hearts and gifts</a>.</li>
       <li><b>Fares are per person:</b> a ticket for you and one for each friend, return.</li>
       <li><b>Leaving and coming home:</b> each place has a window for setting off and a time for the last train or boat home. Come home whenever you like before that; the trip ends when you're home, at the last train, or at midnight.</li>
-      <li><b>Rain:</b> the little island boat to Puffin Isle stays in on rainy days, and so does your own boat.</li></ul>
+      <li><b>Rain:</b> the little island boat to Puffin Isle stays in while it's raining, and so does your own boat.</li></ul>
     <h2>${ico("xm_train", 22)} By train, from Honeybrook station</h2><p>The ticket window at Honeybrook station, on the cottage lane. Pick a town, pick who's coming, and buy the tickets.</p>
     ${table(["Town", "Return fare", "Trains out", "Last train home"], trainRows)}
     <h2>${ico("water", 22)} By ferry, from the foreshore jetty</h2><p>The ferry leaves from the jetty on the foreshore and brings you back to it. Jeju has both: over the sea bridge by train, or the slower crossing by ferry (there are dolphins), and you can come home either way.</p>

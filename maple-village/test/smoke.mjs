@@ -1990,13 +1990,20 @@ if (want("\nrainy days")) try {
   console.log("\nrainy days");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`rain pageerror: ${e.message}`));
-  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-12"); await page.waitForTimeout(900);
+  // round 228 (Mel: "rain shouldn't be for the whole day. One hour at most"): one spell of 30 to 60 minutes on a wet day
+  { const vx = await import(new URL("../src/art/village-extras.js", import.meta.url)); const days = Array.from({length: 730}, (_, i) => new Date(Date.UTC(2026, 0, 1) + i*864e5).toISOString().slice(0, 10)), spells = days.map(vx.rainSpell).filter(Boolean);
+    check(spells.length > 50 && spells.every(x => x.to - x.from >= 30 && x.to - x.from <= 60 && x.from >= 8*60 && x.from <= 20*60), "rain comes in one spell of 30 minutes to an hour, never all day (" + spells.length + " wet days in two years)");
+    const sp = vx.rainSpell("2026-10-12"); check(vx.rainyOn("2026-10-12") && vx.rainyOn("2026-10-12", sp.from + 5) && !vx.rainyOn("2026-10-12", sp.from - 5) && !vx.rainyOn("2026-10-12", sp.to), "dry before the shower and after it"); }
+  await page.goto(url + "?reset=1&seed=1&time=13:10&date=2026-10-12"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => { const r = document.getElementById("rain"); return !r.hidden && r.classList.contains("light"); }), "a light shower in October (not just the wet season)");
   check(await page.locator("#melRain .brolly").count() === 1, "you're under your brolly");
   await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(2500);
   const gear = await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].map(n => n.querySelector(".brolly") ? "b:" + n.querySelector(".brolly > path:nth-of-type(3)").getAttribute("style") : n.querySelector(".rcoat") ? "c:" + n.querySelector(".rcoat").getAttribute("style") : ""));
   check(gear.length > 0 && gear.every(Boolean) && new Set(gear).size > 1, "everyone in town has a brolly or a raincoat, not all the same");
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-12"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(1500);
+  check(await page.evaluate(() => document.getElementById("rain").hidden), "the same day, before the shower, it's dry");
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-07"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => document.getElementById("rain").hidden) && await page.locator("#melRain .brolly, #actors .brolly").count() === 0, "and on a dry day the brollies are put away");

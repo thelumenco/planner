@@ -12,7 +12,7 @@
 import { esc, dayKey, localHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
-import { stormyOn } from "../art/village-extras.js";
+import { stormyOn, rainSpell } from "../art/village-extras.js";
 // Round 99, making it a real job:
 //   trust       every bit of help earns Felix and Elena's trust (h.trust); four levels (LEVELS), each giving something:
 //               a hive of the player's own, new cheeses and honeys, a shelf at the farm stand and a bigger cave
@@ -53,7 +53,7 @@ export function hfState(F){
 // how long a hive has been filling, in "bee days": downpour days count half (the bees stay home)
 const DAY = 864e5;
 function beeTime(t0){ const now = clock(), span = now - t0; if (span <= 0) return 0; let rain = 0;
-  for (let d = Math.floor(t0/DAY); d <= Math.floor(now/DAY); d++) { const k = new Date(d*DAY).toISOString().slice(0, 10); if (stormyOn(k)) rain += Math.max(0, Math.min(now, (d + 1)*DAY) - Math.max(t0, d*DAY)); }
+  for (let d = Math.floor(t0/DAY); d <= Math.floor(now/DAY); d++) { const k = new Date(d*DAY).toISOString().slice(0, 10); if (stormyOn(k)) { const s = rainSpell(k), a = d*DAY + s.from*60e3, b = d*DAY + s.to*60e3; rain += Math.max(0, Math.min(now, b) - Math.max(t0, a)); } }   // only while the downpour lasts
   return span - rain/2; }
 const hiveT = (h, i) => i === "mine" ? (h.myHive ? h.myHive.t : clock()) : h.hives[i];
 export const hiveFill = (h, i) => Math.min(1, beeTime(hiveT(h, i))/(HIVE_DAYS*DAY));
@@ -229,7 +229,7 @@ export function herdPanel(F, herd, keeper){
   return p + shut;
 }
 export function hivesPanel(F, keeper){
-  const h = hfState(F), full = fullHives(h), mine = myHiveFull(h), rain = stormyOn(dayKey()), n = full.length*JARS + (mine ? MY_FRAMES : 0);
+  const h = hfState(F), full = fullHives(h), mine = myHiveFull(h), rain = stormyOn(dayKey(), localHM()), n = full.length*JARS + (mine ? MY_FRAMES : 0);
   let p = `<span class="tape stripe" aria-hidden="true"></span><h2>The beehives</h2><p class="sub">Each hive fills over three days${rain ? " (slower today: it's raining, so the bees are staying in)" : ""}. Collect a full one for ${JARS} frames of comb to spin at the barn's extractor (Felix keeps the rest), but don't leave it too long: a full hive gets restless and swarms. This week the bees are on the ${honeyNow().n}. ${keeper ? "Felix lends you his bee veil." : levelOf(h) >= 1 ? "Your own veil's on its hook." : "Put on the bee veil from the hook."}</p>`;
   const row = (label, f, warn, extra = "") => `<li><span class="wpic">${icon("honey", 22)}</span><span class="wtxt"><b>${label}</b><small>${f >= 1 ? (warn ? "full, and the bees are restless: collect it soon!" : "full, heavy with honey") : `${Math.round(f*100)}% full`}</small>${extra}</span><span class="clbar" style="width:70px"><i style="width:${Math.round(f*100)}%"></i></span></li>`;
   p += `<ul class="hlist wlist">${h.hives.map((_, i) => row(`Hive ${i + 1}`, hiveFill(h, i), restless(h, i))).join("")}${h.myHive ? row(`${esc(h.myHive.name)} <small class="muted">(yours: all ${MY_FRAMES} frames)</small>`, hiveFill(h, "mine"), restless(h, "mine")) : ""}</ul>`;

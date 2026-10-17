@@ -81,9 +81,14 @@ export function festivalOn(day){
 // The rainy months (November to January): roughly one day in three is a proper downpour, and another one in ten a
 // light shower. The rest of the year a shower blows through about one day in seven: brollies up, nothing called off.
 // rainLevel: 0 dry, 1 a light shower, 2 a downpour (paddling's off).
-export function rainLevel(day){ const h = hash(day + "rain") % 100; return [11, 12, 1].includes(+day.slice(5, 7)) ? (h < 34 ? 2 : h < 44 ? 1 : 0) : (h < 14 ? 1 : 0); }
-export const rainyOn = day => rainLevel(day) > 0;
-export const stormyOn = day => rainLevel(day) === 2;
+// Mel: "rain shouldn't be for the whole day. One hour at most": a wet day has one spell of rain, 30 to 60 minutes,
+// some time between 8am and 8pm (rainSpell). Given a time (minutes since midnight), rainLevel/rainyOn/stormyOn say
+// whether it's raining right then; without one, whether it rains at all that day.
+const dayRain = day => { const h = hash(day + "rain") % 100; return [11, 12, 1].includes(+day.slice(5, 7)) ? (h < 34 ? 2 : h < 44 ? 1 : 0) : (h < 14 ? 1 : 0); };
+export function rainSpell(day){ if (!dayRain(day)) return null; const h = hash(day + "spell"), from = 8*60 + (h % 144)*5; return {from, to: from + 30 + (Math.floor(h/144) % 7)*5}; }
+export function rainLevel(day, hm){ const l = dayRain(day); if (!l || hm == null) return l; const s = rainSpell(day); return hm >= s.from && hm < s.to ? l : 0; }
+export const rainyOn = (day, hm) => rainLevel(day, hm) > 0;
+export const stormyOn = (day, hm) => rainLevel(day, hm) === 2;
 
 export function festivalArt(f){
   if (!f) return "";

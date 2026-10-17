@@ -354,7 +354,7 @@ function sellTo(c, day, out, o){
 // wet season -> true if one sold this minute
 function hotMinute(c, day, hm, opts, out){
   const k = ["milk", "dark", "white"].find(x => c.choc[x] > 0); if (!k) return false;
-  const p = .015*(hm >= 17*60 ? 1.6 : 1)*(rainyOn(day) ? 1.6 : 1)*([11, 12, 1].includes(+day.slice(5, 7)) ? 1.2 : 1)*(opts.serving ? 1.3 : 1)*Math.pow(5/Math.max(2, c.prices.hot), 1.2);
+  const p = .015*(hm >= 17*60 ? 1.6 : 1)*(rainyOn(day, hm) ? 1.6 : 1)*([11, 12, 1].includes(+day.slice(5, 7)) ? 1.2 : 1)*(opts.serving ? 1.3 : 1)*Math.pow(5/Math.max(2, c.prices.hot), 1.2);
   if (Math.random() >= p) return false;
   const s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0}; c.choc[k]--; s.hot = (s.hot || 0) + 1; s.coins += c.prices.hot; out.coins += c.prices.hot; out.hot = (out.hot || 0) + 1; return true;
 }

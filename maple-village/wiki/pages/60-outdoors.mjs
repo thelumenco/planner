@@ -17,7 +17,7 @@ const spotsIn = scene => Object.entries(VILLAGE).filter(([, p]) => p.scene === s
 function fishingPage(){
   const spot = k => FI.SPOTS[k].n;
   const rows = Object.entries(FI.FISH).map(([id, f]) => ({id: "fish-" + id, cells: [`${icon(f.item || id, 22, "fish")}<b>${esc(f.n)}</b>${f.rare ? ` <small class="muted">rare</small>` : ""}`,
-    [f.spot, ...(f.also || [])].map(k => ({river: "Home river", lake: "Lake", sea: "Sea", pool: "Waterfall pool", bay: "The bay"})[k] || spot(k)).map(esc).join(", "), esc(id === "crayfish" ? "At night, or in the rain" : f.when ? WHEN[f.when] : f.rain ? "On rainy days" : "Any time"),
+    [f.spot, ...(f.also || [])].map(k => ({river: "Home river", lake: "Lake", sea: "Sea", pool: "Waterfall pool", bay: "The bay"})[k] || spot(k)).map(esc).join(", "), esc(id === "crayfish" ? "At night, or while it's raining" : f.when ? WHEN[f.when] : f.rain ? "While it's raining" : "Any time"),
     `${f.cm[0]} to ${f.cm[1]}cm`, "●".repeat(f.hard) + `<span class="muted">${"○".repeat(5 - f.hard)}</span>`,
     id === "koi" ? "Goes in your home pond" : f.junk ? `<span class="muted">${id === "seaglass" ? "For the windowsill" : "Journal only"}</span>` : `${f.item === "fish" ? "Fish" : esc(nameOf(f.item))}, ${sell(f.item)}`]}));
   const spots = Object.entries(FI.SPOTS).map(([k, s]) => ({id: "spot-" + k, cells: [`<b>${esc(s.n)}</b>`, esc(s.line), k === "bay" ? "Fridays, 5pm to 8pm" : "Any time"]}));

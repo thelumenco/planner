@@ -106,7 +106,7 @@ function makeNode(id, look, kid, letter, act){
   const owned = (api.F().fam && api.F().fam.owned) || {};
   if (id === "bo" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
   // a rainy day outdoors: everyone has their own brolly or raincoat (a coat if their right hand's busy or they're on a board)
-  if (OUTDOOR.includes(api.scene()) && !townOf(api.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, {rain: rainGearFor(id, {coat: !!look.bike || !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look.extra)})});
+  if (OUTDOOR.includes(api.scene()) && !townOf(api.scene()) && rainyOn(dayKey(), localHM()) && !look.board) look = Object.assign({}, look, {rain: rainGearFor(id, {coat: !!look.bike || !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look.extra)})});
   g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "") + `<g class="storycue" transform="translate(0 ${kid ? -48 : -72})" pointer-events="none"><g filter="url(#wob)"><rect x="-13" y="-9" width="26" height="16" rx="8" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1.2"/><circle cx="-6" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="0" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="6" cy="-1" r="1.8" style="fill:var(--line)"/></g></g>`;
   $("actors").appendChild(g);
   return g;

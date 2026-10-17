@@ -54,8 +54,8 @@ export const FISH = {
 // crayfish come out at night or in the rain
 const OK_WHEN = {day: m => m >= 7*60 && m < 18*60, dawn: m => m >= 5*60 && m < 10*60, dusk: m => m >= 18*60 && m < 20*60, night: m => m >= 19*60 || m < 6*60};
 export function canBite(id, day = dayKey(), hm = localHM()){
-  const f = FISH[id]; if (f.when && !OK_WHEN[f.when](hm)) return false; if (f.rain && !rainyOn(day)) return false;
-  if (id === "crayfish" && !(OK_WHEN.night(hm) || rainyOn(day))) return false;
+  const f = FISH[id]; if (f.when && !OK_WHEN[f.when](hm)) return false; if (f.rain && !rainyOn(day, hm)) return false;
+  if (id === "crayfish" && !(OK_WHEN.night(hm) || rainyOn(day, hm))) return false;
   return true;
 }
 export const fishHere = (spot, day, hm) => !spotOpen(spot, day, hm) ? [] : Object.keys(FISH).filter(id => (FISH[id].spot === spot || (FISH[id].also || []).includes(spot)) && canBite(id, day, hm));
