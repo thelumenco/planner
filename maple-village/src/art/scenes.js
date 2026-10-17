@@ -771,6 +771,7 @@ export function roomArt(id){
     h += `<g pointer-events="none"><rect x="434" y="50" width="62" height="72" rx="2" fill="#3E4A43"/><text x="465" y="64" text-anchor="middle" font-family="Klee One,serif" font-size="9" fill="#F3C969">Tapas today</text>${lines.slice(0, 4).map((l, i) => `<text x="465" y="${80 + i*12}" text-anchor="middle" font-family="Klee One,serif" font-size="9" fill="#F6EFE3">${l.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</text>`).join("")}</g>`; }
   st.forEach(s => {
     if (s.kind === "millcrate" && !(G.millCrate && G.millCrate())) return;
+    if (s.kind === "gcatalogue" && G.upsDone && G.upsDone(id)) return;   // round 226: the upgrades sign goes once every upgrade's bought
     if (s.kind === "hampertable" && !(G.xmasSeason && G.xmasSeason())) return;   // round 173: Penny's hamper table, in the Christmas season   // the crate's only there once there's a mill, and till its own shop opens
     // a pedestal's sign names the trophy standing on it (an empty one has no sign)
     const nm = s.kind === "millcrate" ? "" : s.kind === "pedestal" ? ((G.ped && G.ped(s.x, s.y)) || {}).label || "" : s.kind === "vaultjar" ? (() => { const j = G.vault && G.vault(s.x); return j ? j.label : "Empty"; })() : s.name;

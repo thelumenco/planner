@@ -426,7 +426,8 @@ export const ROOMS = {
     ["crock","Yoghurt crocks","Y","crock",null,"Crocks of yoghurt, setting.",30],
     ["press","Cheese press","P","hfpress",null,"The cheese press.",30],
     ["cave","Cheese cave","C","cheesecave",null,"The cheese cave.",30]]},
-  cocoa: {name:"The Cocoa Room", wall:"#F3E4D2", trim:"#6B4430", noBoard:true, pos:{C:[300,330], W:[110,262], Z:[40,400], T:[340,520], D:[440,262]}, stations:[
+  cocoa: {name:"The Cocoa Room", wall:"#F3E4D2", trim:"#6B4430", noBoard:true, pos:{C:[300,330], W:[110,262], Z:[40,400], T:[340,520], D:[440,262], U:[446,430]}, stations:[
+    ["cupgrades","Upgrades","U","gcatalogue",null,"The upgrades catalogue: things to make the Cocoa Room even nicer.",34],   // round 226: like the Scoop Shack's
     ["case","Display case","D","bonboncase",null,"The display case: bonbons, six flavours at a time.",36],
     ["ccounter","Counter","C","ccounter",null,"The counter. Yours are free.",46],
     ["barwall","Bar wall","W","barwall",null,"Wrapped bars of your own chocolate.",36],
