@@ -4119,7 +4119,7 @@ if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) tr
   check(!lt.offerOpen(F, 4) && !lt.buyCottage(F, "figtree", 4, day) && lt.offerOpen(F, 5) && lt.letsMail(F, 5, 1).length === 1 && !lt.letsMail(F, 4, 1).length, "Elena offers the cottages at five hearts (and writes to say so)");
   check(lt.buyCottage(F, "figtree", 5, day) && F.coins === 7000 && lt.owns(F, "figtree") && !lt.letsMail(F, 5, 1).length && !lt.buyCottage(F, "figtree", 5, day), "Fig Tree is yours for 2000");
   check(["bed", "linen", "bed2", "linen2"].every(sl => ld.floorOf("bluebell", sl) === "up") && ["bath", "basin", "towels", "bathmat", "toiletries", "bplant"].every(sl => ld.floorOf("figtree", sl) === "bath") && ["seat", "table", "shelf", "rug"].every(sl => ld.floorOf("figtree", sl) === "down"), "the sitting room downstairs, beds upstairs, and a bathroom off the bedroom");
-  check(Object.values(ld.CATS).every(c => c.prices[0] < c.prices[1] && c.prices[1] < c.prices[2]) && ld.GUEST_POOL.every(g => np.NPCS.some(n => n.id === g)) && np.NPCS.some(n => n.id === "nell" && !n.tourist), "simple, good and fine, each dearer than the last; the guests are real visitors; Nell lives on the lane");
+  check(Object.values(ld.CATS).every(c => c.prices[0] < c.prices[1] && c.prices[1] < c.prices[2]) && ld.GUEST_POOL.every(g => np.NPCS.some(n => n.id === g)) && np.NPCS.some(n => n.id === "hettie" && !n.tourist), "simple, good and fine, each dearer than the last; the guests are real visitors; Hettie lives on the lane");
   check(lt.order(F, "figtree", "bed", 1, "sage", day) && F.coins === 6880 && !lt.order(F, "bluebell", "bed", 1, "sage", day) && !lt.order(F, "figtree", "bed", 4, "sage", day), "a pine bed ordered (120); nothing for a cottage you don't own");
   check(lt.deliver(F, day) === 0 && lt.deliver(F, "2026-10-13") === 1 && F.lets.cottages.figtree.parcels.length === 1, "it comes on the next day's train, a parcel in the hall");
   check(!lt.place(F, "figtree", "seat", "parcel", 0) && lt.place(F, "figtree", "bed", "parcel", 0), "a bed only goes where a bed goes");
@@ -4156,10 +4156,10 @@ if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) tr
   check(hc.stay && hc.stay.untidy, "nobody tidied: the next guests arrive to a mess");
   lt.settle(H, A(hb2.from, hb2.nights));
   check(hc.book[0].stars === Math.max(1, s1 - 2) && /wasn't quite clean/.test(hc.book[0].text), "and it shows in the review (" + hc.book[0].stars + " star)");
-  // Nell
+  // Hettie
   lt.hireKeeper(H, "figtree", true); H.inv = {plum: 2, tangerine: 1, cheese: 2}; ["plum", "plum", "tangerine", "cheese", "cheese"].forEach(i => lt.stock(H, "figtree", "pantry", i));
   hc.ready.tidy = true; const hb3 = hc.bookings[0]; lt.settle(H, hb3.from); const hk = H.coins; lt.settle(H, A(hb3.from, hb3.nights));
-  check(hc.ready.tidy && Object.keys(hc.ready.fruit).length === 2 && hc.ready.fridge.cheese === 2 && !Object.keys(hc.pantry).length && H.coins - hk === hc.book[0].pay - 25 && lt.keeperDays(H, A(hb3.from, hb3.nights)).includes("figtree"), "Nell does the changeover (25) and fills the basket and fridge from the pantry");
+  check(hc.ready.tidy && Object.keys(hc.ready.fruit).length === 2 && hc.ready.fridge.cheese === 2 && !Object.keys(hc.pantry).length && H.coins - hk === hc.book[0].pay - 25 && lt.keeperDays(H, A(hb3.from, hb3.nights)).includes("figtree"), "Hettie does the changeover (25) and fills the basket and fridge from the pantry");
   // closing and pausing
   const P = {coins: 5000, inv: {}}; lt.buyCottage(P, "figtree", 5, day); Object.assign(P.lets.cottages.figtree.slots, F.lets.cottages.figtree.slots);
   for (let k = 2; k < 30; k++) lt.toggleDay(P, "figtree", A(day, k), day); P.lets.last = day; lt.settle(P, A(day, 1));
@@ -4169,7 +4169,7 @@ if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) tr
   F.lets.last = out; const far = "2027-03-01", f0 = F.coins; lt.settle(F, far);
   check(F.coins > f0 && F.lets.cottages.figtree.book.length > 2, "away for months: guests still came, stayed and paid");
   const p = lt.hallPanel(F, "figtree", {tab: "shop"}, far);
-  check(/data-let="order:bed:1:sage"/.test(p) && /data-let="order:bath:3:rose"/.test(lt.hallPanel(F, "figtree", {tab: "shop", cat: "bath", col: "rose"}, far)) && /data-let="extra:hottub"/.test(lt.hallPanel(F, "figtree", {tab: "garden"}, far)) && /data-let="day:/.test(lt.hallPanel(F, "figtree", {tab: "cal"}, far)) && /data-let="keeper:/.test(lt.hallPanel(F, "figtree", {tab: "welcome"}, far)), "the hall table: the catalogue (bathrooms too), the garden, the calendar, the welcome and Nell");
+  check(/data-let="order:bed:1:sage"/.test(p) && /data-let="order:bath:3:rose"/.test(lt.hallPanel(F, "figtree", {tab: "shop", cat: "bath", col: "rose"}, far)) && /data-let="extra:hottub"/.test(lt.hallPanel(F, "figtree", {tab: "garden"}, far)) && /data-let="day:/.test(lt.hallPanel(F, "figtree", {tab: "cal"}, far)) && /data-let="keeper:/.test(lt.hallPanel(F, "figtree", {tab: "welcome"}, far)), "the hall table: the catalogue (bathrooms too), the garden, the calendar, the welcome and Hettie");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await closeFriends(page);
   page.on("pageerror", e => errors.push(`lets pageerror: ${e.message}`));
@@ -4201,7 +4201,7 @@ if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) tr
   await page.click(`#ctx [data-let="${free}"]`); await page.waitForTimeout(200);
   check(await fox().then(f => f.lets.cottages.figtree.closed[free.slice(4)] === 1) && await page.locator(`#ctx [data-let="${free}"].closed`).count() === 1, "the calendar: tap a free day and it's closed");
   await page.click('#ctx [data-let="tab:welcome"]'); await page.waitForTimeout(200);
-  check(await page.locator('#ctx [data-let="keeper:1"]').count() === 1 && /fruit basket/.test(await page.locator("#ctx").textContent()), "the welcome tab: the fruit basket, the fridge, and Nell to hire");
+  check(await page.locator('#ctx [data-let="keeper:1"]').count() === 1 && /fruit basket/.test(await page.locator("#ctx").textContent()), "the welcome tab: the fruit basket, the fridge, and Hettie to hire");
   await page.click('#ctx [data-let="tab:garden"]'); await page.waitForTimeout(200);
   check(await page.locator('#ctx [data-let="extra:hottub"]').count() === 1, "the garden tab: a hot tub, among other things");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(200);

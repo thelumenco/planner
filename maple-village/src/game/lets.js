@@ -7,7 +7,7 @@
 //     fine it is (a bed made up and a bath are the least it needs to let at all);
 //   - round 221: guests book ahead, onto a calendar (you can close days, or pause bookings altogether). Between stays
 //     there are changeover days (1 to 3, your choice): go in, tidy up, fill the fruit basket and the fridge with your
-//     own things, or hire Nell to do the changeover for you (she stocks the welcome from a pantry you keep filled).
+//     own things, or hire Hettie to do the changeover for you (she stocks the welcome from a pantry you keep filled).
 //     Guests pay when they leave, with a tip for a good welcome, and write a review: stars from the furniture, one
 //     more for a good welcome, two fewer if the place wasn't tidy when they arrived.
 // State: F.lets = {offered, spare: [piece], orders: [{c, piece} | {c, extra}, day], last, cottages: {id: {owned, slots: {slot: piece},
@@ -85,7 +85,7 @@ export const starsOf = (F, id) => { const s = scoreOf(F, id); return s.ready ? M
 // what's missing, for the hint in the panel
 export const missing = (F, id) => { const c = letsState(F).cottages[id]; return Object.keys(COTTAGES[id].slots).filter(s => !c.slots[s]).map(s => CATS[catOf(id, s)].line).filter((v, i, a) => a.indexOf(v) === i); };
 
-/* ---------- the welcome: fruit basket, fridge, the pantry for Nell ---------- */
+/* ---------- the welcome: fruit basket, fridge, the pantry for Hettie ---------- */
 export const isFruit = id => !!(ITEMS[id] && ITEMS[id].fruit);
 export const isTreat = id => !!(ITEMS[id] && (ITEMS[id].wine || FRIDGE.includes(id)));
 const count = o => Object.values(o || {}).reduce((a, b) => a + b, 0);
@@ -101,9 +101,9 @@ export function unstock(F, id, where, item){
   bump(box, item, -1); F.inv = F.inv || {}; bump(F.inv, item, 1); return true;
 }
 const goodWelcome = r => r.tidy && count(r.fruit) >= WELCOME.need && count(r.fridge) >= WELCOME.need;
-// a tidy-up (by you, or Nell): the sheets, the floors, the windows
+// a tidy-up (by you, or Hettie): the sheets, the floors, the windows
 export function tidy(F, id, day = dayKey()){ const c = letsState(F).cottages[id]; if (!c.owned || c.ready.tidy || staying(F, id, day)) return false; c.ready.tidy = true; return true; }
-// Nell's changeover: tidy (for her fee), then the basket and the fridge from the pantry
+// Hettie's changeover: tidy (for her fee), then the basket and the fridge from the pantry
 function keeperRound(F, id){
   const c = F.lets.cottages[id], fee = KEEPER.fee[id]; if (c.ready.tidy) return null; if (F.coins < fee) return {unpaid: true};
   F.coins -= fee; c.ready.tidy = true; let moved = 0;
@@ -154,7 +154,7 @@ export function dayState(F, id, d){
 }
 
 /* ---------- running the days ---------- */
-// run the cottages forward to `day`: parcels arrive, guests leave (and pay, and review), Nell does the changeover,
+// run the cottages forward to `day`: parcels arrive, guests leave (and pay, and review), Hettie does the changeover,
 // new guests arrive, and new bookings come in. -> [events]
 export function settle(F, day = dayKey()){
   const L = letsState(F), ev = []; if (!ownsAny(F)) return ev;
@@ -186,7 +186,7 @@ export function settle(F, day = dayKey()){
 // who's staying in a cottage today (for the village's schedules), or null
 export const staying = (F, id, day = dayKey()) => { const c = F.lets && F.lets.cottages && F.lets.cottages[id]; if (!c || !c.stay) return null; const s = c.stay;
   return s.from <= day && day < endOf(s) ? s : null; };
-// round 221: where Nell goes today: the cottages she's doing a changeover in (a checkout today, and she's hired)
+// round 221: where Hettie goes today: the cottages she's doing a changeover in (a checkout today, and she's hired)
 export const keeperDays = (F, day) => !F.lets ? [] : Object.keys(COTTAGES).filter(id => { const c = F.lets.cottages[id]; return c && c.owned && c.keeper && c.book.length && c.book[0].day === day; });
 
 /* ---------- the panels ---------- */

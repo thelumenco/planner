@@ -76,8 +76,8 @@ export const FRIDGE = ["cheese", "chz_fresh", "chz_blue", "goatcheese", "chocola
   "honey_blossom", "honey_cream", "lavhoney", "olivejar", "olives", "cider", "milk", "egg", "bananabread", "eggtart", "pinklemonade", "honeylemon", "pairbox"];
 // an untidy cottage when guests arrive costs two stars
 export const UNTIDY = 2;
-// Nell, who'll do the changeovers for you (and stock the welcome from a pantry cupboard you keep filled)
-export const KEEPER = {name: "Nell", fee: {bluebell: 35, figtree: 25}};
+// Hettie, who'll do the changeovers for you (and stock the welcome from a pantry cupboard you keep filled)
+export const KEEPER = {name: "Hettie", fee: {bluebell: 35, figtree: 25}};
 export const catOf = (cottage, slot) => COTTAGES[cottage].cats[slot] || slot;
 
 // stays: one to five nights; after each stay the cottage needs a tidy before the next booking. The better the last

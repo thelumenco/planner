@@ -178,7 +178,7 @@ function migrate(){
 }
 // Saves from before the internal names changed: old place and villager ids become the new ones (once; harmless after)
 const OLD_IDS = {chord: "carpentry", fresh: "library", chico: "haberdash", luna: "tailor", ohayo: "okadahouse", kidroom: "guestroom", jason: "ornella", luca: "dario"};
-const OLD_PEOPLE = {jason: "ornella", luca: "dario"};
+const OLD_PEOPLE = {jason: "ornella", luca: "dario", nell: "hettie"};   // nell: the cottages' housekeeper, now Hettie (Saltwick has its own Nell)
 function renameIds(F){
   const keys = o => { if (!o || typeof o !== "object") return; Object.entries(OLD_PEOPLE).forEach(([a, b]) => { if (a in o) { if (!(b in o)) o[b] = o[a]; delete o[a]; } }); };
   if (F.where && OLD_IDS[F.where.scene]) F.where.scene = OLD_IDS[F.where.scene];
@@ -1594,11 +1594,11 @@ function ctx(){
     else if (a === "place") { const p = LT.place(F, letView, v, w, +x); if (!p) return; sfx("tap"); gainXp(1); save(); drawScene(); }
     else if (a === "out") { if (!LT.takeOut(F, letView, v)) return; sfx("paper", true); save(); drawScene(); }
     else if (a === "tidy") { if (!LT.tidy(F, letView)) return; sfx("chime"); gainXp(1); speak("Sheets changed, floor swept, windows opened, a jar of fresh flowers on the table. Ready for the next guests.", 5000); save(); drawScene(); }
-    // round 221: the garden, the welcome, Nell, the calendar
+    // round 221: the garden, the welcome, Hettie, the calendar
     else if (a === "extra") { const x = LT.orderExtra(F, letView, v); if (!x) return; sfx("chaching"); flash(x.n); speak("Ordered. The builders will bring it tomorrow and put it in the garden.", 4000); save(); }
     else if (a === "put") { if (!LT.stock(F, letView, v, w)) return; sfx("tap"); save(); drawScene(); }
     else if (a === "un") { if (!LT.unstock(F, letView, v, w)) return; sfx("tap"); save(); drawScene(); }
-    else if (a === "keeper") { LT.hireKeeper(F, letView, v === "1"); sfx("paper", true); if (v === "1") speak("Nell beams. \"Leave it with me. I'll do the changeovers, and fill the basket and the fridge from the pantry. Just keep it stocked.\"", 6000); save(); }
+    else if (a === "keeper") { LT.hireKeeper(F, letView, v === "1"); sfx("paper", true); if (v === "1") speak("Hettie beams. \"Leave it with me. I'll do the changeovers, and fill the basket and the fridge from the pantry. Just keep it stocked.\"", 6000); save(); }
     else if (a === "day") { if (!LT.toggleDay(F, letView, v)) { sfx("tap"); return; } sfx("tap"); save(); }
     else if (a === "buffer") { LT.setBuffer(F, letView, +v); sfx("tap"); save(); }
     else if (a === "pause") { LT.setPaused(F, letView, v === "1"); sfx("paper", true); save(); }
@@ -1905,8 +1905,8 @@ function letsTick(){
   const ev = LT.settle(F); if (!ev.length) return;
   ev.forEach(e => { if (e.kind === "left") { flash(`+${e.pay} from ${LET_COTTAGES[e.id].n}`); } });
   const nm = e => LET_COTTAGES[e.id].n, by = k => ev.filter(e => e.kind === k), parcels = ev.find(e => e.kind === "parcels"), kept = id => ev.some(e => e.kind === "keeper" && e.id === id);
-  const lines = [...by("left").map(e => `Guests have left ${nm(e)} (${"★".repeat(e.stars)}): ${e.pay} coins${e.tip ? `, with a tip` : ""}.${kept(e.id) ? " Nell's done the changeover." : " It needs a tidy before the next guests."}`),
-    ...by("keeperUnpaid").map(e => `Nell couldn't do the changeover at ${nm(e)}: not enough coins for her fee.`),
+  const lines = [...by("left").map(e => `Guests have left ${nm(e)} (${"★".repeat(e.stars)}): ${e.pay} coins${e.tip ? `, with a tip` : ""}.${kept(e.id) ? " Hettie's done the changeover." : " It needs a tidy before the next guests."}`),
+    ...by("keeperUnpaid").map(e => `Hettie couldn't do the changeover at ${nm(e)}: not enough coins for her fee.`),
     ...by("arrived").map(e => `New guests at ${nm(e)} for ${e.nights} night${e.nights === 1 ? "" : "s"}.${e.untidy ? " It wasn't tidy when they arrived." : ""}`),
     ...by("cancelled").map(e => `A booking at ${nm(e)} was called off: it isn't ready to let.`),
     ...by("booked").map(e => `A new booking at ${nm(e)}: ${e.b.nights} night${e.b.nights === 1 ? "" : "s"} from ${e.b.from}.`),

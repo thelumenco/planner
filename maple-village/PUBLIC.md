@@ -185,7 +185,7 @@ Then they're yours to furnish and let, a mini landlord business:
   fruit) and the fridge (up to 4: your own wine, cheese, chocolate, bread, jam, honey, cider and so on), all from
   your backpack. Tidy with 2 or more in each: the guests add a star to their review and leave a tip of 4 a thing.
   Guests who arrive to an untidy cottage take two stars off. Either way they come, and pay when they leave.
-- Nell (a new villager on the lane, round 221) does changeovers if you hire her: 25 a time at Fig Tree, 35 at
+- Hettie (a new villager on the lane, round 221) does changeovers if you hire her: 25 a time at Fig Tree, 35 at
   Bluebell, paid on the day guests leave. She tidies, and fills the basket and fridge from a pantry cupboard you
   keep stocked. Let her go any time. On her changeover mornings she's at the cottage from 10.
 - The garden, out of the back door downstairs: things the builders bring the next day, each raising the most the

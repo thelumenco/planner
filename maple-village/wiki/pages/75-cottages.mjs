@@ -1,5 +1,5 @@
 // Elena's cottages: Bluebell and Fig Tree, buying them at five hearts with Elena, the catalogue, the nightly rate and
-// the stars, bookings, the welcome, Nell, and the garden (data/lets.js, game/lets.js, PUBLIC.md).
+// the stars, bookings, the welcome, Hettie, and the garden (data/lets.js, game/lets.js, PUBLIC.md).
 import { TIERS, COLOURS, CATS, ESSENTIAL, COTTAGES, EXTRAS, BOOK, WELCOME, FRIDGE, UNTIDY, KEEPER, STAY, REVIEWS, floorOf, catOf } from "../../src/data/lets.js";
 import { OFFER_HEARTS } from "../../src/game/lets.js";
 import { ITEMS } from "../../src/data/items.js";
@@ -61,14 +61,14 @@ function html(){
       <li><b>An untidy cottage</b> when they arrive takes ${UNTIDY} stars off. Either way they come, and they pay when they leave.</li>
       <li>Reviews are from 1 to 5 stars: the cottage's own stars, one more for a good welcome, ${UNTIDY} fewer if it wasn't tidy. They go in the guest book.</li></ul>
     ${table(["Stars", "The kind of thing guests write"], [5, 4, 3, 2, 1].map(k => [stars(k), `<span class="muted">"${esc(REVIEWS[k][0])}"</span>`]))}
-  <h2>${ico("broom", 22)} Nell, the housekeeper</h2>
-    <p><a href="/villagers/nell">Nell</a> keeps house for the cottages on the lane, and does changeovers if you hire her: ${IDS.map(id => `${coin(KEEPER.fee[id])} a time at ${esc(COTTAGES[id].n)}`).join(", ")}, paid on the day the guests leave. She tidies, then fills the basket and the fridge from a pantry cupboard you keep stocked with fruit and treats. If you haven't the coins for her fee that day, she can't do it. On her changeover mornings she's at the cottage from 10. Let her go any time.</p>
+  <h2>${ico("broom", 22)} Hettie, the housekeeper</h2>
+    <p><a href="/villagers/hettie">Hettie</a> keeps house for the cottages on the lane, and does changeovers if you hire her: ${IDS.map(id => `${coin(KEEPER.fee[id])} a time at ${esc(COTTAGES[id].n)}`).join(", ")}, paid on the day the guests leave. She tidies, then fills the basket and the fridge from a pantry cupboard you keep stocked with fruit and treats. If you haven't the coins for her fee that day, she can't do it. On her changeover mornings she's at the cottage from 10. Let her go any time.</p>
   <h2>${ico("sprout", 22)} The garden</h2>
     <p>Out of the back door downstairs. The builders bring each thing the next day, and each raises the most the cottage can charge a night.</p>
     ${table(["Extra", "Price", "Adds to the most a night"], Object.values(EXTRAS).map(x => [`<b>${esc(x.n)}</b><br><small class="muted">${esc(x.line)}</small>`, coin(x.price), `+${coin(x.add)}`]))}
     <p>All of them together cost ${coin(extrasCost)} a cottage and add ${coin(extrasAdd)}: ${IDS.map(id => `${esc(COTTAGES[id].n)} up to ${coin(COTTAGES[id].cap + extrasAdd)} a night`).join(", ")}.</p>`;
 }
-export const pages = () => [{slug: "elenas-cottages", title: "Elena's cottages", section: "cottages", blurb: "Buying Bluebell and Fig Tree, furnishing them, the nightly rate, bookings, the welcome, Nell and the garden", html: html(),
+export const pages = () => [{slug: "elenas-cottages", title: "Elena's cottages", section: "cottages", blurb: "Buying Bluebell and Fig Tree, furnishing them, the nightly rate, bookings, the welcome, Hettie and the garden", html: html(),
   search: [{t: "Bluebell", d: "One of Elena's cottages", a: "/elenas-cottages"}, {t: "Fig Tree", d: "One of Elena's cottages", a: "/elenas-cottages"}, {t: "Holiday lets", d: "Elena's cottages", a: "/elenas-cottages"},
-    {t: "Nell (housekeeper)", d: "Changeovers at Elena's cottages", a: "/elenas-cottages"}, {t: "Furniture catalogue", d: "Elena's cottages", a: "/elenas-cottages"}, {t: "Nightly rate and stars", d: "Elena's cottages", a: "/elenas-cottages"},
+    {t: "Hettie (housekeeper)", d: "Changeovers at Elena's cottages", a: "/elenas-cottages"}, {t: "Furniture catalogue", d: "Elena's cottages", a: "/elenas-cottages"}, {t: "Nightly rate and stars", d: "Elena's cottages", a: "/elenas-cottages"},
     ...Object.values(EXTRAS).map(x => ({t: x.n, d: "A garden extra for the cottages", a: "/elenas-cottages"}))]}];
