@@ -1,6 +1,7 @@
 // The wine cave (round 239): a secret passage from Mel's cellar, found over a few days of clues (a candle flame that
 // leans, a draught behind the barrel racks, old bricks under the plaster with "T.R. 1912" scratched on one), leads to
-// an old stone wine cave hewn under the vineyard about 1912 by Tomás, the miller. A vaulted brick ceiling, rough
+// an old stone wine cave the monks of the priory (now the Scoop Shack) dug long ago to carry wine from the vineyard
+// down to the bay; Tomás Ruiz found it in 1912, bricked up the cellar end and hid the key. A vaulted brick ceiling, rough
 // limestone walls, flagstones, candles in niches, cobwebs, an iron lantern: dim and warm, cosy rather than scary.
 // Its far end comes out behind a hidden panel of shelving in the Scoop Shack's gelato kitchen at the bay.
 //   caveArt(st)            the cave scene ("winecave"); spots are data-cavespot, the cellar door is data-exit
@@ -63,9 +64,11 @@ function shell(){
 }
 // candles in little niches cut into the back wall, and the iron lantern hanging from the crown of the vault
 function niches(){
-  const niche = (x, y) => `<path d="M${x - 9} ${y} v-14 q9 -10 18 0 v14z" fill="#5E4A3A" stroke="${INK}" stroke-width=".8"/>` + candle(x, y, 8, 4) + warm(x, y - 8, 28);
+  const niche = (x, y, h = 8) => `<path d="M${x - 9} ${y} v-14 q9 -10 18 0 v14z" fill="#5E4A3A" stroke="${INK}" stroke-width=".8"/>` + candle(x, y, h, 4) + warm(x, y - h, 28);
+  // a little cross the monks carved over one niche
+  const cross = (x, y) => `<path d="M${x - 2} ${y - 12} h4 v6 h5 v4 h-5 v12 h-4 v-12 h-5 v-4 h5z" fill="${STONE2}" stroke="${STONE3}" stroke-width=".9"/><path d="M${x + 2} ${y - 12} v6 M${x + 7} ${y - 6} v4" stroke="#E2D8C4" stroke-width=".7"/>`;
   const lantern = `<path d="M260 0 V58" stroke="${IRON}" stroke-width="1.6"/>` + warm(260, 78, 120, .9) + D(`<path d="M250 64 h20 l-3 26 h-14z" style="fill:#FFE8A8"/><path d="M247 64 l13 -8 l13 8z" style="fill:${IRON}"/><rect x="249" y="89" width="22" height="4" rx="1" style="fill:${IRON}"/>`, `<path d="M256 64 v26 M264 64 v26" stroke="${IRON}" stroke-width="1"/>` + flame(260, 84, .5));
-  return g(niche(150, 128) + niche(370, 128) + niche(36, 300) + niche(484, 300) + lantern
+  return g(cross(150, 98) + niche(150, 128, 4) + niche(370, 128) + niche(36, 300) + niche(484, 300) + lantern
     + cobweb(70, 96, 1, 1, 1.1) + cobweb(450, 96, -1, 1, 1.1) + cobweb(60, FL + 6, 1, -1, .7) + cobweb(460, FL + 6, -1, -1, .7) + cobweb(4, 210, 1, 1, .8) + cobweb(516, 210, -1, 1, .8));
 }
 // the ageing alcoves: three stone arches with wooden racks, filled with st.laid bottles (eight to an alcove)
@@ -126,7 +129,12 @@ function gate(){
   const body = `<circle cx="34" cy="424" r="60" fill="url(#wcSea)"/>` + D(`<path d="${arch}" style="fill:#1E2A30"/>`, `<path d="${arch}" fill="#2E5866" opacity=".55"/>`)
     + sk(`${[20, 27, 34, 41, 48].map(x => `<path d="M${x} 470 V${x < 34 ? 390 + (34 - x)*.9 : 390 + (x - 34)*.9}" style="stroke:#7A4A32" stroke-width="2"/>`).join("")}<path d="M14 420 h40 M14 446 h40" style="stroke:#7A4A32" stroke-width="2"/><path d="M14 392 q20 -38 40 0" fill="none" style="stroke:#6A3E2A" stroke-width="3"/>`, `<path d="${arch}"/>`)
     + `<g pointer-events="none">${draught}${[[26, 440], [42, 430], [34, 456]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.4" fill="#C86A3A" opacity=".8"/>`).join("")}</g>`;
-  return spot("gate", 64, 450, "The iron gate: the passage to the Scoop Shack", hovE(40, 470, 32, 10), body + lab(66, 488, "To the Scoop Shack", "#D8ECF2"));
+  // the monks' worn stone arch over it, carved VINUM LAETIFICAT COR (wine gladdens the heart)
+  const voussoirs = Array.from({length: 9}, (_, k) => { const a0 = Math.PI*(1 - k/9), a1 = Math.PI*(1 - (k + 1)/9), p = (a, r) => [34 + Math.cos(a)*r, 394 - Math.sin(a)*r*.95];
+    const [x0, y0] = p(a0, 21), [x1, y1] = p(a1, 21), [x2, y2] = p(a1, 31), [x3, y3] = p(a0, 31); return `<path d="M${f1(x0)} ${f1(y0)} L${f1(x1)} ${f1(y1)} L${f1(x2)} ${f1(y2)} L${f1(x3)} ${f1(y3)}z" fill="${k % 2 ? "#D8CCB4" : STONE}" stroke="${STONE3}" stroke-width=".8"/>`; }).join("");
+  const stoneArch = g(voussoirs + `<rect x="1" y="394" width="12" height="78" fill="${STONE}" stroke="${STONE3}" stroke-width=".8"/><rect x="55" y="394" width="10" height="78" fill="${STONE}" stroke="${STONE3}" stroke-width=".8"/>`
+    + `<defs><path id="wcMotto" d="M7 394 A27 25.6 0 0 1 61 394"/></defs><text font-family="Georgia,'Times New Roman',serif" font-size="4.6" letter-spacing=".25" fill="#6A5A44"><textPath href="#wcMotto" startOffset="50%" text-anchor="middle">VINUM LAETIFICAT COR</textPath></text>`);
+  return spot("gate", 64, 450, "The iron gate under the monks' arch: the passage to the Scoop Shack", hovE(40, 470, 32, 10), body + stoneArch + lab(66, 488, "To the Scoop Shack", "#D8ECF2"));
 }
 // the heavy old door back to the cellar, in the right wall
 function cellarDoor(){
@@ -137,9 +145,10 @@ function cellarDoor(){
 }
 export function caveArt(st = {}){
   const laid = Math.max(0, Math.min(24, +st.laid || 0)), old = Math.max(0, Math.min(3, +st.old || 0));
-  const props = g(D(`<ellipse cx="96" cy="560" rx="16" ry="5" style="fill:#7A5A3E"/><path d="M80 560 v-26 q16 -6 32 0 v26z" style="fill:#8A6A4A"/>`, `<path d="M80 542 q16 5 32 0 M80 552 q16 5 32 0" stroke="${IRON}" stroke-width="1.6" fill="none"/>`)
+  // the monks' old bench, worn smooth, with a candle left on the end
+  const props = g(D(`<rect x="70" y="544" width="92" height="7" rx="2" style="fill:${OAK}"/><rect x="74" y="551" width="8" height="18" style="fill:${OAK2}"/><rect x="150" y="551" width="8" height="18" style="fill:${OAK2}"/>`, `<path d="M74 547 q40 -2 84 1" stroke="${OAKL}" stroke-width="1" fill="none"/><path d="M78 562 h76" stroke="${OAK2}" stroke-width="2"/>`)
     + D(`<ellipse cx="430" cy="566" rx="16" ry="5" style="fill:#7A5A3E"/><path d="M414 566 v-26 q16 -6 32 0 v26z" style="fill:#8A6A4A"/>`, `<path d="M414 548 q16 5 32 0 M414 558 q16 5 32 0" stroke="${IRON}" stroke-width="1.6" fill="none"/>`)
-    + candle(96, 534, 9, 4) + warm(96, 524, 40) + [[408, 530], [414, 522]].map(([x, y], k) => `<rect x="${x}" y="${y}" width="${10 - k*2}" height="4" rx="1" fill="#C9A26A" stroke="${INK}" stroke-width=".4"/>`).join(""));
+    + candle(84, 544, 7, 4) + warm(84, 534, 40) + [[408, 530], [414, 522]].map(([x, y], k) => `<rect x="${x}" y="${y}" width="${10 - k*2}" height="4" rx="1" fill="#C9A26A" stroke="${INK}" stroke-width=".4"/>`).join(""));
   return defs + shell() + niches() + alcoves(laid) + oldBottles(old) + press() + props + gate() + cellarDoor() + table(!!st.supper)
     + `<rect width="520" height="640" fill="url(#wcDim)" pointer-events="none"/>`;
 }
