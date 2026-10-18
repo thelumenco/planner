@@ -21,6 +21,7 @@ function gateOk(F, g){
   if (g === "oil") return ((F.mill && F.mill.made) || 0) > 0;   // the first bottle pressed at the old mill
   if (g === "ronda2") return ((F.ronda && F.ronda.days) || []).length >= 2;   // a second day in Ronda
   if (g === "tiles4") return Object.keys((F.ronda && F.ronda.tiles) || {}).length >= 4;
+  if (g === "cave") return !!(F.secret && F.secret.step >= 5);   // round 245: the secret passage found
   if (g === "bouquet") return Object.keys(F.inv || {}).some(id => /^bq_/.test(id) && F.inv[id] > 0);
   return false;
 }

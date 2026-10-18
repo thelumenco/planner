@@ -4866,6 +4866,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(!SC.photoTap(F, "2026-10-20") && SC.photoTap(F, "2026-10-21") && SC.stoneTap(F, "2026-10-21") && SC.brickTap(F, "2026-10-21") && SC.caveOpen(F), "the back of the mill's photograph, the key under the millstone, and the brick hides a keyhole: the passage opens");
     check(SC.layDown(F, v, "w1", "2026-10-21").n === 6 && !v.cellar.length && SC.bringUp(F, v, 0, "2026-11-18").aged === 4 && v.cellar[0].hold, "laid down four weeks in the ageing alcoves: +4 a bottle, back in the cellar kept back");
     check(SC.takeOld(F, "old_r1923", false) && F.inv.old_r1923 === 1 && !SC.takeOld(F, "old_r1923", false), "a forgotten 1923 red, into the backpack (only one of each)");
+    { const ST = await import(new URL("../src/game/stories.js", import.meta.url)), G = {secret: {step: 4}, met: {hazel: 1}, storyDay: "2026-10-22"};
+      const before = ST.storyReady(G, "hazel", "2026-10-22"); G.secret.step = 5;
+      check(!before && ST.storyReady(G, "hazel", "2026-10-22") && /cave under the cellar/.test(ST.storyReady(G, "hazel", "2026-10-22").ch.lines[0]), "round 245: once the passage is found, Hazel starts telling how the old priory became the Scoop Shack"); }
     check(SC.supperGuests("2026-10-26").length === 4 && SC.supperSlot(SC.supperGuests("2026-10-26")[0], "2026-10-26", 19*60 + 30).scene === "winecave" && !SC.supperSlot(SC.supperGuests("2026-10-26")[0], "2026-10-27", 19*60 + 30) && SC.host(F, "2026-10-26").coins === 88 && !SC.host(F, "2026-10-26"), "Monday suppers for four in the cave, hosted once a night"); }
   const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
   page.on("pageerror", e => errors.push(`cave pageerror: ${e.message}`));

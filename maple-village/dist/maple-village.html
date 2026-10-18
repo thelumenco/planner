@@ -48730,6 +48730,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
 
   // src/data/stories.js
   var STORIES = {
+    // round 245 (Mel: "I love your backstory, let's make it part of the game. Hazel tells the story"): how the Scoop Shack
+    // came to be, told once Mel's found the secret passage (gate "cave"). Hazel's gran grew up by the bay.
+    hazel: [
+      { needs: ["cave"], lines: ["You found a cave under the cellar? With a passage to the Scoop Shack? Oh, love. My gran would have cried.", "She always said that building was holy ground once. Nobody believed her."] },
+      { recap: "My gran always said the Scoop Shack was holy ground once.", lines: ["Long, long ago it was a little priory. A handful of monks kept vines on the hill.", "They dug that passage so they could roll their wine down to the bay in the dark, and the boats took it away."] },
+      { recap: "The monks dug the passage to bring their wine down to the boats, remember.", lines: ["When the last brothers left, the fishermen took the priory for a boathouse. Nets and lobster pots where the altar used to be.", "Gran said on still nights you could hear singing under the vineyard. The wind, I expect. Mostly."] },
+      { recap: "The fishermen kept their nets in the old priory, after the monks.", lines: ["Then Tomás Ruiz came with the railway and found the cave, mending the cellar. He told nobody but his wife.", "He bricked it up and hid the key. Ines will want to know her great-great-grandfather kept a secret like that."] },
+      { recap: "Tomás found the cave in 1912 and bricked it up. A secret for a hundred years.", lines: ["After the war the boathouse became a beach café. Tea, chips, ice lollies. I had my first knickerbocker glory there, aged six.", "Then it sat empty for years, salt on the windows. And now it's yours, full of ice cream again. Full circle, love."] }
+    ],
     celeste: [
       { lines: ["That building down at the bay, before it was your Cocoa Room…", "…it was Marchand & Fille. My grandfather Henri's chocolaterie."] },
       { recap: "Remember Marchand & Fille, the chocolaterie down at the bay? My grandfather Henri's.", lines: ["Grand-père Henri opened the shop in 1962. Copper pots, a marble slab, and a queue out the door on Sunday mornings.", "I used to sit under the counter eating the broken bits."] },
@@ -49108,6 +49117,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (g18 === "oil") return (F2.mill && F2.mill.made || 0) > 0;
     if (g18 === "ronda2") return (F2.ronda && F2.ronda.days || []).length >= 2;
     if (g18 === "tiles4") return Object.keys(F2.ronda && F2.ronda.tiles || {}).length >= 4;
+    if (g18 === "cave") return !!(F2.secret && F2.secret.step >= 5);
     if (g18 === "bouquet") return Object.keys(F2.inv || {}).some((id) => /^bq_/.test(id) && F2.inv[id] > 0);
     return false;
   }

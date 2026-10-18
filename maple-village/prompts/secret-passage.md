@@ -20,6 +20,15 @@ THE WINE CAVE (a new indoor scene, entered through the cellar door, with its own
 - Monday candlelit suppers, 7 to 9pm. Four villagers sit at the long table, which is laid with candelabra, plates and glasses during supper. Tapping the table lets the player host, once a night, for 22 coins a guest (88). Outside supper time the table explains when suppers are.
 - The rusty gate at the far end ("To the Scoop Shack") with a sea-blue glow. Through it, the passage comes out behind a section of shelving that swings open in the Scoop Shack's gelato kitchen. On first arrival: "...in the Scoop Shack's kitchen! Of course: long ago the Scoop Shack was the brothers' little priory by the bay." From then on that panel in the kitchen is a way back into the cave. Keep it secret too: ordinary-looking shelves of jars and tubs, a hairline of light down one edge and a tea towel stirring in the draught. No label.
 
+THE STORY IN THE GAME
+- Once the passage is found, Hazel (who runs the Mill Shop; use an older villager if this edition has no Hazel) tells how it came to be, one chapter at a time like the other villagers' stories:
+  1. her gran always said the Scoop Shack was holy ground
+  2. the monks' priory and the passage to the boats
+  3. the fishermen's boathouse, and singing under the vineyard on still nights
+  4. Tomás finding the cave in 1912 and bricking it up
+  5. the post-war beach café where she had her first knickerbocker glory, the empty years, and now the Scoop Shack: full circle
+- The Scoop Shack end of the passage only exists once the player has come through the cave's gate.
+
 GENERAL
 - Keep the save compatible (new state under its own key, defaults for old saves).
 - Give the old bottles their own icons.
