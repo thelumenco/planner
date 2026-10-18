@@ -32,11 +32,12 @@ export const rideSpeed = F => ({walk: 1, bike: 1.3, scooter: 1.6, car: 2.5})[rid
 export function buyGoal(F, k){
   const g = GOALS[k]; if (!g || owns(F, k) || F.coins < g.price || (g.needs && !owns(F, g.needs))) return null;
   F.coins -= g.price; F.goals = {...(F.goals || {}), [k]: Date.now()};
+  if (k === "cellar") { F.vine = F.vine || {}; const b = F.vine.barrels = F.vine.barrels || [null]; b.push(null, null); }   // round 228: two more oak barrels come with the cellar door, free
   if (k === "scooter" || k === "car") F.ride = k;
   return {scooter: "A shiny new scooter, parked in the garage. You'll zip about on it outdoors from now on.",
     car: "A cream convertible! Roof down, your pet in the back, ears flapping, and you waving at everyone. You'll drive between screens from now on.",
     boat: "Your dolphin cruise boat is moored at the end of the jetty. Take everyone out!",
-    cellar: "The cellar door is open! Through the new door on the wine shop's west wall.",
+    cellar: "The cellar door is open! Through the new door on the wine shop's west wall. Two new oak barrels are on the racks, and the wine wall's racks hold any bottles you're not selling yet.",
     paperkeeper: "Lise starts tomorrow! She's already rearranged the ribbon rack by colour.",
     paperie: "The paperie's yours! The À VENDRE board's down and PAPETERIE is up over the green door. Start with the scrap bin.",
     giftshop: "The gift shop's open! Through the new door in the wine shop's corner. Posy's already rearranging the bonbon case.",

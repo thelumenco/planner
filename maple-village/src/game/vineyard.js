@@ -155,7 +155,7 @@ export const riddleDays = (c, now = Date.now()) => c && c.rack ? Math.min(RIDDLE
 export const canRiddle = F => !!(F.bellbird && F.bellbird.riddle);
 export function onRack(F, id){ const c = vineState(F).cellar.find(x => x.id === id); if (!c || c.type !== "sparkling" || c.rack || !canRiddle(F)) return null; c.rack = Date.now(); return c; }
 export function stock(F, id){ const v = vineState(F), c = v.cellar.find(x => x.id === id); if (!c) return null;
-  const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES[c.type].price + RIDDLE.day*riddleDays(c), open: 0});
+  const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: c.price || STYLES[c.type].price + RIDDLE.day*riddleDays(c), open: 0});
   v.cellar = v.cellar.filter(x => x.id !== id); return `${c.name} is on the shelves.`; }
 // Pricier bottles sell less often (and cheaper ones a little more), like the Scoop Shack and the Cocoa Room: each
 // style's usual price is the sweet spot. Glasses are a quarter of the bottle price and follow it.
@@ -223,7 +223,7 @@ export function sellTick(F, opts = {}){
       if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const spare = c => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st = spare("tempranillo") ? "tempranillo" : spare("pinot") ? "pinot" : spare("chardonnay") ? "chardonnay" : spare("red") ? "red" : spare("white") ? "white" : null;
         if (st) { v.grapes[st] -= PER_BATCH; v.barrels[i] = {style: st, start: at, dur: STYLES[st].dur, stage: 1}; out.filled++; } });
     }
-    if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.reduce((n, c) => n + c.n, 0); v.cellar.filter(c => !c.rack).forEach(c => stock(F, c.id)); }
+    if (w.staff && v.help.stock && v.cellar.some(c => !c.rack && !c.keep)) { const go = v.cellar.filter(c => !c.rack && !c.keep); out.stocked += go.reduce((n, c) => n + c.n, 0); go.forEach(c => stock(F, c.id)); }   // (never the ones you're keeping in the cellar)
     // the Sunday farmers market: the wine shop's stall at the field sells from these same shelves (Ines minds it;
     // standing at the stall yourself brings more people over, and they pay you)
     const ev = eventNow(new Date(at + off + LOC()).toISOString().slice(0, 10), hm);
@@ -321,6 +321,21 @@ export function stallPanel(F){
 export const vy = {name: {}};
 export const GRAPE_COL = {red: "#7A2E5A", white: "#C9D98A", tempranillo: "#3A2050", pinot: "#4A2A4E", chardonnay: "#D9D27A"};
 const grapePic = c => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="${GRAPE_COL[c] || "#C9D98A"}" stroke="#3A2E28" stroke-width="1"/>`).join("")}<path d="M12 5 V2" stroke="#3A2E28" stroke-width="1.2"/></svg>`;
+/* ---------- round 228: the wine store at the cellar door ---------- */
+// The creator: "I thought I'd get extra space for stocking wines that I don't want to put on shelves yet". Bottled wine
+// waits in the cellar; at the cellar door's wine wall you can keep any of it down here (Ines and Marco leave kept wine
+// alone when they stock the shelves), put it on the shelves, or bring a wine on the shelves back down.
+export function keepWine(F, id, on){ const c = vineState(F).cellar.find(x => x.id === id); if (!c) return null; c.keep = !!on; return on ? `${c.name} stays down here till you say.` : `${c.name} can go out when Ines stocks the shelves.`; }
+export function unstock(F, id){ const v = vineState(F), s = v.shelf.find(x => x.id === id); if (!s || !s.n) return null;
+  const c = v.cellar.find(x => x.id === id); if (c) c.n += s.n; else v.cellar.push({id: s.id, name: s.name, type: s.type, n: s.n, price: s.price, keep: true});
+  const n = s.n; s.n = 0; if (!s.open) v.shelf = v.shelf.filter(x => x !== s); return `${n} bottle${n === 1 ? "" : "s"} of ${s.name}, back down to the cellar.`; }
+export function storePanel(F){
+  const v = vineState(F), down = v.cellar.reduce((n, c) => n + c.n, 0), up = v.shelf.filter(s => s.n > 0);
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The wine store</h2><p class="sub">The racks behind the wine wall hold every bottle you're not selling yet: ${down} down here. Keep a wine here and Ines and Marco won't put it out; it waits till you take it up.</p>`;
+  h += v.cellar.length ? `<ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.keep ? " · kept down here" : ""}${c.rack ? " · on the riddling rack" : ""}</small><span class="actions" style="margin-top:6px"><button class="btn small primary" data-vy="stock" data-k="${esc(c.id)}">To the shelves</button>${c.rack ? "" : `<button class="btn small alt" data-vy="keepw" data-k="${esc(c.id)}" data-n="${c.keep ? 0 : 1}">${c.keep ? "Let it go out" : "Keep it here"}</button>`}</span></span></li>`).join("")}</ul>` : `<p class="muted">Nothing down here just now. Bottled wine comes to the cellar first.</p>`;
+  if (up.length) h += `<p class="eyebrow">On the shelves upstairs</p><ul class="hlist wlist">${up.map(s => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${s.n} bottle${s.n === 1 ? "" : "s"} at ${s.price} each</small></span><button class="btn small alt" data-vy="unstock" data-k="${esc(s.id)}">Bring them down</button></li>`).join("")}</ul>`;
+  return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
 export function barrelPanel(F){
   const v = vineState(F);
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles.</p>`;
@@ -344,6 +359,8 @@ export function barrelPanel(F){
       else h += `<p>${st.n} is ready to bottle!</p><label class="sr" for="vyName${i}">Name this wine</label><input id="vyName${i}" class="vyname" maxlength="30" placeholder="${esc(wineNames(F, i)[0] || "Name it")}" value="${esc(vy.name[i] || "")}"><button class="btn alt small" data-vy="suggest" data-i="${i}">Suggest a name</button><button class="btn primary small" data-vy="bottle" data-i="${i}">Bottle it</button>`; }
     h += `</div></div>`;
   });
+  // round 228: roll another barrel onto the racks from here (the cellar door holds twelve)
+  if (F.goals && F.goals.cellar && v.barrels.length < maxBarrels(F)) h += `</div><div class="actions"><button class="btn small primary" data-vy="buybarrel" ${F.coins >= shopPrice(v, "barrel") ? "" : "disabled"}>Another barrel on the racks · ${shopPrice(v, "barrel")} coins</button></div><div>`;
   h += `</div>${v.cellar.length ? `<p class="eyebrow">In the cellar</p><ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles${c.rack ? ` · on the riddling rack, ${riddleDays(c)} day${riddleDays(c) === 1 ? "" : "s"} (+${RIDDLE.day*riddleDays(c)} a bottle${riddleDays(c) >= RIDDLE.max ? ", as fine as it gets" : ""})` : ""}</small></span>${c.type === "sparkling" && !c.rack && canRiddle(F) ? `<button class="btn small primary" data-vyrack="${esc(c.id)}">Onto the riddling rack</button>` : ""}</li>`).join("")}</ul><p class="muted">Take them to the wine shop to stock the shelves.</p>` : ""}`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
@@ -439,6 +456,10 @@ export function wireVine(root, F, api){
     else if (k === "putgr") { const v = vineState(F), c = b.dataset.k, n = (F.inv || {})["grape_" + c] || 0; if (n) { v.grapes[c] += n; delete F.inv["grape_" + c]; line = `${n} bunch${n > 1 ? "es" : ""} back in the crates.`; } }
     else if (k === "keep") { const v = vineState(F), c = b.dataset.k; v.keep[c] = Math.max(0, Math.min(30, (v.keep[c] || 0) + +b.dataset.n)); }
     else if (k === "second") line = secondFerment(F, i);
+    else if (k === "stock") { line = stock(F, b.dataset.k); if (line) api.sfx("paper"); }   // round 228: the wine store
+    else if (k === "keepw") { line = keepWine(F, b.dataset.k, b.dataset.n === "1"); api.sfx("tap"); }
+    else if (k === "unstock") { line = unstock(F, b.dataset.k); if (line) api.sfx("paper"); }
+    else if (k === "buybarrel") { const before = vineState(F).barrels.length; line = buy(F, "barrel"); if (line && vineState(F).barrels.length > before) api.sfx("coin"); }
     else if (k === "suggest") { const ns = wineNames(F, i); vy.sug = vy.sug || {}; vy.sug[i] = ((vy.sug[i] ?? 0) + 1) % Math.max(1, ns.length); vy.name[i] = ns[vy.sug[i]] || ""; api.sfx("tap"); }
     else if (k === "bottle") { line = bottle(F, i, vy.name[i]); if (line) { vy.name[i] = ""; api.sfx("chime"); } }
     else if (k === "olives") { line = pickOlives(F); if (line) api.sfx("coin"); }

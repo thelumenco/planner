@@ -4391,6 +4391,34 @@ if (want("\nCustomers at the campervan pop-up (round 228)")) try {
   check(/ros/i.test(sold.say), "saying what they're buying (" + sold.say.slice(0, 60) + ")");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe cellar door's wine store and barrels (round 228)")) try {
+  // the creator: "I thought I'd get extra space for stocking wines that I don't want to put on shelves yet and extra barrels",
+  // and "don't need the exit mat for cellar since I leave by the door"
+  console.log("\nThe cellar door's wine store and barrels (round 228)");
+  const gl = await import(new URL("../src/game/goals.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
+  { const F = {coins: 3000, vine: {barrels: [null, null, null]}}; gl.buyGoal(F, "cellar"); check(F.goals.cellar && F.vine.barrels.length === 5, "building the cellar door brings two more oak barrels"); }
+  { const F = {vine: {}}; const v = vy.vineState(F); v.cellar = [{id: "a", name: "Keep Red", type: "red", n: 12}]; v.shelf = [{id: "b", name: "Shelf White", type: "white", n: 5, price: 21, open: 0}];
+    vy.keepWine(F, "a", true); check(v.cellar[0].keep, "a wine can be kept down in the cellar");
+    vy.unstock(F, "b"); check(!v.shelf.length && v.cellar.find(c => c.id === "b").n === 5 && v.cellar.find(c => c.id === "b").keep, "a wine on the shelves can come back down (and stays kept)");
+    vy.stock(F, "b"); check(v.shelf.find(s => s.id === "b").price === 21, "and goes back up at the same price"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`cellar store pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.goals = {...(F.goals || {}), cellar: Date.now()}; F.coins = 2000; F.vine = F.vine || {}; F.vine.cellar = [{id: "w1", name: "Cellar Red", type: "red", n: 12}]; F.vine.barrels = [null, null, null, null, null, null, null, null]; window.__hbGame.save(); window.__hbScene("cellar"); });
+  await page.waitForTimeout(1500);
+  check(await page.evaluate(() => !/>Exit</.test(document.getElementById("world").innerHTML) && !!document.querySelector('#world [data-exit][aria-label="Back to the wine shop"]')), "no exit mat: you leave by the door on the east wall");
+  await page.locator('#world [data-spot="winewall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vy="keepw"]', { timeout: 15000 });
+  check(/The wine store/.test(await page.locator("#ctx").innerText()), "the wine wall opens the wine store");
+  await page.click('#ctx [data-vy="keepw"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().vine.cellar[0].keep === true), "keep a wine down here, off the shelves");
+  await page.click('#ctx [data-close]').catch(() => {}); await page.waitForTimeout(300);
+  await page.locator('#world [data-spot="racks"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vy="buybarrel"]', { timeout: 15000 });
+  await page.click('#ctx [data-vy="buybarrel"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().vine.barrels.length === 9 && window.__hbGame.F().coins === 1750), "roll another barrel onto the racks from the racks themselves (250)");
+  await page.click('#ctx [data-vy="fill"]').catch(() => {}); await page.waitForTimeout(200);
+  check(await page.evaluate(() => typeof window.__hbGame.F().vine.barrels[0] !== "undefined"), "the barrels' buttons work in the cellar too");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

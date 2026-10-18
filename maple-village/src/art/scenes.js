@@ -816,6 +816,8 @@ export function roomArt(id){
     h += `<g data-exit="1" aria-label="${sk2 ? "Back to the shop" : "Back to the living room"}"><ellipse class="hov" cx="${hx}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
       ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:${sk2 ? "#E3F2EC" : "#F8EED8"}"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, sk2 ? 478 : 296, id === "giftshop" ? "Wine shop" : sk2 ? "The shop" : "Living room", "var(--card)", 11)}</g>`;
     return h; }
+  // the cellar door: you leave by the door on the east wall (drawn with the room), not over a mat
+  if (id === "cellar") return h + `<g data-exit="1" aria-label="Back to the wine shop"><ellipse class="hov" cx="486" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>${tapeLabel(472, 296, "Wine shop", "#EFE6D6")}</g>`;
   h += `<g data-exit="1" aria-label="Exit"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
     ${sk(`<rect x="214" y="600" width="92" height="26" rx="8" style="fill:${r.trim}"/>`, `<rect x="214" y="600" width="92" height="26" rx="8"/><path d="M222 606 h76 M222 620 h76" stroke-dasharray="3 4" opacity=".6"/>`)}
     <text class="lab" x="260" y="618" text-anchor="middle" pointer-events="none">Exit</text></g>`;
