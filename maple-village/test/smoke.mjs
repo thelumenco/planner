@@ -4371,6 +4371,26 @@ if (want("\nNobody stands on tables or stalls (round 228)")) try {
     await page.close(); }
   check(!offenders.length, "nobody's feet are on a table, counter, shelf or stall" + (offenders.length ? ` (${offenders.length}: ${offenders.slice(0, 40).join("; ")})` : ""));
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nCustomers at the campervan pop-up (round 228)")) try {
+  // the creator: "nobody actually came up and bought stuff from my campervan popup". Now they walk up to the crate and buy.
+  console.log("\nCustomers at the campervan pop-up (round 228)");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`popup pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-17"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.trip = {town: "bv_gate", day: "2026-10-17", party: [], from: 600, by: "van"}; F.craft = F.craft || {}; window.__hbGame.save(); });
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-17"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.craft.van = {items: {}, wine: [{sid: "t1", name: "Honeybrook Rosé", type: "rose", price: 18, n: 4}]}; window.__hbScene("bg_gate"); });
+  await page.waitForTimeout(1500);
+  const c0 = await page.evaluate(() => window.__hbGame.F().coins);
+  check(await page.evaluate(() => document.getElementById("world").innerHTML.includes("For sale")), "the crate's out by the van");
+  await page.waitForFunction(() => !!document.querySelector('#actors [data-npc^="popup-"]'), null, { timeout: 40000 });
+  check(true, "someone from the town walks up to the crate");
+  await page.waitForFunction(c0 => window.__hbGame.F().coins > c0, c0, { timeout: 20000 });
+  const sold = await page.evaluate(() => ({coins: window.__hbGame.F().coins, left: window.__hbGame.F().craft.van.wine.reduce((a, w) => a + w.n, 0), say: (document.getElementById("npcSay") || {}).textContent || ""}));
+  check(sold.coins === c0 + 18 && sold.left === 3, "and buys a bottle: 18 coins, one fewer in the crate (" + (sold.coins - c0) + ")");
+  check(/ros/i.test(sold.say), "saying what they're buying (" + sold.say.slice(0, 60) + ")");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

@@ -303,9 +303,10 @@ export function unpackCrate(F, v){ const vc = vanCrate(F), c = craftState(F);
   Object.entries(vc.items).forEach(([id, n]) => { c.store[id] = (c.store[id] || 0) + n; }); vc.items = {};
   vc.wine.forEach(w => { const s = v.shelf.find(x => x.id === w.sid); if (s) s.n += w.n; else v.shelf.push({id: w.sid, name: w.name, type: w.type, price: w.price, n: w.n, open: 0}); }); vc.wine = []; }
 // a minute at a campervan stop with the crate out: maybe a passer-by buys something -> {coins, what} or null
-export function vanSellMinute(F){
+// (sure: a customer is standing at the crate, so they buy something)
+export function vanSellMinute(F, sure){
   const vc = vanCrate(F), opts = [...Object.keys(vc.items).filter(id => vc.items[id] > 0 && ITEMS[id]).map(id => ({id})), ...vc.wine.filter(w => w.n > 0).map(w => ({w}))];
-  if (!opts.length || Math.random() >= VAN_CRATE.p) return null; const o = opts[Math.floor(Math.random()*opts.length)];
+  if (!opts.length || (!sure && Math.random() >= VAN_CRATE.p)) return null; const o = opts[Math.floor(Math.random()*opts.length)];
   if (o.w) { o.w.n--; const what = `a bottle of ${o.w.name}`; vc.wine = vc.wine.filter(w => w.n > 0); return {coins: o.w.price, what}; }
   vc.items[o.id]--; if (!vc.items[o.id]) delete vc.items[o.id]; return {coins: ITEMS[o.id].price, what: ITEMS[o.id].n.replace(/^A (bar|jar|bottle) of /i, (m, k) => `a ${k} of `)};
 }

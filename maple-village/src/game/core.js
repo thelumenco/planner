@@ -1949,6 +1949,14 @@ function vanGo(stop){
     setTimeout(() => speak(`${T.arriveLine}${!on && t.party.length ? ` ${partyList(t)} climb${t.party.length > 1 ? "" : "s"} out behind you.` : ""} ${!on || (r && r.first) ? "A new stamp in the passport!" : ""}`.trim(), 7000), 700);
     ; });
 }
+// round 228 (Mel: "nobody actually came up and bought stuff from my campervan popup"): where a customer stands at the crate -> {town, x, y} or null
+function popupSpot(){
+  const t = tripOn(F), T = t && TOWNS[t.town]; if (!T || T.by !== "van" || townOf(scene) !== t.town || !crateCount(vanCrate(F)) || localHM() >= T.backTo) return null;
+  const st = TOWN_PLACES[T.station]; if (!st || st.scene !== scene) return null; return {town: t.town, x: st.door[0] + 68, y: st.door[1] + 22};
+}
+function popupSale(){
+  const r = vanSellMinute(F, true); if (!r) return null; F.coins += r.coins; sfx("coin"); flash(`+${r.coins}: ${r.what}, from the pop-up crate`); save(); render(); return r;
+}
 function vanCrateArt(){
   const t = tripOn(F), T = t && TOWNS[t.town]; if (!T || T.by !== "van" || !crateCount(vanCrate(F))) return ""; const st = TOWN_PLACES[T.station]; if (!st || st.scene !== scene) return "";
   const [x, y] = st.door, cx = x + 68, cy = y - 4;
@@ -2543,7 +2551,8 @@ function millShopPanel(){
 }
 // round 153: the pop-up crate by the van on a campervan trip: passers-by buy while you're at the stop
 function crateTick(){
-  const c = craftState(F), t = tripOn(F), now = Date.now(), here = t && t.by === "van" && townOf(scene) === t.town && crateCount(vanCrate(F)) > 0;
+  // (on the van's own screen the customers walk up and buy in person: popupSpot, npcs.js; elsewhere in the town, sales tick over quietly)
+  const c = craftState(F), t = tripOn(F), now = Date.now(), here = t && t.by === "van" && townOf(scene) === t.town && crateCount(vanCrate(F)) > 0 && !popupSpot();
   if (!here) { c.vanAt = now; return; } let coins = 0; const what = [];
   for (let at = (c.vanAt || now) + 60000; at <= now; at += 60000) { const r = vanSellMinute(F); if (r) { coins += r.coins; what.push(r.what); } }
   c.vanAt = (c.vanAt || now) + Math.floor((now - (c.vanAt || now))/60000)*60000;
@@ -3468,7 +3477,7 @@ initNotebook({windDown, water:() => ({ml: S.waterMl || 0, goal: waterGoal(), gla
 // the add-a-task form on the quest board
 $("addForm").onsubmit = e => { e.preventDefault(); if (addMine($("addTitle").value, $("addKind").value === "daily")) { $("addTitle").value = ""; $("addTitle").focus(); } };
 setStallOwned(() => ({cocoa: owns(F, "cocoa"), millshop: owns(F, "millshop"), cc_cart: !!(F.cocoa && F.cocoa.up && F.cocoa.up.cart), cc_workshop: !!(F.cocoa && F.cocoa.up && F.cocoa.up.workshop)}));   // the Cocoa Room's market cart and Saturday workshop, once bought
-initNpcs({sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyReady(F, id), flash, quiet: () => quietNow(), chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, hero, sup: () => sup, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, unreadMail,
+initNpcs({popup: () => popupSpot(), popupSale: () => popupSale(), sfx, story: id => tellStory(F, id, addInv), storyReady: id => !!storyReady(F, id), flash, quiet: () => quietNow(), chatted:n => { if (!S.chats.includes(n)) { S.chats.push(n); save(); } }, scene:() => scene, bounds, hero, sup: () => sup, F:() => F, S:() => S, save:() => save(), facts, bubble:bubbleAt, unreadMail,
   openMail:item => openMail(item), gift:id => { addInv(id, 1); flash(`Auntie Lin gave you ${ITEMS[id].n.toLowerCase()}`); save(); }});
 measureHud();
 initTrips(() => F);

@@ -26,6 +26,7 @@ const NS = "http://www.w3.org/2000/svg";
 const ents = {};            // id -> entity (villagers and the active messenger)
 let api = null, storyT = null;             // see core: scene(), bounds(), hero, F(), S(), save(), facts(), bubble(), openMail(), unreadMail(), gift()
 let courier = null;         // the messenger currently on screen
+let popup = null, popupNext = 0, popupN = 0;   // a customer at the campervan's pop-up crate, and when the next may come
 let sayer = null, sayT = null;
 const greeted = new Set();  // messengers say hello once, then just tag along quietly
 
@@ -216,6 +217,32 @@ function tickCourier(dt){
   c.node.classList.toggle("run", c.moving && c.state !== "leaving");
   c.node.classList.toggle("walk", c.moving);
 }
+// round 228: customers at the campervan's pop-up crate. While you're on the van's screen with the crate out, someone from
+// the town wanders up every couple of minutes, has a look, buys something (popupSale in core), and strolls off.
+const POPUP_GAP = [70, 150], POPUP_SAY = ["Ooh, I'll take {w}, please.", "{W}! Just what I was after.", "Is that {w}? Go on then.", "I'll have {w}. It's for my mum.", "{W}, please. Lovely little stall."];
+function tickPopup(dt){
+  const scene = api.scene(), spot = api.popup && api.popup(), t = performance.now();
+  if (popup && (popup.scene !== scene || (!spot && popup.state !== "leaving"))) { drop(popup.id); popup = null; }
+  if (!spot) { popupNext = Math.max(popupNext, t + 20000); return; }   // (the first one comes a little after you get there)
+  if (!popup) {
+    if (t < popupNext) return;
+    // someone from round here who isn't already on the screen: the day-trippers and travelling neighbours, or a local whose day brings them to this spot
+    const locals = NPCS.filter(d => d.local === "bellbird" && !d.kid && !ents[d.id] && (d.tourist || d.neighbour || (d.routine || []).some(r => r.scene === scene)));
+    if (!locals.length) { popupNext = t + 30000; return; } const def = pick(locals);
+    const from = spot.x > 260 ? [-24, spot.y + 30] : [544, spot.y + 30], id = "popup-" + (++popupN);
+    popup = ents[id] = {id, kind: "agent", popup: true, ag: {name: def.name, look: def.look}, scene, state: "coming", x: from[0], y: from[1], dir: 1, moving: true, wait: 0, node: makeNode(id, def.look, false, false)};
+    route(popup, spot.x + (Math.random() < .5 ? -6 : 6), spot.y);
+  }
+  const c = popup;
+  if (c.state === "coming") { if (walk(c, 110, dt)) { c.state = "looking"; c.wait = 2.2; c.dir = 1; } }
+  else if (c.state === "looking") { c.wait -= dt; if (c.wait <= 0) {
+    const r = api.popupSale && api.popupSale(); c.state = "paid"; c.wait = 2.6;
+    if (r) { const w = r.what.replace(/^(an?) /i, (m, a) => a.toLowerCase() + " "), line = pick(POPUP_SAY); say(c, line.replace("{w}", w).replace("{W}", w[0].toUpperCase() + w.slice(1)), 3200); }
+  } }
+  else if (c.state === "paid") { c.wait -= dt; if (c.wait <= 0) { c.state = "leaving"; route(c, c.x < 260 ? -30 : 550, c.y + 20); } }
+  else if (c.state === "leaving" && walk(c, 120, dt)) { drop(c.id); popup = null; popupNext = t + (POPUP_GAP[0] + Math.random()*(POPUP_GAP[1] - POPUP_GAP[0]))*1000; return; }
+  c.node.classList.toggle("walk", c.moving);
+}
 export function courierDelivered(itemId){
   if (!courier || courier.item.id !== itemId) return;
   courier.state = "leaving"; courier.node.querySelector(".letter")?.remove();
@@ -236,7 +263,7 @@ function hideSay(){ $("npcSay").hidden = true; sayer = null; }
 
 export function tapNpc(id){
   const e = ents[id]; if (!e) return;
-  if (e.kind === "agent") { api.openMail(e.item); return; }
+  if (e.kind === "agent") { if (e.popup) { say(e, pick(["Lovely stall!", "Did you make all this yourself?", "I'll tell my friends about this."]), 2600); return; } api.openMail(e.item); return; }
   const def = e.def, F = api.F(), S = api.S();
   F.met = F.met || {}; S.npcSaid = S.npcSaid || {};
   if (!e.act) e.dir = api.hero.x < e.x ? -1 : 1;
@@ -263,6 +290,7 @@ export function tapNpc(id){
 export function tickNpcs(dt){
   NPCS.forEach(def => tickVillager(def, dt));
   tickCourier(dt);
+  tickPopup(dt);
   Object.values(ents).forEach(e => {
     e.node.setAttribute("transform", `translate(${e.x.toFixed(1)} ${e.y.toFixed(1)})`);
     e.node.firstElementChild.setAttribute("transform", `scale(${e.dir} 1)`);
@@ -273,7 +301,7 @@ export function tickNpcs(dt){
   if (sayer && !el.hidden) api.bubble(el, sayer.x, sayer.y, sayer.kind === "npc" && sayer.def.kid ? 44 : 70, Math.hypot(sayer.x - api.hero.x, sayer.y - api.hero.y) < 90);
 }
 export const npcActors = () => Object.values(ents).map(e => [e.node, e]);
-export function resetScene(){ Object.keys(ents).forEach(drop); courier = null; }
+export function resetScene(){ Object.keys(ents).forEach(drop); courier = null; popup = null; }
 
 // Someone's whole day as a list of stretches: {from, to, scene, act, club} (6am to 11pm, in quarter hours)
 const schedCache = {};
