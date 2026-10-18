@@ -4334,6 +4334,7 @@ if (want("\nNobody stands on tables or stalls (round 228)")) try {
     return out; };
   const setUp = () => { const g = window.__hbGame, F = g.F();   // everything built, so every shop, class and club has its people
     F.goals = Object.assign(F.goals || {}, {cocoa: 1, giftshop: 1, millshop: 1, cellar: 1, greenhouse: 1, mill: 1, paperie: 1, paperkeeper: 1});
+    F.passage = {step: 5, kitchen: 1};   // round 229: the wine cave, for Monday suppers
     F.vine = Object.assign(F.vine || {}, {terrace: 1}); F.cocoa = Object.assign(F.cocoa || {}, {up: {assistant: 1, cart: 1, workshop: 1}});
     F.fam = F.fam || {}; F.fam.owned = Object.assign(F.fam.owned || {}, {grove: 1, olive: 1}); g.save(); };
   // every spot people are put at or stroll between, on these days between these times
@@ -4417,6 +4418,97 @@ if (want("\nThe cellar door's wine store and barrels (round 228)")) try {
   check(await page.evaluate(() => window.__hbGame.F().vine.barrels.length === 9 && window.__hbGame.F().coins === 1750), "roll another barrel onto the racks from the racks themselves (250)");
   await page.click('#ctx [data-vy="fill"]').catch(() => {}); await page.waitForTimeout(200);
   check(await page.evaluate(() => typeof window.__hbGame.F().vine.barrels[0] !== "undefined"), "the barrels' buttons work in the cellar too");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe secret passage (round 229)")) try {
+  // the creator's brief: a clue trail under the cellar door (one clue a day, missed days just wait), the door, the monks'
+  // wine cave and its spots, ageing wine, Tomás's forgotten bottles, Monday candlelit suppers, and the gate to the Scoop Shack
+  console.log("\nThe secret passage (round 229)");
+  const ps = await import(new URL("../src/game/passage.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url));
+  const WK = 7*864e5;
+  { // the trail's rules
+    const F = {goals: {cellar: 1}};
+    check(!ps.cellarLine({goals: {}}, "2026-10-14"), "no trail before the cellar door's built");
+    check(/candle/.test(ps.cellarLine(F, "2026-10-14")) && F.passage.step === 1, "walking into the cellar: the draught (step 1)");
+    check(!ps.clue(F, "bricks", "2026-10-14") && !ps.cellarLine(F, "2026-10-14"), "no second clue, nor a nudge, the same day");
+    check(/racks/.test(ps.cellarLine(F, "2026-10-17") || "") && !ps.cellarLine(F, "2026-10-17"), "days later, a nudge from the pet (once that day)");
+    check(/T\.R\. 1912/.test(ps.clue(F, "bricks", "2026-10-17") || "") && F.passage.step === 2, "the racks hide the old bricks (step 2), after days missed");
+    check(!ps.clue(F, "photo", "2026-10-17") && ps.clue(F, "photo", "2026-10-20") && ps.clue(F, "key", "2026-10-20") && F.passage.step === 4, "the photograph on a later day, the key straight after");
+    check(!ps.clue(F, "bricks", "2026-10-21") && /keyhole/.test(ps.clue(F, "open", "2026-10-20") || "") && ps.found(F), "then the door opens");
+    check(st.storyReady({met: {hazel: 1}, passage: {step: 5}, board: {hearts: {}}}, "hazel", "2026-10-20") && !st.storyReady({met: {hazel: 1}, board: {hearts: {}}}, "hazel", "2026-10-20"), "Hazel's chapters wait for the passage to be found");
+  }
+  { // ageing: +10% of the base a full week, up to 8 weeks
+    const lot = {base: 20, at: 0}, price = w => lot.base + ps.ageBonus(lot, w*WK + 1000);
+    check(price(0) === 20 && price(1) === 22 && price(8) === 36 && price(12) === 36, `a 20-coin wine: 22 after a week, 36 after 8, still 36 after 12 (${price(1)}, ${price(8)}, ${price(12)})`);
+    check(24 + ps.ageBonus({base: 24, at: 0}, 8*WK) === 43, "a 24-coin bottle reaches 43 after 8 weeks");
+    const F = {vine: {cellar: [{id: "r", name: "Hill Red", type: "red", n: 30}, {id: "s", name: "Fizz", type: "sparkling", n: 6, price: 31}]}};
+    check(ps.layDown(F, "r", 0) === 24 && F.vine.cellar.find(c => c.id === "r").n === 6 && ps.layDown(F, "s", 0) === 0, "lay down up to 24 bottles, the rest stay in the cellar");
+    const up = ps.bringUp(F, 0, 3*WK + 5);
+    check(up && up.price === 18 + Math.round(18*.3) && up.keep && F.vine.cellar.some(c => c.id === up.id && c.n === 24 && c.keep) && !F.passage.aged.length, `brought up after 3 weeks: back in the cellar, kept back, at 18 + 30% (${up && up.price})`);
+    const vy = await import(new URL("../src/game/vineyard.js", import.meta.url)); vy.stock(F, up.id);
+    check(F.vine.shelf.find(s => s.id === up.id).price === up.price, "and sells for the extra on the shelves");
+    ps.layDown(F, "s", 0); check(F.passage.aged[0].base === 31, "a wine with its own price ages from that price");
+  }
+  { // suppers: Monday 7 to 9pm, four seated beside the table, 88 once a night
+    const g = ps.supperGuests("2026-10-19"), slots = g.map(id => ps.supperSlot(id, "2026-10-19", 20*60, []));
+    check(g.length === 4 && slots.every(s => s && s.scene === "cave" && s.act === "sit") && !ps.supperSlot(g[0], "2026-10-19", 21*60 + 5, []) && !ps.supperSlot(g[0], "2026-10-20", 20*60, []), "four villagers at supper, Mondays 7 to 9pm only");
+    check(ps.SUP_SEATS.every(([x, y]) => !(x > 150 && x < 370 && y > 388 && y < 440)), "their seats are beside the long table, not on it");
+    const F = {}; check(!ps.supperTap(F, "2026-10-20", 20*60).coins && ps.supperTap(F, "2026-10-19", 19*60 + 30).coins === 88 && !ps.supperTap(F, "2026-10-19", 20*60).coins, "hosting pays 88, once a night");
+  }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`passage pageerror: ${e.message}`));
+  const at = s => page.evaluate(() => (window.__hbGame.F().where || {}).scene), P = () => page.evaluate(() => JSON.parse(JSON.stringify(window.__hbGame.F().passage || {})));
+  const tap = async (sel, until) => { await page.locator("#world " + sel).first().dispatchEvent("click"); await page.waitForFunction(until, null, { timeout: 15000 }); };
+  const scene = async s => { await page.evaluate(s => window.__hbScene(s), s); await page.waitForFunction(s => (window.__hbGame.F().where || {}).scene === s, s, { timeout: 5000 }); await page.waitForTimeout(400); };
+  const day = async (d, t = "14:00") => { await page.goto(url + `?seed=1&time=${t}&date=${d}`); await page.waitForTimeout(1200); };
+  await page.goto(url + "?reset=1&seed=1&time=14:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.goals = {...(F.goals || {}), cellar: Date.now(), mill: Date.now()}; F.coins = 500; F.vine = F.vine || {}; F.vine.cellar = [{id: "w1", name: "Cellar Red", type: "red", n: 12}]; window.__hbGame.save(); });
+  await scene("cellar");
+  check((await P()).step === 1 && await page.locator("#world .hbdraught").count() === 1 && await page.locator("#world .hbflame").count() > 0, "in the cellar: the draught lines and the bending candle (step 1)");
+  await tap('[data-spot="racks"]', () => !!document.querySelector('#ctx [data-vy="buybarrel"]'));
+  check((await P()).step === 1, "the same day, the racks just open the barrels");
+  await day("2026-10-17"); await scene("cellar");
+  check((await P()).nudged === "2026-10-17", "days later, walking in brings the pet's nudge");
+  await tap('[data-spot="racks"]', () => (window.__hbGame.F().passage || {}).step === 2);
+  await page.waitForTimeout(300);
+  check(await page.locator('#world [data-pass="bricks"]').count() === 1 && /T\.R\. 1912/.test(await page.locator("#speech").innerText()), "the racks give up the old bricks, and they stay on the left wall");
+  await tap('[data-spot="racks"]', () => !!document.querySelector('#ctx [data-vy="buybarrel"]')); check(true, "after that, the racks open the barrels again");
+  await scene("mill"); await tap('[data-millspot="photo"]', () => !document.getElementById("panel").hidden);
+  check((await P()).step === 2, "the same day, the photograph's just the photograph");
+  await day("2026-10-20"); await scene("mill");
+  await tap('[data-millspot="photo"]', () => (window.__hbGame.F().passage || {}).step === 3);
+  await page.waitForTimeout(500); await tap('[data-millspot="press"]', () => (window.__hbGame.F().passage || {}).step === 4);
+  check(/key/.test(await page.locator("#speech").innerText()), "a later day: the photograph's clue, then the key under the millstone");
+  await scene("cellar"); await tap('[data-pass="bricks"]', () => (window.__hbGame.F().passage || {}).step === 5); await page.waitForTimeout(300);
+  check(await page.locator('#world [data-pass="door"]').count() === 1 && !(await page.locator('#world [data-pass="door"] text').count()) && !(await page.locator('#world [data-pass="bricks"]').count()), "the key turns: a secret door in the cellar wall, no label on it");
+  await tap('[data-pass="door"]', () => (window.__hbGame.F().where || {}).scene === "cave"); await page.waitForTimeout(600);
+  const spots = await page.evaluate(() => [...document.querySelectorAll("#world [data-spot]")].map(g => g.dataset.spot));
+  check(["cavegate", "alcoves", "oldpress", "oldbottles", "supper", "oakbench"].every(k => spots.includes(k)) && await page.locator('#world textPath').count() === 1, "through it: the wine cave, with every spot and the carved arch");
+  await tap('[data-spot="oldpress"]', () => /press|beam|screw|grapes/.test(document.getElementById("speech").textContent)); check(true, "the monks' press has its lines");
+  await tap('[data-spot="alcoves"]', () => !!document.querySelector('#ctx [data-pass="lay"]'));
+  await page.click('#ctx [data-pass="lay"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().passage.aged[0].n === 12 && !window.__hbGame.F().vine.cellar.length), "lay the cellar's wine down in the alcoves");
+  await page.evaluate(() => { window.__hbGame.F().passage.aged[0].at -= 2*7*864e5; }); await page.click('#ctx [data-close]').catch(() => {}); await page.waitForTimeout(200);
+  await tap('[data-spot="alcoves"]', () => !!document.querySelector('#ctx [data-pass="up"]')); await page.click('#ctx [data-pass="up"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => { const c = window.__hbGame.F().vine.cellar[0]; return c && c.n === 12 && c.keep && c.price === 18 + Math.round(18*.2); }), "two weeks on, bring it up: kept in the cellar at 20% more");
+  await page.click('#ctx [data-close]').catch(() => {}); await page.waitForTimeout(200);
+  await tap('[data-spot="oldbottles"]', () => !!document.querySelector('#ctx [data-pass="keep"]'));
+  await page.click('#ctx [data-pass="keep"][data-k="ob_1923"]'); await page.waitForTimeout(300); await page.click('#ctx [data-pass="open"][data-k="ob_1931"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => { const F = window.__hbGame.F(), I = window.__hbGame.items(); return F.inv.ob_1923 === 1 && I.ob_1923.kind === "keepsake" && !I.ob_1923.sell && F.passage.bottles.ob_1931 === "opened" && !F.inv.ob_1931; }) && /Tomás/.test(await page.locator("#speech").innerText()), "a forgotten bottle kept (a keepsake), another opened with a toast to Tomás");
+  await page.click('#ctx [data-close]').catch(() => {}); await page.waitForTimeout(200);
+  await tap('[data-spot="supper"]', () => /Monday/.test(document.getElementById("speech").textContent)); check(true, "outside supper time, the table says when suppers are");
+  await tap('[data-spot="cavegate"]', () => (window.__hbGame.F().where || {}).scene === "scoopkitchen"); await page.waitForTimeout(1200);
+  check((await P()).kitchen && /priory/.test(await page.locator("#speech").innerText()) && await page.locator('#world [data-pass="kpanel"]').count() === 1, "the gate comes out in the Scoop Shack's kitchen, behind a panel that stays");
+  await tap('[data-pass="kpanel"]', () => (window.__hbGame.F().where || {}).scene === "cave"); check(true, "and the panel leads back into the cave");
+  await tap('[data-exit]', () => (window.__hbGame.F().where || {}).scene === "cellar"); check(true, "the cave's door goes back up to the cellar");
+  // a Monday supper: four at the table, laid; host once for 88
+  await day("2026-10-26", "19:30"); await scene("cave"); await page.waitForTimeout(800);
+  const seated = await page.evaluate(() => [...document.querySelectorAll("#actors [data-npc]")].filter(n => !/^agent/.test(n.dataset.npc)).length);
+  check(seated === 4, `Monday at 7:30: four villagers at the long table (${seated})`);
+  const c0 = await page.evaluate(() => window.__hbGame.F().coins);
+  await tap('[data-spot="supper"]', () => /supper/.test(document.getElementById("speech").textContent)); await page.waitForTimeout(300);
+  await page.locator('#world [data-spot="supper"]').dispatchEvent("click"); await page.waitForTimeout(1500);
+  check(await page.evaluate(c0 => window.__hbGame.F().coins - c0, c0) === 88, "hosting the supper pays 88, once");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {

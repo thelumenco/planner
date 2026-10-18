@@ -13,7 +13,7 @@
 // A chapter: {lines: [bubble, ...], needs: [gate, ...], reward}
 //   gates: "cocoa" / "cellar" (big goals owned), "mill" (the old mill opened), "oil" (a first bottle pressed there),
 //   "trust1" (Trusted hand at the farm), "fish5" (five kinds in the fish journal), "bouquet" (a bouquet in the
-//   backpack), "ronda2" (a second day in Ronda), "tiles4" (four of Lucía's tiles), "<npc>:<n>" (you've heard n of
+//   backpack), "ronda2" (a second day in Ronda), "passage" (the secret passage found, round 229), "tiles4" (four of Lucía's tiles), "<npc>:<n>" (you've heard n of
 //   that villager's chapters)
 //   rewards: see game/stories.js REWARDS
 export const STORIES = {
@@ -140,6 +140,16 @@ export const STORIES = {
     {needs: ["mill"], lines: ["You opened up the old mill! Did you see the initials on the beam? T.R. That's Tomás, my great-great-grandad!", "Family story: he carved them the day the millstone stopped, and said one day it would turn again, for olives."]},
     {needs: ["oil"], lines: ["I took a bottle of your oil to Abuela: olives from Tomás's tree's grandchildren, pressed in his own mill.", "She cried into her bread. Then she ate the bread.", "She sent this. Tomás carved it from a branch of that tree in 1913. It should live with the oil now."], reward: "spoon"},
     {needs: ["ines:5"], lines: ["Ever since that bottle of your oil, Abuela's been baking her olive oil cake again, the one from Tomás's village.", "She said I could give you the recipe. That's basically a royal decree."], reward: "oilcake"}
+  ],
+  // round 229: Hazel tells how the secret passage came to be, once it's found (gate "passage"): her gran's holy
+  // ground, the brothers' priory and the passage to the boats, the fishermen's boathouse and the singing, Tomás in
+  // 1912, and her own first knickerbocker glory at the beach café, now the Scoop Shack
+  hazel: [
+    {needs: ["passage"], lines: ["You found a door under the cellar? Well I never. My gran always said the Scoop Shack was holy ground.", "She'd stop on the sand outside and bow her head, every single time. We children thought she'd gone soft."]},
+    {needs: ["passage"], lines: ["My gran's holy ground, the Scoop Shack at the bay? She was right, you know. Long ago it was a little priory.", "A handful of brothers kept vines on the hill, and dug a cave under them, and a passage all the way down to the boats.", "Their wine went down to the bay by candlelight, and off up the coast."]},
+    {needs: ["passage"], lines: ["After the brothers' priory at the bay went quiet, it was the fishermen's boathouse for a hundred years.", "Gran's father mended nets in there. He swore that on still nights you could hear singing under the vineyard.", "Old songs, coming up through the ground. Nobody believed him. I did."]},
+    {needs: ["passage"], lines: ["That singing under the vineyard, from Gran's stories? In 1912 a young railwayman found the cave, mending the cellar.", "Tomás, the one who planted the olive by the mill. Ines's great-great-grandad, if you can believe it.", "He laid a few bottles down, bricked the cellar end up and hid the key. Said some places should wait for the right person."]},
+    {needs: ["passage"], lines: ["So that's the brothers' cave and the old priory by the bay. Here's my own little bit of it.", "After the war it was a beach café, with striped awnings. I had my first knickerbocker glory there, aged six, and wore most of it.", "Then it stood empty for years and years. And now it's the Scoop Shack: ice cream again. Full circle, love."]}
   ],
   // Kyoto's locals (round 122), told on a day trip like Ronda's. Sachiko and Okada: his grandmother taught her the tea ceremony
   sachiko: [

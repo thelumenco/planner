@@ -38,12 +38,12 @@ const AREAS = [
   {scene: "hwoods", id: "honeybrook-woods", n: "Honeybrook Woods", icon: "mushroom", more: "/woods", line: "East through the gate from the cottage lane: the ranger's cabin, the foraging patch, the lookout, a fishing spot and the wish-tower."}
 ];
 // where a place's own page is (other sections of the wiki)
-const MORE = {wineshop: "/vineyard-and-wine", kitchen: "/kitchen-and-tapas", cellar: "/vineyard-and-wine", giftshop: "/gift-shop", scoopshop: "/scoop-shack", cocoa: "/cocoa-room", mill: "/olive-mill",
+const MORE = {wineshop: "/vineyard-and-wine", kitchen: "/kitchen-and-tapas", cellar: "/vineyard-and-wine", cave: "/secret-passage", giftshop: "/gift-shop", scoopshop: "/scoop-shack", cocoa: "/cocoa-room", mill: "/olive-mill",
   farm: "/garden-and-crops", bluebell: "/elenas-cottages", figtree: "/elenas-cottages", station: "/trips", timetable: "/trips", ferry: "/islands", boat: "/islands", barrels: "/vineyard-and-wine", vinestall: "/vineyard-and-wine",
   grove: "/olive-mill", olive: "/olive-mill", farmshop: "/orchard", toursign: "/orchard", cacao: "/cocoa-room", forage: "/woods", ranger: "/woods", reno: "/cocoa-room",
   fishriver: "/fishing", fishlake: "/fishing", fishsea: "/fishing", fishpool: "/fishing", fishbay: "/fishing", fishvan: "/fishing", hives: "/places#wildflower-farm", run: "/pets#the-animal-run", mstall: "/markets"};
 // what's needed first, or when it's open
-const NEED = {terrace: `Once the terrace is built (${coin(VINE_SHOP.terrace.price)} at the vineyard stall)`, cellar: goal("cellar"), giftshop: goal("giftshop"), cocoa: goal("cocoa"), cocoakitchen: goal("cocoa"),
+const NEED = {cave: "A secret, found over a few days of clues once the cellar door is built", terrace: `Once the terrace is built (${coin(VINE_SHOP.terrace.price)} at the vineyard stall)`, cellar: goal("cellar"), giftshop: goal("giftshop"), cocoa: goal("cocoa"), cocoakitchen: goal("cocoa"),
   mill: goal("mill"), millup: goal("millshop"), van: goal("van"), boat: goal("boat"), greenhouse: goal("greenhouse"), reno: "Until it becomes the Cocoa Room",
   scoopdip: "Once the Scoop Shack has its dip station (an upgrade)", hfreezer: "Once the Scoop Shack has its honesty freezer (an upgrade)", dbike: "Once the Scoop Shack has its delivery bike (an upgrade)",
   bluebell: "A holiday let of Elena's, until you buy it", figtree: "A holiday let of Elena's, until you buy it", olive: "Once it's planted (bought at the vineyard stall)"};

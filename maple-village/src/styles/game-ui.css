@@ -1040,3 +1040,16 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .letcal .lc i{font-style:normal;font-size:.8rem}.letcal .lc small{font-size:.62rem;line-height:1.1}
 .letcal .lc.in,.letcal .lc.arrive{background:#DDE8F4;border-color:#7FA0D0}.letcal .lc.leave{background:#F6E7C4;border-color:#D9A84A}
 .letcal .lc.closed{background:#E9E4DC;color:#9A8E80}.letcal .lc.today{box-shadow:0 0 0 2px #C2505F inset}.letcal .lc:disabled{opacity:.45}
+
+/* round 229: the secret passage: a candle bent by the draught, draught lines, the tea towel stirring, the sea-blue glow */
+.map .hbflame{transform-box:fill-box;transform-origin:50% 100%;animation:hbLean 1.4s ease-in-out infinite}
+.map .hbflame.still{animation:hbFlick 2.4s ease-in-out infinite}
+@keyframes hbLean{0%,100%{transform:rotate(30deg) scaleY(.92)}50%{transform:rotate(44deg) scaleY(.74)}}
+@keyframes hbFlick{50%{transform:scaleY(.86)}}
+.map .hbdraught path{stroke-dasharray:16 12;animation:hbDraught 2.4s linear infinite}
+@keyframes hbDraught{to{stroke-dashoffset:-56}}
+.map .hbtowel{transform-box:fill-box;transform-origin:50% 0;animation:hbTowel 3s ease-in-out infinite}
+@keyframes hbTowel{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(7deg)}}
+.map .hbsea{animation:hbSea 4s ease-in-out infinite}
+@keyframes hbSea{50%{opacity:.65}}
+@media (prefers-reduced-motion: reduce){.map .hbflame,.map .hbdraught path,.map .hbtowel,.map .hbsea{animation:none}}

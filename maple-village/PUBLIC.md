@@ -311,3 +311,38 @@ Built from the game's own data by `node wiki/build-wiki.mjs` (part of `npm run b
 it, and the leak check covers it strictly). A new villager, item, recipe or destination appears on its own. The one
 hand-written piece per destination is its "Things to do" list (ACTS in wiki/pages/70-trips.mjs): the test "The wiki
 covers every destination" fails until a new place has one.
+
+## The secret passage (round 229, the creator's brief)
+Under the cellar door, a clue trail leads to the monks' wine cave, which comes out behind a hidden panel in the Scoop
+Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passage`, defaults for old saves), art in
+`src/art/cave.js`, the scene in `src/data/world.js` (INNER.cave, parent "cellar"; ROOMS.cave), wiki page
+`wiki/pages/76-passage.mjs` (/secret-passage).
+- Backstory: the Scoop Shack was the brothers' little priory; they dug a cave and passage under the vineyard to the
+  boats. Tomás (the mill's railwayman, "T.R. 1912" on the beam) found it in 1912, laid down a few bottles, bricked it up
+  and hid the key under the millstone.
+- The trail (only once the cellar door is built; at most one new clue a day; missed days wait): 1 the draught (walking
+  into the cellar: the high table's candle bends, draught lines behind the racks, the pet noses at them), 2 the bricks
+  (a later day: tap the racks once; old bricks on the cellar's left wall from then on), 3 the photograph (a later day:
+  the back of the one at the mill; if the mill isn't owned, the windmill's door is on the latch for steps 3 and 4),
+  4 the key (straight after: the millstone), 5 the door (tap the bricks; the key isn't a clue, so no wait). On a new day
+  mid-trail the pet nudges you as you walk into the cellar. Brief adaptations: "the fox" is the player's pet ({pet});
+  "Keep it" makes a keepsake to treasure or give a friend (no family here).
+- The secret door: a panel in the cellar's stone colour on the west wall (the same perspective as the east door), a
+  hairline of light and an iron ring, no label. The kitchen panel (only after first coming through the gate): shelves
+  of jars and tubs on the kitchen's west wall, a hairline of light and a tea towel stirring, no label.
+- The cave: brick barrel vault, limestone, flagstones, candles in niches, cobwebs, a hanging lantern, the arch carved
+  VINUM LAETIFICAT COR over the rusty gate with a sea-blue glow, a carved cross over a niche with a candle stub. Spots:
+  the gate ("To the Scoop Shack"), the ageing alcoves, the monks' press (tap lines), the forgotten bottles, the long
+  table, an oak bench; its east door goes back to the cellar.
+- Ageing (creator's change): up to 24 bottles; a wine gains 10% of its base bottle price a full week, up to 8 weeks
+  (+80%), rounded (`AGE`). Base: its own price, else its style's plus riddling. Brought up, it returns to the cellar
+  kept back from the staff, priced with the bonus (a separate "(cave-aged)" entry so it doesn't merge at the old price).
+- Forgotten bottles: `ob_1923` red, `ob_1931` white, `ob_1958` sparkling, each with its own icon. Keepsakes (`to:
+  "family"`, no sell price). Open it here: a tasting line and a toast to Tomás.
+- Monday suppers, 7 to 9pm (`SUPPER`): four villagers sit beside the long table (`SUP_SEATS`, slot in npcs.js slotAt;
+  the table's laid only then). Host once a night: 22 a guest, 88. The furniture audit's set-up opens the passage so the
+  cave is checked too.
+- Hazel's five chapters (data/stories.js, gate "passage"): her gran's holy ground, the priory and the boats, the
+  fishermen's boathouse and the singing, Tomás in 1912, the beach café and her first knickerbocker glory.
+- go() now handles rooms inside rooms (cave inside cellar inside wine shop) for walking there from anywhere.
+- Test: "The secret passage (round 229)" in test/smoke.mjs.

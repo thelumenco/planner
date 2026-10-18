@@ -8,11 +8,12 @@ import { OUTDOOR } from "../data/world.js";
 import { localHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey, LOC } from "../util.js";
 import { lunchSlot } from "./lunch.js";
 import { occasionSlot } from "./occasions.js";
-import { toursOn, visitsOn, eventOn, keepersOn, TOURISTS, NIGHT_TOURISTS } from "./tours.js";
+import { toursOn, visitsOn, eventOn, keepersOn, TOURISTS, NIGHT_TOURISTS, awayToday } from "./tours.js";
 import { browseSlot } from "./browse.js";
 import { openOn as cocoaOpen, OPEN as CC_OPEN, CLOSE as CC_CLOSE } from "./cocoa.js";
 import { keeperOn as giftOpen, GIFT_HOURS } from "./giftshop.js";
 import { millSlot } from "./millcraft.js";
+import { supperSlot } from "./passage.js";
 import { MILL_VISITORS } from "../data/mill-people.js";
 import { tourSlot, visitSlot, fieldSlot, tastingSlot, familySlot, eventSlot, classSlot, shoreSlot, dateSlot, clubSlot, discoSlot, scoopSlot, workshopSlot, trainSlot, letSlot, movieSlot, bayMarketSlot } from "./tours.js";
 import { SEA } from "../data/npcs.js";
@@ -48,7 +49,7 @@ const routineAt = (def, day, t) => { const dw = dowOf(day), we = dw === 0 || dw 
   return def.routine.find(s => t >= s.from && t < s.to && (!s.days || (s.days === "we") === we) && (!s.dow || s.dow.includes(dw)) && (!s.needs || owned[s.needs])) || null; };
 const routineNow = def => routineAt(def, dayKey(), localHM());
 export function slotAt(def, day, t, live){
-  return (api && guestSlot(api.F(), def.id, day, t)) || (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || lunchSlot(def.id, day, t, terraceBuilt()) || occasionSlot(def.id, day, t, terraceBuilt()) || millSlot(def.id, day, t, millShopOpen(), MILL_VISITORS, []) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || (cellarBuilt() && discoSlot(def.id, day, t)) || movieSlot(def.id, day, t) || bayMarketSlot(def.id, day, t) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
+  return (api && guestSlot(api.F(), def.id, day, t)) || (api && tripSlot(api.F(), def.id, day, t, live ? api.scene() : null)) || (live && supSlot(def)) || lunchSlot(def.id, day, t, terraceBuilt()) || occasionSlot(def.id, day, t, terraceBuilt()) || millSlot(def.id, day, t, millShopOpen(), MILL_VISITORS, []) || (passageFound() && supperSlot(def.id, day, t, awayToday(day))) || dateSlot(def.id, day, t) || (cellarBuilt() && clubSlot(def.id, day, t)) || (cellarBuilt() && discoSlot(def.id, day, t)) || movieSlot(def.id, day, t) || bayMarketSlot(def.id, day, t) || workshopSlot(def.id, day, t) || trainSlot(def.id, day, t) || nightOk(eventSlot(def.id, day, t), def, day, t) || tourSlot(def.id, day, t) || classSlot(def.id, day, t) || familySlot(def.id, day, t)
     || visitSlot(def.id, day, t) || fieldSlot(def.id, day, t) || tastingSlot(def.id, day, t) || iceOk(shopSlot(def.id, day, t), def, day, t) || shoreSlot(def.id, day, t) || iceOk(scoopSlot(def.id, day, t), def, day, t) || letSlot(def.id, day, t) || routineAt(def, day, t);
 }
 // round 181: shoppers you can see in the Cocoa Room (day tourists) and the gift shop (the night-market folk, by day)
@@ -68,6 +69,7 @@ const iceOk = (s, def, day, t) => { if (!s) return null; const r = routineAt(def
 const terraceBuilt = () => !!(api && api.F().vine && api.F().vine.terrace);   // the wine shop's terrace (round 146: the Sunday long lunch)
 const millShopOpen = () => !!(api && api.F().goals && api.F().goals.millshop);   // round 153: weekend day-trippers walk up to the Mill Shop
 const busyCache = {}; const busyOn = day => busyCache[day] || (busyCache[day] = [...toursOn(day).flatMap(t => [t.guide, ...t.group]), ...visitsOn(day).map(v => v.id), ...keepersOn(day)]);
+const passageFound = () => !!(api && api.F().passage && api.F().passage.step >= 5);   // round 229: Monday suppers in the wine cave
 const cellarBuilt = () => !!(api && api.F().goals && api.F().goals.cellar);   // the wine club meets in the cellar door
 // Where someone should be right now. Working it out walks every tour, visit, tasting and class, so it's kept for the
 // rest of the game minute (round 193: it was over half the frame time, and the player felt the game hang). Anything the player does

@@ -196,6 +196,8 @@ export const INNER = {
   office: {parent: "home", door: [64, 512], arrive: [450, 450], exit: [486, 440]},
   cellar: {parent: "wineshop", door: [64, 400], arrive: [450, 430], exit: [486, 430]},
   giftshop: {parent: "wineshop", door: [64, 556], arrive: [450, 440], exit: [486, 440]},   // round 178
+  // round 229: the monks' wine cave, through the secret door on the cellar's west wall (game/passage.js); its own way back is the door on its east wall
+  cave: {parent: "cellar", door: [44, 440], arrive: [450, 440], exit: [486, 440]},
   // the Scoop Shack's kitchen, through the door on the shop's west wall; its own way back is the door on its east wall
   scoopkitchen: {parent: "scoopshop", door: [64, 400], arrive: [450, 440], exit: [486, 440]},
   // the chocolate dip station (an upgrade), through the door on the shop's east wall
@@ -466,6 +468,15 @@ export const ROOMS = {
     ["flight","Tasting bar","B","tastebar",null,"The tasting bar. Pour yourself a flight (and on the first Friday of the month, host the wine club).",34],
     ["racks","Barrel racks","R","barrelrack",null,"Barrels resting, quietly getting better.",30],
     ["ctable","High table","T","table",null,"A high table for tastings. Visitors linger here.",40]]},
+  // round 229: the monks' wine cave (art/cave.js draws it all): the gate to the Scoop Shack, the ageing alcoves, the
+  // brothers' press, Tomás's forgotten bottles, the long table (Monday suppers) and an oak bench
+  cave: {name:"The wine cave", wall:"#E9DDC2", trim:"#7A4A30", noBoard:true, pos:{G:[260,172], A:[82,330], P:[418,298], O:[92,574], T:[260,440], B:[400,590]}, stations:[
+    ["cavegate","To the Scoop Shack","G","cavegate",null,"A rusty iron gate under the carved arch, with a sea-blue glow beyond: the brothers' passage down to the bay.",40],
+    ["alcoves","Ageing alcoves","A","alcoves",null,"Lay wine down for weeks: each full week adds a tenth to its bottle price, up to eight weeks.",36],
+    ["oldpress","The monks' press","P","oldpress",null,"The brothers' old oak wine press.",36],
+    ["oldbottles","Forgotten bottles","O","oldbottles",null,"Three dusty bottles with tags in Tomás's hand.",28],
+    ["supper","Long table","T","supper",null,"Candlelit suppers on Monday evenings, 7 to 9: host four friends.",48],
+    ["oakbench","Oak bench","B","oakbench",null,"An old oak bench, worn smooth.",18]]},
   market:{name:"Market", wall:"#F8E5E2", trim:"var(--blush)", stations:[
     ["stall","Shop counter","M","shopcounter",null,"Welcome in! Have a browse."]]}
 };

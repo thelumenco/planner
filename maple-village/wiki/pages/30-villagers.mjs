@@ -16,7 +16,7 @@ function routine(n){
   return table(["When", "Where", "Days"], rows);
 }
 // round 226 (Mel: "do the story arcs make it into the wiki?"): each storied villager's chapters, folded away
-const GATE = {cocoa: "once the Cocoa Room is open", cellar: "once the cellar door is built", mill: "once the old mill is restored", oil: "once you've pressed your first bottle at the mill",
+const GATE = {cocoa: "once the Cocoa Room is open", cellar: "once the cellar door is built", passage: "once the secret passage is found", mill: "once the old mill is restored", oil: "once you've pressed your first bottle at the mill",
   trust1: "once you're a Trusted hand at Wildflower Farm", fish5: "once five kinds of fish are in your journal", bouquet: "when you bring a bouquet", ronda2: "after a second day in Ronda", tiles4: "once you have four of Lucía's tiles"};
 const nameOf = id => (NPCS.find(x => x.id === id) || {}).name || id;
 const gateText = g => GATE[g] || (/^([a-z]+):(\d+)$/.test(g) ? `after ${g.split(":")[1]} of ${nameOf(g.split(":")[0])}'s chapters` : "later in the game");

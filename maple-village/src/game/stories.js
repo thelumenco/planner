@@ -20,6 +20,7 @@ function gateOk(F, g){
   if (g === "trust1") return ((F.hfarm && F.hfarm.trust) || 0) >= 40;
   if (g === "fish5") return Object.keys((F.fish && F.fish.caught) || {}).length >= 5;
   if (g === "mill") return owns(F, "mill");
+  if (g === "passage") return ((F.passage && F.passage.step) || 0) >= 5;   // round 229: the secret passage found
   if (g === "oil") return ((F.mill && F.mill.made) || 0) > 0;   // the first bottle pressed at the old mill
   if (g === "ronda2") return ((F.ronda && F.ronda.days) || []).length >= 2;   // a second day in Ronda
   if (g === "tiles4") return Object.keys((F.ronda && F.ronda.tiles) || {}).length >= 4;

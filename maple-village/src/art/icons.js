@@ -341,6 +341,11 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
 CR_BOUQUETS.forEach(b => { I[b.id] = [`<path d="M7.5 12.5l4.5 9.5 4.5-9.5z" ${f("#E8D3B0")}/>${[[8.5, 9], [15.5, 9], [12, 6], [10.5, 11.5], [13.8, 11.8]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.7" ${f(b.cols[i])}/>`).join("")}<path d="M9.5 16h5" stroke-width="2" style="stroke:var(--rose)"/>`,
   `<path d="M7.5 12.5l4.5 9.5 4.5-9.5z"/>${[[8.5, 9], [15.5, 9], [12, 6]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.7"/>`).join("")}<path d="M10 16l2 1.5 2-1.5"/>`]; });
 
+// round 229: Tomás's three forgotten bottles from the wine cave: dusty, each its own colour, a paper tag on a string
+[["ob_1923", "#5A1A2E", "#A8304A"], ["ob_1931", "#C9B25A", "#E8D88A"], ["ob_1958", "#3E5E36", "#E8D88A"]].forEach(([id, glass, foil]) => { I[id] = [
+  `<path d="M9 21v-9q0-2.6 2-3.6V4h2v4.4q2 1 2 3.6v9z" ${f(glass)}/><rect x="11" y="2.5" width="2" height="3" ${f(foil)}/><path d="M9.6 14h4.8v4H9.6z" ${f("#EFE4CC")}/><path d="M9.6 12.5q2 1 4.8 0" style="stroke:#D8D2C8;opacity:.7" stroke-width="1.6"/><rect x="15" y="7.5" width="5" height="3.6" rx=".6" transform="rotate(14 17.5 9.3)" ${f("#FFFDF6")}/>`,
+  `<path d="M9 21v-9q0-2.6 2-3.6V4h2v4.4q2 1 2 3.6v9z"/><path d="M9.6 14h4.8v4H9.6z"/><path d="M13 7.5l2.6 1.2"/><rect x="15" y="7.5" width="5" height="3.6" rx=".6" transform="rotate(14 17.5 9.3)"/><path d="M8 21h8" opacity=".4"/>`]; });
+
 // The market stalls' extra goods (data/stall-goods.js): each names a shape and its colours, drawn here
 {
   const S = {
