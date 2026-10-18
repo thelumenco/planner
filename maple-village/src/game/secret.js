@@ -1,5 +1,7 @@
 // The secret passage (round 244, Mel: "what if the cellar had a secret passageway that needed to be discovered"). Tomás
-// Ruiz (the railwayman of 1912, Ines's great-great-grandfather: stories.js) dug the cave and hid the key.
+// Ruiz (the railwayman of 1912, Ines's great-great-grandfather: stories.js) found it. Mel's backstory: the Scoop Shack
+// was once a little priory by the bay, and its monks dug the cave to bring wine down from the vineyard. Tomás bricked
+// up the cellar end in 1912 and hid the key; his own bottles still sleep in a niche.
 // A trail of clues over a few days, at most one new clue a day, and nothing is lost if Mel misses a day: each step
 // waits for her.
 //   1 a draught: the candle on the cellar's high table leans, Maple noses the barrel racks (on walking into the cellar)
@@ -55,7 +57,7 @@ export function racksTap(F, day){
 // the bricks themselves -> line
 export function brickTap(F, day){
   const s = secretState(F);
-  if (s.step === 4) { advance(s, 5, day); return "The scratched brick slides out. Behind it: a keyhole, crusted with rust. The iron key turns, stiff, then all at once. A narrow door groans open onto a passage, and a breath of cool air that smells of old oak and the sea."; }
+  if (s.step === 4) { advance(s, 5, day); return "The scratched brick slides out. Behind it: a keyhole, crusted with rust. The iron key turns, stiff, then all at once. A narrow door groans open onto a stone passage, worn smooth by feet long gone, and a breath of cool air that smells of old oak and the sea."; }
   if (s.step >= 5) return null;
   if (s.step === 3) return "T.R. 1912. You still need that key: where the stone turns...";
   return "T.R. 1912. Tomás Ruiz? The railwayman who planted the olive tree by the mill, Ines's great-great-grandfather. His initials are carved in the beam at the old mill too. You run a finger over the brick: it moves, just a little.";
@@ -114,7 +116,7 @@ const tape = `<span class="tape gingham" aria-hidden="true"></span>`, shut = `<d
 const TYPE = {red: "Red", rose: "Rosé", white: "White", sparkling: "Sparkling", pinot: "Pinot noir", tempranillo: "Tempranillo", chardonnay: "Chardonnay"};
 export function alcovesPanel(F, v, day){
   const s = secretState(F), n = laidCount(F);
-  let h = `${tape}<h2>The ageing alcoves</h2><p class="sub">Cool and still, the way Tomás built it. Wine laid down here gains a coin a bottle for every week it rests, up to ${AGE_MAX}. ${n} of ${CAVE_MAX} places taken.</p>`;
+  let h = `${tape}<h2>The ageing alcoves</h2><p class="sub">Cool and still, the way the monks built it. Wine laid down here gains a coin a bottle for every week it rests, up to ${AGE_MAX}. ${n} of ${CAVE_MAX} places taken.</p>`;
   if (s.laid.length) h += `<p class="eyebrow">Resting</p><ul class="hlist wlist">${s.laid.map((l, i) => { const b = Math.min(AGE_MAX, (l.aged || 0) + bonus(l, day));
     return `<li><span class="wtxt"><b>${esc(l.name)}</b><small>${TYPE[l.type] || ""} · ${l.n} bottle${l.n === 1 ? "" : "s"} · ${b ? `+${b} a bottle so far` : "laid down this week"}</small></span><button class="btn small alt" data-cave="up:${i}">Bring it up</button></li>`; }).join("")}</ul>`;
   const down = (v.cellar || []).filter(c => c.n > 0 && !c.rack);

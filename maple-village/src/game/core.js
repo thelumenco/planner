@@ -4310,8 +4310,8 @@ svg.addEventListener("click", ev => {
     if (k === "passage") { go(scene, x, y, () => setScene("winecave", [90, 455])); return; } }
   const cav = scene === "winecave" && ev.target.closest("[data-cavespot]");
   if (cav) { const k = cav.dataset.cavespot, x = +cav.dataset.x || mel.x, y = +cav.dataset.y || mel.y;
-    if (k === "gate") { go(scene, x, y, () => { const st = SC.secretState(F), first = !st.through; st.through = true; save(); setScene("scoopkitchen", [100, 455]); if (first) setTimeout(() => speak("The passage climbs, and the rusty gate opens behind a panel of shelves... in the Scoop Shack's kitchen! Nobody ever knew.", 7000), 900); }); return; }
-    if (k === "press") { go(scene, x, y, () => speak(pick(["Tomás's old wine press. The screw still turns, slow and creaking.", "A wooden press, black with age. Someone carved a little olive branch into the beam.", "The press smells faintly of grapes, even after a hundred years."]), 5000)); return; }
+    if (k === "gate") { go(scene, x, y, () => { const st = SC.secretState(F), first = !st.through; st.through = true; save(); setScene("scoopkitchen", [100, 455]); if (first) setTimeout(() => speak("The passage climbs, and the rusty gate opens behind a panel of shelves... in the Scoop Shack's kitchen! Of course: long ago the Scoop Shack was the brothers' little priory by the bay.", 7000), 900); }); return; }
+    if (k === "press") { go(scene, x, y, () => speak(pick(["The monks' old wine press. The screw still turns, slow and creaking.", "A wooden press, black with age. Someone carved a little olive branch into the beam.", "The press smells faintly of grapes, even after a hundred years."]), 5000)); return; }
     go(scene, x, y, () => { caveView = k === "oldbottles" ? "old" : k; atSpot = k; sfx("paper", true); ctx(); }); return; }
   // round 236: inside the holiday cottages
   const cs = coOf(scene) && ev.target.closest("[data-cospot]");

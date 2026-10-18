@@ -2646,7 +2646,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - Test in "The terrace and the Sunday long lunch (round 146)".
 
 ## Round 244: the secret passage and Tomás's wine cave (Mel: "what if the cellar had a secret passageway that needed to be discovered"; "wine cave with all four, a few days of clues, except it leads to the bay")
-- **The story:** Tomás Ruiz (the railwayman of 1912, Ines's great-great-grandfather) dug a wine cave under the vineyard and hid the key. His initials are already carved in the mill's beam (art/mill.js "T.R. 1912").
+- **The story** (Mel's backstory: the Scoop Shack used to be a monastery): the monks of a little priory by the bay, where the Scoop Shack stands now, dug a wine cave and passage up under the vineyard to bring their wine down. Tomás Ruiz (the railwayman of 1912, Ines's great-great-grandfather) found it, bricked up the cellar end and hid the key; his own bottles sleep in a niche. His initials are already carved in the mill's beam (art/mill.js "T.R. 1912").
 - **The trail** (game/secret.js, `F.secret.step`; at most one new clue a day, and it waits if Mel misses days):
   1. walking into the cellar (once the cellar door's built): the candle on the high table leans, Maple noses the racks (`cellarEnter`);
   2. a later day, tap the barrel racks: old bricks behind them, one scratched T.R. 1912 (`racksTap`);
