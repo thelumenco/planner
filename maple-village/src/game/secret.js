@@ -9,12 +9,13 @@
 //   3 the photograph: on the back of the old photo at the mill, "Where the stone turns, the key sleeps" (a later day)
 //   4 the key: under the edge of the millstone, wrapped in oilcloth (straight after)
 //   5 the door: the loose brick hides a keyhole; a narrow door opens on a passage to Tomás's old wine cave
-// The cave: ageing alcoves (wine laid down gains a coin a bottle a week, up to eight), three forgotten bottles, a
+// The cave: ageing alcoves (wine laid down gains 10% of its price a week, up to 80%), three forgotten bottles, a
 // candlelit supper for four on Mondays 7 to 9pm that Mel hosts, and a rusty gate out to a hidden panel in the Scoop
 // Shack's gelato kitchen.
 import { ITEMS } from "../data/items.js";
 import { esc } from "../util.js";
 import { icon } from "../art/icons.js";
+import { STYLES } from "./vineyard.js";
 
 export const OLD = {
   old_r1923: {n: "A dusty 1923 red", ico: "oldred", label: "Tomás Ruiz, 1923. The year the mill's sails were mended."},
@@ -24,7 +25,10 @@ export const OLD = {
 Object.entries(OLD).forEach(([id, o]) => { ITEMS[id] = ITEMS[id] || {n: o.n, ico: o.ico, kind: "gift", to: ["dad", "gonggong", "mum", "darren", "mama", "angelina", "marcus"], price: 0, sell: 0,
   say: "From a secret cave under the vineyard? A hundred years old? I'm going to save it for something very special.", says: {gonggong: "Gong Gong was born after this bottle! Very old. Very precious.", dad: "Wah, 1920-something. We open this at Chinese New Year."}}; });
 
-export const CAVE_MAX = 24, AGE_STEP = 7, AGE_MAX = 8;   // bottles in the alcoves; a coin a bottle a week, up to eight
+export const CAVE_MAX = 24, AGE_STEP = 7, AGE_MAX = 8, AGE_PCT = 10;   // bottles in the alcoves; `aged` counts weeks rested, each +10% of the style's price, up to eight (80%)
+// coins a bottle gained for `weeks` rested (vineyard stock() adds this to the shelf price)
+export const agedCoins = (type, weeks) => Math.round(((STYLES[type] || {}).price || 18)*AGE_PCT/100*Math.min(AGE_MAX, weeks || 0));
+const agedTxt = (type, w) => `+${w*AGE_PCT}% (+${agedCoins(type, w)} a bottle)`;
 export const SUPPER = {dow: 1, from: 19*60, to: 21*60, pay: 22, seats: [[200, 430, 1], [320, 430, -1], [200, 480, 1], [320, 480, -1]]};
 const POOL = ["noor", "felix", "elena", "lila", "mateo", "hazel", "farid", "pilar", "celeste", "opal", "aiko", "ben"];
 const hash = s => { let h = 0; for (const c of String(s)) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
@@ -90,7 +94,7 @@ export function bringUp(F, v, i, day){
   const s = secretState(F), l = s.laid[i]; if (!l) return null;
   const aged = Math.min(AGE_MAX, (l.aged || 0) + bonus(l, day)); s.laid.splice(i, 1);
   v.cellar.push({id: l.id + "a" + Date.now().toString(36).slice(-3), name: l.name, type: l.type, n: l.n, aged, hold: true});
-  return {n: l.n, aged, name: l.name};
+  return {n: l.n, aged, name: l.name, pct: aged*AGE_PCT, coins: agedCoins(l.type, aged)};
 }
 
 /* ---------- the forgotten bottles ---------- */
@@ -116,11 +120,11 @@ const tape = `<span class="tape gingham" aria-hidden="true"></span>`, shut = `<d
 const TYPE = {red: "Red", rose: "Rosé", white: "White", sparkling: "Sparkling", pinot: "Pinot noir", tempranillo: "Tempranillo", chardonnay: "Chardonnay"};
 export function alcovesPanel(F, v, day){
   const s = secretState(F), n = laidCount(F);
-  let h = `${tape}<h2>The ageing alcoves</h2><p class="sub">Cool and still, the way the monks built it. Wine laid down here gains a coin a bottle for every week it rests, up to ${AGE_MAX}. ${n} of ${CAVE_MAX} places taken.</p>`;
+  let h = `${tape}<h2>The ageing alcoves</h2><p class="sub">Cool and still, the way the monks built it. Wine laid down here gains ${AGE_PCT}% of its price for every week it rests, up to ${AGE_MAX*AGE_PCT}%. ${n} of ${CAVE_MAX} places taken.</p>`;
   if (s.laid.length) h += `<p class="eyebrow">Resting</p><ul class="hlist wlist">${s.laid.map((l, i) => { const b = Math.min(AGE_MAX, (l.aged || 0) + bonus(l, day));
-    return `<li><span class="wtxt"><b>${esc(l.name)}</b><small>${TYPE[l.type] || ""} · ${l.n} bottle${l.n === 1 ? "" : "s"} · ${b ? `+${b} a bottle so far` : "laid down this week"}</small></span><button class="btn small alt" data-cave="up:${i}">Bring it up</button></li>`; }).join("")}</ul>`;
+    return `<li><span class="wtxt"><b>${esc(l.name)}</b><small>${TYPE[l.type] || ""} · ${l.n} bottle${l.n === 1 ? "" : "s"} · ${b ? `${agedTxt(l.type, b)} so far` : "laid down this week"}</small></span><button class="btn small alt" data-cave="up:${i}">Bring it up</button></li>`; }).join("")}</ul>`;
   const down = (v.cellar || []).filter(c => c.n > 0 && !c.rack);
-  h += `<p class="eyebrow">From the cellar</p>` + (down.length ? `<ul class="hlist wlist">${down.map(c => `<li><span class="wtxt"><b>${esc(c.name)}</b><small>${TYPE[c.type] || ""} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.aged ? ` · already +${c.aged}` : ""}</small></span><button class="btn small primary" data-cave="lay:${esc(c.id)}" ${n >= CAVE_MAX ? "disabled" : ""}>Lay it down</button></li>`).join("")}</ul>` : `<p class="muted">Nothing waiting in the cellar. Bottle a barrel, or keep a wine back, and it can rest here.</p>`);
+  h += `<p class="eyebrow">From the cellar</p>` + (down.length ? `<ul class="hlist wlist">${down.map(c => `<li><span class="wtxt"><b>${esc(c.name)}</b><small>${TYPE[c.type] || ""} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.aged ? ` · already ${agedTxt(c.type, c.aged)}` : ""}</small></span><button class="btn small primary" data-cave="lay:${esc(c.id)}" ${n >= CAVE_MAX ? "disabled" : ""}>Lay it down</button></li>`).join("")}</ul>` : `<p class="muted">Nothing waiting in the cellar. Bottle a barrel, or keep a wine back, and it can rest here.</p>`);
   return h + `<p class="muted">Brought up, it waits in the cellar (kept back) and sells for the extra on the shelves.</p>` + shut;
 }
 export function oldPanel(F){

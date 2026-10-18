@@ -14,7 +14,7 @@ THE CLUE TRAIL (only once the cellar door has been built)
 
 THE WINE CAVE (a new indoor scene, entered through the cellar door, with its own door back to the cellar)
 - Draw it: a brick barrel vault, limestone walls, flagstones, candles in niches, cobwebs, a hanging iron lantern. Warm and cosy, not scary. Monastic touches: a worn stone arch over the far gate carved "VINUM LAETIFICAT COR", a little carved cross over a niche with a candle stub, and an old oak bench. Calm screen: edges full, middle clear, everything to the player's scale.
-- Ageing alcoves. Lay wine down from the cellar, up to 24 bottles. A wine gains 1 coin a bottle for every week it rests, up to 8. Bring it back up and it returns to the cellar (kept back from the staff who stock shelves) and sells for the extra on the shop shelves.
+- Ageing alcoves. Lay wine down from the cellar, up to 24 bottles. A wine gains 10% of its shelf price for every week it rests, up to 80% (eight weeks), so dearer wines gain more. Bring it back up and it returns to the cellar (kept back from the staff who stock shelves) and sells for the extra on the shop shelves.
 - Forgotten bottles. Three dusty bottles with tags in Tomás's hand: a 1923 red, a 1931 white and a 1958 sparkling, one of each. "Keep it" puts it in the backpack as a gift the family treasure. "Open it here" gives a lovely tasting line and a toast to Tomás.
 - The old press. The monks' wooden wine press, with a few tap lines.
 - Monday candlelit suppers, 7 to 9pm. Four villagers sit at the long table, which is laid with candelabra, plates and glasses during supper. Tapping the table lets the player host, once a night, for 22 coins a guest (88). Outside supper time the table explains when suppers are.

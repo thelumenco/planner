@@ -14,6 +14,7 @@ import { bikeOwned, DELIVERY, deliveryHours } from "./scoop.js";
 import { occasionNow, OCC } from "./occasions.js";
 import { mulledSeason, sellCup, mullState } from "./mulled.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
+import { agedCoins } from "./secret.js";
 
 export const GROW = 8*H;                                     // a watered vine ripens in 8 hours
 // Fermenting is a once-a-day rhythm: fill a barrel one evening, bottle it the next day (finishing quests speeds it up).
@@ -155,7 +156,7 @@ export const riddleDays = (c, now = Date.now()) => c && c.rack ? Math.min(RIDDLE
 export const canRiddle = F => !!(F.bellbird && F.bellbird.riddle);
 export function onRack(F, id){ const c = vineState(F).cellar.find(x => x.id === id); if (!c || c.type !== "sparkling" || c.rack || !canRiddle(F)) return null; c.rack = Date.now(); return c; }
 export function stock(F, id){ const v = vineState(F), c = v.cellar.find(x => x.id === id); if (!c) return null;
-  const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES[c.type].price + RIDDLE.day*riddleDays(c) + (c.aged || 0), open: 0});   // round 244: + what it gained resting in the cave
+  const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES[c.type].price + RIDDLE.day*riddleDays(c) + agedCoins(c.type, c.aged), open: 0});   // round 244: + what it gained resting in the cave (10% of the style's price a week)
   v.cellar = v.cellar.filter(x => x.id !== id); return `${c.name} is on the shelves.`; }
 // round 243 (Mel: "space for stocking wines I don't want to put on shelves yet"): the cellar is the store. A wine
 // kept back stays down here (Celeste won't stock it); bottles can come back down off the shelves too.

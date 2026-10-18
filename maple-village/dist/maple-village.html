@@ -20992,6 +20992,191 @@ ${r.n}`;
     return h3 + `<div class="actions"><button class="btn primary" data-mull="go" ${ready2 ? "" : "disabled"}>${ready2 ? known2 ? `Mull ${esc(mullName(pick5))} again` : "Into the pot: something new" : "Into the pot"}</button></div>` + shut6;
   }
 
+  // src/game/secret.js
+  var OLD = {
+    old_r1923: { n: "A dusty 1923 red", ico: "oldred", label: "Tomás Ruiz, 1923. The year the mill's sails were mended." },
+    old_s1958: { n: "A dusty 1958 sparkling", ico: "oldfizz", label: "Ruiz, 1958. Kept for a wedding." },
+    old_w1931: { n: "A dusty 1931 white", ico: "oldwhite", label: "Ruiz, 1931. The good summer." }
+  };
+  Object.entries(OLD).forEach(([id, o]) => {
+    ITEMS[id] = ITEMS[id] || {
+      n: o.n,
+      ico: o.ico,
+      kind: "gift",
+      to: ["dad", "gonggong", "mum", "darren", "mama", "angelina", "marcus"],
+      price: 0,
+      sell: 0,
+      say: "From a secret cave under the vineyard? A hundred years old? I'm going to save it for something very special.",
+      says: { gonggong: "Gong Gong was born after this bottle! Very old. Very precious.", dad: "Wah, 1920-something. We open this at Chinese New Year." }
+    };
+  });
+  var CAVE_MAX = 24;
+  var AGE_STEP = 7;
+  var AGE_MAX = 8;
+  var AGE_PCT = 10;
+  var agedCoins = (type, weeks) => Math.round(((STYLES2[type] || {}).price || 18) * AGE_PCT / 100 * Math.min(AGE_MAX, weeks || 0));
+  var agedTxt = (type, w) => `+${w * AGE_PCT}% (+${agedCoins(type, w)} a bottle)`;
+  var SUPPER = { dow: 1, from: 19 * 60, to: 21 * 60, pay: 22, seats: [[200, 430, 1], [320, 430, -1], [200, 480, 1], [320, 480, -1]] };
+  var POOL = ["noor", "felix", "elena", "lila", "mateo", "hazel", "farid", "pilar", "celeste", "opal", "aiko", "ben"];
+  var hash2 = (s) => {
+    let h3 = 0;
+    for (const c of String(s)) h3 = h3 * 31 + c.charCodeAt(0) | 0;
+    return Math.abs(h3);
+  };
+  var DAY = 864e5;
+  var days = (a, b) => Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / DAY);
+  function secretState(F2) {
+    const s = F2.secret = F2.secret || {};
+    s.step = s.step || 0;
+    s.laid = s.laid || [];
+    s.old = s.old || { old_r1923: 1, old_s1958: 1, old_w1931: 1 };
+    s.hosted = s.hosted || {};
+    return s;
+  }
+  var caveOpen = (F2) => secretState(F2).step >= 5;
+  var fresh = (s, day) => s.day !== day;
+  var advance = (s, n, day) => {
+    s.step = n;
+    s.day = day;
+    return n;
+  };
+  function cellarEnter(F2, day) {
+    const s = secretState(F2);
+    if (!(F2.goals && F2.goals.cellar)) return null;
+    if (s.step === 0) {
+      advance(s, 1, day);
+      return "The candle on the high table keeps leaning sideways, as if something's breathing. Maple's nose is pressed to the barrel racks.";
+    }
+    if (!fresh(s, day) || s.said === day) return null;
+    s.said = day;
+    if (s.step === 1) return "That draught again, from behind the barrel racks. Maple won't leave them alone.";
+    if (s.step === 2) return "T.R. 1912, scratched in the old bricks. Where else have you seen those initials?";
+    if (s.step === 3) return "Where the stone turns, the key sleeps. The old millstone?";
+    if (s.step === 4) return "The iron key's heavy in your pocket. The loose brick, perhaps?";
+    return null;
+  }
+  function racksTap(F2, day) {
+    const s = secretState(F2);
+    if (s.step === 1 && fresh(s, day)) {
+      advance(s, 2, day);
+      return "You roll the end barrel aside. Behind the racks the plaster's crumbled away: old bricks, cold air whistling through, and one brick scratched with T.R. 1912.";
+    }
+    if (s.step === 1) return null;
+    return null;
+  }
+  function brickTap(F2, day) {
+    const s = secretState(F2);
+    if (s.step === 4) {
+      advance(s, 5, day);
+      return "The scratched brick slides out. Behind it: a keyhole, crusted with rust. The iron key turns, stiff, then all at once. A narrow door groans open onto a stone passage, worn smooth by feet long gone, and a breath of cool air that smells of old oak and the sea.";
+    }
+    if (s.step >= 5) return null;
+    if (s.step === 3) return "T.R. 1912. You still need that key: where the stone turns...";
+    return "T.R. 1912. Tomás Ruiz? The railwayman who planted the olive tree by the mill, Ines's great-great-grandfather. His initials are carved in the beam at the old mill too. You run a finger over the brick: it moves, just a little.";
+  }
+  function photoTap(F2, day) {
+    const s = secretState(F2);
+    if (s.step === 2 && fresh(s, day)) {
+      advance(s, 3, day);
+      return 'You lift the old photograph off its nail. On the back, in faded brown ink: "Where the stone turns, the key sleeps. T.R."';
+    }
+    return null;
+  }
+  function stoneTap(F2, day) {
+    const s = secretState(F2);
+    if (s.step === 3) {
+      s.step = 4;
+      s.key = day;
+      return "You run your hand under the lip of the old millstone. Wrapped in oilcloth, wedged in a gap in the stone: a heavy iron key, long as your hand.";
+    }
+    return null;
+  }
+  var laidCount = (F2) => secretState(F2).laid.reduce((n, l) => n + l.n, 0);
+  var bonus = (l, day) => Math.min(AGE_MAX, Math.floor(Math.max(0, days(l.at, day)) / AGE_STEP));
+  function layDown(F2, v, id, day) {
+    const s = secretState(F2), c = v.cellar.find((x) => x.id === id);
+    if (!c) return { msg: "That's not in the cellar." };
+    const room4 = CAVE_MAX - laidCount(F2);
+    if (room4 < 1) return { msg: "The alcoves are full: twenty-four bottles resting." };
+    const n = Math.min(room4, c.n);
+    c.n -= n;
+    if (!c.n) v.cellar = v.cellar.filter((x) => x !== c);
+    s.laid.push({ id: c.id, name: c.name, type: c.type, n, at: day, aged: c.aged || 0 });
+    return { n };
+  }
+  function bringUp(F2, v, i, day) {
+    const s = secretState(F2), l = s.laid[i];
+    if (!l) return null;
+    const aged = Math.min(AGE_MAX, (l.aged || 0) + bonus(l, day));
+    s.laid.splice(i, 1);
+    v.cellar.push({ id: l.id + "a" + Date.now().toString(36).slice(-3), name: l.name, type: l.type, n: l.n, aged, hold: true });
+    return { n: l.n, aged, name: l.name, pct: aged * AGE_PCT, coins: agedCoins(l.type, aged) };
+  }
+  function takeOld(F2, id, open2) {
+    const s = secretState(F2);
+    if (!s.old[id]) return null;
+    s.old[id] = 0;
+    if (open2) return { opened: true };
+    F2.inv = F2.inv || {};
+    F2.inv[id] = (F2.inv[id] || 0) + 1;
+    return { opened: false };
+  }
+  var supperOn = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() === SUPPER.dow;
+  var supperNow = (day, hm12) => supperOn(day) && hm12 >= SUPPER.from && hm12 < SUPPER.to;
+  function supperGuests(day) {
+    const pool2 = [...POOL], out = [];
+    let k = 0;
+    while (out.length < 4 && pool2.length) {
+      const i = hash2(day + ":supper:" + k++) % pool2.length;
+      out.push(pool2.splice(i, 1)[0]);
+    }
+    return out;
+  }
+  function supperSlot(id, day, hm12) {
+    if (!supperNow(day, hm12)) return null;
+    const i = supperGuests(day).indexOf(id);
+    if (i < 0) return null;
+    const [x, y, d] = SUPPER.seats[i];
+    return { from: SUPPER.from, to: SUPPER.to, scene: "winecave", at: [x, y], dir: d, act: "sit" };
+  }
+  function host(F2, day) {
+    const s = secretState(F2);
+    if (s.hosted[day]) return null;
+    s.hosted = { [day]: true };
+    const coins = 4 * SUPPER.pay;
+    F2.coins = (F2.coins || 0) + coins;
+    return { coins };
+  }
+  var tape = `<span class="tape gingham" aria-hidden="true"></span>`;
+  var shut7 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var TYPE = { red: "Red", rose: "Rosé", white: "White", sparkling: "Sparkling", pinot: "Pinot noir", tempranillo: "Tempranillo", chardonnay: "Chardonnay" };
+  function alcovesPanel(F2, v, day) {
+    const s = secretState(F2), n = laidCount(F2);
+    let h3 = `${tape}<h2>The ageing alcoves</h2><p class="sub">Cool and still, the way the monks built it. Wine laid down here gains ${AGE_PCT}% of its price for every week it rests, up to ${AGE_MAX * AGE_PCT}%. ${n} of ${CAVE_MAX} places taken.</p>`;
+    if (s.laid.length) h3 += `<p class="eyebrow">Resting</p><ul class="hlist wlist">${s.laid.map((l, i) => {
+      const b = Math.min(AGE_MAX, (l.aged || 0) + bonus(l, day));
+      return `<li><span class="wtxt"><b>${esc(l.name)}</b><small>${TYPE[l.type] || ""} · ${l.n} bottle${l.n === 1 ? "" : "s"} · ${b ? `${agedTxt(l.type, b)} so far` : "laid down this week"}</small></span><button class="btn small alt" data-cave="up:${i}">Bring it up</button></li>`;
+    }).join("")}</ul>`;
+    const down = (v.cellar || []).filter((c) => c.n > 0 && !c.rack);
+    h3 += `<p class="eyebrow">From the cellar</p>` + (down.length ? `<ul class="hlist wlist">${down.map((c) => `<li><span class="wtxt"><b>${esc(c.name)}</b><small>${TYPE[c.type] || ""} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.aged ? ` · already ${agedTxt(c.type, c.aged)}` : ""}</small></span><button class="btn small primary" data-cave="lay:${esc(c.id)}" ${n >= CAVE_MAX ? "disabled" : ""}>Lay it down</button></li>`).join("")}</ul>` : `<p class="muted">Nothing waiting in the cellar. Bottle a barrel, or keep a wine back, and it can rest here.</p>`);
+    return h3 + `<p class="muted">Brought up, it waits in the cellar (kept back) and sells for the extra on the shelves.</p>` + shut7;
+  }
+  function oldPanel(F2) {
+    const s = secretState(F2), left7 = Object.keys(OLD).filter((k) => s.old[k]);
+    let h3 = `${tape}<h2>Forgotten bottles</h2><p class="sub">Three bottles under a hundred years of dust, each with a paper tag in Tomás's hand.</p>`;
+    if (!left7.length) return h3 + `<p class="muted">The niche is empty now, just a candle and the cobwebs.</p>` + shut7;
+    h3 += `<ul class="hlist wlist">${left7.map((k) => `<li style="flex-wrap:wrap"><span class="wpic">${icon(OLD[k].ico, 34)}</span><span class="wtxt"><b>${esc(OLD[k].n)}</b><small>"${esc(OLD[k].label)}"</small></span>
+    <span style="flex-basis:100%;display:flex;gap:6px;justify-content:flex-end"><button class="btn small primary" data-cave="take:${k}">Keep it</button><button class="btn small alt" data-cave="open:${k}">Open it here</button></span></li>`).join("")}</ul>`;
+    return h3 + `<p class="muted">Kept, it goes in your backpack: a gift the family will treasure.</p>` + shut7;
+  }
+  function tablePanel(F2, day, hm12, here) {
+    const s = secretState(F2), on = supperNow(day, hm12);
+    let h3 = `${tape}<h2>The supper table</h2>`;
+    if (!on) return h3 + `<p class="sub">Mondays, 7 to 9pm: a candlelit supper for four down here. Come and host, and they'll pay ${SUPPER.pay} coins each.</p>` + shut7;
+    if (s.hosted[day]) return h3 + `<p class="sub">Supper's under way: candlelight, old stories and the good glasses. You're hosting tonight.</p>` + shut7;
+    return h3 + `<p class="sub">Four guests at the long table${here ? "" : " (on their way down)"}. Light the candelabra and pour?</p><div class="actions"><button class="btn primary" data-cave="host">Host supper</button></div>` + shut7;
+  }
+
   // src/game/vineyard.js
   var GROW2 = 8 * H;
   var STYLES2 = {
@@ -21247,7 +21432,7 @@ ${r.n}`;
     if (!c) return null;
     const s = v.shelf.find((x) => x.id === id);
     if (s) s.n += c.n;
-    else v.shelf.push({ id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES2[c.type].price + RIDDLE.day * riddleDays(c) + (c.aged || 0), open: 0 });
+    else v.shelf.push({ id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES2[c.type].price + RIDDLE.day * riddleDays(c) + agedCoins(c.type, c.aged), open: 0 });
     v.cellar = v.cellar.filter((x) => x.id !== id);
     return `${c.name} is on the shelves.`;
   }
@@ -24215,7 +24400,7 @@ ${r.n}`;
   var board = (k) => `<ellipse cx="0" cy="${-1 * k}" rx="${22 * k}" ry="${3.6 * k}" style="fill:#F3C969"/><path d="M${-18 * k} ${-1 * k} h${36 * k}" fill="none" stroke-width=".8" style="stroke:#E8566C"/>`;
   var paddle = (k) => `<path d="M${12 * k} ${-30 * k} l${5 * k} ${32 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16 * k} ${-2 * k} l${2 * k} ${8 * k} l${3 * k} ${-1 * k} l${-2 * k} ${-8 * k}z" ${S("#7FB8E8")}/>`;
   var cap = (c, y, r) => `<path d="M${-r - 0.2} ${y + 1} c-1 -9 4 -14 ${r} -14 c6 0 ${r + 1} 4 ${r} 14 c-3 -4 -8 -5 -12 -4 c-3 0 -6 2 -8 4z" ${S(c)}/>`;
-  var shut7 = (look, k) => [-1, 1].map((d) => `<ellipse cx="${d * 3.7 * k}" cy="${-44 * k}" rx="${1.7 * k}" ry="${2.1 * k}" ${S(look.skin)} stroke="none"/><path d="M${(d * 3.7 - 1.6) * k} ${-44.2 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="${0.9 * k}"/>`).join("");
+  var shut8 = (look, k) => [-1, 1].map((d) => `<ellipse cx="${d * 3.7 * k}" cy="${-44 * k}" rx="${1.7 * k}" ry="${2.1 * k}" ${S(look.skin)} stroke="none"/><path d="M${(d * 3.7 - 1.6) * k} ${-44.2 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="${0.9 * k}"/>`).join("");
   var limb = (d, col, w) => `<path d="${d}" fill="none" stroke-width="${w + 1.6}" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--line)"/><path d="${d}" fill="none" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" style="stroke:${col}"/>`;
   var basket = (cx, ty, k, col, inside2) => `<path d="M${(cx - 5) * k} ${ty * k} Q${cx * k} ${(ty - 12) * k} ${(cx + 5) * k} ${ty * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:#8A6A42"/>${inside2}<path d="M${(cx - 6.4) * k} ${ty * k} H${(cx + 6.4) * k} L${(cx + 5) * k} ${(ty + 8.4) * k} H${(cx - 5) * k}z" style="fill:${col}" stroke-width="${0.8 * k}"/><path d="M${(cx - 6) * k} ${(ty + 2.8) * k} H${(cx + 6) * k} M${(cx - 5.6) * k} ${(ty + 5.6) * k} H${(cx + 5.6) * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#8A6A42"/>${[-3, 0, 3].map((x) => `<path d="M${(cx + x) * k} ${ty * k} v${8.4 * k}" fill="none" stroke-width="${0.4 * k}" style="stroke:#8A6A42"/>`).join("")}`;
   function extra(kind, look, k) {
@@ -24523,7 +24708,7 @@ ${r.n}`;
       }
       // (on the head) a green coconut held up to his mouth on a bendy straw, eyes shut in bliss; the arm is posed at -135deg
       case "coconutdrink":
-        return shut7(look, k) + `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${limb(`M${17 * k} ${-49 * k} L${9 * k} ${-46 * k} L${3 * k} ${-41 * k}`, "#F6A8C4", 1.3 * k)}<ellipse cx="${19.6 * k}" cy="${-47 * k}" rx="${5.4 * k}" ry="${5.8 * k}" style="fill:#6FA84A" stroke-width="${0.9 * k}"/><path d="M${15.8 * k} ${-50.4 * k} q${3.6 * k} ${-3 * k} ${7.6 * k} 0 q${-3.8 * k} ${2 * k} ${-7.6 * k} 0z" style="fill:#F3EFD8" stroke-width="${0.6 * k}"/><path d="M${22.6 * k} ${-46 * k} q${0.8 * k} ${2.6 * k} ${-0.4 * k} ${4.4 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#A8D07A"/><circle cx="${19 * k}" cy="${-42.6 * k}" r="${2.2 * k}" ${S(look.skin)}/></g><g class="bliss"><path d="M${-13 * k} ${-60 * k} c${-1.4 * k} ${-1.6 * k} ${-3.4 * k} 0 ${-1.6 * k} ${1.8 * k} l${1.6 * k} ${1.6 * k} l${1.6 * k} ${-1.6 * k} c${1.8 * k} ${-1.8 * k} ${-0.2 * k} ${-3.4 * k} ${-1.6 * k} ${-1.8 * k}z" style="fill:#E8739A" stroke-width="${0.6 * k}"/></g>`;
+        return shut8(look, k) + `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${limb(`M${17 * k} ${-49 * k} L${9 * k} ${-46 * k} L${3 * k} ${-41 * k}`, "#F6A8C4", 1.3 * k)}<ellipse cx="${19.6 * k}" cy="${-47 * k}" rx="${5.4 * k}" ry="${5.8 * k}" style="fill:#6FA84A" stroke-width="${0.9 * k}"/><path d="M${15.8 * k} ${-50.4 * k} q${3.6 * k} ${-3 * k} ${7.6 * k} 0 q${-3.8 * k} ${2 * k} ${-7.6 * k} 0z" style="fill:#F3EFD8" stroke-width="${0.6 * k}"/><path d="M${22.6 * k} ${-46 * k} q${0.8 * k} ${2.6 * k} ${-0.4 * k} ${4.4 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#A8D07A"/><circle cx="${19 * k}" cy="${-42.6 * k}" r="${2.2 * k}" ${S(look.skin)}/></g><g class="bliss"><path d="M${-13 * k} ${-60 * k} c${-1.4 * k} ${-1.6 * k} ${-3.4 * k} 0 ${-1.6 * k} ${1.8 * k} l${1.6 * k} ${1.6 * k} l${1.6 * k} ${-1.6 * k} c${1.8 * k} ${-1.8 * k} ${-0.2 * k} ${-3.4 * k} ${-1.6 * k} ${-1.8 * k}z" style="fill:#E8739A" stroke-width="${0.6 * k}"/></g>`;
       // (on the head, instead of a hat) a woven basket of fruit on a little cloth ring; the right hand (arm at -170deg) steadies it
       case "basketonhead":
         return `<ellipse cx="0" cy="${-57 * k}" rx="${6.4 * k}" ry="${1.7 * k}" style="fill:#E8566C" stroke-width="${0.7 * k}"/><path d="M${-5 * k} ${-66 * k} q${-3 * k} ${-5 * k} ${-1 * k} ${-8 * k} M${-2 * k} ${-66 * k} q${1 * k} ${-5 * k} ${4 * k} ${-6.4 * k}" fill="none" stroke-width="${1.4 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/><ellipse cx="${-5 * k}" cy="${-66.4 * k}" rx="${4.6 * k}" ry="${3.2 * k}" style="fill:#F2A23A" stroke-width="${0.7 * k}"/><path d="M${-7.4 * k} ${-67.6 * k} q${1.6 * k} ${-1 * k} ${3 * k} ${-0.6 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#FFD98A"/><path d="M${2 * k} ${-66.6 * k} q${4 * k} ${-5 * k} ${9 * k} ${-2.6 * k} q${-4 * k} ${-0.6 * k} ${-7.6 * k} ${3.4 * k}z" style="fill:#F3D34A" stroke-width="${0.7 * k}"/><circle cx="${1.2 * k}" cy="${-67.4 * k}" r="${2.9 * k}" style="fill:#D8432F" stroke-width="${0.7 * k}"/>${[0, 60, 120, 180, 240, 300].map((a) => {
@@ -24532,7 +24717,7 @@ ${r.n}`;
         }).join("")}<circle cx="${7.4 * k}" cy="${-66 * k}" r="${2.6 * k}" style="fill:#8A5A3A" stroke-width="${0.7 * k}"/><path d="M${-11.4 * k} ${-65.4 * k} h${22.8 * k} l${-2.8 * k} ${8 * k} h${-17.2 * k}z" style="fill:#C9A06A" stroke-width="${0.9 * k}"/><path d="M${-10.6 * k} ${-62.6 * k} h${21.2 * k} M${-9.8 * k} ${-60 * k} h${19.6 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#8A6A42"/>${[-7, -3.5, 0, 3.5, 7].map((x) => `<path d="M${x * k} ${-65 * k} l${-0.4 * k} ${7.6 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#8A6A42"/>`).join("")}<rect x="${-12 * k}" y="${-66.6 * k}" width="${24 * k}" height="${2 * k}" rx="${1 * k}" style="fill:#B8894E" stroke-width="${0.8 * k}"/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${limb(`M${12.2 * k} ${-47 * k} L${11.4 * k} ${-57.4 * k}`, look.skin, 4.2 * k)}<circle cx="${11.2 * k}" cy="${-58.4 * k}" r="${2.2 * k}" ${S(look.skin)}/></g>`;
       // (on the head, instead of a hat) a conical caping, eyes shut, and a "z" now and then
       case "ricehat":
-        return shut7(look, k) + `<path d="M${-19 * k} ${-51 * k} L0 ${-66 * k} L${19 * k} ${-51 * k} Q0 ${-47.4 * k} ${-19 * k} ${-51 * k}z" style="fill:#E6CB8A" stroke-width="${1 * k}"/>` + [-10, -4, 3, 10].map((x) => `<path d="M0 ${-65 * k} L${x * k} ${-49.6 * k}" fill="none" stroke-width="${0.55 * k}" style="stroke:#B8955A"/>`).join("") + `<path d="M${-13.6 * k} ${-55 * k} Q0 ${-52.4 * k} ${13.6 * k} ${-55 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#B8955A"/><circle cx="0" cy="${-66 * k}" r="${0.9 * k}" style="fill:#8A6A42" stroke="none"/><g class="zzz"><text x="${15 * k}" y="${-60 * k}" font-size="${7 * k}" font-weight="700" stroke="none" style="fill:var(--line)">z</text><text x="${20 * k}" y="${-67 * k}" font-size="${5 * k}" font-weight="700" stroke="none" style="fill:var(--line);animation-delay:-1.5s">z</text></g>`;
+        return shut8(look, k) + `<path d="M${-19 * k} ${-51 * k} L0 ${-66 * k} L${19 * k} ${-51 * k} Q0 ${-47.4 * k} ${-19 * k} ${-51 * k}z" style="fill:#E6CB8A" stroke-width="${1 * k}"/>` + [-10, -4, 3, 10].map((x) => `<path d="M0 ${-65 * k} L${x * k} ${-49.6 * k}" fill="none" stroke-width="${0.55 * k}" style="stroke:#B8955A"/>`).join("") + `<path d="M${-13.6 * k} ${-55 * k} Q0 ${-52.4 * k} ${13.6 * k} ${-55 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#B8955A"/><circle cx="0" cy="${-66 * k}" r="${0.9 * k}" style="fill:#8A6A42" stroke="none"/><g class="zzz"><text x="${15 * k}" y="${-60 * k}" font-size="${7 * k}" font-weight="700" stroke="none" style="fill:var(--line)">z</text><text x="${20 * k}" y="${-67 * k}" font-size="${5 * k}" font-weight="700" stroke="none" style="fill:var(--line);animation-delay:-1.5s">z</text></g>`;
       // sitting cross-legged (the real legs are hidden, npcs.css; drawn for the body sunk by 11px), hands on his knees
       case "crosslegs": {
         const G3 = -11, shin = look.shorts ? look.skin : look.bottom;
@@ -24565,7 +24750,7 @@ ${r.n}`;
       // eat it, Angellina listening to a little music box. (Helpers: shut eyes; a skin forearm with an outline.)
       // (on the head) eyes shut in bliss and a little heart now and then; the bench and the water are in personArt
       case "footsoak":
-        return shut7(look, k) + `<g class="bliss"><path d="M${-13 * k} ${-60 * k} c${-1.4 * k} ${-1.6 * k} ${-3.4 * k} 0 ${-1.6 * k} ${1.8 * k} l${1.6 * k} ${1.6 * k} l${1.6 * k} ${-1.6 * k} c${1.8 * k} ${-1.8 * k} ${-0.2 * k} ${-3.4 * k} ${-1.6 * k} ${-1.8 * k}z" style="fill:#E8739A" stroke-width="${0.6 * k}"/></g>`;
+        return shut8(look, k) + `<g class="bliss"><path d="M${-13 * k} ${-60 * k} c${-1.4 * k} ${-1.6 * k} ${-3.4 * k} 0 ${-1.6 * k} ${1.8 * k} l${1.6 * k} ${1.6 * k} l${1.6 * k} ${-1.6 * k} c${1.8 * k} ${-1.8 * k} ${-0.2 * k} ${-3.4 * k} ${-1.6 * k} ${-1.8 * k}z" style="fill:#E8739A" stroke-width="${0.6 * k}"/></g>`;
       // a giant king crab leg held across the body in both hands (arms posed at -62deg and 48deg), knobbly and spiky
       case "crablegheld": {
         const seg = (x1, y1, x2, y2, w) => limb(`M${x1 * k} ${y1 * k} L${x2 * k} ${y2 * k}`, "#D8573A", w * k) + `<path d="M${x1 * k} ${(y1 + w * 0.28) * k} L${x2 * k} ${(y2 + w * 0.28) * k}" fill="none" stroke-width="${w * 0.34 * k}" stroke-linecap="round" style="stroke:#F6C9A0"/>`;
@@ -24597,7 +24782,7 @@ ${r.n}`;
       }
       // (on the head) eyes shut, listening
       case "listen":
-        return shut7(look, k);
+        return shut8(look, k);
       // a day out in Formentera (round 233, never done anywhere before): Mum in a straw sun hat with a palm basket on her arm,
       // holding up a leather sandal from the market; Dad on a turquoise hire bike ringing its bell; Ma Ma reaching up for a
       // fig, her basket half full; Gong Gong watching the flamingos through field glasses; Darren balancing one more flat
@@ -28661,7 +28846,7 @@ Quests finished today: ${S4.doneIds.length}`;
   var DEFAULT_LAST = [{ id: "l1", name: "Aircon servicing", last: null, every: 90 }, { id: "l2", name: "Change our sheets", last: null, every: 7 }, { id: "l3", name: "Evan's sheets", last: null, every: 7 }];
   var EVERY = [[0, "no reminder"], [7, "every week"], [14, "every 2 weeks"], [30, "every month"], [90, "every 3 months"], [180, "every 6 months"], [365, "every year"]];
   var KEY5 = "fox.hestia";
-  var fresh = () => ({
+  var fresh2 = () => ({
     zones: DEFAULT_ZONES,
     dailyTasks: DEFAULT_DAILY,
     weeklyTasks: DEFAULT_WEEKLY,
@@ -28686,9 +28871,9 @@ Quests finished today: ${S4.doneIds.length}`;
   });
   var H2 = (() => {
     try {
-      return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY5)) || {});
+      return Object.assign(fresh2(), JSON.parse(localStorage.getItem(KEY5)) || {});
     } catch {
-      return fresh();
+      return fresh2();
     }
   })();
   var api2 = null;
@@ -28726,7 +28911,7 @@ Quests finished today: ${S4.doneIds.length}`;
         return;
       }
       if (first || (remote.updatedAt || 0) > (H2.updatedAt || 0)) {
-        H2 = Object.assign(fresh(), remote);
+        H2 = Object.assign(fresh2(), remote);
         tidy();
         local();
         api2.changed();
@@ -28750,7 +28935,7 @@ Quests finished today: ${S4.doneIds.length}`;
       try {
         const cur2 = await ref3.get(), r = cur2.exists ? cur2.data() : null;
         if (r && (r.updatedAt || 0) > seen) {
-          H2 = Object.assign(fresh(), JSON.parse(JSON.stringify(r)));
+          H2 = Object.assign(fresh2(), JSON.parse(JSON.stringify(r)));
           seen = r.updatedAt;
           tidy();
           local();
@@ -32213,7 +32398,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return true;
   }
   var coin3 = () => icon("coin", 13);
-  var shut8 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  var shut9 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var dot2 = (c) => `<span class="gdot" style="background:${c}"></span>`;
   function counterPanel3(F2, st6) {
     const c = cocoaState(F2), day = dayKey(), hm12 = sgHM(), t2 = c.sold[day] || { n: 0, coins: 0 };
@@ -32223,14 +32408,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (ccUp(c, "hotchoc")) h3 += `<div class="row gprices"><span>Hot chocolate${t2.hot ? ` <small class="muted">(${t2.hot} today)</small>` : ""}</span><span class="gstep"><button class="btn small alt" data-cc="hprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.hot}</b><button class="btn small alt" data-cc="hprice" data-n="1" aria-label="Dearer">+</button></span></div><div class="actions"><button class="btn small primary" data-cc="hot" ${Object.values(c.choc).some((n) => n > 0) ? "" : "disabled"}>Have a hot chocolate</button></div>`;
     if (!st6.cart) h3 += `<form class="row hadd" data-ccname="1"><label class="sr" for="ccName">Shop name</label><input id="ccName" maxlength="30" value="${esc(c.name)}"><button class="btn small alt">Rename</button></form>`;
     if (ccUp(c, "vending") && !st6.cart && !st6.xmas) h3 += `<div class="row gprices"><span>Vending machine by the door${t2.vending ? ` <small class="muted">(${t2.vending} today)</small>` : ""}</span><span><b>${c.vend || 0}</b> ${coin3()} <button class="btn small alt" data-cc="vendbox" ${c.vend ? "" : "disabled"}>Empty it</button></span></div>`;
-    if (st6.cart) return h3 + counterBonbons(F2, st6.pk) + `<p class="muted">Mateo sells from the shop's stock: bars, bonbons from the case${ccUp(c, "hotchoc") ? ", and hot chocolate" : ""}. More people stop while you're serving.</p>` + shut8;
-    return h3 + counterBonbons(F2, st6.pk) + planPanel(F2, st6) + `<div class="actions"><button class="btn small alt" data-cc="ups">Shop upgrades</button></div><p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut8;
+    if (st6.cart) return h3 + counterBonbons(F2, st6.pk) + `<p class="muted">Mateo sells from the shop's stock: bars, bonbons from the case${ccUp(c, "hotchoc") ? ", and hot chocolate" : ""}. More people stop while you're serving.</p>` + shut9;
+    return h3 + counterBonbons(F2, st6.pk) + planPanel(F2, st6) + `<div class="actions"><button class="btn small alt" data-cc="ups">Shop upgrades</button></div><p class="muted">Yours are free. Tap a bonbon to have one. Customers buy bars and bonbons while the shop's open, more often while you're here.</p>` + shut9;
   }
   function barWallPanel(F2) {
     const c = cocoaState(F2);
     return `<span class="tape stripe" aria-hidden="true"></span><h2>The bar wall</h2><p class="sub">Wrapped bars, ready to sell. ${c.made} made so far.</p>
     <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${icon(BAR_ID(k), 26)}</span><span class="wtxt"><b>${d.n}</b><small>${c.bars[k]} bars</small></span></li>`).join("")}</ul>
-    <p class="muted">${Object.values(c.bars).some((n) => n) ? "Make more in the kitchen when it runs low." : "Empty! Beans to bars happens in the kitchen, through the door on the west wall."}</p>` + shut8;
+    <p class="muted">${Object.values(c.bars).some((n) => n) ? "Make more in the kitchen when it runs low." : "Empty! Beans to bars happens in the kitchen, through the door on the west wall."}</p>` + shut9;
   }
   function kitchenPanel(F2, which) {
     const c = cocoaState(F2);
@@ -32238,17 +32423,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const short = (k) => KINDS2[k].n.split(" ")[0].toLowerCase();
     const steps = `<p class="muted">Beans ${c.beans} · roasted ${c.roasted} · for bars ${Object.keys(KINDS2).map((k) => `${short(k)} ${c.choc[k]}`).join(", ")} · bonbon shelf ${Object.keys(KINDS2).map((k) => `${short(k)} ${c.res[k]}/${c.keep[k]}`).join(", ")}</p>`;
     if (which === "sacks") return `<span class="tape gingham" aria-hidden="true"></span><h2>Bean sacks</h2><p class="sub">Cacao beans, ${SACK} ${coin3()} a sack. A sack makes a pot of chocolate: 30 pieces.</p>
-    <p class="olabel">${c.beans} sack${c.beans === 1 ? "" : "s"} in the kitchen</p><div class="actions"><button class="btn primary" data-cc="beans" data-n="1" ${F2.coins < SACK ? "disabled" : ""}>Buy a sack (${SACK} ${coin3()})</button><button class="btn alt" data-cc="beans" data-n="3" ${F2.coins < SACK * 3 ? "disabled" : ""}>Three (${SACK * 3} ${coin3()})</button></div>${steps}` + shut8;
+    <p class="olabel">${c.beans} sack${c.beans === 1 ? "" : "s"} in the kitchen</p><div class="actions"><button class="btn primary" data-cc="beans" data-n="1" ${F2.coins < SACK ? "disabled" : ""}>Buy a sack (${SACK} ${coin3()})</button><button class="btn alt" data-cc="beans" data-n="3" ${F2.coins < SACK * 3 ? "disabled" : ""}>Three (${SACK * 3} ${coin3()})</button></div>${steps}` + shut9;
     if (which === "roaster") return `<span class="tape stripe" aria-hidden="true"></span><h2>The roaster</h2><p class="sub">${c.roast ? `Roasting a sack: ready in ${left3(c.roast.done)}.` : "Roast a sack of beans. Ten minutes, and the whole kitchen smells amazing."}</p>
-    <div class="actions"><button class="btn primary" data-cc="roast" ${c.roast || c.beans < 1 ? "disabled" : ""}>${c.beans < 1 ? "No beans: buy a sack" : "Roast a sack"}</button></div>${steps}` + shut8;
+    <div class="actions"><button class="btn primary" data-cc="roast" ${c.roast || c.beans < 1 ? "disabled" : ""}>${c.beans < 1 ? "No beans: buy a sack" : "Roast a sack"}</button></div>${steps}` + shut9;
     const gline = (g18) => c["grind" + g18] ? `Grinding ${KINDS2[c["grind" + g18].kind].n.toLowerCase()}: ready in ${left3(c["grind" + g18].done)}.` : c["ground" + g18] ? `A pot of ${KINDS2[c["ground" + g18]].n.toLowerCase()} is ready: temper it on the marble slab.` : "";
     if (which === "grinder") return `<span class="tape gingham" aria-hidden="true"></span><h2>The stone grinder${slots(c).length > 1 ? "s" : ""}</h2>${slots(c).length > 1 ? `<ul class="hlist">${slots(c).map((g18, i) => `<li><span><b>${i ? "Second" : "First"} grinder</b><small>${gline(g18) || "Free: ready for a sack of roasted beans."}</small></span></li>`).join("")}</ul>` : `<p class="sub">${gline("") || "Roasted beans in, chocolate out. It takes two hours."}</p>`}
-    ${freeSlot2(c) === void 0 ? "" : `<div class="actions">${Object.entries(KINDS2).map(([k, d]) => `<button class="btn ${k === "milk" ? "primary" : "alt"}" data-cc="grind" data-k="${k}" ${c.roasted < 1 ? "disabled" : ""}>${dot2(d.col)} ${d.n}</button>`).join("")}</div>${c.roasted < 1 ? `<p class="muted">${c.roast ? `A sack's in the roaster: ready in ${left3(c.roast.done)}.` : c.beans > 0 ? "No roasted beans yet. Roast a sack first (ten minutes):" : "No beans left: buy a sack, then roast it."}</p>${!c.roast && c.beans > 0 ? `<div class="actions"><button class="btn primary" data-cc="roast">Roast a sack</button></div>` : ""}` : ""}`}${steps}` + shut8;
+    ${freeSlot2(c) === void 0 ? "" : `<div class="actions">${Object.entries(KINDS2).map(([k, d]) => `<button class="btn ${k === "milk" ? "primary" : "alt"}" data-cc="grind" data-k="${k}" ${c.roasted < 1 ? "disabled" : ""}>${dot2(d.col)} ${d.n}</button>`).join("")}</div>${c.roasted < 1 ? `<p class="muted">${c.roast ? `A sack's in the roaster: ready in ${left3(c.roast.done)}.` : c.beans > 0 ? "No roasted beans yet. Roast a sack first (ten minutes):" : "No beans left: buy a sack, then roast it."}</p>${!c.roast && c.beans > 0 ? `<div class="actions"><button class="btn primary" data-cc="roast">Roast a sack</button></div>` : ""}` : ""}`}${steps}` + shut9;
     const pot5 = readyPot(c) === void 0 ? null : c["ground" + readyPot(c)];
     if (which === "slab") return `<span class="tape stripe" aria-hidden="true"></span><h2>The marble slab</h2><p class="sub">${pot5 ? `Temper the ${KINDS2[pot5].n.toLowerCase()}: spread, scrape, fold, until it shines.` : "Tempering makes chocolate snap and shine. Bring a pot from the grinder."}</p>
-    <div class="actions"><button class="btn primary" data-cc="temper" ${pot5 ? "" : "disabled"}>Temper it (${POT} pieces)</button></div>${steps}` + shut8;
+    <div class="actions"><button class="btn primary" data-cc="temper" ${pot5 ? "" : "disabled"}>Temper it (${POT} pieces)</button></div>${steps}` + shut9;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The moulds</h2><p class="sub">${MOULD} pieces of tempered chocolate make ${MOULD} bars, straight onto the bar wall.</p>
-    <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${dot2(d.col)}</span><span class="wtxt"><b>${d.n}</b><small>${c.choc[k]} pieces</small></span><button class="btn small primary" data-cc="mould" data-k="${k}" ${c.choc[k] < MOULD ? "disabled" : ""}>Mould ${MOULD} bars</button></li>`).join("")}</ul>${scoopSend(F2)}${steps}` + shut8;
+    <ul class="hlist wlist">${Object.entries(KINDS2).map(([k, d]) => `<li><span class="wpic">${dot2(d.col)}</span><span class="wtxt"><b>${d.n}</b><small>${c.choc[k]} pieces</small></span><button class="btn small primary" data-cc="mould" data-k="${k}" ${c.choc[k] < MOULD ? "disabled" : ""}>Mould ${MOULD} bars</button></li>`).join("")}</ul>${scoopSend(F2)}${steps}` + shut9;
   }
   function scoopSend(F2) {
     const c = cocoaState(F2), s = scoopState(F2), ok = c.choc.dark >= SEND;
@@ -32269,7 +32454,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const wines = wineShelf(F2);
     if (wines.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">From the wine shop</p><ul class="hlist wlist">${wines.map((b) => cell("wine_" + b.type, `${esc(b.name)} · ${b.n} on the shelf`, `<button class="btn small primary" data-cc="wine" data-k="${esc(b.id)}">Open a bottle (${WINE_FILLS})</button>`)).join("")}</ul>`;
     if (!bag2.length && !shelf6.length && !wines.length) h3 += `<p class="muted">Nothing to add right now. Hana's deli has honey, pandan, coffee, nuts and more; Ma Ma's farm shop has fruit and flowers.</p>`;
-    return h3 + shut8;
+    return h3 + shut9;
   }
   function bonbonPanel(F2, st6) {
     const c = cocoaState(F2), inS = Object.keys(c.pantry).filter((id) => c.pantry[id] > 0 && isFilling(id)), sel = (st6.sel || []).filter((id) => inS.includes(id)), shell3 = KINDS2[st6.shell] ? st6.shell : "dark";
@@ -32303,7 +32488,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const sp = specialOn(dayKey());
     if (sp) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Beside the case</p><p class="muted">${icon(sp.id, 20)} ${esc(sp.n)}: ${c.specials[sp.id] || 0} left, ${sp.price} ${coin3()} each, for ${esc(sp.fest)}.</p>`;
     h3 += `<div class="row gprices"><span>Price of a bonbon</span><span class="gstep"><button class="btn small alt" data-cc="bprice" data-n="-1" aria-label="Cheaper">−</button><b>${c.prices.bonbon}</b><button class="btn small alt" data-cc="bprice" data-n="1" aria-label="Dearer">+</button></span></div>`;
-    return h3 + shut8;
+    return h3 + shut9;
   }
   function upsPanel(F2) {
     const c = cocoaState(F2), btn4 = (k, u) => `<button class="btn small ${F2.coins >= u.price ? "primary" : "alt"}" data-cc="buyup" data-k="${k}" ${F2.coins >= u.price ? "" : "disabled"}>Buy · ${u.price} ${coin3()}</button>`;
@@ -32412,188 +32597,6 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     }
     if (!opts.length) return "";
     return `<p class="eyebrow" style="margin:14px 0 6px">Or from your other shops</p><ul class="hlist wlist">${opts.map((o) => `<li><span class="wtxt"><b>${esc(o.n)}</b><small>${esc(o.sub)}</small></span><button class="btn small primary" data-gvother="${esc(o.k)}">Choose</button></li>`).join("")}</ul>`;
-  }
-
-  // src/game/secret.js
-  var OLD = {
-    old_r1923: { n: "A dusty 1923 red", ico: "oldred", label: "Tomás Ruiz, 1923. The year the mill's sails were mended." },
-    old_s1958: { n: "A dusty 1958 sparkling", ico: "oldfizz", label: "Ruiz, 1958. Kept for a wedding." },
-    old_w1931: { n: "A dusty 1931 white", ico: "oldwhite", label: "Ruiz, 1931. The good summer." }
-  };
-  Object.entries(OLD).forEach(([id, o]) => {
-    ITEMS[id] = ITEMS[id] || {
-      n: o.n,
-      ico: o.ico,
-      kind: "gift",
-      to: ["dad", "gonggong", "mum", "darren", "mama", "angelina", "marcus"],
-      price: 0,
-      sell: 0,
-      say: "From a secret cave under the vineyard? A hundred years old? I'm going to save it for something very special.",
-      says: { gonggong: "Gong Gong was born after this bottle! Very old. Very precious.", dad: "Wah, 1920-something. We open this at Chinese New Year." }
-    };
-  });
-  var CAVE_MAX = 24;
-  var AGE_STEP = 7;
-  var AGE_MAX = 8;
-  var SUPPER = { dow: 1, from: 19 * 60, to: 21 * 60, pay: 22, seats: [[200, 430, 1], [320, 430, -1], [200, 480, 1], [320, 480, -1]] };
-  var POOL = ["noor", "felix", "elena", "lila", "mateo", "hazel", "farid", "pilar", "celeste", "opal", "aiko", "ben"];
-  var hash2 = (s) => {
-    let h3 = 0;
-    for (const c of String(s)) h3 = h3 * 31 + c.charCodeAt(0) | 0;
-    return Math.abs(h3);
-  };
-  var DAY = 864e5;
-  var days = (a, b) => Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / DAY);
-  function secretState(F2) {
-    const s = F2.secret = F2.secret || {};
-    s.step = s.step || 0;
-    s.laid = s.laid || [];
-    s.old = s.old || { old_r1923: 1, old_s1958: 1, old_w1931: 1 };
-    s.hosted = s.hosted || {};
-    return s;
-  }
-  var caveOpen = (F2) => secretState(F2).step >= 5;
-  var fresh2 = (s, day) => s.day !== day;
-  var advance = (s, n, day) => {
-    s.step = n;
-    s.day = day;
-    return n;
-  };
-  function cellarEnter(F2, day) {
-    const s = secretState(F2);
-    if (!(F2.goals && F2.goals.cellar)) return null;
-    if (s.step === 0) {
-      advance(s, 1, day);
-      return "The candle on the high table keeps leaning sideways, as if something's breathing. Maple's nose is pressed to the barrel racks.";
-    }
-    if (!fresh2(s, day) || s.said === day) return null;
-    s.said = day;
-    if (s.step === 1) return "That draught again, from behind the barrel racks. Maple won't leave them alone.";
-    if (s.step === 2) return "T.R. 1912, scratched in the old bricks. Where else have you seen those initials?";
-    if (s.step === 3) return "Where the stone turns, the key sleeps. The old millstone?";
-    if (s.step === 4) return "The iron key's heavy in your pocket. The loose brick, perhaps?";
-    return null;
-  }
-  function racksTap(F2, day) {
-    const s = secretState(F2);
-    if (s.step === 1 && fresh2(s, day)) {
-      advance(s, 2, day);
-      return "You roll the end barrel aside. Behind the racks the plaster's crumbled away: old bricks, cold air whistling through, and one brick scratched with T.R. 1912.";
-    }
-    if (s.step === 1) return null;
-    return null;
-  }
-  function brickTap(F2, day) {
-    const s = secretState(F2);
-    if (s.step === 4) {
-      advance(s, 5, day);
-      return "The scratched brick slides out. Behind it: a keyhole, crusted with rust. The iron key turns, stiff, then all at once. A narrow door groans open onto a stone passage, worn smooth by feet long gone, and a breath of cool air that smells of old oak and the sea.";
-    }
-    if (s.step >= 5) return null;
-    if (s.step === 3) return "T.R. 1912. You still need that key: where the stone turns...";
-    return "T.R. 1912. Tomás Ruiz? The railwayman who planted the olive tree by the mill, Ines's great-great-grandfather. His initials are carved in the beam at the old mill too. You run a finger over the brick: it moves, just a little.";
-  }
-  function photoTap(F2, day) {
-    const s = secretState(F2);
-    if (s.step === 2 && fresh2(s, day)) {
-      advance(s, 3, day);
-      return 'You lift the old photograph off its nail. On the back, in faded brown ink: "Where the stone turns, the key sleeps. T.R."';
-    }
-    return null;
-  }
-  function stoneTap(F2, day) {
-    const s = secretState(F2);
-    if (s.step === 3) {
-      s.step = 4;
-      s.key = day;
-      return "You run your hand under the lip of the old millstone. Wrapped in oilcloth, wedged in a gap in the stone: a heavy iron key, long as your hand.";
-    }
-    return null;
-  }
-  var laidCount = (F2) => secretState(F2).laid.reduce((n, l) => n + l.n, 0);
-  var bonus = (l, day) => Math.min(AGE_MAX, Math.floor(Math.max(0, days(l.at, day)) / AGE_STEP));
-  function layDown(F2, v, id, day) {
-    const s = secretState(F2), c = v.cellar.find((x) => x.id === id);
-    if (!c) return { msg: "That's not in the cellar." };
-    const room4 = CAVE_MAX - laidCount(F2);
-    if (room4 < 1) return { msg: "The alcoves are full: twenty-four bottles resting." };
-    const n = Math.min(room4, c.n);
-    c.n -= n;
-    if (!c.n) v.cellar = v.cellar.filter((x) => x !== c);
-    s.laid.push({ id: c.id, name: c.name, type: c.type, n, at: day, aged: c.aged || 0 });
-    return { n };
-  }
-  function bringUp(F2, v, i, day) {
-    const s = secretState(F2), l = s.laid[i];
-    if (!l) return null;
-    const aged = Math.min(AGE_MAX, (l.aged || 0) + bonus(l, day));
-    s.laid.splice(i, 1);
-    v.cellar.push({ id: l.id + "a" + Date.now().toString(36).slice(-3), name: l.name, type: l.type, n: l.n, aged, hold: true });
-    return { n: l.n, aged, name: l.name };
-  }
-  function takeOld(F2, id, open2) {
-    const s = secretState(F2);
-    if (!s.old[id]) return null;
-    s.old[id] = 0;
-    if (open2) return { opened: true };
-    F2.inv = F2.inv || {};
-    F2.inv[id] = (F2.inv[id] || 0) + 1;
-    return { opened: false };
-  }
-  var supperOn = (day) => (/* @__PURE__ */ new Date(day + "T00:00:00Z")).getUTCDay() === SUPPER.dow;
-  var supperNow = (day, hm12) => supperOn(day) && hm12 >= SUPPER.from && hm12 < SUPPER.to;
-  function supperGuests(day) {
-    const pool2 = [...POOL], out = [];
-    let k = 0;
-    while (out.length < 4 && pool2.length) {
-      const i = hash2(day + ":supper:" + k++) % pool2.length;
-      out.push(pool2.splice(i, 1)[0]);
-    }
-    return out;
-  }
-  function supperSlot(id, day, hm12) {
-    if (!supperNow(day, hm12)) return null;
-    const i = supperGuests(day).indexOf(id);
-    if (i < 0) return null;
-    const [x, y, d] = SUPPER.seats[i];
-    return { from: SUPPER.from, to: SUPPER.to, scene: "winecave", at: [x, y], dir: d, act: "sit" };
-  }
-  function host(F2, day) {
-    const s = secretState(F2);
-    if (s.hosted[day]) return null;
-    s.hosted = { [day]: true };
-    const coins = 4 * SUPPER.pay;
-    F2.coins = (F2.coins || 0) + coins;
-    return { coins };
-  }
-  var tape = `<span class="tape gingham" aria-hidden="true"></span>`;
-  var shut9 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
-  var TYPE = { red: "Red", rose: "Rosé", white: "White", sparkling: "Sparkling", pinot: "Pinot noir", tempranillo: "Tempranillo", chardonnay: "Chardonnay" };
-  function alcovesPanel(F2, v, day) {
-    const s = secretState(F2), n = laidCount(F2);
-    let h3 = `${tape}<h2>The ageing alcoves</h2><p class="sub">Cool and still, the way the monks built it. Wine laid down here gains a coin a bottle for every week it rests, up to ${AGE_MAX}. ${n} of ${CAVE_MAX} places taken.</p>`;
-    if (s.laid.length) h3 += `<p class="eyebrow">Resting</p><ul class="hlist wlist">${s.laid.map((l, i) => {
-      const b = Math.min(AGE_MAX, (l.aged || 0) + bonus(l, day));
-      return `<li><span class="wtxt"><b>${esc(l.name)}</b><small>${TYPE[l.type] || ""} · ${l.n} bottle${l.n === 1 ? "" : "s"} · ${b ? `+${b} a bottle so far` : "laid down this week"}</small></span><button class="btn small alt" data-cave="up:${i}">Bring it up</button></li>`;
-    }).join("")}</ul>`;
-    const down = (v.cellar || []).filter((c) => c.n > 0 && !c.rack);
-    h3 += `<p class="eyebrow">From the cellar</p>` + (down.length ? `<ul class="hlist wlist">${down.map((c) => `<li><span class="wtxt"><b>${esc(c.name)}</b><small>${TYPE[c.type] || ""} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.aged ? ` · already +${c.aged}` : ""}</small></span><button class="btn small primary" data-cave="lay:${esc(c.id)}" ${n >= CAVE_MAX ? "disabled" : ""}>Lay it down</button></li>`).join("")}</ul>` : `<p class="muted">Nothing waiting in the cellar. Bottle a barrel, or keep a wine back, and it can rest here.</p>`);
-    return h3 + `<p class="muted">Brought up, it waits in the cellar (kept back) and sells for the extra on the shelves.</p>` + shut9;
-  }
-  function oldPanel(F2) {
-    const s = secretState(F2), left7 = Object.keys(OLD).filter((k) => s.old[k]);
-    let h3 = `${tape}<h2>Forgotten bottles</h2><p class="sub">Three bottles under a hundred years of dust, each with a paper tag in Tomás's hand.</p>`;
-    if (!left7.length) return h3 + `<p class="muted">The niche is empty now, just a candle and the cobwebs.</p>` + shut9;
-    h3 += `<ul class="hlist wlist">${left7.map((k) => `<li style="flex-wrap:wrap"><span class="wpic">${icon(OLD[k].ico, 34)}</span><span class="wtxt"><b>${esc(OLD[k].n)}</b><small>"${esc(OLD[k].label)}"</small></span>
-    <span style="flex-basis:100%;display:flex;gap:6px;justify-content:flex-end"><button class="btn small primary" data-cave="take:${k}">Keep it</button><button class="btn small alt" data-cave="open:${k}">Open it here</button></span></li>`).join("")}</ul>`;
-    return h3 + `<p class="muted">Kept, it goes in your backpack: a gift the family will treasure.</p>` + shut9;
-  }
-  function tablePanel(F2, day, hm12, here) {
-    const s = secretState(F2), on = supperNow(day, hm12);
-    let h3 = `${tape}<h2>The supper table</h2>`;
-    if (!on) return h3 + `<p class="sub">Mondays, 7 to 9pm: a candlelit supper for four down here. Come and host, and they'll pay ${SUPPER.pay} coins each.</p>` + shut9;
-    if (s.hosted[day]) return h3 + `<p class="sub">Supper's under way: candlelight, old stories and the good glasses. You're hosting tonight.</p>` + shut9;
-    return h3 + `<p class="sub">Four guests at the long table${here ? "" : " (on their way down)"}. Light the candelabra and pour?</p><div class="actions"><button class="btn primary" data-cave="host">Host supper</button></div>` + shut9;
   }
 
   // src/game/browse.js
@@ -59626,7 +59629,7 @@ ${SIGNOFF[t2.who] || ""}`;
         const r = bringUp(F, v, +k, day);
         if (!r) return;
         sfx("chime", true);
-        speak(r.aged ? `${r.name}, up to the cellar: +${r.aged} a bottle for its rest.` : `${r.name}, back up to the cellar. It hardly had time to sleep.`, 4500);
+        speak(r.aged ? `${r.name}, up to the cellar: ${r.pct}% more for its rest, +${r.coins} a bottle.` : `${r.name}, back up to the cellar. It hardly had time to sleep.`, 4500);
       } else if (a === "take") {
         if (!takeOld(F, k, false)) return;
         sfx("chime", true);

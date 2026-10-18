@@ -4864,7 +4864,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(SC.cellarEnter(F, "2026-10-12") && SC.secretState(F).step === 1 && !SC.racksTap(F, "2026-10-12"), "a draught in the cellar, and no more than one clue a day");
     check(!SC.cellarEnter(F, "2026-10-12") && SC.cellarEnter(F, "2026-10-20") && SC.racksTap(F, "2026-10-20") && SC.secretState(F).step === 2, "miss a week and the trail waits: behind the racks, old bricks scratched T.R. 1912");
     check(!SC.photoTap(F, "2026-10-20") && SC.photoTap(F, "2026-10-21") && SC.stoneTap(F, "2026-10-21") && SC.brickTap(F, "2026-10-21") && SC.caveOpen(F), "the back of the mill's photograph, the key under the millstone, and the brick hides a keyhole: the passage opens");
-    check(SC.layDown(F, v, "w1", "2026-10-21").n === 6 && !v.cellar.length && SC.bringUp(F, v, 0, "2026-11-18").aged === 4 && v.cellar[0].hold, "laid down four weeks in the ageing alcoves: +4 a bottle, back in the cellar kept back");
+    check(SC.layDown(F, v, "w1", "2026-10-21").n === 6 && !v.cellar.length && SC.bringUp(F, v, 0, "2026-11-18").coins === 7 && v.cellar[0].aged === 4 && v.cellar[0].hold, "laid down four weeks in the ageing alcoves: +40%, so +7 on an 18 coin red, back in the cellar kept back");
+    check(SC.agedCoins("tempranillo", 12) === 22 && SC.agedCoins("rose", 8) === 12, "ageing scales with the wine: up to 80%, 22 more on a tempranillo, 12 on a rosé");
     check(SC.takeOld(F, "old_r1923", false) && F.inv.old_r1923 === 1 && !SC.takeOld(F, "old_r1923", false), "a forgotten 1923 red, into the backpack (only one of each)");
     { const ST = await import(new URL("../src/game/stories.js", import.meta.url)), G = {secret: {step: 4}, met: {hazel: 1}, storyDay: "2026-10-22"};
       const before = ST.storyReady(G, "hazel", "2026-10-22"); G.secret.step = 5;

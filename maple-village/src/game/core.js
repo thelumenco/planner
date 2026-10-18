@@ -3756,7 +3756,7 @@ function cocoaNow(){
 function wireCave(c){
   c.querySelectorAll("[data-cave]").forEach(b => b.onclick = () => { const [a, k] = b.dataset.cave.split(":"), day = dayKey(), v = vineState(F);
     if (a === "lay") { const r = SC.layDown(F, v, k, day); if (r.msg) return speak(r.msg, 4000); sfx("paper", true); flash(`${r.n} bottle${r.n === 1 ? "" : "s"} laid down to rest`); }
-    else if (a === "up") { const r = SC.bringUp(F, v, +k, day); if (!r) return; sfx("chime", true); speak(r.aged ? `${r.name}, up to the cellar: +${r.aged} a bottle for its rest.` : `${r.name}, back up to the cellar. It hardly had time to sleep.`, 4500); }
+    else if (a === "up") { const r = SC.bringUp(F, v, +k, day); if (!r) return; sfx("chime", true); speak(r.aged ? `${r.name}, up to the cellar: ${r.pct}% more for its rest, +${r.coins} a bottle.` : `${r.name}, back up to the cellar. It hardly had time to sleep.`, 4500); }
     else if (a === "take") { if (!SC.takeOld(F, k, false)) return; sfx("chime", true); gainXp(1); flash(`${SC.OLD[k].n}, into your backpack`); }
     else if (a === "open") { if (!SC.takeOld(F, k, true)) return; sfx("chime", true); gainXp(2); act("cheer");
       speak(k === "old_s1958" ? "The cork sighs out after sixty-odd years. Tiny, tired bubbles, and it tastes of honey and toast. You raise the glass to Tomás." : k === "old_r1923" ? "It pours brick-red, soft as velvet, a little like dried figs and old leather. A hundred years in one sip. To Tomás." : "Golden, nutty, still alive after all this time. You can almost taste that good summer. To Tomás.", 7500); }
