@@ -4858,6 +4858,40 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\nThe secret passage under the cellar, and Tomás's wine cave (round 244)");
+  const SC = await import(new URL("../src/game/secret.js", import.meta.url));
+  { const F = {goals: {cellar: 1}}, v = {cellar: [{id: "w1", name: "Lane Red", type: "red", n: 6}], shelf: []};
+    check(SC.cellarEnter(F, "2026-10-12") && SC.secretState(F).step === 1 && !SC.racksTap(F, "2026-10-12"), "a draught in the cellar, and no more than one clue a day");
+    check(!SC.cellarEnter(F, "2026-10-12") && SC.cellarEnter(F, "2026-10-20") && SC.racksTap(F, "2026-10-20") && SC.secretState(F).step === 2, "miss a week and the trail waits: behind the racks, old bricks scratched T.R. 1912");
+    check(!SC.photoTap(F, "2026-10-20") && SC.photoTap(F, "2026-10-21") && SC.stoneTap(F, "2026-10-21") && SC.brickTap(F, "2026-10-21") && SC.caveOpen(F), "the back of the mill's photograph, the key under the millstone, and the brick hides a keyhole: the passage opens");
+    check(SC.layDown(F, v, "w1", "2026-10-21").n === 6 && !v.cellar.length && SC.bringUp(F, v, 0, "2026-11-18").aged === 4 && v.cellar[0].hold, "laid down four weeks in the ageing alcoves: +4 a bottle, back in the cellar kept back");
+    check(SC.takeOld(F, "old_r1923", false) && F.inv.old_r1923 === 1 && !SC.takeOld(F, "old_r1923", false), "a forgotten 1923 red, into the backpack (only one of each)");
+    check(SC.supperGuests("2026-10-26").length === 4 && SC.supperSlot(SC.supperGuests("2026-10-26")[0], "2026-10-26", 19*60 + 30).scene === "winecave" && !SC.supperSlot(SC.supperGuests("2026-10-26")[0], "2026-10-27", 19*60 + 30) && SC.host(F, "2026-10-26").coins === 88 && !SC.host(F, "2026-10-26"), "Monday suppers for four in the cave, hosted once a night"); }
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`cave pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/cave=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = Object.assign(f.goals || {}, {cellar: 1, mill: 1});
+    f.secret = {step: 4, day: "2026-10-10", laid: [], old: {old_r1923: 1, old_s1958: 1, old_w1931: 1}, hosted: {}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=19:20&date=2026-10-12"); await page.waitForTimeout(700);
+  await page.goto(url + "?seed=1&time=19:20&date=2026-10-12&cave=1"); await page.waitForTimeout(1200);
+  const sf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).secret);
+  await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1500);
+  check(await page.locator('#world [data-secret="brick"]').count() === 1, "in the cellar, the patch of old bricks");
+  await page.locator('#world [data-secret="brick"]').dispatchEvent("click"); await page.waitForTimeout(5000);
+  check((await sf()).step === 5 && await page.locator('#world [data-secret="door"]').count() === 1, "the key turns in the brick: a narrow door in the cellar wall");
+  await page.locator('#world [data-secret="door"]').dispatchEvent("click"); await page.waitForFunction(() => /wine cave/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(3000);
+  check(await page.locator('#world [data-cavespot]').count() >= 5 && await page.locator('#actors .npc.act-sit').count() >= 3, "Tomás's wine cave: the alcoves, the forgotten bottles, the press, the gate, and Monday supper guests at the table");
+  await page.locator('#world [data-cavespot="table"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-cave="host"]', { timeout: 20000 });
+  const c0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins); await page.click('#ctx [data-cave="host"]'); await page.waitForTimeout(500);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins) === c0 + 88, "host the candlelit supper: 22 coins a guest");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await page.locator('#world [data-cavespot="gate"]').dispatchEvent("click"); await page.waitForFunction(() => /kitchen/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(1500);
+  check((await sf()).through && await page.locator('#world [data-secret="passage"]').count() === 1, "through the rusty gate: out behind the shelves of the Scoop Shack's kitchen, and the way back in");
+  await page.close();
+}
+{
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
   const missing = Object.entries(sd.STORIES).flatMap(([id, chs]) => chs.map((c, i) => i > 0 && !c.recap ? id + ":" + i : null).filter(Boolean));

@@ -429,6 +429,11 @@ I.clams = [`<path d="M4 15a8 7 0 0 1 16 0z" ${f("#E8DCC8")}/><path d="M6 15c2 3 
 I.kite = [`<path d="M12 2l7 8-7 9-7-9z" ${f("#E8566C")}/><path d="M12 2v17M5 10h14" ${f("none")} style="stroke:#FFFDF6"/><path d="M12 19q-2 2 0 3q2 1 0 2" ${f("none")}/>`, `<path d="M12 2l7 8-7 9-7-9zM12 2v17M5 10h14M12 19q-2 2 0 3"/>`];
 I.popcorn = [`<path d="M6 10h12l-2 11H8z" ${f("#E8566C")}/><path d="M9 10l-.6 11M12 10v11M15 10l.6 11" ${f("none")} style="stroke:#FFFDF6" stroke-width="1.6"/>${[[8, 8], [11, 6], [14, 7], [16, 9], [10, 9], [13, 9]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.2" ${f("#FFF6DC")}/>`).join("")}`, `<path d="M6 10h12l-2 11H8z"/>`];
 I.shrimp = [`<path d="M6 8c6-3 13 0 13 6s-6 7-10 5c3-1 5-3 4-5-1-3-5-3-7-6z" ${f("#F28C6A")}/><path d="M6 8l-3-3M6 8l-4 0" ${f("none")}/>`, `<path d="M6 8c6-3 13 0 13 6s-6 7-10 5c3-1 5-3 4-5-1-3-5-3-7-6zM6 8l-3-3M6 8h-4M12 9l1 3M15 10l0 3"/>`];
+// round 244: the forgotten bottles in the secret wine cave (dusty, with a cobweb)
+const oldBottle = (glass, label, top) => [`<path d="M10 2h4v4c2 1.4 3 3 3 5.5V21a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V11.5C7 9 8 7.4 10 6z" ${f(glass)}/><rect x="9" y="12" width="6" height="5" rx=".6" ${f(label)}/><rect x="9.6" y="1" width="4.8" height="3" rx=".8" ${f(top)}/><path d="M7.4 14.5c2 .8 3 2.4 2.4 4.6M16.6 9.6c-1.4 1-2 2.4-1.4 4" ${f("none")} style="stroke:#E8E2D6" stroke-width=".7" opacity=".9"/><path d="M8 20.5h8" ${f("none")} style="stroke:#C9BFAE" stroke-width="1.6" opacity=".7"/>`, `<path d="M10 2h4v4c2 1.4 3 3 3 5.5V21a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V11.5C7 9 8 7.4 10 6z"/><rect x="9" y="12" width="6" height="5" rx=".6"/>`];
+I.oldred = oldBottle("#3E1E24", "#E8D9B8", "#7A1F2D");
+I.oldfizz = oldBottle("#3F4A2E", "#EFE6CC", "#C9A23A");
+I.oldwhite = oldBottle("#C9B46A", "#F4EBD4", "#8A6A3A");
 export const icon = (name, size = 24, cls = "") => `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false">${body(name)}</svg>`;
 export const iconAt = (name, x, y, size = 24, cls = "") => `<svg x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" viewBox="0 0 24 24" overflow="visible"${cls ? ` class="${cls}"` : ""} pointer-events="none">${body(name)}</svg>`;
 export const ICON_NAMES = Object.keys(I);

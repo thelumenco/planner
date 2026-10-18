@@ -2644,3 +2644,16 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - The cellar has no exit mat: its door on the east wall (`data-exit`, labelled "Wine shop") is the way back up (art/scenes.js `roomArt`).
 - **The cellar store** (vineyard.js `cellarPanel`, opened from the wine wall, `vyView = "cellar"`): every bottled wine waits in the cellar; "Keep it here" sets `hold` so Celeste's stocking skips it (`sellTick` filters `!c.hold`), "To the shelves" stocks it, and "Back down" (`unstock`) brings a shelf wine back down (kept). It also shows the barrel racks (12 down here once the cellar door's open, beside the shed's 6) with a button for another barrel.
 - Test in "The terrace and the Sunday long lunch (round 146)".
+
+## Round 244: the secret passage and Tomás's wine cave (Mel: "what if the cellar had a secret passageway that needed to be discovered"; "wine cave with all four, a few days of clues, except it leads to the bay")
+- **The story:** Tomás Ruiz (the railwayman of 1912, Ines's great-great-grandfather) dug a wine cave under the vineyard and hid the key. His initials are already carved in the mill's beam (art/mill.js "T.R. 1912").
+- **The trail** (game/secret.js, `F.secret.step`; at most one new clue a day, and it waits if Mel misses days):
+  1. walking into the cellar (once the cellar door's built): the candle on the high table leans, Maple noses the racks (`cellarEnter`);
+  2. a later day, tap the barrel racks: old bricks behind them, one scratched T.R. 1912 (`racksTap`);
+  3. a later day, the old photograph at the mill: on the back, "Where the stone turns, the key sleeps" (`photoTap`);
+  4. straight after, the millstone: the iron key (`stoneTap`);
+  5. the bricks in the cellar: a keyhole, and a narrow door opens (`brickTap`).
+  On a new day mid-trail, Maple gives a gentle nudge when Mel walks into the cellar.
+- **The cave** (scene `winecave`, INNER under `cellar`; art/winecave.js `caveArt`, `cellarSecretArt(step)`, `kitchenSecretArt`): ageing alcoves (`layDown`/`bringUp`: up to 24 bottles; +1 coin a bottle a week, up to 8; `c.aged` rides on the cellar entry and vineyard `stock()` adds it to the shelf price), three forgotten bottles (`OLD`: a 1923 red, a 1958 sparkling, a 1931 white; keep one as a family gift or open it there), Monday candlelit suppers 7 to 9pm for four villagers (`supperSlot`, in npcs `slotAt` once the cave is found; Mel hosts once a night for 88), the old press, and a rusty gate that comes out behind a shelf panel in the Scoop Shack's gelato kitchen (`F.secret.through`; the panel is the way back in).
+- Icons `oldred`, `oldfizz`, `oldwhite` (icons.js). core.js: `caveView`, `wireCave`, `data-secret` and `data-cavespot` taps.
+- Test: "The secret passage under the cellar, and Tomás's wine cave (round 244)".
