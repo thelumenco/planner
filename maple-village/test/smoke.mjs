@@ -4834,6 +4834,26 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\nPassers-by walk up to the campervan pop-up (round 241)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`popup pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/van=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.bellbird = {stamps: {bv_gate: "2026-10-01"}}; f.trip = {town: "bv_gate", day: "2026-10-12", party: [], from: 7*60, by: "van"}; f.craft = f.craft || {}; f.craft.van = {items: {}, wine: [{sid: "w1", name: "House red", type: "red", price: 18, n: 6}]};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-12"); await page.waitForTimeout(700);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-12&van=1"); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__mapleScene("bg_gate")); await page.waitForTimeout(1500);
+  const c0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins);
+  await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("fox.fox")); window.__realRandom = Math.random; Math.random = () => .01; });
+  await page.waitForFunction(() => document.querySelector("#actors .shopper"), null, { timeout: 90000 }).catch(() => {});
+  const seen = await page.locator("#actors .shopper").count();
+  await page.evaluate(() => { Math.random = window.__realRandom; });
+  await page.waitForTimeout(6000);
+  const f = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  check(seen === 1 && f.coins > c0 && (f.craft.van.wine[0] || {n: 0}).n < 6, "standing by the van, a passer-by walks up to the pop-up crate and buys something");
+  await page.close();
+}
+{
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
   const missing = Object.entries(sd.STORIES).flatMap(([id, chs]) => chs.map((c, i) => i > 0 && !c.recap ? id + ":" + i : null).filter(Boolean));

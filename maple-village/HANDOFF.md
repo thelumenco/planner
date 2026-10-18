@@ -2634,3 +2634,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Round 240 (Mel: "check that nobody stands on tables or market stalls")
 - millcraft.js: Hazel stood at [410, 508], the middle of the soap workshop table; she now teaches from the open floor at its left end, [346, 508], facing the table. Test in "Mulled wine, and the mill workshop and shop (round 153)".
 - Checked by screenshot, with people in place: the mill's tasting table and workshop, the Sunday market, the night market, the Christmas market, the terrace long lunch, the wine shop, the Cocoa Room and disco night at the cellar. Stall keepers are behind their counters (stallFronts), diners are seated, nobody else is on a table.
+
+## Round 241 (Mel: "nobody actually came up and bought stuff from my campervan pop-up")
+- The crate sold quietly (a coin flash, about one sale every 25 minutes) and nobody was seen buying. Now `VAN_CRATE` is `{p: .05, here: .14}`: a sale about every 20 minutes while Mel's anywhere at the stop, about every 7 while she's on the van's screen (`vanSellMinute(F, here)`).
+- On the van's screen each sale is a passer-by (npcs.js `shopperVisit(look, at, onArrive)`, one of the regions' locals or a tourist): they stroll in from the side, stop at the crate, say something short ("I'll take one!"), the coins arrive, and they wander off. Sales made while Mel was elsewhere are added up quietly as before.
+- Test: "Passers-by walk up to the campervan pop-up (round 241)".

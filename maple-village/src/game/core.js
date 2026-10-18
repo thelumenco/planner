@@ -40,7 +40,7 @@ import { loadDesk, deskPanel, wireDesk } from "./desk.js";
 import { kid, kidPanel, wireKid, stopKidGame, SNACKS, snackPic, EVAN_TAPS, pickSay } from "./kid.js";
 import { addReminder, cancelReminder, upcoming as upcomingReminders, dueNow, fmtWhen } from "./reminders.js";
 import { sendOptions, takeSend, sendMorePanel } from "./bikesend.js";
-import { rideBy, initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos, daySchedule, clearSlots } from "./npcs.js";
+import { rideBy, shopperVisit, initNpcs, tickNpcs, tapNpc, npcActors, resetScene as resetNpcs, courierDelivered, isHere, whereIs, npcSay, npcPos, daySchedule, clearSlots } from "./npcs.js";
 import { dishArt, glassArt } from "../art/wine.js";
 import { fieldArt, stallFront } from "../art/field.js";
 import { shoreArt } from "../art/shore.js";
@@ -3418,9 +3418,18 @@ function millShopPanel(){
 function crateTick(){
   const c = craftState(F), t = tripOn(F), now = Date.now(), here = t && t.by === "van" && townOf(scene) === t.town && crateCount(vanCrate(F)) > 0 && !evanNight();
   if (!here) { c.vanAt = now; return; } let coins = 0; const what = [];
-  for (let at = (c.vanAt || now) + 60000; at <= now; at += 60000) { const r = vanSellMinute(F); if (r) { coins += r.coins; what.push(r.what); } }
+  // round 241: while Mel's on the van's screen, sales come quicker and each buyer walks up to the crate in person
+  const T = TOWNS[t.town], st = T && TOWN_PLACES[T.station], atVan = !!(st && st.scene === scene), live = atVan && now - (c.vanAt || now) < 3*60000;
+  for (let at = (c.vanAt || now) + 60000; at <= now; at += 60000) { const r = vanSellMinute(F, atVan); if (r) { coins += r.coins; what.push(r.what); } }
   c.vanAt = (c.vanAt || now) + Math.floor((now - (c.vanAt || now))/60000)*60000;
-  if (coins) { F.coins += coins; sfx("coin"); flash(`+${coins}: ${what.length === 1 ? `a passer-by bought ${what[0]}` : `${what.length} sales`} at the van`); save(); }
+  if (!coins) return;
+  F.coins += coins; save();
+  const tell = () => { sfx("coin"); flash(`+${coins}: ${what.length === 1 ? `a passer-by bought ${what[0]}` : `${what.length} sales`} at the van`); };
+  if (!live || what.length > 1) { tell(); drawScene(); return; }
+  const locals = NPCS.filter(n => (n.local === "bellbird" || n.tourist) && n.look), who = locals.length ? pick(locals) : pick(NPCS), [dx, dy] = st.door;
+  const v = shopperVisit(who.look, [dx + 52, dy + 14], g => { tell(); drawScene(); const line = pick(["I'll take one!", "Ooh, lovely!", "One for my mum.", "From your own mill?", "What a sweet pop-up!"]), w = line.length*5.4 + 16;
+    g.insertAdjacentHTML("beforeend", `<g transform="translate(0 -84)"><rect x="${-w/2}" y="-11" width="${w}" height="18" rx="9" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1"/><text y="2" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9.5" fill="#2F2B28">${line}</text></g>`); });
+  if (!v) { tell(); drawScene(); }
 }
 /* ---------- round 236: the holiday cottages (game/lets.js, game/letpanels.js, art/cottages.js) ---------- */
 function coArt(){

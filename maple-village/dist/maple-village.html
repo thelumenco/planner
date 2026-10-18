@@ -33170,7 +33170,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const next = UNMADE.find(([k, b, a]) => !c.recipes.some((r) => r.kind === k && (r.base || null) === (k === "soap" ? b : null) && r.adds.join() === [...a].sort().join()));
     return { tips, hint: next ? craftName(next[0], next[1], next[2]) : null };
   }
-  var VAN_CRATE = { max: 24, p: 0.04 };
+  var VAN_CRATE = { max: 24, p: 0.05, here: 0.14 };
   function vanCrate(F2) {
     const c = craftState(F2);
     c.van = c.van || { items: {}, wine: [] };
@@ -33211,9 +33211,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     });
     vc.wine = [];
   }
-  function vanSellMinute(F2) {
+  function vanSellMinute(F2, here) {
     const vc = vanCrate(F2), opts = [...Object.keys(vc.items).filter((id) => vc.items[id] > 0 && ITEMS[id]).map((id) => ({ id })), ...vc.wine.filter((w) => w.n > 0).map((w) => ({ w }))];
-    if (!opts.length || Math.random() >= VAN_CRATE.p) return null;
+    if (!opts.length || Math.random() >= (here ? VAN_CRATE.here : VAN_CRATE.p)) return null;
     const o = opts[Math.floor(Math.random() * opts.length)];
     if (o.w) {
       o.w.n--;
@@ -33855,6 +33855,48 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       else out.push({ key, from: t2, to: t2 + 15, scene: s && s.scene, act: s && s.act, dinner: !!(s && s.dinner), club: !!(s && s.club) });
     }
     return schedCache[ck] = out.filter((x) => x.scene);
+  }
+  function shopperVisit(look, at9, onArrive, side = Math.random() < 0.5 ? 1 : -1) {
+    const host = $("actors");
+    if (!host || host.querySelector(".shopper")) return null;
+    const g17 = document.createElementNS(NS, "g");
+    g17.setAttribute("class", "ch npc walk shopper");
+    g17.setAttribute("pointer-events", "none");
+    g17.innerHTML = personArt(look, false);
+    host.appendChild(g17);
+    const xo = side > 0 ? 560 : -40, walk2 = Math.min(4200, Math.abs(at9[0] - xo) * 14), stay = 2600, t0 = performance.now();
+    let arrived2 = false;
+    const face = (d) => g17.firstElementChild.setAttribute("transform", `scale(${d} 1)`);
+    const step6 = (now5) => {
+      const t2 = now5 - t0;
+      let x;
+      if (t2 < walk2) {
+        x = xo + (at9[0] - xo) * (t2 / walk2);
+        face(at9[0] > xo ? 1 : -1);
+      } else if (t2 < walk2 + stay) {
+        x = at9[0];
+        if (!arrived2) {
+          arrived2 = true;
+          g17.classList.remove("walk");
+          face(at9[0] > 280 ? 1 : -1);
+          if (onArrive) onArrive(g17);
+        }
+      } else {
+        const k = Math.min(1, (t2 - walk2 - stay) / walk2);
+        x = at9[0] + (xo - at9[0]) * k;
+        if (!g17.classList.contains("walk")) g17.classList.add("walk");
+        face(xo > at9[0] ? 1 : -1);
+        if (k >= 1) {
+          g17.remove();
+          return;
+        }
+      }
+      g17.setAttribute("transform", `translate(${x.toFixed(1)} ${at9[1]})`);
+      g17.style.opacity = Math.min(1, t2 / 400, (walk2 * 2 + stay - t2) / 400).toFixed(2);
+      if (g17.isConnected) requestAnimationFrame(step6);
+    };
+    requestAnimationFrame(step6);
+    return g17;
   }
   function rideBy(look, y, dir = Math.random() < 0.5 ? 1 : -1, ms = 6500, xr = [-50, 570]) {
     const host = $("actors");
@@ -58303,19 +58345,37 @@ ${SIGNOFF[t2.who] || ""}`;
     }
     let coins = 0;
     const what = [];
+    const T2 = TOWNS[t2.town], st6 = T2 && TOWN_PLACES[T2.station], atVan = !!(st6 && st6.scene === scene), live3 = atVan && now5 - (c.vanAt || now5) < 3 * 6e4;
     for (let at9 = (c.vanAt || now5) + 6e4; at9 <= now5; at9 += 6e4) {
-      const r = vanSellMinute(F);
+      const r = vanSellMinute(F, atVan);
       if (r) {
         coins += r.coins;
         what.push(r.what);
       }
     }
     c.vanAt = (c.vanAt || now5) + Math.floor((now5 - (c.vanAt || now5)) / 6e4) * 6e4;
-    if (coins) {
-      F.coins += coins;
+    if (!coins) return;
+    F.coins += coins;
+    save2();
+    const tell = () => {
       sfx("coin");
       flash(`+${coins}: ${what.length === 1 ? `a passer-by bought ${what[0]}` : `${what.length} sales`} at the van`);
-      save2();
+    };
+    if (!live3 || what.length > 1) {
+      tell();
+      drawScene();
+      return;
+    }
+    const locals = NPCS.filter((n) => (n.local === "bellbird" || n.tourist) && n.look), who3 = locals.length ? pick(locals) : pick(NPCS), [dx, dy] = st6.door;
+    const v = shopperVisit(who3.look, [dx + 52, dy + 14], (g17) => {
+      tell();
+      drawScene();
+      const line = pick(["I'll take one!", "Ooh, lovely!", "One for my mum.", "From your own mill?", "What a sweet pop-up!"]), w = line.length * 5.4 + 16;
+      g17.insertAdjacentHTML("beforeend", `<g transform="translate(0 -84)"><rect x="${-w / 2}" y="-11" width="${w}" height="18" rx="9" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1"/><text y="2" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9.5" fill="#2F2B28">${line}</text></g>`);
+    });
+    if (!v) {
+      tell();
+      drawScene();
     }
   }
   function coArt() {

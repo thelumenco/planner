@@ -280,7 +280,7 @@ export function helpWorkshop(F){ const c = craftState(F); c.helped = dayKey(); c
 /* ---------- the pop-up crate in the campervan ---------- */
 // Mel packs a crate at the van's fold-down table: things off the mill's shelves and bottles off the wine shop's shelves
 // (up to two dozen). On a campervan trip, with the crate out by the van, passers-by buy from it while she's at the stop.
-export const VAN_CRATE = {max: 24, p: .04};
+export const VAN_CRATE = {max: 24, p: .05, here: .14};   // round 241: a sale about every 20 minutes at the stop, every 7 or so while Mel's standing by the van
 export function vanCrate(F){ const c = craftState(F); c.van = c.van || {items: {}, wine: []}; return c.van; }
 export const crateCount = vc => Object.values(vc.items).reduce((a, b) => a + b, 0) + vc.wine.reduce((a, w) => a + w.n, 0);
 export function packCrate(F, v, key, n = 1){
@@ -292,9 +292,9 @@ export function unpackCrate(F, v){ const vc = vanCrate(F), c = craftState(F);
   Object.entries(vc.items).forEach(([id, n]) => { c.store[id] = (c.store[id] || 0) + n; }); vc.items = {};
   vc.wine.forEach(w => { const s = v.shelf.find(x => x.id === w.sid); if (s) s.n += w.n; else v.shelf.push({id: w.sid, name: w.name, type: w.type, price: w.price, n: w.n, open: 0}); }); vc.wine = []; }
 // a minute at a campervan stop with the crate out: maybe a passer-by buys something -> {coins, what} or null
-export function vanSellMinute(F){
+export function vanSellMinute(F, here){
   const vc = vanCrate(F), opts = [...Object.keys(vc.items).filter(id => vc.items[id] > 0 && ITEMS[id]).map(id => ({id})), ...vc.wine.filter(w => w.n > 0).map(w => ({w}))];
-  if (!opts.length || Math.random() >= VAN_CRATE.p) return null; const o = opts[Math.floor(Math.random()*opts.length)];
+  if (!opts.length || Math.random() >= (here ? VAN_CRATE.here : VAN_CRATE.p)) return null; const o = opts[Math.floor(Math.random()*opts.length)];
   if (o.w) { o.w.n--; const what = `a bottle of ${o.w.name}`; vc.wine = vc.wine.filter(w => w.n > 0); return {coins: o.w.price, what}; }
   vc.items[o.id]--; if (!vc.items[o.id]) delete vc.items[o.id]; return {coins: ITEMS[o.id].price, what: ITEMS[o.id].n.replace(/^A (bar|jar|bottle) of /i, (m, k) => `a ${k} of `)};
 }

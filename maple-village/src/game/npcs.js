@@ -279,6 +279,22 @@ export function daySchedule(id, day){
   }
   return (schedCache[ck] = out.filter(x => x.scene));
 }
+// round 241 (Mel: "nobody actually came up and bought stuff from my campervan pop-up"): a passer-by strolls in from
+// the side, stops at the crate (onArrive: the sale's moment), has a look for a couple of seconds, then wanders off
+export function shopperVisit(look, at, onArrive, side = Math.random() < .5 ? 1 : -1){
+  const host = $("actors"); if (!host || host.querySelector(".shopper")) return null;
+  const g = document.createElementNS(NS, "g"); g.setAttribute("class", "ch npc walk shopper"); g.setAttribute("pointer-events", "none");
+  g.innerHTML = personArt(look, false); host.appendChild(g);
+  const xo = side > 0 ? 560 : -40, walk = Math.min(4200, Math.abs(at[0] - xo)*14), stay = 2600, t0 = performance.now(); let arrived = false;
+  const face = d => g.firstElementChild.setAttribute("transform", `scale(${d} 1)`);
+  const step = now => { const t = now - t0; let x;
+    if (t < walk) { x = xo + (at[0] - xo)*(t/walk); face(at[0] > xo ? 1 : -1); }
+    else if (t < walk + stay) { x = at[0]; if (!arrived) { arrived = true; g.classList.remove("walk"); face(at[0] > 280 ? 1 : -1); if (onArrive) onArrive(g); } }
+    else { const k = Math.min(1, (t - walk - stay)/walk); x = at[0] + (xo - at[0])*k; if (!g.classList.contains("walk")) g.classList.add("walk"); face(xo > at[0] ? 1 : -1); if (k >= 1) { g.remove(); return; } }
+    g.setAttribute("transform", `translate(${x.toFixed(1)} ${at[1]})`); g.style.opacity = Math.min(1, t/400, (walk*2 + stay - t)/400).toFixed(2);
+    if (g.isConnected) requestAnimationFrame(step); };
+  requestAnimationFrame(step); return g;
+}
 // Tomo on the mint delivery bike (round 138): when an order goes out and Mel's outdoors in Honeybrook, he pedals
 // across the screen with the cool box on the back, waves, and is gone. Not a villager entity (no taps, no routine).
 // round 228 (Mel): along a clear row only (core.js picks it), from one side of the walkable ground to the other: on a
