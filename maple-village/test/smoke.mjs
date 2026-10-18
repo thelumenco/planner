@@ -3733,6 +3733,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   { const B = {coins: 9999, inv: {}, goals: {}}, bv = vy.vineState(B); let spent = 0; for (let i = 0; i < 8; i++) { const c = B.coins; vy.buy(B, "barrel"); spent += c - B.coins; }
     check(bv.barrels.length === 6 && spent === 150 + 225 + 300 + 375 + 450 && vy.maxBarrels(B) === 6, "barrels: up to six in the shed (150, then 75 more each)");
     B.goals.cellar = 1; for (let i = 0; i < 15; i++) vy.buy(B, "barrel"); check(bv.barrels.length === 18 && vy.shopPrice(bv, "barrel") === vy.BARRELS.cellarPrice, "and twelve more on the cellar's racks once the cellar door's open"); }
+  { const G = {coins: 0, goals: {cellar: 1}}, gv = vy.vineState(G); gv.cellar.push({id: "wa", name: "Keeper", type: "red", n: 6}, {id: "wb", name: "Seller", type: "red", n: 6});
+    vy.hold(G, "wa", true); vy.stock(G, "wb");
+    check(vy.cellarPanel(G).includes('data-vyhold="wa"') && gv.cellar[0].hold && gv.shelf[0].id === "wb" && vy.unstock(G, "wb") && gv.cellar.find(c => c.id === "wb").n === 6 && !gv.shelf.find(x => x.id === "wb" && x.n),
+      "round 243: the cellar store behind the wine wall: keep a wine back, send it up, bring bottles back down"); }
   { const G = {coins: 0, inv: {}}, gv = vy.vineState(G); gv.cuttings.pinot = 1; gv.pinot = true; vy.plantVine(G, 0, 0, "red");
     check(vy.uprootVine(G, 0, 0) && !gv.rows[0].vines[0] && gv.cuttings.red === 1 && vy.plantVine(G, 0, 0, "pinot") && gv.rows[0].vines[0].v === "pinot", "dig a vine up (the cutting goes back in the box) and plant a different grape in its place"); }
   // in the browser: through the glass doors, the book, the long table, and back

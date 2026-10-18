@@ -8316,7 +8316,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     ] },
     // round 202
     cellar: { name: "The cellar door", wall: "#E9DCCB", trim: "#6B3A2A", noBoard: true, pos: { W: [130, 262], B: [340, 262], R: [140, 500], T: [360, 500] }, stations: [
-      ["winewall", "Wine wall", "W", "winewall", null, "A bottle of every wine you've made. It's getting full.", 36],
+      ["winewall", "Wine wall", "W", "winewall", null, "The cellar: wine waits down here until you want it upstairs.", 36],
       ["flight", "Tasting bar", "B", "tastebar", null, "The tasting bar. Pour yourself a flight (and on the first Friday of the month, host the wine club).", 34],
       ["racks", "Barrel racks", "R", "barrelrack", null, "Barrels resting, quietly getting better.", 30],
       ["ctable", "High table", "T", "table", null, "A high table for tastings. Visitors linger here.", 40]
@@ -19291,13 +19291,13 @@ ${r.n}`;
     const m = Math.ceil(ms / 6e4);
     return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
   };
-  function sendToKitchen(F2, id, n, hold = true) {
+  function sendToKitchen(F2, id, n, hold2 = true) {
     if (!isGood(id) || !(F2.inv && F2.inv[id] > 0)) return 0;
     const k = kitchenState(F2), m = Math.min(F2.inv[id], n || F2.inv[id]);
     F2.inv[id] -= m;
     if (F2.inv[id] <= 0) delete F2.inv[id];
     add(k, id, m);
-    if (!hold) return m;
+    if (!hold2) return m;
     k.fresh = k.fresh || {};
     Object.keys(k.fresh).forEach((x) => {
       if (k.fresh[x].until <= Date.now()) delete k.fresh[x];
@@ -21246,6 +21246,37 @@ ${r.n}`;
     v.cellar = v.cellar.filter((x) => x.id !== id);
     return `${c.name} is on the shelves.`;
   }
+  function hold(F2, id, on) {
+    const c = vineState(F2).cellar.find((x) => x.id === id);
+    if (!c) return null;
+    c.hold = !!on;
+    return c;
+  }
+  function unstock(F2, id) {
+    const v = vineState(F2), s = v.shelf.find((x) => x.id === id);
+    if (!s || s.n < 1) return null;
+    const c = v.cellar.find((x) => x.id === id);
+    if (c) {
+      c.n += s.n;
+      c.hold = true;
+    } else v.cellar.push({ id: s.id, name: s.name, type: s.type, n: s.n, hold: true });
+    const n = s.n;
+    s.n = 0;
+    if (!s.open) v.shelf = v.shelf.filter((x) => x !== s);
+    return `${n} bottle${n === 1 ? "" : "s"} of ${s.name}, back down to the cellar.`;
+  }
+  function cellarPanel(F2) {
+    const v = vineState(F2), down = v.barrels.length - BARRELS.shed;
+    let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The cellar</h2><p class="sub">Cool, dark and quiet: wine waits down here until you want it upstairs. Anything you keep back stays here, and Celeste leaves it alone.</p>`;
+    h3 += `<p class="eyebrow">In the cellar</p>` + (v.cellar.length ? `<ul class="hlist wlist">${v.cellar.map((c) => `<li style="flex-wrap:wrap"><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES2[c.type].n} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.hold ? " · kept back" : ""}${c.rack ? " · on the riddling rack" : ""}</small></span>
+      <span class="orbtns" style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end"><button class="btn small primary" data-vystock="${c.id}">To the shelves</button><button class="btn small alt" data-vyhold="${c.id}" data-on="${c.hold ? 0 : 1}">${c.hold ? "Let Celeste stock it" : "Keep it here"}</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing down here just now. Bottled wine comes here first.</p>`);
+    const up = v.shelf.filter((s) => s.n > 0);
+    if (up.length) h3 += `<p class="eyebrow">Upstairs on the shelves</p><ul class="hlist wlist">${up.map((s) => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${s.n} on the shelf</small></span><button class="btn small alt" data-vyunstock="${s.id}">Back down</button></li>`).join("")}</ul>`;
+    const max = maxBarrels(F2), p = shopPrice(v, "barrel");
+    h3 += `<p class="eyebrow">Barrel racks</p><p class="muted">${Math.max(0, down)} of ${BARRELS.cellar} barrels on the racks down here, plus ${Math.min(v.barrels.length, BARRELS.shed)} in the shed. Tap the racks to fill or bottle them.</p>`;
+    if (v.barrels.length < max) h3 += `<div class="actions"><button class="btn small ${F2.coins >= p ? "primary" : "alt"}" data-vybuy="barrel" ${F2.coins >= p ? "" : "disabled"}>Another barrel · ${p} coins</button></div>`;
+    return h3 + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
   var winePf = (s) => Math.min(1.6, Math.pow(((STYLES2[s.type] || {}).price || 18) / Math.max(2, s.price || 1), 1.3));
   function setPrice(F2, id, p) {
     const s = vineState(F2).shelf.find((x) => x.id === id);
@@ -21376,8 +21407,8 @@ ${r.n}`;
         });
       }
       if (w.staff && v.help.stock && v.cellar.length) {
-        out.stocked += v.cellar.reduce((n, c) => n + c.n, 0);
-        v.cellar.filter((c) => !c.rack).forEach((c) => stock(F2, c.id));
+        out.stocked += v.cellar.filter((c) => !c.rack && !c.hold).reduce((n, c) => n + c.n, 0);
+        v.cellar.filter((c) => !c.rack && !c.hold).forEach((c) => stock(F2, c.id));
       }
       const ev = eventNow(new Date(at9 + off + 6 * H).toISOString().slice(0, 10), hm12);
       if (ev && ev.wine) {
@@ -21890,6 +21921,24 @@ ${r.n}`;
       if (c) {
         api4.sfx("chime");
         api4.say(`${c.name}, neck-down on the riddling rack. A quarter turn a day, like Jono showed you. The longer it stays, the finer it gets.`);
+        api4.save();
+        api4.rerender();
+      }
+    });
+    root.querySelectorAll("[data-vyhold]").forEach((b) => b.onclick = () => {
+      const c = hold(F2, b.dataset.vyhold, b.dataset.on === "1");
+      if (c) {
+        api4.sfx("paper");
+        api4.say(c.hold ? `${c.name} stays in the cellar till you say so.` : `Celeste can put ${c.name} out when she's on.`);
+        api4.save();
+        api4.rerender();
+      }
+    });
+    root.querySelectorAll("[data-vyunstock]").forEach((b) => b.onclick = () => {
+      const line = unstock(F2, b.dataset.vyunstock);
+      if (line) {
+        api4.sfx("paper");
+        api4.say(line);
         api4.save();
         api4.rerender();
       }
@@ -24032,6 +24081,10 @@ ${r.n}`;
       const e = id !== "garage" && id !== "scoopdip", x0 = e ? 520 : 0, x1 = e ? 492 : 28, hx2 = e ? 486 : 34, sk2 = id === "scoopkitchen" || id === "scoopdip" || id === "cocoakitchen" || id === "giftshop";
       h3 += `<g data-exit="1" aria-label="${sk2 ? "Back to the shop" : "Back to the living room"}"><ellipse class="hov" cx="${hx2}" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>
       ${sk(`<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z" style="fill:${sk2 ? "#E3F2EC" : "#F8EED8"}"/>`, `<path d="M${x0} 316 L${x1} 328 L${x1} 428 L${x0} 440z"/><circle cx="${e ? 497 : 23}" cy="384" r="1.8"/>`)}${tapeLabel(e ? 456 : 64, sk2 ? 478 : 296, id === "giftshop" ? "Wine shop" : sk2 ? "The shop" : "Living room", "var(--card)", 11)}</g>`;
+      return h3;
+    }
+    if (id === "cellar") {
+      h3 += `<g data-exit="1" aria-label="Back up to the wine shop"><ellipse class="hov" cx="486" cy="450" rx="34" ry="10" style="fill:var(--butter)"/>${tapeLabel(456, 478, "Wine shop", "#F6E3B4", 9)}</g>`;
       return h3;
     }
     h3 += `<g data-exit="1" aria-label="Exit"><ellipse class="hov" cx="260" cy="612" rx="54" ry="14" style="fill:var(--butter)"/>
@@ -52661,7 +52714,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (kView === "mull" && scene === "kitchen") h3 = mullPanel(F, vineState(F), mullSt);
     else if (kView && scene === "kitchen") h3 = kView === "oven" ? ovenPanel(F) : kView === "press" ? pressPanel(F) : kView === "stove" ? stovePanel(F, dayKey()) : larderPanel(F);
     else if (loftView && scene === "vineyard") h3 = loftPanel(F);
-    else if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) h3 = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "mcrate" ? wineCratePanel(F, dayKey()) : vyView === "shelf" ? shelfPanel(F) : vyView === "menu" ? menuPanel2(F, dayKey()) : vyView === "counter" ? counterPanel2(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter((n) => n.id !== "celeste" && isHere(n.id)).map((n) => n.name), dayKey());
+    else if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) h3 = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "mcrate" ? wineCratePanel(F, dayKey()) : vyView === "shelf" ? shelfPanel(F) : vyView === "cellar" ? cellarPanel(F) : vyView === "menu" ? menuPanel2(F, dayKey()) : vyView === "counter" ? counterPanel2(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter((n) => n.id !== "celeste" && isHere(n.id)).map((n) => n.name), dayKey());
     else if (kudosOpen && scene === "trophy") h3 = kudosPanel();
     else if (trophyView && scene === "trophy") h3 = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
     else if (routOpen && scene === "room") h3 = routinesPanel();
@@ -57410,6 +57463,12 @@ ${SIGNOFF[t2.who] || ""}`;
       const here = clubMembers(dayKey()).filter(isHere);
       here.slice(0, 2).forEach((n, k) => setTimeout(() => npcSay(n, pick(["Ooh, what are we tasting first?", "Is this the new red? Pour me a big one.", "I'll take two bottles of that. No, three.", "Best club in the village, this.", "Cheers to the winemaker!"])), 900 + k * 1800));
       speak(first ? "You're hosting the wine club! Pouring tastings, telling the story of each bottle. Everyone buys more when the winemaker's here." : "Another round for the club. The bottles are flying off the shelves.", 5500);
+      render();
+      return;
+    }
+    if (scene === "cellar" && id === "winewall" && owns3(F, "cellar")) {
+      vyView = "cellar";
+      sfx("paper", true);
       render();
       return;
     }

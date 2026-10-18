@@ -9,7 +9,7 @@ import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, o
 import { vineSpot } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, tapasAll, TAPAS, cookTick, cookLine } from "./kitchen.js";
 import { questBoost } from "./vineyard.js";
-import { wineNews, vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, grovePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
+import { wineNews, vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, cellarPanel, counterPanel, boxPanel, cafePanel, olivePanel, grovePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama, subtaskInSunsama } from "./sunsama.js";
@@ -1771,7 +1771,7 @@ function ctx(){
   else if (kView && scene === "kitchen") h = kView === "oven" ? ovenPanel(F) : kView === "press" ? pressPanel(F) : kView === "stove" ? stovePanel(F, dayKey()) : larderPanel(F);
   else if (loftView && scene === "vineyard") h = loftPanel(F);
   else if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) h = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F)
-    : vyView === "mcrate" ? wineCratePanel(F, dayKey()) : vyView === "shelf" ? shelfPanel(F) : vyView === "menu" ? menuPanel(F, dayKey()) : vyView === "counter" ? counterPanel(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter(n => n.id !== "celeste" && isHere(n.id)).map(n => n.name), dayKey());
+    : vyView === "mcrate" ? wineCratePanel(F, dayKey()) : vyView === "shelf" ? shelfPanel(F) : vyView === "cellar" ? cellarPanel(F) : vyView === "menu" ? menuPanel(F, dayKey()) : vyView === "counter" ? counterPanel(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter(n => n.id !== "celeste" && isHere(n.id)).map(n => n.name), dayKey());
   else if (kudosOpen && scene === "trophy") h = kudosPanel();
   else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
   else if (routOpen && scene === "room") h = routinesPanel();
@@ -3219,6 +3219,7 @@ function arriveSpot(id){
     const here = clubMembers(dayKey()).filter(isHere);
     here.slice(0, 2).forEach((n, k) => setTimeout(() => npcSay(n, pick(["Ooh, what are we tasting first?", "Is this the new red? Pour me a big one.", "I'll take two bottles of that. No, three.", "Best club in the village, this.", "Cheers to the winemaker!"])), 900 + k*1800));
     speak(first ? "You're hosting the wine club! Pouring tastings, telling the story of each bottle. Everyone buys more when the winemaker's here." : "Another round for the club. The bottles are flying off the shelves.", 5500); render(); return; }
+  if (scene === "cellar" && id === "winewall" && owns(F, "cellar")) { vyView = "cellar"; sfx("paper", true); render(); return; }   // round 243: the cellar store
   if (scene === "cellar" && id === "racks" && owns(F, "cellar")) { vyView = "barrels"; sfx("paper", true); render(); return; }   // round 152: the cellar's barrels are on these racks
   if (scene === "cellar" && id === "flight") { const first = S.flightDay !== dayKey(); if (first) { S.flightDay = dayKey(); gainXp(2); save(); }
     speak(first ? "A tasting flight: a splash of each of your wines, lined up on the bar. Honestly? They're good." : "Another little pour. Just to be sure.", 4500); render(); return; }

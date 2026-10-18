@@ -448,7 +448,7 @@ export const ROOMS = {
     ["gmakers","Makers' shelf","H","makershelf",null,"Handmade things from around Honeybrook, on consignment.",-4],
     ["gbasket","Gift basket","I","giftbasket",null,"Your wrapped gifts, out for sale beside the wrapping table.",-4]]},   // round 202
   cellar: {name:"The cellar door", wall:"#E9DCCB", trim:"#6B3A2A", noBoard:true, pos:{W:[130,262], B:[340,262], R:[140,500], T:[360,500]}, stations:[
-    ["winewall","Wine wall","W","winewall",null,"A bottle of every wine you've made. It's getting full.",36],
+    ["winewall","Wine wall","W","winewall",null,"The cellar: wine waits down here until you want it upstairs.",36],
     ["flight","Tasting bar","B","tastebar",null,"The tasting bar. Pour yourself a flight (and on the first Friday of the month, host the wine club).",34],
     ["racks","Barrel racks","R","barrelrack",null,"Barrels resting, quietly getting better.",30],
     ["ctable","High table","T","table",null,"A high table for tastings. Visitors linger here.",40]]},

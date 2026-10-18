@@ -157,6 +157,24 @@ export function onRack(F, id){ const c = vineState(F).cellar.find(x => x.id === 
 export function stock(F, id){ const v = vineState(F), c = v.cellar.find(x => x.id === id); if (!c) return null;
   const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES[c.type].price + RIDDLE.day*riddleDays(c), open: 0});
   v.cellar = v.cellar.filter(x => x.id !== id); return `${c.name} is on the shelves.`; }
+// round 243 (Mel: "space for stocking wines I don't want to put on shelves yet"): the cellar is the store. A wine
+// kept back stays down here (Celeste won't stock it); bottles can come back down off the shelves too.
+export function hold(F, id, on){ const c = vineState(F).cellar.find(x => x.id === id); if (!c) return null; c.hold = !!on; return c; }
+export function unstock(F, id){ const v = vineState(F), s = v.shelf.find(x => x.id === id); if (!s || s.n < 1) return null;
+  const c = v.cellar.find(x => x.id === id); if (c) { c.n += s.n; c.hold = true; } else v.cellar.push({id: s.id, name: s.name, type: s.type, n: s.n, hold: true});
+  const n = s.n; s.n = 0; if (!s.open) v.shelf = v.shelf.filter(x => x !== s); return `${n} bottle${n === 1 ? "" : "s"} of ${s.name}, back down to the cellar.`; }
+export function cellarPanel(F){
+  const v = vineState(F), down = v.barrels.length - BARRELS.shed;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The cellar</h2><p class="sub">Cool, dark and quiet: wine waits down here until you want it upstairs. Anything you keep back stays here, and Celeste leaves it alone.</p>`;
+  h += `<p class="eyebrow">In the cellar</p>` + (v.cellar.length ? `<ul class="hlist wlist">${v.cellar.map(c => `<li style="flex-wrap:wrap"><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.hold ? " · kept back" : ""}${c.rack ? " · on the riddling rack" : ""}</small></span>
+      <span class="orbtns" style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end"><button class="btn small primary" data-vystock="${c.id}">To the shelves</button><button class="btn small alt" data-vyhold="${c.id}" data-on="${c.hold ? 0 : 1}">${c.hold ? "Let Celeste stock it" : "Keep it here"}</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing down here just now. Bottled wine comes here first.</p>`);
+  const up = v.shelf.filter(s => s.n > 0);
+  if (up.length) h += `<p class="eyebrow">Upstairs on the shelves</p><ul class="hlist wlist">${up.map(s => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${s.n} on the shelf</small></span><button class="btn small alt" data-vyunstock="${s.id}">Back down</button></li>`).join("")}</ul>`;
+  const max = maxBarrels(F), p = shopPrice(v, "barrel");
+  h += `<p class="eyebrow">Barrel racks</p><p class="muted">${Math.max(0, down)} of ${BARRELS.cellar} barrels on the racks down here, plus ${Math.min(v.barrels.length, BARRELS.shed)} in the shed. Tap the racks to fill or bottle them.</p>`;
+  if (v.barrels.length < max) h += `<div class="actions"><button class="btn small ${F.coins >= p ? "primary" : "alt"}" data-vybuy="barrel" ${F.coins >= p ? "" : "disabled"}>Another barrel · ${p} coins</button></div>`;
+  return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
 // Pricier bottles sell less often (and cheaper ones a little more), like the Scoop Shack and the Cocoa Room: each
 // style's usual price is the sweet spot. Glasses are a quarter of the bottle price and follow it.
 export const winePf = s => Math.min(1.6, Math.pow(((STYLES[s.type] || {}).price || 18)/Math.max(2, s.price || 1), 1.3));
@@ -223,7 +241,7 @@ export function sellTick(F, opts = {}){
       if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const spare = c => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st = spare("tempranillo") ? "tempranillo" : spare("pinot") ? "pinot" : spare("chardonnay") ? "chardonnay" : spare("red") ? "red" : spare("white") ? "white" : null;
         if (st) { v.grapes[st] -= PER_BATCH; v.barrels[i] = {style: st, start: at, dur: STYLES[st].dur, stage: 1}; out.filled++; } });
     }
-    if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.reduce((n, c) => n + c.n, 0); v.cellar.filter(c => !c.rack).forEach(c => stock(F, c.id)); }
+    if (w.staff && v.help.stock && v.cellar.length) { out.stocked += v.cellar.filter(c => !c.rack && !c.hold).reduce((n, c) => n + c.n, 0); v.cellar.filter(c => !c.rack && !c.hold).forEach(c => stock(F, c.id)); }
     // the Sunday farmers market: the wine shop's stall at the field sells from these same shelves (Ines minds it;
     // standing at the stall yourself brings more people over, and they pay you)
     const ev = eventNow(new Date(at + off + 6*H).toISOString().slice(0, 10), hm);
@@ -451,6 +469,8 @@ export function wireVine(root, F, api){
   root.querySelectorAll("[data-vybuy]").forEach(b => b.onclick = () => { const line = buy(F, b.dataset.vybuy); if (line) { api.sfx("coin"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyfruit]").forEach(b => b.onclick = () => { const line = stockFruit(F, b.dataset.vyfruit); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyrack]").forEach(b => b.onclick = () => { const c = onRack(F, b.dataset.vyrack); if (c) { api.sfx("chime"); api.say(`${c.name}, neck-down on the riddling rack. A quarter turn a day, like Jono showed you. The longer it stays, the finer it gets.`); api.save(); api.rerender(); } });
+  root.querySelectorAll("[data-vyhold]").forEach(b => b.onclick = () => { const c = hold(F, b.dataset.vyhold, b.dataset.on === "1"); if (c) { api.sfx("paper"); api.say(c.hold ? `${c.name} stays in the cellar till you say so.` : `Celeste can put ${c.name} out when she's on.`); api.save(); api.rerender(); } });
+  root.querySelectorAll("[data-vyunstock]").forEach(b => b.onclick = () => { const line = unstock(F, b.dataset.vyunstock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vystock]").forEach(b => b.onclick = () => { const line = stock(F, b.dataset.vystock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyhelp]").forEach(inp => inp.onchange = () => { vineState(F).help[inp.dataset.vyhelp] = inp.checked; api.save(); });
   root.querySelectorAll("[data-vyprice]").forEach(inp => inp.onchange = () => { setPrice(F, inp.dataset.vyprice, +inp.value); api.save(); });

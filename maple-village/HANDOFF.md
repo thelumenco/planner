@@ -2639,3 +2639,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - The crate sold quietly (a coin flash, about one sale every 25 minutes) and nobody was seen buying. Now `VAN_CRATE` is `{p: .05, here: .5}`: a sale about every 20 minutes while Mel is anywhere at the stop, and (round 242, Mel asked) about every 2 minutes while she is on the van's screen (`vanSellMinute(F, here)`).
 - On the van's screen each sale is a passer-by (npcs.js `shopperVisit(look, at, onArrive)`, one of the regions' locals or a tourist): they stroll in from the side, stop at the crate, say something short ("I'll take one!"), the coins arrive, and they wander off. Sales made while Mel was elsewhere are added up quietly as before.
 - Test: "Passers-by walk up to the campervan pop-up (round 241)".
+
+## Round 243 (Mel: no exit mat in the cellar; "I thought I'd get extra space for stocking wines that I don't want to put on shelves yet and extra barrels")
+- The cellar has no exit mat: its door on the east wall (`data-exit`, labelled "Wine shop") is the way back up (art/scenes.js `roomArt`).
+- **The cellar store** (vineyard.js `cellarPanel`, opened from the wine wall, `vyView = "cellar"`): every bottled wine waits in the cellar; "Keep it here" sets `hold` so Celeste's stocking skips it (`sellTick` filters `!c.hold`), "To the shelves" stocks it, and "Back down" (`unstock`) brings a shelf wine back down (kept). It also shows the barrel racks (12 down here once the cellar door's open, beside the shed's 6) with a button for another barrel.
+- Test in "The terrace and the Sunday long lunch (round 146)".
