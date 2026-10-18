@@ -175,13 +175,15 @@ export function cellarSecretArt(step = 0){
       + sk("", `<path d="${patch}"/>`) + g([[8, 470], [20, 476], [52, 474]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="4" ry="1.6" fill="#E9DCCB" stroke="#B8A890" stroke-width=".5"/>`).join(""))
       + lab(44, 494, "Old bricks", "#EFE6D6") + `</g>`;
   } else {
-    // the passage is open: a narrow arched door stands ajar, lantern light spilling out across the floor
-    const arch = `M12 470 V396 q22 -34 44 0 V470z`;
-    s += `<g data-secret="door" data-x="70" data-y="440" aria-label="The secret passage">${hovE(44, 474, 36, 10)}`
-      + g(`<path d="M12 470 L56 470 L120 500 L40 506z" fill="#FFD98A" opacity=".28"/>` + warm(34, 430, 64))
-      + D(`<path d="M6 474 V394 q28 -42 56 0 V474z" style="fill:${BRICK}"/><path d="${arch}" style="fill:#3A2418"/>`, `<path d="${arch}" fill="#FFC66B" opacity=".35"/><path d="M34 408 v-8" stroke="${IRON}" stroke-width="1"/><path d="M29 408 h10 l-2 12 h-6z" fill="#FFE8A8" stroke="${IRON}" stroke-width=".8"/>` + flame(34, 418, .35))
-      + D(`<path d="M56 470 V398 L80 386 V480z" style="fill:${OAK}"/>`, `<path d="M62 395 V474 M68 392 V476 M74 389 V478" stroke="${OAK2}" stroke-width=".8"/><path d="M56 408 L80 398 M56 456 L80 452" stroke="${IRON}" stroke-width="2"/><circle cx="74" cy="432" r="1.6" fill="${IRON}"/>`)
-      + lab(46, 494, "Passage", "#F3C969") + `</g>`;
+    // the passage is open (round 244, Mel: "more secret"): a hidden panel on the west wall, the same boards and
+    // colour as the cellar around it, set in the same perspective as the real door opposite. Only a hairline of
+    // lantern light at its edge and a small iron ring give it away. No label.
+    const panel = `M0 318 L26 329 L26 427 L0 438z`;
+    s += `<g data-secret="door" data-x="56" data-y="440" aria-label="The secret passage">${hovE(30, 452, 30, 9)}`
+      + D(`<path d="${panel}" style="fill:#B48A66"/>`, `<path d="M0 352 L26 360 M0 388 L26 393 M0 418 L26 419" stroke="#8E6A4A" stroke-width=".9" opacity=".7"/>`)
+      + g(`<path d="M26.5 330 V426" stroke="#FFD27A" stroke-width="1.3" opacity=".55"><animate attributeName="opacity" values=".35;.7;.4;.6;.35" dur="3.2s" repeatCount="indefinite"/></path>`
+        + `<circle cx="20" cy="380" r="2.6" fill="none" stroke="#4A3A30" stroke-width="1.1"/>`)
+      + `</g>`;
   }
   return s;
 }
@@ -189,15 +191,16 @@ export function cellarSecretArt(step = 0){
 /* ---------- the far end: the gelato kitchen's shelving swings open ---------- */
 export function kitchenSecretArt(open){
   if (!open) return "";
-  const hole = `M14 470 V330 h46 V470z`;
-  const steps = Array.from({length: 5}, (_, k) => `<rect x="${18 + k*2}" y="${452 - k*20}" width="${38 - k*4}" height="10" fill="${["#6A5A4A", "#5E4E40", "#524436", "#46392E", "#3A2E26"][k]}"/>`).join("");
-  return defs + `<g data-secret="passage" data-x="70" data-y="450" aria-label="The secret passage">${hovE(56, 474, 40, 10)}`
-    + g(warm(36, 380, 60))
-    + D(`<path d="${hole}" style="fill:#2A201A"/>`, steps + `<path d="M37 336 v8" stroke="${IRON}" stroke-width="1"/><path d="M32 344 h10 l-2 12 h-6z" fill="#FFE8A8" stroke="${IRON}" stroke-width=".8"/>` + flame(37, 354, .35) + `<path d="${hole}" fill="#FFC66B" opacity=".15"/>`)
-    // the shelving itself, swung out into the room on its hinge, jars and tubs still on it
-    + D(`<path d="M60 330 L96 318 V482 L60 470z" style="fill:#F4F1EA"/>`, [0, 1, 2, 3].map(k => `<path d="M60 ${362 + k*30} L96 ${352 + k*32}" stroke="#B8C4CC" stroke-width="2"/>${[0, 1, 2].map(j => `<rect x="${64 + j*10}" y="${f1(350 + k*30 - j*3.2)}" width="7" height="9" rx="1.4" fill="${["#F4C7CF", "#FFF3D6", "#BFE0F2"][(j + k) % 3]}" stroke="${INK}" stroke-width=".4"/>`).join("")}`).join(""))
-    + lab(72, 494, "Passage", "#F3C969") + `</g>`;
+  // round 244 (Mel: "more secret"): just a tall set of shelves on the west wall, jars and tubs on it, like any kitchen.
+  // A hairline of lantern light down one edge, and a draught that stirs the tea towel, are all that give it away.
+  const shelf = `M0 330 L34 340 V470 L0 480z`;
+  return defs + `<g data-secret="passage" data-x="64" data-y="455" aria-label="The secret passage">${hovE(34, 478, 30, 9)}`
+    + D(`<path d="${shelf}" style="fill:#F4F1EA"/>`, [0, 1, 2, 3].map(k => `<path d="M0 ${364 + k*30} L34 ${370 + k*28}" stroke="#B8C4CC" stroke-width="2"/>${[0, 1].map(j => `<rect x="${6 + j*13}" y="${f1(354 + k*29 + j*2)}" width="8" height="9" rx="1.4" fill="${["#F4C7CF", "#FFF3D6", "#BFE0F2"][(j + k) % 3]}" stroke="${INK}" stroke-width=".4"/>`).join("")}`).join(""))
+    + g(`<path d="M34.6 342 V468" stroke="#FFD27A" stroke-width="1.2" opacity=".5"><animate attributeName="opacity" values=".3;.65;.35;.55;.3" dur="3.4s" repeatCount="indefinite"/></path>`
+      + `<g><path d="M30 404 h8 v16 l-3 -2 l-2 3 l-3 -3z" fill="#FFFDF6" stroke="${INK}" stroke-width=".5"/><animateTransform attributeName="transform" type="rotate" values="0 34 404;4 34 404;-2 34 404;0 34 404" dur="2.6s" repeatCount="indefinite"/></g>`)
+    + `</g>`;
 }
+
 
 /* ---------- the forgotten bottles, as icons ---------- */
 export function oldBottleIcon(kind){
