@@ -4289,7 +4289,7 @@ if (want("\nA surprise bouquet from the creator (round 228)")) try {
   page.on("pageerror", e => errors.push(`creator pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-17"); await page.waitForTimeout(1200);
   const c0 = await page.evaluate(() => window.__hbGame.F().coins);
-  await page.evaluate(() => { const F = window.__hbGame.F(); F.creator = {next: Date.now() - 1000, sent: [], specials: {"hello-2026-10": true}}; F.mailRead = F.mailRead || {}; window.__hbGame.mail().unread.forEach(id => { F.mailRead[id] = Date.now(); }); window.__hbGame.save(); });
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.creator = {next: Date.now() + (globalThis.__hbOffset || 0) - 1000, sent: [], specials: {"hello-2026-10": true}}; F.mailRead = F.mailRead || {}; window.__hbGame.mail().unread.forEach(id => { F.mailRead[id] = Date.now(); }); window.__hbGame.save(); });
   await page.waitForFunction(() => window.__hbGame.mail().unread.some(id => /^creator-/.test(id)), null, { timeout: 20000 });
   check(!(await page.evaluate(() => (window.__hbGame.F().inv || {}).cr_bouquet)) && await page.evaluate(() => window.__hbGame.F().coins) === c0, "in the game: the note comes by post, the gift still tucked inside it");
   await page.waitForFunction(() => [...document.querySelectorAll("#actors .npc, #actors [data-npc]")].some(n => /agent-creator-/.test(n.id || n.dataset.npc || "")) || /Flowers for you!/.test((document.getElementById("npcSay") || {}).textContent || "") || document.querySelector('[id^="agent-creator-"]'), null, { timeout: 25000 }).catch(() => {});
@@ -4633,7 +4633,7 @@ if (want("\nKind words, affirmations, savings vaults and emotion jars (round 227
   await tapTill('#world [data-spot="journal"]', "#ctx [data-letters]");
   await page.click("#ctx [data-letters]"); await page.waitForTimeout(300);
   await page.click('#ctx [data-lt="universe"]'); await page.fill("#ltText", "Dear Universe, thank you for today. I'm so grateful."); await page.click('#ctx [data-lt="senduni"]'); await page.waitForTimeout(400);
-  check(await fox().then(f => f.letters.items.length === 1 && f.letters.items[0].reply.theme === "thanks" && f.letters.items[0].reply.due > Date.now()), "letters at the writing desk: a letter to the Universe, posted and saved");
+  check(await fox().then(f => f.letters.items.length === 1 && f.letters.items[0].reply.theme === "thanks" && f.letters.items[0].reply.due > f.letters.items[0].at), "letters at the writing desk: a letter to the Universe, posted and saved");
   await page.evaluate(() => { globalThis.__hbOffset = (globalThis.__hbOffset || 0) + 30*3600e3; });
   await page.click("#pclose"); await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(1200);
   await tapTill('#world [data-place="letterbox"]', '#ctx .lnew [data-lt="open"]');
