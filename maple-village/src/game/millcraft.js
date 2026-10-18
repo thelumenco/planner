@@ -280,7 +280,7 @@ export function helpWorkshop(F){ const c = craftState(F); c.helped = dayKey(); c
 /* ---------- the pop-up crate in the campervan ---------- */
 // Mel packs a crate at the van's fold-down table: things off the mill's shelves and bottles off the wine shop's shelves
 // (up to two dozen). On a campervan trip, with the crate out by the van, passers-by buy from it while she's at the stop.
-export const VAN_CRATE = {max: 24, p: .05, here: .14};   // round 241: a sale about every 20 minutes at the stop, every 7 or so while Mel's standing by the van
+export const VAN_CRATE = {max: 24, p: .05, here: .5};   // round 241: a sale about every 20 minutes at the stop; round 242 (Mel): about every 2 minutes while she is standing by the van
 export function vanCrate(F){ const c = craftState(F); c.van = c.van || {items: {}, wine: []}; return c.van; }
 export const crateCount = vc => Object.values(vc.items).reduce((a, b) => a + b, 0) + vc.wine.reduce((a, w) => a + w.n, 0);
 export function packCrate(F, v, key, n = 1){

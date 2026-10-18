@@ -33170,7 +33170,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const next = UNMADE.find(([k, b, a]) => !c.recipes.some((r) => r.kind === k && (r.base || null) === (k === "soap" ? b : null) && r.adds.join() === [...a].sort().join()));
     return { tips, hint: next ? craftName(next[0], next[1], next[2]) : null };
   }
-  var VAN_CRATE = { max: 24, p: 0.05, here: 0.14 };
+  var VAN_CRATE = { max: 24, p: 0.05, here: 0.5 };
   function vanCrate(F2) {
     const c = craftState(F2);
     c.van = c.van || { items: {}, wine: [] };
