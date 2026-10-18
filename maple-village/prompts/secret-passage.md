@@ -10,7 +10,7 @@ THE CLUE TRAIL (only once the cellar door has been built)
 - 2. The bricks (a later day). Tap the barrel racks: "You roll the end barrel aside. Behind the racks the plaster's crumbled away: old bricks, cold air whistling through, and one brick scratched with T.R. 1912." From now on a patch of old bricks shows on the cellar's left wall (tappable; it says the initials match the mill beam).
 - 3. The photograph (a later day). The old photograph at the mill: on the back, in faded ink, "Where the stone turns, the key sleeps. T.R."
 - 4. The key (straight after). Tap the millstone: under its lip, wrapped in oilcloth, a heavy iron key.
-- 5. The door. Tap the bricks in the cellar: the scratched brick slides out to show a keyhole, the key turns, and a narrow arched door opens onto a stone passage. The door stays in the cellar wall from then on.
+- 5. The door. Tap the bricks in the cellar: the scratched brick slides out to show a keyhole, the key turns, and a narrow arched door opens onto a stone passage. The door stays in the cellar wall from then on. Make it look secret: a panel in the same colour and boards as the wall, in the same perspective as the cellar's real door, with only a hairline of lantern light at its edge and a small iron ring. No label.
 
 THE WINE CAVE (a new indoor scene, entered through the cellar door, with its own door back to the cellar)
 - Draw it: a brick barrel vault, limestone walls, flagstones, candles in niches, cobwebs, a hanging iron lantern. Warm and cosy, not scary. Monastic touches: a worn stone arch over the far gate carved "VINUM LAETIFICAT COR", a little carved cross over a niche with a candle stub, and an old oak bench. Calm screen: edges full, middle clear, everything to the player's scale.
@@ -18,7 +18,7 @@ THE WINE CAVE (a new indoor scene, entered through the cellar door, with its own
 - Forgotten bottles. Three dusty bottles with tags in Tomás's hand: a 1923 red, a 1931 white and a 1958 sparkling, one of each. "Keep it" puts it in the backpack as a gift the family treasure. "Open it here" gives a lovely tasting line and a toast to Tomás.
 - The old press. The monks' wooden wine press, with a few tap lines.
 - Monday candlelit suppers, 7 to 9pm. Four villagers sit at the long table, which is laid with candelabra, plates and glasses during supper. Tapping the table lets the player host, once a night, for 22 coins a guest (88). Outside supper time the table explains when suppers are.
-- The rusty gate at the far end ("To the Scoop Shack") with a sea-blue glow. Through it, the passage comes out behind a section of shelving that swings open in the Scoop Shack's gelato kitchen. On first arrival: "...in the Scoop Shack's kitchen! Of course: long ago the Scoop Shack was the brothers' little priory by the bay." From then on that panel in the kitchen is a way back into the cave.
+- The rusty gate at the far end ("To the Scoop Shack") with a sea-blue glow. Through it, the passage comes out behind a section of shelving that swings open in the Scoop Shack's gelato kitchen. On first arrival: "...in the Scoop Shack's kitchen! Of course: long ago the Scoop Shack was the brothers' little priory by the bay." From then on that panel in the kitchen is a way back into the cave. Keep it secret too: ordinary-looking shelves of jars and tubs, a hairline of light down one edge and a tea towel stirring in the draught. No label.
 
 GENERAL
 - Keep the save compatible (new state under its own key, defaults for old saves).
