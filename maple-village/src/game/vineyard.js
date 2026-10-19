@@ -364,6 +364,8 @@ export function barrelPanel(F){
     h += `</div></div>`;
   });
   h += `</div>${v.cellar.length ? `<p class="eyebrow">In the cellar</p><ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottles${c.rack ? ` · on the riddling rack, ${riddleDays(c)} day${riddleDays(c) === 1 ? "" : "s"} (+${RIDDLE.day*riddleDays(c)} a bottle${riddleDays(c) >= RIDDLE.max ? ", as fine as it gets" : ""})` : ""}</small></span>${c.type === "sparkling" && !c.rack && canRiddle(F) ? `<button class="btn small primary" data-vyrack="${esc(c.id)}">Onto the riddling rack</button>` : ""}</li>`).join("")}</ul><p class="muted">Take them to the wine shop to stock the shelves.</p>` : ""}`;
+  const max = maxBarrels(F), p = shopPrice(v, "barrel");   // Mel: "there's no option to buy extra barrels for the cellar"
+  if (v.barrels.length < max) h += `<p class="muted">${v.barrels.length} of ${max} barrels${max > BARRELS.shed ? `: six in the shed, twelve on the cellar's racks` : ""}.</p><div class="actions"><button class="btn small ${F.coins >= p ? "primary" : "alt"}" data-vybuy="barrel" ${F.coins >= p ? "" : "disabled"}>${v.barrels.length >= BARRELS.shed ? "Another barrel for the cellar" : "Another barrel"} · ${p} coins</button></div>`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 // Fruit from the orchard goes in a crate by the shelves (all of one kind from the backpack at a time)

@@ -21918,6 +21918,8 @@ ${r.n}`;
       h3 += `</div></div>`;
     });
     h3 += `</div>${v.cellar.length ? `<p class="eyebrow">In the cellar</p><ul class="hlist wlist">${v.cellar.map((c) => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES2[c.type].n} · ${c.n} bottles${c.rack ? ` · on the riddling rack, ${riddleDays(c)} day${riddleDays(c) === 1 ? "" : "s"} (+${RIDDLE.day * riddleDays(c)} a bottle${riddleDays(c) >= RIDDLE.max ? ", as fine as it gets" : ""})` : ""}</small></span>${c.type === "sparkling" && !c.rack && canRiddle(F2) ? `<button class="btn small primary" data-vyrack="${esc(c.id)}">Onto the riddling rack</button>` : ""}</li>`).join("")}</ul><p class="muted">Take them to the wine shop to stock the shelves.</p>` : ""}`;
+    const max = maxBarrels(F2), p = shopPrice(v, "barrel");
+    if (v.barrels.length < max) h3 += `<p class="muted">${v.barrels.length} of ${max} barrels${max > BARRELS.shed ? `: six in the shed, twelve on the cellar's racks` : ""}.</p><div class="actions"><button class="btn small ${F2.coins >= p ? "primary" : "alt"}" data-vybuy="barrel" ${F2.coins >= p ? "" : "disabled"}>${v.barrels.length >= BARRELS.shed ? "Another barrel for the cellar" : "Another barrel"} · ${p} coins</button></div>`;
     return h3 + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function stockFruit(F2, id) {
@@ -55157,7 +55159,7 @@ ${SIGNOFF[t2.who] || ""}`;
       },
       tea: haveTea
     });
-    if (vyView && (scene === "vineyard" || scene === "wineshop")) wireVine(c, F, { harvest: (festivalOn(dayKey()) || {}).id === "harvest", save: () => save2(true), rerender: () => {
+    if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) wireVine(c, F, { harvest: (festivalOn(dayKey()) || {}).id === "harvest", save: () => save2(true), rerender: () => {
       ctx();
       drawScene();
     }, say: (l) => speak(l, 4500), sfx, r: vyAt && vyAt.r, i: vyAt && vyAt.i });

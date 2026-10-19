@@ -4896,6 +4896,28 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  console.log("\nThe cellar's wine wall and barrel racks buttons work (Mel: \"can't click to the shelves or keep it here\")");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`cellar pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/cel=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = Object.assign(f.goals || {}, {cellar: 1}); f.coins = 600;
+    f.vine = Object.assign(f.vine || {}, {barrels: [null, null, null, null, null, null], cellar: [{id: "wa", name: "Lantern Night", type: "red", n: 6}, {id: "wb", name: "Lighthouse Red", type: "red", n: 6}], shelf: []});
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(700);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-14&cel=1"); await page.waitForTimeout(1200);
+  const vf = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine);
+  await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1500);
+  await page.locator('#world [data-spot="winewall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vyhold="wa"]', { timeout: 20000 });
+  await page.click('#ctx [data-vyhold="wa"]'); await page.waitForTimeout(400); await page.click('#ctx [data-vystock="wb"]'); await page.waitForTimeout(400);
+  { const v = await vf(); check(v.cellar.find(c => c.id === "wa").hold && v.shelf.some(x => x.id === "wb" && x.n === 6), "in the cellar: keep one wine back, send the other up to the shelves"); }
+  await page.click('#ctx [data-vybuy="barrel"]'); await page.waitForTimeout(400);
+  check((await vf()).barrels.length === 7, "another barrel for the cellar's racks, from the wine wall");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await page.locator('#world [data-spot="racks"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vybuy="barrel"]', { timeout: 20000 });
+  await page.click('#ctx [data-vybuy="barrel"]'); await page.waitForTimeout(400);
+  check((await vf()).barrels.length === 8, "and from the barrel racks");
+  await page.close();
+}
+{
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
   const missing = Object.entries(sd.STORIES).flatMap(([id, chs]) => chs.map((c, i) => i > 0 && !c.recap ? id + ":" + i : null).filter(Boolean));
