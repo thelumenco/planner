@@ -212,11 +212,27 @@ let leaving = false;   // switching save slots: nothing more gets written before
 // in another tab could save over a newer one. Before writing, the page checks this browser's copy: if another tab has
 // saved since this page last read or wrote it, this page catches up to that copy instead of writing its older one.
 const lsKnown = {today: S.updatedAt || 0, fox: F.updatedAt || 0};
+let lastInput = 0; ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { lastInput = Date.now(); }, {capture: true, passive: true}));
 const lsRead = which => { try { return JSON.parse(localStorage.getItem("fox." + which) || "null"); } catch { return null; } };
+// One copy plays at a time: the newest copy to open (or come back on screen) says so on a broadcast channel, and any
+// other copy of the game in this browser stops saving and offers "Play here" (which reloads it with the latest save).
+// Two copies writing side by side could otherwise race, the older one's save landing a moment after the newer one's.
+const tabId = Math.random().toString(36).slice(2), tabs = typeof BroadcastChannel === "function" ? new BroadcastChannel("honeybrook") : null;
+let passive = false;
+function claimPlay(){ if (tabs && !passive && !leaving) tabs.postMessage({t: "playing", id: tabId}); }
+function goPassive(){
+  if (passive) return; passive = true; clearTimeout(pending.fox); clearTimeout(pending.today);
+  const d = document.createElement("div"); d.id = "elsewhere"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Honeybrook is open elsewhere");
+  d.innerHTML = `<div class="elsecard"><h2>Honeybrook is open in another window</h2><p>Your village carries on there, so this one has paused to keep your progress safe.</p><button class="btn primary" id="playHere">Play here</button></div>`;
+  document.body.appendChild(d); d.querySelector("#playHere").onclick = () => { leaving = true; location.reload(); };
+}
+if (tabs) tabs.onmessage = e => { if (e.data && e.data.t === "playing" && e.data.id !== tabId) goPassive(); };
 function persist(which){
-  if (leaving) return;
+  if (leaving || passive) return;
   const obj = which === "today" ? S : F;
-  { const ls = lsRead(which); if (ls && (ls.updatedAt || 0) > lsKnown[which] && (ls.updatedAt || 0) > (obj.updatedAt || 0) && !(which === "today" && ls.day !== dayKey())) { adopt(which, ls); speak("Caught up with the game in your other tab.", 4000); return; } }
+  // (only while this copy is out of sight or untouched for a minute: an idle copy's timers are the ones that save old
+  // progress; a copy you're playing hears about the other's saves straight away, and checks again whenever it's back on screen)
+  if (document.hidden || Date.now() - lastInput > 60000) { const ls = lsRead(which); if (ls && (ls.updatedAt || 0) > lsKnown[which] && (ls.updatedAt || 0) > (obj.updatedAt || 0) && !(which === "today" && ls.day !== dayKey())) { adopt(which, ls); return; } }
   obj.updatedAt = Date.now(); lsKnown[which] = obj.updatedAt;
   try { localStorage.setItem("fox."+which, JSON.stringify(obj)); } catch {}
   if (!refs || !synced[which]) return;
@@ -247,6 +263,14 @@ async function push(which, direct){
 window.addEventListener("storage", e => { const m = /^fox\.(fox|today)$/.exec(e.key || ""); if (!m || !e.newValue || leaving) return; const which = m[1];
   let r; try { r = JSON.parse(e.newValue); } catch { return; } const local = which === "today" ? S : F;
   if ((r.updatedAt || 0) > (local.updatedAt || 0) && !(which === "today" && r.day !== dayKey())) { clearTimeout(pending[which]); adopt(which, r); } });
+// a copy that slept in the background (a phone keeps yesterday's page alive; a home-screen shortcut can open a second)
+// misses the news while it sleeps: the moment it's back on screen, it checks this browser's save before anything else
+function catchUpOnWake(){ if (leaving) return; ["fox", "today"].forEach(which => { const ls = lsRead(which), local = which === "today" ? S : F;
+  if (ls && (ls.updatedAt || 0) > (local.updatedAt || 0) && !(which === "today" && ls.day !== dayKey())) { clearTimeout(pending[which]); adopt(which, ls); } }); }
+const onWake = () => { if (passive) return; catchUpOnWake(); claimPlay(); };
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") onWake(); });
+window.addEventListener("pageshow", onWake); window.addEventListener("focus", onWake);
+setTimeout(claimPlay, 0);   // (a copy just opened is the one playing)
 function adopt(which, remote){
   if (which === "today") S = Object.assign(freshToday(), remote); else F = Object.assign(freshFox(), remote);
   seen[which] = Math.max(seen[which], remote.updatedAt || 0);
@@ -485,8 +509,6 @@ function defaultLine(){
 // Peace and quiet: whenever there are no active quests (all done, or none yet), nobody pipes up on their own and
 // the pet's bubble tucks itself away after a few seconds. Bubbles only appear in answer to a tap. Not during the
 // lantern wind-down or a running timer. Settings can turn it off (F.quietEvening === false).
-let lastInput = 0;
-["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { lastInput = Date.now(); }, {capture: true}));
 const hushed = () => F.quietEvening !== false && !QB.tasksLeft(F) && !(S.pond && (S.pond.shown != null || Date.now() - (S.pond.done || 0) < 20e3));
 let speechAt = 0;
 const unprompted = () => Date.now() - lastInput > 1500;
