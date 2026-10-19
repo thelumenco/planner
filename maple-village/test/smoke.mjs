@@ -31,6 +31,18 @@ const openPages = new Set();
 { const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, zoomOut, ...rest } = o; const pg = await np(rest); openPages.add(pg); pg.on("close", () => openPages.delete(pg)); if (!resume) await pg.addInitScript(() => { window.__hbNoResume = true; });
   // the game opens zoomed out; the checks tap the map close up, so their pages start zoomed in (the core loop checks the real start)
   if (!zoomOut) await pg.addInitScript(() => { try { if (!localStorage.getItem("fox.view")) localStorage.setItem("fox.view", "in"); } catch {} });
+  // a fresh game only writes its first save once the (stubbed) cloud answers, and now and then (about one in seven, with
+  // or without the round 230 save changes) the test browser drops that page's saves when the next goto replaces it: the
+  // reload finds no save to patch and the check fails on a fresh game. So a reset waits for its first save, and a goto
+  // straight after one that finds no save at all does the reset and the goto again (twice at most).
+  await pg.addInitScript(() => { try { window.__hbHadSave = !!localStorage.getItem("fox.fox"); } catch {} });
+  const go = pg.goto.bind(pg), settle = () => pg.waitForFunction(() => !!localStorage.getItem("fox.fox"), null, { timeout: 3000 }).catch(() => {});
+  let lastReset = null;
+  pg.goto = async (u, ...a) => {
+    if (/[?&]reset=1/.test(u)) { const r = await go(u, ...a); await settle(); lastReset = {u, a}; return r; }
+    let r = await go(u, ...a);
+    for (let tries = 0; lastReset && tries < 2 && !(await pg.evaluate(() => window.__hbHadSave).catch(() => true)); tries++) { await go(lastReset.u, ...lastReset.a); await settle(); await pg.waitForTimeout(800); r = await go(u, ...a); }
+    lastReset = null; return r; };
   // a click that times out leaves a screenshot and says what's on top of the target (to catch the odd blocked click)
   const click = pg.click.bind(pg); let shot = 0; pg.click = async (sel, opts) => { try { return await click(sel, opts); } catch (e) {
     const f = join(shots, `stuck-click-${Date.now()}-${shot++}.png`); await pg.screenshot({path: f}).catch(() => {});
