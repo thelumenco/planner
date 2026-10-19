@@ -166,6 +166,7 @@ if (want("\nquest board rules")) try {
   check(priced.every(id => QB.payEach(id) <= ITEMS[id].price), "a request never pays more for something than a shop's own price for it");
   check(Object.keys(ITEMS).filter(id => ITEMS[id].tab && ITEMS[id].price > 0 && ITEMS[id].sell > 0).every(id => ITEMS[id].sell <= ITEMS[id].price), "nothing Hana sells fetches more back at the market than it costs");
   check(Object.keys(ITEMS).filter(id => ITEMS[id].sell > 0).every(id => QB.payEach(id) >= ITEMS[id].sell || ITEMS[id].price), "and pays at least what the market would");
+  { const id = Object.keys(ITEMS).find(x => ITEMS[x].sell === 10 && !ITEMS[x].price); check(!id || QB.payEach(id) === 18, `requests pay about 1.8 times the sell price (round 231: ${id} pays ${id && QB.payEach(id)} each)`); }
   const G = {inv: {}}, people = Object.keys(QB.ASKERS).map(id => ({id, name: id[0].toUpperCase() + id.slice(1)}));
   const day = "2026-10-14", posted = QB.refreshRequests(G, people, day);
   check(posted.length === 2 && QB.refreshRequests(G, people, day).length === 0, "two requests go up on the first day, and no more that day");
@@ -4259,6 +4260,7 @@ if (want("\nPicked flowers stay in the backpack (round 228)")) try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`flowers pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-17"); await page.waitForTimeout(1200);
+  check(await page.evaluate(() => window.__hbGame.F().coins) === 200, "a new game starts with 200 coins (round 231: it was 100)");
   await page.evaluate(() => { const F = window.__hbGame.F(); F.plots[0] = {crop: "tulip", seed: "tulip_seed", plantedAt: Date.now() - 864e5, wateredAt: Date.now() - 864e5}; window.__hbGame.save(); });
   await page.evaluate(() => window.__hbScene("farm")); await page.waitForTimeout(1000);
   await page.locator('#world [data-plot="0"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-farm="pick"], #ctx [data-farm]:not([data-farm="water"])', { timeout: 15000 });

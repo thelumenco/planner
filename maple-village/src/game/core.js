@@ -154,14 +154,14 @@ const freshToday = () => ({day:dayKey(), berries:0, earned:0, steps:0, stepMs:0,
 const freshFox = () => ({name:"", xp:0, days:0, streak:0, lastActive:null, coins:null, inv:null, plots:null, cool:{}, met:{}, gifts:{}, mailRead:{}, updatedAt:0});
 const load = (k, f) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ? Object.assign(f(), v) : f(); } catch { return f(); } };
 let S = load("fox.today", freshToday), F = load("fox.fox", freshFox);
-const START_COINS = 100;
+const START_COINS = 200;   // round 231: was 100, and the first days felt slow
 // the bag of seeds: three packets each of the three cheapest garden seeds that grow this season
 export const starterSeeds = day => { const season = seasonOf(day);
   return Object.fromEntries(Object.keys(ITEMS).filter(k => ITEMS[k].kind === "seed" && ITEMS[k].price && !k.startsWith("gh_") && (ITEMS[k].seasons || []).includes(season)).sort((a, b) => ITEMS[a].price - ITEMS[b].price).slice(0, 3).map(k => [k, 3])); };
 function migrate(){
   if (S.day !== dayKey()) S = freshToday();
   if (S.waterMl == null) { S.waterMl = (S.water || 0)*250; S.waterPaid = Math.min(4, S.water || 0); }
-  // round 225 (Mel: "there's nothing to start"): a new game starts with 100 coins and a bag of seeds for the season
+  // round 225 (Mel: "there's nothing to start"): a new game starts with 200 coins (100 before round 231) and a bag of seeds for the season
   if (F.coins == null) F.coins = F.inv ? (S.berries || 0) : START_COINS;
   if (!F.inv) { F.inv = starterSeeds(dayKey()); F.gift = true; F.welcomeAt = Date.now(); }
   if (!F.tools) F.tools = {};
@@ -3542,6 +3542,6 @@ function showTitle(){
 { let skip = false; try { skip = !!sessionStorage.getItem("hb.skipTitle"); sessionStorage.removeItem("hb.skipTitle"); } catch {}
   if (skip || (window.__hbDevStub && !/[?&]title=1/.test(location.search))) needSetup(); else showTitle(); }
 render(true);
-if (F.gift) setTimeout(() => speak("Your savings, 100 coins, are in your purse, and the village has left you a welcome bag of seeds 🌷 There's a letter from Hana in the mailbox, too.", 6500), 1200);
+if (F.gift) setTimeout(() => speak(`Your savings, ${START_COINS} coins, are in your purse, and the village has left you a welcome bag of seeds 🌷 There's a letter from Hana in the mailbox, too.`, 6500), 1200);
 requestAnimationFrame(frame);
 initDb();

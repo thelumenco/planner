@@ -103,7 +103,7 @@ export function canAsk(F, day = dayKey()){
   return [...new Set([...inSeasonCrops(day), ...seen])];
 }
 // coins for each one: a bit more than selling it at market, never more than a shop's own price for it
-export const payEach = id => { const it = ITEMS[id] || {}, s = it.sell || 1, p = Math.max(s + 1, Math.round(s*1.4)); return it.price ? Math.min(p, it.price) : p; };
+export const payEach = id => { const it = ITEMS[id] || {}, s = it.sell || 1, p = Math.max(s + 1, Math.round(s*1.8));   /* round 231: was 1.4, the first days felt slow */ return it.price ? Math.min(p, it.price) : p; };
 export const howMany = id => Math.max(1, Math.min(5, Math.ceil(12/((ITEMS[id] || {}).sell || 3))));
 const NAMES = {goatmilk: ["bottle of goat's milk", "bottles of goat's milk"], milk: ["bottle of milk", "bottles of milk"], oliveoil: ["bottle of olive oil", "bottles of olive oil"],
   loaf: ["loaf of bread", "loaves of bread"], egg: ["fresh egg", "fresh eggs"], peach: ["peach", "peaches"], cherry: ["cherry", "cherries"]};

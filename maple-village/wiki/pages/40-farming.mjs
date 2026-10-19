@@ -90,7 +90,7 @@ function gardenPage(){
       <li><b>Water:</b> a new seed waits for water. Growing only starts once it's watered.</li>
       <li><b>Wait:</b> each crop has its own growing time (below). Every finished quest on the quest board takes ${dur(QUEST_BOOST)} off everything that's growing.</li>
       <li><b>Harvest:</b> tap a ripe plot and the whole harvest goes into your backpack. The plot's empty again, ready for the next packet.</li></ul>`
-    + box(`${ico("sparkle", 20)} A new game starts with a welcome gift from the village: three packets each of the three cheapest seeds in season, in your backpack, and 100 coins.`)
+    + box(`${ico("sparkle", 20)} A new game starts with a welcome gift from the village: three packets each of the three cheapest seeds in season, in your backpack, and 200 coins.`)
     + h2("seasons", "Seeds by season", "calendar")
     + `<p>Seasons follow the real calendar. Hana's seed shelf changes with them; once the <a href="/greenhouse">greenhouse</a> is built she also sells greenhouse packets of anything out of season.</p>` + bySeason
     + h2("crops", "Every crop", "carrot")

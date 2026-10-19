@@ -126,7 +126,7 @@ function questBoard(){
     <li>"Find" walks you to the villager. Once you have everything, tap them to hand it over. A villager who's at home shows "at home" instead.</li>
     <li>A missed deadline quietly takes the note down. There's no penalty.</li></ul>`
   + h3("rewards", "Rewards")
-  + `<p>A request pays per item, about 1.4 times the market's sell price (never more than a shop's own price for the same thing), and gives the villager <b>a heart</b>. Finishing someone's request also makes their next story chapter ready that same day.</p>`
+  + `<p>A request pays per item, about 1.8 times the market's sell price (never more than a shop's own price for the same thing), and gives the villager <b>a heart</b>. Finishing someone's request also makes their next story chapter ready that same day.</p>`
   + table(["Item", "How many", "Each", "Total"], ex)
   + `<p class="muted">Typical requests. Hearts are never lost; see <a href="/hearts-and-gifts">Hearts and gifts</a>.</p>`
   + h3("who-asks", "Who asks for what")
