@@ -198,6 +198,7 @@ export function sendToKitchen(F, id, n, hold = true){
   if (!isGood(id) || !(F.inv && F.inv[id] > 0)) return 0; const k = kitchenState(F), m = Math.min(F.inv[id], n || F.inv[id]);
   F.inv[id] -= m; if (F.inv[id] <= 0) delete F.inv[id]; add(k, id, m);
   if (!hold) return m;
+  if (k.out) delete k.out[id];   // (you brought it back in yourself: Pilar may fetch it again)
   k.fresh = k.fresh || {}; Object.keys(k.fresh).forEach(x => { if (k.fresh[x].until <= Date.now()) delete k.fresh[x]; });
   k.fresh[id] = {n: heldNew(k, id) + m, until: Date.now() + FRESH_HOLD}; return m;
 }
@@ -259,7 +260,10 @@ const cookLog = (k, line) => { k.log = [line, ...(k.log || [])].slice(0, 4); };
 export function cookTick(F, today){
   const k = kitchenState(F), v = vineState(F), help = v.help || {}, done = [];
   if (help.cook === false) return done;
-  if (help.fetch) { const moved = backpackGoods(F).filter(x => (ITEMS[x] || {}).kind !== "flower").map(x => [x, sendToKitchen(F, x, 0, false)]).filter(([, n]) => n); if (moved.length) done.push(`brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")} from your backpack`); }
+  // (round 230: what you took out of the larder yourself stays in your backpack: Pilar used to carry it straight back)
+  if (help.fetch) { const out = k.out = k.out || {}, inv = F.inv || {};
+    Object.keys(out).forEach(x => { const keep = Math.min(out[x], inv[x] || 0); if (keep > 0) out[x] = keep; else delete out[x]; });   // (used or sold since: forgotten)
+    const moved = backpackGoods(F).filter(x => (ITEMS[x] || {}).kind !== "flower").map(x => { const n = (inv[x] || 0) - (out[x] || 0); return [x, n > 0 ? sendToKitchen(F, x, n, false) : 0]; }).filter(([, n]) => n); if (moved.length) done.push(`brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")} from your backpack`); }
   if (k.oven && !left(k.oven)) { takeLoaves(F); done.push("took two loaves out of the oven"); }
   if (k.press && !left(k.press)) { takeCheese(F); done.push("unwrapped a new cheese"); }
   if (!k.press && !k.pilarNo.press && canSpare(k, {milk: 2})) { useSpare(k, {milk: 2}); k.press = {start: Date.now(), dur: PRESS}; done.push("started a cheese in the press"); }
@@ -337,7 +341,7 @@ export function wireKitchen(root, F, api){
     const k = b.dataset.k, id = b.dataset.dish || b.dataset.id; let line = null;   // (dish buttons avoid data-id: the market claims .item[data-id])
     if (k === "send") { const n = sendToKitchen(F, id); if (n) line = `${n} ${nm(id, n)} into the larder.`; }
     else if (k === "syrup") line = makeSyrup(F);
-    else if (k === "take") { const kk = kitchenState(F); if ((kk.larder[id] || 0) > 0) { kk.larder[id]--; if (kk.larder[id] <= 0) delete kk.larder[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; line = `One ${nm(id, 1)} back in your backpack.`; } }
+    else if (k === "take") { const kk = kitchenState(F); if ((kk.larder[id] || 0) > 0) { kk.larder[id]--; if (kk.larder[id] <= 0) delete kk.larder[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; kk.out = kk.out || {}; kk.out[id] = (kk.out[id] || 0) + 1; line = `One ${nm(id, 1)} back in your backpack.`; } }
     else if (k === "sendall") { const moved = backpackGoods(F).map(x => [x, sendToKitchen(F, x)]).filter(([, n]) => n); if (moved.length) line = `Brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")}.`; }
     else if (k === "bake") line = bake(F); else if (k === "loaves") line = takeLoaves(F);
     else if (k === "press") line = pressCheese(F); else if (k === "cheese") line = takeCheese(F);

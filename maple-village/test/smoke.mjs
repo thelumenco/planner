@@ -1874,6 +1874,7 @@ if (want("\ningredients")) try {
   await page.locator('#world [data-spot="larder"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="take"]', { timeout: 15000 });
   await page.click('#ctx [data-k="take"][data-id="fish"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.fish >= 1 && !(f.kitchen.larder.fish)), "anything in the wine shop's larder can be taken back to the backpack");
+  check(await fox().then(f => f.kitchen.out && f.kitchen.out.fish === 1), "and the larder remembers you took it out yourself (so Pilar won't fetch it back)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\naccessories in the wardrobe")) try {
@@ -3076,6 +3077,14 @@ if (want("\nPilar's list, keeping things back, and more tapas")) try {
     k.cookTick(G, day); const held = !(G.vine.menu || {}).honeycake && gk.larder.honey === 1;
     gk.fresh.honey.until = Date.now() - 1; k.cookTick(G, day);
     check(held && G.vine.menu.honeycake === 4, "honey just brought in waits 15 minutes before Pilar can bake it into honey cake (time to set keep)"); }
+  // round 230, a friend's report: "I click take one, the corn goes from 6 to 5, then bounces back to 6"
+  { const H = {inv: {corn: 2}, vine: {help: {fetch: true}}}; const hk = k.kitchenState(H); hk.larder.corn = 5; hk.out = {corn: 1}; hk.pilarNo.bread = true;
+    k.cookTick(H, day);
+    check(H.inv.corn === 1 && hk.larder.corn === 6, "with fetch ticked, Pilar brings in the backpack's corn but leaves the cob you took out of the larder");
+    H.inv.corn = 0; delete H.inv.corn; k.cookTick(H, day);
+    check(!hk.out.corn, "once it's used or sold, she can fetch corn again as usual");
+    H.inv.potato = 3; hk.out.potato = 3; k.sendToKitchen(H, "potato", 1);
+    check(!hk.out.potato, "and bringing it back in yourself lets her fetch the rest"); }
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nthe greenhouse, herbs and gambas")) try {
   console.log("\nthe greenhouse, herbs and gambas");

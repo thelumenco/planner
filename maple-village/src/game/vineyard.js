@@ -68,7 +68,7 @@ export function rename(F, which, name){ const v = vineState(F), n = plain(String
 // The staff: what each of them takes off the player's hands (each can be switched off in the staff card)
 export const HELP = [["pick", "Marco and Ines pick ripe grapes", "and water the vines again, as before"], ["barrels", "Marco fills empty barrels", "red grapes become red wine, white grapes white; you still name and bottle them"],
   ["stock", "Celeste stocks the shelves", "bottles go from the cellar to the shop when she's on"], ["cook", "Pilar runs the kitchen", "oven, cheese press, the tapas of the day and small plates, from what's in the larder"],
-  ["fetch", "Pilar takes kitchen goods from my backpack", "crops, eggs, milk, flour, cheese and olives go straight to the larder (your pet keeps their treats)"]];
+  ["fetch", "Pilar takes kitchen goods from my backpack", "crops, eggs, milk, flour, cheese and olives go straight to the larder (your pet keeps their treats, and anything you take out of the larder stays with you)"]];
 // Finishing a quest moves the vineyard and kitchen on too: ripening vines, fermenting barrels, the oven and the
 // cheese press each jump ahead by `ms` (the garden gets the same boost in core).
 export function questBoost(F, ms){
