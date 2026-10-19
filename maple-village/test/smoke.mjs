@@ -3085,6 +3085,7 @@ if (want("\nPilar's list, keeping things back, and more tapas")) try {
     check(!hk.out.corn, "once it's used or sold, she can fetch corn again as usual");
     H.inv.potato = 3; hk.out.potato = 3; k.sendToKitchen(H, "potato", 1);
     check(!hk.out.potato, "and bringing it back in yourself lets her fetch the rest"); }
+  { const vy = await import(new URL("../src/game/vineyard.js", import.meta.url)); check(vy.vineState({}).help.fetch === false && /off unless you tick it/.test(vy.HELP.find(h => h[0] === "fetch")[2]), "a new vineyard starts with Pilar's fetching off, and the staff list says what it does"); }
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nthe greenhouse, herbs and gambas")) try {
   console.log("\nthe greenhouse, herbs and gambas");

@@ -68,7 +68,7 @@ export function rename(F, which, name){ const v = vineState(F), n = plain(String
 // The staff: what each of them takes off the player's hands (each can be switched off in the staff card)
 export const HELP = [["pick", "Marco and Ines pick ripe grapes", "and water the vines again, as before"], ["barrels", "Marco fills empty barrels", "red grapes become red wine, white grapes white; you still name and bottle them"],
   ["stock", "Celeste stocks the shelves", "bottles go from the cellar to the shop when she's on"], ["cook", "Pilar runs the kitchen", "oven, cheese press, the tapas of the day and small plates, from what's in the larder"],
-  ["fetch", "Pilar takes kitchen goods from my backpack", "crops, eggs, milk, flour, cheese and olives go straight to the larder (your pet keeps their treats, and anything you take out of the larder stays with you)"]];
+  ["fetch", "Pilar takes kitchen goods from my backpack", "off unless you tick it. When it's on, crops, eggs, milk, flour, cheese and olives leave your backpack for the larder by themselves on her rounds. Flowers, your pet's treats and anything you take out of the larder stay with you"]];
 // Finishing a quest moves the vineyard and kitchen on too: ripening vines, fermenting barrels, the oven and the
 // cheese press each jump ahead by `ms` (the garden gets the same boost in core).
 export function questBoost(F, ms){
@@ -473,7 +473,9 @@ export function wireVine(root, F, api){
   root.querySelectorAll("[data-vyfruit]").forEach(b => b.onclick = () => { const line = stockFruit(F, b.dataset.vyfruit); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyrack]").forEach(b => b.onclick = () => { const c = onRack(F, b.dataset.vyrack); if (c) { api.sfx("chime"); api.say(`${c.name}, neck-down on the riddling rack. A quarter turn a day, like Jono showed you. The longer it stays, the finer it gets.`); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vystock]").forEach(b => b.onclick = () => { const line = stock(F, b.dataset.vystock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
-  root.querySelectorAll("[data-vyhelp]").forEach(inp => inp.onchange = () => { vineState(F).help[inp.dataset.vyhelp] = inp.checked; api.save(); });
+  root.querySelectorAll("[data-vyhelp]").forEach(inp => inp.onchange = () => { vineState(F).help[inp.dataset.vyhelp] = inp.checked; api.save();
+    // (round 230: say plainly what fetching means, so nobody wonders where their crops went)
+    if (inp.dataset.vyhelp === "fetch") api.say(inp.checked ? "Pilar: \"Right you are. From now on, the crops and kitchen goods in your backpack come to the larder on my rounds. Untick me if you'd rather carry them yourself.\"" : "Pilar: \"Fair enough. Your backpack's your own; bring things to the larder when you like.\""); });
   root.querySelectorAll("[data-vyprice]").forEach(inp => inp.onchange = () => { setPrice(F, inp.dataset.vyprice, +inp.value); api.save(); });
 }
 // the day's takings once the winery shuts at 10 (round 139): -> a line, or null. v.reported
