@@ -4527,6 +4527,28 @@ if (want("\nThe secret passage (round 229)")) try {
   check(await page.evaluate(c0 => window.__hbGame.F().coins - c0, c0) === 88, "hosting the supper pays 88, once");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nAn old tab never saves over newer progress (round 230)")) try {
+  // a friend's morning (a chick, a finished barrel) was undone: an older copy of the game left open elsewhere saved over it
+  console.log("\nAn old tab never saves over newer progress (round 230)");
+  const ctx2 = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await ctx2.addInitScript(() => { window.__hbNoResume = true; try { localStorage.setItem("fox.view", "in"); } catch {} });
+  const a = await ctx2.newPage(); a.on("pageerror", e => errors.push(`tabs A pageerror: ${e.message}`));
+  await a.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-14"); await a.waitForTimeout(1200);
+  const b = await ctx2.newPage(); b.on("pageerror", e => errors.push(`tabs B pageerror: ${e.message}`));
+  await b.goto(url + "?seed=1&time=10:00&date=2026-10-14"); await b.waitForTimeout(1200);
+  await b.evaluate(() => { const F = window.__hbGame.F(); F.coins = 777; F.inv.egg = 3; window.__hbGame.save(); });   // the newer tab: this morning's progress
+  await a.waitForTimeout(600);
+  check(await a.evaluate(() => window.__hbGame.F().coins) === 777, "the old tab catches up as soon as the new one saves");
+  await a.evaluate(() => window.__hbGame.save()); await a.waitForTimeout(300);
+  const stored = await a.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  check(stored.coins === 777 && stored.inv.egg === 3, "and when the old tab saves, the newer progress stays");
+  // the old tab missed the news (no storage event): its next save still catches up instead of writing over
+  // (a write made from this same page fires no storage event: it stands in for another tab's save the old one never heard about)
+  await a.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")); o.coins = 888; o.updatedAt = Date.now() + 5000; localStorage.setItem("fox.fox", JSON.stringify(o));
+    window.__hbGame.F().coins = 5; window.__hbGame.save(); }); await a.waitForTimeout(300);
+  check(await a.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).coins) === 888, "even if it missed the news, its save catches up instead of writing over");
+  await ctx2.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

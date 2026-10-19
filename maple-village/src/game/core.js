@@ -208,10 +208,16 @@ let guestView = false, habView = false, habSt = {}, tailView = false, tailSt = {
 // own browser copy, and the Claude app can clear it between visits.
 const loadedAt = {today: S.updatedAt || 0, fox: F.updatedAt || 0}, synced = {today: false, fox: false};
 let leaving = false;   // switching save slots: nothing more gets written before the page reloads
+// round 230 (a friend's morning was undone: a chick and a finished barrel, gone): an older copy of the game left open
+// in another tab could save over a newer one. Before writing, the page checks this browser's copy: if another tab has
+// saved since this page last read or wrote it, this page catches up to that copy instead of writing its older one.
+const lsKnown = {today: S.updatedAt || 0, fox: F.updatedAt || 0};
+const lsRead = which => { try { return JSON.parse(localStorage.getItem("fox." + which) || "null"); } catch { return null; } };
 function persist(which){
   if (leaving) return;
   const obj = which === "today" ? S : F;
-  obj.updatedAt = Date.now();
+  { const ls = lsRead(which); if (ls && (ls.updatedAt || 0) > lsKnown[which] && (ls.updatedAt || 0) > (obj.updatedAt || 0) && !(which === "today" && ls.day !== dayKey())) { adopt(which, ls); speak("Caught up with the game in your other tab.", 4000); return; } }
+  obj.updatedAt = Date.now(); lsKnown[which] = obj.updatedAt;
   try { localStorage.setItem("fox."+which, JSON.stringify(obj)); } catch {}
   if (!refs || !synced[which]) return;
   clearTimeout(pending[which]); pending[which] = setTimeout(() => push(which), 500);
@@ -232,14 +238,20 @@ async function push(which, direct){
       }
     }
     const body = JSON.parse(JSON.stringify(which === "today" ? S : F));
-    await refs[which].set(body); seen[which] = Math.max(seen[which], body.updatedAt || 0);
+    seen[which] = Math.max(seen[which], body.updatedAt || 0);   // (before the write: its own echo mustn't look like another device's save)
+    await refs[which].set(body);
   } catch(e) {}
   writing[which] = false;
 }
+// another tab in this browser saved: catch up straight away (the older tab never writes over the newer one's progress)
+window.addEventListener("storage", e => { const m = /^fox\.(fox|today)$/.exec(e.key || ""); if (!m || !e.newValue || leaving) return; const which = m[1];
+  let r; try { r = JSON.parse(e.newValue); } catch { return; } const local = which === "today" ? S : F;
+  if ((r.updatedAt || 0) > (local.updatedAt || 0) && !(which === "today" && r.day !== dayKey())) { clearTimeout(pending[which]); adopt(which, r); } });
 function adopt(which, remote){
   if (which === "today") S = Object.assign(freshToday(), remote); else F = Object.assign(freshFox(), remote);
   seen[which] = Math.max(seen[which], remote.updatedAt || 0);
   migrate();
+  lsKnown[which] = (which === "today" ? S : F).updatedAt || 0;
   try { localStorage.setItem("fox."+which, JSON.stringify(which === "today" ? S : F)); } catch {}
   render(true);
 }
@@ -307,12 +319,14 @@ function connect(col){
     const local = which === "today" ? S : F, first = !synced[which], cached = !!(snap.metadata && snap.metadata.fromCache);
     if (!cached) synced[which] = true;
     if (!snap.exists) { if (!cached) persist(which); return; }
-    const remote = JSON.parse(JSON.stringify(snap.data()));
+    const remote = JSON.parse(JSON.stringify(snap.data())), was = seen[which];
     seen[which] = Math.max(seen[which], remote.updatedAt || 0);
     if (which === "today" && remote.day !== dayKey()) { if (!cached && local.day === dayKey()) persist(which); return; }
     // First load: the cloud wins unless this browser's copy (as it was when the page opened) is genuinely newer
     if (first && (remote.updatedAt || 0) < loadedAt[which]) { if (!cached) persist(which); return; }
-    if (first || (remote.updatedAt || 0) > (local.updatedAt || 0)) adopt(which, remote);
+    // (round 230: a save newer than anything this page has seen came from another device: take it, even if this page
+    // has just stamped a newer time on its own older copy (a tab waking up saves before the news arrives))
+    if (first || (remote.updatedAt || 0) > (local.updatedAt || 0) || (!cached && (remote.updatedAt || 0) > was && !(snap.metadata && snap.metadata.hasPendingWrites))) { clearTimeout(pending[which]); adopt(which, remote); }
     else if (!cached && (remote.updatedAt || 0) < (local.updatedAt || 0)) persist(which);
   }, () => {});
   watch("today"); watch("fox");
