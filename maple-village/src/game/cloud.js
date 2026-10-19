@@ -13,7 +13,7 @@ let app = null, auth = null, fs = null;
 const start = () => { if (!app) { app = initializeApp(FIREBASE_CONFIG); auth = getAuth(app); fs = initializeFirestore(app, {localCache: persistentLocalCache()}); } };
 
 // one document, in the shape the game expects (snap.exists, snap.data(), snap.metadata.fromCache)
-const wrap = s => ({id: s.id, exists: s.exists(), data: () => s.data(), metadata: {fromCache: s.metadata.fromCache}});
+const wrap = s => ({id: s.id, exists: s.exists(), data: () => s.data(), metadata: {fromCache: s.metadata.fromCache, hasPendingWrites: s.metadata.hasPendingWrites}});
 const docAt = path => { const r = fsDoc(fs, path);
   return {id: r.id, path, get: async () => wrap(await getDoc(r)), set: async v => setDoc(r, v), delete: async () => deleteDoc(r),
     onSnapshot: (next, err) => onSnapshot(r, {includeMetadataChanges: true}, s => next(wrap(s)), err || (() => {}))}; };
@@ -39,4 +39,4 @@ export async function emailReset(email){ start(); try { await sendPasswordResetE
 // a slot's collection of documents in the cloud (the player must be signed in)
 export const slotCollection = (uid, n) => { start(); return collectionAt(`players/${uid}/slot${n}`); };
 // the docs a slot keeps (so a deleted slot can be cleared from the cloud too)
-export const SLOT_DOCS = ["fox", "today", "routines", "journal"];
+export const SLOT_DOCS = ["fox", "today", "routines", "journal", "playing"];

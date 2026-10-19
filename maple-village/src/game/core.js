@@ -214,6 +214,11 @@ let leaving = false;   // switching save slots: nothing more gets written before
 const lsKnown = {today: S.updatedAt || 0, fox: F.updatedAt || 0};
 let lastInput = 0; ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { lastInput = Date.now(); }, {capture: true, passive: true}));
 const lsRead = which => { try { return JSON.parse(localStorage.getItem("fox." + which) || "null"); } catch { return null; } };
+// round 231 (a friend's laptop, opened after a while, put its old game over her phone's): the updatedAt of the cloud's
+// copy when this browser was last in step with it (sent up or taken down). If the cloud's copy still has that time when
+// the game opens, nothing else has saved since, and this browser's newer copy can go up; if not, the cloud's wins.
+const syncMark = (() => { try { return JSON.parse(localStorage.getItem("fox.synced") || "{}") || {}; } catch { return {}; } })();
+const markSynced = (which, at) => { syncMark[which] = at || 0; try { localStorage.setItem("fox.synced", JSON.stringify(syncMark)); } catch {} };
 // One copy plays at a time: the newest copy to open (or come back on screen) says so on a broadcast channel, and any
 // other copy of the game in this browser stops saving and offers "Play here" (which reloads it with the latest save).
 // Two copies writing side by side could otherwise race, the older one's save landing a moment after the newer one's.
@@ -223,7 +228,7 @@ function claimPlay(){ if (tabs && !passive && !leaving) tabs.postMessage({t: "pl
 function goPassive(){
   if (passive) return; passive = true; clearTimeout(pending.fox); clearTimeout(pending.today);
   const d = document.createElement("div"); d.id = "elsewhere"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Honeybrook is open elsewhere");
-  d.innerHTML = `<div class="elsecard"><h2>Honeybrook is open in another window</h2><p>Your village carries on there, so this one has paused to keep your progress safe.</p><button class="btn primary" id="playHere">Play here</button></div>`;
+  d.innerHTML = `<div class="elsecard"><h2>Honeybrook is open somewhere else</h2><p>In another window or on another device. Your village carries on there, so this one has paused to keep your progress safe.</p><button class="btn primary" id="playHere">Play here</button></div>`;
   document.body.appendChild(d); d.querySelector("#playHere").onclick = () => { leaving = true; location.reload(); };
 }
 if (tabs) tabs.onmessage = e => { if (e.data && e.data.t === "playing" && e.data.id !== tabId) goPassive(); };
@@ -249,13 +254,13 @@ async function push(which, direct){
     if (!direct) {
       const cur = await refs[which].get(), r = cur.exists ? cur.data() : null;
       if (r && (r.updatedAt || 0) > seen[which] && !(which === "today" && r.day !== dayKey())) {
-        adopt(which, JSON.parse(JSON.stringify(r))); writing[which] = false;
+        adopt(which, JSON.parse(JSON.stringify(r))); markSynced(which, r.updatedAt); writing[which] = false;
         speak("Caught up with your other device. That last bit here didn't save, sorry!", 5000); return;
       }
     }
     const body = JSON.parse(JSON.stringify(which === "today" ? S : F));
     seen[which] = Math.max(seen[which], body.updatedAt || 0);   // (before the write: its own echo mustn't look like another device's save)
-    await refs[which].set(body);
+    await refs[which].set(body); markSynced(which, body.updatedAt);
   } catch(e) {}
   writing[which] = false;
 }
@@ -343,15 +348,26 @@ function connect(col){
     const local = which === "today" ? S : F, first = !synced[which], cached = !!(snap.metadata && snap.metadata.fromCache);
     if (!cached) synced[which] = true;
     if (!snap.exists) { if (!cached) persist(which); return; }
-    const remote = JSON.parse(JSON.stringify(snap.data()));
-    seen[which] = Math.max(seen[which], remote.updatedAt || 0);
-    if (which === "today" && remote.day !== dayKey()) { if (!cached && local.day === dayKey()) persist(which); return; }
-    // First load: the cloud wins unless this browser's copy (as it was when the page opened) is genuinely newer
-    if (first && (remote.updatedAt || 0) < loadedAt[which]) { if (!cached) persist(which); return; }
-    if (first || (remote.updatedAt || 0) > (local.updatedAt || 0)) { clearTimeout(pending[which]); adopt(which, remote); }
-    else if (!cached && (remote.updatedAt || 0) < (local.updatedAt || 0)) persist(which);
+    const remote = JSON.parse(JSON.stringify(snap.data())), at = remote.updatedAt || 0, took = () => { seen[which] = Math.max(seen[which], at); if (!cached) markSynced(which, at); };
+    if (which === "today" && remote.day !== dayKey()) { seen[which] = Math.max(seen[which], at); if (!cached && local.day === dayKey()) persist(which); return; }
+    // First load: the cloud wins unless this browser's copy (as it was when the page opened) is genuinely newer, and
+    // (round 231) the cloud hasn't moved on since the two were last in step: if another device has saved since, its
+    // save wins, whatever this device's clock says (before that mark existed, the newer time wins, as it always did)
+    if (first && at < loadedAt[which] && (syncMark[which] == null || at === syncMark[which])) { seen[which] = Math.max(seen[which], at); if (!cached) persist(which); return; }
+    if (first || at > (local.updatedAt || 0)) { clearTimeout(pending[which]); adopt(which, remote); took(); }
+    // (round 231: a save from another device that's older than this copy's last stamp isn't counted as seen, so the
+    // check before this page's next cloud write finds it and catches up, instead of sending this older game over it:
+    // a laptop waking up stamps its old game with the time before the phone's save reaches it)
+    else if (!cached && at < (local.updatedAt || 0)) { if (at <= seen[which]) persist(which); else { clearTimeout(pending[which]); pending[which] = setTimeout(() => push(which), 50); } }
   }, () => {});
   watch("today"); watch("fox");
+  // round 231: one copy plays at a time across devices too. Opening the game claims it in the cloud ("playing": this
+  // copy's id); once this copy has seen its own claim there, another copy's claim pauses it (Play here, as for tabs).
+  // Only opening the game (or Play here, which reopens it) claims: a copy waking up doesn't take it back.
+  const playing = col.doc("playing"); let armed = false;
+  playing.set({id: tabId, at: Date.now()}).catch(() => {});
+  playing.onSnapshot(snap => { const d = snap.exists ? snap.data() : null; if (!d || (snap.metadata && snap.metadata.hasPendingWrites)) return;
+    if (d.id === tabId) armed = true; else if (armed && !leaving) goPassive(); }, () => {});
 }
 
 /* =================== QUESTS =================== */

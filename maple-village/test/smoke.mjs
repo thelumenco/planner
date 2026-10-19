@@ -4550,7 +4550,7 @@ if (want("\nAn old tab never saves over newer progress (round 230)")) try {
   await a.goto(url + "?seed=1&time=10:00&date=2026-10-14"); await a.waitForTimeout(1200);   // (no reset in the address: Play here reloads it)
   const b = await ctx2.newPage(); b.on("pageerror", e => errors.push(`tabs B pageerror: ${e.message}`));
   await b.goto(url + "?seed=1&time=10:00&date=2026-10-14"); await b.waitForTimeout(1200);
-  check(await a.locator("#elsewhere #playHere").count() === 1 && await b.locator("#elsewhere").count() === 0, "open the game again and the older copy pauses: \"Honeybrook is open in another window\", with Play here");
+  check(await a.locator("#elsewhere #playHere").count() === 1 && await b.locator("#elsewhere").count() === 0, "open the game again and the older copy pauses: \"Honeybrook is open somewhere else\", with Play here");
   await b.evaluate(() => { const F = window.__hbGame.F(); F.coins = 777; F.inv.egg = 3; window.__hbGame.save(); });   // this morning's progress, in the new copy
   await a.evaluate(() => { const F = window.__hbGame.F(); F.coins = 5; window.__hbGame.save(); }); await a.waitForTimeout(400);   // the old copy's timers try to save
   const stored = await b.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
@@ -4566,6 +4566,38 @@ if (want("\nAn old tab never saves over newer progress (round 230)")) try {
   await a.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")); o.coins = 999; o.updatedAt = Date.now() + 9000; localStorage.setItem("fox.fox", JSON.stringify(o)); window.dispatchEvent(new Event("pageshow")); }); await a.waitForTimeout(300);
   check(await a.evaluate(() => window.__hbGame.F().coins) === 999, "a copy waking up from the background catches up straight away");
   await ctx2.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nAnother device never saves over newer progress (round 231)")) try {
+  // the same friend: opening the browser on her laptop put its old game over the one on her phone. A copy asleep on
+  // another device wakes, stamps its old game with the time, and the phone's newer save reaches it a moment later.
+  console.log("\nAnother device never saves over newer progress (round 231)");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`devices pageerror: ${e.message}`));
+  const u = url + "?seed=1&time=10:00&date=2026-10-14", cloud = () => page.evaluate(() => window.devDb.get("fox"));
+  await page.goto(u + "&reset=1"); await page.waitForTimeout(1200); await page.goto(u); await page.waitForTimeout(1500);
+  await page.evaluate(() => { window.__hbGame.F().coins = 50; window.__hbGame.save(); }); await page.waitForTimeout(900);
+  check((await cloud()).coins === 50, "this copy's saves reach the cloud");
+  // the old copy saves (its timers) just before the phone's newer save arrives from the cloud
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.coins = 5; window.__hbGame.save();
+    const phone = {...window.devDb.get("fox"), coins: 999, updatedAt: F.updatedAt - 20}; window.devDb.set("fox", phone); });
+  await page.waitForFunction(() => window.__hbGame.F().coins === 999, null, { timeout: 5000 }).catch(() => {});
+  await page.waitForTimeout(900);
+  check(await page.evaluate(() => window.__hbGame.F().coins) === 999 && (await cloud()).coins === 999, "a copy that missed another device's save catches up to it, instead of sending its older game over it");
+  // a copy already in step with the cloud never wins just because this device's clock reads later
+  // (the phone's save, made with its clock behind: written in as the page opens, so this copy's own saves can't touch it first)
+  await page.addInitScript(() => { if (!/skew=1/.test(location.search)) return; const k = "stub:data/users/me/fox", c = JSON.parse(localStorage.getItem(k)); c.coins = 321; c.updatedAt -= 600000; localStorage.setItem(k, JSON.stringify(c)); });
+  await page.goto(u + "&skew=1"); await page.waitForTimeout(2000);
+  check(await page.evaluate(() => window.__hbGame.F().coins) === 321, "opening the game takes the cloud's save over this browser's copy (it had nothing the cloud hadn't), whatever the clocks say");
+  // offline play here (saved in this browser, never sent up) still wins
+  await page.evaluate(() => { const o = JSON.parse(localStorage.getItem("fox.fox")); o.coins = 654; o.updatedAt = Date.now() + 1000; localStorage.setItem("fox.fox", JSON.stringify(o)); });
+  await page.goto(u); await page.waitForTimeout(2000);
+  check(await page.evaluate(() => window.__hbGame.F().coins) === 654 && (await cloud()).coins === 654, "but progress made here that the cloud hasn't had yet is kept, and sent up");
+  // opening the game on another device pauses this one
+  await page.evaluate(() => window.devDb.set("playing", {id: "laptop", at: Date.now()})); await page.waitForTimeout(500);
+  check(await page.locator("#elsewhere #playHere").count() === 1 && /another device/.test(await page.locator("#elsewhere").textContent()), "open the game on another device and this copy pauses, with Play here");
+  await page.evaluate(() => { window.__hbGame.F().coins = 1; window.__hbGame.save(); }); await page.waitForTimeout(900);
+  check((await cloud()).coins === 654, "and the paused copy never saves to the cloud");
+  await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
