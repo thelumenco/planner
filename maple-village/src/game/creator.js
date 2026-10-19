@@ -27,6 +27,10 @@ export const NOTES = [NOTE,
   "Hello,\n\nI've been told the bees are especially busy this week, and the pond's never looked better. You've been looking after things beautifully.\n\nThank you, from me, with flowers.",
   "Hello,\n\nThank you for coming back to Honeybrook. Little visits add up: a watered plot, a hello to a neighbour, a lantern on the pond.\n\nHere's a bouquet to say I noticed."];
 export const SPECIALS = [
+  // round 231: a one-off thank you to everyone already playing, with the kinder start (new games now begin with more).
+  // It comes first, and stands in for the October hello for anyone who hasn't had that yet (one bouquet, not two)
+  {id: "thanks-2026-10", from: "2026-10-19", until: "2026-11-09", title: "A head start, with thanks", coins: 100, bouquet: "cr_bouquet2", covers: ["hello-2026-10"],
+    note: "Hello,\n\nA little thank you for being one of Honeybrook's first villagers. I've heard the first few days can feel slow, so here are 100 coins to help your garden along, and some sunny flowers for the house.\n\nNew villagers now start with a bit more in their purse, and your neighbours pay more for the things they ask for. I wanted you to have a head start too.\n\nPut the bouquet in the vase on your bedroom table, give it to a villager, or sell it at Hana's. It's yours."},
   {id: "hello-2026-10", from: "2026-10-17", until: "2026-10-31", title: "Flowers for you", note: NOTE}
 ];
 
@@ -41,7 +45,7 @@ export function creatorState(F, now, rnd = Math.random){
 export function creatorPost(F, now, hm, day, rnd = Math.random, specials = SPECIALS){
   const c = creatorState(F, now, rnd); if (hm < 8*60 || hm >= 20*60) return null;
   const sp = specials.find(s => day >= s.from && day <= s.until && !c.specials[s.id]);
-  if (sp) { c.specials[sp.id] = true; c.next = Math.max(c.next, now + 3*DAY); if (sp.note === NOTE && !c.regular) c.regular = 1;   // (the hello carries the first note: the regular ones start at the second)
+  if (sp) { c.specials[sp.id] = true; (sp.covers || []).forEach(id => { c.specials[id] = true; }); c.next = Math.max(c.next, now + 3*DAY); if (sp.note === NOTE && !c.regular) c.regular = 1;   // (the hello carries the first note: the regular ones start at the second)
     const g = {id: "creator-" + sp.id, at: now, special: sp.id, item: sp.bouquet || GIFT.item}; c.sent = [...c.sent, g].slice(-12); return g; }
   if (now < c.next) return null;
   const k = (c.regular = (c.regular || 0) + 1) - 1, g = {id: "creator-" + now, at: now, note: k, item: CR_BOUQUETS[k % CR_BOUQUETS.length].id}; c.sent = [...c.sent, g].slice(-12); c.next = now + span(GIFT.gap, rnd()); return g;

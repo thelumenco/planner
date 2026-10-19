@@ -4275,6 +4275,10 @@ if (want("\nPicked flowers stay in the backpack (round 228)")) try {
 if (want("\nA surprise bouquet from the creator (round 228)")) try {
   console.log("\nA surprise bouquet from the creator (round 228)");
   const cr = await import(new URL("../src/game/creator.js", import.meta.url)), D = 864e5, t0 = Date.UTC(2026, 9, 17, 3);
+  // round 231: a one-off thank you to everyone already playing: 100 coins and the sunshine bouquet, standing in for the October hello
+  { const F = {coins: 0}, g = cr.creatorPost(F, t0, 11*60, "2026-10-20", () => .5); const m = cr.creatorMail(F)[0];
+    check(g && g.special === "thanks-2026-10" && F.creator.specials["hello-2026-10"] && !cr.creatorPost(F, t0 + 3600e3, 12*60, "2026-10-20", () => .5) && cr.collectCreator(F, g.id) === 100 && F.coins === 100 && F.inv.cr_bouquet2 === 1 && /head start/.test(m.body) && !/[\u2013\u2014]/.test(m.body),
+      "the thank-you post: 100 coins and a sunshine bouquet, once, and no second bouquet for the October hello"); }
   { const F = {}; const r = () => .5, none = [], day = "2026-10-20"; const c = cr.creatorState(F, t0, r);
     check(c.next - t0 >= 6*D && c.next - t0 <= 9*D, "the first bouquet comes about a week into the game");
     check(!cr.creatorPost(F, c.next - 60000, 12*60, day, r, none) && !cr.creatorPost(F, c.next + 1000, 22*60, day, r, none), "not before it's due, and never at night");
@@ -4628,7 +4632,7 @@ if (want("\nKind words, affirmations, savings vaults and emotion jars (round 227
   await tapTill('#world [data-spot="vault1"]', "#ctx #vForm");
   await page.fill("#vLabel", "New bike"); await page.fill("#vGoal", "800"); await page.selectOption("#vCur", "$"); await page.click("#ctx #vForm button[type=submit]"); await page.waitForTimeout(400);
   await page.fill("#vAmt", "120"); await page.click("#ctx #vAdd button"); await page.waitForTimeout(500);
-  check(await fox().then(f => f.vaults.cur === "$" && f.vaults.jars[0].slot === 1 && f.vaults.jars[0].amount === 120 && f.coins === 100), "a vault jar: set up and saved into, in your own currency");
+  check(await fox().then(f => f.vaults.cur === "$" && f.vaults.jars[0].slot === 1 && f.vaults.jars[0].amount === 120 && f.coins === 200), "a vault jar: set up and saved into, in your own currency");
   await page.waitForTimeout(2800); check(/\$120 of \$800/.test(await page.locator("#ctx").textContent()), "the jewels pour in and the panel says so");
   await page.click("#pclose"); await page.waitForTimeout(300);
   check(await page.locator('#world [data-spot="vault1"] svg .vgems path').count() > 0, "the jar on the bank floor shows its jewels");
