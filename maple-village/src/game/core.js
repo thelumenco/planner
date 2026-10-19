@@ -230,9 +230,9 @@ if (tabs) tabs.onmessage = e => { if (e.data && e.data.t === "playing" && e.data
 function persist(which){
   if (leaving || passive) return;
   const obj = which === "today" ? S : F;
-  // (only while this copy is out of sight or untouched for a minute: an idle copy's timers are the ones that save old
-  // progress; a copy you're playing hears about the other's saves straight away, and checks again whenever it's back on screen)
-  if (document.hidden || Date.now() - lastInput > 60000) { const ls = lsRead(which); if (ls && (ls.updatedAt || 0) > lsKnown[which] && (ls.updatedAt || 0) > (obj.updatedAt || 0) && !(which === "today" && ls.day !== dayKey())) { adopt(which, ls); return; } }
+  // (only while this copy is out of sight: a hidden copy's timers are the ones that save old progress; a copy on screen
+  // hears about the other's saves straight away, and checks again whenever it comes back on screen)
+  if (document.hidden) { const ls = lsRead(which); if (ls && (ls.updatedAt || 0) > lsKnown[which] && (ls.updatedAt || 0) > (obj.updatedAt || 0) && !(which === "today" && ls.day !== dayKey())) { adopt(which, ls); return; } }
   obj.updatedAt = Date.now(); lsKnown[which] = obj.updatedAt;
   try { localStorage.setItem("fox."+which, JSON.stringify(obj)); } catch {}
   if (!refs || !synced[which]) return;
@@ -343,14 +343,12 @@ function connect(col){
     const local = which === "today" ? S : F, first = !synced[which], cached = !!(snap.metadata && snap.metadata.fromCache);
     if (!cached) synced[which] = true;
     if (!snap.exists) { if (!cached) persist(which); return; }
-    const remote = JSON.parse(JSON.stringify(snap.data())), was = seen[which];
+    const remote = JSON.parse(JSON.stringify(snap.data()));
     seen[which] = Math.max(seen[which], remote.updatedAt || 0);
     if (which === "today" && remote.day !== dayKey()) { if (!cached && local.day === dayKey()) persist(which); return; }
     // First load: the cloud wins unless this browser's copy (as it was when the page opened) is genuinely newer
     if (first && (remote.updatedAt || 0) < loadedAt[which]) { if (!cached) persist(which); return; }
-    // (round 230: a save newer than anything this page has seen came from another device: take it, even if this page
-    // has just stamped a newer time on its own older copy (a tab waking up saves before the news arrives))
-    if (first || (remote.updatedAt || 0) > (local.updatedAt || 0) || (!cached && (remote.updatedAt || 0) > was && !(snap.metadata && snap.metadata.hasPendingWrites))) { clearTimeout(pending[which]); adopt(which, remote); }
+    if (first || (remote.updatedAt || 0) > (local.updatedAt || 0)) { clearTimeout(pending[which]); adopt(which, remote); }
     else if (!cached && (remote.updatedAt || 0) < (local.updatedAt || 0)) persist(which);
   }, () => {});
   watch("today"); watch("fox");
