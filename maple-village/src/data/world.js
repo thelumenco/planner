@@ -251,14 +251,15 @@ export const ROOMS = {
     ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview/,"For evening chats with users."],
     ["table","Planning table","D","table",/plan|schedule|roadmap|launch/,"Where Luna's plans happen."],
     ["status","Health sign","E","healthluna",null,"Last night's Luna bug check."]]},
-  // Ohayo (not launched yet: it sends video hellos): a reactions board and a hello chart from the founder desk's
-  // numbers (feeds.js ohayoHellos), the health sign, and the usual desk, shelf and sofa
+  // Ohayo (launched in October: it sends video hellos, and has paying customers now). Like the Chord workshop: a
+  // customer wall (sign-ups, plans, money a month, the reactions pinned up) and a numbers board (site visits and the
+  // hellos), both from the Founder Desk (feeds.js ohayoDesk), the health sign, and the usual desk, shelf and sofa
   ohayo: {name:"Ohayo house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], R:[110,262], H:[372,420], E:[170,420]}, stations:[
     ["laptop","Laptop desk","A","desk",/build|fix|app|code|feature|bug|test|ship|plan|schedule|roadmap|launch/,"Ohayo's engine room."],
     ["shelf","Plant shelf","B","craft",/design|brand|content|post|icon|copy/,"Colours, ideas, a lot of plants."],
-    ["sofa","Cosy sofa","C","sofa",/user|beta|tester|feedback|call|interview|hello|video/,"For morning chats with users."],
-    ["reactions","Reactions board","R","reactboard",null,"What people sent back from their hellos.",34],
-    ["hellos","Hello chart","H","hellochart",null,"How many people are waiting, and how many watched.",30],
+    ["sofa","Cosy sofa","C","sofa",/user|customer|client|support|onboard|feedback|call|interview|hello|video/,"For morning chats with customers."],
+    ["customers","Customer wall","R","custwall",null,"Everyone who's signed up, and what they sent back.",34],
+    ["numbers","Numbers board","H","numboard",null,"Visits to the site, and how the hellos are doing.",30],
     ["status","Health sign","E","healthohayo",null,"Last night's Ohayo bug check."]]},
   post:  {name:"Post office", wall:"#E3EEF5", trim:"var(--sky)", pos:{A:[260,340], B:[436,258], C:[400,530], D:[110,216], E:[72,440], F:[150,560]}, stations:[
     ["hampers","Hamper table","F","hampertable",null,"Penny's hamper table: baskets, straw and ribbon. Out for Valentine's, Mother's Day and Christmas.",30],

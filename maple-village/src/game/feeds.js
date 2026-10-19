@@ -7,7 +7,7 @@ import { esc, plain, dayKey } from "../util.js";
 
 export const APPS = {chord: {name: "Chord", room: "chord"}, chico: {name: "Chico", room: "chico"}, luna: {name: "Luna", room: "luna"}, ohayo: {name: "Ohayo", room: "ohayo"}};
 export const BRANDS = {chord: {name: "Chord", color: "var(--sage)"}, ambidextrous: {name: "Ambidextrous", color: "var(--peri)"}};
-const DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-hellos", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
+const DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-desk", "ohayo-hellos", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
 const KEY = "fox.feeds";
 let D = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
 let onChange = () => {};
@@ -44,34 +44,60 @@ export function healthPanel(app){
   return s;
 }
 
-/* ---------- Ohayo's hellos: "ohayo-hellos" doc, copied from the Ohayo Founder Desk by the morning feeds routine ----------
-   {at, queued, sent30, opened30, watched30, reactions30, watchRate30, avgWatchSecs30, arrived7, sentTotal,
-    reactions: [{name, product, emoji, text, at}]}  (first names only) */
+/* ---------- Ohayo, launched (Mel: "now it looks more like Chord"): "ohayo-desk" doc, copied from the Ohayo Founder Desk by
+   the morning feeds routine. Counts only, no names; Mel's own test account is left out.
+   {at, customers: {n, new7, new30, paying, cancelling, mrr, currency, free, solo, studio, latest: [{plan, at}]},
+    visits: {views7, starts7, days: [{day, views, starts}]}, hellos: {queued, sent30, opened30, watched30, reactions30,
+    watchRate30, avgWatchSecs30, arrived7, sentTotal}, reactions: [{name, product, emoji, text, at}], feedback}
+   Before the routine first writes it, the older "ohayo-hellos" doc (just the hellos) still fills the numbers board. */
 const n0 = v => Math.max(0, Math.round(+v || 0));
-export function ohayoHellos(){
-  const d = D["ohayo-hellos"]; if (!d || !d.at) return null;
-  const reactions = (Array.isArray(d.reactions) ? d.reactions : []).slice(0, 12).map(r => ({name: plain(String(r.name || "Someone")).slice(0, 30), product: plain(String(r.product || "")).slice(0, 30),
+const PLANS = {free: "Free", solo: "Solo", studio: "Studio"};
+export function ohayoDesk(){
+  const d = D["ohayo-desk"], old = D["ohayo-hellos"], src = d && d.at ? d : old && old.at ? {at: old.at, hellos: old, reactions: old.reactions} : null;
+  if (!src) return null;
+  const h = src.hellos || {}, c = src.customers || null, v = src.visits || null;
+  const reactions = (Array.isArray(src.reactions) ? src.reactions : []).slice(0, 12).map(r => ({name: plain(String(r.name || "Someone")).slice(0, 30), product: plain(String(r.product || "")).slice(0, 30),
     emoji: [...String(r.emoji || "")].slice(0, 2).join("") || "💬", text: plain(String(r.text || "")).slice(0, 140), at: Date.parse(r.at) || 0}));
-  const sent = n0(d.sent30), pct = v => sent ? Math.round(100*n0(v)/sent) : 0;
-  return {at: +d.at, queued: n0(d.queued), sent, opened: n0(d.opened30), watched: n0(d.watched30), reacted: n0(d.reactions30), arrived7: n0(d.arrived7), total: n0(d.sentTotal),
-    avgWatch: n0(d.avgWatchSecs30), watchRate: d.watchRate30 != null ? n0(d.watchRate30) : pct(d.watched30), openRate: pct(d.opened30), reactRate: pct(d.reactions30), reactions};
+  const sent = n0(h.sent30), pct = x => sent ? Math.round(100*n0(x)/sent) : 0;
+  return {at: +src.at, reactions, feedback: n0(src.feedback),
+    customers: c ? {n: n0(c.n), new7: n0(c.new7), new30: n0(c.new30), paying: n0(c.paying), cancelling: n0(c.cancelling), mrr: Math.max(0, +c.mrr || 0), currency: /^[A-Z]{3}$/.test(c.currency || "") ? c.currency : "USD",
+      plans: Object.keys(PLANS).map(k => [k, n0(c[k])]), latest: (Array.isArray(c.latest) ? c.latest : []).slice(0, 8).map(l => ({plan: PLANS[l.plan] ? l.plan : "free", at: Date.parse(l.at) || 0}))} : null,
+    visits: v ? {views7: n0(v.views7), starts7: n0(v.starts7), days: (Array.isArray(v.days) ? v.days : []).slice(-14).map(x => ({day: /^\d{4}-\d{2}-\d{2}$/.test(x.day || "") ? x.day : "", views: n0(x.views), starts: n0(x.starts)}))} : null,
+    hellos: {queued: n0(h.queued), sent, opened: n0(h.opened30), watched: n0(h.watched30), reacted: n0(h.reactions30), arrived7: n0(h.arrived7), total: n0(h.sentTotal),
+      avgWatch: n0(h.avgWatchSecs30), watchRate: h.watchRate30 != null ? n0(h.watchRate30) : pct(h.watched30), openRate: pct(h.opened30), reactRate: pct(h.reactions30)}};
 }
 const agoD = ms => { const n = Math.floor((Date.now() - ms)/864e5); return n <= 0 ? "today" : n === 1 ? "yesterday" : `${n} days ago`; };
-export function reactionsPanel(){
-  const o = ohayoHellos();
-  let s = `<span class="tape gingham" aria-hidden="true"></span><h2>The reactions board</h2><p class="sub">What people sent back from their hello's watch page.</p>`;
-  if (!o) return s + `<p class="muted">Nothing pinned up yet. The morning feeds copy reactions over from the Ohayo Founder Desk.</p>`;
-  return s + (o.reactions.length ? `<ul class="hlist ohreact">${o.reactions.map(r => `<li><span class="ohemo">${esc(r.emoji)}</span><span>${r.text ? `"${esc(r.text)}"` : ""}<small>${esc(r.name)}${r.product ? " · " + esc(r.product) : ""}${r.at ? " · " + agoD(r.at) : ""}</small></span></li>`).join("")}</ul>` : `<p class="muted">No reactions yet. They'll pin up here as people watch their hellos.</p>`);
+const asOf = at => new Date(at).toLocaleDateString("en-GB", {day: "numeric", month: "short", timeZone: "Asia/Singapore"});
+const money = (n, cur) => (cur === "USD" ? "US$" : cur + " ") + (Math.round(n*100)/100).toLocaleString("en-US");
+// the customer wall: who's signed up, on which plan, and what they've sent back
+export function customersPanel(){
+  const o = ohayoDesk(), c = o && o.customers;
+  let s = `<span class="tape gingham" aria-hidden="true"></span><h2>The customer wall</h2><p class="sub">Everyone who's signed up at ohayodesk.com${o ? `, as of ${asOf(o.at)}` : ""}. Not counting you.</p>`;
+  if (!c) s += `<p class="muted">No customers pinned up yet. The morning feeds copy them over from the Ohayo Founder Desk.</p>`;
+  else {
+    s += `<div class="ohtiles"><div><b>${c.n}</b><small>customers</small></div><div><b>${c.new7}</b><small>new this week</small></div><div><b>${c.paying}</b><small>paying${c.cancelling ? `, ${c.cancelling} cancelling` : ""}</small></div><div><b>${money(c.mrr, c.currency)}</b><small>a month</small></div></div>`;
+    const top = Math.max(1, ...c.plans.map(p => p[1]));
+    s += `<ul class="hlist ohfunnel ohplans">${c.plans.map(([k, n]) => `<li><span class="ohl">${PLANS[k]}</span><span class="ohbar"><i style="width:${Math.max(2, Math.round(100*n/top))}%;background:${k === "free" ? "#7E8BB8" : "#F2A65A"}"></i></span><b>${n}</b></li>`).join("")}</ul>`;
+    s += c.latest.length ? `<p class="eyebrow">Latest sign-ups</p><ul class="hlist ohjoin">${c.latest.map(l => `<li><span class="hbadge">${PLANS[l.plan]}</span><span>Joined ${l.at ? agoD(l.at) : "recently"}</span></li>`).join("")}</ul>` : `<p class="muted">No sign-ups yet.</p>`;
+  }
+  if (o && o.reactions.length) s += `<p class="eyebrow">Pinned-up reactions</p><ul class="hlist ohreact">${o.reactions.map(r => `<li><span class="ohemo">${esc(r.emoji)}</span><span>${r.text ? `"${esc(r.text)}"` : ""}<small>${esc(r.name)}${r.product ? " · " + esc(r.product) : ""}${r.at ? " · " + agoD(r.at) : ""}</small></span></li>`).join("")}</ul>`;
+  if (o && o.feedback) s += `<p class="muted">${o.feedback} new bug report${o.feedback === 1 ? "" : "s"} or idea${o.feedback === 1 ? "" : "s"} on the Founder Desk.</p>`;
+  return s;
 }
-export function helloPanel(){
-  const o = ohayoHellos();
-  let s = `<span class="tape stripe" aria-hidden="true"></span><h2>Hello chart</h2>`;
+// the numbers board: visits to the site, and how the hellos are doing
+export function numbersPanel(){
+  const o = ohayoDesk();
+  let s = `<span class="tape stripe" aria-hidden="true"></span><h2>The numbers board</h2>`;
   if (!o) return s + `<p class="sub">No numbers yet. The morning feeds copy them over from the Ohayo Founder Desk.</p>`;
-  const bar = (label, v, pct, col) => `<li><span class="ohl">${label}</span><span class="ohbar"><i style="width:${Math.max(2, Math.min(100, pct))}%;background:${col}"></i></span><b>${v}</b><small>${pct}%</small></li>`;
-  s += `<p class="sub">Hellos in the last 30 days. Numbers from ${new Date(o.at).toLocaleDateString("en-GB", {day: "numeric", month: "short", timeZone: "Asia/Singapore"})}.</p>`;
-  s += `<div class="ohtiles"><div><b>${o.queued}</b><small>waiting for a hello</small></div><div><b>${o.watchRate}%</b><small>watched</small></div><div><b>${o.avgWatch}s</b><small>average watch</small></div><div><b>${o.arrived7}</b><small>new this week</small></div></div>`;
-  s += `<ul class="hlist ohfunnel">${bar("Sent", o.sent, o.sent ? 100 : 0, "#3D4C7A")}${bar("Opened", o.opened, o.openRate, "#7E8BB8")}${bar("Watched", o.watched, o.watchRate, "#F2A65A")}${bar("Reacted", o.reacted, o.reactRate, "#E8566C")}</ul>`;
-  return s + `<p class="muted">${o.total} hello${o.total === 1 ? "" : "s"} sent since the start. Apple Mail opens emails by itself, so "Opened" runs high: trust "Watched".</p>`;
+  s += `<p class="sub">Numbers from ${asOf(o.at)}.</p>`;
+  const v = o.visits, h = o.hellos;
+  if (v) { const top = Math.max(1, ...v.days.map(d => d.views));
+    s += `<p class="eyebrow">Visits to ohayodesk.com</p><div class="ohtiles"><div><b>${v.views7}</b><small>visits this week</small></div><div><b>${v.starts7}</b><small>tapped Start</small></div><div><b>${v.views7 ? Math.round(100*v.starts7/v.views7) : 0}%</b><small>of visits</small></div></div>`;
+    if (v.days.length) s += `<div class="ohdays" aria-label="Visits each day for two weeks">${v.days.map(d => `<i style="height:${Math.max(2, Math.round(40*d.views/top))}px" title="${d.day}: ${d.views} visits"></i>`).join("")}</div>`; }
+  const bar = (label, n, pct, col) => `<li><span class="ohl">${label}</span><span class="ohbar"><i style="width:${Math.max(2, Math.min(100, pct))}%;background:${col}"></i></span><b>${n}</b><small>${pct}%</small></li>`;
+  s += `<p class="eyebrow">Hellos, last 30 days</p><div class="ohtiles"><div><b>${h.queued}</b><small>waiting for a hello</small></div><div><b>${h.watchRate}%</b><small>watched</small></div><div><b>${h.avgWatch}s</b><small>average watch</small></div><div><b>${h.arrived7}</b><small>new this week</small></div></div>`;
+  s += `<ul class="hlist ohfunnel">${bar("Sent", h.sent, h.sent ? 100 : 0, "#3D4C7A")}${bar("Opened", h.opened, h.openRate, "#7E8BB8")}${bar("Watched", h.watched, h.watchRate, "#F2A65A")}${bar("Reacted", h.reacted, h.reactRate, "#E8566C")}</ul>`;
+  return s + `<p class="muted">${h.total} hello${h.total === 1 ? "" : "s"} sent since launch. Apple Mail opens emails by itself, so "Opened" runs high: trust "Watched".</p>`;
 }
 
 /* ---------- content calendar ---------- */

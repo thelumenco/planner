@@ -2222,16 +2222,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(700);
   check(await page.locator('#world [data-place="luna"]').count() === 1 && await page.locator('#world [data-place="ohayo"]').count() === 1 && await page.locator('#world [data-place^="plot"]').count() === 0, "Luna and Ohayo have houses on Makers' Lane where their plots were");
   await page.addInitScript(() => { if (!/hellopatch/.test(location.search)) return;
-    const d = {at: Date.now() - 3600e3, queued: 55, sent30: 3, opened30: 1, watched30: 1, reactions30: 1, watchRate30: 33, avgWatchSecs30: 7, arrived7: 68, sentTotal: 3, reactions: [{name: "Tester", product: "Chord", emoji: "❤️", text: "So lovely!", at: new Date().toISOString()}]};
-    const f = JSON.parse(localStorage.getItem("fox.feeds") || "{}"); f["ohayo-hellos"] = d; localStorage.setItem("fox.feeds", JSON.stringify(f)); localStorage.setItem("stub:data/users/me/ohayo-hellos", JSON.stringify(d)); });
+    const d = {at: Date.now() - 3600e3, customers: {n: 2, new7: 2, new30: 2, paying: 1, cancelling: 0, mrr: 19, currency: "USD", free: 1, solo: 1, studio: 0, latest: [{plan: "solo", at: new Date().toISOString()}, {plan: "free", at: new Date(Date.now() - 3*864e5).toISOString()}]},
+      visits: {views7: 71, starts7: 2, days: [{day: "2026-10-08", views: 16, starts: 0}, {day: "2026-10-09", views: 27, starts: 1}]},
+      hellos: {queued: 55, sent30: 3, opened30: 1, watched30: 1, reactions30: 1, watchRate30: 33, avgWatchSecs30: 7, arrived7: 1, sentTotal: 3},
+      reactions: [{name: "Tester", product: "Chord", emoji: "❤️", text: "So lovely!", at: new Date().toISOString()}], feedback: 0};
+    const f = JSON.parse(localStorage.getItem("fox.feeds") || "{}"); f["ohayo-desk"] = d; localStorage.setItem("fox.feeds", JSON.stringify(f)); localStorage.setItem("stub:data/users/me/ohayo-desk", JSON.stringify(d)); });
   await page.goto(url + "?seed=1&time=10:30&date=2026-10-10&hellopatch=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("ohayo")); await page.waitForTimeout(700);
-  check(/55 waiting/.test(await page.locator("#sceneArt").textContent()) && /33%/.test(await page.locator("#sceneArt").textContent()), "the Ohayo house's hello chart shows who's waiting and the watched percentage");
-  await page.locator('#world [data-spot="reactions"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ohreact li", { timeout: 15000 });
-  check(/So lovely!/.test(await page.locator("#ctx .ohreact").innerText()), "and its reactions board pins up what people sent back");
+  { const art = await page.locator("#sceneArt").textContent(); check(/2 customers, 1 paying/.test(art) && /71 visits this week/.test(art) && /55 waiting/.test(art), "the Ohayo house, launched: a customer wall (2 customers, 1 paying) and a numbers board (visits, and who's waiting for a hello)"); }
+  await page.locator('#world [data-spot="customers"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ohjoin li", { timeout: 15000 });
+  { const t = await page.locator("#ctx").innerText(); check(/US\$19/.test(t) && await page.locator("#ctx .ohplans li").count() === 3 && await page.locator("#ctx .ohjoin li").count() === 2 && /So lovely!/.test(t), "the customer wall opens like Chord's founder room: customers, plans, money a month, latest sign-ups, and the reactions pinned up"); }
   await page.click("#pclose").catch(() => {});
-  await page.locator('#world [data-spot="hellos"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ohfunnel li", { timeout: 15000 });
-  check(await page.locator("#ctx .ohfunnel li").count() === 4, "the hello chart opens: sent, opened, watched and reacted");
+  await page.locator('#world [data-spot="numbers"]').dispatchEvent("click"); await page.waitForSelector("#ctx .ohfunnel li", { timeout: 15000 });
+  check(await page.locator("#ctx .ohfunnel li").count() === 4 && await page.locator("#ctx .ohdays i").count() === 2 && /71/.test(await page.locator("#ctx").innerText()), "the numbers board opens: site visits by day, and the hellos sent, opened, watched and reacted");
   await page.click("#pclose").catch(() => {});
   for (const app of ["ohayo", "luna"]) {
     await page.evaluate(a => window.__mapleScene(a), app); await page.waitForTimeout(700);

@@ -1369,6 +1369,7 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .hlist.ohreact li{display:flex;gap:10px;align-items:flex-start}.hlist.ohreact .ohemo{font-size:1.3rem;line-height:1.2;flex:none;width:1.7rem;text-align:center}.hlist.ohreact span{display:grid;gap:2px}.hlist.ohreact small{color:var(--soft)}
 #ctx .ohtiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}#ctx .ohtiles div{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:8px 10px}#ctx .ohtiles b{display:block;font-size:1.3rem}#ctx .ohtiles small{color:var(--soft)}
 .hlist.ohfunnel li{display:grid;grid-template-columns:64px 1fr 28px 38px;gap:8px;align-items:center}.hlist.ohfunnel .ohbar{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}.hlist.ohfunnel .ohbar i{display:block;height:100%;border-radius:5px}.hlist.ohfunnel small{color:var(--soft);text-align:right}
+#ctx .ohdays{display:flex;align-items:flex-end;gap:3px;height:44px;margin:4px 0 10px;padding:0 2px;border-bottom:1px solid var(--rule)}#ctx .ohdays i{flex:1;background:#3D4C7A;border-radius:2px 2px 0 0;opacity:.8}.hlist.ohjoin li{display:flex;gap:10px;align-items:center}
 .hlist.gnews.vcal:not(.world) li::before{background:#9FD3C2}.hlist.gnews.vcal.fests:not(.world) li::before{background:#F2A0B8}.hlist.gnews.vcal small{color:var(--soft)}
 .hlist.gnews:not(.world) li::before{content:"";width:8px;height:8px;border-radius:50%;background:#F3C969;flex:none;box-shadow:0 0 0 1.5px rgba(60,40,30,.2)}
 /* tomorrow's quests, peeked from the quest list */
@@ -8089,14 +8090,15 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["table", "Planning table", "D", "table", /plan|schedule|roadmap|launch/, "Where Luna's plans happen."],
       ["status", "Health sign", "E", "healthluna", null, "Last night's Luna bug check."]
     ] },
-    // Ohayo (not launched yet: it sends video hellos): a reactions board and a hello chart from the founder desk's
-    // numbers (feeds.js ohayoHellos), the health sign, and the usual desk, shelf and sofa
+    // Ohayo (launched in October: it sends video hellos, and has paying customers now). Like the Chord workshop: a
+    // customer wall (sign-ups, plans, money a month, the reactions pinned up) and a numbers board (site visits and the
+    // hellos), both from the Founder Desk (feeds.js ohayoDesk), the health sign, and the usual desk, shelf and sofa
     ohayo: { name: "Ohayo house", wall: "#FFF4E6", trim: "#F2A65A", pos: { A: [400, 530], B: [420, 262], C: [130, 530], R: [110, 262], H: [372, 420], E: [170, 420] }, stations: [
       ["laptop", "Laptop desk", "A", "desk", /build|fix|app|code|feature|bug|test|ship|plan|schedule|roadmap|launch/, "Ohayo's engine room."],
       ["shelf", "Plant shelf", "B", "craft", /design|brand|content|post|icon|copy/, "Colours, ideas, a lot of plants."],
-      ["sofa", "Cosy sofa", "C", "sofa", /user|beta|tester|feedback|call|interview|hello|video/, "For morning chats with users."],
-      ["reactions", "Reactions board", "R", "reactboard", null, "What people sent back from their hellos.", 34],
-      ["hellos", "Hello chart", "H", "hellochart", null, "How many people are waiting, and how many watched.", 30],
+      ["sofa", "Cosy sofa", "C", "sofa", /user|customer|client|support|onboard|feedback|call|interview|hello|video/, "For morning chats with customers."],
+      ["customers", "Customer wall", "R", "custwall", null, "Everyone who's signed up, and what they sent back.", 34],
+      ["numbers", "Numbers board", "H", "numboard", null, "Visits to the site, and how the hellos are doing.", 30],
       ["status", "Health sign", "E", "healthohayo", null, "Last night's Ohayo bug check."]
     ] },
     post: { name: "Post office", wall: "#E3EEF5", trim: "var(--sky)", pos: { A: [260, 340], B: [436, 258], C: [400, 530], D: [110, 216], E: [72, 440], F: [150, 560] }, stations: [
@@ -23342,26 +23344,27 @@ ${r.n}`;
           `<rect x="${x - 44}" y="${y - 30}" width="88" height="30" rx="3" style="fill:var(--sage)"/><circle cx="${x - 14}" cy="${y - 46}" r="14" style="fill:var(--stone)"/><circle cx="${x + 18}" cy="${y - 46}" r="14" style="fill:var(--stone)"/><rect x="${x - 30}" y="${y - 70}" width="40" height="14" style="fill:#FFFDF6"/>`,
           `<rect x="${x - 44}" y="${y - 30}" width="88" height="30" rx="3"/><circle cx="${x - 14}" cy="${y - 46}" r="14"/><circle cx="${x + 18}" cy="${y - 46}" r="14"/><rect x="${x - 30}" y="${y - 70}" width="40" height="14"/><path d="M${x + 40} ${y - 30} l14 -30"/>`
         );
-      // Ohayo's reactions board (the latest reactions pinned up as notes, each with its emoji) and its hello chart (an
-      // easel: how many are waiting, and the watched percentage as a filling sun)
-      case "reactboard": {
-        const o = G2.ohayo ? G2.ohayo() : null, rs = o ? o.reactions.slice(0, 6) : [], c = ["#FFFDF6", "#F6E3A1", "#F4C7CF", "#FCE2C2", "#DCE8C8", "#C3CDEE"];
-        const notes2 = Array.from({ length: 6 }, (_, i) => {
-          const nx = x - 40 + i % 3 * 28, ny = y - 92 + Math.floor(i / 3) * 30, r = rs[i];
-          return `<rect x="${nx}" y="${ny}" width="22" height="22" transform="rotate(${i % 2 ? 5 : -4} ${nx + 11} ${ny + 11})" style="fill:${r ? c[i] : "#E9D9C2"}"/>${r ? `<text x="${nx + 11}" y="${ny + 16}" text-anchor="middle" font-size="12" pointer-events="none">${r.emoji.replace(/[<&>]/g, "")}</text>` : ""}`;
+      // Ohayo's customer wall (a cork board: a pinned card for each customer, the paying ones in sunrise orange, and a
+      // reaction or two) and its numbers board (an easel: the fortnight's site visits as little bars, and the week's total)
+      case "custwall": {
+        const o = G2.ohayo ? G2.ohayo() : null, cu = o && o.customers, n = cu ? cu.n : 0, paid = cu ? cu.paying : 0, rs = o ? o.reactions.slice(0, 2) : [];
+        const cards = Array.from({ length: 8 }, (_, i) => {
+          const cx = x - 42 + i % 4 * 21, cy = y - 92 + Math.floor(i / 4) * 25, on = i < n;
+          return `<rect x="${cx}" y="${cy}" width="16" height="19" transform="rotate(${i % 2 ? 4 : -3} ${cx + 8} ${cy + 9})" style="fill:${on ? i < paid ? "#F2A65A" : "#FFFDF6" : "#E9D9C2"}"/>${on ? `<circle cx="${cx + 8}" cy="${cy + 2}" r="1.8" style="fill:#3D4C7A"/><circle cx="${cx + 8}" cy="${cy + 9}" r="3" style="fill:${i < paid ? "#FFF4E6" : "#C3CDEE"}"/>` : ""}`;
         }).join("");
-        return sk(`<rect x="${x - 50}" y="${y - 102}" width="100" height="66" rx="3" style="fill:#D9B893"/>${notes2}`, `<rect x="${x - 50}" y="${y - 102}" width="100" height="66" rx="3"/><path d="M${x - 38} ${y - 36} l-6 36 M${x + 38} ${y - 36} l6 36"/>`) + `<text x="${x}" y="${y - 106}" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9" style="fill:var(--line)" pointer-events="none">${rs.length ? "reactions" : "no reactions yet"}</text>`;
+        const notes2 = rs.map((r, i) => `<text x="${x + 44}" y="${y - 78 + i * 22}" text-anchor="middle" font-size="11" pointer-events="none">${r.emoji.replace(/[<&>]/g, "")}</text>`).join("");
+        return sk(`<rect x="${x - 50}" y="${y - 102}" width="112" height="66" rx="3" style="fill:#D9B893"/>${cards}${notes2}`, `<rect x="${x - 50}" y="${y - 102}" width="112" height="66" rx="3"/><path d="M${x - 38} ${y - 36} l-6 36 M${x + 50} ${y - 36} l6 36"/>`) + `<text x="${x + 6}" y="${y - 106}" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9" style="fill:var(--line)" pointer-events="none">${cu ? `${n} customer${n === 1 ? "" : "s"}${paid ? `, ${paid} paying` : ""}` : "customers"}</text>`;
       }
-      case "hellochart": {
-        const o = G2.ohayo ? G2.ohayo() : null, pct = o ? o.watchRate : 0, q = o ? o.queued : 0;
+      case "numboard": {
+        const o = G2.ohayo ? G2.ohayo() : null, v = o && o.visits, days2 = v ? v.days.slice(-10) : [], top = Math.max(1, ...days2.map((d) => d.views)), q = o ? o.hellos.queued : 0;
+        const bars2 = days2.map((d, i) => {
+          const hh = Math.max(1.5, 26 * d.views / top);
+          return `<rect x="${(x - 30 + i * 6).toFixed(1)}" y="${(y - 50 - hh).toFixed(1)}" width="4.4" height="${hh.toFixed(1)}" rx="1" style="fill:#3D4C7A"/>`;
+        }).join("");
         return sk(
-          `<path d="M${x - 30} ${y} l14 -86 M${x + 30} ${y} l-14 -86 M${x} ${y - 80} v80" style="stroke:var(--wood)" stroke-width="3"/><rect x="${x - 38}" y="${y - 100}" width="76" height="62" rx="3" style="fill:#FFFDF6"/>
-          <path d="M${x - 22} ${y - 52} a22 22 0 0 1 44 0z" style="fill:#FBE3C8"/>${pct > 0 ? (() => {
-            const t2 = Math.PI * (1 - Math.min(100, pct) / 100);
-            return `<path d="M${x} ${y - 52} L${x - 22} ${y - 52} A22 22 0 0 1 ${(x + 22 * Math.cos(t2)).toFixed(1)} ${(y - 52 - 22 * Math.sin(t2)).toFixed(1)}Z" style="fill:#F2A65A"/>`;
-          })() : ""}`,
-          `<rect x="${x - 38}" y="${y - 100}" width="76" height="62" rx="3"/><path d="M${x - 22} ${y - 52} a22 22 0 0 1 44 0z M${x - 28} ${y - 52} h56"/>`
-        ) + `<g font-family="Mulish,sans-serif" font-weight="800" text-anchor="middle" pointer-events="none" style="fill:var(--line)"><text x="${x}" y="${y - 58}" font-size="11">${o ? pct + "%" : "–"}</text><text x="${x}" y="${y - 88}" font-size="7.5">${o ? q + " waiting" : "no numbers yet"}</text><text x="${x}" y="${y - 42}" font-size="6.5" font-weight="600">watched</text></g>`;
+          `<path d="M${x - 30} ${y} l14 -86 M${x + 30} ${y} l-14 -86 M${x} ${y - 80} v80" style="stroke:var(--wood)" stroke-width="3"/><rect x="${x - 38}" y="${y - 100}" width="76" height="62" rx="3" style="fill:#FFFDF6"/><path d="M${x - 32} ${y - 50} h64" style="stroke:#E2DACD"/>${bars2}`,
+          `<rect x="${x - 38}" y="${y - 100}" width="76" height="62" rx="3"/>`
+        ) + `<g font-family="Mulish,sans-serif" font-weight="800" text-anchor="middle" pointer-events="none" style="fill:var(--line)"><text x="${x}" y="${y - 88}" font-size="7.5">${v ? v.views7 + " visits this week" : o ? "no visits yet" : "no numbers yet"}</text><text x="${x}" y="${y - 42}" font-size="6.5" font-weight="600">${o ? q + " waiting for a hello" : ""}</text></g>`;
       }
       case "cork": {
         let p = "";
@@ -28618,7 +28621,7 @@ Quests finished today: ${S4.doneIds.length}`;
   // src/game/feeds.js
   var APPS2 = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" }, luna: { name: "Luna", room: "luna" }, ohayo: { name: "Ohayo", room: "ohayo" } };
   var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
-  var DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-hellos", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
+  var DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-desk", "ohayo-hellos", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
   var KEY4 = "fox.feeds";
   var D4 = (() => {
     try {
@@ -28667,52 +28670,85 @@ Quests finished today: ${S4.doneIds.length}`;
     return s;
   }
   var n0 = (v) => Math.max(0, Math.round(+v || 0));
-  function ohayoHellos() {
-    const d = D4["ohayo-hellos"];
-    if (!d || !d.at) return null;
-    const reactions = (Array.isArray(d.reactions) ? d.reactions : []).slice(0, 12).map((r) => ({
+  var PLANS = { free: "Free", solo: "Solo", studio: "Studio" };
+  function ohayoDesk() {
+    const d = D4["ohayo-desk"], old = D4["ohayo-hellos"], src = d && d.at ? d : old && old.at ? { at: old.at, hellos: old, reactions: old.reactions } : null;
+    if (!src) return null;
+    const h3 = src.hellos || {}, c = src.customers || null, v = src.visits || null;
+    const reactions = (Array.isArray(src.reactions) ? src.reactions : []).slice(0, 12).map((r) => ({
       name: plain(String(r.name || "Someone")).slice(0, 30),
       product: plain(String(r.product || "")).slice(0, 30),
       emoji: [...String(r.emoji || "")].slice(0, 2).join("") || "💬",
       text: plain(String(r.text || "")).slice(0, 140),
       at: Date.parse(r.at) || 0
     }));
-    const sent = n0(d.sent30), pct = (v) => sent ? Math.round(100 * n0(v) / sent) : 0;
+    const sent = n0(h3.sent30), pct = (x) => sent ? Math.round(100 * n0(x) / sent) : 0;
     return {
-      at: +d.at,
-      queued: n0(d.queued),
-      sent,
-      opened: n0(d.opened30),
-      watched: n0(d.watched30),
-      reacted: n0(d.reactions30),
-      arrived7: n0(d.arrived7),
-      total: n0(d.sentTotal),
-      avgWatch: n0(d.avgWatchSecs30),
-      watchRate: d.watchRate30 != null ? n0(d.watchRate30) : pct(d.watched30),
-      openRate: pct(d.opened30),
-      reactRate: pct(d.reactions30),
-      reactions
+      at: +src.at,
+      reactions,
+      feedback: n0(src.feedback),
+      customers: c ? {
+        n: n0(c.n),
+        new7: n0(c.new7),
+        new30: n0(c.new30),
+        paying: n0(c.paying),
+        cancelling: n0(c.cancelling),
+        mrr: Math.max(0, +c.mrr || 0),
+        currency: /^[A-Z]{3}$/.test(c.currency || "") ? c.currency : "USD",
+        plans: Object.keys(PLANS).map((k) => [k, n0(c[k])]),
+        latest: (Array.isArray(c.latest) ? c.latest : []).slice(0, 8).map((l) => ({ plan: PLANS[l.plan] ? l.plan : "free", at: Date.parse(l.at) || 0 }))
+      } : null,
+      visits: v ? { views7: n0(v.views7), starts7: n0(v.starts7), days: (Array.isArray(v.days) ? v.days : []).slice(-14).map((x) => ({ day: /^\d{4}-\d{2}-\d{2}$/.test(x.day || "") ? x.day : "", views: n0(x.views), starts: n0(x.starts) })) } : null,
+      hellos: {
+        queued: n0(h3.queued),
+        sent,
+        opened: n0(h3.opened30),
+        watched: n0(h3.watched30),
+        reacted: n0(h3.reactions30),
+        arrived7: n0(h3.arrived7),
+        total: n0(h3.sentTotal),
+        avgWatch: n0(h3.avgWatchSecs30),
+        watchRate: h3.watchRate30 != null ? n0(h3.watchRate30) : pct(h3.watched30),
+        openRate: pct(h3.opened30),
+        reactRate: pct(h3.reactions30)
+      }
     };
   }
   var agoD = (ms) => {
     const n = Math.floor((Date.now() - ms) / 864e5);
     return n <= 0 ? "today" : n === 1 ? "yesterday" : `${n} days ago`;
   };
-  function reactionsPanel() {
-    const o = ohayoHellos();
-    let s = `<span class="tape gingham" aria-hidden="true"></span><h2>The reactions board</h2><p class="sub">What people sent back from their hello's watch page.</p>`;
-    if (!o) return s + `<p class="muted">Nothing pinned up yet. The morning feeds copy reactions over from the Ohayo Founder Desk.</p>`;
-    return s + (o.reactions.length ? `<ul class="hlist ohreact">${o.reactions.map((r) => `<li><span class="ohemo">${esc(r.emoji)}</span><span>${r.text ? `"${esc(r.text)}"` : ""}<small>${esc(r.name)}${r.product ? " · " + esc(r.product) : ""}${r.at ? " · " + agoD(r.at) : ""}</small></span></li>`).join("")}</ul>` : `<p class="muted">No reactions yet. They'll pin up here as people watch their hellos.</p>`);
+  var asOf = (at9) => new Date(at9).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Singapore" });
+  var money2 = (n, cur2) => (cur2 === "USD" ? "US$" : cur2 + " ") + (Math.round(n * 100) / 100).toLocaleString("en-US");
+  function customersPanel() {
+    const o = ohayoDesk(), c = o && o.customers;
+    let s = `<span class="tape gingham" aria-hidden="true"></span><h2>The customer wall</h2><p class="sub">Everyone who's signed up at ohayodesk.com${o ? `, as of ${asOf(o.at)}` : ""}. Not counting you.</p>`;
+    if (!c) s += `<p class="muted">No customers pinned up yet. The morning feeds copy them over from the Ohayo Founder Desk.</p>`;
+    else {
+      s += `<div class="ohtiles"><div><b>${c.n}</b><small>customers</small></div><div><b>${c.new7}</b><small>new this week</small></div><div><b>${c.paying}</b><small>paying${c.cancelling ? `, ${c.cancelling} cancelling` : ""}</small></div><div><b>${money2(c.mrr, c.currency)}</b><small>a month</small></div></div>`;
+      const top = Math.max(1, ...c.plans.map((p) => p[1]));
+      s += `<ul class="hlist ohfunnel ohplans">${c.plans.map(([k, n]) => `<li><span class="ohl">${PLANS[k]}</span><span class="ohbar"><i style="width:${Math.max(2, Math.round(100 * n / top))}%;background:${k === "free" ? "#7E8BB8" : "#F2A65A"}"></i></span><b>${n}</b></li>`).join("")}</ul>`;
+      s += c.latest.length ? `<p class="eyebrow">Latest sign-ups</p><ul class="hlist ohjoin">${c.latest.map((l) => `<li><span class="hbadge">${PLANS[l.plan]}</span><span>Joined ${l.at ? agoD(l.at) : "recently"}</span></li>`).join("")}</ul>` : `<p class="muted">No sign-ups yet.</p>`;
+    }
+    if (o && o.reactions.length) s += `<p class="eyebrow">Pinned-up reactions</p><ul class="hlist ohreact">${o.reactions.map((r) => `<li><span class="ohemo">${esc(r.emoji)}</span><span>${r.text ? `"${esc(r.text)}"` : ""}<small>${esc(r.name)}${r.product ? " · " + esc(r.product) : ""}${r.at ? " · " + agoD(r.at) : ""}</small></span></li>`).join("")}</ul>`;
+    if (o && o.feedback) s += `<p class="muted">${o.feedback} new bug report${o.feedback === 1 ? "" : "s"} or idea${o.feedback === 1 ? "" : "s"} on the Founder Desk.</p>`;
+    return s;
   }
-  function helloPanel() {
-    const o = ohayoHellos();
-    let s = `<span class="tape stripe" aria-hidden="true"></span><h2>Hello chart</h2>`;
+  function numbersPanel() {
+    const o = ohayoDesk();
+    let s = `<span class="tape stripe" aria-hidden="true"></span><h2>The numbers board</h2>`;
     if (!o) return s + `<p class="sub">No numbers yet. The morning feeds copy them over from the Ohayo Founder Desk.</p>`;
-    const bar = (label2, v, pct, col) => `<li><span class="ohl">${label2}</span><span class="ohbar"><i style="width:${Math.max(2, Math.min(100, pct))}%;background:${col}"></i></span><b>${v}</b><small>${pct}%</small></li>`;
-    s += `<p class="sub">Hellos in the last 30 days. Numbers from ${new Date(o.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Singapore" })}.</p>`;
-    s += `<div class="ohtiles"><div><b>${o.queued}</b><small>waiting for a hello</small></div><div><b>${o.watchRate}%</b><small>watched</small></div><div><b>${o.avgWatch}s</b><small>average watch</small></div><div><b>${o.arrived7}</b><small>new this week</small></div></div>`;
-    s += `<ul class="hlist ohfunnel">${bar("Sent", o.sent, o.sent ? 100 : 0, "#3D4C7A")}${bar("Opened", o.opened, o.openRate, "#7E8BB8")}${bar("Watched", o.watched, o.watchRate, "#F2A65A")}${bar("Reacted", o.reacted, o.reactRate, "#E8566C")}</ul>`;
-    return s + `<p class="muted">${o.total} hello${o.total === 1 ? "" : "s"} sent since the start. Apple Mail opens emails by itself, so "Opened" runs high: trust "Watched".</p>`;
+    s += `<p class="sub">Numbers from ${asOf(o.at)}.</p>`;
+    const v = o.visits, h3 = o.hellos;
+    if (v) {
+      const top = Math.max(1, ...v.days.map((d) => d.views));
+      s += `<p class="eyebrow">Visits to ohayodesk.com</p><div class="ohtiles"><div><b>${v.views7}</b><small>visits this week</small></div><div><b>${v.starts7}</b><small>tapped Start</small></div><div><b>${v.views7 ? Math.round(100 * v.starts7 / v.views7) : 0}%</b><small>of visits</small></div></div>`;
+      if (v.days.length) s += `<div class="ohdays" aria-label="Visits each day for two weeks">${v.days.map((d) => `<i style="height:${Math.max(2, Math.round(40 * d.views / top))}px" title="${d.day}: ${d.views} visits"></i>`).join("")}</div>`;
+    }
+    const bar = (label2, n, pct, col) => `<li><span class="ohl">${label2}</span><span class="ohbar"><i style="width:${Math.max(2, Math.min(100, pct))}%;background:${col}"></i></span><b>${n}</b><small>${pct}%</small></li>`;
+    s += `<p class="eyebrow">Hellos, last 30 days</p><div class="ohtiles"><div><b>${h3.queued}</b><small>waiting for a hello</small></div><div><b>${h3.watchRate}%</b><small>watched</small></div><div><b>${h3.avgWatch}s</b><small>average watch</small></div><div><b>${h3.arrived7}</b><small>new this week</small></div></div>`;
+    s += `<ul class="hlist ohfunnel">${bar("Sent", h3.sent, h3.sent ? 100 : 0, "#3D4C7A")}${bar("Opened", h3.opened, h3.openRate, "#7E8BB8")}${bar("Watched", h3.watched, h3.watchRate, "#F2A65A")}${bar("Reacted", h3.reacted, h3.reactRate, "#E8566C")}</ul>`;
+    return s + `<p class="muted">${h3.total} hello${h3.total === 1 ? "" : "s"} sent since launch. Apple Mail opens emails by itself, so "Opened" runs high: trust "Watched".</p>`;
   }
   function contentItems() {
     const out = [];
@@ -30047,7 +30083,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     }
     st3.busy = false;
   }
-  var money2 = (n, c) => `${c}${Math.round(Number(n) || 0).toLocaleString()}`;
+  var money3 = (n, c) => `${c}${Math.round(Number(n) || 0).toLocaleString()}`;
   var mlabel = (k) => (/* @__PURE__ */ new Date(k + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
   function chart(d, target) {
     const ms = Object.keys(d.byMonth), vals = ms.map((k) => d.byMonth[k]), max = Math.max(1, target || 0, ...vals) * 1.15;
@@ -30056,10 +30092,10 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
       const x = L3 + i * (bw + gap), v = vals[i], top = y(v), h3 = Math.max(0, B - top), cur2 = i === ms.length - 1;
       const r = Math.min(4, h3);
       const path4 = h3 > 0 ? `M${x} ${B} V${top + r} Q${x} ${top} ${x + r} ${top} H${x + bw - r} Q${x + bw} ${top} ${x + bw} ${top + r} V${B}z` : "";
-      return `<g class="rbar${cur2 ? " cur" : ""}" tabindex="0" aria-label="${mlabel(k)}: ${money2(v, d.currency)}"><title>${mlabel(k)} ${k.slice(0, 4)}: ${money2(v, d.currency)}</title><rect x="${x - gap / 2}" y="${T2}" width="${bw + gap}" height="${B - T2}" fill="transparent"/>${path4 ? `<path d="${path4}" fill="#4E9A4A" opacity="${cur2 ? 1 : 0.55}"/>` : ""}
-      ${cur2 || v === Math.max(...vals) && v > 0 ? `<text x="${x + bw / 2}" y="${top - 4}" text-anchor="middle" class="rval">${money2(v, d.currency)}</text>` : ""}<text x="${x + bw / 2}" y="${B + 14}" text-anchor="middle" class="rax">${mlabel(k)}</text></g>`;
+      return `<g class="rbar${cur2 ? " cur" : ""}" tabindex="0" aria-label="${mlabel(k)}: ${money3(v, d.currency)}"><title>${mlabel(k)} ${k.slice(0, 4)}: ${money3(v, d.currency)}</title><rect x="${x - gap / 2}" y="${T2}" width="${bw + gap}" height="${B - T2}" fill="transparent"/>${path4 ? `<path d="${path4}" fill="#4E9A4A" opacity="${cur2 ? 1 : 0.55}"/>` : ""}
+      ${cur2 || v === Math.max(...vals) && v > 0 ? `<text x="${x + bw / 2}" y="${top - 4}" text-anchor="middle" class="rval">${money3(v, d.currency)}</text>` : ""}<text x="${x + bw / 2}" y="${B + 14}" text-anchor="middle" class="rax">${mlabel(k)}</text></g>`;
     }).join("");
-    const tl = target ? `<path d="M${L3} ${y(target)} H${W11 - L3}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W11 - L3}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money2(target, d.currency)}</text>` : "";
+    const tl = target ? `<path d="M${L3} ${y(target)} H${W11 - L3}" stroke="#8A8279" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W11 - L3}" y="${y(target) - 4}" text-anchor="end" class="rax">target ${money3(target, d.currency)}</text>` : "";
     return `<svg class="rchart" viewBox="0 0 ${W11} ${H3}" role="img" aria-label="Paid income by month, last six months"><path d="M${L3} ${B} H${W11 - L3}" stroke="#D8CFC2" stroke-width="1"/>${bars2}${tl}</svg>`;
   }
   var revenueNow = () => {
@@ -30074,14 +30110,14 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     const d = st3.data, c = d.currency, ms = Object.keys(d.byMonth), now5 = d.byMonth[ms[ms.length - 1]], target = Number(F2.revTarget) || 0;
     const pct = target ? Math.min(100, Math.round(100 * now5 / target)) : 0, retTotal = Number(d.retTotal) || d.retainers.reduce((s, r) => s + (Number(r.monthly_amount) || 0), 0);
     h3 += `<p class="sub">Studio income from Chord: paid invoices, by the month they were paid${st3.busy ? " · refreshing…" : ""}.</p>
-    <div class="rhero"><p class="rbig">${money2(now5, c)}</p><p class="muted">${esc((/* @__PURE__ */ new Date(ms[ms.length - 1] + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }))} so far${target ? ` · ${pct}% of your ${money2(target, c)} target` : ""}</p>
+    <div class="rhero"><p class="rbig">${money3(now5, c)}</p><p class="muted">${esc((/* @__PURE__ */ new Date(ms[ms.length - 1] + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }))} so far${target ? ` · ${pct}% of your ${money3(target, c)} target` : ""}</p>
       ${target ? `<span class="clbar rprog"><i style="width:${pct}%"></i></span>` : ""}
       ${st3.editing || !target ? `<form class="row rtarget" id="rvForm"><label for="rvIn" class="muted">Monthly target</label><input id="rvIn" type="number" min="0" step="50" inputmode="numeric" value="${target || ""}" placeholder="e.g. 6000"><button class="btn small" type="submit">Set</button></form>` : `<button class="btn alt small" data-rv="edit">Change target</button>`}</div>
     ${chart(d, target)}
-    <details class="rtable"><summary>See the numbers</summary><table><thead><tr><th>Month</th><th>Paid</th></tr></thead><tbody>${ms.map((k) => `<tr><td>${mlabel(k)} ${k.slice(0, 4)}</td><td>${money2(d.byMonth[k], c)}</td></tr>`).join("")}</tbody></table></details>`;
-    if (retTotal || d.retainers.length) h3 += `<p class="muted">${d.retainers.length} retainer${d.retainers.length === 1 ? "" : "s"} running${retTotal ? `: ${money2(retTotal, c)} a month` : ""}.</p>`;
+    <details class="rtable"><summary>See the numbers</summary><table><thead><tr><th>Month</th><th>Paid</th></tr></thead><tbody>${ms.map((k) => `<tr><td>${mlabel(k)} ${k.slice(0, 4)}</td><td>${money3(d.byMonth[k], c)}</td></tr>`).join("")}</tbody></table></details>`;
+    if (retTotal || d.retainers.length) h3 += `<p class="muted">${d.retainers.length} retainer${d.retainers.length === 1 ? "" : "s"} running${retTotal ? `: ${money3(retTotal, c)} a month` : ""}.</p>`;
     const owedTotal = d.owed.reduce((s, i) => s + (Number(i.total) || 0), 0);
-    h3 += `<p class="eyebrow">Still owed${d.owed.length ? ` · ${money2(owedTotal, c)}` : ""}</p>` + (d.owed.length ? `<ul class="hlist clatt">${d.owed.slice(0, 8).map((i) => `<li><span><b>${esc(plain(String(i.client || "")).slice(0, 40))}</b> ${money2(i.total, c)}<small>${esc(String(i.number || ""))}${i.due ? " · due " + esc(String(i.due)) : ""}</small></span>${i.overdue ? `<span class="hbadge now">overdue</span>` : ""}</li>`).join("")}</ul>` : `<p class="muted">Nothing outstanding. Every invoice is paid.</p>`);
+    h3 += `<p class="eyebrow">Still owed${d.owed.length ? ` · ${money3(owedTotal, c)}` : ""}</p>` + (d.owed.length ? `<ul class="hlist clatt">${d.owed.slice(0, 8).map((i) => `<li><span><b>${esc(plain(String(i.client || "")).slice(0, 40))}</b> ${money3(i.total, c)}<small>${esc(String(i.number || ""))}${i.due ? " · due " + esc(String(i.due)) : ""}</small></span>${i.overdue ? `<span class="hbadge now">overdue</span>` : ""}</li>`).join("")}</ul>` : `<p class="muted">Nothing outstanding. Every invoice is paid.</p>`);
     return h3 + `<div class="actions"><button class="btn alt small" data-rv="refresh">Refresh</button></div>`;
   }
   function wireRevenue(root, F2, save3, rerender) {
@@ -49727,7 +49763,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   migrate();
   setPaperArtF(() => F);
-  setArtContext({ cocoa: () => cocoaState(F), ohayo: () => ohayoHellos(), F: () => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
+  setArtContext({ cocoa: () => cocoaState(F), ohayo: () => ohayoDesk(), F: () => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
     const l = tapasAll(F, dayKey());
     return l.length ? l.map((t2) => TAPAS[t2.id].n).join(" · ") : null;
   }, vineStock: () => shelfStock(vineState(F)), S: () => S3, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth2(p), stats: () => ST2, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
@@ -49868,7 +49904,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       if (id === "journal" && journalOpen && document.activeElement?.id !== "jText" || id === "scratch" && scratchOpen && document.activeElement?.id !== "scratchText") ctx();
     });
     attachFeeds(col, (id) => {
-      if ((/^health/.test(id) || id === "ohayo-hellos") && ["lane", ...APP_IDS].includes(scene)) {
+      if ((/^health/.test(id) || /^ohayo-/.test(id)) && ["lane", ...APP_IDS].includes(scene)) {
         drawScene();
         ctx();
       }
@@ -51891,9 +51927,8 @@ Return JSON only: {"reply": "...", "actions": [ ... ]}`, { modelTier: "quick", c
     });
     if (ST2.chord && ST2.chord.users) w.push(`Chord is home to ${ST2.chord.users} ${ST2.chord.label || "studios"}`);
     if (ST2.chico && ST2.chico.users) w.push(`${ST2.chico.users} ${ST2.chico.label || "families"} use Chico`);
-    ["luna", "ohayo"].forEach((a) => {
-      if (ST2[a] && ST2[a].users) w.push(`${ST2[a].users} ${ST2[a].label || "users"} use ${APP_NAME[a]}`);
-    });
+    if (ST2.ohayo && ST2.ohayo.users) w.push(`${ST2.ohayo.users} ${ST2.ohayo.label || "customers"} use Ohayo`);
+    if (ST2.luna && ST2.luna.users) w.push(`${ST2.luna.users} ${ST2.luna.label || "users"} use Luna`);
     return w;
   }
   var sgAt = (day, h3, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), h3 - 8, m);
@@ -53105,7 +53140,7 @@ ${SIGNOFF[t2.who] || ""}`;
     else if (fieldView && scene === "giftshop") h3 = giftPanel(F, fieldView, giftOpts());
     else if (fieldView === "hampers" && scene === "post") h3 = hamperPanel(F, vineState(F), { day: dayKey(), pick: xmPick, season: hamperSeason(dayKey()) || "xmas" });
     else if (postOpen && scene === "post") h3 = postPanel();
-    else if (healthOpen && APP_IDS.includes(scene)) h3 = healthOpen === "reactions" ? reactionsPanel() : healthOpen === "hellos" ? helloPanel() : healthPanel(scene);
+    else if (healthOpen && APP_IDS.includes(scene)) h3 = healthOpen === "customers" ? customersPanel() : healthOpen === "numbers" ? numbersPanel() : healthPanel(scene);
     else if (newsOpen && scene === "village") h3 = goodNewsHTML(myWins(), villageCalendar(), newsTab);
     else if (scene === "market" && !shopClosed) {
       const tabs = [["seeds", "Seeds"], ["treats", "Treats"], ["deli", "Deli"], ["care", "Care"], ["family", "Family"], ["animals", "Animals"], ["home", "Home"], ["me", "Me & my room"], ["sell", "Sell"]];
@@ -57976,7 +58011,7 @@ ${SIGNOFF[t2.who] || ""}`;
       render();
       return;
     }
-    if (scene === "ohayo" && (id === "reactions" || id === "hellos")) {
+    if (scene === "ohayo" && (id === "customers" || id === "numbers")) {
       healthOpen = id;
       sfx("paper");
       render();
@@ -61243,7 +61278,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     const ug = ev.target.closest("[data-ugarden]");
     if (ug) {
       const k = ug.dataset.ugarden, st6 = ST2[k] || {};
-      speak(`${(st6.users || 0).toLocaleString()} ${st6.label || (k === "chord" ? "studios" : "families")} use ${k === "chord" ? "Chord" : "Chico"}! One flower for every ${st6.per > 0 ? st6.per : 10}.`, 4500);
+      speak(`${(st6.users || 0).toLocaleString()} ${st6.label || ({ chord: "studios", chico: "families", ohayo: "customers" }[k] || "users")} use ${APP_NAME[k] || k}! One flower for every ${st6.per > 0 ? st6.per : 10}.`, 4500);
       return;
     }
     const ent = ev.target.closest("[data-ent]");

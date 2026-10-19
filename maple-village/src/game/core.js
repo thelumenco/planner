@@ -17,7 +17,7 @@ import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, set
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
 import { findPath, blocked, rideBlocked, offWater } from "./paths.js";
 import { fetchPost, postPanel, postCount } from "./postbox.js";
-import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML, ohayoHellos, reactionsPanel, helloPanel } from "./feeds.js";
+import { attachFeeds, health, healthPanel, contentHTML, wireContent, goodNews, goodNewsHTML, ohayoDesk, customersPanel, numbersPanel } from "./feeds.js";
 import { initHestia, attachHestiaDb, hestiaPanel, wireHestia, setFridgeTab, hestiaCounts, importHestia, chatLastDone, lastDueCount, chatAddShopping, chatRestock, chatAddChore, chatTickChore, chatTidyTimer, hestiaSummary } from "./hestia.js";
 import { ensurePets, addAnimal, feedOne, upgradeRun, runPanel, scatterTreat, roomLeft, hungry, hungryCount, KINDS } from "./pets.js";
 import { wardrobePanel, newOutfit, outfitsToday, wearing, ACCESSORIES } from "./wardrobe.js";
@@ -189,7 +189,7 @@ function migrate(){
 }
 migrate();
 setPaperArtF(() => F);
-setArtContext({cocoa: () => cocoaState(F), ohayo: () => ohayoHellos(), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kudos: () => kudosCount(), vault: x => { const i = [70, 165, 260, 355, 450].indexOf(x); return i < 0 ? null : jarAt(i); }, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()}), millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns(F, "giftshop") && GAL.stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey())});
+setArtContext({cocoa: () => cocoaState(F), ohayo: () => ohayoDesk(), F:() => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => { const l = tapasAll(F, dayKey()); return l.length ? l.map(t => TAPAS[t.id].n).join(" · ") : null; }, vineStock: () => shelfStock(vineState(F)), S:() => S, remaining:() => remaining(), questsIn:pl => questsIn(pl), growth:p => growth(p), stats:() => ST, day:() => dayKey(), postCount:() => postCount(), health: app => health(app), goodNews: () => { const g = goodNews(); return g && F.goodRead !== g.at ? g : null; }, lanterns:() => (S.pond ? (S.pond.shown ?? S.pond.wins.length) : 0), dusk:() => isDusk(), music:() => sound.music, jars:() => jarShelf(), kudos: () => kudosCount(), vault: x => { const i = [70, 165, 260, 355, 450].indexOf(x); return i < 0 ? null : jarAt(i); }, ped: (x, y) => { const i = stationsOf("trophy").filter(s => s.kind === "pedestal").findIndex(s => s.x === x && s.y === y); return i < 0 ? null : onPedestals(F)[i] || null; }, kid: () => ({sleep: kid.sleep || evanNight()}), millCrate: () => owns(F, "mill") && !owns(F, "millshop") && !owns(F, "giftshop") ? crateMix(F) : null, giftMill: () => crateMix(F), galleryStock: () => owns(F, "giftshop") && GAL.stockUp(F, dayKey()), xmasSeason: () => xmasOn(dayKey())});
 function isDusk(){ const t = sgHM(); return t >= 19*60 || t < 6*60; }
 let say = null, refs = null, writing = {}, pending = {}, speechT = null, speechLock = 0;
 let scene = "base", atSpot = null, boardOpen = false, shelfOpen = false, selPlot = null, shopTab = "seeds";
@@ -261,7 +261,7 @@ async function initDb(){
   attachJars(col, () => { if (scene === "room") drawScene(); if (jarsOpen && !/^(jNote|jcName)$/.test(document.activeElement?.id || "")) ctx(); });
   attachMyDocs(col, id => { if ((id === "journal" && journalOpen && document.activeElement?.id !== "jText") || (id === "scratch" && scratchOpen && document.activeElement?.id !== "scratchText")) ctx(); });
   attachFeeds(col, id => {
-    if ((/^health/.test(id) || id === "ohayo-hellos") && ["lane", ...APP_IDS].includes(scene)) { drawScene(); ctx(); }
+    if ((/^health/.test(id) || /^ohayo-/.test(id)) && ["lane", ...APP_IDS].includes(scene)) { drawScene(); ctx(); }
     if (/^content/.test(id) && openView === "cal" && calTab === "content") renderCal();
     if (id === "goodnews" && scene === "village") drawScene();
   });
@@ -1173,7 +1173,8 @@ function myWins(){
   APP_IDS.forEach(a => { const h = health(a); if (h && h.status === "green") w.push(`${APP_NAME[a]}: all checks green last night`); });
   if (ST.chord && ST.chord.users) w.push(`Chord is home to ${ST.chord.users} ${ST.chord.label || "studios"}`);
   if (ST.chico && ST.chico.users) w.push(`${ST.chico.users} ${ST.chico.label || "families"} use Chico`);
-  ["luna", "ohayo"].forEach(a => { if (ST[a] && ST[a].users) w.push(`${ST[a].users} ${ST[a].label || "users"} use ${APP_NAME[a]}`); });
+  if (ST.ohayo && ST.ohayo.users) w.push(`${ST.ohayo.users} ${ST.ohayo.label || "customers"} use Ohayo`);
+  if (ST.luna && ST.luna.users) w.push(`${ST.luna.users} ${ST.luna.label || "users"} use Luna`);
   return w;
 }
 
@@ -1783,7 +1784,7 @@ function ctx(){
   else if (fieldView && scene === "giftshop") h = giftPanel(F, fieldView, giftOpts());   // round 178
   else if (fieldView === "hampers" && scene === "post") h = hamperPanel(F, vineState(F), {day: dayKey(), pick: xmPick, season: hamperSeason(dayKey()) || "xmas"});   // round 173
   else if (postOpen && scene === "post") h = postPanel();
-  else if (healthOpen && APP_IDS.includes(scene)) h = healthOpen === "reactions" ? reactionsPanel() : healthOpen === "hellos" ? helloPanel() : healthPanel(scene);
+  else if (healthOpen && APP_IDS.includes(scene)) h = healthOpen === "customers" ? customersPanel() : healthOpen === "numbers" ? numbersPanel() : healthPanel(scene);
   else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar(), newsTab);
   else if (scene === "market" && !shopClosed) {
     const tabs = [["seeds","Seeds"],["treats","Treats"],["deli","Deli"],["care","Care"],["family","Family"],["animals","Animals"],["home","Home"],["me","Me & my room"],["sell","Sell"]];
@@ -3245,7 +3246,7 @@ function arriveSpot(id){
   if (id === "digest") { shelfOpen = true; speak(digestReady() ? (isHere("juniper") ? "Juniper's waving a digest at you!" : "A fresh digest is ready on the shelf.") : "Digests are rationed. Like dessert.", 3500); render(); return; }
   if (id === "stall") { shopClosed = false; render(); return; }
   if (id === "status") { healthOpen = true; sfx("paper"); render(); return; }
-  if (scene === "ohayo" && (id === "reactions" || id === "hellos")) { healthOpen = id; sfx("paper"); render(); return; }   // Ohayo's reactions board and hello chart
+  if (scene === "ohayo" && (id === "customers" || id === "numbers")) { healthOpen = id; sfx("paper"); render(); return; }   // Ohayo's customer wall and numbers board
   if (id === "pobox") { postOpen = true; sfx("paper"); render(); fetchPost().then(() => { ctx(); drawScene(); }); return; }
   if (id === "board" && outside()) { openView = "quests"; speak("All of today's quests!", 3500); render(); return; }
   if (scene === "post" && id === "hampers") { if (!hamperSeason(dayKey())) { speak("Penny's hamper table comes out three times a year: Valentine's (from the 1st of February), Mother's Day (from the 1st of May) and Christmas (from the 20th of November).", 5000); render(); return; } fieldView = "hampers"; sfx("paper", true); render(); return; }
@@ -4274,7 +4275,7 @@ svg.addEventListener("click", ev => {
   const kp = ev.target.closest("[data-keep]");
   if (kp) { keepSpot = kp.dataset.keep; sfx("paper", true); render(); return; }
   const ug = ev.target.closest("[data-ugarden]");
-  if (ug) { const k = ug.dataset.ugarden, st = ST[k] || {}; speak(`${(st.users || 0).toLocaleString()} ${st.label || (k === "chord" ? "studios" : "families")} use ${k === "chord" ? "Chord" : "Chico"}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500); return; }
+  if (ug) { const k = ug.dataset.ugarden, st = ST[k] || {}; speak(`${(st.users || 0).toLocaleString()} ${st.label || ({chord: "studios", chico: "families", ohayo: "customers"}[k] || "users")} use ${APP_NAME[k] || k}! One flower for every ${st.per > 0 ? st.per : 10}.`, 4500); return; }
   const ent = ev.target.closest("[data-ent]");
   if (ent && ent.dataset.ent === "evan" && hug && hug.phase === "ask") { hugBack(); return; }
   if (ent && ent.dataset.ent === "evan") { evanSays(pick(["Mama!", "hug!", "hehe!", "up up!"])); mprop("heart", evan.x, evan.y - 40); evan.tx = mel.x + 16; evan.ty = mel.y + 4; evan.run = true; return; }
