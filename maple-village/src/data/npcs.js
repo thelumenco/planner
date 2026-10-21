@@ -872,7 +872,7 @@ export const NPCS = [
   // shop floor and the deck every day 10 to 6 (and doing the deliveries once there's a bike; scoop.js waiterOn)
   {
     id: "sofia", pitch: 1.2, name: "Sofia", job: "Runs the counter at the Scoop Shack",
-    intro: "Ciao, I'm Sofia! I scoop, I chat, I tell everyone the new flavour is the best one. Because it is.",
+    intro: "Ciao, I'm Sofia! Your uncle hired me the summer he opened this place. He ate pistachio every single day. I scoop, I chat, and I tell everyone the new flavour is the best one. Because it is.",
     look: {skin: "#E8C4A0", hair: "#3A2A22", hairStyle: "bun", top: "#F4C7CF", bottom: "#3F4A6B", extra: "apron"},
     routine: [slot("9:45", "14:00", "scoopshop", [300, 268]), slot("14:00", "14:30", "bay", [196, 360], {act: "sit"}), slot("14:30", "20:15", "scoopshop", [300, 268])],
     lines: ["Cup or cone? Trick question: both.", "The deck's lovely this time of day.", "Someone ordered four scoops before lunch. Respect.", "Tomo's run off his feet on the deck. Bless him."],
