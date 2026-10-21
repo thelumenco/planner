@@ -68,6 +68,7 @@ export const INGR = {
   // round 251 (Mel: wine and rum in ice cream): grown-up flavours, a little dearer, never for Evan
   wine_red: ["Your red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Your rosé", "Rosé", "#E98AA0"], wine_white: ["Your white wine", "White Wine", "#E8D57A"], wine_sparkling: ["Your sparkling", "Sparkling", "#F3E7B0"],
   rum: ["Sailors' dark rum", "Rum", "#8A4A1E"], raisins: ["Raisins", "Raisin", "#6B3A2A"],
+  dried_cherry: ["Dried cherries", "Cherry", "#8A2234"], hk_cherry: ["Hokkaido cherries", "Cherry", "#C2334D"],   // round 252: cherries out of season (Ronda) and in summer (Hokkaido)
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
   yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
   ...Object.fromEntries(Object.values(TREES).map(t => [t.fruit, [t.fruit[0].toUpperCase() + t.fruit.slice(1), t.fruit[0].toUpperCase() + t.fruit.slice(1), FRUIT_COL[t.fruit] || "#F3C969"]])),
@@ -172,7 +173,7 @@ const NOTES = ["Best pandan ever. Sorry, only had coins for one! x", "For the li
 const GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"], SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
 const POETIC = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
 // the classics keep their proper names (round 251): rum and raisin, not raisin and rum
-const CLASSIC = {"raisins+rum": "Rum & Raisin", "chocolate+wine_red": "Red Wine & Chocolate", "housechoc+wine_red": "Red Wine & Chocolate", "lemon+wine_sparkling": "Sparkling Lemon", "peach+wine_white": "White Peach & Wine", "cherry+wine_red": "Cherry & Red Wine"};
+const CLASSIC = {"raisins+rum": "Rum & Raisin", "chocolate+wine_red": "Red Wine & Chocolate", "housechoc+wine_red": "Red Wine & Chocolate", "lemon+wine_sparkling": "Sparkling Lemon", "peach+wine_white": "White Peach & Wine", "cherry+wine_red": "Cherry & Red Wine", "dried_cherry+wine_red": "Cherry & Red Wine", "hk_cherry+wine_red": "Cherry & Red Wine", "chocolate+dried_cherry": "Black Forest", "chocolate+cherry": "Black Forest", "chocolate+hk_cherry": "Black Forest"};
 export const ADULT = ["wine_red", "wine_rose", "wine_white", "wine_sparkling", "rum"];
 export const isAdult = r => !!(r && (r.ings || []).some(i => ADULT.includes(i)));
 export function nameFor(ings){

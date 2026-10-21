@@ -2691,3 +2691,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - **Raisins:** a new "raisin tray" in the drying loft (loft.js `LOFT.tray`): 2 bunches of your grapes, 2 days, 2 bags of raisins; needs Signor Bruno's raisin lesson, like the racks.
 - **The flavours** (scoop.js): `INGR` has the four wines, rum and raisins. `CLASSIC` keeps the classics' proper names (Rum & Raisin, Red Wine & Chocolate, Sparkling Lemon, White Peach & Wine, Cherry & Red Wine). Anything with wine or rum (`ADULT`, `isAdult`) is a grown-up special: it sells for the special's extra, isn't giftable to Evan, and when Mel has one with Evan there, Sofia gives him a plain milk scoop instead.
 - Test: "Wine and rum in the Scoop Shack (round 251)".
+
+## Round 252: cherries out of season (Mel: "Where do I get cherries?"; the orchard's cherry tree only fruits in spring)
+- **Dried cherries** all year at Ronda's mercado (towns.js `dried_cherry`, 5, sells back 2).
+- **Hokkaido cherries** at Haruko's market hall, June to August only (hokkaido-goods.js `hk_cherry` with `months: [6, 7, 8]`; hokkaido.js `goods()` hides seasonal goods out of their months).
+- Both are gelato ingredients (scoop.js `INGR`, word "Cherry") and so bonbon fillings too. `CLASSIC` names: any cherry with red wine is "Cherry & Red Wine"; any cherry with chocolate is "Black Forest". Test in "Wine and rum in the Scoop Shack".

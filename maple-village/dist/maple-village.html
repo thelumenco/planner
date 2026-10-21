@@ -5608,6 +5608,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     hk_melon: { n: "Yubari melon", kind: "ingredient", price: 9, sell: 4, shop: "hk_cafe", art: ["globe", "#F2A65A", "#9CC27E"], what: "a melon gelato as orange as a sunset; a sweet melon bonbon filling" },
     kingcrab: { n: "King crab legs", kind: "ingredient", price: 9, sell: 4, shop: "hk_hall", art: ["fish", "#D8573A", "#F3E7C8"], what: "king crab hotpot and the seafood rice bowl at the kitchen (Hokkaido specials)" },
     unikura: { n: "Sea urchin and salmon roe tray", kind: "ingredient", price: 8, sell: 4, shop: "hk_hall", art: ["box", "#F2A23A", "#E8563A"], what: "the seafood rice bowl at the kitchen (a Hokkaido special): sweet uni and bright little pearls of ikura" },
+    // round 252 (Mel: "where do I get cherries?"): Hokkaido's famous summer cherries, June to August only (`months`)
+    hk_cherry: { n: "Hokkaido cherries", kind: "ingredient", price: 7, sell: 3, shop: "hk_hall", months: [6, 7, 8], art: ["apple", "#C2334D", "#7FB86A"], what: "a punnet of Hokkaido's summer cherries, deep red and sweet: cherry gelato (try them with your red wine), a cherry bonbon filling. Only June to August" },
     kombu: { n: "Kombu seaweed", kind: "ingredient", price: 3, sell: 1, shop: "hk_hall", art: ["sticks", "#3E5A3A", "#7A8A5A"], what: "the broth for king crab hotpot at the kitchen (a Hokkaido special)" },
     hk_musicbox: { n: "Glass music box", kind: "gift", to: ["angelina", "mum", "evan"], price: 16, shop: "hk_glass", art: ["box", "#9FC3D9", "#E3C26A"], say: "A music box from Otaru! Wind it up and the little glass lid twinkles while it plays. I could listen to it all day." },
     hk_namachoc: { n: "Nama chocolate", kind: "gift", to: "family", price: 8, shop: "hk_cafe", art: ["box", "#5A3A2A", "#F3E7C8"], say: "Nama chocolate, made with Hokkaido cream! It melts the second it touches your tongue. One square each. Maybe two." },
@@ -6749,6 +6751,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     oliveoil: { n: "Olive oil", kind: "ingredient", price: 18, sell: 16, shop: "mercado", art: ["bottle", "#B9B04A"], what: "Rafael's family oil, from Ronda: salmorejo, ajo blanco, bread with oil" },
     jamon: { n: "Jamón", kind: "ingredient", price: 15, sell: 5, shop: "mercado", art: ["roll", "#B5443A", "#F3E1D0"], what: "from Ronda's market: jamón croquetas at the kitchen" },
     payoyo: { n: "Payoyo goat's cheese", kind: "ingredient", price: 12, sell: 4, shop: "mercado", art: ["wheel", "#F3E7C8", "#C9A27E"], what: "a mountain goat's cheese from Ronda: payoyo with membrillo at the kitchen" },
+    dried_cherry: { n: "Dried cherries", kind: "ingredient", price: 5, sell: 2, shop: "mercado", art: ["bag", "#8A2234", "#E8D3A8"], what: "sour cherries dried in the Andalusian sun, all year round: cherry gelato (lovely with red wine or chocolate), a cherry bonbon filling" },
+    // round 252 (Mel: cherries out of season)
     membrillo: { n: "Membrillo", kind: "ingredient", price: 6, sell: 2, shop: "mercado", art: ["bar", "#C8643B"], what: "quince paste from Ronda: with payoyo at the kitchen, a quince bonbon filling" },
     picnic: { n: "Picnic basket", kind: "picnic", price: 18, sell: 0, shop: "mercado", art: ["tote", "#C9A27E", "#E8566C"], what: "bread, cheese, jamón and oranges: spread it out at the Alameda balcony" },
     churros: { n: "Churros", kind: "gift", to: "family", price: 4, shop: "dulces", art: ["roll", "#E8C48E", "#C98A4A"], say: "Churros! Still warm, and sugary all over. Is there chocolate?", says: { evan: "CHURROS! Dip dip dip!" } },
@@ -19943,6 +19947,9 @@ ${r.n}`;
     wine_sparkling: ["Your sparkling", "Sparkling", "#F3E7B0"],
     rum: ["Sailors' dark rum", "Rum", "#8A4A1E"],
     raisins: ["Raisins", "Raisin", "#6B3A2A"],
+    dried_cherry: ["Dried cherries", "Cherry", "#8A2234"],
+    hk_cherry: ["Hokkaido cherries", "Cherry", "#C2334D"],
+    // round 252: cherries out of season (Ronda) and in summer (Hokkaido)
     goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
     yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"],
     honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"],
@@ -20085,7 +20092,7 @@ ${r.n}`;
   var GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"];
   var SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
   var POETIC = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
-  var CLASSIC = { "raisins+rum": "Rum & Raisin", "chocolate+wine_red": "Red Wine & Chocolate", "housechoc+wine_red": "Red Wine & Chocolate", "lemon+wine_sparkling": "Sparkling Lemon", "peach+wine_white": "White Peach & Wine", "cherry+wine_red": "Cherry & Red Wine" };
+  var CLASSIC = { "raisins+rum": "Rum & Raisin", "chocolate+wine_red": "Red Wine & Chocolate", "housechoc+wine_red": "Red Wine & Chocolate", "lemon+wine_sparkling": "Sparkling Lemon", "peach+wine_white": "White Peach & Wine", "cherry+wine_red": "Cherry & Red Wine", "dried_cherry+wine_red": "Cherry & Red Wine", "hk_cherry+wine_red": "Cherry & Red Wine", "chocolate+dried_cherry": "Black Forest", "chocolate+cherry": "Black Forest", "chocolate+hk_cherry": "Black Forest" };
   var ADULT = ["wine_red", "wine_rose", "wine_white", "wine_sparkling", "rum"];
   var isAdult = (r) => !!(r && (r.ings || []).some((i) => ADULT.includes(i)));
   function nameFor(ings) {
@@ -41976,7 +41983,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   var shut17 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin9 = () => icon("coin", 13);
-  var goods3 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop);
+  var goods3 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop && (!TOWN_GOODS[id].months || TOWN_GOODS[id].months.includes(+dayKey().slice(5, 7))));
   var row4 = (F2, id) => {
     const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
     return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin9()}</button></li>`;

@@ -530,6 +530,7 @@ export const TOWN_GOODS = {
   oliveoil: {n: "Olive oil", kind: "ingredient", price: 18, sell: 16, shop: "mercado", art: ["bottle", "#B9B04A"], what: "Rafael's family oil, from Ronda: salmorejo, ajo blanco, bread with oil"},
   jamon: {n: "Jamón", kind: "ingredient", price: 15, sell: 5, shop: "mercado", art: ["roll", "#B5443A", "#F3E1D0"], what: "from Ronda's market: jamón croquetas at the kitchen"},
   payoyo: {n: "Payoyo goat's cheese", kind: "ingredient", price: 12, sell: 4, shop: "mercado", art: ["wheel", "#F3E7C8", "#C9A27E"], what: "a mountain goat's cheese from Ronda: payoyo with membrillo at the kitchen"},
+  dried_cherry: {n: "Dried cherries", kind: "ingredient", price: 5, sell: 2, shop: "mercado", art: ["bag", "#8A2234", "#E8D3A8"], what: "sour cherries dried in the Andalusian sun, all year round: cherry gelato (lovely with red wine or chocolate), a cherry bonbon filling"},   // round 252 (Mel: cherries out of season)
   membrillo: {n: "Membrillo", kind: "ingredient", price: 6, sell: 2, shop: "mercado", art: ["bar", "#C8643B"], what: "quince paste from Ronda: with payoyo at the kitchen, a quince bonbon filling"},
   picnic: {n: "Picnic basket", kind: "picnic", price: 18, sell: 0, shop: "mercado", art: ["tote", "#C9A27E", "#E8566C"], what: "bread, cheese, jamón and oranges: spread it out at the Alameda balcony"},
   churros: {n: "Churros", kind: "gift", to: "family", price: 4, shop: "dulces", art: ["roll", "#E8C48E", "#C98A4A"], say: "Churros! Still warm, and sugary all over. Is there chocolate?", says: {evan: "CHURROS! Dip dip dip!"}},

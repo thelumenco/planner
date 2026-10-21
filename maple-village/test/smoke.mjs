@@ -5010,6 +5010,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(b.recipe && /Red Wine & Chocolate/.test(b.recipe.name) && sc.priceOf(sc.scoopState(F), "cup", b.recipe) > sc.priceOf(sc.scoopState(F), "cup", {special: false}), `red wine and chocolate (${b.recipe && b.recipe.name}), a little dearer a scoop`);
   sc.registerItems(F); const gid = Object.keys(ITEMS).find(k => ITEMS[k].gel && /Rum & Raisin/.test(ITEMS[k].n));
   check(gid && Array.isArray(ITEMS[gid].to) && !ITEMS[gid].to.includes("evan"), "nobody gives Evan a rum and raisin cone");
+  // round 252 (Mel: "where do I get cherries?"): dried cherries all year at Ronda's market, fresh ones in Hokkaido in summer
+  const tw = await import(new URL("../src/data/towns.js", import.meta.url));
+  check(tw.TOWN_GOODS.dried_cherry.shop === "mercado" && tw.TOWN_GOODS.hk_cherry.shop === "hk_hall" && tw.TOWN_GOODS.hk_cherry.months.join() === "6,7,8", "cherries out of season: dried at Ronda's mercado all year, fresh at Hokkaido's market hall June to August");
+  F.inv.dried_cherry = 1; F.inv.chocolate = 1; sc.stockFridge(F, "dried_cherry", 1, "bag"); sc.stockFridge(F, "chocolate", 1, "bag"); sc.scoopState(F).churn = [];
+  const c = sc.discover(F, ["dried_cherry", "chocolate"]);
+  check(c.recipe && /^Black Forest/.test(c.recipe.name) && !c.recipe.special, `dried cherries and chocolate: ${c.recipe && c.recipe.name} (no wine, so it's for everyone)`);
 }
 {
   console.log("\nStories pick up where they left off (round 203)");

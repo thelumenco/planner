@@ -18,7 +18,7 @@ import { hkSeason } from "../data/hokkaido.js";
 export function hkState(F){ F.hokkaido = F.hokkaido || {}; const c = F.hokkaido; c.seeds = c.seeds || {}; c.scroll = c.scroll || {}; return c; }
 const shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 const coin = () => icon("coin", 13);
-const goods = shop => Object.keys(TOWN_GOODS).filter(id => TOWN_GOODS[id].shop === shop);
+const goods = shop => Object.keys(TOWN_GOODS).filter(id => TOWN_GOODS[id].shop === shop && (!TOWN_GOODS[id].months || TOWN_GOODS[id].months.includes(+dayKey().slice(5, 7))));   // seasonal goods (the summer cherries) only in their months
 const row = (F, id) => { const g = TOWN_GOODS[id], have = (F.inv || {})[id] || 0;
   return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g.n)}</b><small>${esc(g.what || g.say || g.line || "")}${have ? ` (${have} in your backpack)` : ""}${g.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F.coins >= g.price ? "" : "disabled"}>${g.price} ${coin()}</button></li>`; };
 const list = (F, shop, title) => { const ids = goods(shop); return ids.length ? `${title ? `<h3 class="ph3">${esc(title)}</h3>` : ""}<ul class="hlist wlist">${ids.map(id => row(F, id)).join("")}</ul>` : ""; };
