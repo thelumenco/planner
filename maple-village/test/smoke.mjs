@@ -4638,6 +4638,7 @@ if (want("\nWine in ice cream, and rum and raisin (round 231)")) try {
     const r = sc.discover(F, ["wine_red", "cherry"]).recipe; check(r && /Red Wine/.test(r.name) && !r.dairy && !r.special, `wine makes a sorbet with fruit (${r && r.name})`); }
   { const rd = await import(new URL("../src/game/ronda.js", import.meta.url)), tw = await import(new URL("../src/data/towns.js", import.meta.url)), F = {coins: 20, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
     check(tw.TOWN_GOODS.hk_cherries.shop === "hkmarket" && rd.buyGood(F, "hk_cherries", add) && F.inv.cherry === 3 && F.coins === 5 && !F.inv.hk_cherries && its.ITEMS.cherry.sell < 5, "cherries all year: a punnet at Otaru's morning market is three of the orchard's cherries, 15 coins (they sell back for less)"); }
+  { await import(new URL("../src/game/ronda.js", import.meta.url)); check(its.ITEMS.rum && its.ITEMS.rum.scoop, "in the backpack, the rum says it's for ice cream or bonbons (not the kitchen)"); }
   { const rum = sw.SW_GOODS.rum; check(rum && rum.price === 15 && rum.sell < rum.price && rum.shop === "sw_chandlery" && sc.isIngr("rum"), "dark sailor's rum at Saltwick's chandlery: 15 coins (it sells back for less)"); }
   { const F = {inv: {}, towns: {cinque: 1}, cinque: {raisin: 1}}; const L = lf.loftState(F); L.rack = {at: Date.now() - 4*864e5, n: 6};
     check(lf.takeRaisins(F).n === 6 && F.inv.raisins === 6 && !L.rack && !L.cask && sc.isIngr("raisins"), "grapes dried on the loft's racks can be kept as raisins: six bags");
@@ -4671,7 +4672,23 @@ if (want("\nWindows glow in the evening (round 231)")) try {
   const nine = await lit("21:00", "lane"), late = await lit("23:15", "lane"), day = await lit("15:00", "lane");
   check(nine >= 6, `at 9pm the windows on Makers' Lane glow (${nine} lit)`);
   check(late === 0 && day === 0, "and they're dark after 11pm (everyone's in bed), and in the daytime");
+  { const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    await page.goto(url + "?reset=1&seed=1&time=22:57&date=2026-10-14"); await page.waitForTimeout(1200); await page.evaluate(() => window.__hbScene("lane")); await page.waitForTimeout(1200);
+    const before = await page.evaluate(() => document.querySelectorAll(".nightcopy .glow").length);
+    await page.evaluate(() => { globalThis.__hbOffset = (globalThis.__hbOffset || 0) + 5*60e3; }); await page.waitForTimeout(2500);
+    const after = await page.evaluate(() => document.querySelectorAll(".nightcopy .glow").length); await page.close();
+    check(before > 0 && after === 0, `standing on the lane as 11pm comes, the windows go out (${before} lit, then ${after})`); }
+  const seven = await lit("19:02", "lane"); check(seven >= 6, `and they're on from 7pm (${seven} lit at 7:02)`);
   const woods = await lit("21:30", "hwoods"); check(woods >= 2, "a window drawn in its own colour can be marked to glow too (the ranger's cabin)");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe cottage fruit basket takes any fruit (round 231)")) try {
+  // the creator: "can't seem to put stuff in the fruit basket in the cottage": only orchard fruit was allowed
+  console.log("\nThe cottage fruit basket takes any fruit (round 231)");
+  const lt = await import(new URL("../src/game/lets.js", import.meta.url)); await import(new URL("../src/game/ronda.js", import.meta.url));   // (trip goods become items there)
+  check(["apple", "strawberry", "blueberry", "raspberry", "banana", "grape_red", "hallabong", "hkmelon"].every(lt.isFruit), "orchard fruit, garden berries, raspberries, bananas, grapes and sweet trip fruit all go in the welcome basket");
+  check(!["sevilla", "yuzu", "fingerlime", "carrot"].some(lt.isFruit), "but not sour or cooking fruit, or vegetables");
+  const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), r = mc.HERB.raspberry;
+  check(r.soap && r.lotion && r.balm && r.lipoil, "and at the mill, raspberries go in soaps, hand lotions, lip balms and lip oils (the creator: \"need to be able to use raspberries for the mill stuff\")");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");

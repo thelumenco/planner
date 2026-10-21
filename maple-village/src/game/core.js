@@ -579,7 +579,9 @@ function act(kind, item){
 
 /* =================== SOUND + TIMERS =================== */
 let lastReady = readyCount(), lastDusk = null, lastFieldEv = null, lastSky = null;
-const skyKey = () => skyWash(localHM()) + scene;
+// (round 231: and the windows going on at 7 and off at 11, after the sky has settled)
+const winLit = () => { const m = localHM(); return m >= 19*60 && m < 23*60; };
+const skyKey = () => skyWash(localHM()) + scene + winLit();
 setInterval(() => {
   if (S.sleep && S.sleep.until && Date.now() > S.sleep.until) wakeUp();
   if (hushed() && !$("speech").hidden && Date.now() > speechLock && Date.now() - speechAt > 6000) $("speech").hidden = true;   // tuck the pet's bubble away
@@ -1887,11 +1889,12 @@ function nightLights(){
   // Honeybrook's buildings glaze their windows in the sky colour (the wine shop, the train and the van a paler blue),
   // so any window-sized piece of it lights up warm
   // (class "win" marks a window drawn in another colour; data-nowin opts a sky-coloured thing that isn't a window out). Home has its own, and after 11 the village is abed.
-  { const m = localHM(); if (scene !== "base" && !townOf(scene) && m >= 19*60 && m < 23*60) art.querySelectorAll('.win, [style*="fill:var(--sky)"], [style*="fill:#CFE0EE"], [style*="fill:#DCE8F0"]').forEach(w => {
+  { if (scene !== "base" && !townOf(scene) && winLit()) art.querySelectorAll('.win, [style*="fill:var(--sky)"], [style*="fill:#CFE0EE"], [style*="fill:#DCE8F0"]').forEach(w => {
     if (!/^(rect|circle|path|ellipse)$/.test(w.tagName) || w.closest(".nightcopy, [data-nowin]")) return; let b; try { b = w.getBBox(); } catch { return; }
     if (b.width < 3 || b.height < 3 || b.width > 50 || b.height > 40) return;   // (shop windows run a little wider)
     const k = w.cloneNode(false); k.setAttribute("style", "fill:#FFD98A"); k.setAttribute("class", "glow"); k.removeAttribute("filter");
-    h += `<g transform="${mtx(w)}"><rect x="${(b.x - 6).toFixed(1)}" y="${(b.y - 6).toFixed(1)}" width="${(b.width + 12).toFixed(1)}" height="${(b.height + 12).toFixed(1)}" rx="8" fill="#FFD98A" opacity=".18"/>${k.outerHTML}</g>`; }); }
+    // (a halo as wide as home's, so the glow reads against the sunset at 7 as well as in the dark)
+    h += `<g transform="${mtx(w)}"><rect x="${(b.x - 8).toFixed(1)}" y="${(b.y - 8).toFixed(1)}" width="${(b.width + 16).toFixed(1)}" height="${(b.height + 16).toFixed(1)}" rx="10" fill="#FFD98A" opacity=".3"/>${k.outerHTML}</g>`; }); }
   art.querySelectorAll(".nglow").forEach(g => { const k = g.cloneNode(true); k.setAttribute("transform", mtx(g)); k.removeAttribute("class"); h += k.outerHTML; });   // neon, fairy lights
   art.querySelectorAll("text.lab").forEach(t => { const g = t.parentNode; if (!g || g.closest(".nightcopy")) return;
     const k = g.cloneNode(true), p = k.querySelector("path"); if (p) { p.style.fill = "#FFFDF6"; p.setAttribute("opacity", "1"); }

@@ -86,7 +86,10 @@ export const starsOf = (F, id) => { const s = scoreOf(F, id); return s.ready ? M
 export const missing = (F, id) => { const c = letsState(F).cottages[id]; return Object.keys(COTTAGES[id].slots).filter(s => !c.slots[s]).map(s => CATS[catOf(id, s)].line).filter((v, i, a) => a.indexOf(v) === i); };
 
 /* ---------- the welcome: fruit basket, fridge, the pantry for Hettie ---------- */
-export const isFruit = id => !!(ITEMS[id] && ITEMS[id].fruit);
+// (round 231: not just the orchard's: garden berries, raspberries, bananas, grapes and the sweet ones from trips too;
+// sour and cooking fruit, like Seville oranges, yuzu and finger limes, aren't for a welcome basket)
+const BASKET_FRUIT = ["strawberry", "blueberry", "raspberry", "banana", "grape_red", "grape_white", "grape_tempranillo", "grape_pinot", "grape_chardonnay", "hallabong", "hkmelon"];
+export const isFruit = id => !!(ITEMS[id] && (ITEMS[id].fruit || BASKET_FRUIT.includes(id)));
 export const isTreat = id => !!(ITEMS[id] && (ITEMS[id].wine || FRIDGE.includes(id)));
 const count = o => Object.values(o || {}).reduce((a, b) => a + b, 0);
 const bump = (o, id, n) => { o[id] = (o[id] || 0) + n; if (o[id] <= 0) delete o[id]; };

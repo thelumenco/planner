@@ -4,7 +4,7 @@
 //     lemon, orange, lavender) steep for six hours: two bottles worth half as much again as plain oil.
 //   soaps: goat's milk (two) or olive oil (one) and one or two add-ins (lavender, rose, every honey, rosemary, mint, thyme,
 //     orange, lemon, raspberries); a day curing on the rack, then six bars.
-//   lotions: goat's milk, olive oil and one scent (lavender, rose, every honey but comb, orange, lemon, mint): an hour, three jars.
+//   lotions: goat's milk, olive oil and one scent (lavender, rose, every honey but comb, orange, lemon, mint, raspberry): an hour, three jars.
 // Like the gelato flavours, every new mix is found once and named, then made again. Herbs come from the garden and the
 // greenhouse, lavender and roses from Mei's flower farm (her bouquets); fruit from the orchard.
 // What's made goes onto the mill's shelves (the store). Until the Mill Shop's open the wine shop sells a little of it
@@ -45,7 +45,7 @@ export const KINDS = {oil: {n: "Infused oils", max: 2, price: 28, sell: 24}, soa
 // The dye is a stem of any flower from Mei's flower farm (its shed), or a tulip or sunflower from the player's garden; the
 // tin's lid and the oil take its colour.
 for (const a of ["honey", "honey_lav", "honey_blossom", "honey_cream", "honey_sun", "honey_heath", "euchoney", "mint", "orange", "lemon", "bq_lavender", "bq_rose", "strawberry", "bq_sweetpea", "bq_camellia"]) if (HERB[a]) Object.assign(HERB[a], {balm: true, lipoil: true});
-if (HERB.raspberry) HERB.raspberry.lipoil = true;
+if (HERB.raspberry) Object.assign(HERB.raspberry, {lipoil: true, balm: true, lotion: true});   // round 231: raspberries in balms and lotions too, like strawberries
 ITEMS.beeswax = Object.assign(ITEMS.beeswax || {}, {n: "A block of beeswax", kind: "ingredient", ico: "beeswax", price: 4, sell: 2});
 export const dyeHave = (F, d) => (((F.orch || {}).stock || {})["stem:" + d] || 0) + ((F.inv || {})[d] && ITEMS[d] && ITEMS[d].kind === "flower" ? F.inv[d] : 0);
 const useDye = (F, d) => { if ((F.inv || {})[d] > 0 && ITEMS[d] && ITEMS[d].kind === "flower") { F.inv[d]--; if (!F.inv[d]) delete F.inv[d]; return; } F.orch.stock["stem:" + d]--; if (F.orch.stock["stem:" + d] <= 0) delete F.orch.stock["stem:" + d]; };
