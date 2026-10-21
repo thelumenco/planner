@@ -237,6 +237,8 @@ function light(){
 const gate = (id, x, y, label, lx, ly, aria, col = "#F6E3B4") => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="20" style="fill:var(--butter)"/>
   ${sk(`<rect x="${x - 3}" y="${y - 30}" width="6" height="38" style="fill:${C.bamboo2}"/><path d="M${x - 3} ${y - 20} h6 M${x - 3} ${y - 6} h6" style="stroke:${C.wood}" stroke-width="1"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z" style="fill:#FFFDF6"/><path d="M${x + 6} ${y - 22} h16" style="stroke:${C.brick}" stroke-width="2"/>`,
     `<rect x="${x - 3}" y="${y - 30}" width="6" height="38"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z"/>`)}${lab(lx, ly, label, col, 11)}</g>`;
+// the tap area over your boat (the drawing itself ignores taps): Mel couldn't easily tap the boat to sail home
+const boatHit = (x, y) => `<rect x="${x - 50}" y="${y - 66}" width="104" height="76" fill="transparent" pointer-events="all"/>`;
 const place = (id, x, y, rx, ry, aria, body, label, lx, ly, col) => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>${body}${label ? lab(lx, ly, label, col, 10) : ""}</g>`;
 
 /* ---------- ba_beach: Sanur beach ---------- */
@@ -255,7 +257,7 @@ function beachScreen(){
   // kites over the sea in season, their strings running down to the rack on the sand
   const flying = kiteDay() ? kite(176, 28, "fish", 0, 214, 306) + kite(392, 22, "bird", 1, 214, 306) + kite(330, 74, "leaf", 2, 214, 306) + kite(40, 70, "leaf", 3, 214, 306) : "";
   // your boat in the shallows among the jukung
-  const boat = place("baboat", 300, 200, 34, 10, "Your boat on the reef edge", yourBoat(296, 186), "Your boat", 212, 206, "#BFE0DA");
+  const boat = place("baboat", 300, 200, 34, 10, "Your boat on the reef edge", yourBoat(296, 186) + boatHit(296, 186), "Your boat", 212, 206, "#BFE0DA");
   // the jukung pulled up on the sand: white, yellow and blue hulls, stripes, eyes, furled sails, a net drying
   const boats = place("bajukung", 430, 314, 32, 10, "The jukung, the painted outrigger boats", palm(508, 196, .85, -1, 6) + jukung(438, 226, .9, -1, "#FFFDF6", "#C9302A", 0, {furl: "#3E8FC0"}) + jukung(452, 262, .95, 1, "#F2C230", "#2B7A9A", 1, {furl: "#E8566C", stripe2: "#C9302A"}) + jukung(430, 296, .85, -1, "#3E8FC0", "#FFFDF6", 2, {furl: "#F2C230", stripe2: "#F2C230"})
     + NP(`<path d="M376 300 q8 -6 16 0 q8 6 16 0" fill="none" stroke="#3E6B8C" stroke-width="2" stroke-dasharray="1.6 1.2" opacity=".7"/>`), "Jukung", 440, 334, "#BFE0DA");

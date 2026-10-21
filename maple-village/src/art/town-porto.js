@@ -118,6 +118,8 @@ const blocks = (x, y, w, h, s = 12) => `<path d="${Array.from({length: Math.floo
 const gate = (id, x, y, label, lx, ly, aria, col = "#F6E3B4") => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="20" style="fill:var(--butter)"/>
   ${sk(`<rect x="${x - 3}" y="${y - 30}" width="6" height="38" style="fill:${C.iron}"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z" style="fill:#FFFDF6"/><path d="M${x + 6} ${y - 22} h16" style="stroke:${C.sea}" stroke-width="2"/>`,
     `<rect x="${x - 3}" y="${y - 30}" width="6" height="38"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z"/>`)}${lab(lx, ly, label, col, 11)}</g>`;
+// the tap area over your boat (the drawing itself ignores taps): Mel couldn't easily tap the boat to sail home
+const boatHit = (x, y) => `<rect x="${x - 50}" y="${y - 66}" width="104" height="76" fill="transparent" pointer-events="all"/>`;
 const place = (id, x, y, rx, ry, aria, body, label, lx, ly, col) => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>${body}${label ? lab(lx, ly, label, col, 10) : ""}</g>`;
 // black-and-white stripes, the way San Pietro is built: a band of dark stone, a band of pale
 const stripes = (x, y, w, h, b = 7) => Array.from({length: Math.ceil(h/b)}, (_, k) => `<rect x="${x}" y="${f1(y + k*b)}" width="${w}" height="${f1(Math.min(b, h - k*b))}" style="fill:${k % 2 ? C.white : C.black}"/>`).join("");
@@ -155,7 +157,7 @@ function harbourScreen(){
   const boats = gozzo(448, 148, "#3E6B8C", -1, 0) + gozzo(450, 236, C.shutter, 1, 1) + gozzo(447, 318, "#C9483A", -1, 2)
     + NP(`<path d="M413 146 L424 138 M413 236 L424 228 M413 326 L424 312" style="stroke:#3A3430" stroke-width=".7"/>`);
   const farm = musselFloats(434, 512, 396, 5, 38) + NP(sk(`<rect x="434" y="370" width="5" height="26" style="fill:${C.wood}"/>`, "")) + cormorant(436, 372, .9) + flyingCormorant(150, 612, 0);
-  const boat = place("pvboat", 330, 578, 34, 10, "Your boat at the quay", yourBoat(326, 634), "Your boat", 228, 588, "#BFE0DA");
+  const boat = place("pvboat", 330, 578, 34, 10, "Your boat at the quay", yourBoat(326, 634) + boatHit(326, 634) + `<rect x="180" y="574" width="96" height="30" fill="transparent" pointer-events="all"/>`, "Your boat", 228, 588, "#BFE0DA");
   return ground + sea + palmaria + farm + boats + kerb + wall + north + west + wallPlace + mussels + bar + cats + boat
     + gate("pvToBorgo", 20, 526, "The Borgo", 76, 560, "West through the old gate into the Borgo")
     + gate("pvToPoint", 398, 40, "San Pietro", 392, 92, "North along the rocks to San Pietro", "#BFE0DA");

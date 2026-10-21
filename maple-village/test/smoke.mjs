@@ -4322,6 +4322,26 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 
+// Mel: "I can't seem to click the boat easily to go home when I am in a boat town": the boat drawings ignored taps and
+// only a small patch nearby caught one. A tap in the middle of the drawn boat must reach it, in every boat town.
+{
+  console.log("\nTapping your boat in the boat towns");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });   // a phone, zoomed out to the whole screen
+  page.on("pageerror", e => errors.push(`boattap pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.evaluate(() => window.__mapleScene("sw_quay")); await page.waitForTimeout(900); await page.click("#zoomBtn"); await page.waitForTimeout(400);
+  const bad = [];
+  for (const [scene, id] of [["sw_quay", "swboat"], ["pv_harbour", "pvboat"], ["pi_haven", "piboat"], ["ba_beach", "baboat"], ["fm_illetes", "fmboat"], ["hk_market", "hkboat"], ["jj_harbour", "jjpier"]]) {
+    await page.evaluate(s => window.__mapleScene(s), scene); await page.waitForTimeout(900);
+    const ok = await page.evaluate(id => { const g = document.querySelector(`#world [data-place="${id}"]`), r = g && g.querySelector("rect[pointer-events=all]"); if (!r) return false;
+      const b = r.getBoundingClientRect(); let n = 0;   // most of the boat, allowing for a villager walking past in front
+      for (const i of [1, 2, 3]) for (const j of [1, 2, 3]) { const e = document.elementFromPoint(b.left + b.width*i/4, b.top + b.height*j/4); if (e && e.closest(`[data-place="${id}"]`)) n++; }
+      return n >= 6; }, id);
+    if (!ok) bad.push(scene);
+  }
+  check(!bad.length, `a tap on the middle of your boat reaches it in every boat town${bad.length ? ` (not in ${bad.join(", ")})` : ""}`);
+  await page.close();
+}
 // Round 206: Saltwick Harbour, the first boat town: four screens in a horseshoe round the river mouth
 {
   console.log("\nSaltwick Harbour by boat (round 206)");

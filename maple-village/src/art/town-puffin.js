@@ -129,6 +129,8 @@ const yourBoat = (x, y) => NP(`<g><animateTransform attributeName="transform" ty
 const gate = (id, x, y, label, lx, ly, aria, col = "#F6E3B4") => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="20" style="fill:var(--butter)"/>
   ${sk(`<rect x="${x - 3}" y="${y - 30}" width="6" height="38" style="fill:${C.wood}"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z" style="fill:#FFFDF6"/><path d="M${x + 6} ${y - 22} h16" style="stroke:${C.sea}" stroke-width="2"/>`,
     `<rect x="${x - 3}" y="${y - 30}" width="6" height="38"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z"/>`)}${lab(lx, ly, label, col, 11)}</g>`;
+// the tap area over your boat (the drawing itself ignores taps): Mel couldn't easily tap the boat to sail home
+const boatHit = (x, y) => `<rect x="${x - 50}" y="${y - 66}" width="104" height="76" fill="transparent" pointer-events="all"/>`;
 const place = (id, x, y, rx, ry, aria, body, label, lx, ly, col) => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>${body}${label ? lab(lx, ly, label, col, 10) : ""}</g>`;
 // chimney smoke drifting off on the wind
 const smoke = (x, y) => NP([0, 1, 2].map(k => `<circle cx="${x}" cy="${y}" r="${3 + k}" fill="#E8ECEC" opacity="0"><animate attributeName="cy" values="${y};${y - 30}" dur="4.5s" begin="${k*1.5}s" repeatCount="indefinite"/><animate attributeName="cx" values="${x};${x + 22}" dur="4.5s" begin="${k*1.5}s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;.8;0" dur="4.5s" begin="${k*1.5}s" repeatCount="indefinite"/></circle>`).join(""));
@@ -156,7 +158,7 @@ function havenScreen(){
     `<path d="M248 140 V30 Q248 22 262 22 Q276 22 276 30 V140"/>`)
     + [[253, 32], [271, 32], [271, 84]].map(([x, y]) => `<rect x="${x - 2.6}" y="${y - 6}" width="5.2" height="7" rx="2" fill="${C.iron}"/>`).join("")
     + `<path d="M244 46 v24 M240 50 h4 M240 58 h4 M240 66 h4" stroke="#8A8C88" stroke-width="1.2"/><path d="M272 82 Q282 86 292 74" stroke="#C9B88A" stroke-width="1.4" fill="none"/><path d="M271 32 Q300 40 372 64" stroke="#C9B88A" stroke-width="1" fill="none"/>`);
-  const boat = place("piboat", 262, 132, 30, 10, "Your boat at the jetty", yourBoat(330, 86), "Your boat", 344, 132, "#BFE0DA");
+  const boat = place("piboat", 262, 132, 30, 10, "Your boat at the jetty", yourBoat(330, 86) + boatHit(330, 86), "Your boat", 344, 132, "#BFE0DA");
   const punt = NP(`<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.2;0 0" dur="3s" repeatCount="indefinite"/>${sk(`<path d="M190 66 Q192 80 212 80 H232 Q240 78 240 66z" fill="#7FA9C4"/><path d="M190 66 H240" stroke="#F4F1EA" stroke-width="2"/><path d="M200 70 h28" stroke="${C.wood}" stroke-width="2"/>`, `<path d="M190 66 Q192 80 212 80 H232 Q240 78 240 66z"/>`)}</g><path d="M240 68 Q246 70 249 66" stroke="#C9B88A" stroke-width="1" fill="none"/>`);
   const pots = NP(sk([[212, 140], [230, 138], [220, 126]].map(([x, y]) => `<path d="M${x - 8} ${y} V${y - 8} Q${x} ${y - 16} ${x + 8} ${y - 8} V${y}z" fill="#C2A878"/><path d="M${x - 8} ${y - 4} h16 M${x - 4} ${y} V${y - 12} M${x + 4} ${y} V${y - 12}" stroke="#7A5A3A" stroke-width=".7"/>`).join("") + `<circle cx="242" cy="136" r="5" fill="#E8823A"/><ellipse cx="204" cy="146" rx="7" ry="3" fill="none" stroke="#C9B88A" stroke-width="2"/>`, ""));
   // puffins rafting on the water in the cove, and whirring in and out; gannets far out in winter

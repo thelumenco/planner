@@ -76,6 +76,8 @@ const thrift = (x, y) => `<g pointer-events="none">${[[0, 0], [5, -2], [-4, -3],
 const gate = (id, x, y, label, lx, ly, aria, col = "#F6E3B4") => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="20" style="fill:var(--butter)"/>
   ${sk(`<rect x="${x - 3}" y="${y - 30}" width="6" height="38" style="fill:${C.iron}"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z" style="fill:#FFFDF6"/><path d="M${x + 6} ${y - 22} h16" style="stroke:#3E6B8C" stroke-width="2"/>`,
     `<rect x="${x - 3}" y="${y - 30}" width="6" height="38"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z"/>`)}${lab(lx, ly, label, col, 11)}</g>`;
+// the tap area over your boat (the drawing itself ignores taps): Mel couldn't easily tap the boat to sail home
+const boatHit = (x, y) => `<rect x="${x - 50}" y="${y - 66}" width="104" height="76" fill="transparent" pointer-events="all"/>`;
 const place = (id, x, y, rx, ry, aria, body, label, lx, ly, col) => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>${body}${label ? lab(lx, ly, label, col, 10) : ""}</g>`;
 function fret(){ return fretOn() ? `<g pointer-events="none"><rect width="520" height="640" fill="#E8ECEE" opacity=".2"/><g filter="url(#wash)" opacity=".32">${[[120, 120], [380, 260], [200, 460], [420, 560]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="200" ry="70" fill="#F4F6F7"><animateTransform attributeName="transform" type="translate" values="0 0;30 0;0 0" dur="24s" repeatCount="indefinite"/></ellipse>`).join("")}</g></g>` : ""; }
 // December: a string of lights along the swing bridge's rail
@@ -104,7 +106,7 @@ function quayScreen(){
   const edge = `<g pointer-events="none">${[130, 190, 250, 320, 400].map(y => bollard(344, y)).join("")}${railing(0, 110, 140)}</g>`;
   const pontoon = sk(`<rect x="340" y="548" width="130" height="38" style="fill:${C.wood}"/><path d="${[352, 368, 384, 400, 416, 432, 448, 464].map(x => `M${x} 548 v38`).join(" ")}" style="stroke:#6B5444" stroke-width=".7"/>`, `<rect x="340" y="548" width="130" height="38"/>`);
   const boats = coble(440, 220, "#3E6B8C", -1, 0) + coble(420, 330, "#3E8A5A", 1, 1) + coble(500, 120, "#C9483A", -1, 2);
-  const boat = place("swboat", 330, 572, 34, 10, "Your boat at the pontoon", yourBoat(420, 620), "Your boat", 410, 534, "#CFE0EE");
+  const boat = place("swboat", 330, 572, 34, 10, "Your boat at the pontoon", yourBoat(420, 620) + boatHit(420, 620) + `<rect x="336" y="520" width="144" height="70" fill="transparent" pointer-events="all"/>`, "Your boat", 410, 534, "#CFE0EE");
   const bridge = swingBridge(350, 520, 426);
   const birds = gull(220, 180, 1, 0) + gull(410, 70, .8, 1) + gull(160, 420, .9, 2);
   // the harbourmaster's tide board by the pier, and the crab line and bucket at the quay's edge (round 208)

@@ -162,6 +162,8 @@ const smoke = (x, y, i = 0) => NP(Array.from({length: 3}, (_, k) => `<circle cx=
 const gate = (id, x, y, label, lx, ly, aria, col = "#F6E3B4") => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="20" style="fill:var(--butter)"/>
   ${sk(`<rect x="${x - 3}" y="${y - 30}" width="6" height="38" style="fill:${C.timber2}"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z" style="fill:#FFFDF6"/><path d="M${x + 6} ${y - 22} h16" style="stroke:${C.red}" stroke-width="2"/>`,
     `<rect x="${x - 3}" y="${y - 30}" width="6" height="38"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z"/>`)}${winter() ? NP(`<path d="M${x - 4} ${y - 30} q4 -5 8 0z M${x + 3} ${y - 28} q14 -5 22 0z" fill="${C.snow}"/>`) : ""}${lab(lx, ly, label, col, 11)}</g>`;
+// the tap area over your boat (the drawing itself ignores taps): Mel couldn't easily tap the boat to sail home
+const boatHit = (x, y) => `<rect x="${x - 50}" y="${y - 66}" width="104" height="76" fill="transparent" pointer-events="all"/>`;
 const place = (id, x, y, rx, ry, aria, body, label, lx, ly, col) => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>${body}${label ? lab(lx, ly, label, col, 10) : ""}</g>`;
 
 /* ---------- creatures ---------- */
@@ -257,7 +259,7 @@ function marketScreen(){
     + NP(sk(`${[128, 162].map(x => `<rect x="${x - 2}" y="520" width="5" height="124" fill="${C.wood2}"/>`).join("")}<rect x="128" y="516" width="38" height="128" fill="${C.timber}"/>${Array.from({length: 16}, (_, k) => `<path d="M128 ${524 + k*8} h38" stroke="${C.timber2}" stroke-width="1"/>`).join("")}`, `<rect x="128" y="516" width="38" height="128"/>`)
       + (w ? `<rect x="128" y="516" width="38" height="128" fill="${C.snow}" opacity=".7"/>` : "") + `<path d="M124 590 q-20 -6 -40 -2" stroke="#C8A86A" stroke-width="1.2" fill="none"/>`)
     + yourBoat(76, 596) + fishingBoat(204, 616, 1) + NP([40, 196].map(x => `<rect x="${x - 4}" y="506" width="8" height="8" rx="2" fill="${C.iron}"/>`).join("")) + gullFly(110, 470, 70, 18) + gullFly(380, 160, 60, 22, -7);
-  const boat = place("hkboat", 150, 498, 30, 10, "Your boat at the harbour pier", "", "Your boat", 68, 534, "#BFE0DA");
+  const boat = place("hkboat", 150, 498, 30, 10, "Your boat at the harbour pier", boatHit(76, 596), "Your boat", 68, 534, "#BFE0DA");
   // the gull on his bollard
   const gull = place("hkgull", 262, 506, 18, 8, "A gull on a bollard", NP(sk(`<path d="M252 546 v-16 q10 -6 20 0 v16z" fill="${C.iron}"/><ellipse cx="262" cy="530" rx="10" ry="3" fill="#4A5258"/>`, `<path d="M252 546 v-16 q10 -6 20 0 v16z"/>`)) + gullStand(262, 530, 1.1), "Gull", 214, 548, "#F6E3B4");
   // the fish crates, nets and glass floats on the quay

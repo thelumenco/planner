@@ -173,6 +173,8 @@ function stall(x, y, w, col, goods, i = 0){
 const gate = (id, x, y, label, lx, ly, aria, col = "#F6E3B4") => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y + 6}" rx="26" ry="20" style="fill:var(--butter)"/>
   ${sk(`<rect x="${x - 3}" y="${y - 30}" width="6" height="38" style="fill:#9A8C7A"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z" style="fill:#FFFDF6"/><path d="M${x + 6} ${y - 22} h16" style="stroke:${C.blue}" stroke-width="2"/>`,
     `<rect x="${x - 3}" y="${y - 30}" width="6" height="38"/><path d="M${x + 3} ${y - 28} h22 l6 6 l-6 6 h-22z"/>`)}${lab(lx, ly, label, col, 11)}</g>`;
+// the tap area over your boat (the drawing itself ignores taps): Mel couldn't easily tap the boat to sail home
+const boatHit = (x, y) => `<rect x="${x - 50}" y="${y - 66}" width="104" height="76" fill="transparent" pointer-events="all"/>`;
 const place = (id, x, y, rx, ry, aria, body, label, lx, ly, col) => `<g data-place="${id}" aria-label="${aria}"><ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>${body}${label ? lab(lx, ly, label, col, 10) : ""}</g>`;
 
 /* ---------- fm_illetes: Ses Illetes and La Savina ---------- */
@@ -231,7 +233,7 @@ function illetesScreen(){
     `<path d="M40 520 H214 V650 M244 500 V650 M40 500 V520"/>`) + [70, 120, 176].map(x => `<rect x="${x - 4}" y="502" width="8" height="8" rx="2" fill="${C.iron}"/>`).join("")
     + `<path d="M120 508 q-6 30 -26 74" stroke="#C8A86A" stroke-width="1.2" fill="none"/>`);
   const harbour = quay + yourBoat(84, 600) + llaut(170, 612, C.blue, 2, .8) + waves([[30, 540], [150, 560], [30, 624]]);
-  const boat = place("fmboat", 130, 500, 30, 10, "Your boat at La Savina's quay", "", "Your boat", 168, 560, "#BFE8E2");
+  const boat = place("fmboat", 130, 500, 30, 10, "Your boat at La Savina's quay", boatHit(84, 600), "Your boat", 168, 560, "#BFE8E2");
   const lightArt = NP(sk(`<path d="M222 606 L224 566 H234 L236 606z" fill="${C.white}"/><rect x="221" y="580" width="16" height="7" fill="#3E9A5A"/><rect x="223" y="554" width="12" height="12" fill="#D8F0E0"/><path d="M221 554 L229 546 L237 554z" fill="#3E9A5A"/><rect x="219" y="604" width="20" height="5" fill="#D9D2C2"/>`,
     `<path d="M222 606 L224 566 H234 L236 606z M221 554 L229 546 L237 554z"/><rect x="223" y="554" width="12" height="12"/>`)
     + `<circle cx="229" cy="560" r="10" fill="#7AF0A0" opacity=".25"><animate attributeName="opacity" values=".05;.45;.05" dur="3s" repeatCount="indefinite"/></circle>`);
