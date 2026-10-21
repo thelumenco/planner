@@ -14,6 +14,8 @@ import { MARKET, FAIR, NIGHT, XMAS, eventsOn, XMAS_FROM, XMAS_TO } from "../../s
 import { POOLS } from "../../src/data/stall-goods.js";
 import { TREATS as XM_TREATS } from "../../src/game/xmas.js";
 import { thingName } from "../lib.mjs";
+import { SALON, PRICE as SALON_PRICE } from "../../src/game/salon.js";
+import { STYLES as HAIR_STYLES, HAIRS } from "../../src/game/look.js";
 import { esc, table, ico, itemIcon, coin, lede, hm, slugify } from "../lib.mjs";
 
 const h2 = (id, t, icon) => `<h2 id="${id}">${icon ? ico(icon, 22) + " " : ""}${esc(t)}</h2>`;
@@ -55,13 +57,15 @@ const HOURS = {
   millup: `Hazel's there ${hm(10*60)} to ${hm(17*60)}, every day but Monday`, wineshop: `Customers ${hm(10*60)} to ${hm(22*60)}`,
   fishvan: `Fridays, ${hm(17*60)} to ${hm(22*60)}`, fishbay: `Fridays, ${hm(17*60)} to ${hm(20*60)}`, xgrotto: `Weekend evenings in the Christmas season, ${hm(17*60)} to ${hm(20*60)}`,
   taxiwoods: `${hm(TAXI_FROM)} to ${hm(TAXI_TO)}`, taxilane: `${hm(TAXI_FROM)} to ${hm(TAXI_TO)}`, taxilake: `${hm(TAXI_FROM)} to ${hm(TAXI_TO)}`, taxishore: `${hm(TAXI_FROM)} to ${hm(TAXI_TO)}`,
-  exlawn: `Hana's class, ${hm(8*60)} to ${hm(9*60)}, Monday to Saturday`
+  exlawn: `Hana's class, ${hm(8*60)} to ${hm(9*60)}, Monday to Saturday`,
+  okadahouse: `Mika's chair, ${hm(SALON.from)} to ${hm(SALON.to)}, Tuesday to Saturday`
 };
 // a few places want a word more than their one line in the game
 const EXTRA = {
   market: "Hana's shop, with tabs for seeds, treats, the deli, pet care, gifts, animals, things for your home, things for you and your room, and selling what you've grown and made.",
   haberdash: "Ada sells fabric by the piece and buttons by the card, and buys unused fabric back at half price. She always has every fabric and button in stock.",
   tailor: "Idris makes clothes to your design from your fabric: ready the next morning from 9.",
+  okadahouse: `Mr Okada lives here with his granddaughter <a href="/villagers/mika">Mika</a>, who cuts hair in the corner of his front room (look for her sign by the path: "Mika's: hair, by appointment"). Tap her chair and pick a style and a colour; you see it on you before you decide. A new style is ${coin(SALON_PRICE.style)}, a new colour ${coin(SALON_PRICE.colour)}, both ${coin(SALON_PRICE.style + SALON_PRICE.colour)}. Keep it as it is and there's nothing to pay, and there's an Undo straight after. ${HAIR_STYLES.length} styles (${HAIR_STYLES.map(([, n]) => n.toLowerCase()).join(", ")}) and ${HAIRS.length} colours. Her last story chapter makes your next visit free.`,
   hall: "Through the archway on the west wall: the courtyard, with your trophies (see <a href=\"/collections#trophies\">Collections</a>).",
   news: "Tap it for your wins, and the village calendar: what's on over the next fortnight, and the festivals coming up (see the <a href=\"/calendar\">Calendar</a>).",
   post: "Letters, parcels and your post box. Penny's hamper table comes out for Valentine's, Mother's Day and Christmas.",

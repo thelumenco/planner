@@ -327,7 +327,7 @@ if (want("\nvillagers' loves")) try {
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url)), kt = await import(new URL("../src/game/kitchen.js", import.meta.url));
   const xm = await import(new URL("../src/game/xmas.js", import.meta.url)), orch = await import(new URL("../src/data/orchard.js", import.meta.url)), T = its.ITEMS;
   const res = np.NPCS.filter(n => !n.tourist && !n.local && !n.kid).map(n => n.id);
-  check(res.length === 28 && res.every(w => LV.LOVES[w] && LV.lovesOf(w).length >= 6 && LV.lovesOf(w).length <= 10), "all 28 Honeybrook villagers have 6 to 10 loves");
+  check(res.length === 29 && res.every(w => LV.LOVES[w] && LV.lovesOf(w).length >= 6 && LV.lovesOf(w).length <= 10), "all 29 Honeybrook villagers have 6 to 10 loves");
   check(res.every(w => LV.lovesOf(w).filter(l => l.kind === "combo").length <= 1 && LV.lovesOf(w).filter(l => l.kind === "story").every(l => l.thanks && !/—/.test(l.thanks))), "at most one combination each; every story love has its own thank-you (no em dashes)");
   check(res.every(w => LV.lovesOf(w).every(l => l.match ? typeof l.match === "function" && l.what && l.thanks : typeof l.id === "string")), "every love is an item id or a matcher (with what it's for and a thank-you)");
   // matchers, on made things the way their ITEMS entries look
@@ -4713,6 +4713,34 @@ if (want("\nThe bin, and digging up (round 231)")) try {
   await page.click('#bag [data-binmode="0"]'); await page.waitForTimeout(200); await page.click('#bag [data-binview="1"]'); await page.waitForTimeout(300);
   await page.click('#bag [data-unbin="s_magnet"]'); await page.waitForTimeout(300);
   check(await page.evaluate(() => window.__hbGame.F().inv.s_magnet === 3 && !window.__hbGame.F().bin.length), "and The bin gives it back with Take back");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nMika's: hair, by appointment (round 231)")) try {
+  // the creator: "a home hair salon... one chair and one salon mirror... clicks on the chair... choose their hair colour
+  // and the hairstyle... 5 coins for a haircut, 10 coins for a colour change"; and "add more hairstyles"
+  console.log("\nMika's: hair, by appointment (round 231)");
+  const sa = await import(new URL("../src/game/salon.js", import.meta.url)), lk = await import(new URL("../src/game/look.js", import.meta.url)), np = await import(new URL("../src/data/npcs.js", import.meta.url));
+  check(["curls", "bangs", "pigtails", "pixie", "mohawk"].every(k => lk.STYLES.some(([s]) => s === k)), "long curls, bangs, pigtails, a pixie cut and a mohawk are hairstyles now");
+  check(sa.salonOpen("2026-10-14", 11*60) && !sa.salonOpen("2026-10-18", 11*60) && !sa.salonOpen("2026-10-19", 11*60) && !sa.salonOpen("2026-10-14", 17*60), "Mika's is open 10 to 5, Tuesday to Saturday (shut Sundays and Mondays)");
+  { const F = {coins: 40, me: {look: {...lk.START.woman}}}, L = lk.lookOf(F);
+    check(sa.quote(F, {style: L.style, hair: L.hair}).total === 0 && sa.haveItDone(F, {style: L.style, hair: L.hair}).err && F.coins === 40, "nothing changed, nothing to pay");
+    check(sa.quote(F, {style: "bangs"}).total === 5 && sa.quote(F, {hair: lk.HAIRS[5]}).total === 10 && sa.quote(F, {style: "bangs", hair: lk.HAIRS[5]}).total === 15, "a new style is 5 coins, a new colour 10, both 15");
+    const r = sa.haveItDone(F, {style: "pigtails", hair: lk.HAIRS[5]}); check(r.cost === 15 && F.coins === 25 && lk.lookOf(F).style === "pigtails" && lk.lookOf(F).hair === lk.HAIRS[5], "have it done: the coins go, and the new hair stays");
+    F.salon.free = 1; const r2 = sa.haveItDone(F, {style: "mohawk"}); check(r2.cost === 0 && F.coins === 25 && !F.salon.free, "after Mika's last chapter, the next visit is free"); }
+  const mk = np.NPCS.find(n => n.id === "mika"); check(mk && mk.look.extra === "apron" && mk.routine.some(s => s.scene === "okadahouse" && s.from === 600 && s.to === 1020), "Mika, in her apron, is at the chair in Mr Okada's house from 10 to 5");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`salon pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.coins = 50; window.__hbGame.save(); window.__hbScene("okadahouse"); }); await page.waitForTimeout(600);
+  await page.click('[data-spot="salon"]'); await page.waitForTimeout(2500);
+  check(await page.evaluate(() => /Mika's/.test((document.querySelector("#ctx") || document.body).textContent) && !!document.querySelector('[data-salon="style:bangs"]') && !!document.querySelector("#slFig .me")), "tap the chair: Mika's panel, with every style and a preview of you");
+  const before = await page.evaluate(() => ((window.__hbGame.F().me || {}).look || {}).style || "pony"), pickStyle = before === "bangs" ? "pixie" : "bangs";
+  await page.click(`[data-salon="style:${pickStyle}"]`); await page.waitForTimeout(200);
+  check(await page.evaluate(s => document.querySelector("#slFig .me").classList.contains("hs-" + s) && window.__hbGame.F().coins === 50, pickStyle), "picking a style shows it on the preview, and costs nothing yet");
+  await page.click('[data-salon="do"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(s => window.__hbGame.F().coins === 45 && window.__hbGame.F().me.look.style === s && document.getElementById("hero").classList.contains("hs-" + s), pickStyle), "have it done: 5 coins, and you're wearing it");
+  await page.click("#undoBtn"); await page.waitForTimeout(300);
+  check(await page.evaluate(s => window.__hbGame.F().coins === 50 && (((window.__hbGame.F().me || {}).look || {}).style || "pony") === s && document.getElementById("hero").classList.contains("hs-" + s), before), "and Undo puts your hair and coins back");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {

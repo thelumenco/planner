@@ -165,7 +165,13 @@ export const LOVES = {
   idris: {story: [
       {id: "b_record", thanks: "Something to dance to. Long arm first, Grandfather would say."},
       {id: "cinturon", thanks: "Hand-stitched. Even stitches, every one. I'm almost jealous."}],
-    everyday: ["pear", "egg", "pepperbun", "handcream"]}
+    everyday: ["pear", "egg", "pepperbun", "handcream"]},
+  // round 231: Mika, from her chapters: Grandmother's claw clip, the glass lamp from Otaru, hōjicha with Grandpa
+  mika: {story: [
+      {id: "clawclip", thanks: "A claw clip, tortoiseshell. Grandmother wore one just like it. I'll wear it on Saturdays, for her."},
+      {id: "h_lamp", thanks: "A glass lamp from Otaru! Now there are two by the mirror. Twice the light."},
+      {id: "hojicha", thanks: "Hōjicha. Grandpa will say it's for me, and then drink most of it."}],
+    everyday: ["peach", "pearlclip", "mochi"]}
 };
 // every love of one villager, as [{kind, id?, match?, what?, thanks?}]
 export const lovesOf = w => { const L = LOVES[w]; if (!L) return [];

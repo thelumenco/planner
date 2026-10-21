@@ -73,6 +73,7 @@ export function untickTask(F, id){
 // Who asks, what they'd most like (item ids, in order; anything else they can use comes after) and why. (Requests
 // only: what a villager loves as a gift is in data/loves.js.)
 export const ASKERS = {
+  mika:    {likes: ["peach", "strawberry", "tulip", "honey", "egg"], why: ["for the salon corner", "Grandpa's asked for it", "a treat after a long day of trims"]},
   hana:    {likes: ["carrot", "tomato", "potato", "corn", "pea", "pepper", "leek", "pumpkin", "egg"], why: ["for the market stall", "my regulars keep asking", "the stall looks bare without them"]},
   hazel:   {likes: ["oliveoil", "goatmilk", "rosemary", "thyme", "mint", "sunflower"], why: ["for the Mill Shop", "I've an order to fill", "I'm trying something new"]},
   juniper: {likes: ["tulip", "sunflower", "wildflower", "strawberry", "blueberry"], why: ["for the library", "for the poetry evening", "a little treat for the reading hour"]},

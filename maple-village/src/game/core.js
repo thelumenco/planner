@@ -37,6 +37,7 @@ import * as LTR from "./letters.js";   // and the letters: Dear future me, Dear 
 import { myName, dearMe } from "./me.js";
 import * as GU from "./guests.js";
 import * as TL from "./tailor.js";
+import * as SA from "./salon.js";
 import { lookOf, applyLook } from "./look.js";
 import { openSetup, setupOpen } from "./setup.js";
 import { openIntro, introOpen, introAt } from "./intro.js";
@@ -202,7 +203,7 @@ let scene = "base", atSpot = null, boardOpen = false, selPlot = null, shopTab = 
 // In-game UI: the quest note pinned on the map (open, or slim while walking) and the panel over the map.
 // The note starts folded when the village opens; it only pops open on step changes after the first few seconds.
 let qnOpen = false, qnQuietUntil = Date.now() + 5000, qnKey = "", openView = null, shopClosed = false;
-let guestView = false, habView = false, habSt = {}, tailView = false, tailSt = {}, homeView = null, newsOpen = false, friendTab = "where", newsTab = "wins";   // homeView: "stored" (the fridge) or "shelf" (the garage shelf) while one is open
+let guestView = false, habView = false, habSt = {}, tailView = false, tailSt = {}, salonView = false, salonSt = {}, homeView = null, newsOpen = false, friendTab = "where", newsTab = "wins";   // homeView: "stored" (the fridge) or "shelf" (the garage shelf) while one is open
 
 // Cloud saves wait until the cloud copy has loaded once (synced). Without that, a save made in the first moments after
 // opening (from a blank or stale copy in this browser) would overwrite the real save: phone and laptop each keep their
@@ -970,6 +971,13 @@ function tailorPreview(){
   const c = fig.cloneNode(true); c.removeAttribute("id"); c.querySelectorAll("[id]").forEach(e => e.removeAttribute("id")); c.removeAttribute("transform"); c.removeAttribute("style"); c.setAttribute("class", "ch me");
   g.replaceChildren(c); const d = TL.designOf(F, tailSt); applyLook(c, lookOf(F), d.fab ? {...TL.wornSpec(F), ...TL.specOf(d), ...(TL.specOf(d).top && TL.specOf(d).top.kind === "dress" ? {bottom: null} : {})} : TL.wornSpec(F));
 }
+// Mika's (salon.js): open 10 to 5, Tuesday to Saturday; the preview is a copy of you with the hair being chosen
+const salonNow = () => SA.salonOpen(dayKey(), localHM());
+function salonPreview(){
+  const g = $("slFig"), fig = $("hero"); if (!g || !fig) return;
+  const c = fig.cloneNode(true); c.removeAttribute("id"); c.querySelectorAll("[id]").forEach(e => e.removeAttribute("id")); c.removeAttribute("transform"); c.removeAttribute("style"); c.setAttribute("class", "ch me");
+  const L = lookOf(F); g.replaceChildren(c); applyLook(c, {...L, style: salonSt.style || L.style, hair: salonSt.hair || L.hair}, TL.wornSpec(F));
+}
 // Gifts and hearts (quests.js giveTo): one gift per villager a day, in person or sent round. One of their loves
 // (data/loves.js: from their stories, a combination, or an everyday favourite) is worth a heart, anything else half a
 // heart. A story love says its own thank-you (loveThanks), before any line the item has for them (it.says).
@@ -1171,7 +1179,7 @@ function showPanel(hasCtx, skin){
 }
 function closePanel(){
   if (openView) { openView = null; ctx(); return; }
-  boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; passView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
+  boardOpen = false; guestView = false; habView = false; tailView = false; salonView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; selPlot = null; homeView = null; newsOpen = false; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; passView = null; scView = null; scSt.pick = null; scSt.dpick = null; scSt.vpick = null; scSt.swap = null; if (scene === "market") shopClosed = true; ctx();
 }
 /* ---------- storage at home (round 166, game/storage.js): the fridge's "Stored" tab, and the garage shelf ---------- */
 // the fridge: what's stored for the shops (storage.js), and the shopping list on the door (shopping.js)
@@ -1190,6 +1198,14 @@ function wireStorage(c){
     else if (a === "pockets") { tailSt.pockets = !!x; sfx("tap"); }
     else if (a === "order") { const r = TL.placeOrder(F, TL.designOf(F, tailSt), nextDay(dayKey())); if (r.err) { speak(r.err, 3500); return; } sfx("chaching"); flash(`Idris's fee for the ${GARMENT_N(r.kind)}`); if (isHere("idris")) npcSay("idris", "Tomorrow from nine. I'll press it twice."); speak(`Your ${r.name} goes on Idris's table. Ready tomorrow from nine.`, 5000); tailSt = {}; save(); }
     else if (a === "collect") { const piece = TL.collect(F, dayKey(), localHM()); if (piece) { sfx("chime"); act("cheer"); flash(`Your ${piece.name}`); speak(`Your ${piece.name}, in tissue paper. It's in your wardrobe at home: wear it whenever you like.`, 5500); save(); } }
+    ctx(); });
+  c.querySelectorAll("[data-salon]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const v = b.dataset.salon, i = v.indexOf(":"), a = i < 0 ? v : v.slice(0, i), x = i < 0 ? "" : v.slice(i + 1);
+    if (a === "style" || a === "hair") { salonSt[a] = x; sfx("tap"); }
+    else if (a === "do") { const was = {coins: F.coins, look: {...lookOf(F)}, salon: {...SA.salonState(F)}}, r = SA.haveItDone(F, {style: salonSt.style, hair: salonSt.hair});
+      if (r.err) { speak(r.err, 3500); return; }
+      sfx("chaching"); applyWear(); act("cheer"); salonSt = {}; save(true);
+      if (isHere("mika")) npcSay("mika", pick(["There. Have a look in the mirror.", "Suits you. I knew it would.", "Grandpa will say he can't tell. He can tell."]));
+      undoable(`${r.q.style && r.q.colour ? "A new style and colour" : r.q.style ? "A new style" : "A new colour"} from Mika${r.cost ? ` · ${r.cost} coins` : ""}`, () => { F.coins = was.coins; F.me = {...F.me, look: was.look}; F.salon = was.salon; applyWear(); save(true); ctx(); }); }
     ctx(); });
   c.querySelectorAll("[data-wear]").forEach(b => b.onclick = ev => { ev.stopPropagation(); if (b.dataset.wear) TL.wear(F, b.dataset.wear); else TL.everyday(F); applyWear(); sfx("paper", true); save(true); });
   c.querySelectorAll("[data-guest]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const [a, id] = b.dataset.guest.split(":");
@@ -1228,6 +1244,7 @@ function ctx(){
   const c = $("ctx"); let h = "";
   if (guestView && scene === "guestroom") h = GU.guestBookHTML(F);
   else if (habView && scene === "haberdash") h = TL.haberdasheryHTML(F, habSt, sewOpen());
+  else if (salonView && scene === "okadahouse") h = SA.salonHTML(F, salonSt, salonNow());
   else if (tailView && scene === "tailor") h = TL.tailorHTML(F, tailSt, sewOpen(), dayKey(), localHM());
   else if (homeView && (scene === "home" || scene === "garage")) h = homeView === "shelf" ? storePanel(F, "shelf", {owns: k => owns(F, k)}) : fridgeHead() + (homeView === "shoplist" ? SL.shopPanelHTML(F, slDraft.showText) : storePanel(F, "fridge", {owns: k => owns(F, k)}));
   else if (scView && (SCOOP_IN.includes(scene) || SC_ANY.includes(scView))) h = scView === "trolley" ? trolleyPanel(F, {sel: scSt.tsel || []}) : scView === "upgrade" ? upgradePanel(F) : scView === "honesty" ? honestyPanel(F) : scView === "deliver" ? deliverMore(deliverPanel(F, {pick: scSt.vpick, fmt: scSt.vfmt, who: deliverTo()}))
@@ -1371,8 +1388,9 @@ function ctx(){
   { const hn = scView === "fridge" && SCOOP_IN.includes(scene) ? "scoop" : ccView === "pantry" && COCOA_IN.includes(scene) ? "cocoa" : kView === "larder" && scene === "kitchen" ? "kitchen" : kView === "mull" && scene === "kitchen" ? "rack" : null, note = hn ? homeNote(F, hn) : "";
     if (note) { const i = h.lastIndexOf('<div class="actions">'); h = i < 0 ? h + note : h.slice(0, i) + note + h.slice(i); } }
   c.innerHTML = h;
-  if ((homeView && (scene === "home" || scene === "garage")) || (guestView && scene === "guestroom") || (wardOpen && scene === "room") || (habView && scene === "haberdash") || (tailView && scene === "tailor")) wireStorage(c);
+  if ((homeView && (scene === "home" || scene === "garage")) || (guestView && scene === "guestroom") || (wardOpen && scene === "room") || (habView && scene === "haberdash") || (tailView && scene === "tailor") || (salonView && scene === "okadahouse")) wireStorage(c);
   if (tailView && scene === "tailor") tailorPreview();
+  if (salonView && scene === "okadahouse") salonPreview();
   if (ppView && scene === "bv_hpaper") wirePaper(c);
   if ((ppView && scene === "bv_hpaper") || (fieldView === "gwrap" && scene === "giftshop")) wireWrap(c);
   if (fieldView && scene === "giftshop") c.querySelectorAll("[data-gs]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const [a, v] = b.dataset.gs.split(/:(.*)/s), cc = owns(F, "cocoa") ? cocoaState(F) : null;   // round 188: take from the displays
@@ -1778,7 +1796,7 @@ function ctx(){
     else if (a === "fill") { const [oid, hid] = v0.split("|"), pay = fillOrder(F, oid, hid, dayKey()); if (pay) { sfx("coin"); gainXp(2); flash(`+${pay}: a hamper order`); speak("Penny takes the hamper and the envelope of coins, and crosses the order off. \"They'll be thrilled.\"", 5000); } }
     else if (a === "tie") { const hp = packTie(F); if (hp) { sfx("chime"); hearts(2); gainXp(2); flash(`${hp.name} hamper`); speak(`Penny ties a fat red bow on top and writes the tag: "${hp.name}". It's in your backpack.`, 5500); } }
     save(true); ctx(); });
-  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { gsPk = null; ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; passView = null; scView = null; scSt.pick = null; boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
+  c.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { salonView = false; gsPk = null; ppView = null; ccSt.pk = null; bvView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; ccSt.made = null; keepItem = null; keepSpot = null; adoptItem = null; adoptSt = {}; petView = null; passView = null; scView = null; scSt.pick = null; boardOpen = false; guestView = false; habView = false; tailView = false; salonView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); });
   c.querySelectorAll("[data-bed]").forEach(b => b.onclick = () => bedAction(b.dataset.bed));
   c.querySelectorAll("[data-track]").forEach(b => b.onclick = () => { setTrack(b.dataset.track); speak(`${TRACKS[b.dataset.track].name} is on. Mmm.`, 2500); ctx(); drawScene(); });
   c.querySelectorAll('[data-rec="stop"]').forEach(b => b.onclick = () => { setMusic(false); speak("Needle up. Quiet time.", 2500); ctx(); drawScene(); });
@@ -2383,7 +2401,7 @@ function setScene(id, at){
   setTimeout(() => {
     if (S.sleep && id !== "room") S.sleep = null;
     scView = null; scSt.pick = null; scSt.dpick = null; ppView = null; passView = null;
-    GU.signBook(F); scene = id; cam.snap = true; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; resetNpcs();
+    GU.signBook(F); scene = id; cam.snap = true; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; salonView = false; selPlot = null; openView = null; shopClosed = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; keepSpot = null; petView = null; ccView = null; hfView = null; railOpen = false; fishSpot = null; woodsView = null; rondaView = null; kyotoView = null; ktSt = {}; jejuView = null; jjSt = {}; swView = null; swSt = {}; letView = null; letSt = {}; piView = null; piSt = {}; hkView = null; hkSt = {}; blView = null; blSt = {}; loftView = false; cinqueView = null; ctSt = {}; ghBed = null; millOpen = false; friView = null; vanView = null; bbRoom = null; bbSt = {}; lunchView = null; occView = null; trvSt = null; pntSt = null; resetNpcs();
     const p = at || [260, 596];
     hero.x = hero.tx = p[0]; hero.y = hero.ty = p[1]; hero.path = []; chum.x = chum.tx = p[0] - 22; chum.y = chum.ty = p[1] + 2;
     render(true); w.classList.remove("fading");
@@ -2440,7 +2458,7 @@ function go(target, x, y, fn){
     for (const s of tc.slice(tc.includes(cur) ? tc.indexOf(cur) + 1 : 1)) { const I = INNER[s]; legs.push({scene:I.parent, x:I.door[0], y:I.door[1], fn:() => setScene(s, I.arrive)}); }
   }
   legs.push({scene:target, x, y, fn});
-  route = legs; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; openView = null; nextLeg(); render();
+  route = legs; atSpot = null; boardOpen = false; guestView = false; habView = false; tailView = false; salonView = false; shedOpen = false; runOpen = false; wardOpen = false; bedOpen = false; journalOpen = false; calmOpen = false; recOpen = false; routOpen = false; trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; homeView = null; newsOpen = false; openView = null; nextLeg(); render();
 }
 function nextLeg(){
   const l = route[0]; if (!l || l.scene !== scene) return;
@@ -2477,6 +2495,7 @@ function arriveSpot(id){
   if (scene === "cottage" && id === "tea") { orView = "tea"; sfx("paper", true); render(); return; }
   if (id === "dine") sitAtTable();
   if (scene === "haberdash" && ["habcounter", "bolts", "buttonjar", "habtable"].includes(id)) { habView = true; habSt.tab = id === "buttonjar" ? "buttons" : habSt.tab || "fabric"; sfx("paper", true); if (isHere("ada") && sewOpen()) npcSay("ada", pick(["What are we making?", "Gingham's on the left. Everything else is on the right. Mostly.", "Feel that linen. Go on."])); render(); return; }
+  if (scene === "okadahouse" && id === "salon") { salonView = true; salonSt = {}; sfx("paper", true); if (isHere("mika") && salonNow()) npcSay("mika", pick(["Sit down, sit down. What are we doing today?", "A trim? Something new? The chair's all yours.", "Mind the hairdryer cable. Grandpa never does."])); render(); return; }
   if (scene === "tailor" && ["tailtable", "rail", "sewing", "mirror"].includes(id)) { tailView = true; sfx("paper", true); if (isHere("idris") && sewOpen() && !TL.orderState(F)) npcSay("idris", pick(["Right. What shall we make?", "Stand there. Arms out. Lovely.", "Show me what Ada sold you."])); render(); return; }
   if (id === "lethall" && LET_COTTAGES[scene]) { letView = scene; letSt = {}; sfx("paper", true); render(); return; }   // round 219: the cottage's hall table
   if (id === "gbook") { guestView = true; sfx("paper", true); render(); return; }

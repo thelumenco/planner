@@ -221,6 +221,14 @@ export const STORIES = {
     {lines: ["My grandfather's suit, the one with the odd sleeves: he wore it to every wedding for thirty years.", "He said the short arm was for shaking hands and the long one was for dancing.", "He wore it with a leather belt older than me. I polished it every wedding."]},
     {lines: ["After that suit for my grandfather, I went to a tailor in the city to learn properly. Five years of buttonholes.", "Then the lane had an empty house and a door with a step that suited me."]},
     {lines: ["When my grandfather died, that suit with the odd sleeves came back to me. It hangs at the end of my rail.", "I've never taken the sleeves up. Some mistakes should be kept exactly as they are."]}
-  ]
+  ],
+  // round 231: Mika, Mr Okada's granddaughter: the kitchen scissors, Grandmother's claw clip, the salon under the
+  // arches and the glass lamp from Otaru, and why she came to the lane
+  mika: [
+    {lines: ["The first head of hair I ever cut was Grandpa's. I was nine, and I used the kitchen scissors.", "He sat perfectly still for twenty minutes. Then he wore a hat for a month."]},
+    {lines: ["That haircut I gave Grandpa with the kitchen scissors? Grandmother fixed it that evening, with her tortoiseshell claw clip in her own hair.", "She did my hair every morning before school. That's when I knew what I wanted to do."]},
+    {lines: ["After Grandmother's mornings doing my hair, I trained in the city. Six years in a salon under the railway arches.", "No windows at all. On a holiday in Otaru I bought a little glass lamp, just to have some light by the mirror.", "It's on the trolley now. Grandpa makes us hōjicha after I close, and we sit by it."]},
+    {lines: ["Six years under the arches, and then Grandpa wrote: the lane was quiet, he said, and his hair was getting long.", "So I came. One chair, one mirror, his front room. I've never been so busy.", "Your next visit to the chair is on me. No arguing: I'm an Okada, and we're very stubborn."], reward: "mikacut"}
+  ],
 
 };

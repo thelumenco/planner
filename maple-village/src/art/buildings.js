@@ -125,7 +125,12 @@ export function ohayoHouse(){
     <rect x="344" y="482" width="36" height="38"/><path d="M362 482 v38 M344 496 h36 M356 482 v14 M368 482 v14"/>
     <rect x="320" y="474" width="16" height="16"/><path d="M328 474 v16 M320 482 h16"/><rect x="388" y="474" width="16" height="16"/><path d="M396 474 v16 M388 482 h16"/>
     <rect x="392" y="508" width="26" height="5" rx="1"/><path d="M395 513 v6 M415 513 v6"/>`;
-  return wrap("okadahouse", "Mr Okada's", "var(--peach)", 362, 520, 60, art, lines);
+  // round 231: Mika's sandwich board by the path (text kept out of the filtered groups, for Safari)
+  const sign = `<g aria-label="Mika's: hair, by appointment" pointer-events="none"><path d="M262 520 l6 -44 M304 520 l-6 -44" style="stroke:var(--line)" stroke-width="1.3"/>
+    <rect x="258" y="474" width="50" height="36" rx="4" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1.3"/><path d="M262 490 h42" style="stroke:#C9A3E0" stroke-width="1.2"/>
+    <text x="283" y="486" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="10" fill="#3a2e28">Mika's</text>
+    <text x="283" y="499" text-anchor="middle" font-family="Klee One,serif" font-size="7" fill="#3a2e28">hair, by</text><text x="283" y="507" text-anchor="middle" font-family="Klee One,serif" font-size="7" fill="#3a2e28">appointment</text></g>`;
+  return wrap("okadahouse", "Mr Okada's", "var(--peach)", 362, 520, 60, art, lines).replace(/<\/g>$/, sign + "</g>");
 }
 
 // Post office: flat roof with a cornice, POST sign board, striped awning over the door, postbox.

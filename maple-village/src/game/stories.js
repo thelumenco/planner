@@ -75,6 +75,7 @@ const REWARDS = {
   poem: (F, addInv) => { addInv("s_poem", 1); return "a verse from Ornella, in her big sloping hand (a keepsake)"; },
   linseeds: (F, addInv) => { addInv("tomato_seed", 3); return "three packets of Lin's tomato seeds (with a poem on the back)"; },
   seabutton: (F, addInv) => { const b = (F.sew = F.sew || {}).buttons = (F.sew.buttons || {}); b.brass = (b.brass || 0) + 1; return "the sea captain's brass button, in your sewing basket"; },
+  mikacut: F => { const s = F.salon = F.salon || {free: 0, visits: 0}; s.free = 1; return "your next visit to Mika's chair, free"; },   // round 231 (salon.js)
   oilcake: F => { storyState(F).flags.oilcake = true; applyFlags(F); return "Ines's abuela's olive oil cake, on the tapas menu"; }
 };
 // has the chapter with this reward been told? (reads what's been heard, so saves from before it was asked work too).

@@ -249,7 +249,8 @@ export const ROOMS = {
     ["rail","Clothes rail","B","wardrobe",null,"Finished pieces in tissue paper, waiting to be collected."],
     ["sewing","Sewing machine","C","craft",null,"An old black sewing machine with gold lettering. It purrs."],
     ["mirror","Long mirror","D","shelf",null,"A long mirror in a wooden frame. You look very well, says Idris."]]},
-  okadahouse: {name:"Mr Okada's house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], R:[110,262]}, stations:[
+  okadahouse: {name:"Mr Okada's house", wall:"#FFF4E6", trim:"#F2A65A", pos:{A:[400,530], B:[420,262], C:[130,530], R:[110,262], S:[262,262]}, stations:[
+    ["salon","Mika's chair","S","salon",/\b(hair|haircut|salon|barber|trim|fringe)\b/i,"Mika's corner: one chair, one mirror, a little hairdryer on the trolley."],
     ["laptop","Sorting desk","A","writedesk",null,"Pebbles, sorted by colour. Then by size. Then by colour again."],
     ["shelf","Plant shelf","B","craft",null,"A lot of plants, all watered at six sharp."],
     ["sofa","Cosy sofa","C","sofa",null,"For the morning paper and a pot of tea."],

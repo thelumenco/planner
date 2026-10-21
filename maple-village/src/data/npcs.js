@@ -51,7 +51,7 @@ export const NPCS = [
     look: {skin: "#EBC9A8", hair: "#D9D4CC", hairStyle: "short", top: "#8FA7C8", bottom: "#5E5A55", extra: "glasses"},
     routine: [slot("7:15", "7:30", "hlane", [[250, 300], [250, 180], [460, 186]], {dow: [2, 4]}), slot("7:30", "9:00", "hwoods", WOODS_WALK, {dow: [2, 4]}), slot("6:30", "9:00", "field", [96, 352], {act: "fish", dow: [0], dir: 1}), slot("14:00", "15:00", "lane", LANE, {dow: [1, 3, 5]}),
       slot("19:30", "21:00", "wineshop", [313, 518], {act: "sit", dow: [1, 3, 4, 5]}), slot("7:30", "12:00", "village", [455, 512]), slot("12:00", "14:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("14:00", "15:00", "trophy", [[200, 500], [320, 520], [250, 540]]), slot("15:00", "17:00", "village", [[226, 420], [170, 440], [236, 444]]), slot("17:00", "19:30", "village", [322, 566], {act: "sit"})],
-    lines: ["Wilf Song and I played draughts on this bench for twenty years. He cheated. Charmingly.", "Letters used to come in sacks. Now it's all on your little phone.", "The well water is sweeter in the afternoon. Don't ask me why.", "I've sorted the pebbles by colour. Then by size. Then by colour again.",
+    lines: ["My granddaughter Mika cuts hair in my front room now. I sit very still. I have had practice.", "Wilf Song and I played draughts on this bench for twenty years. He cheated. Charmingly.", "Letters used to come in sacks. Now it's all on your little phone.", "The well water is sweeter in the afternoon. Don't ask me why.", "I've sorted the pebbles by colour. Then by size. Then by colour again.",
       "A tidy inbox is a tidy mind. Mine is a shoebox.", "The river's high today. Good for the ducks."],
     react: {inbox: "An email quest! Just like the old days. Stamp it and send it.", water: "Good, drink up. Forty years of walking taught me that.", quests3: "Steady work. That's the postmaster's way."}
   },
@@ -914,6 +914,20 @@ export const NPCS = [
     lines: ["A good hem is invisible. That's the whole point of it.", "I don't hurry. Clothes can tell.", "Stand up straight. No, that's very good. I was talking to the mannequin.",
       "Buttons first, then the buttonholes. Never the other way round.", "Ada chooses the fabric. I just do what it tells me."],
     away: "Idris has put the needle down for the day. Back at half past nine."
+  },
+  // round 231: Mika, Mr Okada's granddaughter, back from six years in a city salon. She cuts hair in the corner of his
+  // front room (game/salon.js), 10 to 5, Tuesday to Saturday, and lives with him on Makers' Lane.
+  {
+    id: "mika", pitch: 1.15, name: "Mika", job: "Cuts hair in the corner of Mr Okada's front room",
+    intro: "Mika! Mr Okada's granddaughter. I cut hair, in the corner of Grandpa's front room. One chair, one mirror. Come and sit in it sometime.",
+    look: {skin: "#EFCDB0", hair: "#2A211D", hairStyle: "bobfringe", top: "#C9A3E0", bottom: "#3E4A5C", extra: "apron"},
+    routine: [slot("10:00", "17:00", "okadahouse", [[206, 300], [214, 306], [318, 300]], {dow: [2, 3, 4, 5, 6]}), slot("8:30", "10:00", "village", [[362, 372], [300, 400], [226, 420]], {dow: [2, 3, 4, 5, 6]}),
+      slot("10:00", "12:00", "market", [[130, 470], [220, 196]], {dow: [0]}), slot("13:00", "16:00", "bay", [[180, 420], [300, 440], [240, 470]], {dow: [0]}),
+      slot("11:00", "15:00", "hwoods", [[200, 318], [300, 300], [330, 420]], {dow: [1]}),
+      slot("17:00", "19:00", "lane", [[262, 400], [320, 400], [200, 390]]), slot("19:00", "21:00", "okadahouse", [150, 560], {act: "sit", dir: 1})],
+    lines: ["A trim every eight weeks. I'm not strict about it. I'm a little strict about it.", "Grandpa still won't let me near his eyebrows.", "The hairdryer's older than me. It's louder than me too.",
+      "Everyone tells you things in the chair. I never repeat a word.", "Fringes are a commitment. I always say so. Nobody listens."],
+    away: "Mika's swept up and gone home for the day. The towel's folded over the chair."
   },
   ...BB_PEOPLE,   // round 143: Bellbird Valley (data/bb-people.js)
   ...CR_PEOPLE,   // round 150: the Coast Road (data/cr-people.js)
