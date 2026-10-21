@@ -67,14 +67,14 @@ export function keepsakesIn(F, scene){
 
 /* ---------- pets ---------- */
 export const PETS = {
-  kitten: {n: "kitten", names: ["Mochi", "Kaya", "Tofu", "Mango", "Pumpkin"], indoor: false, col: "#F2A65A"},
-  puppy: {n: "puppy", names: ["Biscuit", "Bao", "Peanut", "Waffle", "Teddy"], indoor: false, col: "#C98A4A"},
-  bunny: {n: "bunny", names: ["Clover", "Dumpling", "Snowy", "Bun Bun", "Pebble"], indoor: false, col: "#C9C2BA"},
-  hamster: {n: "hamster", names: ["Muffin", "Nugget", "Sesame", "Bean", "Puff"], indoor: true, col: "#E3B06A"},
-  goldfish: {n: "goldfish", names: ["Bubbles", "Goldie", "Koi Koi", "Sunny", "Finn"], indoor: true, col: "#F28C3A"},
-  budgie: {n: "budgie", names: ["Kiwi", "Sky", "Pip", "Blue", "Chirpy"], indoor: true, col: "#7FB8E8"},
-  tortoise: {n: "tortoise", names: ["Shelly", "Sir Slowly", "Mossy", "Pebbles", "Turbo"], indoor: false, col: "#7FA35A"},
-  duckling: {n: "duckling", names: ["Lemon", "Puddle", "Quackers", "Sunny", "Custard"], indoor: false, col: "#F3D34A"}
+  kitten: {snd: "purr", n: "kitten", names: ["Mochi", "Kaya", "Tofu", "Mango", "Pumpkin"], indoor: false, col: "#F2A65A"},
+  puppy: {snd: "yip", n: "puppy", names: ["Biscuit", "Bao", "Peanut", "Waffle", "Teddy"], indoor: false, col: "#C98A4A"},
+  bunny: {snd: "sniff", n: "bunny", names: ["Clover", "Dumpling", "Snowy", "Bun Bun", "Pebble"], indoor: false, col: "#C9C2BA"},
+  hamster: {snd: "sniff", n: "hamster", names: ["Muffin", "Nugget", "Sesame", "Bean", "Puff"], indoor: true, col: "#E3B06A"},
+  goldfish: {snd: "blub", n: "goldfish", names: ["Bubbles", "Goldie", "Koi Koi", "Sunny", "Finn"], indoor: true, col: "#F28C3A"},
+  budgie: {snd: "tweet", n: "budgie", names: ["Kiwi", "Sky", "Pip", "Blue", "Chirpy"], indoor: true, col: "#7FB8E8"},
+  tortoise: {snd: "munch", n: "tortoise", names: ["Shelly", "Sir Slowly", "Mossy", "Pebbles", "Turbo"], indoor: false, col: "#7FA35A"},
+  duckling: {snd: "peep", n: "duckling", names: ["Lemon", "Puddle", "Quackers", "Sunny", "Custard"], indoor: false, col: "#F3D34A"}
 };
 // where a pet can live, and the open floor spots it sits on there (it picks one when it moves in)
 export const PET_HOMES = {

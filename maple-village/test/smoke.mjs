@@ -4612,6 +4612,16 @@ if (want("\nThe boat home is easy to tap (round 231)")) try {
   }
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nEach animal sounds like itself (round 231)")) try {
+  // the creator: "there's still a purr for all 5 different pets, when they should be different sounds"
+  console.log("\nEach animal sounds like itself (round 231)");
+  const { readFileSync } = await import("node:fs"), au = readFileSync(new URL("../src/game/audio.js", import.meta.url), "utf8");
+  const ps = await import(new URL("../src/art/pets.js", import.meta.url)), cp = await import(new URL("../src/game/companions.js", import.meta.url));
+  const fx = n => new RegExp("\\n  " + n + "\\(t").test(au), sp = Object.values(ps.SPECIES).map(x => x.snd), co = Object.entries(cp.PETS);
+  check(sp.every(fx) && new Set(sp).size === 5 && !sp.includes("purr"), `the five pets each have their own sound, and none of them purrs (${sp.join(", ")})`);
+  check(co.every(([, x]) => fx(x.snd)) && co.filter(([, x]) => x.snd === "purr").map(([k]) => k).join() === "kitten", "the villagers' little animals too: only the kitten purrs");
+  check(!/sfx\("purr"\)/.test(readFileSync(new URL("../src/game/core.js", import.meta.url), "utf8")), "no pet is given the purr by default any more");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

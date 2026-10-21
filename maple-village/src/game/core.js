@@ -372,6 +372,7 @@ function connect(col){
 
 /* =================== QUESTS =================== */
 // The quest board's state lives in F.board (quests.js). A day with something ticked is a quest day.
+const petSound = () => sfx((SPECIES[speciesOf(F)] || {}).snd || "purr");   // round 231: each pet its own sound
 const doneToday = () => QB.myTasks(F).filter(t => QB.isDone(t)).length;   // tasks ticked off today
 /* =================== FARM =================== */
 function growth(p){ if (!p || !p.crop || !p.wateredAt) return 0; return clamp((Date.now() - p.wateredAt + (p.bonus || 0)) / (CROPS[p.crop].dur / ((F.tools || {}).compost ? 1.25 : 1)), 0, 1); }
@@ -890,7 +891,7 @@ function useItem(id){
   // a flower you've picked is for giving (or the kitchen, or the mill): a tap with nobody to give it to only has a sniff,
   // and it stays in the backpack (before, the tap used it up, and picked tulips seemed to vanish)
   if (it.kind === "flower") { act("flower", it); speak("Mmm, lovely. To give it, stand by a villager, open your backpack and tap \"Give them something\". It keeps in here till then.", 5000); return; }
-  addInv(id, -1); gainXp(it.xp || 1); sfx("purr");
+  addInv(id, -1); gainXp(it.xp || 1); petSound();
   act(it.kind === "food" ? "eat" : it.act, it); speak(it.say, 4500); save();
 }
 // Arriving at the orchard or flower farm: Farid hands over the farm shop's takings and says hello (or calls you in
@@ -1065,7 +1066,7 @@ function giveGift(id, chosen){
 }
 function playFree(kind){
   const lines = {pet:["*leans into the pat*", "Happy {kind} noises!", "More pats please."], hide:["You found me!"], nap:["Mmm… cosy…"]};
-  if (kind === "pet") { sfx("purr"); hearts(2); speak(pick(lines.pet), 3000); return; }
+  if (kind === "pet") { petSound(); hearts(2); speak(pick(lines.pet), 3000); return; }
   act(kind); speak(pick(lines[kind]), 4500);
   if (!F.cool[kind] || Date.now() - F.cool[kind] > 30*M) { F.cool[kind] = Date.now(); gainXp(1); save(); }
 }
@@ -2995,7 +2996,7 @@ function wireCompanions(c){
     speak(`${p.name} the ${PETS[p.kind].n} is ${who}'s now, and lives at ${where}.${giftPos(p.owner) ? "" : ` ${who}'ll send a thank-you note.`} Tap ${p.name} there to say hello.`, 6000); done(); });
   const pc = () => companions(F).find(x => x.id === petView);
   c.querySelectorAll("[data-petdo]").forEach(b => b.onclick = () => { const p = pc(); if (!p) return; const [x, y] = petAt(p);
-    if (b.dataset.petdo === "pat") { mprop("heart", x, y - 30, 1600); sfx("purr"); if (p.patDay !== dayKey()) { p.patDay = dayKey(); gainXp(1); } speak(petFill(["{p} leans into the pat.", "{p} looks very pleased with itself.", "A happy little wiggle from {p}."][Math.floor(Math.random()*3)], p), 3500); save(); return; }
+    if (b.dataset.petdo === "pat") { mprop("heart", x, y - 30, 1600); sfx((PETS[p.kind] || {}).snd || "purr"); if (p.patDay !== dayKey()) { p.patDay = dayKey(); gainXp(1); } speak(petFill(["{p} leans into the pat.", "{p} looks very pleased with itself.", "A happy little wiggle from {p}."][Math.floor(Math.random()*3)], p), 3500); save(); return; }
     if (!giftPos(p.owner) || p.playDay === dayKey()) return;
     p.playDay = dayKey(); gainXp(2); [0, 300, 600].forEach((t, k) => setTimeout(() => mprop("heart", x + (k - 1)*14, y - 34, 1800), t)); sfx("chime");
     speak(playLine(p), 5000); setTimeout(() => { const l = ownerLine(p); npcSay(p.owner, l); }, 1800); done(); });
@@ -3340,7 +3341,7 @@ svg.addEventListener("click", ev => {
   const kp = ev.target.closest("[data-keep]");
   if (kp) { keepSpot = kp.dataset.keep; sfx("paper", true); render(); return; }
   const ent = ev.target.closest("[data-ent]");
-  if (ent && ent.dataset.ent === "chum") { sfx("purr"); if (Math.random() < .35) { hearts(2); speak("A happy wriggle. Treats and toys are in your backpack: tap the bag up top!", 4000); return; } hearts(2); speak(pick(["*leans into the pat*", "Happy {kind} noises!", "More pats please."]), 3000); return; }
+  if (ent && ent.dataset.ent === "chum") { petSound(); if (Math.random() < .35) { hearts(2); speak("A happy wriggle. Treats and toys are in your backpack: tap the bag up top!", 4000); return; } hearts(2); speak(pick(["*leans into the pat*", "Happy {kind} noises!", "More pats please."]), 3000); return; }
   // the orchard's tree spots and the flower farm's beds and bushes: walk over, then the spot's card
   const ot = ev.target.closest("[data-tree], [data-bed], [data-bush]");
   if (ot && (scene === "orchard" || scene === "flowers")) { const where = ot.dataset.tree != null ? "tree" : ot.dataset.bed != null ? "bed" : "bush", i = +(ot.dataset.tree ?? ot.dataset.bed ?? ot.dataset.bush);
@@ -3538,7 +3539,7 @@ $("paperNameIn").placeholder = paperName();
 $("nameSave").onclick = () => { const v = $("nameIn").value.trim(); if (v) { F.name = v.slice(0, 20); $("nameIn").value = ""; act("cheer"); speak(`Hi! I'm ${F.name} now.`, 4000); save(); } };
 $("meSave").onclick = () => { const v = $("meIn").value.trim(); if (v) { F.me = {...(F.me || {}), name: v.slice(0, 24)}; $("meIn").value = ""; sfx("chime"); speak(`Nice to meet you, ${F.me.name}.`, 4000); save(); } };
 $("meLook").onclick = () => { sfx("paper", true); openSetup(F, {lookOnly: true, done: () => { applyWear(); save(true); speak("A new look. Very you.", 3500); }}); };
-$("pet").onclick = () => { sfx("purr"); hearts(2); speak(pick(["*leans into the pat*", "Happy {kind} noises!", "More pats please.", "You're my favourite human."]), 3000); };
+$("pet").onclick = () => { petSound(); hearts(2); speak(pick(["*leans into the pat*", "Happy {kind} noises!", "More pats please.", "You're my favourite human."]), 3000); };
 
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;

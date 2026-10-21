@@ -555,6 +555,10 @@ function bell(freq, t, dur, vel){
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel/(i*1.8 + 1), t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + dur/(i + 1));
     o.connect(g).connect(sfxBus); o.start(t); o.stop(t + dur); });
 }
+// a short soft note sliding from f0 to f1 (the animals' voices)
+function tone(t, f0, f1, dur, vel, type = "sine"){ const o = ac.createOscillator(), g = ac.createGain(); o.type = type;
+  o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel, t + .01);
+  g.gain.exponentialRampToValueAtTime(.0001, t + dur + .04); o.connect(g).connect(sfxBus); o.start(t); o.stop(t + dur + .05); }
 const FX = {
   // paper: a handful of tiny filtered crackles
   paper(t, soft){ for (let i = 0; i < (soft ? 5 : 9); i++) { const s = noise(.03), f = ac.createBiquadFilter(), g = ac.createGain(), at = t + i*(.018 + Math.random()*.03);
@@ -565,6 +569,20 @@ const FX = {
     f.type = "lowpass"; f.frequency.value = 260; lfo.frequency.value = 24; lg.gain.value = .5; lfo.connect(lg).connect(g.gain);
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.55, t + .3); g.gain.linearRampToValueAtTime(.45, t + 1.2); g.gain.linearRampToValueAtTime(0, t + 1.75);
     s.connect(f).connect(g).connect(sfxBus); s.start(t); lfo.start(t); lfo.stop(t + 1.8); },
+  // round 231: each animal its own soft sound (they all purred, and none of the five pets is a cat)
+  yip(t){ tone(t, 900, 1400, .08, .1, "triangle"); tone(t + .15, 1000, 1600, .09, .09, "triangle"); },   // fox, puppy
+  sniff(t){ for (let i = 0; i < 3; i++) { const s = noise(.05), f = ac.createBiquadFilter(), g = ac.createGain(), at = t + i*.1;   // rabbit, bunny, hamster
+    f.type = "bandpass"; f.frequency.value = 3200; f.Q.value = 1.2; g.gain.setValueAtTime(.09, at); g.gain.exponentialRampToValueAtTime(.0001, at + .05); s.connect(f).connect(g).connect(sfxBus); s.start(at); } },
+  munch(t){ for (let i = 0; i < 4; i++) { const s = noise(.05), f = ac.createBiquadFilter(), g = ac.createGain(), at = t + i*.24;   // tortoise: slow and steady
+    f.type = "lowpass"; f.frequency.value = 900; g.gain.setValueAtTime(.16, at); g.gain.exponentialRampToValueAtTime(.0001, at + .06); s.connect(f).connect(g).connect(sfxBus); s.start(at); } },
+  chirp(t){ tone(t, 1800, 2300, .07, .06); tone(t + .12, 2000, 1700, .08, .06); tone(t + .3, 1900, 2300, .06, .05); },   // quokka
+  chirr(t){ const o = ac.createOscillator(), g = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();   // capybara: a low clicking chirr
+    o.type = "triangle"; o.frequency.value = 190; lfo.frequency.value = 11; lg.gain.value = .09; lfo.connect(lg).connect(g.gain);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.12, t + .15); g.gain.linearRampToValueAtTime(0, t + .9);
+    o.connect(g).connect(sfxBus); o.start(t); o.stop(t + .95); lfo.start(t); lfo.stop(t + .95); },
+  tweet(t){ for (let i = 0; i < 3; i++) tone(t + i*.1, 2800, 3600, .06, .05); },   // budgie
+  blub(t){ for (let i = 0; i < 3; i++) tone(t + i*.16, 300, 900, .06, .1); },   // goldfish: bubbles
+  peep(t){ tone(t, 2200, 2600, .1, .06); tone(t + .18, 2300, 2000, .1, .06); },   // duckling
   // cha-ching: a quick register clunk then two bright bells
   chaching(t){ const s = noise(.08), f = ac.createBiquadFilter(), g = ac.createGain(); f.type = "highpass"; f.frequency.value = 2500;
     g.gain.setValueAtTime(.35, t); g.gain.exponentialRampToValueAtTime(.0001, t + .08); s.connect(f).connect(g).connect(sfxBus); s.start(t);

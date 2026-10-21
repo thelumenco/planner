@@ -13,15 +13,15 @@
 // Colours come from --pet1 (main coat), --pet2 (the light parts) and --pet3 (eyes, nose, paws), set on :root by
 // core.js from SPECIES[kind].cols, so the same drawing works in light and dark themes.
 export const SPECIES = {
-  fox: {n: "Fox", a: "a fox", cols: ["#EE8B3A", "#FFF7EA", "#4A3029"], names: ["Ember", "Rusty", "Clementine", "Toffee", "Saffron"],
+  fox: {snd: "yip", n: "Fox", a: "a fox", cols: ["#EE8B3A", "#FFF7EA", "#4A3029"], names: ["Ember", "Rusty", "Clementine", "Toffee", "Saffron"],
     pace: 1, sleepy: 1, line: "Quick, curious and a terrible sock thief."},
-  rabbit: {n: "Rabbit", a: "a rabbit", cols: ["#CDB497", "#FFF4E6", "#4A3A30"], names: ["Clover", "Biscuit", "Thistle", "Pudding", "Bramble"],
+  rabbit: {snd: "sniff", n: "Rabbit", a: "a rabbit", cols: ["#CDB497", "#FFF4E6", "#4A3A30"], names: ["Clover", "Biscuit", "Thistle", "Pudding", "Bramble"],
     pace: 1.15, sleepy: 1, line: "Hops everywhere. Will do anything for a carrot top."},
-  tortoise: {n: "Tortoise", a: "a tortoise", cols: ["#9AAE6E", "#E6D7A8", "#3E3A2C"], names: ["Pebble", "Basil", "Mossy", "Sage", "Professor"],
+  tortoise: {snd: "munch", n: "Tortoise", a: "a tortoise", cols: ["#9AAE6E", "#E6D7A8", "#3E3A2C"], names: ["Pebble", "Basil", "Mossy", "Sage", "Professor"],
     pace: .55, sleepy: 1.3, line: "Never in a hurry. Always gets there."},
-  quokka: {n: "Quokka", a: "a quokka", cols: ["#A97E5A", "#EBD6B8", "#3A2A20"], names: ["Sunny", "Wattle", "Pip", "Banjo", "Smiley"],
+  quokka: {snd: "chirp", n: "Quokka", a: "a quokka", cols: ["#A97E5A", "#EBD6B8", "#3A2A20"], names: ["Sunny", "Wattle", "Pip", "Banjo", "Smiley"],
     pace: 1, sleepy: .9, line: "Smiles at everyone. Everyone smiles back."},
-  capybara: {n: "Capybara", a: "a capybara", cols: ["#9C7350", "#C9A27E", "#3A2A20"], names: ["Mochi", "Tofu", "Chestnut", "Bean", "Captain"],
+  capybara: {snd: "chirr", n: "Capybara", a: "a capybara", cols: ["#9C7350", "#C9A27E", "#3A2A20"], names: ["Mochi", "Tofu", "Chestnut", "Bean", "Captain"],
     pace: .8, sleepy: 1.4, line: "Calm about absolutely everything. Loves a warm bath."}
 };
 export const KINDS = Object.keys(SPECIES);
