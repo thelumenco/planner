@@ -346,3 +346,21 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   fishermen's boathouse and the singing, Tomás in 1912, the beach café and her first knickerbocker glory.
 - go() now handles rooms inside rooms (cave inside cellar inside wine shop) for walking there from anywhere.
 - Test: "The secret passage (round 229)" in test/smoke.mjs.
+
+## Round 231 (2026-10-21)
+- One copy plays at a time (a BroadcastChannel plus a cloud "playing" doc, with a Play here card); on first load the
+  cloud save wins unless it hasn't changed since the last sync (`fox.synced`).
+- The larder: take-outs stay in the backpack; Pilar's fetch is off by default.
+- Economy: START_COINS 200, requests pay 1.8x. A one-off thank-you special (100 coins and a bouquet), 19 Oct to 9 Nov 2026.
+- Wine in ice cream and bonbons ("Take a bottle"), Saltwick rum, raisins from the loft, the Rum and Raisin special.
+- Cherries all year (Otaru market punnet); raspberries at the mill; the cottage fruit basket takes any fruit.
+- Windows glow 7pm to 11pm in Honeybrook. Each pet has its own sound. Boats home are easy to tap.
+- The bin (game/bin.js): Throw something away from the backpack, with Undo; The bin keeps it 24 hours with Take back.
+  Dig it up (orchard.js digUp) for in-season orchard and flower spots.
+- Hairstyles (game/look.js STYLES, #hero in index.html, CSS .hs-*): long curls, bangs, pigtails, pixie cut, mohawk.
+- Mika's (game/salon.js): Mr Okada's granddaughter cuts hair in his front room (station "salon", furn "salon"),
+  10 to 5, Tuesday to Saturday; style 5, colour 10, both 15, Undo; her last chapter (reward "mikacut") makes the next
+  visit free. A sandwich board on the lane (buildings.js ohayoHouse). Villagers are now 29.
+- Wiki: a Home page (wiki/pages/23-home.mjs), the drying loft, seasons, the campervan mood board, Sunday lunch,
+  shoppers, the salon and Mika's page.
+- Tests: "Mika's: hair, by appointment (round 231)" and the other round 231 sections in test/smoke.mjs.
