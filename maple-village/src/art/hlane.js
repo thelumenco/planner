@@ -29,6 +29,7 @@ const grazer = (x, y, col, k) => `<g ${W} stroke-width="1" pointer-events="none"
 
 // the campervan, once it's bought (goals.js "van"): cream on top, mint below, a pop-top roof, round headlights, a
 // spare wheel on the back; curtains in the windows (and fairy lights, if the van's done up with lights)
+const millOwned = () => { const F = artCtx() && artCtx().F(); return !!(F && F.goals && F.goals.mill); };   // round 231: the windmill's label
 const vanOwned = () => { const F = artCtx() && artCtx().F(); return !!(F && F.goals && F.goals.van); };
 export function campervan(x, y){
   const F = artCtx().F(), use = (F.van && F.van.use) || {}, st = k => { const m = /^van_\w+?_(\w+)$/.exec(use[k] || ""); return m && STYLES[m[1]]; };
@@ -67,8 +68,8 @@ export function hlaneArt(){
     + `<g ${W} pointer-events="none"><rect x="413" y="398" width="6" height="18" style="fill:var(--wood)"/><circle cx="416" cy="388" r="14" style="fill:#7FA35A"/>${[[410, 386], [421, 392], [414, 380]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" style="fill:#8C5A7A"/>`).join("")}</g>`;
   const van = vanOwned() ? campervan(420, 588) : `<g data-place="vanspot" aria-label="Campervan spot"><ellipse class="hov" cx="420" cy="584" rx="48" ry="10" style="fill:var(--butter)"/>${sk(`<rect x="372" y="548" width="96" height="40" rx="6" style="fill:#D8CFC2" opacity=".85"/>`, `<rect x="372" y="548" width="96" height="40" rx="6" stroke-dasharray="4 5"/>`)}${tapeLabel(420, 536, "Campervan spot", "#E3EED2", 9)}</g>`;
   return lampDefs + ground + top + trainLayer("hlane") + trees + honeysuckle + hive(180, 254) + clover + pen + bluebell + figtree + hens(436, 486)
-    + `<g data-place="windmill" aria-label="The windmill"><ellipse class="hov" cx="458" cy="344" rx="30" ry="8" style="fill:var(--butter)"/>${windmill(458, 340)}</g>`
-    + grazer(470, 372, "#FFFDF6", 0) + grazer(496, 352, "#D9B48A", 1) + grazer(484, 520, "#FFFDF6", 2) + van
+    + `<g data-place="windmill" aria-label="The windmill"><ellipse class="hov" cx="458" cy="344" rx="30" ry="8" style="fill:var(--butter)"/>${windmill(458, 340)}${tapeLabel(434, 362, millOwned() ? "Olive mill" : "The windmill", "#F3E1A0", 9)}</g>`
+    + grazer(478, 384, "#FFFDF6", 0) + grazer(496, 352, "#D9B48A", 1) + grazer(484, 520, "#FFFDF6", 2) + van
     + archGate("toFarmL", 22, 560, "Wildflower Farm", 70, 520, "var(--butter)", "Gate west to Wildflower Farm")
     + archGate("toTownL", 280, 620, "Town square", 336, 600, "var(--peri)", "Down the station road to the town square")
     + archGate("toWoodsL", 498, 176, "Woods", 452, 196, "#C3E8DA", "East through the gate into Honeybrook Woods") + bikeRack("bikesst", 232, 200)
