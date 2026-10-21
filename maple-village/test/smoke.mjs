@@ -283,9 +283,9 @@ if (want("\ngifts for friends")) try {
   await page.waitForSelector('#ctx [data-shop="family"]', { timeout: 20000 });
   check(await page.locator('#ctx [data-shop="family"]').textContent() === "Gifts", "the market has a Gifts tab");
   await page.click('#ctx [data-shop="family"]');
-  for (const id of ["sandpit", "truck", "headphones", "hammock", "icecream", "kopi"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(150); }
+  for (const id of ["sandpit", "shipbottle", "headphones", "hammock", "icecream", "kopi"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(150); }
   check(await page.locator('#ctx .item[data-id="hammock"]').textContent().then(t => /at home/.test(t)), "keepsakes are bought once and go home");
-  check(await page.evaluate(() => { const o = window.__hbGame.F().fam.owned; return o.truck && o.sandpit && o.headphones && o.hammock; }), "the tin truck, the sandpit, Bo's headphones and the hammock are all kept");
+  check(await page.evaluate(() => { const o = window.__hbGame.F().fam.owned; return o.shipbottle && o.sandpit && o.headphones && o.hammock; }), "the ship in a bottle, the sandpit, Bo's headphones and the hammock are all kept");
   await page.click('#ctx [data-close]').catch(() => {}); await page.waitForTimeout(300);
   // a present for anyone (the ice cream) can go to any friend at three hearts or more: nobody yet
   await page.click('[data-open="bag"]');
@@ -4741,6 +4741,32 @@ if (want("\nMika's: hair, by appointment (round 231)")) try {
   check(await page.evaluate(s => window.__hbGame.F().coins === 45 && window.__hbGame.F().me.look.style === s && document.getElementById("hero").classList.contains("hs-" + s), pickStyle), "have it done: 5 coins, and you're wearing it");
   await page.click("#undoBtn"); await page.waitForTimeout(300);
   check(await page.evaluate(s => window.__hbGame.F().coins === 50 && (((window.__hbGame.F().me || {}).look || {}).style || "pony") === s && document.getElementById("hero").classList.contains("hs-" + s), before), "and Undo puts your hair and coins back");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe treehouse, and no toys left at the market (round 231)")) try {
+  // the creator: "a number of items at the market are kids stuff left over from Evan"; and "treehouse: where does it go,
+  // why is there no artwork, and how do I use it"
+  console.log("\nThe treehouse, and no toys left at the market (round 231)");
+  const its = await import(new URL("../src/data/items.js", import.meta.url)), tr = await import(new URL("../src/game/tours.js", import.meta.url)), T = its.ITEMS;
+  check(!T.balloon.tab && !T.wand.tab && !T.truck.tab && !T.dinokey.tab && !T.dinotee.tab, "the red balloon, bubble wand, tin truck and dino keychain and tee are off sale (owners keep theirs)");
+  check(T.storybook.n === "A new novel" && T.shipbottle.tab === "family" && T.moonkey.tab === "night" && T.bandtee.tab === "night", "a new novel, a ship in a bottle, a moon keychain and a band tee instead");
+  { const sold = tr.NIGHT.flatMap(x => x.items); check(sold.includes("moonkey") && sold.includes("bandtee") && !sold.includes("dinokey") && !sold.includes("dinotee"), "the night market's stalls sell the moon keychain and band tee"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`treehouse pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  check(await page.evaluate(() => { window.__hbScene("base"); return !document.querySelector('[data-place="treehouse"]'); }), "no treehouse in the swing tree until it's bought");
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.fam.owned.treehouse = true; window.__hbGame.save(); window.__hbScene("lane"); window.__hbScene("base"); }); await page.waitForTimeout(600);
+  await page.locator('#world [data-place="treehouse"]').dispatchEvent("click"); await page.waitForTimeout(3500);
+  check(await page.evaluate(() => !!document.querySelector('[data-spot="thwindow"]') && !!document.querySelector('[data-spot="thshelf"]')), "bought, it's in the swing tree: tap it to climb up to the window seat and the letters shelf");
+  await page.click('[data-spot="thwindow"]'); await page.waitForTimeout(2500);
+  check(await page.evaluate(() => !document.getElementById("speech").hidden && document.getElementById("speech").textContent.length > 20), "sit at the round window and look out");
+  await page.click('[data-spot="thjar"]'); await page.waitForTimeout(2500);
+  await page.click('#ctx [data-dd="add"]'); await page.waitForTimeout(200); await page.fill("#ddText", "See the northern lights"); await page.click('#ddForm [type="submit"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => (window.__hbGame.F().dreams || []).some(d => d.text === "See the northern lights" && !d.done)), "the daydream jar: write one down and pop it in, saved in the game");
+  await page.click('#ctx [data-dd="done"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().dreams[0].done > 0 && /Done/.test(document.getElementById("ctx").textContent)), "and when you've done it, it moves to the Done side");
+  await page.click("#undoBtn"); await page.waitForTimeout(300);
+  check(await page.evaluate(() => !window.__hbGame.F().dreams[0].done), "with Undo");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {

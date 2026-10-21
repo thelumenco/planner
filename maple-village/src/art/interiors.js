@@ -1,6 +1,8 @@
 // Interior shells: each building has its own floor, wall treatment and decor. Furniture positions live in
 // ROOMS[id].pos (data/world.js); decor here stays clear of those and of the walk from the exit to the quest board.
 import { sk, artCtx } from "./scenes.js";
+import { rainyOn } from "./village-extras.js";
+import { localHM, dayKey } from "../util.js";
 import { STYLES as VAN_STYLES } from "../game/van.js";
 const VAN_COLS = Object.fromEntries(Object.entries(VAN_STYLES).map(([k, v]) => [k, v.a]));
 
@@ -128,6 +130,21 @@ const SHELLS = {
     ${skirting}`; },
 
   // the guest room: a soft green room with a floral-dot wallpaper, a striped rug, and a window over the garden
+  // round 231: the treehouse: plank walls and floor, a big round window over the garden whose sky follows the clock
+  // (and the rain), fairy lights along the beam, and a lantern
+  treehouse: () => { const m = localHM(), wet = rainyOn(dayKey(), m), night = m < 6*60 || m >= 20*60, dusk = m >= 17*60 + 30 && m < 20*60, dawn = m >= 6*60 && m < 8*60;
+    const sky = night ? "#2F3A5C" : wet ? "#B8C2CC" : dusk ? "#F6C38A" : dawn ? "#F9DCC4" : "#BFE0F2";
+    const view = night ? `<circle cx="292" cy="58" r="9" style="fill:#F6E3A1"/><circle cx="296" cy="55" r="8" style="fill:${sky}"/>${[[228, 50], [250, 96], [304, 92], [236, 74], [280, 40]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.4" style="fill:#FFFDF6"/>`).join("")}`
+      : wet ? rows(9, i => `<path d="M${222 + i*10} ${44 + (i % 3)*14} l-3 9" style="stroke:#7F93A8" stroke-width="1.4"/>`)
+      : `<ellipse cx="240" cy="58" rx="16" ry="6" style="fill:#FFFDF6" opacity=".9"/>${dusk || dawn ? `<circle cx="292" cy="100" r="12" style="fill:#F3A65A" opacity=".9"/>` : ""}`;
+    return `<rect width="520" height="640" style="fill:#D9B98E"/>
+    <g opacity=".5" style="stroke:#B98A5A" stroke-width="1.2">${rows(12, i => `<path d="M0 ${176 + i*40} H520"/>`)}${rows(12, i => `<path d="M${(i*97) % 520} ${176 + i*40} v40"/>`)}</g>
+    ${wallBase("#E8D3B4", "#B98A5A")}<g opacity=".35" style="stroke:#B98A5A" stroke-width="1">${rows(5, i => `<path d="M0 ${24 + i*26} H520"/>`)}</g>
+    <clipPath id="thwinclip"><circle cx="262" cy="74" r="48"/></clipPath>${sk(`<circle cx="262" cy="74" r="56" style="fill:#A0623A"/><g clip-path="url(#thwinclip)"><circle cx="262" cy="74" r="48" style="fill:${sky}"/>${view}<path d="M206 124 q20 -30 48 -14 q16 -22 40 -6 q14 -6 26 8 v20 h-114z" style="fill:#7FA35A" opacity=".85"/></g>`,
+      `<circle cx="262" cy="74" r="56"/><circle cx="262" cy="74" r="48"/><path d="M262 26 v96 M214 74 h96"/>`)}
+    <path d="M20 14 q60 22 120 0 t120 0 t120 0 t120 0" fill="none" style="stroke:#5E5A55" stroke-width="1"/>${rows(16, i => `<circle class="glow" cx="${32 + i*31}" cy="${16 + (i % 2)*8}" r="3" fill="${["#F6E3A1", "#F4C7CF", "#C9E3F2"][i % 3]}"/>`)}
+    ${sk(`<path d="M452 24 v40" style="stroke:#5E5A55"/><rect x="440" y="64" width="24" height="30" rx="5" style="fill:#F3C969"/><path d="M436 64 h32 l-4 -6 h-24z" style="fill:#5E5A55"/>`, `<rect x="440" y="64" width="24" height="30" rx="5"/><path d="M436 64 h32 l-4 -6 h-24z M446 70 v18 M458 70 v18"/>`)}
+    ${skirting}${plant(470, 520, .9)}`; },
   guestroom: () => `<rect width="520" height="640" style="fill:#DCE6D4"/>
     <g style="fill:#C8D8BC" opacity=".8">${rows(9, r => rows(14, i => `<circle cx="${i*38 + (r % 2)*19 + 10}" cy="${178 + r*52}" r="2.2"/>`))}</g>
     <rect y="150" width="520" height="8" style="fill:#B9CFA8" opacity=".7"/>

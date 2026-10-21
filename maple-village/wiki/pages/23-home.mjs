@@ -2,7 +2,7 @@
 // storage at home, the surprise bouquets, and the quiet things that are just for you: letters, the journal, routines,
 // the shopping list, emotion jars, kind words, affirmations, the savings vaults, and the wardrobe's accessories.
 // Numbers from src/game/guests.js, storage.js, creator.js, letters.js, jars.js, affirm.js, bank.js, wardrobe.js.
-import { DECOR } from "../../src/data/items.js";
+import { DECOR, ITEMS } from "../../src/data/items.js";
 import { STAY } from "../../src/game/guests.js";
 import { GIFT } from "../../src/game/creator.js";
 import { MAX_BLOBS, MAX_KINDS, SLOTS as JAR_SLOTS } from "../../src/game/jars.js";
@@ -41,13 +41,19 @@ function html(){
       ["<b>Kind words</b>", "The corkboard on the courtyard wall by the town hall", "Pin up the nice things people have said to you, and who said them, to reread whenever you need a lift."],
       ["<b>Affirmations</b>", "The board beside it on the courtyard wall", `${PER_DAY} affirmations a day, from a list of ${AFFIRMATIONS.length} and any you write yourself (yours join the rotation). Tap the heart to keep one: Ones you kept stay on the board till you let them go.`],
       ["<b>Savings vaults</b>", "The bank on the town square", `Your own real-life savings (not game coins), as ${VAULTS} tall glass vault jars that fill with jewels. Give each a label, a goal, a marker every so often and a jewel colour. Add savings or take some out; empty a jar or remove a vault (both with Undo). Pick your currency once in the passbook: every vault shares it.`]])}
+  <h2 id="treehouse">${ico("treehouse", 22)} The treehouse</h2>
+    <p>A keepsake from the Gifts tab at Hana's market (${coin(ITEMS.treehouse.price)}). It goes up in the swing tree in your garden, with a ladder down the trunk. Tap it to climb up:</p>
+    <ul class="plain"><li><b>The window seat:</b> sit at the big round window and look out. The view follows the time of day and the weather: morning mist, the sun going down behind the vineyard, rain on the leaves, the moon and stars at night.</li>
+      <li><b>The letters shelf:</b> your letters, to reread (Dear future me, Dear Universe and the rest).</li>
+      <li><b>The daydream jar:</b> write down something you'd like to do one day, big or small, and pop it in. Take one out at random when you need a nudge. When you've done one, it moves to the Done side with the date (with Undo). You can let one go, too. Nothing here costs or earns coins.</li>
+      <li><b>The floor cushions:</b> for doing nothing at all. Your pet comes up too.</li></ul>
   <h2 id="wardrobe">${ico("tee", 22)} Accessories for the wardrobe</h2>
     <p>Hana's market has a Me &amp; my room tab with a few things to wear. Buy one once, then put it on or take it off at the wardrobe at home (which also keeps the clothes Idris makes for you at the tailor's).</p>
     ${table(["Accessory", "Price", "When it shows"], acc)}`;
 }
-export const pages = () => [{slug: "home", title: "Home and your own corner", section: "village", blurb: "Friends to stay, keeping things at home, surprise bouquets, letters, the journal, routines, jars, kind words, affirmations and savings", html: html(),
+export const pages = () => [{slug: "home", title: "Home and your own corner", section: "village", blurb: "Friends to stay, keeping things at home, the treehouse, surprise bouquets, letters, the journal, routines, jars, kind words, affirmations and savings", html: html(),
   search: [{t: "Guest stays", d: `Friends from your trips stay ${STAY} days`, a: "/home#guests"}, {t: "Storage at home", d: "The fridge's Stored side and the garage shelf", a: "/home#storage"},
     {t: "Surprise bouquets", d: `A note, a bouquet and ${GIFT.coins} coins every ${days(GIFT.gap)}`, a: "/home#bouquets"}, {t: "Letters", d: "Dear future me and Dear Universe", a: "/home#your-corner"},
     {t: "Journal", d: "In the writing desk", a: "/home#your-corner"}, {t: "My routines", d: "Checklists and weekly routines", a: "/home#your-corner"}, {t: "Shopping list", d: "On the fridge door", a: "/home#your-corner"},
     {t: "Emotion jars", d: "On the shelf in your room", a: "/home#your-corner"}, {t: "Kind words", d: "The courtyard corkboard", a: "/home#your-corner"}, {t: "Affirmations", d: `${PER_DAY} a day`, a: "/home#your-corner"},
-    {t: "Savings vaults", d: "At the bank, for your real-life savings", a: "/home#your-corner"}, {t: "Accessories", d: "Bow, scarf, sun hat, pyjamas", a: "/home#wardrobe"}]}];
+    {t: "Savings vaults", d: "At the bank, for your real-life savings", a: "/home#your-corner"}, {t: "Accessories", d: "Bow, scarf, sun hat, pyjamas", a: "/home#wardrobe"}, {t: "Treehouse", d: "A reading nook up in the swing tree", a: "/home#treehouse"}, {t: "Daydream jar", d: "In the treehouse: things you'd like to do one day", a: "/home#treehouse"}]}];

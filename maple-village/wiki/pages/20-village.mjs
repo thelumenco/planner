@@ -48,7 +48,7 @@ const MORE = {wineshop: "/vineyard-and-wine", kitchen: "/kitchen-and-tapas", cel
 const NEED = {cave: "A secret, found over a few days of clues once the cellar door is built", terrace: `Once the terrace is built (${coin(VINE_SHOP.terrace.price)} at the vineyard stall)`, cellar: goal("cellar"), giftshop: goal("giftshop"), cocoa: goal("cocoa"), cocoakitchen: goal("cocoa"),
   mill: goal("mill"), millup: goal("millshop"), van: goal("van"), boat: goal("boat"), greenhouse: goal("greenhouse"), reno: "Until it becomes the Cocoa Room",
   scoopdip: "Once the Scoop Shack has its dip station (an upgrade)", hfreezer: "Once the Scoop Shack has its honesty freezer (an upgrade)", dbike: "Once the Scoop Shack has its delivery bike (an upgrade)",
-  bluebell: "A holiday let of Elena's, until you buy it", figtree: "A holiday let of Elena's, until you buy it", olive: "Once it's planted (bought at the vineyard stall)"};
+  bluebell: "A holiday let of Elena's, until you buy it", figtree: "A holiday let of Elena's, until you buy it", olive: "Once it's planted (bought at the vineyard stall)", treehouse: `Once you've bought it on the Gifts tab at Hana's market (${coin(ITEMS.treehouse.price)})`};
 const HOURS = {
   scoopshop: `${hm(SC_OPEN)} to ${hm(SC_CLOSE)}, every day`, hfreezer: `${hm(7*60)} to ${hm(SC_OPEN)} and ${hm(SC_CLOSE)} to ${hm(22*60)}, while the shop's shut`,
   cocoa: `${hm(CC_OPEN)} to ${hm(CC_CLOSE)}, closed Mondays (open Mondays too with a second assistant)`,
@@ -65,6 +65,7 @@ const EXTRA = {
   market: "Hana's shop, with tabs for seeds, treats, the deli, pet care, gifts, animals, things for your home, things for you and your room, and selling what you've grown and made.",
   haberdash: "Ada sells fabric by the piece and buttons by the card, and buys unused fabric back at half price. She always has every fabric and button in stock.",
   tailor: "Idris makes clothes to your design from your fabric: ready the next morning from 9.",
+  treehouse: "Up the ladder in the swing tree: a window seat at a round window (the view follows the time of day and the weather), a shelf with your letters, the daydream jar, and floor cushions for you and your pet. See <a href=\"/home#treehouse\">Home</a>.",
   okadahouse: `Mr Okada lives here with his granddaughter <a href="/villagers/mika">Mika</a>, who cuts hair in the corner of his front room (look for her sign by the path: "Mika's: hair, by appointment"). Tap her chair and pick a style and a colour; you see it on you before you decide. A new style is ${coin(SALON_PRICE.style)}, a new colour ${coin(SALON_PRICE.colour)}, both ${coin(SALON_PRICE.style + SALON_PRICE.colour)}. Keep it as it is and there's nothing to pay, and there's an Undo straight after. ${HAIR_STYLES.length} styles (${HAIR_STYLES.map(([, n]) => n.toLowerCase()).join(", ")}) and ${HAIRS.length} colours. Her last story chapter makes your next visit free.`,
   hall: "Through the archway on the west wall: the courtyard, with your trophies (see <a href=\"/collections#trophies\">Collections</a>).",
   news: "Tap it for your wins, and the village calendar: what's on over the next fortnight, and the festivals coming up (see the <a href=\"/calendar\">Calendar</a>).",
@@ -75,7 +76,7 @@ const EXTRA = {
   homejetty: `The river taxi stops here too (${hm(TAXI_FROM)} to ${hm(TAXI_TO)}).`, suprack: "Paddle about with the dolphins, or paddle home up the river. Your pet hops on the front of your board.",
   ferry: "Boats to the islands: see Islands.", station: "Day trips by train: see Trips.", mill: "Opened up as an olive mill: a millstone, a press and clay jars. Upstairs becomes the Mill Shop."
 };
-const ICON = {hall: "hall", carpentry: "carpentry", library: "library", haberdash: "haberdash", tailor: "tailor", okadahouse: "okadahouse", post: "post", market: "market", home: "home", farm: "farm", board: "board",
+const ICON = {treehouse: "treehouse", hall: "hall", carpentry: "carpentry", library: "library", haberdash: "haberdash", tailor: "tailor", okadahouse: "okadahouse", post: "post", market: "market", home: "home", farm: "farm", board: "board",
   well: "well", news: "note", bench: "chat", pond: "water", shed: "wateringCan", letterbox: "letter", run: "hen", swing: "sparkle", wineshop: "wine_red", barrels: "wine_red", vinestall: "grape_red", grove: "olives", olive: "olives",
   cottage: "home", cacao: "chocolate", farmshop: "apple", toursign: "board", lake: "water", picnic: "picnic", jazzhat: "music", xgrotto: "xm_santaphoto", xtree: "xm_star", pitch: "ball", hanatheo: "home", linjun: "home", tomiposy: "home",
   suprack: "water", ferry: "taxi", wishtower: "sparkle", boat: "taxi", dolphins: "eyes", exlawn: "walker", scoopshop: "icecream", fishvan: "fish", kites: "kite", screen: "popcorn", popcorn: "popcorn", kitefly: "kite", deck: "ic_cone",

@@ -34,6 +34,8 @@ export const VILLAGE = {
   letterbox:{scene:"base", name:"Letterbox", door:[184,326], spot:true, line:"The letterbox. The morning paper lands here."},
   run:    {scene:"base", name:"Animal run", door:[198,566], spot:true, line:"The animal run. Clucks, cheeps and little hops."},
   swing:  {scene:"base", name:"Tree swing", door:[112,318], spot:true, line:"The tree swing. Push off, and wheee!"},
+  // round 231: the treehouse up in the swing tree (bought at Hana's market): up the ladder to a reading nook
+  treehouse:{scene:"base", name:"The treehouse", short:"the treehouse", door:[58,316], mark:[76,170]},
   toVine: {scene:"base", name:"Gate to the vineyard", door:[490,470], spot:true, bridge:"vineyard", mark:[494,416], line:"Over the footbridge to the vineyard."},
   // the vineyard, east of home: vines, the barrel shed, the stall, the wine shop and a playground
   toBaseV:{scene:"vineyard", name:"Gate home", door:[22,300], spot:true, bridge:"base", mark:[30,250], line:"Back over the footbridge, home."},
@@ -293,6 +295,12 @@ export const ROOMS = {
     ["jars","Emotion shelf","J","jarshelf",null,"Feelings, kept safe in jars.",-78]]},
   // The guest room, through the east door of the house: friends from your travels stay here (game/guests.js).
   // The guest book on the desk invites them and shows the day's plan while they're here.
+  // round 231: the treehouse: a window seat at the round window, a shelf of your letters, floor cushions and a lantern
+  treehouse: {name:"The treehouse", wall:"#E8D3B4", trim:"#B98A5A", noBoard:true, pos:{W:[262,214], B:[430,262], C:[120,520], D:[420,500]}, stations:[
+    ["thwindow","Window seat","W","thseat",null,"The window seat, under the round window."],
+    ["thshelf","Letters shelf","B","thshelf",null,"A little shelf of your letters."],
+    ["thjar","Daydream jar","D","thjar",null,"The daydream jar, on its stool."],
+    ["thcushions","Floor cushions","C","thcushions",null,"A heap of floor cushions. Your pet's already claimed one."]]},
   guestroom: {name:"The guest room", wall:"#DCE6D4", trim:"#9CAA6A", noBoard:true, pos:{A:[160,290], B:[430,262], E:[292,250], D:[420,560], C:[110,592]}, stations:[
     ["gbed","Guest bed","A","cottagebed",null,"Clean sheets, a patchwork quilt and a sprig of lavender on the pillow."],
     ["gbook","Guest book","B","writedesk",null,"The guest book: who's coming to stay, and what they're up to."],

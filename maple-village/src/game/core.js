@@ -33,6 +33,7 @@ import * as KD from "./kudos.js";
 import * as AF from "./affirm.js";
 import * as VB from "./bank.js";
 import * as EJ from "./jars.js";
+import * as DD from "./daydreams.js";   // round 231: the daydream jar in the treehouse
 import * as LTR from "./letters.js";   // and the letters: Dear future me, Dear Universe
 import { myName, dearMe } from "./me.js";
 import * as GU from "./guests.js";
@@ -2495,6 +2496,18 @@ function arriveSpot(id){
   if (scene === "cottage" && id === "tea") { orView = "tea"; sfx("paper", true); render(); return; }
   if (id === "dine") sitAtTable();
   if (scene === "haberdash" && ["habcounter", "bolts", "buttonjar", "habtable"].includes(id)) { habView = true; habSt.tab = id === "buttonjar" ? "buttons" : habSt.tab || "fabric"; sfx("paper", true); if (isHere("ada") && sewOpen()) npcSay("ada", pick(["What are we making?", "Gingham's on the left. Everything else is on the right. Mostly.", "Feel that linen. Go on."])); render(); return; }
+  // round 231: the treehouse: sit at the round window (the view follows the clock and the weather), your letters on the
+  // shelf, and the floor cushions
+  if (scene === "treehouse" && id === "thwindow") { hero.sitting = true; nodes.hero.classList.add("sit"); sfx("chime");
+    const m = localHM(), wet = rainyOn(dayKey(), m);
+    speak(wet ? pick(["Rain on the leaves, and on the roof. You could stay up here all afternoon.", "The garden's soaked and shining. Up here, you're dry as toast."])
+      : m < 6*60 || m >= 20*60 ? pick(["Stars over the river, and the house lights below. Very quiet up here.", "The moon's caught in the branches. Somewhere, an owl."])
+      : m >= 17*60 + 30 ? pick(["The sun's going down behind the vineyard. Everything's gold.", "Evening. The swallows are out over the pond."])
+      : m < 9*60 ? pick(["Morning mist over the river. The ducks are up before you.", "Early light through the leaves. The whole garden's waking up."])
+      : pick(["The garden, the pond, the river, and the vines beyond. All yours.", "A breeze through the leaves. Nothing to do but look.", "You can see the whole garden from here. {pet} has spotted a butterfly."]), 6000); return; }
+  if (scene === "treehouse" && id === "thshelf") { openSelf("letters", LTR.freshView()); return; }
+  if (scene === "treehouse" && id === "thjar") { openSelf("dreams", DD.freshView()); speak(DD.waiting(F).length ? "The daydream jar. Everything you'd like to do, one day." : "An empty jar, waiting for your daydreams.", 3500); return; }
+  if (scene === "treehouse" && id === "thcushions") { sfx("tap"); speak(pick(["{pet} curls up on the biggest cushion and sighs.", "A heap of cushions. Perfect for doing nothing at all.", "You sink into the cushions. {pet} sinks in beside you."]), 4500); return; }
   if (scene === "okadahouse" && id === "salon") { salonView = true; salonSt = {}; sfx("paper", true); if (isHere("mika") && salonNow()) npcSay("mika", pick(["Sit down, sit down. What are we doing today?", "A trim? Something new? The chair's all yours.", "Mind the hairdryer cable. Grandpa never does."])); render(); return; }
   if (scene === "tailor" && ["tailtable", "rail", "sewing", "mirror"].includes(id)) { tailView = true; sfx("paper", true); if (isHere("idris") && sewOpen() && !TL.orderState(F)) npcSay("idris", pick(["Right. What shall we make?", "Stand there. Arms out. Lovely.", "Show me what Ada sold you."])); render(); return; }
   if (id === "lethall" && LET_COTTAGES[scene]) { letView = scene; letSt = {}; sfx("paper", true); render(); return; }   // round 219: the cottage's hall table
@@ -3342,7 +3355,7 @@ $("setBed").onchange = e => { F.bedLock = e.target.checked; save(); bedtimeTick(
 
 /* ---------- Trophies ---------- */
 /* ---------- round 227: kind words, affirmations, savings vaults and emotion jars (kudos.js, affirm.js, bank.js, jars.js) ---------- */
-const SELF_AT = {kudos: "trophy", affirm: "trophy", vault: "bank", bank: "bank", jars: "room", letters: "room|base"};
+const SELF_AT = {kudos: "trophy", affirm: "trophy", vault: "bank", bank: "bank", jars: "room", letters: "room|base|treehouse", dreams: "treehouse"};
 const selfHere = () => !!SELF_AT[selfView] && SELF_AT[selfView].split("|").includes(scene);
 function openSelf(view, st){ selfView = view; selfSt = st; sfx("paper", true); render(); }
 function selfRerender(redraw){ selfForce = true; try { ctx(); } finally { selfForce = false; } if (redraw) drawScene(); }
@@ -3354,6 +3367,7 @@ function selfPanel(){
   if (selfView === "bank") return VB.bankOverview(F, isHere("opal"));
   if (selfView === "jars") return EJ.jarsPanel(F, selfSt);
   if (selfView === "letters") return LTR.lettersPanel(F, selfSt);
+  if (selfView === "dreams") return DD.dreamsPanel(F, selfSt);
   return "";
 }
 function wireSelf(c){
@@ -3369,6 +3383,8 @@ function wireSelf(c){
   if (selfView === "letters") LTR.wireLetters(c, F, selfSt, {...base, name: () => myName(F),
     toJournal: t => { const e = addEntry(t, "letter"); if (e) { sfx("chime"); flash("Copied into your journal"); } return !!e; },
     sent: (k, e) => { sfx("paper"); speak(k === "universe" ? "Posted. The Universe always writes back. Keep an eye on the letterbox at home." : `Sealed. It'll arrive in your letterbox on ${LTR.longDate(e.deliver)}.`, 5000); }});
+  if (selfView === "dreams") DD.wireDreams(c, F, selfSt, {...base, added: () => { sfx("chime"); speak(pick(["Folded up and in the jar. One day.", "In it goes. The jar's keeping it safe."]), 3500); },
+    did: () => { sfx("yay"); hearts(2); speak(pick(["You did it! That one's going on the Done side.", "Done! Daydreams are for doing, sometimes."]), 4000); }});
   if (selfView === "jars") EJ.wireJars(c, F, selfSt, {...base, placed: j => { sfx("chime");
     const heavy = j.blobs.filter(x => ["anger", "sad", "fear", "anxious", "tired"].includes(x)).length >= Math.ceil(j.blobs.length/2);
     speak(heavy ? "That's a big feeling. Be gentle with yourself today." : j.blobs.filter(x => ["joy", "love", "proud", "calm"].includes(x)).length > j.blobs.length/2 ? "A happy one. Lovely." : "Kept safe on the shelf.", 4500); }});

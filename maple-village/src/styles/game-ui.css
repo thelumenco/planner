@@ -1080,3 +1080,11 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 /* round 231: "Take a bottle" (for the Scoop Shack or the Cocoa Room) on the wine lists: a small one-line chip under the wine's name, like the backpack's kitchen chip */
 .scoopchip{display:block;width:max-content;margin-top:5px;padding:2px 10px;border:0;border-radius:999px;background:#F6E1EA;color:#7A2E4A;font:inherit;font-size:.7rem;font-weight:800;white-space:nowrap;cursor:pointer}
 .scoopchip:hover{background:#EFD0DC}
+/* round 231: the daydream jar (game/daydreams.js) */
+.ddtop{display:flex;align-items:center;gap:12px}
+.ddtop .sub{margin:0}
+.ddlist{list-style:none;padding:0;margin:4px 0 10px;display:flex;flex-direction:column;gap:6px}
+.ddlist li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:10px;border:1px solid rgba(120,104,84,.2);color:#2F2B28}
+.ddlist.done li{background:#F3EFE7;color:#6E6258}
+.ddlist.done li span{text-decoration:line-through;text-decoration-color:rgba(110,98,88,.5)}
+.ddbtns{display:flex;align-items:center;gap:6px;flex:none}
