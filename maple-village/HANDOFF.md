@@ -2705,5 +2705,5 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Round 254: the cottage fruit basket, and raspberries at the mill
 - Mel: "I can't click the fruit basket. When I click, the dining table catalogue shows up": the bowl's drawing ignored taps and its little hover ellipse sat inside the table's area. cottages.js `fruitBowl()` now has a finger-sized transparent tap area (44 x 32) over the bowl, above the table.
 - She had raspberries and the basket didn't take them: data/cottages.js `FRUIT` now takes raspberries, blackberries, bananas, Hokkaido cherries and melon, Formentera figs, hallabong and snake fruit too.
-- Mel: "how come I can't use raspberries for the mill stuff too": millcraft.js `HERB.raspberry` now goes into oils, soaps, lotions, balms and lip oils (it was soaps and lip oils only).
+- Mel: "how come I can't use raspberries for the mill stuff too": millcraft.js `HERB.raspberry` now goes into soaps, lotions, balms and lip oils (it was soaps and lip oils only); not infused oils (Mel: "not raspberry, that's just odd"). Lemon already infuses oil.
 - Tests in the cottage block ("inside Fig Tree").

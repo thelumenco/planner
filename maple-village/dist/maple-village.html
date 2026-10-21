@@ -33120,7 +33120,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     lipoil: { n: "Lip oils", max: 1, price: 10, sell: 8 }
   };
   for (const a of ["honey", "honey_lav", "honey_blossom", "honey_cream", "honey_sun", "honey_heath", "euchoney", "mint", "orange", "lemon", "bq_lavender", "bq_rose", "strawberry", "bq_sweetpea", "bq_camellia"]) if (HERB[a]) Object.assign(HERB[a], { balm: true, lipoil: true });
-  if (HERB.raspberry) Object.assign(HERB.raspberry, { oil: true, soap: true, lotion: true, balm: true, lipoil: true });
+  if (HERB.raspberry) Object.assign(HERB.raspberry, { soap: true, lotion: true, balm: true, lipoil: true });
   ITEMS.beeswax = Object.assign(ITEMS.beeswax || {}, { n: "A block of beeswax", kind: "ingredient", ico: "beeswax", price: 4, sell: 2 });
   var dyeHave = (F2, d) => (((F2.orch || {}).stock || {})["stem:" + d] || 0) + ((F2.inv || {})[d] && ITEMS[d] && ITEMS[d].kind === "flower" ? F2.inv[d] : 0);
   var useDye = (F2, d) => {

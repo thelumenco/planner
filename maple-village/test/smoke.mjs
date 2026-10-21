@@ -4857,7 +4857,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     const C = await import(new URL("../src/data/cottages.js", import.meta.url));
     check(hit >= 8 && C.FRUIT.includes("raspberry"), `tapping the fruit basket on the dining table reaches the basket, not the table (${hit}/9), and raspberries count as fruit`); }
   { const MC = await import(new URL("../src/game/millcraft.js", import.meta.url)), r = MC.HERB.raspberry;
-    check(r.oil && r.soap && r.lotion && r.balm && r.lipoil, "raspberries go into everything at the mill's bench: oils, soaps, lotions, balms and lip oils"); }
+    check(!r.oil && r.soap && r.lotion && r.balm && r.lipoil && MC.HERB.lemon.oil, "raspberries go into soaps, lotions, balms and lip oils at the mill (not infused oil: odd, says Mel), and lemon infuses oil"); }
   await page.locator('#world [data-cospot="calendar"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-co^="block:"]', { timeout: 20000 });
   check(/Buffer between guests/i.test(await page.locator("#ctx").textContent()), "the bookings calendar on the wall: five weeks, a buffer setting, block or unblock any week");
   const wk = await page.locator('#ctx [data-co^="block:"]').nth(2).getAttribute("data-co");
