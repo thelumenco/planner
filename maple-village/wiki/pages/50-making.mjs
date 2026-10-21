@@ -6,6 +6,7 @@ import { GOALS } from "../../src/game/goals.js";
 import * as VY from "../../src/game/vineyard.js";
 import * as MILL from "../../src/game/mill.js";
 import * as MC from "../../src/game/millcraft.js";
+import { LOFT } from "../../src/game/loft.js";
 import * as K from "../../src/game/kitchen.js";
 import * as MU from "../../src/game/mulled.js";
 import * as SC from "../../src/game/scoop.js";
@@ -61,6 +62,14 @@ function vineyardPage(){
     + T(["For sale", "Price", ""], stall)
     + h2("olives", "Olives", "olives")
     + `<p>The olive tree by the path is ripe every ${dur(VY.OLIVE)}: ${VY.TREE_JARS} jars of olives. The grove along the top terrace gives ${VY.GROVE_JARS} jars a picking (twice that with the second row). Marco and Ines pick them on their shifts into the olive crate; take the crate for the kitchen, gelato, or the <a href="/olive-mill">olive mill</a>, which presses three jars into a bottle of oil.</p>`
+    // round 231 ("do I need to unlock the drying loft? That wasn't in the wiki")
+    + h2("drying-loft", "The drying loft", "w_raisin")
+    + `<p>Up the ladder in the barrel shed. It opens after your first day trip to <a href="/trips/cinque">Cinque Terre</a>: tap the barrels, then <b>Up the ladder to the drying loft</b>. Slow things made here fetch the most at the market.</p>`
+    + T(["What", "You need", "How long", "You get"], [
+      [`${named("w_raisin", 20, "Raisin wine")} or ${named("raisins", 20, "raisins")}`, `${LOFT.rack.need.grapes} bunches of your own grapes, and the monorail harvest with Signor Bruno in Corniglia (he shows you how to dry them)`, `${LOFT.rack.days} days on the cane racks; then either into the cask for ${LOFT.cask.days} more, or kept as raisins`, `${LOFT.cask.gives[1]} bottles of raisin wine, or 6 bags of raisins (for <a href="/scoop-shack#flavours">rum and raisin</a>, or bonbon fillings)`],
+      [named("limoncino", 20, "Limoncino"), `${LOFT.lemon.need.lemon} lemons from the orchard`, `${LOFT.lemon.days} days on the steeping shelf`, `${LOFT.lemon.gives[1]} bottles`],
+      [named("anchovy_salt", 20, "Salted anchovies"), `${LOFT.salt.need.anchovy} fresh anchovies from the sea`, `${LOFT.salt.days} days in the salting barrel`, `${LOFT.salt.gives[1]} jars`],
+      [named("pesto", 20, "Pesto"), "Basil 2, garlic 1, pine nuts, your own olive oil and a bit of cheese, once Nonna Pina has shown you in Cinque Terre", "Right away, at the mortar", `${LOFT.pesto.gives[1]} jars`]])
     + h2("cellar", "The cellar door", "wine_sparkling")
     + `<p>${goal("cellar")}. ${esc(GOALS.cellar.line)}</p>`
     + h3("wine-store", "The wine store") + `<p>Tap the wine wall in the cellar. Every bottle you've made comes down here first. <b>Keep it here</b> and the staff won't put that wine out on the shelves; <b>Bring them down</b> takes a wine back off the shelves upstairs. <b>Take a bottle</b> puts one in your backpack, for a <a href="/scoop-shack#flavours">wine sorbet or gelato</a> at the Scoop Shack or wine bonbons at the Cocoa Room (a bottle fills four). The same chip is on the wine shelves in the shop, for wine that's already out for sale or still waiting to be stocked.</p>`
@@ -178,7 +187,7 @@ function scoopPage(){
       <li>With milk, goat's milk or yoghurt it's a gelato; without, a dairy-free sorbet. Milk on its own is Fior di Latte. A flavour of one or two things is named after them (${esc(SC.nameFor(["milk", "strawberry"]))}, ${esc(SC.nameFor(["honey", "mint"]))}...); three or four get a name of their own.</li>
       <li>Every tub, a new flavour's first or another of one you know, goes into the churner for an hour (blending, then freezing). The churner holds ${SC.CHURNS} batches at once. A tub is ${SC.TUB} scoops, and another tub uses one of each ingredient again.</li>
       <li>Your own wine goes in too: take a bottle from the wine shelves in the shop, or the cellar's <a href="/vineyard-and-wine#wine-store">wine store</a>. On its own it's a wine sorbet; with fruit or milk it's whatever you make of it.</li>
-      <li><b>Rum and Raisin</b> is a special of its own: Saltwick's dark rum (from Walter's chandlery) and raisins you dry in the loft, with milk. It has its own colour, starts out marked special, and sells for more than other specials. ${who("okada")} loves one.</li>
+      <li><b>Rum and Raisin</b> is a special of its own: Saltwick's dark rum (from Walter's chandlery) and raisins you dry in the <a href="/vineyard-and-wine#drying-loft">drying loft</a>, with milk. It has its own colour, starts out marked special, and sells for more than other specials. ${who("okada")} loves one.</li>
       <li>The display holds ${SC.SLOTS} flavours, and customers only buy what's in it. Arrange it yourself, or let it fill itself from what's in the freezer.</li></ul>`
     + h2("ingredients", "What can go in", "strawberry") + ingr
     + h2("menu", "The menu", "coin")
