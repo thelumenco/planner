@@ -386,7 +386,7 @@
     if (shown) return; shown = true;
     var d = document.createElement("div"); d.id = "rescue";
     d.setAttribute("style", "position:fixed;left:16px;right:16px;bottom:24px;z-index:99999;background:#FFFDF6;border:1.5px solid #3b3530;border-radius:14px;padding:14px 16px;font:15px/1.4 system-ui,sans-serif;color:#3b3530;box-shadow:0 6px 20px rgba(0,0,0,.18)");
-    d.innerHTML = '<b>Something went wrong in Honeybrook.</b><div style="margin:6px 0 10px;font-size:13px;opacity:.8;word-break:break-word"></div><button style="font:inherit;padding:8px 14px;border-radius:10px;border:1.5px solid #3b3530;background:#F4C7CF">Take me home</button> <span style="font-size:13px;opacity:.7">A screenshot of this helps fix it.</span> <button aria-label="Close" style="float:right;font:inherit;border:0;background:none;font-size:20px;line-height:1">×</button>';
+    d.innerHTML = '<b>Something went wrong in Honeybrook.</b><div style="margin:6px 0 10px;font-size:13px;opacity:.8;word-break:break-word"></div><button style="font:inherit;padding:8px 14px;border-radius:10px;border:1.5px solid #3b3530;background:#F4C7CF">Take me home</button> <span style="font-size:13px;opacity:.7">A screenshot of this helps fix it.</span> <button aria-label="Close" style="float:right;font:inherit;border:0;background:none;font-size:22px;line-height:1;min-width:44px;min-height:44px;margin:-10px -10px 0 0">×</button>';
     d.children[1].textContent = String(msg).slice(0, 400);
     d.querySelectorAll("button")[1].onclick = function(){ d.remove(); };
     d.querySelector("button").onclick = function(){ try { sessionStorage.setItem("fox.home", "1"); } catch(e) {} location.reload(); };

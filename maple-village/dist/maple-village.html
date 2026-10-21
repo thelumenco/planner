@@ -2350,7 +2350,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (shown) return; shown = true;
     var d = document.createElement("div"); d.id = "rescue";
     d.setAttribute("style", "position:fixed;left:16px;right:16px;bottom:24px;z-index:99999;background:#FFFDF6;border:1.5px solid #3b3530;border-radius:14px;padding:14px 16px;font:15px/1.4 system-ui,sans-serif;color:#3b3530;box-shadow:0 6px 20px rgba(0,0,0,.18)");
-    d.innerHTML = '<b>Something went wrong in Honeybrook.</b><div style="margin:6px 0 10px;font-size:13px;opacity:.8;word-break:break-word"></div><button style="font:inherit;padding:8px 14px;border-radius:10px;border:1.5px solid #3b3530;background:#F4C7CF">Take me home</button> <span style="font-size:13px;opacity:.7">A screenshot of this helps fix it.</span> <button aria-label="Close" style="float:right;font:inherit;border:0;background:none;font-size:20px;line-height:1">×</button>';
+    d.innerHTML = '<b>Something went wrong in Honeybrook.</b><div style="margin:6px 0 10px;font-size:13px;opacity:.8;word-break:break-word"></div><button style="font:inherit;padding:8px 14px;border-radius:10px;border:1.5px solid #3b3530;background:#F4C7CF">Take me home</button> <span style="font-size:13px;opacity:.7">A screenshot of this helps fix it.</span> <button aria-label="Close" style="float:right;font:inherit;border:0;background:none;font-size:22px;line-height:1;min-width:44px;min-height:44px;margin:-10px -10px 0 0">×</button>';
     d.children[1].textContent = String(msg).slice(0, 400);
     d.querySelectorAll("button")[1].onclick = function(){ d.remove(); };
     d.querySelector("button").onclick = function(){ try { sessionStorage.setItem("fox.home", "1"); } catch(e) {} location.reload(); };
@@ -8385,8 +8385,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     if (pl === "fresh" && isWriting(t2)) return "desk";
     if (t2.spot && st6.find((s2) => s2.id === t2.spot)) return t2.spot;
     const s = t2.title.toLowerCase();
-    const hit = st6.find((x) => x.re && x.re.source !== "." && x.re.test(s));
-    if (hit) return hit.id;
+    const hit2 = st6.find((x) => x.re && x.re.source !== "." && x.re.test(s));
+    if (hit2) return hit2.id;
     const fallback = st6.filter((x) => x.id !== "cupboard" && x.re);
     const dflt = fallback.find((x) => x.re && x.re.source === ".");
     return dflt ? dflt.id : fallback[hash(t2.id) % fallback.length].id;
@@ -28340,12 +28340,12 @@ Quests finished today: ${S4.doneIds.length}`;
         const t2 = txt9(el);
         if (!t2) continue;
         const strong = el.firstElementChild && /^(strong|b)$/i.test(el.firstElementChild.tagName) && el.textContent.trim().startsWith(el.firstElementChild.textContent.trim()) ? txt9(el.firstElementChild) : "";
-        const hit = strong && subs.find((x) => !x.local && (sameTitle(x.title, strong) || sameTitle(x.title.replace(/^\[[^\]]*\]\s*/, ""), strong.replace(/^\[[^\]]*\]\s*/, ""))));
-        if (hit) {
+        const hit2 = strong && subs.find((x) => !x.local && (sameTitle(x.title, strong) || sameTitle(x.title.replace(/^\[[^\]]*\]\s*/, ""), strong.replace(/^\[[^\]]*\]\s*/, ""))));
+        if (hit2) {
           if (out.length && out[out.length - 1] && out[out.length - 1].head) out.pop();
-          cur2 = hit;
+          cur2 = hit2;
           const rest = t2.slice(strong.length).trim();
-          if (rest) hit.info.push(rest);
+          if (rest) hit2.info.push(rest);
           continue;
         }
         cur2 = null;
@@ -29617,8 +29617,8 @@ Quests finished today: ${S4.doneIds.length}`;
   ];
   var colourOf = (name, fallback) => {
     const n = String(name || "").toLowerCase();
-    const hit = COLOURS.find(([re]) => re.test(n));
-    return hit ? hit[1] : fallback;
+    const hit2 = COLOURS.find(([re]) => re.test(n));
+    return hit2 ? hit2[1] : fallback;
   };
   function shape(field, n, c) {
     const F2 = `style="fill:${c}"`;
@@ -29806,16 +29806,16 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     try {
       const s = unwrap(await mcp4.callTool(NOTION, "notion-search", { query: title, data_source_url: PLANS_DS, page_size: 5 }, { cache: cache4, signal }));
       const list11 = s && Array.isArray(s.results) ? s.results : [];
-      const hit = list11.find((x) => x && String(x.title || "").trim() === title) || null;
-      if (!hit) return { level: level2, title, error: "not found" };
-      const page = unwrap(await mcp4.callTool(NOTION, "notion-fetch", { id: hit.id || hit.url }, { cache: cache4, signal }));
+      const hit2 = list11.find((x) => x && String(x.title || "").trim() === title) || null;
+      if (!hit2) return { level: level2, title, error: "not found" };
+      const page = unwrap(await mcp4.callTool(NOTION, "notion-fetch", { id: hit2.id || hit2.url }, { cache: cache4, signal }));
       const raw = typeof page === "string" ? page : page && (page.text || "") || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(raw);
       let props2 = {};
       try {
         props2 = pm ? JSON.parse(pm[1]) : {};
       } catch {
       }
-      return { level: level2, title, text: pageText(page).slice(0, 5e3), theme: String(props2.Theme || "").slice(0, 160), start: props2["date:Period Start:start"] || "", end: props2["date:Period End:start"] || "", url: /^https:\/\//.test(props2.url || "") ? props2.url : hit.url && /^https:\/\//.test(hit.url) ? hit.url : "" };
+      return { level: level2, title, text: pageText(page).slice(0, 5e3), theme: String(props2.Theme || "").slice(0, 160), start: props2["date:Period Start:start"] || "", end: props2["date:Period End:start"] || "", url: /^https:\/\//.test(props2.url || "") ? props2.url : hit2.url && /^https:\/\//.test(hit2.url) ? hit2.url : "" };
     } catch (e) {
       return { level: level2, title, error: e && e.code || "upstream_error" };
     }
@@ -43528,8 +43528,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (whaleDone(st6)) return h3 + `<p class="sub">${st6.seen.length ? `You saw: ${st6.seen.map((s) => s.split("!")[0].split(",")[0].toLowerCase()).join("; ")}.` : "Just sea, and more sea, and a container ship very far away. They're out there, though. Win says come back in an hour."}</p>${st6.seen.length ? `<ul class="hlist">${st6.seen.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}<div class="actions"><button class="btn primary" data-bba="whaled">Back down the steps</button></div>`;
     h3 += `<p class="sub">Sweep the binoculars across the water: tap a stretch of sea to look there. ${WHALES.LOOKS - st6.looked.length} looks left before your arms get tired.</p>`;
     h3 += `<div class="crsea">${Array.from({ length: WHALES.SECTORS }, (_, i) => {
-      const l = st6.looked.includes(i), hit = l && st6.at.includes(i);
-      return `<button class="crsect${l ? " l" : ""}${hit ? " hit" : ""}" data-bba="look:${i}" ${l ? "disabled" : ""} aria-label="${l ? hit ? "something there" : "just sea" : "look here"}">${hit ? st6.whales ? WHALE_SVG : DOLPHIN_SVG : ""}</button>`;
+      const l = st6.looked.includes(i), hit2 = l && st6.at.includes(i);
+      return `<button class="crsect${l ? " l" : ""}${hit2 ? " hit" : ""}" data-bba="look:${i}" ${l ? "disabled" : ""} aria-label="${l ? hit2 ? "something there" : "just sea" : "look here"}">${hit2 ? st6.whales ? WHALE_SVG : DOLPHIN_SVG : ""}</button>`;
     }).join("")}</div>`;
     return h3 + `<p class="muted">${st6.seen.length ? esc(st6.seen[st6.seen.length - 1]) + "!" : "Nothing yet. Patience."}</p>`;
   }
@@ -43730,9 +43730,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function kayakSteer(st6, dir) {
     if (st6.leg >= KAYAK.LEGS || ![0, 1, 2].includes(dir)) return null;
-    const hit = st6.at[st6.leg] === dir;
-    if (hit) st6.seen.push(st6.sights[st6.leg % st6.sights.length]);
-    st6.last = hit ? st6.sights[st6.leg % st6.sights.length] : "miss";
+    const hit2 = st6.at[st6.leg] === dir;
+    if (hit2) st6.seen.push(st6.sights[st6.leg % st6.sights.length]);
+    st6.last = hit2 ? st6.sights[st6.leg % st6.sights.length] : "miss";
     st6.leg++;
     return st6.last;
   }
@@ -47669,6 +47669,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
 
   // src/art/winecave.js
   var g15 = (s) => `<g pointer-events="none">${s}</g>`;
+  var hit = (x, y, w, h3) => `<rect x="${x}" y="${y}" width="${w}" height="${h3}" fill="transparent" pointer-events="all"/>`;
   var hovE11 = (x, y, rx, ry) => `<ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>`;
   var lab22 = (x, y, t2, col = "#F3E1A0", size = 8) => tapeLabel(x, y, t2, col, size);
   var f112 = (n) => (+n).toFixed(1);
@@ -47835,14 +47836,14 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       s += `<g data-secret="brick" data-x="70" data-y="440" aria-label="A loose brick">${hovE11(40, 452, 34, 10)}<defs><clipPath id="${id}"><path d="${patch}"/></clipPath></defs><g pointer-events="none"><g clip-path="url(#${id})">${bricks}</g><g transform="rotate(-4 32 426)"><rect x="22" y="420" width="20" height="10" rx="1" fill="#C27A5A" stroke="${INK7}" stroke-width=".7"/>${txt8(32, 428, "T.R. 1912", 4.6, "#3A1E14", 700)}</g></g>` + sk("", `<path d="${patch}"/>`) + g15([[8, 470], [20, 476], [52, 474]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="4" ry="1.6" fill="#E9DCCB" stroke="#B8A890" stroke-width=".5"/>`).join("")) + lab22(44, 494, "Old bricks", "#EFE6D6") + `</g>`;
     } else {
       const panel = `M0 318 L26 329 L26 427 L0 438z`;
-      s += `<g data-secret="door" data-x="56" data-y="440" aria-label="The secret passage">${hovE11(30, 452, 30, 9)}` + D6(`<path d="${panel}" style="fill:#B48A66"/>`, `<path d="M0 352 L26 360 M0 388 L26 393 M0 418 L26 419" stroke="#8E6A4A" stroke-width=".9" opacity=".7"/>`) + g15(`<path d="M26.5 330 V426" stroke="#FFD27A" stroke-width="1.3" opacity=".55"><animate attributeName="opacity" values=".35;.7;.4;.6;.35" dur="3.2s" repeatCount="indefinite"/></path><circle cx="20" cy="380" r="2.6" fill="none" stroke="#4A3A30" stroke-width="1.1"/>`) + `</g>`;
+      s += `<g data-secret="door" data-x="56" data-y="440" aria-label="The secret passage">${hovE11(30, 452, 30, 9)}${hit(0, 306, 66, 160)}` + D6(`<path d="${panel}" style="fill:#B48A66"/>`, `<path d="M0 352 L26 360 M0 388 L26 393 M0 418 L26 419" stroke="#8E6A4A" stroke-width=".9" opacity=".7"/>`) + g15(`<path d="M26.5 330 V426" stroke="#FFD27A" stroke-width="1.3" opacity=".55"><animate attributeName="opacity" values=".35;.7;.4;.6;.35" dur="3.2s" repeatCount="indefinite"/></path><circle cx="20" cy="380" r="2.6" fill="none" stroke="#4A3A30" stroke-width="1.1"/>`) + `</g>`;
     }
     return s;
   }
   function kitchenSecretArt(open2) {
     if (!open2) return "";
     const shelf6 = `M0 330 L34 340 V470 L0 480z`;
-    return defs3 + `<g data-secret="passage" data-x="64" data-y="455" aria-label="The secret passage">${hovE11(34, 478, 30, 9)}` + D6(`<path d="${shelf6}" style="fill:#F4F1EA"/>`, [0, 1, 2, 3].map((k) => `<path d="M0 ${364 + k * 30} L34 ${370 + k * 28}" stroke="#B8C4CC" stroke-width="2"/>${[0, 1].map((j) => `<rect x="${6 + j * 13}" y="${f112(354 + k * 29 + j * 2)}" width="8" height="9" rx="1.4" fill="${["#F4C7CF", "#FFF3D6", "#BFE0F2"][(j + k) % 3]}" stroke="${INK7}" stroke-width=".4"/>`).join("")}`).join("")) + g15(`<path d="M34.6 342 V468" stroke="#FFD27A" stroke-width="1.2" opacity=".5"><animate attributeName="opacity" values=".3;.65;.35;.55;.3" dur="3.4s" repeatCount="indefinite"/></path><g><path d="M30 404 h8 v16 l-3 -2 l-2 3 l-3 -3z" fill="#FFFDF6" stroke="${INK7}" stroke-width=".5"/><animateTransform attributeName="transform" type="rotate" values="0 34 404;4 34 404;-2 34 404;0 34 404" dur="2.6s" repeatCount="indefinite"/></g>`) + `</g>`;
+    return defs3 + `<g data-secret="passage" data-x="64" data-y="455" aria-label="The secret passage">${hovE11(34, 478, 30, 9)}${hit(0, 318, 72, 176)}` + D6(`<path d="${shelf6}" style="fill:#F4F1EA"/>`, [0, 1, 2, 3].map((k) => `<path d="M0 ${364 + k * 30} L34 ${370 + k * 28}" stroke="#B8C4CC" stroke-width="2"/>${[0, 1].map((j) => `<rect x="${6 + j * 13}" y="${f112(354 + k * 29 + j * 2)}" width="8" height="9" rx="1.4" fill="${["#F4C7CF", "#FFF3D6", "#BFE0F2"][(j + k) % 3]}" stroke="${INK7}" stroke-width=".4"/>`).join("")}`).join("")) + g15(`<path d="M34.6 342 V468" stroke="#FFD27A" stroke-width="1.2" opacity=".5"><animate attributeName="opacity" values=".3;.65;.35;.55;.3" dur="3.4s" repeatCount="indefinite"/></path><g><path d="M30 404 h8 v16 l-3 -2 l-2 3 l-3 -3z" fill="#FFFDF6" stroke="${INK7}" stroke-width=".5"/><animateTransform attributeName="transform" type="rotate" values="0 34 404;4 34 404;-2 34 404;0 34 404" dur="2.6s" repeatCount="indefinite"/></g>`) + `</g>`;
   }
 
   // src/game/cinque.js
@@ -53029,6 +53030,13 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       ctx();
       return;
     }
+    coView = null;
+    caveView = null;
+    gsPk = null;
+    ppView = null;
+    bvView = null;
+    ccSt.pk = null;
+    ccSt.made = null;
     boardOpen = false;
     shelfOpen = false;
     shedOpen = false;
@@ -55586,72 +55594,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       save2(true);
       ctx();
     });
-    c.querySelectorAll("[data-close]").forEach((b) => b.onclick = () => {
-      coView = null;
-      caveView = null;
-      gsPk = null;
-      ppView = null;
-      ccSt.pk = null;
-      bvView = null;
-      ccView = null;
-      hfView = null;
-      railOpen = false;
-      fishSpot = null;
-      woodsView = null;
-      rondaView = null;
-      kyotoView = null;
-      ktSt = {};
-      jejuView = null;
-      jjSt = {};
-      loftView = false;
-      cinqueView = null;
-      ctSt = {};
-      ghBed = null;
-      millOpen = false;
-      friView = null;
-      vanView = null;
-      bbRoom = null;
-      bbSt = {};
-      lunchView = null;
-      occView = null;
-      trvSt = null;
-      pntSt = null;
-      ccSt.made = null;
-      keepItem = null;
-      keepSpot = null;
-      adoptItem = null;
-      adoptSt = {};
-      petView = null;
-      scView = null;
-      scSt.pick = null;
-      boardOpen = false;
-      shelfOpen = false;
-      shedOpen = false;
-      runOpen = false;
-      wardOpen = false;
-      bedOpen = false;
-      journalOpen = false;
-      scratchOpen = false;
-      calmOpen = false;
-      recOpen = false;
-      clientsOpen = false;
-      planOpen = false;
-      revOpen = false;
-      jarsOpen = false;
-      deskOpen = false;
-      kudosOpen = false;
-      routOpen = false;
-      trophyView = null;
-      lettersOpen = false;
-      vaultView = null;
-      vyView = null;
-      reviewOpen = false;
-      kView = null;
-      orView = null;
-      fieldView = null;
-      goalView = null;
-      ctx();
-    });
+    c.querySelectorAll("[data-close]").forEach((b) => b.onclick = closePanel);
     c.querySelectorAll("[data-bed]").forEach((b) => b.onclick = () => bedAction(b.dataset.bed));
     if (jarsOpen && scene === "room") wireJars(c);
     c.querySelectorAll("[data-track]").forEach((b) => b.onclick = () => {
@@ -57893,13 +57836,15 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       return;
     }
     if (cur2 !== target) {
-      const tIn = INNER[target] ? INNER[target].parent : target;
-      if (INNER[cur2] && cur2 !== tIn) {
+      const tChain = [target];
+      while (INNER[tChain[0]]) tChain.unshift(INNER[tChain[0]].parent);
+      const tIn = tChain[0];
+      while (INNER[cur2] && !tChain.includes(cur2)) {
         const I3 = INNER[cur2], from = cur2;
         legs2.push({ scene: from, x: I3.exit[0], y: I3.exit[1], fn: () => setScene(I3.parent, I3.door) });
         cur2 = I3.parent;
       }
-      if (cur2 !== tIn) {
+      if (!tChain.includes(cur2)) {
         const curOut = outdoorOf(cur2), tOut = outdoorOf(tIn), c0 = cur2;
         if (!OUTDOOR.includes(c0)) legs2.push({ scene: c0, x: 260, y: 606, fn: () => setScene(curOut, VILLAGE[c0].door) });
         for (let s = curOut, guard = 0; s !== tOut && guard < 6; guard++) {
@@ -57914,9 +57859,10 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
           legs2.push({ scene: tOut, x: d[0], y: d[1], fn: () => setScene(tIn, tIn === "farm" ? [260, 590] : [260, 596]) });
         }
       }
-      if (INNER[target]) {
-        const I3 = INNER[target];
-        legs2.push({ scene: I3.parent, x: I3.door[0], y: I3.door[1], fn: () => setScene(target, I3.arrive) });
+      if (!tChain.includes(cur2)) cur2 = tIn;
+      for (const r of tChain.slice(tChain.indexOf(cur2) + 1)) {
+        const I3 = INNER[r];
+        legs2.push({ scene: I3.parent, x: I3.door[0], y: I3.door[1], fn: () => setScene(r, I3.arrive) });
       }
     }
     legs2.push({ scene: target, x, y, fn });
@@ -61052,6 +60998,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
   }
   setTimeout(vineTick, 3e3);
   if (window.__mapleDevStub) window.__mapleScene = (id) => setScene(id, OUTDOOR.includes(id) ? [260, 330] : INNER[id] ? INNER[id].arrive : [260, 596]);
+  if (window.__mapleDevStub) window.__mapleGo = (id, x, y) => go(id, x, y, null);
   if (window.__mapleDevStub) window.__mapleBreak = () => {
     mel.x = mel.tx = NaN;
     mel.y = mel.ty = NaN;

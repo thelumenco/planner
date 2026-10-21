@@ -4970,6 +4970,30 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // round 250 (Mel's screenshot: "Cannot read properties of undefined (reading 'door')"): walking out of the wine cave,
+  // a room inside a room, to somewhere outside; the X closing the cave's panels; and the hidden doors easy to tap
+  console.log("\nOut of the wine cave, room by room");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`cavewalk pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/cw=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.goals = Object.assign(f.goals || {}, {cellar: 1});
+    f.secret = {step: 5, day: "2026-10-10", laid: [], old: {old_r1923: 1, old_s1958: 1, old_w1931: 1}, hosted: {}, through: 1};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-14"); await page.waitForTimeout(700);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-14&cw=1"); await page.waitForTimeout(1200);
+  const nm = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
+  await page.evaluate(() => window.__mapleScene("winecave")); await page.waitForTimeout(1500);
+  await page.locator('#world [data-cavespot="alcoves"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 15000 }); await page.waitForTimeout(400);
+  await page.click("#pclose"); await page.waitForTimeout(400);
+  check(!(await page.locator("#ctx h2").count()) || !/alcoves/i.test(await page.locator("#ctx").innerText()), "the X closes the cave's alcoves panel");
+  await page.evaluate(() => window.__mapleGo("base", 260, 400)); await page.waitForFunction(() => /garden|home base|base/i.test(document.querySelector("#sceneName").textContent) || !/cave|cellar|wine shop/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 60000 }).catch(() => {});
+  check(!errors.some(e => /cavewalk/.test(e)) && !/cave|cellar/i.test(await nm()), `from the wine cave out through the cellar and the wine shop, to outside (now: ${await nm()})`);
+  await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1200); await page.click("#zoomBtn"); await page.waitForTimeout(500);   // the whole room on a phone
+  const tap = await page.evaluate(() => { const g = document.querySelector('#world [data-secret="door"]'), r = g && g.querySelector("rect[pointer-events=all]"); if (!r) return 0; const b = r.getBoundingClientRect(); let n = 0;
+    for (const i of [1, 2, 3]) for (const j of [1, 2, 3]) { const e = document.elementFromPoint(b.left + b.width*i/4, b.top + b.height*j/4); if (e && e.closest('[data-secret="door"]')) n++; } return n; });
+  check(tap >= 7, `the cellar's hidden door takes a tap across a finger-sized area (${tap}/9)`);
+  await page.close();
+}
+{
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
   const missing = Object.entries(sd.STORIES).flatMap(([id, chs]) => chs.map((c, i) => i > 0 && !c.recap ? id + ":" + i : null).filter(Boolean));

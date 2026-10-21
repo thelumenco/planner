@@ -12,6 +12,8 @@
 import { sk, tapeLabel } from "./scenes.js";
 
 const g = s => `<g pointer-events="none">${s}</g>`;
+// an invisible, finger-sized tap area over a hidden door, so it stays secret to look at but easy to tap (round 250)
+const hit = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="transparent" pointer-events="all"/>`;
 const hovE = (x, y, rx, ry) => `<ellipse class="hov" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:var(--butter)"/>`;
 const lab = (x, y, t, col = "#F3E1A0", size = 8) => tapeLabel(x, y, t, col, size);
 const f1 = n => (+n).toFixed(1);
@@ -179,7 +181,7 @@ export function cellarSecretArt(step = 0){
     // colour as the cellar around it, set in the same perspective as the real door opposite. Only a hairline of
     // lantern light at its edge and a small iron ring give it away. No label.
     const panel = `M0 318 L26 329 L26 427 L0 438z`;
-    s += `<g data-secret="door" data-x="56" data-y="440" aria-label="The secret passage">${hovE(30, 452, 30, 9)}`
+    s += `<g data-secret="door" data-x="56" data-y="440" aria-label="The secret passage">${hovE(30, 452, 30, 9)}${hit(0, 306, 66, 160)}`   // Mel: the tap area was very small
       + D(`<path d="${panel}" style="fill:#B48A66"/>`, `<path d="M0 352 L26 360 M0 388 L26 393 M0 418 L26 419" stroke="#8E6A4A" stroke-width=".9" opacity=".7"/>`)
       + g(`<path d="M26.5 330 V426" stroke="#FFD27A" stroke-width="1.3" opacity=".55"><animate attributeName="opacity" values=".35;.7;.4;.6;.35" dur="3.2s" repeatCount="indefinite"/></path>`
         + `<circle cx="20" cy="380" r="2.6" fill="none" stroke="#4A3A30" stroke-width="1.1"/>`)
@@ -194,7 +196,7 @@ export function kitchenSecretArt(open){
   // round 244 (Mel: "more secret"): just a tall set of shelves on the west wall, jars and tubs on it, like any kitchen.
   // A hairline of lantern light down one edge, and a draught that stirs the tea towel, are all that give it away.
   const shelf = `M0 330 L34 340 V470 L0 480z`;
-  return defs + `<g data-secret="passage" data-x="64" data-y="455" aria-label="The secret passage">${hovE(34, 478, 30, 9)}`
+  return defs + `<g data-secret="passage" data-x="64" data-y="455" aria-label="The secret passage">${hovE(34, 478, 30, 9)}${hit(0, 318, 72, 176)}`
     + D(`<path d="${shelf}" style="fill:#F4F1EA"/>`, [0, 1, 2, 3].map(k => `<path d="M0 ${364 + k*30} L34 ${370 + k*28}" stroke="#B8C4CC" stroke-width="2"/>${[0, 1].map(j => `<rect x="${6 + j*13}" y="${f1(354 + k*29 + j*2)}" width="8" height="9" rx="1.4" fill="${["#F4C7CF", "#FFF3D6", "#BFE0F2"][(j + k) % 3]}" stroke="${INK}" stroke-width=".4"/>`).join("")}`).join(""))
     + g(`<path d="M34.6 342 V468" stroke="#FFD27A" stroke-width="1.2" opacity=".5"><animate attributeName="opacity" values=".3;.65;.35;.55;.3" dur="3.4s" repeatCount="indefinite"/></path>`
       + `<g><path d="M30 404 h8 v16 l-3 -2 l-2 3 l-3 -3z" fill="#FFFDF6" stroke="${INK}" stroke-width=".5"/><animateTransform attributeName="transform" type="rotate" values="0 34 404;4 34 404;-2 34 404;0 34 404" dur="2.6s" repeatCount="indefinite"/></g>`)
