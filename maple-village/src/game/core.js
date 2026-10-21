@@ -1883,6 +1883,15 @@ function nightLights(){
   let h = "";
   if (scene !== "base") art.querySelectorAll(".lglow").forEach(g => { const c = g.querySelector("circle"), x = +c.getAttribute("cx"), y = +c.getAttribute("cy"), r = +c.getAttribute("r");
     h += `<g transform="${mtx(g)}"><circle cx="${x}" cy="${y + 6}" r="${r + 10}" fill="url(#lampg)"/><circle class="flick" cx="${x}" cy="${y}" r="${(r*.45).toFixed(1)}" fill="#FFE3A3" opacity=".4"/>${r > 30 ? `<rect x="${x - 5}" y="${y - 6}" width="10" height="12" rx="2" fill="#FFE9A8" stroke="#3b3530" stroke-width="1.1"/>` : ""}</g>`; });
+  // round 231: from 7 to 11pm the village's windows glow like home's (the creator: "the same glow we have in our home");
+  // Honeybrook's buildings glaze their windows in the sky colour (the wine shop, the train and the van a paler blue),
+  // so any window-sized piece of it lights up warm
+  // (class "win" marks a window drawn in another colour; data-nowin opts a sky-coloured thing that isn't a window out). Home has its own, and after 11 the village is abed.
+  { const m = localHM(); if (scene !== "base" && !townOf(scene) && m >= 19*60 && m < 23*60) art.querySelectorAll('.win, [style*="fill:var(--sky)"], [style*="fill:#CFE0EE"], [style*="fill:#DCE8F0"]').forEach(w => {
+    if (!/^(rect|circle|path|ellipse)$/.test(w.tagName) || w.closest(".nightcopy, [data-nowin]")) return; let b; try { b = w.getBBox(); } catch { return; }
+    if (b.width < 3 || b.height < 3 || b.width > 50 || b.height > 40) return;   // (shop windows run a little wider)
+    const k = w.cloneNode(false); k.setAttribute("style", "fill:#FFD98A"); k.setAttribute("class", "glow"); k.removeAttribute("filter");
+    h += `<g transform="${mtx(w)}"><rect x="${(b.x - 6).toFixed(1)}" y="${(b.y - 6).toFixed(1)}" width="${(b.width + 12).toFixed(1)}" height="${(b.height + 12).toFixed(1)}" rx="8" fill="#FFD98A" opacity=".18"/>${k.outerHTML}</g>`; }); }
   art.querySelectorAll(".nglow").forEach(g => { const k = g.cloneNode(true); k.setAttribute("transform", mtx(g)); k.removeAttribute("class"); h += k.outerHTML; });   // neon, fairy lights
   art.querySelectorAll("text.lab").forEach(t => { const g = t.parentNode; if (!g || g.closest(".nightcopy")) return;
     const k = g.cloneNode(true), p = k.querySelector("path"); if (p) { p.style.fill = "#FFFDF6"; p.setAttribute("opacity", "1"); }

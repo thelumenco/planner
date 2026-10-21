@@ -4662,6 +4662,17 @@ if (want("\nWine in ice cream, and rum and raisin (round 231)")) try {
   check(await page.evaluate(() => window.__hbGame.F().inv.wine_red === 2 && window.__hbGame.F().vine.shelf[0].n === 3), "and at the wine shelves in the shop, from what's out for sale (no cellar door needed)");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nWindows glow in the evening (round 231)")) try {
+  // the creator: "the windows of buildings should have the same glow we have in our home, until 11pm"
+  console.log("\nWindows glow in the evening (round 231)");
+  const lit = async (t, sc) => { const page = await browser.newPage({ viewport: { width: 390, height: 844 } }); page.on("pageerror", e => errors.push(`windows pageerror: ${e.message}`));
+    await page.goto(url + `?reset=1&seed=1&time=${t}&date=2026-10-14`); await page.waitForTimeout(1200); await page.evaluate(sc => window.__hbScene(sc), sc); await page.waitForTimeout(1200);
+    const n = await page.evaluate(() => document.querySelectorAll(".nightcopy .glow").length); await page.close(); return n; };
+  const nine = await lit("21:00", "lane"), late = await lit("23:15", "lane"), day = await lit("15:00", "lane");
+  check(nine >= 6, `at 9pm the windows on Makers' Lane glow (${nine} lit)`);
+  check(late === 0 && day === 0, "and they're dark after 11pm (everyone's in bed), and in the daytime");
+  const woods = await lit("21:30", "hwoods"); check(woods >= 2, "a window drawn in its own colour can be marked to glow too (the ranger's cabin)");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));
