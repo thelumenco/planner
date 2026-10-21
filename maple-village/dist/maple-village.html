@@ -1723,6 +1723,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
 .panel .ph3 + .eyebrow{margin-top:6px}
 .item .tokit{display:inline-block;margin-top:4px;padding:1px 8px;border-radius:999px;background:#E3EEDA;color:#3F5A3A;font-size:.68rem;font-weight:800;cursor:pointer}
 .item .tokit:hover{background:#D3E4C6}
+.item .tokit.tobin{background:#F4D6D2;color:#8A3A30}.item .tokit.tobin:hover{background:#EEC5BF}.binlist .hlist{margin-top:4px}
 /* the kitchen: larder goods, recipe cards for the tapas of the day */
 .kdishes{display:grid;gap:10px;margin:8px 0 12px}
 .kdish{display:flex;gap:12px;align-items:center;width:100%;box-sizing:border-box;text-align:left;padding:10px 12px;border:1px solid rgba(120,104,84,.18);border-radius:12px;background:#FFFDF7;font:inherit;color:#2F2B28;cursor:pointer}
@@ -6870,6 +6871,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     c_white: { n: "Cinque Terre white", kind: "gift", to: ["dad", "mum", "marcus", "angelina"], price: 14, shop: "ct_cantina", art: ["bottle", "#E8E0A0", "#4E7A5A"], say: "Wine from the terraces! Grown on a cliff, carried down by hand. You can taste the sea." },
     c_limoncino: { n: "Limoncino", kind: "gift", to: ["mum", "mama", "angelina", "darren"], price: 20, shop: "ct_limoni", art: ["bottle", "#F3D34A", "#FFFDF6"], say: "Limoncino from Monterosso! Ice cold, in a tiny glass. It tastes like sunshine." },
     c_soap: { n: "Lemon soap", kind: "gift", to: "family", price: 5, shop: "ct_limoni", art: ["box", "#F3E7A0", "#F3D34A"], say: "Lemon soap! The whole bathroom smells like Italy now." },
+    // round 255 (Mel: lemons out of season, for lemon-infused oil): a bag of Monterosso lemons all year, three to a bag, as
+    // ordinary lemons (oils, soaps, lotions, limoncino, gelato)
+    ct_lemons: { n: "Bag of Monterosso lemons", kind: "ingredient", price: 6, shop: "ct_limoni", gives: ["lemon", 3], art: ["bag", "#F3D34A", "#7FB86A"], what: "three big knobbly lemons from the terraces, all year round: lemon-infused oil at the mill, limoncino in the loft, lemon gelato" },
     c_linen: { n: "Linen tea towel", kind: "gift", to: ["mum", "mama", "dad"], price: 8, shop: "ct_limoni", art: ["cloth", "#FFFDF6", "#F3D34A"], say: "A linen tea towel with lemons on it. Too nice to dry dishes with. I'll dry dishes with it." },
     c_anchovy: { n: "Monterosso anchovies in oil", kind: "gift", to: ["dad", "gonggong", "marcus"], price: 16, shop: "ct_limoni", art: ["box", "#9FC3D9", "#C9A27E"], say: "Monterosso anchovies! The best in Italy, they say. On toast, with butter." },
     // round 192: tucked into Jason's letters now and then (never sold)
@@ -46359,6 +46363,45 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var tablelandsRoomArt = (scene2) => (ROOMS5[scene2] || cafeRoom4)();
 
+  // src/game/bin.js
+  var BIN_KEEP = 24 * 36e5;
+  var binState = (F2) => {
+    F2.bin = Array.isArray(F2.bin) ? F2.bin : [];
+    return F2.bin;
+  };
+  function purgeBin(F2, t2 = Date.now()) {
+    const b = binState(F2), keep6 = b.filter((e) => e && e.n > 0 && t2 - e.at < BIN_KEEP);
+    const gone = b.length - keep6.length;
+    F2.bin = keep6;
+    return gone;
+  }
+  function throwAway(F2, id, n = 1, t2 = Date.now()) {
+    const inv = F2.inv || {};
+    n = Math.min(n, inv[id] || 0);
+    if (n <= 0) return false;
+    inv[id] -= n;
+    if (inv[id] <= 0) delete inv[id];
+    const b = binState(F2), last2 = b.find((e) => e.id === id && t2 - e.at < 6e4);
+    if (last2) {
+      last2.n += n;
+      last2.at = t2;
+    } else b.push({ id, n, at: t2 });
+    return true;
+  }
+  function takeBack3(F2, i, t2 = Date.now()) {
+    purgeBin(F2, t2);
+    const b = binState(F2), e = b[i];
+    if (!e) return null;
+    F2.inv = F2.inv || {};
+    F2.inv[e.id] = (F2.inv[e.id] || 0) + e.n;
+    b.splice(i, 1);
+    return e.id;
+  }
+  var binLeft = (e, t2 = Date.now()) => {
+    const ms = Math.max(0, e.at + BIN_KEEP - t2), h3 = Math.floor(ms / 36e5);
+    return h3 >= 1 ? `${h3} hour${h3 === 1 ? "" : "s"} left` : `${Math.max(1, Math.ceil(ms / 6e4))} min left`;
+  };
+
   // src/game/wrap.js
   var RIBBONS = { gingham: { n: "Gingham ribbon", price: 4 }, velvet: { n: "Velvet ribbon", price: 6 }, twine: { n: "Garden twine", price: 2 } };
   var REEL2 = 4;
@@ -48653,7 +48696,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     const g18 = TOWN_GOODS[id];
     if (!g18 || F2.coins < g18.price) return null;
     F2.coins -= g18.price;
-    addInv2(id, 1);
+    if (g18.gives) addInv2(g18.gives[0], g18.gives[1]);
+    else addInv2(id, 1);
     return g18;
   }
   function buyVines(F2) {
@@ -55869,15 +55913,18 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       }
     });
   }
+  var binTidy = false;
+  var binOpen = false;
   function bag() {
+    purgeBin(F);
     const ids = Object.keys(F.inv).filter((id) => ITEMS[id] && F.inv[id] > 0);
     const order3 = ["gift", "food", "ingredient", "feed", "flower", "use", "tool", "seed"];
     ids.sort((a, b) => order3.indexOf(ITEMS[a].kind) - order3.indexOf(ITEMS[b].kind));
     $("bag").innerHTML = ids.map((id) => {
       const it = ITEMS[id];
       const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
-      const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
-      return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit);
+      const kit = binTidy ? `<span class="tokit tobin" role="button" tabindex="0" data-bin="${id}">throw one away</span>` : isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
+      return itemBtn(id, lbl, it.kind === "seed" && !binTidy, (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit);
     }).join("");
     if (giftPick && F.inv[giftPick]) $("bag").insertAdjacentHTML("afterbegin", giftPickHTML(giftPick));
     else giftPick = null;
@@ -55892,6 +55939,31 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         ctx();
       };
     }
+    {
+      const bn = binState(F);
+      $("bag").insertAdjacentHTML("beforeend", `<div class="actions binbar" style="grid-column:1/-1"><button class="btn small alt" data-bintidy="1">${binTidy ? "Done throwing away" : "Throw things away"}</button>${bn.length ? `<button class="btn small alt" data-binopen="1">The bin (${bn.reduce((n, e) => n + e.n, 0)})</button>` : ""}</div>` + (binOpen && bn.length ? `<div class="binlist" style="grid-column:1/-1"><p class="muted">Things stay in the bin for a day, then they're gone for good.</p><ul class="hlist wlist">${bn.map((e, i) => `<li><span class="wpic">${icon(ITEMS[e.id] ? ITEMS[e.id].ico || e.id : e.id, 26)}</span><span class="wtxt"><b>${esc(ITEMS[e.id] ? ITEMS[e.id].n : e.id)}${e.n > 1 ? ` ×${e.n}` : ""}</b><small>${binLeft(e)}</small></span><button class="btn small primary" data-binback="${i}">Take it back</button></li>`).join("")}</ul></div>` : ""));
+    }
+    $("bag").querySelectorAll("[data-bintidy]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      binTidy = !binTidy;
+      giftPick = null;
+      bag();
+    });
+    $("bag").querySelectorAll("[data-binopen]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      binOpen = !binOpen;
+      bag();
+    });
+    $("bag").querySelectorAll("[data-binback]").forEach((b) => b.onclick = (ev) => {
+      ev.stopPropagation();
+      const id = takeBack3(F, +b.dataset.binback);
+      if (!id) return;
+      sfx("paper", true);
+      flash(`${ITEMS[id] ? ITEMS[id].n : "It"}: back in your backpack`);
+      if (!binState(F).length) binOpen = false;
+      save2();
+      bag();
+    });
     $("bag").querySelectorAll("[data-giveto]").forEach((b) => b.onclick = (ev) => {
       ev.stopPropagation();
       giveTo(giftPick, b.dataset.giveto);
@@ -55928,6 +56000,17 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       if (k) {
         ev.stopPropagation();
         toKitchen2(k.dataset.kit);
+        return;
+      }
+      if (binTidy) {
+        ev.stopPropagation();
+        const id = b.dataset.id;
+        if (throwAway(F, id)) {
+          sfx("paper", true);
+          flash(`${ITEMS[id].n}: into the bin`);
+          save2();
+          bag();
+        }
         return;
       }
       useItem(b.dataset.id);

@@ -642,6 +642,9 @@ Object.assign(TOWN_GOODS, {
   c_white: {n: "Cinque Terre white", kind: "gift", to: ["dad", "mum", "marcus", "angelina"], price: 14, shop: "ct_cantina", art: ["bottle", "#E8E0A0", "#4E7A5A"], say: "Wine from the terraces! Grown on a cliff, carried down by hand. You can taste the sea."},
   c_limoncino: {n: "Limoncino", kind: "gift", to: ["mum", "mama", "angelina", "darren"], price: 20, shop: "ct_limoni", art: ["bottle", "#F3D34A", "#FFFDF6"], say: "Limoncino from Monterosso! Ice cold, in a tiny glass. It tastes like sunshine."},
   c_soap: {n: "Lemon soap", kind: "gift", to: "family", price: 5, shop: "ct_limoni", art: ["box", "#F3E7A0", "#F3D34A"], say: "Lemon soap! The whole bathroom smells like Italy now."},
+  // round 255 (Mel: lemons out of season, for lemon-infused oil): a bag of Monterosso lemons all year, three to a bag, as
+  // ordinary lemons (oils, soaps, lotions, limoncino, gelato)
+  ct_lemons: {n: "Bag of Monterosso lemons", kind: "ingredient", price: 6, shop: "ct_limoni", gives: ["lemon", 3], art: ["bag", "#F3D34A", "#7FB86A"], what: "three big knobbly lemons from the terraces, all year round: lemon-infused oil at the mill, limoncino in the loft, lemon gelato"},
   c_linen: {n: "Linen tea towel", kind: "gift", to: ["mum", "mama", "dad"], price: 8, shop: "ct_limoni", art: ["cloth", "#FFFDF6", "#F3D34A"], say: "A linen tea towel with lemons on it. Too nice to dry dishes with. I'll dry dishes with it."},
   c_anchovy: {n: "Monterosso anchovies in oil", kind: "gift", to: ["dad", "gonggong", "marcus"], price: 16, shop: "ct_limoni", art: ["box", "#9FC3D9", "#C9A27E"], say: "Monterosso anchovies! The best in Italy, they say. On toast, with butter."},
   // round 192: tucked into Jason's letters now and then (never sold)

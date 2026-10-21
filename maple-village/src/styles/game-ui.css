@@ -709,6 +709,7 @@ body:has(.map.panel-open) .earn:not(:empty){top:auto;bottom:calc(env(safe-area-i
 .panel .ph3 + .eyebrow{margin-top:6px}
 .item .tokit{display:inline-block;margin-top:4px;padding:1px 8px;border-radius:999px;background:#E3EEDA;color:#3F5A3A;font-size:.68rem;font-weight:800;cursor:pointer}
 .item .tokit:hover{background:#D3E4C6}
+.item .tokit.tobin{background:#F4D6D2;color:#8A3A30}.item .tokit.tobin:hover{background:#EEC5BF}.binlist .hlist{margin-top:4px}
 /* the kitchen: larder goods, recipe cards for the tapas of the day */
 .kdishes{display:grid;gap:10px;margin:8px 0 12px}
 .kdish{display:flex;gap:12px;align-items:center;width:100%;box-sizing:border-box;text-align:left;padding:10px 12px;border:1px solid rgba(120,104,84,.18);border-radius:12px;background:#FFFDF7;font:inherit;color:#2F2B28;cursor:pointer}

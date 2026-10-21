@@ -2707,3 +2707,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - She had raspberries and the basket didn't take them: data/cottages.js `FRUIT` now takes raspberries, blackberries, bananas, Hokkaido cherries and melon, Formentera figs, hallabong and snake fruit too.
 - Mel: "how come I can't use raspberries for the mill stuff too": millcraft.js `HERB.raspberry` now goes into soaps, lotions, balms and lip oils (it was soaps and lip oils only); not infused oils (Mel: "not raspberry, that's just odd"). Lemon already infuses oil.
 - Tests in the cottage block ("inside Fig Tree").
+
+## Round 255: lemons all year, and the bin
+- **Lemons** (Mel: lemon-infused oil, with Ma Ma's lemon tree out of season): Signora Franca's lemon shop in Monterosso sells a "Bag of Monterosso lemons" (6) all year (towns.js `ct_lemons`); a town good with `gives: [id, n]` hands over that item instead (ronda.js `buyGood`), so it's three ordinary `lemon`s for oils, soaps, lotions, limoncino and gelato. Test in the Cinque Terre block.
+- **The bin** (Mel: "throw away items in my backpack... into the bin that I can retrieve things from... 24 hours, then disappear"): game/bin.js (`throwAway`, `takeBack`, `purgeBin`, `binLeft`; `F.bin = [{id, n, at}]`). In the backpack, "Throw things away" turns on a mode where a tap bins one (every item, seeds too, shows a "throw one away" chip); "The bin (n)" lists what's in it with the time left and "Take it back". Anything a day old is purged whenever the backpack opens. Test: "The bin (round 255)".
+- Out-of-season trees and flowers already fade at the season's turn, and a faded spot takes anything in season straight away (orchard.js `plant`), so no digging up is needed.

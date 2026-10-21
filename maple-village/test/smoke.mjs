@@ -3161,6 +3161,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-rdspot="ct_limoni"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="c_magnet"]', { timeout: 15000 });
   await page.click('#ctx [data-rbuy="c_magnet"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.c_magnet === 1 && f.coins === 131), "the lemon shop: a Cinque Terre fridge magnet (3)");
+  { const l0 = await fox().then(f => (f.inv || {}).lemon || 0); await page.click('#ctx [data-rbuy="ct_lemons"]'); await page.waitForTimeout(300);
+    check(await fox().then(f => f.inv.lemon === l0 + 3 && !f.inv.ct_lemons && f.coins === 125), "round 255: a bag of Monterosso lemons (6): three ordinary lemons in the backpack, all year"); }
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
   await page.evaluate(() => window.__mapleScene("ct_corniglia")); await page.waitForTimeout(1200);
   await page.locator('#world [data-place="cttrain"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-triphome="train"]', { timeout: 15000 });
@@ -5035,6 +5037,27 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(night.tagged >= 4 && night.lit === night.tagged, `the village's windows glow at 9pm (${night.lit} of ${night.tagged})`);
   check(late.lit === 0 && day.lit === 0, "and they're dark again after 11pm, and by day");
   check(town.tagged >= 2 && town.lit === town.tagged, `the towns' windows too: Saltwick's quay at 9pm (${town.lit})`);
+  await page.close();
+}
+{
+  // round 255 (Mel: "throw away items in my backpack... go into the bin that I can retrieve things from... for 24 hours")
+  console.log("\nThe bin (round 255)");
+  const B = await import(new URL("../src/game/bin.js", import.meta.url)), T = Date.parse("2026-10-21T02:00:00Z");
+  const F = {inv: {c_magnet: 3, jj_shell: 1}};
+  check(B.throwAway(F, "c_magnet", 1, T) && B.throwAway(F, "jj_shell", 1, T + 5*60e3) && F.inv.c_magnet === 2 && !F.inv.jj_shell && B.binState(F).length === 2 && !B.throwAway(F, "nothing", 1, T), "throw a magnet and a shell away: out of the backpack, into the bin");
+  check(B.takeBack(F, 1, T + 3600e3) === "jj_shell" && F.inv.jj_shell === 1 && B.binState(F).length === 1, "changed your mind within the day: the shell comes back out of the bin");
+  check(/23 hours left/.test(B.binLeft(B.binState(F)[0], T + 30*60e3)) && B.purgeBin(F, T + 24*3600e3 + 1) === 1 && !B.binState(F).length && F.inv.c_magnet === 2, "after a day the magnet's gone for good");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`bin pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-16"); await page.waitForTimeout(800);
+  const inv0 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).inv);
+  const id = Object.keys(inv0).find(k => inv0[k] > 0);
+  await page.click('[data-open="bag"]'); await page.waitForSelector("#bag [data-bintidy]", { timeout: 15000 });
+  await page.click("#bag [data-bintidy]"); await page.waitForTimeout(200); await page.click(`#bag .item[data-id="${id}"]`); await page.waitForTimeout(300);
+  const f1 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.click("#bag [data-binopen]"); await page.waitForSelector("#bag [data-binback]", { timeout: 10000 }); await page.click("#bag [data-binback]"); await page.waitForTimeout(300);
+  const f2 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  check((f1.inv[id] || 0) === inv0[id] - 1 && f1.bin.length === 1 && f2.inv[id] === inv0[id] && !f2.bin.length, "in the backpack: \"Throw things away\", tap one into the bin, then take it back out");
   await page.close();
 }
 {

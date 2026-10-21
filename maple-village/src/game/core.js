@@ -107,6 +107,7 @@ import { bookPanel as lunchBookPanel, lunchNow, bookingsFor, seatedAt, LUNCH } f
 import { craftState, craft as millCraft, renderWax, craftDone, registerCraft, benchPanel as millBenchPanel, inesStep, fromBasket, craftSellMinute, takeFromStore, toBasket, storeCount, cratePanel, packCrate, unpackCrate, vanCrate, crateCount, vanSellMinute, itemId as craftItemId, KINDS as CRAFT_KINDS, SHOPKEEP, crateMix, wineCratePanel } from "./millcraft.js";
 import { hamperSeason, xmasState, TREATS, treatsHTML, mulledStallPanel, treePanel, treeLit, countdownDue, myStallPanel as xmStallPanel, putOut, takeBack as xmTakeBack, putWine, takeWine, stallSellMinute, registerHampers, hamperPanel, packStart, packAdd, packWine, packRemove, packTie, singCarol, lanternWalk, grottoPanel, grottoVisit, sendHamper, hamperMail, collectReplies, fillOrder } from "./xmas.js";
 import * as BK from "./contacts.js";
+import { binState, purgeBin, throwAway, takeBack, binLeft } from "./bin.js";
 import * as GAL from "./gallery.js";
 import { giftPanel, giftSellMinute, keeperOn as giftKeeperOn, putOutPairs, takeBackPair, putWrapped, takeWrapped, giftState, takeBottle, registerBottles } from "./giftshop.js";
 import * as PP from "./paperie.js";
@@ -2431,24 +2432,35 @@ function ctx(){
     else if (k === "past") { const d = pastDigests()[+b.dataset.i]; if (d) openDigest(d); }
   });
 }
+let binTidy = false, binOpen = false;   // round 255: throwing things away, and looking in the bin
 function bag(){
+  purgeBin(F);
   const ids = Object.keys(F.inv).filter(id => ITEMS[id] && F.inv[id] > 0);
   const order = ["gift","food","ingredient","feed","flower","use","tool","seed"];
   ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
   $("bag").innerHTML = ids.map(id => { const it = ITEMS[id];
     const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? `give to ${giftNames(it.to)}` : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed Maple" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
     // kitchen ingredients can go to the wine shop's larder instead (food can still be fed to Maple)
-    const kit = isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
-    return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");
+    const kit = binTidy ? `<span class="tokit tobin" role="button" tabindex="0" data-bin="${id}">throw one away</span>` : isGood(id) && it.kind !== "ingredient" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
+    return itemBtn(id, lbl, it.kind === "seed" && !binTidy, (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");
   if (giftPick && F.inv[giftPick]) $("bag").insertAdjacentHTML("afterbegin", giftPickHTML(giftPick)); else giftPick = null;
   if (hasUp(scoopState(F), "bike")) { $("bag").insertAdjacentHTML("beforeend", `<button class="btn small alt" data-deliver="1" style="grid-column:1/-1">Send something by delivery bike</button>`);
     $("bag").querySelector("[data-deliver]").onclick = () => { openView = null; scView = "deliver"; scSt.vpick = null; scSt.vother = null; scoopNow(); ctx(); }; }
+  // the bin: throw things away, and take them back out within a day
+  { const bn = binState(F);
+    $("bag").insertAdjacentHTML("beforeend", `<div class="actions binbar" style="grid-column:1/-1"><button class="btn small alt" data-bintidy="1">${binTidy ? "Done throwing away" : "Throw things away"}</button>${bn.length ? `<button class="btn small alt" data-binopen="1">The bin (${bn.reduce((n, e) => n + e.n, 0)})</button>` : ""}</div>`
+      + (binOpen && bn.length ? `<div class="binlist" style="grid-column:1/-1"><p class="muted">Things stay in the bin for a day, then they're gone for good.</p><ul class="hlist wlist">${bn.map((e, i) => `<li><span class="wpic">${icon(ITEMS[e.id] ? ITEMS[e.id].ico || e.id : e.id, 26)}</span><span class="wtxt"><b>${esc(ITEMS[e.id] ? ITEMS[e.id].n : e.id)}${e.n > 1 ? ` ×${e.n}` : ""}</b><small>${binLeft(e)}</small></span><button class="btn small primary" data-binback="${i}">Take it back</button></li>`).join("")}</ul></div>` : "")); }
+  $("bag").querySelectorAll("[data-bintidy]").forEach(b => b.onclick = ev => { ev.stopPropagation(); binTidy = !binTidy; giftPick = null; bag(); });
+  $("bag").querySelectorAll("[data-binopen]").forEach(b => b.onclick = ev => { ev.stopPropagation(); binOpen = !binOpen; bag(); });
+  $("bag").querySelectorAll("[data-binback]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const id = takeBack(F, +b.dataset.binback); if (!id) return; sfx("paper", true); flash(`${ITEMS[id] ? ITEMS[id].n : "It"}: back in your backpack`); if (!binState(F).length) binOpen = false; save(); bag(); });
   $("bag").querySelectorAll("[data-giveto]").forEach(b => b.onclick = ev => { ev.stopPropagation(); giveTo(giftPick, b.dataset.giveto); });
   $("bag").querySelectorAll("[data-bypost]").forEach(b => b.onclick = ev => { ev.stopPropagation(); postPick = !postPick; bag(); });
   $("bag").querySelectorAll("[data-postto]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const to = b.dataset.postto, r = BK.postTo(F, to, {item: giftPick}); if (r.err) { flash(r.err); return; }
     postPick = false; giftPick = null; sfx("chime"); flash(`Posted to ${BK.person(to).name}`); speak(`Wrapped in brown paper and off to ${BK.REGIONS[BK.regionOf(to)]}. Watch your mailbox for a thank-you.`, 4500); save(); bag(); });
   $("bag").querySelectorAll("[data-keepit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); keepItem = giftPick; giftPick = null; openView = null; render(); });   // a souvenir kept: off to the shelf chooser
-  $("bag").querySelectorAll(".item").forEach(b => b.onclick = ev => { const k = ev.target.closest("[data-kit]"); if (k) { ev.stopPropagation(); toKitchen(k.dataset.kit); return; } useItem(b.dataset.id); });
+  $("bag").querySelectorAll(".item").forEach(b => b.onclick = ev => { const k = ev.target.closest("[data-kit]"); if (k) { ev.stopPropagation(); toKitchen(k.dataset.kit); return; }
+    if (binTidy) { ev.stopPropagation(); const id = b.dataset.id; if (throwAway(F, id)) { sfx("paper", true); flash(`${ITEMS[id].n}: into the bin`); save(); bag(); } return; }   // while throwing away, a tap bins one
+    useItem(b.dataset.id); });
   $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome gift of seeds is in here. Plant them in the garden." : "";
   $("play").innerHTML = [["pet","Pet"],["hide","Hide-and-seek"],["nap","Nap together"]].map(([k, n]) => `<button class="btn alt small" data-play="${k}">${n}</button>`).join("");
   $("play").querySelectorAll("[data-play]").forEach(b => b.onclick = () => playFree(b.dataset.play));
