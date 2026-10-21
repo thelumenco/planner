@@ -6,7 +6,7 @@ import { clothesArt } from "../art/clothes.js";
 export const BODIES = [["woman", "Woman"], ["man", "Man"], ["neither", "Neither"]];
 export const SKINS = ["#FBE3D3", "#F3D2B8", "#EBC4A0", "#D9A57E", "#C08A62", "#A26E4B", "#7E5136", "#5C3A26"];
 export const HAIRS = ["#2A211D", "#4A3226", "#6B4A2E", "#A9713E", "#D9A35A", "#E9D6A6", "#B5562E", "#D9D4CC", "#8FA7C8", "#C98AA8"];
-export const STYLES = [["pony", "Ponytail"], ["long", "Long"], ["bob", "Bob"], ["short", "Short"], ["bun", "Bun"], ["curly", "Curly"]];
+export const STYLES = [["pony", "Ponytail"], ["long", "Long"], ["bob", "Bob"], ["short", "Short"], ["bun", "Bun"], ["curly", "Short curls"], ["curls", "Long curls"], ["bangs", "Bangs"], ["pigtails", "Pigtails"]];
 export const TOPS = ["#F2A290", "#FFFDF6", "#6E9FD6", "#9CC27E", "#F3C969", "#C9A3E0", "#E8566C", "#3E4A5C", "#8FA7C8", "#2F2B28"];
 export const BOTTOMS = ["#7D97C2", "#2F3A4A", "#2F2B28", "#8C8F7A", "#C9A27E", "#E8566C", "#FFFDF6", "#5E6E8C"];
 export const LEGS = [["shorts", "Shorts"], ["trousers", "Trousers"], ["skirt", "Skirt"]];
