@@ -4230,6 +4230,14 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(abroad.every(p => bk.PEN[p.id]), "round 192: and everyone in Ronda, Kyoto, Jeju and Cinque Terre too (" + abroad.length + ")");
   const J = {coins: 20, inv: {box4: 1}, met: {jason: true}}; bk.addContact(J, "jason", "d"); const je = bk.postTo(J, "jason", {item: "box4"}, T), jb = bk.replyBody(je);
   check(!je.err && je.at === T + 3*D && /^My dear Mel,/.test(jb) && jb.includes("yellow house by the harbour") && /\nP\.S\. /.test(jb) && jb.split("\n\n").length >= 6 && /;/.test(jb), "Jason writes back at length, semicolons and all, with a P.S.");
+  // round 249 (Mel: Jason's letters repeat themselves; "write it instead of it being like a template"): each reply is
+  // written fresh, knowing his last letters, and the template is only the fallback
+  { const prompts = [], fake = {json: async p => { prompts.push(p); return {body: `The parcel came; Luca says hello \u2014 and the cat approves. Letter ${prompts.length}.`, ps: "P.S. The steps are now 400."}; }};
+    const n1 = await bk.writePenReplies(J, fake, T + 3*D), b1 = bk.replyBody(je);
+    J.inv.box4 = 1; J.coins = 20; const je2 = bk.postTo(J, "jason", {item: "box4"}, T + 5*D); await bk.writePenReplies(J, fake, T + 8*D);
+    check(n1 === 1 && /^My dear Mel,\n\nThe parcel came; Luca says hello, and the cat approves\. Letter 1\./.test(b1) && !/[\u2013\u2014]/.test(b1) && b1.includes("Ever yours") && /P\.S\. The steps are now 400\.$/.test(b1)
+      && /Letter 1\./.test(prompts[1]) && /Vernazza/.test(prompts[0]) && /joyful/i.test(prompts[0]) && /Letter 2\./.test(bk.replyBody(je2)),
+      "round 249: Jason's letters are written fresh in his voice (no dashes), each knowing his last ones so he doesn't repeat himself"); }
 }
 {
   console.log("\nEvery two-filling bonbon has a name (round 194: mint and pear crashed the bonbon table)");
@@ -4603,6 +4611,26 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
 // Rounds 222 to 225: Hokkaido by boat: the four screens in a ring, a seafood bowl, a glass float, the onsen (the last
 // mark on the seasons scroll), a walk with Ben out of ski season, Kumiko's seeds unlocking new flowers at home
 {
+  // Mel: at the hot springs "she is moving together with the bench towards the hot spring": the bench only appears once
+  // Mum has sat down at the foot bath
+  console.log("\nMum's foot bath in Hokkaido: the bench stays put");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`footbath pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/hkpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 500; f.goals = {...(f.goals || {}), boat: 1};
+    f.hokkaido = {scroll: {}, seeds: {}}; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-16"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=10:00&date=2026-10-16&hkpatch=1"); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
+  await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-btown="hokkaido"]', { timeout: 15000 });
+  await page.click('#ctx [data-btown="hokkaido"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-tpick="mum"]'); await page.waitForTimeout(100); await page.click('#ctx [data-trip="hokkaido"]'); await page.waitForTimeout(12000);
+  await page.evaluate(() => window.__mapleScene("hk_onsen")); await page.waitForTimeout(300);
+  const seat = () => page.evaluate(() => { const m = document.querySelector('#actors [data-npc="mum"]'), s = m && m.querySelector(".soakseat"); return m ? {walk: m.classList.contains("walk"), shown: !!s && getComputedStyle(s).display !== "none"} : null; });
+  const s0 = await seat(); await page.waitForTimeout(6000); const s1 = await seat();
+  check(s0 && s0.walk && !s0.shown && s1 && !s1.walk && s1.shown, "walking over, Mum carries no bench; sitting at the foot bath, there it is");
+  await page.close();
+}
+{
   console.log("\nHokkaido by boat (rounds 222 to 225)");
   const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
   page.on("pageerror", e => errors.push(`hokkaido pageerror: ${e.message}`));
@@ -4886,7 +4914,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   { const F = {goals: {cellar: 1}}, v = {cellar: [{id: "w1", name: "Lane Red", type: "red", n: 6}], shelf: []};
     check(SC.cellarEnter(F, "2026-10-12") && SC.secretState(F).step === 1 && !SC.racksTap(F, "2026-10-12"), "a draught in the cellar, and no more than one clue a day");
     check(!SC.cellarEnter(F, "2026-10-12") && SC.cellarEnter(F, "2026-10-20") && SC.racksTap(F, "2026-10-20") && SC.secretState(F).step === 2, "miss a week and the trail waits: behind the racks, old bricks scratched T.R. 1912");
-    check(!SC.photoTap(F, "2026-10-20") && SC.photoTap(F, "2026-10-21") && SC.stoneTap(F, "2026-10-21") && SC.brickTap(F, "2026-10-21") && SC.caveOpen(F), "the back of the mill's photograph, the key under the millstone, and the brick hides a keyhole: the passage opens");
+    check(/tomorrow/.test(SC.photoTap(F, "2026-10-20")) && SC.secretState(F).step === 2 && /photograph/.test(SC.millEnter(F, "2026-10-21")) && !SC.millEnter(F, "2026-10-21"), "too early, the photograph says come back tomorrow; the next day Maple leads you to it at the mill");
+    check(SC.photoTap(F, "2026-10-21") && SC.stoneTap(F, "2026-10-21") && SC.brickTap(F, "2026-10-21") && SC.caveOpen(F), "the back of the mill's photograph, the key under the millstone, and the brick hides a keyhole: the passage opens");
     check(SC.layDown(F, v, "w1", "2026-10-21").n === 6 && !v.cellar.length && SC.bringUp(F, v, 0, "2026-11-18").coins === 7 && v.cellar[0].aged === 4 && v.cellar[0].hold, "laid down four weeks in the ageing alcoves: +40%, so +7 on an 18 coin red, back in the cellar kept back");
     check(SC.agedCoins("tempranillo", 12) === 22 && SC.agedCoins("rose", 8) === 12, "ageing scales with the wine: up to 80%, 22 more on a tempranillo, 12 on a rosé");
     check(SC.takeOld(F, "old_r1923", false) && F.inv.old_r1923 === 1 && !SC.takeOld(F, "old_r1923", false), "a forgotten 1923 red, into the backpack (only one of each)");

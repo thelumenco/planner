@@ -470,15 +470,17 @@
    choosing the best; Gong Gong lowers his basket of eggs into the steaming spring and lifts it again; Darren marches on
    the spot with his skis on his shoulder; Marcus's soft-serve drips while he licks round it; Angellina listens to her
    music box with her eyes shut, the notes floating up. (Steam rises from the foot bath and the egg spring: .hksteam) */
-.ch.npc.walk .soak,.ch.npc.walk .eggpool{display:none}
+.ch.npc.walk .soak,.ch.npc.walk .soakseat,.ch.npc.walk .eggpool{display:none}
 .ch.npc .hksteam{animation:hkSteam 3.3s ease-out infinite}
 @keyframes hkSteam{0%{opacity:0;transform:translateY(2px)}30%{opacity:.8}100%{opacity:0;transform:translateY(-8px)}}
 .ch.npc.act-footbath:not(.walk) .bob{transform:translateY(6px)}
 .ch.npc.act-footbath:not(.walk) .armR{transform:rotate(-16deg)}.ch.npc.act-footbath:not(.walk) .armL{transform:rotate(16deg)}
-.ch.npc.act-footbath:not(.walk) .legL{transform-box:fill-box;transform-origin:50% 0;animation:soakL 3.2s ease-in-out infinite alternate}
-.ch.npc.act-footbath:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;animation:soakL 3.2s ease-in-out infinite alternate-reverse}
-.ch.npc.act-footbath:not(.walk) .bhead{transform-box:fill-box;transform-origin:50% 100%;animation:soakH 5s ease-in-out infinite alternate}
-.ch.npc.act-footbath:not(.walk) .bliss{animation:blissH 5s ease-out infinite}
+.ch.npc.act-footbath:not(.walk) .legL{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.72) rotate(-4deg)}
+.ch.npc.act-footbath:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.72) rotate(4deg)}
+.ch.npc.act-footbath:not(.walk) .bhead{transform-box:fill-box;transform-origin:50% 100%;transform:rotate(-3deg)}
+/* round 249 (Mel: after the foot soak "everything moves very slowly"): nothing animates inside the figure's wobble filter
+   any more (that redraws the filter every frame on a phone); only the steam and ripples move, drawn outside it */
+.ch.npc.act-footbath:not(.walk) .bliss{opacity:.9}
 .ch.npc.act-footbath:not(.walk) .prip{transform-box:fill-box;transform-origin:50% 50%;animation:pripR 3.2s ease-out infinite}
 @keyframes soakL{from{transform:scaleY(.72) rotate(-5deg)}to{transform:scaleY(.72) rotate(5deg)}}
 @keyframes soakH{from{transform:rotate(-5deg)}to{transform:rotate(4deg)}}

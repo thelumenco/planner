@@ -255,7 +255,7 @@ async function initDb(){
   attachHestiaDb(col.doc("hestia"));
   attachVaults(col, () => { if (scene === "bank") drawScene(); if (vaultView && !bv.pouring && !/^(vLabel|vGoal|vAmt)$/.test(document.activeElement?.id || "")) ctx(); });
   attachLetters(col, () => { if (lettersOpen && !/^(ltText|ltDate)$/.test(document.activeElement?.id || "")) ctx(); });
-  setTimeout(() => writeReplies(sampleCap), 6000);
+  setTimeout(() => { writeReplies(sampleCap); writeLetters(); }, 6000);
   attachRoutines(col, () => { if (routOpen && !/^(rtName|rtNew|rtPaste)$/.test(document.activeElement?.id || "") && !document.activeElement?.dataset?.day && !document.activeElement?.dataset?.item) ctx(); });
   attachKudos(col, () => { if (scene === "trophy") drawScene(); if (kudosOpen && !/^(kText|kFrom)$/.test(document.activeElement?.id || "")) ctx(); });
   attachJars(col, () => { if (scene === "room") drawScene(); if (jarsOpen && !/^(jNote|jcName)$/.test(document.activeElement?.id || "")) ctx(); });
@@ -1435,12 +1435,44 @@ const BQ_NOTE = {mama: "Ma Ma put them by the TV. So pretty, I look at them ever
 const nameWords = n => n.toLowerCase().replace(/^(a|an|the|bar of|box of|jar of|bottle of|pot of|slab of) /, "").split(/[^a-z']+/).filter(w => w.length > 3 && !["with", "wrapped", "paper", "little"].includes(w));
 const namesIt = (n, line) => { const l = line.toLowerCase(); return nameWords(n).filter(w => l.includes(w)).length >= Math.min(2, nameWords(n).length || 9); };
 function thankNote(t){
+  if (t.text) return `${t.who === "evan" ? "Dear Mama" : "Dear Mel"},\n\n${t.text}\n\n${SIGNOFF[t.who] || ""}`;
   const it = ITEMS[t.item] || {n: "present", say: ""}, line = it.kind === "bouquet" ? BQ_NOTE[t.who] || "They're beautiful." : (it.says && it.says[t.who]) || it.say || "";
   let open;
   if (it.wrapped) { const paper = (/wrapped in (.+ paper)$/.exec(it.n) || [])[1] || "pretty paper"; open = `Thank you for the parcel in ${paper}! I opened it straight away.`; }
   else open = line && namesIt(it.n, line) ? "Thank you so much!" : `Thank you for the ${it.n.toLowerCase()}!`;
   return `${t.who === "evan" ? "Dear Mama" : "Dear Mel"},\n\n${open} ${line}\n\n${SIGNOFF[t.who] || ""}`;
 }
+// round 249 (Mel: "the thank yous... need to be a bit more varied... write it instead of it being like a template"):
+// each family thank-you is written fresh by Claude in that person's voice (t.text), knowing the gift and their last
+// few notes; thankNote above is the fallback until it's written, or if Claude can't be reached
+const FAM_WHO = {darren: "Darren, Mel's husband: easy-going, practical, few words, quietly sweet and a bit cheeky",
+  evan: "Evan, Mel and Darren's two-year-old son. Daddy holds the pencil and writes down exactly what he says: tiny excited sentences, toddler words",
+  mama: "Ma Ma, Mel's grandma, who keeps the orchard: very loving, Singaporean, a little Singlish, calls Mel 'ah girl', always asks if she's eaten",
+  gonggong: "Gong Gong, Mel's grandpa: gentle, few words, calls himself 'Gong Gong' in the third person, likes the news on TV and helping Ma Ma",
+  mum: "Mum, Mel's mum: bubbly, always off to Pilates, Zumba or volunteering, calls Mel 'darling', always tells her to eat",
+  dad: "Dad, Mel's dad: soft-hearted, into music (piano, double bass) and drawing, says 'love you, have a good day'",
+  marcus: "Marcus, Mel's brother, a banker who loves games: teasing, calls her 'Zeh', short and funny, secretly very fond of her",
+  angelina: "Angellina, Marcus's fiancée, studying for her master's in psychology: warm, bright, a little self-deprecating about exams"};
+const undashT = s => String(s || "").replace(/\s*[\u2013\u2014]\s*/g, ", ").replace(/ ,/g, ",").trim();
+let thanksBusy = false;
+async function writeThanks(){
+  if (thanksBusy || !sampleCap || !sampleCap.json) return 0;
+  const t0 = Date.now(), todo = (F.thanks || []).filter(t => !t.text && FAM_WHO[t.who] && t.at > t0 - 3600e3); if (!todo.length) return 0;
+  thanksBusy = true; let n = 0;
+  try { for (const t of todo) {
+    const it = ITEMS[t.item] || {n: "a present"}, inner = it.wrapped && it.inner && ITEMS[it.inner];
+    const past = (F.thanks || []).filter(x => x.who === t.who && x.text && x.id !== t.id).slice(-4).map(x => x.text).join("\n---\n");
+    const hint = (inner || it).says && (inner || it).says[t.who] || (inner || it).say || "";
+    const r = await sampleCap.json(`Write a short thank-you note for a cosy family game, from ${FAM_WHO[t.who]}, to Mel, for a gift she sent them: ${it.wrapped ? `a parcel ${(/wrapped in (.+ paper)$/.exec(it.n) || [])[1] ? "in " + /wrapped in (.+ paper)$/.exec(it.n)[1] : "in pretty paper"}, with ${(inner || it).n} inside` : it.n}.${hint ? ` (Something they might say about it, for flavour only, don't copy it: "${hint}")` : ""}
+${past ? `Their last notes to Mel (say something new, in different words; no repeated phrases or jokes):\n${past}\n` : ""}Write only the note's body: no greeting and no sign-off. One to three sentences, under 55 words, specific to the gift, in their own voice. British spelling. No em dashes or en dashes. Warm and happy.
+Return JSON only: {"text": "..."}`, {modelTier: "quick", cache: false}).catch(err => { if (err && err.code === "not_granted") throw err; return null; });
+    const text = undashT(r && r.text); if (text.length < 8) continue;
+    t.text = text.slice(0, 400); n++;
+  } } catch {}
+  thanksBusy = false; if (n) save(); return n;
+}
+// Jason's (and every pen pal's) replies and the family's thank-yous, written as they're posted
+async function writeLetters(){ await writeThanks(); if (await BK.writePenReplies(F, sampleCap)) save(); }
 // thank-you notes that have arrived (they take about ten minutes to come back)
 const thanksMail = () => (F.thanks || []).filter(t => t.at <= Date.now()).map(t => ({id: t.id, from: "postie", at: t.at, title: `Thank you from ${GIFT_NAME[t.who] || "someone"}`, body: thankNote(t)}));
 function giveGift(id, chosen){
@@ -3151,6 +3183,7 @@ function setScene(id, at){
     else if (id === "hall" && kudosCount() >= 3 && Date.now() - (F.kudosSeen || 0) > 7*864e5 && S.kudosSaid !== dayKey()) { S.kudosSaid = dayKey(); setTimeout(() => speak(`${kudosCount()} kind words out in the courtyard. Fancy a read?`, 5000), 1500); }
     if (id === "trophy") { fetchObjectives(); if (F.revTarget) loadRevenue().then(checkTrophies); setTimeout(() => speak(onPedestals(F).length ? "The courtyard. Look at all this. You did that." : "The courtyard. Your first trophy goes on a pedestal.", 4000), 900); }
     if (id === "orchard" || id === "flowers") orchardArrive(id);
+    if (id === "mill") { const l = SC.millEnter(F, dayKey()); if (l) { save(); setTimeout(() => speak(l, 6500), 1100); } }   // the secret passage's trail: nudges at the mill
     if (id === "cellar") { const l = SC.cellarEnter(F, dayKey()); if (l) { save(); drawScene(); setTimeout(() => speak(l, 6500), 1100); } }   // round 244: the secret passage's trail
     { const m = sgHM(); if (owns(F, "cellar") && wineClubOn(dayKey()) && m >= 12*60 && m < 21*60 && S.clubSaid !== dayKey() && id !== "cellar") { S.clubSaid = dayKey();
       setTimeout(() => speak(m < 18*60 ? "Wine club tonight at the cellar door, 6pm! Eight members are coming to taste and buy." : "The wine club's on at the cellar door right now! Pop in and host.", 6000), 2800); } }
@@ -4232,7 +4265,7 @@ async function freshAffirmations(){
   affirmBusy = false; if (trophyView === "affirm") ctx();
 }
 setInterval(() => { const n = lettersAnnounce(); if (n.length) { sfx("chime"); speak(n.some(e => e.kind === "universe") ? "A letter from the universe has arrived. It's in your letterbox at home." : "A letter from your past self just arrived in your letterbox.", 6000); }
-  if (Math.random() < .2) writeReplies(sampleCap); }, 30000);
+  if (Math.random() < .2) writeReplies(sampleCap); writeLetters(); }, 30000);
 setInterval(checkTrophies, 30000); setTimeout(checkTrophies, 4000); setTimeout(fetchObjectives, 9000);
 
 /* ---------- Evan's room: Evan is the one who moves. Nothing here saves or earns. ---------- */

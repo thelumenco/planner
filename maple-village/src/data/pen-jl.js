@@ -4,6 +4,10 @@
 // "Thank you for the…" put in front; `open`, two of his `news`, and a `ps`). Keep him joyful, always.
 export const PEN_JL = {
   jason: {own: true, dear: "My dear Mel,",
+    // round 249 (Mel: "Jason's letters repeat themselves... write it instead of it being like a template. You know Jason's
+    // voice"): each letter is now written fresh by Claude (contacts.js writePenReplies); the lines below are his voice
+    // to go by, and what a letter falls back on if Claude can't be reached
+    voice: "Jason, Mel's dearest old friend, writing from the second floor of the yellow house by the harbour in Vernazza, where he now lives, very happily, with Luca, who mends the fishing boats' engines. His letters are long and literary: purple prose but lucid, full sentences, semicolons, a little formal ('forgive my presumption'), never pompous, with dry wit and warmth. He quotes Wilde, Byron, Wordsworth, Shakespeare now and then (accurately, never invented). His days: a poem at the café in the morning, the steps up to Corniglia (382 of them; he climbed them all in 2015 and is still insufferable about it), lunch at Beppe's focacceria, the beach, a gelato, and the sunset on the harbour wall with Luca, when the houses go pink. Shared memories with Mel: their 2015 trip, the Airbnb in Vernazza, the night he waited on the dark harbour with a pizza when her train came hours late after a strike in Florence. Neighbours: one who sings Puccini badly at seven in the morning; the cat who rides in the fishing boats. He is joyful, always; nothing sad.",
     sign: "Ever yours, from the yellow house by the harbour,\nJason",
     open: [
       "Forgive my presumption in replying so promptly; I have always held that a letter left unanswered is a door left swinging, and the wind off this harbour is not kind to doors.",
@@ -33,6 +37,7 @@ export const PEN_JL = {
     ],
     back: "c_jpoem", backNote: "I have folded a poem in with this; it is about the houses at six o'clock, and it rhymes 'harbour' with 'arbour', for which I refuse to apologise."},
   luca: {sign: "Ciao, Luca",
+    voice: "Luca, Jason's partner, who mends the fishing boats' engines in Vernazza. His English is good but plain and short: short sentences, dry and deadpan, very fond of Jason and gently teasing about him (the speeches, the steps that grow every time he tells the story). Practical things: engines, the ferry, anchovies the fishermen pay him in, his good spanner. Warm underneath.",
     food: "Jason said we would share it. We did share it. He had more. I let him win, it is good for the marriage.",
     drink: "We drank it on the harbour wall with the sunset. Jason made a speech about it. The wine was shorter than the speech.",
     made: "Jason took it to the bathroom and says it is his now. I am allowed to look at it.",

@@ -447,7 +447,7 @@ export function personArt(look, kid){
   const patch = look.extra === "samphirebag" ? `<g style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><path d="M${15*k} ${.6*k} q${1*k} ${-4.6*k} ${6*k} ${-5*k} q${6*k} ${-.4*k} ${8*k} ${5*k}z" style="fill:#9A948A"/>${[17.6, 20, 22.4, 24.8, 27].map((x, i) => `<path d="M${x*k} ${-3*k} l${(i - 2)*.6*k} ${(-6 - (i % 2)*2.4)*k} M${(x + (i - 2)*.3)*k} ${(-6 - (i % 2))*k} l${(i < 2 ? -1.4 : 1.4)*k} ${-1.4*k}" fill="none" stroke-width="${1.3*k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")}</g>` : "";
   // (Hokkaido: Mum's foot-bath bench sits under her outside .bob, and the warm water over her feet after it; Gong Gong's
   // steaming egg spring is on the ground beside him, over the bottom of his basket; both stay put while the body moves)
-  const soakseat = look.extra === "footsoak" ? `<g style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><rect x="${-21*k}" y="${-7*k}" width="${3*k}" height="${7*k}" style="fill:#7A5236"/><rect x="${18*k}" y="${-7*k}" width="${3*k}" height="${7*k}" style="fill:#7A5236"/><rect x="${-25*k}" y="${-9.6*k}" width="${50*k}" height="${3.6*k}" rx="${1*k}" style="fill:#A8794E"/></g>` : "";
+  const soakseat = look.extra === "footsoak" ? `<g class="soakseat" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><rect x="${-21*k}" y="${-7*k}" width="${3*k}" height="${7*k}" style="fill:#7A5236"/><rect x="${18*k}" y="${-7*k}" width="${3*k}" height="${7*k}" style="fill:#7A5236"/><rect x="${-25*k}" y="${-9.6*k}" width="${50*k}" height="${3.6*k}" rx="${1*k}" style="fill:#A8794E"/></g>` : "";
   const steam = (x, y) => [0, 1, 2].map(i => `<path class="hksteam" style="animation-delay:${-i*1.1}s" d="M${(x + (i - 1)*4)*k} ${y*k} q${-2*k} ${-3*k} 0 ${-6*k} q${2*k} ${-3*k} 0 ${-6*k}" fill="none" stroke-width="${1.2*k}" stroke-linecap="round" stroke="#FFFDF6" opacity=".8"/>`).join("");
   const soakwater = look.extra === "footsoak" ? `<g class="soak" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><ellipse cx="0" cy="${4.6*k}" rx="${24*k}" ry="${5.6*k}" style="fill:#9A948A"/><ellipse cx="0" cy="${4*k}" rx="${21.4*k}" ry="${4.2*k}" style="fill:#9ED8D0" fill-opacity=".88"/>${[-3.7, 3.7].map(x => `<ellipse class="prip" cx="${x*k}" cy="${2.4*k}" rx="${4*k}" ry="${1*k}" fill="none" stroke-width="${.6*k}" style="stroke:#E6F8F4"/>`).join("")}${steam(-13, 1)}${steam(13, 1)}</g>` : "";
   const eggpool = look.extra === "eggbasket" ? `<g class="eggpool" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><ellipse cx="${19*k}" cy="${-1.4*k}" rx="${13*k}" ry="${5*k}" style="fill:#9A948A"/><ellipse cx="${19*k}" cy="${-1.6*k}" rx="${11*k}" ry="${3.8*k}" style="fill:#A8DCD0" fill-opacity=".92"/>${steam(19, -4)}</g>` : "";
@@ -488,8 +488,8 @@ export function personArt(look, kid){
       ${look.board ? paddle(k) : ""}
       ${rain && rain.kind === "brolly" ? brollyArt(rain, k) : ""}
       ${look.headphones ? `<path d="M${-11*k} ${-46*k} a${11*k} ${12*k} 0 0 1 ${22*k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5*k}" y="${-49*k}" width="${4.5*k}" height="${7*k}" rx="2" style="fill:var(--peri)"/><rect x="${9*k}" y="${-49*k}" width="${4.5*k}" height="${7*k}" rx="2" style="fill:var(--peri)"/>` : ""}
-    </g>${paddy}${soakwater}${eggpool}${stonestack}
-  </g></g>`;
+    </g>${paddy}${stonestack}
+  </g>${soakwater}${eggpool}</g>`;   // the steaming water sits outside the wobble filter: animating inside it slowed phones right down (Mel)
 }
 
 // A folded letter that floats over a messenger's head until it's read.

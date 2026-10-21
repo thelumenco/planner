@@ -951,15 +951,17 @@ button.subname[aria-expanded="true"]::after{content:"▴"}
    choosing the best; Gong Gong lowers his basket of eggs into the steaming spring and lifts it again; Darren marches on
    the spot with his skis on his shoulder; Marcus's soft-serve drips while he licks round it; Angellina listens to her
    music box with her eyes shut, the notes floating up. (Steam rises from the foot bath and the egg spring: .hksteam) */
-.ch.npc.walk .soak,.ch.npc.walk .eggpool{display:none}
+.ch.npc.walk .soak,.ch.npc.walk .soakseat,.ch.npc.walk .eggpool{display:none}
 .ch.npc .hksteam{animation:hkSteam 3.3s ease-out infinite}
 @keyframes hkSteam{0%{opacity:0;transform:translateY(2px)}30%{opacity:.8}100%{opacity:0;transform:translateY(-8px)}}
 .ch.npc.act-footbath:not(.walk) .bob{transform:translateY(6px)}
 .ch.npc.act-footbath:not(.walk) .armR{transform:rotate(-16deg)}.ch.npc.act-footbath:not(.walk) .armL{transform:rotate(16deg)}
-.ch.npc.act-footbath:not(.walk) .legL{transform-box:fill-box;transform-origin:50% 0;animation:soakL 3.2s ease-in-out infinite alternate}
-.ch.npc.act-footbath:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;animation:soakL 3.2s ease-in-out infinite alternate-reverse}
-.ch.npc.act-footbath:not(.walk) .bhead{transform-box:fill-box;transform-origin:50% 100%;animation:soakH 5s ease-in-out infinite alternate}
-.ch.npc.act-footbath:not(.walk) .bliss{animation:blissH 5s ease-out infinite}
+.ch.npc.act-footbath:not(.walk) .legL{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.72) rotate(-4deg)}
+.ch.npc.act-footbath:not(.walk) .legR{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(.72) rotate(4deg)}
+.ch.npc.act-footbath:not(.walk) .bhead{transform-box:fill-box;transform-origin:50% 100%;transform:rotate(-3deg)}
+/* round 249 (Mel: after the foot soak "everything moves very slowly"): nothing animates inside the figure's wobble filter
+   any more (that redraws the filter every frame on a phone); only the steam and ripples move, drawn outside it */
+.ch.npc.act-footbath:not(.walk) .bliss{opacity:.9}
 .ch.npc.act-footbath:not(.walk) .prip{transform-box:fill-box;transform-origin:50% 50%;animation:pripR 3.2s ease-out infinite}
 @keyframes soakL{from{transform:scaleY(.72) rotate(-5deg)}to{transform:scaleY(.72) rotate(5deg)}}
 @keyframes soakH{from{transform:rotate(-5deg)}to{transform:rotate(4deg)}}
@@ -14247,6 +14249,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     jason: {
       own: true,
       dear: "My dear Mel,",
+      // round 249 (Mel: "Jason's letters repeat themselves... write it instead of it being like a template. You know Jason's
+      // voice"): each letter is now written fresh by Claude (contacts.js writePenReplies); the lines below are his voice
+      // to go by, and what a letter falls back on if Claude can't be reached
+      voice: "Jason, Mel's dearest old friend, writing from the second floor of the yellow house by the harbour in Vernazza, where he now lives, very happily, with Luca, who mends the fishing boats' engines. His letters are long and literary: purple prose but lucid, full sentences, semicolons, a little formal ('forgive my presumption'), never pompous, with dry wit and warmth. He quotes Wilde, Byron, Wordsworth, Shakespeare now and then (accurately, never invented). His days: a poem at the café in the morning, the steps up to Corniglia (382 of them; he climbed them all in 2015 and is still insufferable about it), lunch at Beppe's focacceria, the beach, a gelato, and the sunset on the harbour wall with Luca, when the houses go pink. Shared memories with Mel: their 2015 trip, the Airbnb in Vernazza, the night he waited on the dark harbour with a pizza when her train came hours late after a strike in Florence. Neighbours: one who sings Puccini badly at seven in the morning; the cat who rides in the fishing boats. He is joyful, always; nothing sad.",
       sign: "Ever yours, from the yellow house by the harbour,\nJason",
       open: [
         "Forgive my presumption in replying so promptly; I have always held that a letter left unanswered is a door left swinging, and the wind off this harbour is not kind to doors.",
@@ -14279,6 +14285,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     },
     luca: {
       sign: "Ciao, Luca",
+      voice: "Luca, Jason's partner, who mends the fishing boats' engines in Vernazza. His English is good but plain and short: short sentences, dry and deadpan, very fond of Jason and gently teasing about him (the speeches, the steps that grow every time he tells the story). Practical things: engines, the ferry, anchovies the fishermen pay him in, his good spanner. Warm underneath.",
       food: "Jason said we would share it. We did share it. He had more. I let him win, it is good for the marriage.",
       drink: "We drank it on the harbour wall with the sunset. Jason made a speech about it. The wine was shorter than the speech.",
       made: "Jason took it to the bathroom and says it is his now. I am allowed to look at it.",
@@ -15258,6 +15265,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return /^\S+ [A-Z]/.test(n) ? n : n.replace(/^./, (c) => c.toLowerCase());
   };
   function replyBody(e) {
+    if (e.reply && e.reply.body) return writtenReply(e);
     const d = DEF[e.to], p = PEN[e.to], h3 = hash(e.id), first = (d.name || "").split(" ")[0];
     const fill2 = (s) => String(s || "").replace(/\{it\}/g, e.item ? nm(e.item) : "letter");
     let body2;
@@ -15306,6 +15314,66 @@ ${offerLine(e.to, e.offer)}`;
 
 ${p ? p.sign : `Warmly, ${first}`}`;
   }
+  var undash = (s) => String(s || "").replace(/\s*[\u2013\u2014]\s*/g, ", ").replace(/ ,/g, ",");
+  var clean = (s) => undash(s).replace(/\r/g, "").replace(/\n{3,}/g, "\n\n").trim();
+  function penPrompt(F2, e) {
+    const d = DEF[e.to], p = PEN[e.to] || {}, it = e.item && ITEMS[e.item], inner = it && it.wrapped && it.inner && ITEMS[it.inner], first = (d.name || "").split(" ")[0];
+    const voice = p.voice || `${d.name}, ${d.job || "someone Mel met on her travels"}. How they talk: ${[d.intro, ...(d.lines || []).slice(0, 5)].filter(Boolean).map((x) => `"${x}"`).join(" ")}`;
+    const samples = [p.open && p.open[0], p.food, p.drink, p.other, p.letter, ...(p.news || []).slice(0, 2)].filter(Boolean).slice(0, 4).map((x) => `- ${String(x).replace(/\{it\}/g, "present")}`).join("\n");
+    const past = bookState(F2).sent.filter((x) => x.to === e.to && x.id !== e.id && x.at < e.at && x.reply).slice(-3).map((x) => x.reply.body).join("\n---\n");
+    const what = it ? `Mel posted ${first} a gift: ${(inner || it).n}${it.wrapped ? `, wrapped in ${(/wrapped in (.+ paper)$/.exec(it.n) || [])[1] || "pretty paper"}` : ""}.${(inner || it).say ? ` (What it is: ${(inner || it).say})` : ""}` : "Mel wrote a letter.";
+    const words = [e.open, e.text].filter(Boolean).join(" ");
+    const long = !!p.own;
+    return `Write a reply letter for a cosy village game, as ${first}, to Mel (Melody), the player.
+Who ${first} is and how they write: ${voice}
+${samples ? `A few lines in their voice, for tone only (do NOT reuse them or their images):
+${samples}
+` : ""}
+${what}${words ? `
+Mel's own words: "${words}"` : ""}
+${e.back && ITEMS[e.back] ? `${first} has tucked a little ${ITEMS[e.back].n} into the envelope; mention it naturally.
+` : ""}${past ? `${first}'s last letters to Mel (say something new; don't repeat their news, jokes, images or openings):
+${past}
+` : ""}
+Write the letter body only: no "Dear Mel" greeting and no signature. ${long ? "Three to five paragraphs, about 180 to 260 words: thank her for the gift in a fresh, specific way (or answer her letter), then some new news from their life, something different from before. Also write a separate one-line P.S." : "Two to four sentences, about 40 to 80 words: thank her in their own way (or answer her letter), plus one small bit of fresh news. A P.S. only if it suits them."}
+British spelling. No em dashes or en dashes anywhere. Warm and joyful; nothing sad, no illness or loss. Don't invent quotations.
+Return JSON only: {"body": "...", "ps": "P.S. ... (or empty)"}`;
+  }
+  var penBusy = false;
+  async function writePenReplies(F2, sample, t2 = now()) {
+    if (penBusy || !sample || !sample.json) return 0;
+    const todo = bookState(F2).sent.filter((e) => !e.reply && DEF[e.to] && e.at > t2 - 36e5);
+    if (!todo.length) return 0;
+    penBusy = true;
+    let n = 0;
+    try {
+      for (const e of todo) {
+        const r = await sample.json(penPrompt(F2, e), { modelTier: "default", cache: false }).catch((err) => {
+          if (err && err.code === "not_granted") throw err;
+          return null;
+        });
+        const body2 = clean(r && r.body);
+        if (body2.length < 20) continue;
+        e.reply = { body: body2.slice(0, 2400), ps: /^P\.?S/i.test(clean(r.ps)) ? clean(r.ps).slice(0, 300) : "" };
+        n++;
+      }
+    } catch {
+    }
+    penBusy = false;
+    return n;
+  }
+  var writtenReply = (e) => {
+    const d = DEF[e.to], p = PEN[e.to], first = (d.name || "").split(" ")[0];
+    return `${p && p.dear || "Dear Mel,"}
+
+${e.reply.body}
+
+${p ? p.sign : `Warmly, ${first}`}${e.reply.ps ? `
+
+${e.reply.ps}` : ""}${e.offer && ITEMS[e.offer] ? `
+
+${offerLine(e.to, e.offer)}` : ""}`;
+  };
   var bookMail = (F2, t2 = now()) => bookState(F2).sent.filter((e) => e.at <= t2 && DEF[e.to]).map((e) => ({
     id: e.id,
     from: "postie",
@@ -21052,16 +21120,29 @@ ${r.n}`;
     if (!fresh(s, day) || s.said === day) return null;
     s.said = day;
     if (s.step === 1) return "That draught again, from behind the barrel racks. Maple won't leave them alone.";
-    if (s.step === 2) return "T.R. 1912, scratched in the old bricks. Where else have you seen those initials?";
+    if (s.step === 2) return "T.R. 1912, scratched in the old bricks. The same initials are carved in the beam at the old mill. Maple looks at you as if to say: the mill?";
     if (s.step === 3) return "Where the stone turns, the key sleeps. The old millstone?";
     if (s.step === 4) return "The iron key's heavy in your pocket. The loose brick, perhaps?";
+    return null;
+  }
+  function millEnter(F2, day) {
+    const s = secretState(F2);
+    if (!fresh(s, day) || s.millSaid === day) return null;
+    if (s.step === 2) {
+      s.millSaid = day;
+      return "Maple trots straight to the old photograph by the mill door, and sits, tail sweeping. Tap the photograph.";
+    }
+    if (s.step === 3) {
+      s.millSaid = day;
+      return "Where the stone turns, the key sleeps. Maple's pawing at the old millstone by the press.";
+    }
     return null;
   }
   function racksTap(F2, day) {
     const s = secretState(F2);
     if (s.step === 1 && fresh(s, day)) {
       advance(s, 2, day);
-      return "You roll the end barrel aside. Behind the racks the plaster's crumbled away: old bricks, cold air whistling through, and one brick scratched with T.R. 1912.";
+      return "You roll the end barrel aside. Behind the racks the plaster's crumbled away: old bricks, cold air whistling through, and one brick scratched with T.R. 1912. Tomás Ruiz carved those same initials at the old mill. Sleep on it, and tomorrow have a look round the mill.";
     }
     if (s.step === 1) return null;
     return null;
@@ -21073,15 +21154,18 @@ ${r.n}`;
       return "The scratched brick slides out. Behind it: a keyhole, crusted with rust. The iron key turns, stiff, then all at once. A narrow door groans open onto a stone passage, worn smooth by feet long gone, and a breath of cool air that smells of old oak and the sea.";
     }
     if (s.step >= 5) return null;
-    if (s.step === 3) return "T.R. 1912. You still need that key: where the stone turns...";
+    if (s.step === 3) return "T.R. 1912. You still need that key: where the stone turns... The old millstone, by the mill's press?";
+    if (s.step === 2 && !fresh(s, day)) return "T.R. 1912. The brick moves, just a little, but it won't come out. Tomás's initials are carved at the old mill too: have a look there tomorrow.";
+    if (s.step === 2) return "T.R. 1912. The brick won't budge. Tomás left his mark at the old mill too: the old photograph by the mill door, perhaps?";
     return "T.R. 1912. Tomás Ruiz? The railwayman who planted the olive tree by the mill, Ines's great-great-grandfather. His initials are carved in the beam at the old mill too. You run a finger over the brick: it moves, just a little.";
   }
   function photoTap(F2, day) {
     const s = secretState(F2);
     if (s.step === 2 && fresh(s, day)) {
       advance(s, 3, day);
-      return 'You lift the old photograph off its nail. On the back, in faded brown ink: "Where the stone turns, the key sleeps. T.R."';
+      return 'You lift the old photograph off its nail. On the back, in faded brown ink: "Where the stone turns, the key sleeps. T.R." The stone that turns: the old millstone, by the press.';
     }
+    if (s.step === 2) return "The old photograph: the mill in 1912, and a man on a ladder mending the sails. You've had enough secrets for one day. Come back tomorrow and look again.";
     return null;
   }
   function stoneTap(F2, day) {
@@ -24879,7 +24963,7 @@ ${r.n}`;
     const bodyx = { frangipani: "softhands", ricehat: "crosslegs" }[look.extra], headx = { legonghands: "legongeyes", musicboxheld: "listen" }[look.extra];
     const paddy = look.extra === "seedlings" ? `<g class="paddy" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><path d="M${-23 * k} ${-5 * k} Q${-23 * k} ${-9 * k} ${-17 * k} ${-9 * k} H${17 * k} Q${23 * k} ${-9 * k} ${23 * k} ${-5 * k} V${2.4 * k} Q0 ${5 * k} ${-23 * k} ${2.4 * k}z" style="fill:#8DB8A2" fill-opacity=".96"/><path d="M${-16 * k} ${-7 * k} h${9 * k} M${6 * k} ${-6.4 * k} h${8 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#D6ECE2"/>${[-18, -12, 16].map((x) => [-1, 0, 1].map((i) => `<path d="M${x * k} ${-8.4 * k} q${i * 0.6 * k} ${-2.6 * k} ${i * 1.8 * k} ${-5 * k}" fill="none" stroke-width="${1 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")).join("")}<g class="prip"><ellipse cx="${19.6 * k}" cy="${-8.6 * k}" rx="${3 * k}" ry="${0.9 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#E6F4EE"/><ellipse cx="${19.6 * k}" cy="${-8.6 * k}" rx="${5.4 * k}" ry="${1.5 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#E6F4EE"/></g></g>` : "";
     const patch = look.extra === "samphirebag" ? `<g style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><path d="M${15 * k} ${0.6 * k} q${1 * k} ${-4.6 * k} ${6 * k} ${-5 * k} q${6 * k} ${-0.4 * k} ${8 * k} ${5 * k}z" style="fill:#9A948A"/>${[17.6, 20, 22.4, 24.8, 27].map((x, i) => `<path d="M${x * k} ${-3 * k} l${(i - 2) * 0.6 * k} ${(-6 - i % 2 * 2.4) * k} M${(x + (i - 2) * 0.3) * k} ${(-6 - i % 2) * k} l${(i < 2 ? -1.4 : 1.4) * k} ${-1.4 * k}" fill="none" stroke-width="${1.3 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")}</g>` : "";
-    const soakseat = look.extra === "footsoak" ? `<g style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><rect x="${-21 * k}" y="${-7 * k}" width="${3 * k}" height="${7 * k}" style="fill:#7A5236"/><rect x="${18 * k}" y="${-7 * k}" width="${3 * k}" height="${7 * k}" style="fill:#7A5236"/><rect x="${-25 * k}" y="${-9.6 * k}" width="${50 * k}" height="${3.6 * k}" rx="${1 * k}" style="fill:#A8794E"/></g>` : "";
+    const soakseat = look.extra === "footsoak" ? `<g class="soakseat" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><rect x="${-21 * k}" y="${-7 * k}" width="${3 * k}" height="${7 * k}" style="fill:#7A5236"/><rect x="${18 * k}" y="${-7 * k}" width="${3 * k}" height="${7 * k}" style="fill:#7A5236"/><rect x="${-25 * k}" y="${-9.6 * k}" width="${50 * k}" height="${3.6 * k}" rx="${1 * k}" style="fill:#A8794E"/></g>` : "";
     const steam3 = (x, y) => [0, 1, 2].map((i) => `<path class="hksteam" style="animation-delay:${-i * 1.1}s" d="M${(x + (i - 1) * 4) * k} ${y * k} q${-2 * k} ${-3 * k} 0 ${-6 * k} q${2 * k} ${-3 * k} 0 ${-6 * k}" fill="none" stroke-width="${1.2 * k}" stroke-linecap="round" stroke="#FFFDF6" opacity=".8"/>`).join("");
     const soakwater = look.extra === "footsoak" ? `<g class="soak" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><ellipse cx="0" cy="${4.6 * k}" rx="${24 * k}" ry="${5.6 * k}" style="fill:#9A948A"/><ellipse cx="0" cy="${4 * k}" rx="${21.4 * k}" ry="${4.2 * k}" style="fill:#9ED8D0" fill-opacity=".88"/>${[-3.7, 3.7].map((x) => `<ellipse class="prip" cx="${x * k}" cy="${2.4 * k}" rx="${4 * k}" ry="${1 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#E6F8F4"/>`).join("")}${steam3(-13, 1)}${steam3(13, 1)}</g>` : "";
     const eggpool = look.extra === "eggbasket" ? `<g class="eggpool" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><ellipse cx="${19 * k}" cy="${-1.4 * k}" rx="${13 * k}" ry="${5 * k}" style="fill:#9A948A"/><ellipse cx="${19 * k}" cy="${-1.6 * k}" rx="${11 * k}" ry="${3.8 * k}" style="fill:#A8DCD0" fill-opacity=".92"/>${steam3(19, -4)}</g>` : "";
@@ -24919,8 +25003,8 @@ ${r.n}`;
       ${look.board ? paddle(k) : ""}
       ${rain && rain.kind === "brolly" ? brollyArt(rain, k) : ""}
       ${look.headphones ? `<path d="M${-11 * k} ${-46 * k} a${11 * k} ${12 * k} 0 0 1 ${22 * k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/><rect x="${9 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/>` : ""}
-    </g>${paddy}${soakwater}${eggpool}${stonestack}
-  </g></g>`;
+    </g>${paddy}${stonestack}
+  </g>${soakwater}${eggpool}</g>`;
   }
   var letterArt = `<g transform="translate(0 -70)"><g class="qmark"><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1.3" stroke-linejoin="round">
   <rect x="-11" y="-9" width="22" height="16" rx="2" style="fill:#FFFDF6"/><path d="M-11 -9 l11 9 l11 -9" fill="none"/><circle cx="0" cy="1" r="3" style="fill:var(--rose)"/></g></g></g>`;
@@ -28800,9 +28884,9 @@ Quests finished today: ${S4.doneIds.length}`;
     return d && d.at ? d : null;
   }
   function goodNewsHTML(localWins, cal, tab = "wins") {
-    const d = goodNews(), clean2 = (s) => plain(String(s || "")).slice(0, 220);
+    const d = goodNews(), clean3 = (s) => plain(String(s || "")).slice(0, 220);
     const world = (d && d.world || []).slice(0, 6).filter((x) => x && x.title);
-    const wins = [...localWins || [], ...(d && d.wins || []).map(clean2)].filter(Boolean).slice(0, 8);
+    const wins = [...localWins || [], ...(d && d.wins || []).map(clean3)].filter(Boolean).slice(0, 8);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><p class="eyebrow" style="margin:0 0 2px">The Honeybrook Gazette</p><h2>Good news</h2><p class="sub">${d ? `Pinned up ${new Date(d.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Singapore" })}.` : "Fresh every morning."}</p>`;
     h3 += `<div class="tabs" role="tablist">${[["wins", "Your wins"], ["events", "Events"], ["news", "In the world"]].map(([k, n]) => `<button role="tab" data-newstab="${k}" aria-selected="${k === tab}">${n}</button>`).join("")}</div>`;
     if (tab === "wins") h3 += wins.length ? `<ul class="hlist gnews">${wins.map((w) => `<li><span>${esc(w)}</span></li>`).join("")}</ul>` : `<p class="muted">Your wins show up here as the day goes on.</p>`;
@@ -28811,7 +28895,7 @@ Quests finished today: ${S4.doneIds.length}`;
       if (cal.fests.length) h3 += `<ul class="hlist gnews vcal fests">${cal.fests.map((f5) => `<li><span><b>${esc(f5.name)}</b><small>${esc(f5.when)} · ${esc(f5.until)}</small></span></li>`).join("")}</ul>`;
       h3 += cal.days.length ? `<ul class="hlist gnews vcal">${cal.days.map((d2) => `<li><span><b>${esc(d2.when)}</b>${d2.list.map((x) => `<small>${esc(x)}</small>`).join("")}</span></li>`).join("")}</ul>` : `<p class="muted">A quiet fortnight in the village.</p>`;
     }
-    if (tab === "news") h3 += world.length ? `<ul class="hlist gnews world">${world.map((x) => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean2(x.title))}</a>` : esc(clean2(x.title))}${x.summary ? `<small>${esc(clean2(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean2(x.source))}</small>` : ""}</span></li>`).join("")}</ul>` : `<p class="muted">The morning's good news hasn't arrived yet.</p>`;
+    if (tab === "news") h3 += world.length ? `<ul class="hlist gnews world">${world.map((x) => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean3(x.title))}</a>` : esc(clean3(x.title))}${x.summary ? `<small>${esc(clean3(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean3(x.source))}</small>` : ""}</span></li>`).join("")}</ul>` : `<p class="muted">The morning's good news hasn't arrived yet.</p>`;
     return h3;
   }
 
@@ -29606,7 +29690,7 @@ Quests finished today: ${S4.doneIds.length}`;
     <button class="btn small ${wearing(F2, k) ? "primary" : "alt"}" data-acc="${k}" aria-pressed="${wearing(F2, k)}">${wearing(F2, k) ? "Wearing" : "Put on"}</button></div>`).join("")}</div>`;
   }
   var FIELDS = [["top", "Top"], ["dress", "Dress"], ["bottom", "Bottom"], ["shoes", "Shoes"], ["bag", "Bag"], ["jewellery", "Jewellery"], ["sunglasses", "Sunglasses"], ["layer", "Layer"], ["hair", "Hair"]];
-  var clean = (s, n = 140) => plain(String(s || "")).slice(0, n);
+  var clean2 = (s, n = 140) => plain(String(s || "")).slice(0, n);
   var todayDoc = () => {
     const d = outfitDoc();
     return d && d.day === dayKey() ? d : null;
@@ -29620,20 +29704,20 @@ Quests finished today: ${S4.doneIds.length}`;
   var FIELD_NAME = Object.fromEntries(FIELDS);
   function card(o, i) {
     if (!o) return "";
-    const rows2 = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><span class="gpic">${garment(k === "layer" ? "layer" : k, o[k])}</span><span><small>${n}</small>${esc(clean(o[k]))}</span></li>`).join("");
-    return `<div class="outfit"><p class="olabel">${esc(clean(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows2}</ul>${o.why ? `<p class="owhy">${esc(clean(o.why, 220))}</p>` : ""}<div class="actions"><button class="btn small primary" data-wear="${i}">Wear this</button></div></div>`;
+    const rows2 = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><span class="gpic">${garment(k === "layer" ? "layer" : k, o[k])}</span><span><small>${n}</small>${esc(clean2(o[k]))}</span></li>`).join("");
+    return `<div class="outfit"><p class="olabel">${esc(clean2(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows2}</ul>${o.why ? `<p class="owhy">${esc(clean2(o.why, 220))}</p>` : ""}<div class="actions"><button class="btn small primary" data-wear="${i}">Wear this</button></div></div>`;
   }
   function wardrobePanel(F2, st6) {
     const d = todayDoc(), more = extras(F2), inv = inventory();
     let h3 = `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2>`;
-    if (d) h3 += `<p class="sub">${[d.weather && esc(clean(d.weather, 60)), d.on && esc(clean(d.on, 160))].filter(Boolean).join(" · ") || "Today's picks from your stylist."}</p>`;
+    if (d) h3 += `<p class="sub">${[d.weather && esc(clean2(d.weather, 60)), d.on && esc(clean2(d.on, 160))].filter(Boolean).join(" · ") || "Today's picks from your stylist."}</p>`;
     else h3 += `<p class="sub">Your stylist hasn't been by yet today. The morning briefing hangs three outfits in here.</p>`;
     const all = outfitsToday(F2), w = F2.wear && F2.wear.day === dayKey() ? F2.wear : null;
     if (w) h3 += `<p class="muted">Wearing today: <b>${esc(w.label || "your outfit")}</b>. <button class="btn small alt" data-wearoff="1">Back to my usual clothes</button></p>`;
     const pick5 = st6.pick != null ? all[st6.pick] : null;
     if (pick5) {
       const fs = FIELDS.filter(([k]) => pick5[k]);
-      h3 += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean(pick5.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick5[k])}</span><span><small>${n}</small>${esc(clean(pick5[k]))}</span></label></li>`).join("")}</ul>
+      h3 += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean2(pick5.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick5[k])}</span><span><small>${n}</small>${esc(clean2(pick5[k]))}</span></label></li>`).join("")}</ul>
       <div class="actions"><button class="btn primary" data-wearok="${st6.pick}">Put it on</button><button class="btn alt small" data-wearback="1">Back</button></div></div>`;
     } else if (all.length) h3 += `<div class="outfits">${all.map(card).join("")}</div>`;
     if (!pick5) h3 += accessories(F2);
@@ -29657,19 +29741,19 @@ Dress for the day below: the most important event decides how polished it is; if
 Use ONLY items from this wardrobe list (copy their names). If a piece that would complete the look isn't there, add "(not currently in wardrobe)" after it.
 Wardrobe: ${JSON.stringify(inv).slice(0, 6e3)}
 Today: ${(/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })}, Singapore.
-Weather: ${d && d.day === dayKey() && d.weather ? clean(d.weather, 80) : "not checked yet; assume Singapore's usual: hot and humid, maybe an afternoon shower, cold aircon indoors"}.
-Calendar: ${(events || []).length ? events.slice(0, 12).map((e) => `${e.allDay ? "all day" : new Date(e.start).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore" })} ${clean(e.title, 60)}${e.where ? ` (${clean(e.where, 40)})` : ""}`).join("; ") : d && d.day === dayKey() && d.on ? clean(d.on, 200) : "nothing on the calendar (a home or WFH day)"}.
+Weather: ${d && d.day === dayKey() && d.weather ? clean2(d.weather, 80) : "not checked yet; assume Singapore's usual: hot and humid, maybe an afternoon shower, cold aircon indoors"}.
+Calendar: ${(events || []).length ? events.slice(0, 12).map((e) => `${e.allDay ? "all day" : new Date(e.start).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore" })} ${clean2(e.title, 60)}${e.where ? ` (${clean2(e.where, 40)})` : ""}`).join("; ") : d && d.day === dayKey() && d.on ? clean2(d.on, 200) : "nothing on the calendar (a home or WFH day)"}.
 Already suggested today (make this one clearly different): ${shown.join(" | ") || "none"}
-Mel's request: ${clean(ask2, 120) || "something different"}
+Mel's request: ${clean2(ask2, 120) || "something different"}
 Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "", "shoes": "", "bag": "", "jewellery": "", "sunglasses": "", "layer": "", "hair": "up|down + short note", "why": "one sentence"} (leave fields empty when not used: dress OR top+bottom).`;
     const o = await sample.json(prompt, { modelTier: "quick", cache: false });
     if (!o || typeof o !== "object") return null;
     const out = {};
     FIELDS.forEach(([k]) => {
-      if (o[k]) out[k] = clean(o[k]);
+      if (o[k]) out[k] = clean2(o[k]);
     });
-    out.label = clean(o.label, 50) || "Fresh pick";
-    if (o.why) out.why = clean(o.why, 220);
+    out.label = clean2(o.label, 50) || "Fresh pick";
+    if (o.why) out.why = clean2(o.why, 220);
     if (!out.top && !out.dress) return null;
     if (!F2.outfits || F2.outfits.day !== dayKey()) F2.outfits = { day: dayKey(), list: [] };
     F2.outfits.list = [...F2.outfits.list, out].slice(-2);
@@ -49894,7 +49978,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     attachLetters(col, () => {
       if (lettersOpen && !/^(ltText|ltDate)$/.test(document.activeElement?.id || "")) ctx();
     });
-    setTimeout(() => writeReplies(sampleCap), 6e3);
+    setTimeout(() => {
+      writeReplies(sampleCap);
+      writeLetters();
+    }, 6e3);
     attachRoutines(col, () => {
       if (routOpen && !/^(rtName|rtNew|rtPaste)$/.test(document.activeElement?.id || "") && !document.activeElement?.dataset?.day && !document.activeElement?.dataset?.item) ctx();
     });
@@ -52459,6 +52546,11 @@ Then tell chat "wind down" whenever you're ready.`
     return nameWords(n).filter((w) => l.includes(w)).length >= Math.min(2, nameWords(n).length || 9);
   };
   function thankNote(t2) {
+    if (t2.text) return `${t2.who === "evan" ? "Dear Mama" : "Dear Mel"},
+
+${t2.text}
+
+${SIGNOFF[t2.who] || ""}`;
     const it = ITEMS[t2.item] || { n: "present", say: "" }, line = it.kind === "bouquet" ? BQ_NOTE[t2.who] || "They're beautiful." : it.says && it.says[t2.who] || it.say || "";
     let open2;
     if (it.wrapped) {
@@ -52470,6 +52562,52 @@ Then tell chat "wind down" whenever you're ready.`
 ${open2} ${line}
 
 ${SIGNOFF[t2.who] || ""}`;
+  }
+  var FAM_WHO = {
+    darren: "Darren, Mel's husband: easy-going, practical, few words, quietly sweet and a bit cheeky",
+    evan: "Evan, Mel and Darren's two-year-old son. Daddy holds the pencil and writes down exactly what he says: tiny excited sentences, toddler words",
+    mama: "Ma Ma, Mel's grandma, who keeps the orchard: very loving, Singaporean, a little Singlish, calls Mel 'ah girl', always asks if she's eaten",
+    gonggong: "Gong Gong, Mel's grandpa: gentle, few words, calls himself 'Gong Gong' in the third person, likes the news on TV and helping Ma Ma",
+    mum: "Mum, Mel's mum: bubbly, always off to Pilates, Zumba or volunteering, calls Mel 'darling', always tells her to eat",
+    dad: "Dad, Mel's dad: soft-hearted, into music (piano, double bass) and drawing, says 'love you, have a good day'",
+    marcus: "Marcus, Mel's brother, a banker who loves games: teasing, calls her 'Zeh', short and funny, secretly very fond of her",
+    angelina: "Angellina, Marcus's fiancée, studying for her master's in psychology: warm, bright, a little self-deprecating about exams"
+  };
+  var undashT = (s) => String(s || "").replace(/\s*[\u2013\u2014]\s*/g, ", ").replace(/ ,/g, ",").trim();
+  var thanksBusy = false;
+  async function writeThanks() {
+    if (thanksBusy || !sampleCap || !sampleCap.json) return 0;
+    const t0 = Date.now(), todo = (F.thanks || []).filter((t2) => !t2.text && FAM_WHO[t2.who] && t2.at > t0 - 36e5);
+    if (!todo.length) return 0;
+    thanksBusy = true;
+    let n = 0;
+    try {
+      for (const t2 of todo) {
+        const it = ITEMS[t2.item] || { n: "a present" }, inner = it.wrapped && it.inner && ITEMS[it.inner];
+        const past = (F.thanks || []).filter((x) => x.who === t2.who && x.text && x.id !== t2.id).slice(-4).map((x) => x.text).join("\n---\n");
+        const hint = (inner || it).says && (inner || it).says[t2.who] || (inner || it).say || "";
+        const r = await sampleCap.json(`Write a short thank-you note for a cosy family game, from ${FAM_WHO[t2.who]}, to Mel, for a gift she sent them: ${it.wrapped ? `a parcel ${(/wrapped in (.+ paper)$/.exec(it.n) || [])[1] ? "in " + /wrapped in (.+ paper)$/.exec(it.n)[1] : "in pretty paper"}, with ${(inner || it).n} inside` : it.n}.${hint ? ` (Something they might say about it, for flavour only, don't copy it: "${hint}")` : ""}
+${past ? `Their last notes to Mel (say something new, in different words; no repeated phrases or jokes):
+${past}
+` : ""}Write only the note's body: no greeting and no sign-off. One to three sentences, under 55 words, specific to the gift, in their own voice. British spelling. No em dashes or en dashes. Warm and happy.
+Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch((err) => {
+          if (err && err.code === "not_granted") throw err;
+          return null;
+        });
+        const text = undashT(r && r.text);
+        if (text.length < 8) continue;
+        t2.text = text.slice(0, 400);
+        n++;
+      }
+    } catch {
+    }
+    thanksBusy = false;
+    if (n) save2();
+    return n;
+  }
+  async function writeLetters() {
+    await writeThanks();
+    if (await writePenReplies(F, sampleCap)) save2();
   }
   var thanksMail = () => (F.thanks || []).filter((t2) => t2.at <= Date.now()).map((t2) => ({ id: t2.id, from: "postie", at: t2.at, title: `Thank you from ${GIFT_NAME[t2.who] || "someone"}`, body: thankNote(t2) }));
   function giveGift(id, chosen) {
@@ -57676,6 +57814,13 @@ ${SIGNOFF[t2.who] || ""}`;
         setTimeout(() => speak(onPedestals(F).length ? "The courtyard. Look at all this. You did that." : "The courtyard. Your first trophy goes on a pedestal.", 4e3), 900);
       }
       if (id === "orchard" || id === "flowers") orchardArrive(id);
+      if (id === "mill") {
+        const l = millEnter(F, dayKey());
+        if (l) {
+          save2();
+          setTimeout(() => speak(l, 6500), 1100);
+        }
+      }
       if (id === "cellar") {
         const l = cellarEnter(F, dayKey());
         if (l) {
@@ -61134,6 +61279,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       speak(n.some((e) => e.kind === "universe") ? "A letter from the universe has arrived. It's in your letterbox at home." : "A letter from your past self just arrived in your letterbox.", 6e3);
     }
     if (Math.random() < 0.2) writeReplies(sampleCap);
+    writeLetters();
   }, 3e4);
   setInterval(checkTrophies, 3e4);
   setTimeout(checkTrophies, 4e3);

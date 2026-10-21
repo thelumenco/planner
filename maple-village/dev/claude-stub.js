@@ -49,6 +49,8 @@ window.__mapleDevStub = true;   // dev only: lets test scripts jump between scen
   sample.json = async (prompt) => {
     window.__lastPrompt = String(prompt);
     if (/Write Mel's weekly visualisation back to her/.test(String(prompt))) return {summary: "Spacious. The week opens in front of you like a held breath let go. You send the Voice Pass email without overthinking it.", theme: "Room to breathe", word: "Spacious", actions: [{title: "Send the Voice Pass email", why: "I sent the Voice Pass email"}]};
+    if (/Write a short thank-you note for a cosy family game/.test(String(prompt))) return {text: "Written note: the kopi was perfect \u2014 thank you, love."};   // round 249
+    if (/Write a reply letter for a cosy village game/.test(String(prompt))) return {body: "Written letter: the parcel arrived, and so did the sun.", ps: "P.S. More soon."};
     if (/You are Mel's personal stylist/.test(String(prompt))) return {label: "Emerald easy day", dress: "Emerald wrap midi dress", shoes: "Black ballet flats", bag: "Black crossbody", jewellery: "Silver hoops", hair: "up, low bun", why: "Soft, fitted and cool-toned for a relaxed day."};
     const m = /\nMel: ([^\n]*)\nReturn JSON only/.exec(String(prompt)); if (!m) return {};
     const t = m[1].toLowerCase(), acts = [];

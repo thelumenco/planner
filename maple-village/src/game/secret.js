@@ -46,15 +46,22 @@ export function cellarEnter(F, day){
   if (s.step === 0) { advance(s, 1, day); return "The candle on the high table keeps leaning sideways, as if something's breathing. Maple's nose is pressed to the barrel racks."; }
   if (!fresh(s, day) || s.said === day) return null; s.said = day;
   if (s.step === 1) return "That draught again, from behind the barrel racks. Maple won't leave them alone.";
-  if (s.step === 2) return "T.R. 1912, scratched in the old bricks. Where else have you seen those initials?";
+  if (s.step === 2) return "T.R. 1912, scratched in the old bricks. The same initials are carved in the beam at the old mill. Maple looks at you as if to say: the mill?";
   if (s.step === 3) return "Where the stone turns, the key sleeps. The old millstone?";
   if (s.step === 4) return "The iron key's heavy in your pocket. The loose brick, perhaps?";
+  return null;
+}
+// walking up to the old mill mid-trail on a new day -> a nudge from Maple, or null
+export function millEnter(F, day){
+  const s = secretState(F); if (!fresh(s, day) || s.millSaid === day) return null;
+  if (s.step === 2) { s.millSaid = day; return "Maple trots straight to the old photograph by the mill door, and sits, tail sweeping. Tap the photograph."; }
+  if (s.step === 3) { s.millSaid = day; return "Where the stone turns, the key sleeps. Maple's pawing at the old millstone by the press."; }
   return null;
 }
 // tapping the barrel racks: the bricks (step 1 -> 2 on a later day) -> line or null (null: open the barrel panel as usual)
 export function racksTap(F, day){
   const s = secretState(F);
-  if (s.step === 1 && fresh(s, day)) { advance(s, 2, day); return "You roll the end barrel aside. Behind the racks the plaster's crumbled away: old bricks, cold air whistling through, and one brick scratched with T.R. 1912."; }
+  if (s.step === 1 && fresh(s, day)) { advance(s, 2, day); return "You roll the end barrel aside. Behind the racks the plaster's crumbled away: old bricks, cold air whistling through, and one brick scratched with T.R. 1912. Tomás Ruiz carved those same initials at the old mill. Sleep on it, and tomorrow have a look round the mill."; }
   if (s.step === 1) return null;
   return null;
 }
@@ -63,13 +70,16 @@ export function brickTap(F, day){
   const s = secretState(F);
   if (s.step === 4) { advance(s, 5, day); return "The scratched brick slides out. Behind it: a keyhole, crusted with rust. The iron key turns, stiff, then all at once. A narrow door groans open onto a stone passage, worn smooth by feet long gone, and a breath of cool air that smells of old oak and the sea."; }
   if (s.step >= 5) return null;
-  if (s.step === 3) return "T.R. 1912. You still need that key: where the stone turns...";
+  if (s.step === 3) return "T.R. 1912. You still need that key: where the stone turns... The old millstone, by the mill's press?";
+  if (s.step === 2 && !fresh(s, day)) return "T.R. 1912. The brick moves, just a little, but it won't come out. Tomás's initials are carved at the old mill too: have a look there tomorrow.";
+  if (s.step === 2) return "T.R. 1912. The brick won't budge. Tomás left his mark at the old mill too: the old photograph by the mill door, perhaps?";
   return "T.R. 1912. Tomás Ruiz? The railwayman who planted the olive tree by the mill, Ines's great-great-grandfather. His initials are carved in the beam at the old mill too. You run a finger over the brick: it moves, just a little.";
 }
 // the old photograph at the mill (step 2 -> 3 on a later day) -> line or null (null: the usual story)
 export function photoTap(F, day){
   const s = secretState(F);
-  if (s.step === 2 && fresh(s, day)) { advance(s, 3, day); return "You lift the old photograph off its nail. On the back, in faded brown ink: \"Where the stone turns, the key sleeps. T.R.\""; }
+  if (s.step === 2 && fresh(s, day)) { advance(s, 3, day); return "You lift the old photograph off its nail. On the back, in faded brown ink: \"Where the stone turns, the key sleeps. T.R.\" The stone that turns: the old millstone, by the press."; }
+  if (s.step === 2) return "The old photograph: the mill in 1912, and a man on a ladder mending the sails. You've had enough secrets for one day. Come back tomorrow and look again.";   // Mel: it said nothing when it was too early
   return null;
 }
 // the millstone (step 3 -> 4 the same day or later) -> line or null

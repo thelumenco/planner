@@ -89,6 +89,7 @@ export function giftKind(id){
 const nm = id => { const it = ITEMS[id]; if (!it) return "present"; const n = it.n.replace(/^(A|An|The) /, ""); return /^\S+ [A-Z]/.test(n) ? n : n.replace(/^./, c => c.toLowerCase()); };
 // the reply, in their own voice
 export function replyBody(e){
+  if (e.reply && e.reply.body) return writtenReply(e);
   const d = DEF[e.to], p = PEN[e.to], h = hash(e.id), first = (d.name || "").split(" ")[0];
   const fill = s => String(s || "").replace(/\{it\}/g, e.item ? nm(e.item) : "letter");
   let body;
@@ -109,6 +110,43 @@ export function replyBody(e){
   if (e.offer && ITEMS[e.offer]) body += `\n\n${offerLine(e.to, e.offer)}`;
   return `${body}\n\n${p ? p.sign : `Warmly, ${first}`}`;
 }
+// round 249 (Mel: the letters "need to be a bit more varied... write it instead of it being like a template"): each
+// reply is written fresh by Claude in that person's voice, knowing the gift, Mel's own words and their last few letters
+// to her, and kept on the entry (e.reply = {body, ps}); replyBody falls back to the lines above until it's written.
+const undash = s => String(s || "").replace(/\s*[\u2013\u2014]\s*/g, ", ").replace(/ ,/g, ",");
+const clean = s => undash(s).replace(/\r/g, "").replace(/\n{3,}/g, "\n\n").trim();
+function penPrompt(F, e){
+  const d = DEF[e.to], p = PEN[e.to] || {}, it = e.item && ITEMS[e.item], inner = it && it.wrapped && it.inner && ITEMS[it.inner], first = (d.name || "").split(" ")[0];
+  const voice = p.voice || `${d.name}, ${d.job || "someone Mel met on her travels"}. How they talk: ${[d.intro, ...(d.lines || []).slice(0, 5)].filter(Boolean).map(x => `"${x}"`).join(" ")}`;
+  const samples = [p.open && p.open[0], p.food, p.drink, p.other, p.letter, ...(p.news || []).slice(0, 2)].filter(Boolean).slice(0, 4).map(x => `- ${String(x).replace(/\{it\}/g, "present")}`).join("\n");
+  const past = bookState(F).sent.filter(x => x.to === e.to && x.id !== e.id && x.at < e.at && x.reply).slice(-3).map(x => x.reply.body).join("\n---\n");
+  const what = it ? `Mel posted ${first} a gift: ${(inner || it).n}${it.wrapped ? `, wrapped in ${(/wrapped in (.+ paper)$/.exec(it.n) || [])[1] || "pretty paper"}` : ""}.${(inner || it).say ? ` (What it is: ${(inner || it).say})` : ""}` : "Mel wrote a letter.";
+  const words = [e.open, e.text].filter(Boolean).join(" ");
+  const long = !!p.own;
+  return `Write a reply letter for a cosy village game, as ${first}, to Mel (Melody), the player.
+Who ${first} is and how they write: ${voice}
+${samples ? `A few lines in their voice, for tone only (do NOT reuse them or their images):\n${samples}\n` : ""}
+${what}${words ? `\nMel's own words: "${words}"` : ""}
+${e.back && ITEMS[e.back] ? `${first} has tucked a little ${ITEMS[e.back].n} into the envelope; mention it naturally.\n` : ""}${past ? `${first}'s last letters to Mel (say something new; don't repeat their news, jokes, images or openings):\n${past}\n` : ""}
+Write the letter body only: no "Dear Mel" greeting and no signature. ${long ? "Three to five paragraphs, about 180 to 260 words: thank her for the gift in a fresh, specific way (or answer her letter), then some new news from their life, something different from before. Also write a separate one-line P.S." : "Two to four sentences, about 40 to 80 words: thank her in their own way (or answer her letter), plus one small bit of fresh news. A P.S. only if it suits them."}
+British spelling. No em dashes or en dashes anywhere. Warm and joyful; nothing sad, no illness or loss. Don't invent quotations.
+Return JSON only: {"body": "...", "ps": "P.S. ... (or empty)"}`;
+}
+let penBusy = false;
+// write any replies still waiting (on their way, or arrived in the last hour) -> how many were written
+export async function writePenReplies(F, sample, t = now()){
+  if (penBusy || !sample || !sample.json) return 0;
+  const todo = bookState(F).sent.filter(e => !e.reply && DEF[e.to] && e.at > t - 3600e3); if (!todo.length) return 0;
+  penBusy = true; let n = 0;
+  try { for (const e of todo) {
+    const r = await sample.json(penPrompt(F, e), {modelTier: "default", cache: false}).catch(err => { if (err && err.code === "not_granted") throw err; return null; });
+    const body = clean(r && r.body); if (body.length < 20) continue;
+    e.reply = {body: body.slice(0, 2400), ps: /^P\.?S/i.test(clean(r.ps)) ? clean(r.ps).slice(0, 300) : ""}; n++;
+  } } catch {}
+  penBusy = false; return n;
+}
+const writtenReply = e => { const d = DEF[e.to], p = PEN[e.to], first = (d.name || "").split(" ")[0];
+  return `${(p && p.dear) || "Dear Mel,"}\n\n${e.reply.body}\n\n${p ? p.sign : `Warmly, ${first}`}${e.reply.ps ? `\n\n${e.reply.ps}` : ""}${e.offer && ITEMS[e.offer] ? `\n\n${offerLine(e.to, e.offer)}` : ""}`; };
 export const bookMail = (F, t = now()) => bookState(F).sent.filter(e => e.at <= t && DEF[e.to]).map(e => ({id: e.id, from: "postie", at: e.at,
   title: `${e.item ? "Thank you" : "A letter"} from ${DEF[e.to].name}${e.back && ITEMS[e.back] ? " (with something tucked in)" : ""}`, body: replyBody(e)}));
 // a reply's tucked-in thing goes into the backpack once it's arrived
