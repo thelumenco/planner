@@ -81,10 +81,12 @@ function vineyardPage(){
       [`Saturdays, ${hm(DISCO_FROM)} to ${hm(DISCO_TO)}`, "Disco night in the cellar (once it's built): a packed floor and thirsty dancers."],
       ["Sundays", "The long lunch on the terrace (once it's built), and the terrace's other occasions: guests order whole bottles and plates."],
       ["20 November to Boxing Day", "Mulled wine by the cup, from the big pot in the <a href=\"/kitchen-and-tapas#mulled-wine\">kitchen</a>."]])
+    + h3("sunday-lunch", "The Sunday long lunch") + `<p>Once the terrace is built, every Sunday from 12 to 3 one long table of 12 fills with people who've booked: villagers, families up for the day, tourists, now and then a birthday party, and two of your closest friends (anyone at five hearts, taking turns). The <b>bookings book</b> on the lectern by the terrace doors shows who's coming next Sunday, filling up as the week goes on, so you can stock the shelves to suit. Its other tabs show trivia, sip and paint, weddings and the special days.</p>
+    <p>At lunch the tables order whole bottles (a pair gets through about one an hour, and they lean to the dearer bottles) and plates from the kitchen. Be out on the terrace yourself while they eat and you're hosting: they order half as much again, and tip on every bottle.</p>`
     + `<p class="muted">With the Scoop Shack's <a href="/scoop-shack#bike">delivery bike</a>, Tomo also takes tapas, small plates and bottles round to people's homes and picnics.</p>`;
   const search = Object.entries(VY.STYLES).map(([k, s]) => ({t: `${s.n} wine`, d: `Wine: ${dur(s.dur)} in the barrel, ${s.price} coins a bottle`, a: "/vineyard-and-wine#wine-" + k}))
     .concat([{t: "Riddling rack", d: "Sparkling wine on the rack fetches more", a: "/vineyard-and-wine#riddling"}, {t: "Cellar door", d: `${GOALS.cellar.price} coins`, a: "/vineyard-and-wine#cellar"},
-      {t: "Wine club", d: "First Friday of the month, in the cellar door", a: "/vineyard-and-wine#evenings"}, {t: "Olive grove", d: `Vineyard stall, ${VY.SHOP.grove.price} coins`, a: "/vineyard-and-wine#stall-grove"}]);
+      {t: "Wine club", d: "First Friday of the month, in the cellar door", a: "/vineyard-and-wine#evenings"}, {t: "Sunday lunch", d: "The long table on the terrace, and the bookings book", a: "/vineyard-and-wine#sunday-lunch"}, {t: "Bookings book", d: "Who's coming to Sunday lunch", a: "/vineyard-and-wine#sunday-lunch"}, {t: "Olive grove", d: `Vineyard stall, ${VY.SHOP.grove.price} coins`, a: "/vineyard-and-wine#stall-grove"}]);
   return {slug: "vineyard-and-wine", title: "Vineyard and wine", section: "making", blurb: "Vines, barrels, every wine, the wine shop and its staff", html, search};
 }
 
@@ -224,7 +226,7 @@ function cocoaPage(){
   const boxes = ["box4", "box9", "box16"].filter(id => ITEMS[id]).map(id => [named(id, 22), coin(ITEMS[id].price)]);
   const html = lede(`Your chocolate shop on the bay, in what was a boarded-up shopfront. ${goal("cocoa")}. You make everything yourself, bean to bar: a wall of bars, a case of bonbons, and a kitchen out the back. ${who("amara")} serves at the counter; ${who("mateo")} is the kitchen hand.`)
     + h2("hours", "Opening hours", "clock")
-    + `<p>${hm(CC.OPEN)} to ${hm(CC.CLOSE)}, Tuesday to Sunday (Mondays too, once Lila joins). Customers buy bars off the wall and bonbons from the case, more often while you're serving. Bars start at ${coin(6)} and bonbons at ${coin(3)} each; set your own prices at the counter.</p>
+    + `<p>${hm(CC.OPEN)} to ${hm(CC.CLOSE)}, Tuesday to Sunday (Mondays too, once Lila joins). Customers buy bars off the wall and bonbons from the case, more often while you're serving. Bars start at ${coin(6)} and bonbons at ${coin(3)} each; set your own prices at the counter. You can watch them come in: a shopper looks at the case, looks at the wall, goes to the counter and leaves with a little paper bag. If the shelves are bare they look, shrug and leave empty-handed: time to restock.</p>
       <p>Mateo works Monday to Saturday, 9:30am to 4:30pm. He keeps the bar line going on his own, roasting, grinding, tempering and moulding whenever a station's free (he stops a kind at ${CC.WALL} bars on the wall), and keeps chocolate back on the bonbon shelf for you. With auto-buy on he orders a sack when the beans run out, never taking your coins below the floor you set.</p>`
     + h2("bean-to-bar", "Bean to bar", "chocolate")
     + T(["Step", ""], steps)
@@ -259,7 +261,7 @@ function giftPage(){
   const makers = Object.entries(GA.MAKERS).map(([id, m]) => ({id: "maker-" + id, cells: [named(m.item, 22), who(id), coin(ITEMS[m.item].price)]}));
   const paper = Object.entries(WR.STORE_PAPER).map(([k, p]) => [named("gw_" + k, 22, `${p.n} wrapping paper`), coin(p.price) + " a sheet"]);
   const ribbons = Object.entries(WR.RIBBONS).map(([k, r]) => [named("rb_" + k, 22, r.n), `${coin(r.price)} a reel of ${WR.REEL} bows`]);
-  const html = lede(`A little gift shop through a new door in the wine shop's corner. ${goal("giftshop")}. ${who("posy")} keeps it, ${hm(GS.GIFT_HOURS.from)} to ${hm(GS.GIFT_HOURS.to)}, every day but Monday; stand behind the till yourself and it's open, and people browse longer while you're chatting.`)
+  const html = lede(`A little gift shop through a new door in the wine shop's corner. ${goal("giftshop")}. ${who("posy")} keeps it, ${hm(GS.GIFT_HOURS.from)} to ${hm(GS.GIFT_HOURS.to)}, every day but Monday; stand behind the till yourself and it's open, and people browse longer while you're chatting. Shoppers come through the door now and then to look round; if the shelves are bare they shrug and leave, so keep them stocked.`)
     + h2("shelves", "The shelves", "bag")
     + `<p>Everything here is shared stock: a sale here is one fewer in your other shops. You can take anything off the displays for yourself, too.</p>`
     + T(["Display", "What's on it"], [["<b>The bonbon case</b>", "Filled from the <a href=\"/cocoa-room\">Cocoa Room</a>'s own display case. Have one, or box four."], ["<b>The chocolate shelf</b>", "Bars from the Cocoa Room's wall."],

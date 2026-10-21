@@ -10,6 +10,7 @@ import { LV_NAMES } from "../../src/data/lavender.js";
 import { TAPAS, SPECIALS, needText } from "../../src/game/kitchen.js";
 import { TRIP_HEARTS } from "../../src/game/quests.js";
 import { VAN_SEATS, LEG, legs } from "../../src/game/bellbird.js";
+import { STYLES as VSTYLES, SLOTS as VSLOTS } from "../../src/game/van.js";
 import { GOALS } from "../../src/game/goals.js";
 import { POSTAGE } from "../../src/game/contacts.js";
 import { PEN_LV } from "../../src/data/pen-lv.js";
@@ -168,12 +169,14 @@ function tripsPage(){
     <h2>${ico("b_koala", 22)} Bellbird Valley, by campervan</h2><p>Save up for the ${esc(GOALS.van.n.toLowerCase())} (${coin(GOALS.van.price)}), parked at its spot on the cottage lane. Open the road map on the dashboard: pick who's coming (${VAN_SEATS} seats, you included) and a stop, and off you drive. At each stop, tap the van to drive on to another stop or head home.</p>
     <ul class="plain"><li><b>Fuel:</b> ${LEG} coins a leg, plus 1 a leg for each friend, along the shortest way.</li><li><b>Times:</b> set off between ${hm(VAN[0][1].outFrom)} and ${hm(VAN[0][1].outTo)}; home by ${hm(VAN[0][1].backTo)}.</li>
       <li><b>The map</b> only shows what you've found: the stops you've been to, and the ones a road away from them. Valley Gate is there from the start.</li><li><b>The passport:</b> a stamp for every stop, ${VAN.length} in all, across ${andList(REGIONS.map(r => REGION_N[r]))}.</li></ul>
+    <h3>Doing up the van</h3><p>Inside the van, the mood board does it up your way: six things to dress, each in any of six styles (${andList(Object.values(VSTYLES).map(x => x.n))}). Buy a piece once and it's yours: swap between the styles you own freely, at no cost.</p>
+    ${table(["Thing", "Price for each style"], Object.values(VSLOTS).map(x => [`<b>${esc(x.n)}</b>`, coin(x.price)]))}
     <h2>${ico("letter", 22)} Pen friends</h2><p>People you meet on your travels (not the day-trippers) can go in your address book. Post them a gift (postage by how far: ${coin(2)} to ${coin(8)}) or a letter (free), and they write back in their own voice, now and then with a little something from home tucked in. Each place's page lists who writes back.</p>
     <h2>${ico("kite", 22)} Where to go</h2><h3>By train</h3><div class="cards">${TRAIN.map(([id, t]) => card(slug(id), t.n, sub(id, t), "xm_train")).join("")}</div>
     <h3>By ferry (the islands)</h3><div class="cards">${ISLES.map(([id, t]) => card(slug(id), t.n, sub(id, t), "water")).join("")}</div>
     <h2>${ico("b_koala", 22)} Bellbird Valley stops</h2>${regionCards}`;
   return {slug: "trips", title: "Trips", section: "trips", blurb: "Day trips by train, ferry, your own boat and the campervan: fares, times and who can come", html,
-    search: [{t: "Ferry", d: "Trips: by ferry from the foreshore jetty", a: "/trips"}, {t: "Ticket window", d: "Trips: Honeybrook station", a: "/trips"}, {t: "Campervan road trips", d: "Trips: Bellbird Valley", a: "/trips"}, {t: "Bellbird Valley", d: "Trips: by campervan", a: "/trips"}]};
+    search: [{t: "Ferry", d: "Trips: by ferry from the foreshore jetty", a: "/trips"}, {t: "Ticket window", d: "Trips: Honeybrook station", a: "/trips"}, {t: "Campervan road trips", d: "Trips: Bellbird Valley", a: "/trips"}, {t: "Bellbird Valley", d: "Trips: by campervan", a: "/trips"}, {t: "Campervan mood board", d: "Do up the van in six styles", a: "/trips"}]};
 }
 function islandsPage(){
   const html = lede(`Across the sea from the foreshore jetty. ${ISLES.length} islands by ferry, from the closest and cheapest to the longest crossing of all, and two you can sail to in your own boat.`)
