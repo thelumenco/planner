@@ -55,7 +55,7 @@ function shopArt(v){
   const n = Math.min(8, shelfStock(v)), bottles = Array.from({length: n}, (_, i) => `<rect x="${338 + i*5.5}" y="${170 - (i % 2)*2}" width="4" height="12" rx="1.5" style="fill:${i % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>`).join("");
   return `<g data-place="wineshop" aria-label="${esc(shopName(artCtx().F()))}"><ellipse class="hov" cx="390" cy="218" rx="86" ry="11" style="fill:var(--butter)"/>
     ${sk(`<rect x="318" y="118" width="144" height="96" style="fill:#F1E2C6"/><path d="M306 120 L340 78 H440 L474 120z" style="fill:#C46A4A"/>
-      <path d="M326 150 h50 l-4 12 h-42z M404 150 h50 l-4 12 h-42z" style="fill:#8E2C48"/><rect x="332" y="162" width="46" height="26" style="fill:#DCE8F0"/>${bottles}<rect x="410" y="162" width="38" height="26" style="fill:#DCE8F0"/>
+      <path d="M326 150 h50 l-4 12 h-42z M404 150 h50 l-4 12 h-42z" style="fill:#8E2C48"/><rect class="wglow" x="332" y="162" width="46" height="26" style="fill:#DCE8F0"/>${bottles}<rect class="wglow" x="410" y="162" width="38" height="26" style="fill:#DCE8F0"/>
       <path d="M376 214 v-40 a14 14 0 0 1 28 0 v40z" style="fill:#7B4A36"/><rect x="368" y="92" width="44" height="18" rx="3" style="fill:#FFFDF6"/>
       <circle cx="430" cy="206" r="9" style="fill:#A8754F"/><rect x="420" y="190" width="20" height="5" rx="2" style="fill:#A8754F"/>`,
       `<rect x="318" y="118" width="144" height="96"/><path d="M306 120 L340 78 H440 L474 120z"/><path d="M318 104 h144 M326 92 h128" opacity=".45"/>

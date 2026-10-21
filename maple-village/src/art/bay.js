@@ -88,8 +88,8 @@ export function bayArt(){
   const cocoa = `<g data-place="cocoa" aria-label="${ccName.replace(/[<&>"]/g, "")}"><ellipse class="hov" cx="396" cy="526" rx="70" ry="10" style="fill:var(--butter)"/>
     ${sk(`<path d="M318 432 L396 392 L474 432z" style="fill:#6B4430"/><rect x="326" y="432" width="140" height="84" style="fill:#C9A27E"/>
       <path d="M320 440 h152 l-6 14 h-140z" style="fill:#FFFDF6"/>${[0, 1, 2, 3, 4, 5].map(i => `<path d="M${324 + i*24} 440 h12 l-1 14 h-12z" style="fill:#6B4430"/>`).join("")}
-      <rect x="336" y="462" width="44" height="34" rx="3" style="fill:#F6EEE4"/>${[0, 1, 2, 3].map(i => `<circle cx="${344 + i*9}" cy="${486 - (i % 2)*4}" r="3.4" style="fill:${["#4A2E22", "#8A5A3A", "#F3E7C9", "#C2505F"][i]}"/>`).join("")}
-      <path d="M404 516 v-36 a12 12 0 0 1 24 0 v36z" style="fill:#4A2E22"/><rect x="438" y="468" width="22" height="26" rx="2" style="fill:#F6EEE4"/>`,
+      <rect class="wglow" x="336" y="462" width="44" height="34" rx="3" style="fill:#F6EEE4"/>${[0, 1, 2, 3].map(i => `<circle cx="${344 + i*9}" cy="${486 - (i % 2)*4}" r="3.4" style="fill:${["#4A2E22", "#8A5A3A", "#F3E7C9", "#C2505F"][i]}"/>`).join("")}
+      <path d="M404 516 v-36 a12 12 0 0 1 24 0 v36z" style="fill:#4A2E22"/><rect class="wglow" x="438" y="468" width="22" height="26" rx="2" style="fill:#F6EEE4"/>`,
       `<path d="M318 432 L396 392 L474 432z"/><rect x="326" y="432" width="140" height="84"/><path d="M320 440 h152 l-6 14 h-140z"/><rect x="336" y="462" width="44" height="34" rx="3"/>
       <path d="M404 516 v-36 a12 12 0 0 1 24 0 v36"/><circle cx="423" cy="500" r="1.4"/><rect x="438" y="468" width="22" height="26" rx="2"/><path d="M449 468 v26 M438 481 h22" opacity=".6"/>`)}
     ${sk(`<path d="M352 414 h88 v14 h-88z" style="fill:#FFFDF6"/>`, `<path d="M352 414 h88 v14 h-88z M364 414 l-6 -10 M428 414 l6 -10"/>`)}

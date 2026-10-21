@@ -18,7 +18,7 @@ const rail = (x1, x2, y) => sk(`<path d="M${x1} ${y-10} H${x2} M${x1} ${y-2} H${
   `<path d="M${x1} ${y-10} H${x2} M${x1} ${y-2} H${x2}"/>`);
 
 // the windmill: a white tower, a red cap, four sails turning slowly
-export const windmill = (x, y) => `<g pointer-events="none">${sk(`<path d="M${x-18} ${y} L${x-11} ${y-88} H${x+11} L${x+18} ${y}z" style="fill:#F6F1E8"/><path d="M${x-14} ${y-88} q14 -16 28 0z" style="fill:#B5443A"/><rect x="${x-5}" y="${y-22}" width="10" height="22" rx="4" style="fill:#8A6A52"/><rect x="${x-4}" y="${y-60}" width="8" height="9" rx="1" style="fill:#CFE0EE"/>`,
+export const windmill = (x, y) => `<g pointer-events="none">${sk(`<path d="M${x-18} ${y} L${x-11} ${y-88} H${x+11} L${x+18} ${y}z" style="fill:#F6F1E8"/><path d="M${x-14} ${y-88} q14 -16 28 0z" style="fill:#B5443A"/><rect x="${x-5}" y="${y-22}" width="10" height="22" rx="4" style="fill:#8A6A52"/><rect class="wglow" x="${x-4}" y="${y-60}" width="8" height="9" rx="1" style="fill:#CFE0EE"/>`,
     `<path d="M${x-18} ${y} L${x-11} ${y-88} H${x+11} L${x+18} ${y}z M${x-14} ${y-88} q14 -16 28 0z"/><rect x="${x-5}" y="${y-22}" width="10" height="22" rx="4"/>`)}
   <g><g filter="url(#wob)" style="stroke:var(--line)" stroke-width="1">${[0, 90, 180, 270].map(a => `<g transform="rotate(${a} ${x} ${y-94})"><rect x="${x-2}" y="${y-144}" width="4" height="50" style="fill:#8A6A52"/><rect x="${x+2}" y="${y-140}" width="12" height="40" style="fill:#FFFDF6"/><path d="M${x+2} ${y-130} h12 M${x+2} ${y-120} h12 M${x+2} ${y-110} h12" opacity=".5"/></g>`).join("")}<circle cx="${x}" cy="${y-94}" r="4" style="fill:#B5443A"/></g>
     <animateTransform attributeName="transform" type="rotate" from="0 ${x} ${y-94}" to="360 ${x} ${y-94}" dur="28s" repeatCount="indefinite"/></g></g>`;

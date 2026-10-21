@@ -44,9 +44,10 @@ export function house(id, x, y, w, h, wall, roof, label, tapeCol, extra){
   const rx = x - 9, rw = w + 18, apex = y - h*0.62;
   const roofP = `M${rx} ${y} L${x + w/2} ${apex} L${rx + rw} ${y}Z`;
   const dx = x + w/2 - 11, dy = y + h - 30;
+  const wg = id === "home" ? "" : ' class="wglow"';   // home's own windows already glow at night
   const art = `<path d="${roofP}" style="fill:${roof}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${wall}"/>
     <rect x="${dx}" y="${dy}" width="22" height="30" rx="10" style="fill:var(--wood)"/>
-    <rect x="${x+12}" y="${y+14}" width="20" height="18" rx="2" style="fill:var(--sky)"/><rect x="${x+w-32}" y="${y+14}" width="20" height="18" rx="2" style="fill:var(--sky)"/>`;
+    <rect${wg} x="${x+12}" y="${y+14}" width="20" height="18" rx="2" style="fill:var(--sky)"/><rect${wg} x="${x+w-32}" y="${y+14}" width="20" height="18" rx="2" style="fill:var(--sky)"/>`;
   const lines = `<path d="${roofP}"/><rect x="${x}" y="${y}" width="${w}" height="${h}"/>
     <rect x="${dx}" y="${dy}" width="22" height="30" rx="10"/><circle cx="${dx+16}" cy="${dy+16}" r="1.4"/>
     <rect x="${x+12}" y="${y+14}" width="20" height="18" rx="2"/><path d="M${x+22} ${y+14} v18 M${x+12} ${y+23} h20"/>

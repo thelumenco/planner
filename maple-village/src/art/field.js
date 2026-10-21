@@ -121,7 +121,7 @@ function grotto(open){
   const [x, y] = GROTTO_AT;
   return `<g data-place="xgrotto" aria-label="Santa's grotto"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="38" ry="9" style="fill:var(--butter)"/>
     ${sk(`<rect x="${x - 28}" y="${y - 34}" width="56" height="34" style="fill:#A8754F"/><path d="M${x - 34} ${y - 32} L${x} ${y - 58} L${x + 34} ${y - 32}z" style="fill:#7A1F3D"/><path d="M${x - 30} ${y - 35} L${x} ${y - 55} L${x + 30} ${y - 35} q-4 5 -8 1 q-4 5 -8 1 q-4 5 -8 1 q-4 5 -8 1 q-4 5 -8 1 q-4 5 -8 1 q-4 5 -8 1z" style="fill:#FFFDF6"/>
-      <rect x="${x - 8}" y="${y - 22}" width="16" height="22" rx="1.5" style="fill:#5A3A2A"/><rect x="${x + 12}" y="${y - 26}" width="11" height="10" rx="1" style="fill:${open ? "#FFE9A8" : "#9FB8C9"}"/>`,
+      <rect x="${x - 8}" y="${y - 22}" width="16" height="22" rx="1.5" style="fill:#5A3A2A"/><rect${open ? "" : ' class="wglow"'} x="${x + 12}" y="${y - 26}" width="11" height="10" rx="1" style="fill:${open ? "#FFE9A8" : "#9FB8C9"}"/>`,
       `<rect x="${x - 28}" y="${y - 34}" width="56" height="34"/><path d="M${x - 34} ${y - 32} L${x} ${y - 58} L${x + 34} ${y - 32}z"/><rect x="${x - 8}" y="${y - 22}" width="16" height="22" rx="1.5"/><rect x="${x + 12}" y="${y - 26}" width="11" height="10" rx="1"/>`)}
     ${open ? `<circle cx="${x + 17.5}" cy="${y - 22}" r="3" style="fill:#F2D3BC"/><path d="M${x + 14.5} ${y - 21} q3 5 6 0z" style="fill:#FFFDF6"/><path d="M${x + 14.5} ${y - 24} l3 -4 l3 4z" style="fill:#C8432F"/>` : ""}
     ${tapeLabel(x, y + 20, "Santa's grotto", "#F4C7CF", 9)}</g>`;

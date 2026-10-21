@@ -42,7 +42,7 @@ function choga(x, y, w, h, o = {}){
   const stones = Array.from({length: Math.floor(w*h/260)}, (_, i) => `<ellipse cx="${x + 6 + rnd(i + x)*(w - 12)}" cy="${y + 6 + rnd(i + y)*(h - 12)}" rx="${4 + rnd(i*3)*3}" ry="${3 + rnd(i*5)*2}" style="fill:${C.basalt3}" opacity=".7"/>`).join("");
   const dx = o.doorX || w/2;
   return shade(x, y, w, h) + sk(`<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:${C.basalt2}"/>${stones}
-    <rect x="${x + dx - 12}" y="${y + h - 34}" width="24" height="34" rx="2" style="fill:${o.door || C.wood}"/>${o.win !== false ? `<rect x="${x + (dx > w/2 ? 14 : w - 38)}" y="${y + 12}" width="22" height="16" rx="2" style="fill:#F3E7C8"/>` : ""}
+    <rect x="${x + dx - 12}" y="${y + h - 34}" width="24" height="34" rx="2" style="fill:${o.door || C.wood}"/>${o.win !== false ? `<rect class="wglow" x="${x + (dx > w/2 ? 14 : w - 38)}" y="${y + 12}" width="22" height="16" rx="2" style="fill:#F3E7C8"/>` : ""}
     <path d="M${rx} ${y + 4} q2 ${-roofH} ${rw/2} ${-roofH} q${rw/2 - 2} 0 ${rw/2} ${roofH}z" style="fill:${C.thatch}"/>${net}`,
     `<rect x="${x}" y="${y}" width="${w}" height="${h}"/><rect x="${x + dx - 12}" y="${y + h - 34}" width="24" height="34" rx="2"/><path d="M${rx} ${y + 4} q2 ${-roofH} ${rw/2} ${-roofH} q${rw/2 - 2} 0 ${rw/2} ${roofH}z"/>`)
     + (o.sign ? `<rect x="${x + dx - 26}" y="${y + 8}" width="52" height="13" rx="2" style="fill:#FFFDF6;stroke:var(--line)" stroke-width=".8" pointer-events="none"/><text x="${x + dx}" y="${y + 18}" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="8" fill="${o.signCol || C.ink}" pointer-events="none">${o.sign}</text>` : "");
@@ -201,7 +201,7 @@ function villageScreen(){
     ${[470, 498].map(x => `<rect x="${x}" y="612" width="6" height="28" style="fill:${C.basalt2};stroke:var(--line)" stroke-width=".8"/>`).join("")}</g>`;
   const station = `<g data-place="jjtrain" aria-label="Jeju station">${shade(338, 464, 164, 84)}
     ${sk(`<rect x="338" y="584" width="182" height="12" style="fill:#B9B0A4"/><rect x="338" y="478" width="164" height="70" style="fill:${C.basalt2}"/>${Array.from({length: 14}, (_, i) => `<ellipse cx="${346 + rnd(i + 9)*150}" cy="${486 + rnd(i + 19)*54}" rx="5" ry="3" style="fill:${C.basalt3}" opacity=".7"/>`).join("")}
-      <path d="M330 482 L420 450 L510 482z" style="fill:${C.blue}"/><rect x="404" y="512" width="30" height="36" style="fill:#5E7A8A"/><rect x="352" y="500" width="34" height="20" rx="2" style="fill:#F3E7C8"/><rect x="452" y="500" width="34" height="20" rx="2" style="fill:#F3E7C8"/>
+      <path d="M330 482 L420 450 L510 482z" style="fill:${C.blue}"/><rect x="404" y="512" width="30" height="36" style="fill:#5E7A8A"/><rect class="wglow" x="352" y="500" width="34" height="20" rx="2" style="fill:#F3E7C8"/><rect class="wglow" x="452" y="500" width="34" height="20" rx="2" style="fill:#F3E7C8"/>
       <rect x="396" y="548" width="46" height="36" style="fill:#E6DFCC"/>`, `<rect x="338" y="478" width="164" height="70"/><path d="M330 482 L420 450 L510 482z"/><rect x="404" y="512" width="30" height="36"/>`)}
     <rect x="384" y="484" width="72" height="14" rx="2" style="fill:#FFFDF6;stroke:var(--line)" stroke-width=".8"/><text x="420" y="494" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="9" fill="${C.ink}" pointer-events="none">제주 JEJU</text>
     ${lab(470, 572, "Station · trains home", "#C3DDF3", 10)}</g>`;

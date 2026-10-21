@@ -2696,3 +2696,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - **Dried cherries** all year at Ronda's mercado (towns.js `dried_cherry`, 5, sells back 2).
 - **Hokkaido cherries** at Haruko's market hall, June to August only (hokkaido-goods.js `hk_cherry` with `months: [6, 7, 8]`; hokkaido.js `goods()` hides seasonal goods out of their months).
 - Both are gelato ingredients (scoop.js `INGR`, word "Cherry") and so bonbon fillings too. `CLASSIC` names: any cherry with red wine is "Cherry & Red Wine"; any cherry with chocolate is "Black Forest". Test in "Wine and rum in the Scoop Shack".
+
+## Round 253: windows glow at night, till 11pm (Mel: "I want the windows of buildings to have the same light, the glow of the light that we have in our home until 11pm")
+- Window glass on outdoor buildings carries `class="wglow"` (tagged in 21 art files, mostly inside each file's window or house helper: scenes.js `house()` except home, buildings.js, hlane, bay, vineyard, field (Santa's grotto only when shut), hwoods, terrace, lavender, coast, bellbird-vines `shed`, tablelands, and every town-*.js). Kyoto's machiya have no glass to tag (lattice fronts), so Kyoto stays dark.
+- core.js `nightLights()` (already copying lamp glows above the dusk wash) clones each `.wglow` pane from 7pm to 11pm, filled warm yellow at 70% (so bottles, chocolates and the odd cat behind shop glass still show) with a soft 18% halo; steady, not pulsing, since Portovenere and Cinque Terre have 60 to 90 panes. Home's own windows are unchanged (duskArt).
+- Test: "Windows glow at night, till 11pm (round 253)".
