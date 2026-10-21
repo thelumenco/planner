@@ -4622,6 +4622,37 @@ if (want("\nEach animal sounds like itself (round 231)")) try {
   check(co.every(([, x]) => fx(x.snd)) && co.filter(([, x]) => x.snd === "purr").map(([k]) => k).join() === "kitten", "the villagers' little animals too: only the kitten purrs");
   check(!/sfx\("purr"\)/.test(readFileSync(new URL("../src/game/core.js", import.meta.url), "utf8")), "no pet is given the purr by default any more");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nWine in ice cream, and rum and raisin (round 231)")) try {
+  // the creator: wine as an ice cream ingredient; dark sailor's rum at Saltwick; raisins dried in the loft; rum and raisin
+  console.log("\nWine in ice cream, and rum and raisin (round 231)");
+  const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), lf = await import(new URL("../src/game/loft.js", import.meta.url));
+  const its = await import(new URL("../src/data/items.js", import.meta.url)), sw = await import(new URL("../src/data/saltwick.js", import.meta.url)), LV = await import(new URL("../src/data/loves.js", import.meta.url));
+  { const F = {inv: {}, vine: {}}; const v = vy.vineState(F); v.cellar = [{id: "c1", name: "Harbour Red", type: "red", n: 2}, {id: "c2", name: "Fizz", type: "sparkling", n: 1}];
+    check(!!vy.wineForScoop(F, "c1") && F.inv.wine_red === 1 && v.cellar[0].n === 1 && its.ITEMS.wine_red.kind === "ingredient" && sc.isIngr("wine_red"), "a bottle from the wine store goes to the backpack, for the Scoop Shack");
+    vy.wineForScoop(F, "c2"); check(F.inv.wine_sparkling === 1 && !v.cellar.find(c => c.id === "c2") && its.ITEMS.wine_sparkling.n === "Bottle of your sparkling wine", "the last bottle of a wine leaves the store");
+    check(Object.keys(vy.STYLES).every(k => its.ITEMS["wine_" + k] && its.ITEMS["wine_" + k].sell === vy.STYLES[k].price && sc.isIngr("wine_" + k)), "every style of your wine can go in a scoop, and sells for no more than on the shelf"); }
+  { const F = {coins: 0, inv: {}}; const s = sc.scoopState(F); s.fridge = {wine_red: 1, cherry: 1};
+    const r = sc.discover(F, ["wine_red", "cherry"]).recipe; check(r && /Red Wine/.test(r.name) && !r.dairy && !r.special, `wine makes a sorbet with fruit (${r && r.name})`); }
+  { const rum = sw.SW_GOODS.rum; check(rum && rum.price === 15 && rum.sell < rum.price && rum.shop === "sw_chandlery" && sc.isIngr("rum"), "dark sailor's rum at Saltwick's chandlery: 15 coins (it sells back for less)"); }
+  { const F = {inv: {}, towns: {cinque: 1}, cinque: {raisin: 1}}; const L = lf.loftState(F); L.rack = {at: Date.now() - 4*864e5, n: 6};
+    check(lf.takeRaisins(F).n === 6 && F.inv.raisins === 6 && !L.rack && !L.cask && sc.isIngr("raisins"), "grapes dried on the loft's racks can be kept as raisins: six bags");
+    L.rack = {at: Date.now() - 864e5, n: 6}; check(!lf.takeRaisins(F), "but not before their three days are up"); }
+  { const F = {coins: 0, inv: {}}; const s = sc.scoopState(F); s.fridge = {milk: 1, rum: 1, raisins: 1};
+    const r = sc.discover(F, ["milk", "rum", "raisins"]).recipe;
+    check(r && r.name === "Rum and Raisin" && r.special && r.col === sc.RR_COL && r.dairy, "milk, rum and raisins: Rum and Raisin, a special with its own colour");
+    check(sc.priceOf(s, "cone", r) === s.prices.cone + s.prices.special + sc.RR_EXTRA && sc.RR_EXTRA > 0, `and dearer than other specials (a cone: ${sc.priceOf(s, "cone", r)} coins)`);
+    sc.registerItems && sc.registerItems(F); const g = Object.keys(its.ITEMS).find(id => its.ITEMS[id].gel && (its.ITEMS[id].ings || []).includes("rum"));
+    check(g && LV.isLove("okada", g), "Mr Okada loves a rum and raisin"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`rum raisin pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.goals = {...(F.goals || {}), cellar: Date.now()}; F.vine = F.vine || {}; F.vine.cellar = [{id: "w1", name: "Cellar Red", type: "red", n: 3}]; window.__hbGame.save(); window.__hbScene("cellar"); });
+  await page.waitForTimeout(1200);
+  await page.locator('#world [data-spot="winewall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vy="scoopw"]', { timeout: 15000 });
+  await page.click('#ctx [data-vy="scoopw"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().inv.wine_red === 1 && window.__hbGame.F().vine.cellar[0].n === 2), "in the game: \"One for the Scoop Shack\" at the wine store puts a bottle in your backpack");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

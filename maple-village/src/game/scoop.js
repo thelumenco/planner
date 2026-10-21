@@ -57,6 +57,11 @@ export const INGR = {
   yuzu: ["Yuzu", "Yuzu", "#F3D34A"], hojicha: ["Hōjicha", "Hōjicha", "#A8754F"], mochi: ["Mochi", "Mochi", "#FBEFF2"], sakura: ["Sakura", "Sakura", "#F6C7D6"],   // from Kyoto (round 122)
   hallabong: ["Hallabong", "Hallabong", "#F28C28"], omija: ["Omija berries", "Omija", "#C8324A"],
   seasalt: ["Saltwick sea salt", "Sea Salt", "#E8EEF0"], seaweed: ["Dulse seaweed", "Seaweed", "#8A3E4A"], buckthorn: ["Sea buckthorn", "Sea Buckthorn", "#F29A2E"], hkmilk: ["Hokkaido milk", "Hokkaido Milk", "#FFFBF2"], hkmelon: ["Furano melon", "Melon", "#F2A65A"], sweetcorn: ["Sweetcorn", "Sweetcorn", "#F3D34A"], cacao_bl: ["Balinese cacao", "Bali Cacao", "#5A3A2A"], salak: ["Snake fruit", "Salak", "#E8D3A0"], lemongrass: ["Lemongrass", "Lemongrass", "#D9E3A8"],   // from Saltwick Harbour (round 215)
+  // round 231: a bottle of your own wine (taken from the cellar's wine store), Saltwick's dark rum, and raisins dried in the loft
+  wine_red: ["Your red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Your rosé", "Rosé", "#E98AA0"], wine_white: ["Your white wine", "White Wine", "#E8D57A"],
+  wine_sparkling: ["Your sparkling wine", "Sparkling Wine", "#F3E7B0"], wine_tempranillo: ["Your Tempranillo", "Tempranillo Wine", "#5A1630"],
+  wine_pinot: ["Your Pinot Noir", "Pinot Noir", "#8A2E3E"], wine_chardonnay: ["Your Chardonnay", "Chardonnay", "#E8C96A"],
+  rum: ["Sailor's dark rum", "Rum", "#8A4A1E"], raisins: ["Raisins", "Raisin", "#5A2E3A"],
   pinenuts: ["Pine nuts", "Pine Nut", "#F3E7C8"], limoncino: ["Your limoncino", "Limoncino", "#F6E27A"],   // from Cinque Terre (round 132; basil and lemon were already here)   // from Jeju (round 128; tangerines come in as an orchard fruit)
   wattleseed: ["Wattleseed", "Wattleseed", "#8A5A3A"], raspberry: ["Raspberries", "Raspberry", "#D9435A"], goldensyrup: ["Golden syrup", "Golden Syrup", "#E8A83A"], honey_heath: ["Coastal heath honey", "Heath Honey", "#E3B04B"], honey_cream: ["Creamed honey", "Creamed Honey", "#F3E1A0"], honeycomb: ["Honeycomb", "Honeycomb", "#E8B04A"], euchoney: ["Eucalyptus honey", "Eucalyptus Honey", "#C98A2E"], macadamia: ["Macadamias", "Macadamia", "#E8D9B8"], fingerlime: ["Finger limes", "Finger Lime", "#9CC45A"], honey_sun: ["Sunflower honey", "Sunflower Honey", "#E3B04B"],   // from the Tablelands (round 158)
     // from Bellbird Valley (round 142)
@@ -164,9 +169,14 @@ const NOTES = ["Best pandan ever. Sorry, only had coins for one! x", "For the li
 /* ---------- discovering flavours ---------- */
 const GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"], SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
 const POETIC = ["Dolphin Bay", "Jetty Sunset", "Village Green", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Harbour Dream", "Secret Garden", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
+// round 231: rum and raisins together are Rum and Raisin, a special of its own: its own name and colour, marked special
+// from the start, and dearer than other specials (RR_EXTRA on top of the special surcharge)
+export const isRumRaisin = ings => { const f = (ings || []).filter(i => !["milk", "goatmilk", "yoghurt", "egg"].includes(i)); return f.length === 2 && f.includes("rum") && f.includes("raisins"); };
+export const RR_EXTRA = 2, RR_COL = "#C98A4E";
 export function nameFor(ings){
   const dairy = isDairy(ings), flav = ings.filter(i => i !== "milk"), h = hash(ings.join("+"));
   if (!flav.length) return "Fior di Latte";
+  if (isRumRaisin(ings)) return dairy ? "Rum and Raisin" : "Rum and Raisin Sorbet";
   const style = (dairy ? GELATO : SORBET)[h % (dairy ? GELATO.length : SORBET.length)];
   if (flav.length === 1) return `${word(flav[0])} ${style}`;
   if (flav.length === 2) return `${word(flav[0])} & ${word(flav[1])} ${style}`;
@@ -188,7 +198,7 @@ export function discover(F, ings){
   if (!hasAll(s, ings)) return {msg: "The fridge is missing some of that."};
   if (churnFull(s)) return {msg: `The churner's full: two batches are blending and freezing. The next one's ready in ${churnLeft(s.churn[0])}.`};
   useAll(s, ings);
-  const r = {id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: isDairy(ings), special: false, found: Date.now()};
+  const rr = isRumRaisin(ings), r = {id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: rr ? RR_COL : blend(ings), dairy: isDairy(ings), special: rr, found: Date.now()};
   s.recipes.push(r); toChurn(s, r.id, true); registerItems(F);
   return {recipe: r, msg: `A new flavour: ${r.name}! It's in the churner now: blending, then freezing. The first tub's ready in an hour.`};
 }
@@ -225,7 +235,7 @@ export function makeTub(F, rid){
 }
 
 /* ---------- customers ---------- */
-export const priceOf = (s, fmt, r) => s.prices[fmt] + (r && r.special ? s.prices.special : 0);
+export const priceOf = (s, fmt, r) => s.prices[fmt] + (r && r.special ? s.prices.special + (isRumRaisin(r.ings) ? RR_EXTRA : 0) : 0);
 const DEFAULT = 4 + 4 + 6 + 7;
 function saleMinute(s, day, hm, opts){
   const box = !openNow(hm) && hasUp(s, "honesty") && honestyOpen(hm); if (!openNow(hm) && !box) return null;
@@ -401,7 +411,7 @@ export function menuPanel(F, st){
   const s = scoopState(F), step = k => `<span class="gstep"><button class="btn small alt" data-gprice="${k}:-1" aria-label="Cheaper">−</button><b>${s.prices[k]}</b><button class="btn small alt" data-gprice="${k}:1" aria-label="Dearer">+</button></span>`;
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The menu</h2><p class="sub">Prices by type. A flavour marked special costs a little extra.</p>
     <ul class="hlist wlist gprices">${Object.keys(FORMATS).map(f => `<li><span class="wtxt"><b>${FORMATS[f].n}</b><small>${f === "float" ? "a scoop in a fizzy float" : f === "waffle" ? "a scoop on a warm waffle" : "one scoop"}</small></span>${step(f)}</li>`).join("")}
-    <li><span class="wtxt"><b>Special surcharge</b><small>added to anything in a special flavour</small></span>${step("special")}</li>${hasUp(s, "dip") ? `
+    <li><span class="wtxt"><b>Special surcharge</b><small>added to anything in a special flavour (Rum and Raisin takes ${RR_EXTRA} more on top)</small></span>${step("special")}</li>${hasUp(s, "dip") ? `
     <li><span class="wtxt"><b>Chocolate dip</b><small>extra for a dipped cone or waffle</small></span>${step("dip")}</li><li><span class="wtxt"><b>Topping</b><small>extra for a topping on a dipped one</small></span>${step("top")}</li>` : ""}</ul>`;
   h += s.recipes.length ? `<p class="eyebrow" style="margin:12px 0 6px">Flavours</p><ul class="hlist wlist gflav">${s.recipes.map(r => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id] ? s.tubs[r.id] + " scoops" : "sold out"}</small></span><label class="gspec"><input type="checkbox" data-gspecial="${esc(r.id)}" ${r.special ? "checked" : ""}> special</label></li>`).join("")}</ul>` : `<p class="muted">No flavours yet: discover some at the mixing bench in the kitchen.</p>`;
   h += `<form class="row hadd" data-gname="1"><label class="sr" for="gName">Shop name</label><input id="gName" name="n" maxlength="30" value="${esc(s.name)}"><button class="btn small alt">Rename</button></form>`;

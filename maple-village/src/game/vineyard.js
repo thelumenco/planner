@@ -325,6 +325,12 @@ const grapePic = c => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidd
 // The creator: "I thought I'd get extra space for stocking wines that I don't want to put on shelves yet". Bottled wine
 // waits in the cellar; at the cellar door's wine wall you can keep any of it down here (Ines and Marco leave kept wine
 // alone when they stock the shelves), put it on the shelves, or bring a wine on the shelves back down.
+// round 231: a bottle of your own wine for the Scoop Shack (wine sorbet, red wine and cherry...): one from the wine store
+// into the backpack, as an ingredient. It sells at the market for what it would on the shelf, never more.
+Object.entries(STYLES).forEach(([k, st]) => { ITEMS["wine_" + k] = {n: `Bottle of your ${st.n === "Rosé" ? "rosé" : st.n.match(/^(Red|White|Sparkling)$/) ? st.n.toLowerCase() + " wine" : st.n}`, kind: "ingredient", scoop: true, ico: "wine_" + k, sell: st.price, crafted: true, what: "your own wine, for a wine sorbet or gelato at the Scoop Shack"}; });
+export function wineForScoop(F, id){ const v = vineState(F), c = v.cellar.find(x => x.id === id); if (!c || !c.n || c.rack) return null;
+  c.n--; if (!c.n) v.cellar = v.cellar.filter(x => x !== c); F.inv = F.inv || {}; F.inv["wine_" + c.type] = (F.inv["wine_" + c.type] || 0) + 1;
+  return `A bottle of ${c.name}, into your backpack for the Scoop Shack.`; }
 export function keepWine(F, id, on){ const c = vineState(F).cellar.find(x => x.id === id); if (!c) return null; c.keep = !!on; return on ? `${c.name} stays down here till you say.` : `${c.name} can go out when Ines stocks the shelves.`; }
 export function unstock(F, id){ const v = vineState(F), s = v.shelf.find(x => x.id === id); if (!s || !s.n) return null;
   const c = v.cellar.find(x => x.id === id); if (c) c.n += s.n; else v.cellar.push({id: s.id, name: s.name, type: s.type, n: s.n, price: s.price, keep: true});
@@ -332,7 +338,7 @@ export function unstock(F, id){ const v = vineState(F), s = v.shelf.find(x => x.
 export function storePanel(F){
   const v = vineState(F), down = v.cellar.reduce((n, c) => n + c.n, 0), up = v.shelf.filter(s => s.n > 0);
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The wine store</h2><p class="sub">The racks behind the wine wall hold every bottle you're not selling yet: ${down} down here. Keep a wine here and Ines and Marco won't put it out; it waits till you take it up.</p>`;
-  h += v.cellar.length ? `<ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.keep ? " · kept down here" : ""}${c.rack ? " · on the riddling rack" : ""}</small><span class="actions" style="margin-top:6px"><button class="btn small primary" data-vy="stock" data-k="${esc(c.id)}">To the shelves</button>${c.rack ? "" : `<button class="btn small alt" data-vy="keepw" data-k="${esc(c.id)}" data-n="${c.keep ? 0 : 1}">${c.keep ? "Let it go out" : "Keep it here"}</button>`}</span></span></li>`).join("")}</ul>` : `<p class="muted">Nothing down here just now. Bottled wine comes to the cellar first.</p>`;
+  h += v.cellar.length ? `<ul class="hlist wlist">${v.cellar.map(c => `<li><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.keep ? " · kept down here" : ""}${c.rack ? " · on the riddling rack" : ""}</small><span class="actions" style="margin-top:6px"><button class="btn small primary" data-vy="stock" data-k="${esc(c.id)}">To the shelves</button>${c.rack ? "" : `<button class="btn small alt" data-vy="keepw" data-k="${esc(c.id)}" data-n="${c.keep ? 0 : 1}">${c.keep ? "Let it go out" : "Keep it here"}</button><button class="btn small alt" data-vy="scoopw" data-k="${esc(c.id)}">One for the Scoop Shack</button>`}</span></span></li>`).join("")}</ul>` : `<p class="muted">Nothing down here just now. Bottled wine comes to the cellar first.</p>`;
   if (up.length) h += `<p class="eyebrow">On the shelves upstairs</p><ul class="hlist wlist">${up.map(s => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${s.n} bottle${s.n === 1 ? "" : "s"} at ${s.price} each</small></span><button class="btn small alt" data-vy="unstock" data-k="${esc(s.id)}">Bring them down</button></li>`).join("")}</ul>`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
@@ -457,6 +463,7 @@ export function wireVine(root, F, api){
     else if (k === "keep") { const v = vineState(F), c = b.dataset.k; v.keep[c] = Math.max(0, Math.min(30, (v.keep[c] || 0) + +b.dataset.n)); }
     else if (k === "second") line = secondFerment(F, i);
     else if (k === "stock") { line = stock(F, b.dataset.k); if (line) api.sfx("paper"); }   // round 228: the wine store
+    else if (k === "scoopw") { line = wineForScoop(F, b.dataset.k); if (line) api.sfx("paper"); }
     else if (k === "keepw") { line = keepWine(F, b.dataset.k, b.dataset.n === "1"); api.sfx("tap"); }
     else if (k === "unstock") { line = unstock(F, b.dataset.k); if (line) api.sfx("paper"); }
     else if (k === "buybarrel") { const before = vineState(F).barrels.length; line = buy(F, "barrel"); if (line && vineState(F).barrels.length > before) api.sfx("coin"); }

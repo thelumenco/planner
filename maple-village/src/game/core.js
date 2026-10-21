@@ -75,7 +75,7 @@ import * as CRA from "./cracts.js";
 import * as TLA from "./tlacts.js";
 import * as LVA from "./lvacts.js";
 import { FIRE_FOLK } from "../data/bb-people.js";
-import { loftPanel, startBatch, collect as loftCollect, loftState } from "./loft.js";
+import { loftPanel, startBatch, collect as loftCollect, loftState, takeRaisins } from "./loft.js";
 import { cinqueRoomArt } from "../art/cinque-rooms.js";
 import { saltwickArt, swFerryRideArt } from "../art/town-saltwick.js";
 import { saltwickRoomArt } from "../art/saltwick-rooms.js";
@@ -875,6 +875,8 @@ function useItem(id){
   if (it.kind === "keepsake" && it.to) { giftPick = giftPick === id ? null : id; postPick = false; bag(); return; }   // round 197: a painting of hers, to give or to keep
   if (it.kind === "keepsake") { keepItem = id; openView = null; render(); return; }
   if (it.kind === "pet") { adoptItem = id; adoptSt = {}; openView = null; render(); return; }
+  // (round 231: your wine, the dark rum and raisins are for the Scoop Shack's fridge, not the kitchen)
+  if (it.kind === "ingredient" && it.scoop) { speak(`${it.n}: for the Scoop Shack. Stock it in the fridge there and mix a flavour with it.`, 4500); return; }
   if (it.kind === "ingredient") { toKitchen(id); return; }
   if (it.kind === "feed") { if (openView) { openView = null; ctx(); } speak("That's for the animals. Off to the run!", 3000); go("base", VILLAGE.run.door[0], VILLAGE.run.door[1], () => arriveVillageSpot("run")); return; }
   // a toy (the kite) is never used up: fly it on the field, and anywhere else it stays in the backpack (round 130)
@@ -1607,6 +1609,7 @@ function ctx(){
   c.querySelectorAll("[data-lf]").forEach(b => b.onclick = () => { const [a, k] = b.dataset.lf.split(":");
     if (a === "start") { if (!startBatch(F, k)) return; sfx(k === "pesto" ? "tap" : "paper", true); gainXp(1);
       speak({rack: "Six bunches laid out on the cane racks in the warm air. In three days they'll be raisins.", lemon: "Lemon peel into the bottle. Five days, and it'll be limoncino.", salt: "Layer of salt, layer of anchovies, layer of salt. Lid on. Four days.", pesto: "Pound, pound, pound: garlic, pine nuts, basil, cheese, a stream of your own olive oil. Two jars of bright green pesto."}[k], 5000); save(); }
+    else if (a === "raisins") { const r = takeRaisins(F); if (!r) return; sfx("chime"); gainXp(2); flash("6 × raisins"); speak("Six little bags of your own raisins, dark and sticky. Into the backpack. Rum and raisin, anyone?", 5000); save(); }
     else if (a === "collect") { const r = loftCollect(F, k); if (!r) return; sfx("chime"); gainXp(2); act("cheer");
       if (r.cask) speak("The grapes have shrivelled into sweet little raisins. Pressed, and into the cask for four days.", 5000); else { flash(`${r.n} × ${ITEMS[r.id].n.toLowerCase()}`); speak(r.id === "w_raisin" ? "Three bottles of amber raisin wine, sticky and sweet. A week of waiting, and worth every day." : `${ITEMS[r.id].n}, ready. Into the backpack.`, 5000); } save(); }
     ctx(); });
@@ -1795,7 +1798,7 @@ function bag(){
   const order = ["gift","food","ingredient","feed","flower","use","tool","seed"];
   ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
   $("bag").innerHTML = ids.map(id => { const it = ITEMS[id];
-    const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? "give to someone" : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed your pet" : it.kind === "ingredient" ? "send to the kitchen" : it.kind === "flower" ? "give" : "use";
+    const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? "give to someone" : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed your pet" : it.kind === "ingredient" ? (it.scoop ? "for the Scoop Shack" : "send to the kitchen") : it.kind === "flower" ? "give" : "use";
     // kitchen ingredients can go to the wine shop's larder instead (food can still be fed to the pet)
     // (not on flowers: a friend's picked tulips kept "vanishing" from the backpack, sent off to the kitchen larder by one
     // tap on this little chip. Flowers still go to the kitchen from the larder itself, or by the delivery bike.)

@@ -171,7 +171,8 @@ export function stockPantry(F, id, n, from, orch){
   const c = cocoaState(F); if (!isFilling(id)) return 0;
   if (from === "bag") { n = Math.min(n, (F.inv || {})[id] || 0); if (n <= 0) return 0; F.inv[id] -= n; if (F.inv[id] <= 0) delete F.inv[id]; }
   else { const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id; n = Math.min(n, orch.stock[key] || 0); if (n <= 0) return 0; orch.stock[key] -= n; if (orch.stock[key] <= 0) delete orch.stock[key]; }
-  c.pantry[id] = (c.pantry[id] || 0) + n; return n;
+  // (round 231: a bottle of your wine from the backpack fills as many bonbons as one brought from the wine shop's shelf)
+  c.pantry[id] = (c.pantry[id] || 0) + (from === "bag" && id in WINE_FILL ? n*WINE_FILLS : n); return n;
 }
 // take fillings back off the shelf (into the backpack, or flower stems back to the farm shop shelf); wine fillings stay
 export const unstockPantry = (F, id, n, orch) => id.startsWith("wine_") ? null : takeBack(cocoaState(F).pantry, id, n, F, orch);

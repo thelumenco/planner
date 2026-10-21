@@ -63,6 +63,7 @@ function vineyardPage(){
     + `<p>The olive tree by the path is ripe every ${dur(VY.OLIVE)}: ${VY.TREE_JARS} jars of olives. The grove along the top terrace gives ${VY.GROVE_JARS} jars a picking (twice that with the second row). Marco and Ines pick them on their shifts into the olive crate; take the crate for the kitchen, gelato, or the <a href="/olive-mill">olive mill</a>, which presses three jars into a bottle of oil.</p>`
     + h2("cellar", "The cellar door", "wine_sparkling")
     + `<p>${goal("cellar")}. ${esc(GOALS.cellar.line)}</p>`
+    + h3("wine-store", "The wine store") + `<p>Tap the wine wall in the cellar. Every bottle you've made comes down here first. <b>Keep it here</b> and the staff won't put that wine out on the shelves; <b>Bring them down</b> takes a wine back off the shelves upstairs. <b>One for the Scoop Shack</b> puts a bottle in your backpack, for a <a href="/scoop-shack#flavours">wine sorbet or gelato</a>.</p>`
     + h2("evenings", "Busy times", "calendar")
     + T(["When", "What happens"], [
       ["Sunday mornings", "The wine stall at the <a href=\"/field#sunday-market\">farmers market</a>, minded by Ines, selling from the shop's shelves. Serve there yourself and more people stop."],
@@ -176,10 +177,12 @@ function scoopPage(){
       <li>At the mixing bench, any 1 to 4 ingredients make a flavour. Every combination is a new one, and there's no such thing as a bad recipe.</li>
       <li>With milk, goat's milk or yoghurt it's a gelato; without, a dairy-free sorbet. Milk on its own is Fior di Latte. A flavour of one or two things is named after them (${esc(SC.nameFor(["milk", "strawberry"]))}, ${esc(SC.nameFor(["honey", "mint"]))}...); three or four get a name of their own.</li>
       <li>Every tub, a new flavour's first or another of one you know, goes into the churner for an hour (blending, then freezing). The churner holds ${SC.CHURNS} batches at once. A tub is ${SC.TUB} scoops, and another tub uses one of each ingredient again.</li>
+      <li>Your own wine goes in too: take a bottle from the cellar's <a href="/vineyard-and-wine#wine-store">wine store</a>. On its own it's a wine sorbet; with fruit or milk it's whatever you make of it.</li>
+      <li><b>Rum and Raisin</b> is a special of its own: Saltwick's dark rum (from Walter's chandlery) and raisins you dry in the loft, with milk. It has its own colour, starts out marked special, and sells for more than other specials. ${who("okada")} loves one.</li>
       <li>The display holds ${SC.SLOTS} flavours, and customers only buy what's in it. Arrange it yourself, or let it fill itself from what's in the freezer.</li></ul>`
     + h2("ingredients", "What can go in", "strawberry") + ingr
     + h2("menu", "The menu", "coin")
-    + `<p>Prices are set per format, and a flavour you mark as special costs ${coin(2)} more. These are the starting prices; change them on the menu.</p>`
+    + `<p>Prices are set per format, and a flavour you mark as special costs ${coin(2)} more (Rum and Raisin ${coin(2 + SC.RR_EXTRA)} more). These are the starting prices; change them on the menu.</p>`
     + T(["Format", "Starting price"], fmt)
     + `<p class="muted">Yours are free at the counter, or take one away to give.</p>`
     + h2("dips", "The dip station", "chocolate")

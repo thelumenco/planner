@@ -28,6 +28,8 @@ export const LOVES = {
       {id: "matcha", thanks: "Matcha. I shall use Grandmother's scoop. Slowly. She would rap my knuckles otherwise."},
       {id: "s_toast", thanks: "Postman's toast. So this is how it feels. Thank you, truly."},
       {id: "wagashibox", thanks: "Sweets from the lane. One meeting, one chance, she used to say. Here is another."}],
+    // round 231: rum and raisin (Saltwick's dark rum and raisins from the drying loft), the special at the Scoop Shack
+    combo: {what: "a rum and raisin ice cream", match: gel(i => i.includes("rum") && i.includes("raisins")), thanks: "Rum and raisin. The flavour of every seaside I posted a letter from. I shall eat it on the bench by the post box."},
     everyday: ["leek", "egg", "kuehlapis"]},
   juniper: {story: [
       {id: "minilantern", thanks: "One of Lior's lanterns. I'll read by it; quietly, at first."},

@@ -125,7 +125,8 @@ export function marketPanel(F){
   return head("The fish market", "Ruth's family have sold fish on this quay for four generations. Today's catch is chalked on the board, the lobsters are sulking in their tank, and Jack's shovelling ice.")
     + list(F, "sw_market") + `<p class="muted">"Clams? Friday's van at your bay has those. I do the things you can't get." Ruth winks.</p>` + shut;
 }
-export const chandleryPanel = F => head("The chandlery", "Walter's grandad opened the chandlery in 1931 and nothing's been thrown away since. Rope, lamps, oilskins, hooks, buttons, ganseys, and a brass bell over the door that rings when you breathe on it.") + list(F, "sw_chandlery") + shut;
+export const chandleryPanel = F => head("The chandlery", "Walter's grandad opened the chandlery in 1931 and nothing's been thrown away since. Rope, lamps, oilskins, hooks, buttons, ganseys, and a brass bell over the door that rings when you breathe on it.") + list(F, "sw_chandlery")
+  + `<p class="muted">"The dark rum's the kind the boats took to sea," says Walter. "For your Scoop Shack? Rum and raisin, then. My grandad's favourite. Dry your own grapes for the raisins, mind."</p>` + shut;   // round 231
 export const smokehousePanel = F => head("The smokehouse", "Sid splits the herring at dawn, salts them, and hangs them on the speats over smouldering oak for sixteen hours. \"No shortcuts,\" he says. \"The smoke knows.\"") + list(F, "sw_smokehouse") + shut;
 
 // the panel for each of Saltwick's room spots and outdoor activities

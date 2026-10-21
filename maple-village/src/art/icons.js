@@ -436,7 +436,7 @@ CR_BOUQUETS.forEach(b => { I[b.id] = [`<path d="M7.5 12.5l4.5 9.5 4.5-9.5z" ${f(
   // round 196: the makers' shelf in the gift shop (game/gallery.js)
   [["mk_cards", "tile", "#FFFDF6", "#F4C7CF"], ["mk_spoon", "disc", "#C9A27E", "#8A5A3A"], ["mk_pettoy", "tile", "#C3CDEE", "#F4C7CF"], ["mk_bird", "bird", "#C9A27E"], ["mk_honeybutter", "jar", "#F3D98A", "#FFFDF6"], ["mk_wraps", "cloth", "#F6E3A1", "#9EBE8C"]].forEach(([id, sh, a, b]) => { if (!I[id]) I[id] = (S[sh] || S.box)(a, b); });
   // round 132: what you make in the loft (game/loft.js)
-  [["w_raisin", "bottle", "#C98A2E", "#5A3A2E"], ["limoncino", "bottle", "#F3D34A", "#FFFDF6"], ["anchovy_salt", "jar", "#9FC3D9", "#F3ECDD"]].forEach(([id, sh, a, b]) => { if (!I[id]) I[id] = (S[sh] || S.box)(a, b); });
+  [["w_raisin", "bottle", "#C98A2E", "#5A3A2E"], ["limoncino", "bottle", "#F3D34A", "#FFFDF6"], ["anchovy_salt", "jar", "#9FC3D9", "#F3ECDD"], ["raisins", "jar", "#5A2E3A", "#F3ECDD"], ["rum", "bottle", "#5A2E1A", "#C98A4E"]].forEach(([id, sh, a, b]) => { if (!I[id]) I[id] = (S[sh] || S.box)(a, b); });
   I.wine_tempranillo = S.bottle("#5A1630"); I.wine_pinot = S.bottle("#8A2E3E"); I.wine_chardonnay = S.bottle("#E8C96A");
 }
 // round 109: greenhouse herbs, and shrimp from the sea

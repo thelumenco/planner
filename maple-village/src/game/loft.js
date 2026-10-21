@@ -16,6 +16,7 @@ const DAY = 24*H;
 Object.assign(ITEMS, {
   w_raisin: {n: "Your raisin wine", kind: "gift", to: ["theo", "mei", "hana", "bo", "tomi"], price: 36, sell: 36, crafted: true, say: "Your own raisin wine? Amber, like honey. You MADE this? Just a tiny glass. Maybe two.", what: "dried on the racks and aged in the cask: the slowest thing you make"},
   limoncino: {n: "Your limoncino", kind: "gift", to: ["hana", "farid", "posy", "bo"], price: 18, sell: 18, crafted: true, say: "Homemade limoncino from the orchard lemons! Into the freezer. Then a tiny glass.", what: "steeped from the orchard's lemons: for your friends, the market, or gelato"},
+  raisins: {n: "Raisins", kind: "ingredient", scoop: true, ico: "raisins", sell: 2, crafted: true, what: "your own grapes, dried on the loft's cane racks: rum and raisin at the Scoop Shack"},   // round 231
   anchovy_salt: {n: "Jar of salted anchovies", kind: "ingredient", price: 15, sell: 15, crafted: true, what: "packed in salt in the loft: anchovy and lemon toasts at the kitchen"}
 });
 export const LOFT = {
@@ -48,6 +49,11 @@ export function startBatch(F, k, now = Date.now()){
   if (k === "rack") { let n = 6; for (const g of GRAPES) { const t = Math.min(n, inv[g] || 0); if (t) { take(inv, g, t); n -= t; } } L.rack = {at: now, n: 6}; return true; }
   Object.entries(LOFT[k].need).forEach(([id, n]) => take(inv, id, n)); L[k] = {at: now}; return true;
 }
+// round 231: or take the dried grapes down as raisins (six bags), instead of into the cask -> {id, n} or null
+export function takeRaisins(F, now = Date.now()){
+  const L = loftState(F), b = L.rack; if (!b || left(b, now, LOFT.rack.days)) return null;
+  L.rack = null; F.inv = F.inv || {}; F.inv.raisins = (F.inv.raisins || 0) + 6; L.made.raisins = (L.made.raisins || 0) + 6; return {id: "raisins", n: 6};
+}
 // collect a finished batch -> {id, n} (or, for the rack, "cask": the raisins go into the cask), or null
 export function collect(F, k, now = Date.now()){
   const L = loftState(F), b = L[k]; if (!b || left(b, now, LOFT[k].days)) return null;
@@ -63,7 +69,7 @@ export function loftPanel(F, now = Date.now()){
   // the racks and the cask (raisin wine)
   if (!canRaisin(F)) h += row(F, "rack", "Raisin wine", "grape_white", "Help Signor Bruno with the harvest on the monorail in Corniglia, and he'll show you how.") + `</li>`;
   else if (L.cask) { const t = left(L.cask, now, LOFT.cask.days); h += row(F, "cask", "The little cask: raisin wine", "w_raisin", t ? `Ageing: ready in ${hrs(t)}.` : "Ready! Three bottles of amber raisin wine.") + `${t ? "" : `<button class="btn small primary" data-lf="collect:cask">Bottle it</button>`}</li>`; }
-  else if (L.rack) { const t = left(L.rack, now, LOFT.rack.days); h += row(F, "rack", "The cane racks: drying grapes", "grape_white", t ? `Six bunches, slowly turning to raisins: ${hrs(t)} to go.` : "Wrinkled and sweet: ready for the cask.") + `${t ? "" : `<button class="btn small primary" data-lf="collect:rack">Into the cask</button>`}</li>`; }
+  else if (L.rack) { const t = left(L.rack, now, LOFT.rack.days); h += row(F, "rack", "The cane racks: drying grapes", "grape_white", t ? `Six bunches, slowly turning to raisins: ${hrs(t)} to go.` : "Wrinkled and sweet: into the cask for raisin wine, or keep them as raisins (six bags, for rum and raisin at the Scoop Shack).") + `${t ? "" : `<span class="actions" style="margin-top:6px"><button class="btn small primary" data-lf="collect:rack">Into the cask</button><button class="btn small alt" data-lf="raisins:rack">Keep them as raisins</button></span>`}</li>`; }
   else { const m = missing(F, "rack"); h += row(F, "rack", "Raisin wine: lay grapes on the racks", "grape_white", `Six bunches of your grapes (from the barrel shed's crates). 3 days on the racks, then 4 in the cask: 3 bottles, 36 each.${m.length ? ` You need ${m.join(", ")}.` : ""}`) + `<button class="btn small primary" data-lf="start:rack" ${m.length ? "disabled" : ""}>Lay them out</button></li>`; }
   // the steeping shelf (limoncino) and the salting barrel (anchovies)
   for (const [k, title, pic, what] of [["lemon", "Limoncino", "limoncino", "Three lemons from the orchard, peeled and steeped for 5 days: 2 bottles, 18 each."], ["salt", "Salted anchovies", "anchovy_salt", "Six fresh anchovies from the sea, packed in salt for 4 days: 2 jars, 15 each."]]) {
