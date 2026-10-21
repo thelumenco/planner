@@ -164,11 +164,22 @@ export function hold(F, id, on){ const c = vineState(F).cellar.find(x => x.id ==
 export function unstock(F, id){ const v = vineState(F), s = v.shelf.find(x => x.id === id); if (!s || s.n < 1) return null;
   const c = v.cellar.find(x => x.id === id); if (c) { c.n += s.n; c.hold = true; } else v.cellar.push({id: s.id, name: s.name, type: s.type, n: s.n, hold: true});
   const n = s.n; s.n = 0; if (!s.open) v.shelf = v.shelf.filter(x => x !== s); return `${n} bottle${n === 1 ? "" : "s"} of ${s.name}, back down to the cellar.`; }
+// round 251 (Mel: wine as an ice cream ingredient): a bottle from the cellar goes in the backpack as a cooking wine for
+// the Scoop Shack's fridge. Grown-up flavours: Evan gets something else.
+export const KITCHEN_WINE = {red: "wine_red", pinot: "wine_red", tempranillo: "wine_red", rose: "wine_rose", white: "wine_white", chardonnay: "wine_white", sparkling: "wine_sparkling"};
+Object.assign(ITEMS, {
+  wine_red: {n: "Bottle of your red, for the kitchen", kind: "ingredient", price: 18, sell: 12, art: ["bottle", "#7A1F3D", "#F3E7C8"], what: "red wine gelato at the Scoop Shack (try it with dark chocolate)"},
+  wine_rose: {n: "Bottle of your rosé, for the kitchen", kind: "ingredient", price: 15, sell: 10, art: ["bottle", "#E98AA0", "#F3E7C8"], what: "a pink rosé sorbet at the Scoop Shack"},
+  wine_white: {n: "Bottle of your white, for the kitchen", kind: "ingredient", price: 16, sell: 10, art: ["bottle", "#E8D57A", "#F3E7C8"], what: "a white wine sorbet at the Scoop Shack (lovely with peach)"},
+  wine_sparkling: {n: "Bottle of your sparkling, for the kitchen", kind: "ingredient", price: 26, sell: 16, art: ["bottle", "#F3E7B0", "#2E3A34"], what: "a sparkling sorbet at the Scoop Shack (with lemon)"}
+});
+export function toKitchen(F, id){ const v = vineState(F), c = v.cellar.find(x => x.id === id), k = c && KITCHEN_WINE[c.type]; if (!k || c.n < 1) return null;
+  c.n--; if (!c.n) v.cellar = v.cellar.filter(x => x !== c); F.inv = F.inv || {}; F.inv[k] = (F.inv[k] || 0) + 1; return `A bottle of ${c.name} into your backpack, for the Scoop Shack's fridge.`; }
 export function cellarPanel(F){
   const v = vineState(F), down = v.barrels.length - BARRELS.shed;
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The cellar</h2><p class="sub">Cool, dark and quiet: wine waits down here until you want it upstairs. Anything you keep back stays here, and Celeste leaves it alone.</p>`;
   h += `<p class="eyebrow">In the cellar</p>` + (v.cellar.length ? `<ul class="hlist wlist">${v.cellar.map(c => `<li style="flex-wrap:wrap"><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES[c.type].n} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.hold ? " · kept back" : ""}${c.rack ? " · on the riddling rack" : ""}</small></span>
-      <span class="orbtns" style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end"><button class="btn small primary" data-vystock="${c.id}">To the shelves</button><button class="btn small alt" data-vyhold="${c.id}" data-on="${c.hold ? 0 : 1}">${c.hold ? "Let Celeste stock it" : "Keep it here"}</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing down here just now. Bottled wine comes here first.</p>`);
+      <span class="orbtns" style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end"><button class="btn small primary" data-vystock="${c.id}">To the shelves</button><button class="btn small alt" data-vyhold="${c.id}" data-on="${c.hold ? 0 : 1}">${c.hold ? "Let Celeste stock it" : "Keep it here"}</button><button class="btn small alt" data-vykitchen="${c.id}">A bottle for the ice cream</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing down here just now. Bottled wine comes here first.</p>`);
   const up = v.shelf.filter(s => s.n > 0);
   if (up.length) h += `<p class="eyebrow">Upstairs on the shelves</p><ul class="hlist wlist">${up.map(s => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${s.n} on the shelf</small></span><button class="btn small alt" data-vyunstock="${s.id}">Back down</button></li>`).join("")}</ul>`;
   const max = maxBarrels(F), p = shopPrice(v, "barrel");
@@ -473,6 +484,7 @@ export function wireVine(root, F, api){
   root.querySelectorAll("[data-vyfruit]").forEach(b => b.onclick = () => { const line = stockFruit(F, b.dataset.vyfruit); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyrack]").forEach(b => b.onclick = () => { const c = onRack(F, b.dataset.vyrack); if (c) { api.sfx("chime"); api.say(`${c.name}, neck-down on the riddling rack. A quarter turn a day, like Jono showed you. The longer it stays, the finer it gets.`); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyhold]").forEach(b => b.onclick = () => { const c = hold(F, b.dataset.vyhold, b.dataset.on === "1"); if (c) { api.sfx("paper"); api.say(c.hold ? `${c.name} stays in the cellar till you say so.` : `Celeste can put ${c.name} out when she's on.`); api.save(); api.rerender(); } });
+  root.querySelectorAll("[data-vykitchen]").forEach(b => b.onclick = () => { const line = toKitchen(F, b.dataset.vykitchen); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyunstock]").forEach(b => b.onclick = () => { const line = unstock(F, b.dataset.vyunstock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vystock]").forEach(b => b.onclick = () => { const line = stock(F, b.dataset.vystock); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyhelp]").forEach(inp => inp.onchange = () => { vineState(F).help[inp.dataset.vyhelp] = inp.checked; api.save(); });

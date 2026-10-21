@@ -142,7 +142,7 @@ import { moodPanel, vanPick, vanClear, lookLine as vanLookLine } from "./van.js"
 import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush, brushNearest, milkOne, milkHerd, collectHives, buyStand, giveName, fullHives,
   extractorPanel, crockPanel, pressPanel as hfPressPanel, cavePanel as hfCavePanel, spinFrames, makeYoghurt, pressCheese, takeWheel, cheeseNames, CHEESES as HF_CHEESES,
   gainTrust, muckOut, latchGate, catchGoat, nameHive, creamHoney, cutComb, turnWheels, finishRequest, stockShelf, hfTick, farmhousePanel, LEVELS as HF_LEVELS, MOODS as HF_MOODS } from "./hfarm.js";
-import { waiterOn, riderOn, scoopState, scoopTick, scoopNews, trolleyPanel, loadTrolley, returnTrolley, trolleySell, trolleyOn, trolleyMelted, TROLLEY, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, unstockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
+import { isAdult, waiterOn, riderOn, scoopState, scoopTick, scoopNews, trolleyPanel, loadTrolley, returnTrolley, trolleySell, trolleyOn, trolleyMelted, TROLLEY, registerItems, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, unstockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaNews, cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
   pantryPanel, bonbonPanel, casePanel, onDisplay as ccOnDisplay, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
@@ -3709,10 +3709,11 @@ function sitAt(seats){
 // a free ice cream at the counter: Mel has one (and Evan, if he's here)
 function haveIceCream(rid){
   const r = eatOne(F, rid); if (!r) return;
-  S.cone = {until: Date.now() + 4*M, col: r.col}; if (evanHere() && eatOne(F, rid) !== null) S.evanHold = {k: "icecream", until: Date.now() + 4*M};
+  const grown = isAdult(r);   // round 251: wine and rum flavours are for grown-ups; Evan gets a plain milk scoop from Sofia
+  S.cone = {until: Date.now() + 4*M, col: r.col}; if (evanHere() && (grown || eatOne(F, rid) !== null)) S.evanHold = {k: "icecream", until: Date.now() + 4*M};
   scView = null; scSt.pick = null; if (fieldView === "mstall8") fieldView = null; ctx(); sfx("chime"); act("cheer"); mprop("heart", mel.x, mel.y - 60, 1600);
   if (S.iceDay !== dayKey()) { S.iceDay = dayKey(); gainXp(1); }
-  speak(`${r.name}! ${evanHere() ? "Evan's got one too and it's already on his nose." : "Find a seat, or take it for a walk along the foreshore."}`, 5000);
+  speak(`${r.name}! ${evanHere() ? (grown ? "That one's for grown-ups, so Sofia gives Evan a little cup of plain milk gelato. He doesn't mind one bit." : "Evan's got one too and it's already on his nose.") : "Find a seat, or take it for a walk along the foreshore."}`, 5000);
   if (evanHere()) setTimeout(() => evanSays(pick(["ICE CREAM!!", "yummy yummy!", "it's so cold!"])), 900);
   save(); render();
 }

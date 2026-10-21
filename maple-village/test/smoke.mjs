@@ -4994,6 +4994,24 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // round 251 (Mel: "build the ice cream. And the rum. Where do I get raisin"): wine and rum gelato, grown-ups only
+  console.log("\nWine and rum in the Scoop Shack (round 251)");
+  const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
+  const lf = await import(new URL("../src/game/loft.js", import.meta.url)), sw = await import(new URL("../src/data/saltwick.js", import.meta.url)), { ITEMS } = await import(new URL("../src/data/items.js", import.meta.url));
+  check(sw.SW_GOODS.rum && sw.SW_GOODS.rum.shop === "sw_chandlery" && sw.SW_GOODS.rum.sell < sw.SW_GOODS.rum.price, "a sailors' dark rum behind the counter at Saltwick's chandlery (sells back for less than it costs)");
+  const F = {coins: 0, inv: {grape_red: 3, rum: 1, milk: 2, chocolate: 1}, towns: {cinque: "2026-10-01"}, cinque: {raisin: true}, vine: {cellar: [{id: "c1", name: "Lantern Red", type: "tempranillo", n: 2}]}};
+  const T0 = Date.parse("2026-10-20T02:00:00Z");
+  check(lf.startBatch(F, "tray", T0) && F.inv.grape_red === 1 && !lf.collect(F, "tray", T0 + 864e5) && lf.collect(F, "tray", T0 + 2*864e5 + 1).n === 2 && F.inv.raisins === 2, "two bunches on the loft's raisin tray, two days later: two bags of raisins");
+  check(/backpack/.test(vy.toKitchen(F, "c1")) && F.inv.wine_red === 1 && F.vine.cellar[0].n === 1, "a bottle from the cellar goes in the backpack for the ice cream");
+  ["raisins", "rum", "milk", "wine_red", "chocolate"].forEach(id => sc.stockFridge(F, id, 1, "bag"));
+  const a = sc.discover(F, ["milk", "raisins", "rum"]);
+  check(a.recipe && a.recipe.name === "Rum & Raisin Gelato" && a.recipe.special && sc.isAdult(a.recipe), `rum and raisin gelato, by its proper name (${a.recipe && a.recipe.name}), and a grown-up special`);
+  const b = sc.discover(F, ["wine_red", "chocolate"]);
+  check(b.recipe && /Red Wine & Chocolate/.test(b.recipe.name) && sc.priceOf(sc.scoopState(F), "cup", b.recipe) > sc.priceOf(sc.scoopState(F), "cup", {special: false}), `red wine and chocolate (${b.recipe && b.recipe.name}), a little dearer a scoop`);
+  sc.registerItems(F); const gid = Object.keys(ITEMS).find(k => ITEMS[k].gel && /Rum & Raisin/.test(ITEMS[k].n));
+  check(gid && Array.isArray(ITEMS[gid].to) && !ITEMS[gid].to.includes("evan"), "nobody gives Evan a rum and raisin cone");
+}
+{
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
   const missing = Object.entries(sd.STORIES).flatMap(([id, chs]) => chs.map((c, i) => i > 0 && !c.recap ? id + ":" + i : null).filter(Boolean));

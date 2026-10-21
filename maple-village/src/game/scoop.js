@@ -65,6 +65,9 @@ export const INGR = {
   hk_milk: ["Hokkaido milk", "Hokkaido Milk", "#FFFDF4"], hk_melon: ["Yubari melon", "Yubari Melon", "#F6A85A"],   // from Hokkaido (round 223)
   flordesal: ["Flor de sal", "Salted Caramel", "#D9A866"], fm_fig: ["Formentera figs", "Fig", "#8A5A7A"],   // from Formentera (round 232)
   housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
+  // round 251 (Mel: wine and rum in ice cream): grown-up flavours, a little dearer, never for Evan
+  wine_red: ["Your red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Your rosé", "Rosé", "#E98AA0"], wine_white: ["Your white wine", "White Wine", "#E8D57A"], wine_sparkling: ["Your sparkling", "Sparkling", "#F3E7B0"],
+  rum: ["Sailors' dark rum", "Rum", "#8A4A1E"], raisins: ["Raisins", "Raisin", "#6B3A2A"],
   goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
   yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"], honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"], honey_blossom: ["Orchard blossom honey", "Blossom Honey", "#F6D98A"],   // from Wildflower Farm's goats (hfarm.js): a dairy base, like milk   // from Mel's own chocolate shop (cocoa.js sendScoop)
   ...Object.fromEntries(Object.values(TREES).map(t => [t.fruit, [t.fruit[0].toUpperCase() + t.fruit.slice(1), t.fruit[0].toUpperCase() + t.fruit.slice(1), FRUIT_COL[t.fruit] || "#F3C969"]])),
@@ -168,10 +171,15 @@ const NOTES = ["Best pandan ever. Sorry, only had coins for one! x", "For the li
 /* ---------- discovering flavours ---------- */
 const GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"], SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
 const POETIC = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
+// the classics keep their proper names (round 251): rum and raisin, not raisin and rum
+const CLASSIC = {"raisins+rum": "Rum & Raisin", "chocolate+wine_red": "Red Wine & Chocolate", "housechoc+wine_red": "Red Wine & Chocolate", "lemon+wine_sparkling": "Sparkling Lemon", "peach+wine_white": "White Peach & Wine", "cherry+wine_red": "Cherry & Red Wine"};
+export const ADULT = ["wine_red", "wine_rose", "wine_white", "wine_sparkling", "rum"];
+export const isAdult = r => !!(r && (r.ings || []).some(i => ADULT.includes(i)));
 export function nameFor(ings){
   const dairy = isDairy(ings), flav = ings.filter(i => i !== "milk"), h = hash(ings.join("+"));
   if (!flav.length) return "Fior di Latte";
   const style = (dairy ? GELATO : SORBET)[h % (dairy ? GELATO.length : SORBET.length)];
+  const classic = CLASSIC[[...flav].sort().join("+")]; if (classic) return `${classic} ${dairy ? "Gelato" : "Sorbet"}`;
   if (flav.length === 1) return `${word(flav[0])} ${style}`;
   if (flav.length === 2) return `${word(flav[0])} & ${word(flav[1])} ${style}`;
   return `${POETIC[h % POETIC.length]} ${style}`;
@@ -192,7 +200,7 @@ export function discover(F, ings){
   if (!hasAll(s, ings)) return {msg: "The fridge is missing some of that."};
   if (churnFull(s)) return {msg: `The churner's full: two batches are blending and freezing. The next one's ready in ${churnLeft(s.churn[0])}.`};
   useAll(s, ings);
-  const r = {id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: isDairy(ings), special: false, found: Date.now()};
+  const r = {id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: isDairy(ings), special: ings.some(i => ADULT.includes(i)), found: Date.now()};   // grown-up flavours sell for the special's extra
   s.recipes.push(r); toChurn(s, r.id, true); registerItems(F);
   return {recipe: r, msg: `A new flavour: ${r.name}! It's in the churner now: blending, then freezing. The first tub's ready in an hour.`};
 }
@@ -295,7 +303,7 @@ function registerDip(s, id){
 export function registerItems(F){
   const s0 = scoopState(F); s0.dipIds.forEach(id => registerDip(s0, id)); Object.keys(F.inv || {}).filter(k => k.startsWith("gel_dip_")).forEach(id => registerDip(s0, id));
   s0.recipes.forEach(r => Object.keys(FORMATS).forEach(fmt => { const id = giftId(r, fmt);
-    ITEMS[id] = {n: `${r.name} ${FORMATS[fmt].n.toLowerCase()}`, kind: "gift", to: r.dairy ? NO_DAIRY : "family", tab: "scoop", ico: "ic_" + fmt, gel: true,
+    ITEMS[id] = {n: `${r.name} ${FORMATS[fmt].n.toLowerCase()}`, kind: "gift", to: isAdult(r) ? ["darren", "mum", "dad", "marcus", "angelina", "mama", "gonggong"].filter(w => !r.dairy || NO_DAIRY.includes(w)) : r.dairy ? NO_DAIRY : "family", tab: "scoop", ico: "ic_" + fmt, gel: true,
       say: `Ice cream! ${r.name}? Ooh, I've never had that one.`, says: {evan: "ICE CREAM!! *happy dance*", marcus: "A sorbet, so no tummy trouble. Nice one, Zeh.", mama: "Ice cream for Ma Ma? Aiyo, so cold! So nice.", dad: "Ah Gong loves ice cream. Don't tell your mum."}}; }));
 }
 export function takeAway(F, rid, fmt){

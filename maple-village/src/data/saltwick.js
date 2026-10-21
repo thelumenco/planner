@@ -169,6 +169,9 @@ export const SW_GOODS = {
   seasalt: {n: "Saltwick sea salt", kind: "ingredient", price: 4, sell: 2, shop: "sw_market", art: ["jar", "#F3F1EC", "#9FC3D9"], what: "a pinch in gelato or a bonbon: try it with dark chocolate"},
   dulse: {n: "Dulse seaweed", kind: "ingredient", price: 5, sell: 3, shop: "sw_market", art: ["bag", "#8A3A4A", "#C9A0A8"], what: "a savoury gelato, or a bonbon filling that tastes of the sea"},
   onion: {n: "Sweet onions", kind: "ingredient", price: 3, sell: 1, shop: "sw_market", art: ["apple", "#C99A5A", "#E8D3A8"], what: "Yorkshire puddings with onion gravy at the kitchen (a Saltwick special)"},
+  // round 251 (Mel: "rum as an item in a shop somewhere in a town"): Tom keeps a sailors' rum behind the counter, for
+  // rum and raisin gelato and rum truffle bonbons (grown-ups only)
+  rum: {n: "Sailors' dark rum", kind: "ingredient", price: 18, sell: 10, shop: "sw_chandlery", art: ["bottle", "#5A2E14", "#E8C96A"], what: "rum and raisin gelato at the Scoop Shack (with raisins from your drying loft), or a rum truffle bonbon"},
   sw_hat: {n: "Oilskin hat", kind: "gift", to: ["gonggong", "dad", "darren"], price: 18, shop: "sw_chandlery", art: ["beanie", "#E8C23A", "#C9A22E"], say: "A proper sou'wester! Yellow as a buttercup. It'll keep the rain off for forty years."},
   sw_rope: {n: "Rope bracelet", kind: "gift", to: "family", price: 6, shop: "sw_chandlery", art: ["roll", "#E8D9B8", "#3E6B8C"], say: "A rope bracelet with a sailor's knot! It smells of the sea. Not wearing it in the bath."},
   sw_ship: {n: "Ship in a bottle", kind: "keepsake", price: 24, shop: "sw_chandlery", art: ["bottle", "#CFE0EE", "#8A6A52"], line: "A tiny three-masted ship in a bottle, sails up, sailing nowhere at all. Tom says he still doesn't know how they get them in."},

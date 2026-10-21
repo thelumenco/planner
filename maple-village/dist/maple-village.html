@@ -4506,6 +4506,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     seasalt: { n: "Saltwick sea salt", kind: "ingredient", price: 4, sell: 2, shop: "sw_market", art: ["jar", "#F3F1EC", "#9FC3D9"], what: "a pinch in gelato or a bonbon: try it with dark chocolate" },
     dulse: { n: "Dulse seaweed", kind: "ingredient", price: 5, sell: 3, shop: "sw_market", art: ["bag", "#8A3A4A", "#C9A0A8"], what: "a savoury gelato, or a bonbon filling that tastes of the sea" },
     onion: { n: "Sweet onions", kind: "ingredient", price: 3, sell: 1, shop: "sw_market", art: ["apple", "#C99A5A", "#E8D3A8"], what: "Yorkshire puddings with onion gravy at the kitchen (a Saltwick special)" },
+    // round 251 (Mel: "rum as an item in a shop somewhere in a town"): Tom keeps a sailors' rum behind the counter, for
+    // rum and raisin gelato and rum truffle bonbons (grown-ups only)
+    rum: { n: "Sailors' dark rum", kind: "ingredient", price: 18, sell: 10, shop: "sw_chandlery", art: ["bottle", "#5A2E14", "#E8C96A"], what: "rum and raisin gelato at the Scoop Shack (with raisins from your drying loft), or a rum truffle bonbon" },
     sw_hat: { n: "Oilskin hat", kind: "gift", to: ["gonggong", "dad", "darren"], price: 18, shop: "sw_chandlery", art: ["beanie", "#E8C23A", "#C9A22E"], say: "A proper sou'wester! Yellow as a buttercup. It'll keep the rain off for forty years." },
     sw_rope: { n: "Rope bracelet", kind: "gift", to: "family", price: 6, shop: "sw_chandlery", art: ["roll", "#E8D9B8", "#3E6B8C"], say: "A rope bracelet with a sailor's knot! It smells of the sea. Not wearing it in the bath." },
     sw_ship: { n: "Ship in a bottle", kind: "keepsake", price: 24, shop: "sw_chandlery", art: ["bottle", "#CFE0EE", "#8A6A52"], line: "A tiny three-masted ship in a bottle, sails up, sailing nowhere at all. Tom says he still doesn't know how they get them in." },
@@ -7797,7 +7800,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     [["mk_cards", "tile", "#FFFDF6", "#F4C7CF"], ["mk_spoon", "disc", "#C9A27E", "#8A5A3A"], ["mk_pettoy", "tile", "#C3CDEE", "#F4C7CF"], ["mk_bird", "bird", "#C9A27E"], ["mk_honeybutter", "jar", "#F3D98A", "#FFFDF6"], ["mk_wraps", "cloth", "#F6E3A1", "#9EBE8C"]].forEach(([id, sh, a, b]) => {
       if (!I[id]) I[id] = (S4[sh] || S4.box)(a, b);
     });
-    [["w_raisin", "bottle", "#C98A2E", "#5A3A2E"], ["limoncino", "bottle", "#F3D34A", "#FFFDF6"], ["anchovy_salt", "jar", "#9FC3D9", "#F3ECDD"]].forEach(([id, sh, a, b]) => {
+    [["w_raisin", "bottle", "#C98A2E", "#5A3A2E"], ["raisins", "bag", "#6B3A2A", "#C9A27E"], ["limoncino", "bottle", "#F3D34A", "#FFFDF6"], ["anchovy_salt", "jar", "#9FC3D9", "#F3ECDD"]].forEach(([id, sh, a, b]) => {
       if (!I[id]) I[id] = (S4[sh] || S4.box)(a, b);
     });
     I.wine_tempranillo = S4.bottle("#5A1630");
@@ -19933,6 +19936,13 @@ ${r.n}`;
     fm_fig: ["Formentera figs", "Fig", "#8A5A7A"],
     // from Formentera (round 232)
     housechoc: ["Cocoa Room chocolate", "House Chocolate", "#3F2519"],
+    // round 251 (Mel: wine and rum in ice cream): grown-up flavours, a little dearer, never for Evan
+    wine_red: ["Your red wine", "Red Wine", "#7A1F3D"],
+    wine_rose: ["Your rosé", "Rosé", "#E98AA0"],
+    wine_white: ["Your white wine", "White Wine", "#E8D57A"],
+    wine_sparkling: ["Your sparkling", "Sparkling", "#F3E7B0"],
+    rum: ["Sailors' dark rum", "Rum", "#8A4A1E"],
+    raisins: ["Raisins", "Raisin", "#6B3A2A"],
     goatmilk: ["Goat's milk", "Goat's Milk", "#FFF8EC"],
     yoghurt: ["Yoghurt", "Yoghurt", "#FFF6F0"],
     honey_lav: ["Lavender honey", "Lavender Honey", "#E3C8E8"],
@@ -20075,10 +20085,15 @@ ${r.n}`;
   var GELATO = ["Gelato", "Cream", "Swirl", "Ripple", "Velvet", "Dream"];
   var SORBET = ["Sorbet", "Sorbetto", "Ice", "Frost"];
   var POETIC = ["Dolphin Bay", "Jetty Sunset", "Ma Ma's Garden", "Lantern Night", "Sea Breeze", "Sunday Picnic", "Orchard Morning", "First Light", "Evan's Dream", "Maple's Secret", "Night Market", "Low Tide", "Paddleboard", "Golden Hour", "Rainy Window", "Swan Lake", "Wildflower", "Porch Swing"];
+  var CLASSIC = { "raisins+rum": "Rum & Raisin", "chocolate+wine_red": "Red Wine & Chocolate", "housechoc+wine_red": "Red Wine & Chocolate", "lemon+wine_sparkling": "Sparkling Lemon", "peach+wine_white": "White Peach & Wine", "cherry+wine_red": "Cherry & Red Wine" };
+  var ADULT = ["wine_red", "wine_rose", "wine_white", "wine_sparkling", "rum"];
+  var isAdult = (r) => !!(r && (r.ings || []).some((i) => ADULT.includes(i)));
   function nameFor(ings) {
     const dairy = isDairy(ings), flav = ings.filter((i) => i !== "milk"), h3 = hash(ings.join("+"));
     if (!flav.length) return "Fior di Latte";
     const style = (dairy ? GELATO : SORBET)[h3 % (dairy ? GELATO.length : SORBET.length)];
+    const classic = CLASSIC[[...flav].sort().join("+")];
+    if (classic) return `${classic} ${dairy ? "Gelato" : "Sorbet"}`;
     if (flav.length === 1) return `${word(flav[0])} ${style}`;
     if (flav.length === 2) return `${word(flav[0])} & ${word(flav[1])} ${style}`;
     return `${POETIC[h3 % POETIC.length]} ${style}`;
@@ -20106,7 +20121,7 @@ ${r.n}`;
     if (!hasAll(s, ings)) return { msg: "The fridge is missing some of that." };
     if (churnFull(s)) return { msg: `The churner's full: two batches are blending and freezing. The next one's ready in ${churnLeft(s.churn[0])}.` };
     useAll(s, ings);
-    const r = { id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: isDairy(ings), special: false, found: Date.now() };
+    const r = { id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: isDairy(ings), special: ings.some((i) => ADULT.includes(i)), found: Date.now() };
     s.recipes.push(r);
     toChurn(s, r.id, true);
     registerItems(F2);
@@ -20296,7 +20311,7 @@ ${r.n}`;
       ITEMS[id] = {
         n: `${r.name} ${FORMATS[fmt7].n.toLowerCase()}`,
         kind: "gift",
-        to: r.dairy ? NO_DAIRY : "family",
+        to: isAdult(r) ? ["darren", "mum", "dad", "marcus", "angelina", "mama", "gonggong"].filter((w) => !r.dairy || NO_DAIRY.includes(w)) : r.dairy ? NO_DAIRY : "family",
         tab: "scoop",
         ico: "ic_" + fmt7,
         gel: true,
@@ -21541,11 +21556,27 @@ ${r.n}`;
     if (!s.open) v.shelf = v.shelf.filter((x) => x !== s);
     return `${n} bottle${n === 1 ? "" : "s"} of ${s.name}, back down to the cellar.`;
   }
+  var KITCHEN_WINE = { red: "wine_red", pinot: "wine_red", tempranillo: "wine_red", rose: "wine_rose", white: "wine_white", chardonnay: "wine_white", sparkling: "wine_sparkling" };
+  Object.assign(ITEMS, {
+    wine_red: { n: "Bottle of your red, for the kitchen", kind: "ingredient", price: 18, sell: 12, art: ["bottle", "#7A1F3D", "#F3E7C8"], what: "red wine gelato at the Scoop Shack (try it with dark chocolate)" },
+    wine_rose: { n: "Bottle of your rosé, for the kitchen", kind: "ingredient", price: 15, sell: 10, art: ["bottle", "#E98AA0", "#F3E7C8"], what: "a pink rosé sorbet at the Scoop Shack" },
+    wine_white: { n: "Bottle of your white, for the kitchen", kind: "ingredient", price: 16, sell: 10, art: ["bottle", "#E8D57A", "#F3E7C8"], what: "a white wine sorbet at the Scoop Shack (lovely with peach)" },
+    wine_sparkling: { n: "Bottle of your sparkling, for the kitchen", kind: "ingredient", price: 26, sell: 16, art: ["bottle", "#F3E7B0", "#2E3A34"], what: "a sparkling sorbet at the Scoop Shack (with lemon)" }
+  });
+  function toKitchen(F2, id) {
+    const v = vineState(F2), c = v.cellar.find((x) => x.id === id), k = c && KITCHEN_WINE[c.type];
+    if (!k || c.n < 1) return null;
+    c.n--;
+    if (!c.n) v.cellar = v.cellar.filter((x) => x !== c);
+    F2.inv = F2.inv || {};
+    F2.inv[k] = (F2.inv[k] || 0) + 1;
+    return `A bottle of ${c.name} into your backpack, for the Scoop Shack's fridge.`;
+  }
   function cellarPanel(F2) {
     const v = vineState(F2), down = v.barrels.length - BARRELS.shed;
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The cellar</h2><p class="sub">Cool, dark and quiet: wine waits down here until you want it upstairs. Anything you keep back stays here, and Celeste leaves it alone.</p>`;
     h3 += `<p class="eyebrow">In the cellar</p>` + (v.cellar.length ? `<ul class="hlist wlist">${v.cellar.map((c) => `<li style="flex-wrap:wrap"><span class="wpic">${bottleSVG(c.type)}</span><span class="wtxt"><b>${esc(c.name)}</b><small>${STYLES2[c.type].n} · ${c.n} bottle${c.n === 1 ? "" : "s"}${c.hold ? " · kept back" : ""}${c.rack ? " · on the riddling rack" : ""}</small></span>
-      <span class="orbtns" style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end"><button class="btn small primary" data-vystock="${c.id}">To the shelves</button><button class="btn small alt" data-vyhold="${c.id}" data-on="${c.hold ? 0 : 1}">${c.hold ? "Let Celeste stock it" : "Keep it here"}</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing down here just now. Bottled wine comes here first.</p>`);
+      <span class="orbtns" style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end"><button class="btn small primary" data-vystock="${c.id}">To the shelves</button><button class="btn small alt" data-vyhold="${c.id}" data-on="${c.hold ? 0 : 1}">${c.hold ? "Let Celeste stock it" : "Keep it here"}</button><button class="btn small alt" data-vykitchen="${c.id}">A bottle for the ice cream</button></span></li>`).join("")}</ul>` : `<p class="muted">Nothing down here just now. Bottled wine comes here first.</p>`);
     const up = v.shelf.filter((s) => s.n > 0);
     if (up.length) h3 += `<p class="eyebrow">Upstairs on the shelves</p><ul class="hlist wlist">${up.map((s) => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${s.n} on the shelf</small></span><button class="btn small alt" data-vyunstock="${s.id}">Back down</button></li>`).join("")}</ul>`;
     const max = maxBarrels(F2), p = shopPrice(v, "barrel");
@@ -22208,6 +22239,15 @@ ${r.n}`;
       if (c) {
         api4.sfx("paper");
         api4.say(c.hold ? `${c.name} stays in the cellar till you say so.` : `Celeste can put ${c.name} out when she's on.`);
+        api4.save();
+        api4.rerender();
+      }
+    });
+    root.querySelectorAll("[data-vykitchen]").forEach((b) => b.onclick = () => {
+      const line = toKitchen(F2, b.dataset.vykitchen);
+      if (line) {
+        api4.sfx("paper");
+        api4.say(line);
         api4.save();
         api4.rerender();
       }
@@ -44503,11 +44543,15 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   Object.assign(ITEMS, {
     w_raisin: { n: "Your raisin wine", kind: "gift", to: ["dad", "gonggong", "mum", "darren", "marcus"], price: 36, sell: 36, crafted: true, say: "Your own raisin wine? Amber, like honey. You MADE this? Just a tiny glass. Maybe two.", what: "dried on the racks and aged in the cask: the slowest thing you make" },
     limoncino: { n: "Your limoncino", kind: "gift", to: ["mum", "mama", "angelina", "darren"], price: 18, sell: 18, crafted: true, say: "Homemade limoncino from Ma Ma's lemons! Into the freezer. Then a tiny glass.", what: "steeped from Ma Ma's lemons: for the family, the market, or gelato" },
+    raisins: { n: "Bag of raisins", kind: "ingredient", price: 6, sell: 4, crafted: true, art: ["bag", "#6B3A2A", "#C9A27E"], what: "dried on the loft's raisin tray: rum and raisin gelato at the Scoop Shack" },
+    // round 251
     anchovy_salt: { n: "Jar of salted anchovies", kind: "ingredient", price: 15, sell: 15, crafted: true, what: "packed in salt in the loft: anchovy and lemon toasts at the kitchen" }
   });
   var LOFT = {
     rack: { n: "The cane drying racks", need: { grapes: 6 }, days: 3, then: "cask" },
     cask: { n: "The little cask", days: 4, gives: ["w_raisin", 3] },
+    tray: { n: "The raisin tray", need: { grapes: 2 }, days: 2, gives: ["raisins", 2] },
+    // round 251 (Mel: "where do I get raisin"): a quicker, smaller drying than the raisin wine's racks
     lemon: { n: "The steeping shelf", need: { lemon: 3 }, days: 5, gives: ["limoncino", 2] },
     salt: { n: "The salting barrel", need: { anchovy: 6 }, days: 4, gives: ["anchovy_salt", 2] },
     pesto: { n: "The mortar", need: { basil: 2, garlic: 1, pinenuts: 1, oliveoil: 1, cheese: 1 }, gives: ["pesto", 2] }
@@ -44549,8 +44593,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return true;
     }
     if (L3[k]) return null;
-    if (k === "rack") {
-      let n = 6;
+    if (k === "tray" && !canRaisin(F2)) return null;
+    if (k === "rack" || k === "tray") {
+      let n = LOFT[k].need.grapes;
       for (const g18 of GRAPES) {
         const t2 = Math.min(n, inv[g18] || 0);
         if (t2) {
@@ -44558,7 +44603,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
           n -= t2;
         }
       }
-      L3.rack = { at: now5, n: 6 };
+      L3[k] = { at: now5, n: LOFT[k].need.grapes };
       return true;
     }
     Object.entries(LOFT[k].need).forEach(([id, n]) => take2(inv, id, n));
@@ -44598,7 +44643,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       const m = missing(F2, "rack");
       h3 += row10(F2, "rack", "Raisin wine: lay grapes on the racks", "grape_white", `Six bunches of your grapes (from the barrel shed's crates). 3 days on the racks, then 4 in the cask: 3 bottles, 36 each.${m.length ? ` You need ${m.join(", ")}.` : ""}`) + `<button class="btn small primary" data-lf="start:rack" ${m.length ? "disabled" : ""}>Lay them out</button></li>`;
     }
-    for (const [k, title, pic3, what] of [["lemon", "Limoncino", "limoncino", "Three lemons from Ma Ma's tree, peeled and steeped for 5 days: 2 bottles, 18 each."], ["salt", "Salted anchovies", "anchovy_salt", "Six fresh anchovies from the sea, packed in salt for 4 days: 2 jars, 15 each."]]) {
+    for (const [k, title, pic3, what] of [...canRaisin(F2) ? [["tray", "Raisins on the tray", "raisins", "Two bunches of your grapes, spread on the little tray in the warm for 2 days: 2 bags of raisins, for rum and raisin gelato."]] : [], ["lemon", "Limoncino", "limoncino", "Three lemons from Ma Ma's tree, peeled and steeped for 5 days: 2 bottles, 18 each."], ["salt", "Salted anchovies", "anchovy_salt", "Six fresh anchovies from the sea, packed in salt for 4 days: 2 jars, 15 each."]]) {
       const b = L3[k], t2 = b ? left5(b, now5, LOFT[k].days) : 0, m = missing(F2, k);
       if (b) h3 += row10(F2, k, `${title}: ${t2 ? "on its way" : "ready!"}`, pic3, t2 ? `Ready in ${hrs4(t2)}.` : "Done. Take it down.") + `${t2 ? "" : `<button class="btn small primary" data-lf="collect:${k}">Take it</button>`}</li>`;
       else h3 += row10(F2, k, title, pic3, `${what}${m.length ? ` You need ${m.join(", ")}.` : ""}`) + `<button class="btn small primary" data-lf="start:${k}" ${m.length ? "disabled" : ""}>Start</button></li>`;
@@ -52307,7 +52352,7 @@ Then tell chat "wind down" whenever you're ready.`
       return;
     }
     if (it.kind === "ingredient") {
-      toKitchen(id);
+      toKitchen2(id);
       return;
     }
     if (it.kind === "feed") {
@@ -52466,7 +52511,7 @@ Then tell chat "wind down" whenever you're ready.`
     setTimeout(() => speak("Pandan chiffon and jasmine tea. Maple got the crumbs.", 4500), 2500);
     save2(true);
   }
-  function toKitchen(id) {
+  function toKitchen2(id) {
     const n = sendToKitchen(F, id);
     if (!n) return;
     sfx("paper", true);
@@ -55852,7 +55897,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       const k = ev.target.closest("[data-kit]");
       if (k) {
         ev.stopPropagation();
-        toKitchen(k.dataset.kit);
+        toKitchen2(k.dataset.kit);
         return;
       }
       useItem(b.dataset.id);
@@ -59511,8 +59556,9 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
   function haveIceCream(rid) {
     const r = eatOne(F, rid);
     if (!r) return;
+    const grown = isAdult(r);
     S3.cone = { until: Date.now() + 4 * M, col: r.col };
-    if (evanHere() && eatOne(F, rid) !== null) S3.evanHold = { k: "icecream", until: Date.now() + 4 * M };
+    if (evanHere() && (grown || eatOne(F, rid) !== null)) S3.evanHold = { k: "icecream", until: Date.now() + 4 * M };
     scView = null;
     scSt.pick = null;
     if (fieldView === "mstall8") fieldView = null;
@@ -59524,7 +59570,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       S3.iceDay = dayKey();
       gainXp(1);
     }
-    speak(`${r.name}! ${evanHere() ? "Evan's got one too and it's already on his nose." : "Find a seat, or take it for a walk along the foreshore."}`, 5e3);
+    speak(`${r.name}! ${evanHere() ? grown ? "That one's for grown-ups, so Sofia gives Evan a little cup of plain milk gelato. He doesn't mind one bit." : "Evan's got one too and it's already on his nose." : "Find a seat, or take it for a walk along the foreshore."}`, 5e3);
     if (evanHere()) setTimeout(() => evanSays(pick(["ICE CREAM!!", "yummy yummy!", "it's so cold!"])), 900);
     save2();
     render();
