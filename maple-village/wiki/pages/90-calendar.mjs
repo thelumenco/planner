@@ -8,6 +8,7 @@ import { XMAS, XMAS_FROM, XMAS_TO, XMAS_LIT, DATE_FROM, DATE_TO, CLUB_FROM, CLUB
 import { CLASS as CARD_CLASS } from "../../src/game/paperie.js";
 import { PUFFIN_MONTHS, PUP_MONTHS } from "../../src/data/puffin.js";
 import { SNOW_MONTHS, MUSICBOXES } from "../../src/data/hokkaido.js";
+import { FORAGE } from "../../src/game/woods.js";
 import { esc, table, ico, itemIcon, coin, lede, hm } from "../lib.mjs";
 
 const h2 = (id, t, icon) => `<h2 id="${id}">${icon ? ico(icon, 22) + " " : ""}${esc(t)}</h2>`;
@@ -27,9 +28,15 @@ function seasonsHTML(){
   const flowers = s => Object.entries(FLOWERS).filter(([, f]) => (f.seasons || []).includes(s)).map(([id]) => "bq_" + id);
   return lede("Honeybrook keeps the real calendar, on your own clock: the seasons, the days of the week and the special days all come round just as they do for you. Here's what happens when.")
   + h2("seasons", "The seasons", "sprout")
-  + `<p>Seasons follow the real months. When the season turns, Hana's seed packets change (anything already bought or planted carries on), the orchard and the flower farm come into their own seasons, and the tapas of the day change too. A greenhouse grows anything all year round.</p>`
+  + `<p>Seasons follow the real months. When the season turns:</p>
+    <ul class="plain"><li><b>The village changes colour.</b> The trees go blossom-pink in spring, deep green in summer, orange and russet in autumn and a quiet grey-green in winter, and the grass with them. The trip towns change with their own seasons too.</li>
+      <li><b>Hana's seed packets change.</b> Anything already bought or planted carries on and can still be harvested.</li>
+      <li><b>The orchard and the flower farm come into their own seasons.</b> A tree or a flower out of season rests, faded, until its season comes round again: nothing to pick from it till then, but nothing's lost, and you don't need to replant.</li>
+      <li><b>Foraging in <a href="/woods">Honeybrook Woods</a> changes</b> (see the tables below).</li>
+      <li><b>Villagers ask for what's in season</b> on the quest board, and the tapas of the day change too.</li></ul>
+    <p>A greenhouse grows anything all year round.</p>`
   + Object.entries(SEASONS).map(([s, S]) => h3(s, `${S.n}: ${SEASON_MONTHS[s]}`) + `<p class="muted">${esc(S.line)}.</p>`
-    + table(["", "In season"], [["<b>Seeds at the market</b>", icoList(seeds(s)) + (seeds(s).some(id => ITEMS[id].visited) ? `<br><small class="muted">${seeds(s).filter(id => ITEMS[id].visited).map(id => `${esc(ITEMS[id].n)} once you've visited ${esc(VISITED[ITEMS[id].visited] || ITEMS[id].visited)}`).join("; ")}.</small>` : "")], ["<b>Orchard fruit</b>", icoList(trees(s))], ["<b>Flower farm</b>", icoList(flowers(s)).replace(/Bouquet of (\w)/g, (m, c) => c.toUpperCase())]])).join("")
+    + table(["", "In season"], [["<b>Seeds at the market</b>", icoList(seeds(s)) + (seeds(s).some(id => ITEMS[id].visited) ? `<br><small class="muted">${seeds(s).filter(id => ITEMS[id].visited).map(id => `${esc(ITEMS[id].n)} once you've visited ${esc(VISITED[ITEMS[id].visited] || ITEMS[id].visited)}`).join("; ")}.</small>` : "")], ["<b>Orchard fruit</b>", icoList(trees(s))], ["<b>Flower farm</b>", icoList(flowers(s)).replace(/Bouquet of (\w)/g, (m, c) => c.toUpperCase())], ["<b>Foraging in the woods</b>", icoList([FORAGE[s].id])]])).join("")
   + h3("weather", "The weather")
   + `<p>The rainy months are November to January: roughly one day in three is a proper downpour (paddling's off), and another one in ten a light shower. The rest of the year a shower blows through about one day in seven: brollies up, nothing called off. Rain never lasts all day: a wet day has one spell of rain, half an hour to an hour, some time between 8am and 8pm.</p>`
   + h3("travel-seasons", "Seasons away from home")
