@@ -1060,6 +1060,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .elsecard h2{font-family:"Klee One",serif;font-weight:600;font-size:1.2rem;margin:0 0 8px}
 .elsecard p{margin:0 0 14px;color:#6B635B;line-height:1.5}
 
-/* round 231: "For the Scoop Shack" on the wine lists: a small one-line chip under the wine's name, like the backpack's kitchen chip */
+/* round 231: "Take a bottle" (for the Scoop Shack or the Cocoa Room) on the wine lists: a small one-line chip under the wine's name, like the backpack's kitchen chip */
 .scoopchip{display:block;width:max-content;margin-top:5px;padding:2px 10px;border:0;border-radius:999px;background:#F6E1EA;color:#7A2E4A;font:inherit;font-size:.7rem;font-weight:800;white-space:nowrap;cursor:pointer}
 .scoopchip:hover{background:#EFD0DC}

@@ -4630,6 +4630,8 @@ if (want("\nWine in ice cream, and rum and raisin (round 231)")) try {
   { const F = {inv: {}, vine: {}}; const v = vy.vineState(F); v.cellar = [{id: "c1", name: "Harbour Red", type: "red", n: 2}, {id: "c2", name: "Fizz", type: "sparkling", n: 1}];
     check(!!vy.wineForScoop(F, "c1") && F.inv.wine_red === 1 && v.cellar[0].n === 1 && its.ITEMS.wine_red.kind === "ingredient" && sc.isIngr("wine_red"), "a bottle from the wine store goes to the backpack, for the Scoop Shack");
     vy.wineForScoop(F, "c2"); check(F.inv.wine_sparkling === 1 && !v.cellar.find(c => c.id === "c2") && its.ITEMS.wine_sparkling.n === "Bottle of your sparkling wine", "the last bottle of a wine leaves the store");
+    { const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), G = {inv: {wine_red: 1}, goals: {cocoa: 1}}; cc.cocoaState(G);
+      check(cc.stockPantry(G, "wine_red", 1, "bag") === 1 && cc.cocoaState(G).pantry.wine_red === 4 && !G.inv.wine_red, "a bottle from the backpack goes in the Cocoa Room's pantry too, and fills four bonbons"); }
     v.shelf = [{id: "s1", name: "Shelf Rosé", type: "rose", n: 1, price: 15, open: 0}]; check(!!vy.shelfWineForScoop(F, "s1") && F.inv.wine_rose === 1 && !v.shelf.length, "or one off the shop's shelves, if it's all out for sale already");
     check(Object.keys(vy.STYLES).every(k => its.ITEMS["wine_" + k] && its.ITEMS["wine_" + k].sell === vy.STYLES[k].price && sc.isIngr("wine_" + k)), "every style of your wine can go in a scoop, and sells for no more than on the shelf"); }
   { const F = {coins: 0, inv: {}}; const s = sc.scoopState(F); s.fridge = {wine_red: 1, cherry: 1};
@@ -4653,7 +4655,7 @@ if (want("\nWine in ice cream, and rum and raisin (round 231)")) try {
   await page.waitForTimeout(1200);
   await page.locator('#world [data-spot="winewall"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vy="scoopw"]', { timeout: 15000 });
   await page.click('#ctx [data-vy="scoopw"]'); await page.waitForTimeout(300);
-  check(await page.evaluate(() => window.__hbGame.F().inv.wine_red === 1 && window.__hbGame.F().vine.cellar[0].n === 2), "in the game: \"For the Scoop Shack\" at the wine store puts a bottle in your backpack");
+  check(await page.evaluate(() => window.__hbGame.F().inv.wine_red === 1 && window.__hbGame.F().vine.cellar[0].n === 2), "in the game: \"Take a bottle\" at the wine store puts a bottle in your backpack");
   await page.evaluate(() => { const F = window.__hbGame.F(); F.vine.shelf = [{id: "s1", name: "Shelf Red", type: "red", n: 4, price: 18, open: 0}]; window.__hbGame.save(); window.__hbScene("wineshop"); }); await page.waitForTimeout(1200);
   await page.locator('#world [data-spot="wshelf"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vy="scoopws"]', { timeout: 15000 });
   await page.click('#ctx [data-vy="scoopws"]'); await page.waitForTimeout(300);

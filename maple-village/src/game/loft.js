@@ -16,7 +16,7 @@ const DAY = 24*H;
 Object.assign(ITEMS, {
   w_raisin: {n: "Your raisin wine", kind: "gift", to: ["theo", "mei", "hana", "bo", "tomi"], price: 36, sell: 36, crafted: true, say: "Your own raisin wine? Amber, like honey. You MADE this? Just a tiny glass. Maybe two.", what: "dried on the racks and aged in the cask: the slowest thing you make"},
   limoncino: {n: "Your limoncino", kind: "gift", to: ["hana", "farid", "posy", "bo"], price: 18, sell: 18, crafted: true, say: "Homemade limoncino from the orchard lemons! Into the freezer. Then a tiny glass.", what: "steeped from the orchard's lemons: for your friends, the market, or gelato"},
-  raisins: {n: "Raisins", kind: "ingredient", scoop: true, ico: "raisins", sell: 2, crafted: true, what: "your own grapes, dried on the loft's cane racks: rum and raisin at the Scoop Shack"},   // round 231
+  raisins: {n: "Raisins", kind: "ingredient", scoop: true, ico: "raisins", sell: 2, crafted: true, what: "your own grapes, dried on the loft's cane racks: rum and raisin at the Scoop Shack, or a bonbon filling at the Cocoa Room"},   // round 231
   anchovy_salt: {n: "Jar of salted anchovies", kind: "ingredient", price: 15, sell: 15, crafted: true, what: "packed in salt in the loft: anchovy and lemon toasts at the kitchen"}
 });
 export const LOFT = {
