@@ -136,7 +136,7 @@ function orchardPage(){
   const rows = Object.entries(TREES).map(([id, t]) => ({id: "tree-" + id, cells: [named(t.fruit, 24, t.n), seasonsText(t.seasons), coin(t.price), `${t.yield} ${esc(t.fn[1])} a day`, sell(t.fruit),
     t.unlock === "jeju" ? `<small>Only once Farid has brought a sapling home from Jeju</small>` : ""]}));
   const H_ = HF.HONEYS.map(x => x.n).join(", ").replace(/, ([^,]*)$/, " and $1");
-  const html = lede(`Farid's orchard, west of home through the gate. You buy the saplings and plant them; ${who("farid")} waters, tends and picks. Everything belongs to its seasons: when the season turns, a tree fades and its spot wants replanting.`)
+  const html = lede(`Farid's orchard, west of home through the gate. You buy the saplings and plant them; ${who("farid")} waters, tends and picks. Everything belongs to its seasons: when the season turns, a tree fades and its spot wants replanting. Tap a faded tree and plant something in season in its place (or buy from the farm shop: it goes into the first empty or faded spot). A tree that's still in season can be dug up too, with Undo, if you'd rather plant something else there.`)
     + h2("how", "How it works", "apple")
     + `<ul class="plain"><li>The orchard has 12 tree spots. Buy a sapling on the farm shop's Plant tab (it goes in the next free spot) or tap a spot.</li>
       <li>A sapling grows for ${dur(TREE_GROW)}, its first fruit ripens ${dur(TREE_FIRST)} after that, and then there's fruit again ${every(TREE_AGAIN)}.</li>
@@ -160,7 +160,7 @@ function orchardPage(){
 function flowerPage(){
   const rows = Object.entries(FLOWERS).map(([id, f]) => ({id: "flower-" + id, cells: [named("bq_" + id, 24, f.n), f.bush ? "Bush" : "Bed", seasonsText(f.seasons), coin(f.price), f.bush ? `${BUSH_YIELD} stems, ${every(BUSH_AGAIN)}` : `${BED_YIELD} stems, ${every(BED_AGAIN)}`]}));
   const spots = Object.values(POT_SPOTS).map(s => cap(s.n)).join("; ");
-  const html = lede(`Mei's flower farm, next to the orchard. Buy seedlings and bushes at the orchard's farm shop; ${who("mei")} plants them (and sings to them), waters them and cuts the stems. Like the trees, flowers live in their own seasons and fade when the season turns.`)
+  const html = lede(`Mei's flower farm, next to the orchard. Buy seedlings and bushes at the orchard's farm shop; ${who("mei")} plants them (and sings to them), waters them and cuts the stems. Like the trees, flowers live in their own seasons and fade when the season turns: plant something in season over a faded bed or bush, or dig up one that's still in season (with Undo) to make room.`)
     + h2("beds", "Beds and bushes", "tulip")
     + `<ul class="plain"><li><b>12 flower beds</b> for seedlings: they grow for ${dur(BED_GROW)}, flower, are cut, and bloom again ${dur(BED_AGAIN)} later. ${BED_YIELD} stems a picking.</li>
       <li><b>4 bushes</b> along the top row: they grow for ${dur(BUSH_GROW)}, then bloom ${every(BUSH_AGAIN)}. ${BUSH_YIELD} stems a picking.</li>

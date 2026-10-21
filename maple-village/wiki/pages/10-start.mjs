@@ -76,6 +76,9 @@ async function gettingStarted(){
   + h2("xp", "XP and your pet's friendship", "heart")
   + `<p>XP measures your friendship with your pet. You get 5 XP the first time you earn coins each day, and a little more for ticking tasks, feeding treats, playing with care things, feeding the animal run and giving gifts. Each level has a name, and some bring a present that shows up around your pet's rug.</p>`
   + table(["Level", "XP", "Name", "Present"], LEVELS.map((l, i) => [String(i + 1), String(l.xp), esc(l.name), l.gift ? esc(l.gift) : ""]))
+  // round 231: the bin
+  + h2("backpack", "Your backpack", "bag")
+  + `<p>Tap anything in your backpack to use it: plant seeds, give a present, put a keepsake on a shelf, feed your pet a treat. To get rid of something, tap <b>Throw something away</b> at the bottom, then tap what you don't want: one goes in the bin each tap, and there's an Undo. <b>The bin</b> keeps everything you've thrown away for a day, with <b>Take back</b> beside each thing; after 24 hours it's gone for good. Your pet's toys and brush never go in the bin.</p>`
   + h2("saving", "Saving, slots and your account", "bag")
   + `<p>The game saves as you play. It opens on a welcome screen with Honeybrook at golden hour, "Continue" for the game you last played, and <b>${SLOTS} save slots</b>. Each slot card shows your name and pet, the day you're on, your coins, your closest friend's hearts and when you last played; an empty one says "New game". Deleting a slot asks first. "Back to the title screen" in the settings takes you back to the slots.</p>
   <p>Everyone plays signed in, with Google or with an email address and password (there's "make an account" and "forgot your password" too). Your three slots are kept in your account and follow you to any device you sign in on. The first time you sign in, the game already in that browser comes with you. For extra peace of mind, "Download a backup" in the settings saves a file copy.</p>`

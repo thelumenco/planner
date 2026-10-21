@@ -134,7 +134,7 @@ export function spotPanel(F, where, i, today){
     : st.stage === "budding" ? `${where === "tree" ? "Fruit ripening" : "In bud"}: ready in about ${hrs(st.left)}.` : `${where === "tree" ? "Ripe fruit" : "In full bloom"}! ${where === "tree" ? "Farid" : "Mei"} will pick ${where === "tree" ? "it" : "them"} for the farm shop.`}</p>
     <span class="clbar"><i style="width:${Math.round(st.g*100)}%"></i></span>
     <p class="muted">${where === "tree" ? `${C.yield} ${C.fn[1]} a day once it's fruiting.` : `${where === "bush" ? BUSH_YIELD : BED_YIELD} stems each picking.`} In season: ${C.seasons.map(s => SEASONS[s].n.toLowerCase()).join(", ")}.</p>`;
-  return h + `<div class="actions">${close}</div>`;
+  return h + `<div class="actions"><button class="btn small alt" data-or="dig">Dig it up</button>${close}</div>`;
 }
 // The farm shop's tabs: Plant (saplings, bushes and seedlings, bought and planted in the first free spot), Fruit and
 // Flowers (only what Farid and Mei have picked from your own trees and beds: free for you to take)
@@ -215,6 +215,13 @@ function tourLine(o, today){
   return `<p class="muted ortour">Tours today: ${tours.map(t => `${fmtTime(t.from)} with ${nm(t.guide)}`).join(", ")}. ${TOUR_FEE} coins a person.${paid}${shown < 3 ? " (Plant a few more things first: nobody pays to see bare ground.)" : ""}</p>`;
 }
 // Plant from the farm shop: the first empty (or faded) spot of that kind. -> line or null
+// round 231: dig up a tree, bed or bush that's still in season (to plant something else there); faded ones are simply
+// planted over. No refund. -> {line, undo} (undo puts it back as it was), or null
+export function digUp(F, where, i){
+  const o = orchState(F), list = o[SPOTS[where]], p = list && list[i]; if (!p) return null;
+  list[i] = null;
+  return {line: `${nameOf(where, p.k)}, dug up. The spot's free for something new.`, undo: () => { list[i] = p; }};
+}
 export function plantAny(F, where, id, today){
   const o = orchState(F), i = o[SPOTS[where]].findIndex(p => { const st = stateOf(where, p, today).stage; return st === "empty" || st === "faded"; });
   return i < 0 ? null : plant(F, where, i, id, today);
@@ -243,6 +250,7 @@ export function wireOrchard(root, F, api){
     else if (k === "plantany") { line = plantAny(F, b.dataset.where, id, api.today); snd = "coin"; }
     else if (k === "place") { line = placePot(F, api.item, id); if (line) { api.sfx("chime"); api.say(line); api.save(); api.placed(); return; } }
     else if (k === "tea") { api.tea(); return; }
+    else if (k === "dig") { const d = digUp(F, api.where, api.i); if (!d) return; api.sfx("paper", true); api.save(); api.undo(d.line, () => { d.undo(); api.save(); api.rerender(); }); api.rerender(); return; }
     if (line) { api.sfx(snd); api.say(line); api.save(); }
     api.rerender();
   });

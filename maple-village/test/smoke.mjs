@@ -4690,6 +4690,31 @@ if (want("\nThe cottage fruit basket takes any fruit (round 231)")) try {
   const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), r = mc.HERB.raspberry;
   check(r.soap && r.lotion && r.balm && r.lipoil, "and at the mill, raspberries go in soaps, hand lotions, lip balms and lip oils (the creator: \"need to be able to use raspberries for the mill stuff\")");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe bin, and digging up (round 231)")) try {
+  // the creator: "there's no trash button... a trash button with an undo, and a trash tab to retrieve it; otherwise it
+  // gets deleted after 24 hours"; and "if it's out of season but the farm is full, I should be able to dig up and replant"
+  console.log("\nThe bin, and digging up (round 231)");
+  const bn = await import(new URL("../src/game/bin.js", import.meta.url)), or = await import(new URL("../src/game/orchard.js", import.meta.url)), its = await import(new URL("../src/data/items.js", import.meta.url));
+  { const F = {inv: {s_magnet: 2}}, t0 = Date.now(); await import(new URL("../src/game/ronda.js", import.meta.url));
+    check(bn.binItem(F, "s_magnet", t0) && F.inv.s_magnet === 1 && F.bin.length === 1, "throw one thing away: it leaves the backpack for the bin");
+    F.inv.brush = 1; check(!bn.binItem(F, "brush", t0) && F.inv.brush === 1, "tools (the pet's brush, ball and yarn) never go in the bin");
+    check(bn.binContents(F, t0 + 3600e3)[0].n === 1 && bn.unbin(F, "s_magnet", t0 + 3600e3) && F.inv.s_magnet === 2 && !F.bin.length, "and it can be taken back from the bin");
+    bn.binItem(F, "s_magnet", t0); check(!bn.binContents(F, t0 + bn.BIN_KEEP + 1000).length && !bn.unbin(F, "s_magnet", t0 + bn.BIN_KEEP + 1000) && F.inv.s_magnet === 1, "after 24 hours it's gone for good"); }
+  { const F = {coins: 500}; const o = or.orchState(F); o.trees[0] = {k: Object.keys((await import(new URL("../src/data/orchard.js", import.meta.url))).TREES)[0], at: Date.now(), next: Date.now() + 864e5};
+    const was = o.trees[0], d = or.digUp(F, "tree", 0); check(d && o.trees[0] === null, "a tree still in season can be dug up, to plant something else in its spot");
+    d.undo(); check(o.trees[0] === was, "and Undo puts it back"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`bin pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.inv = {...F.inv, s_magnet: 3}; window.__hbGame.save(); });
+  await page.click('[data-open="bag"]'); await page.waitForTimeout(400);
+  await page.click('#bag [data-binmode="1"]'); await page.waitForTimeout(200); await page.click('#bag .item[data-id="s_magnet"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().inv.s_magnet === 2 && window.__hbGame.F().bin.length === 1), "in the game: Throw something away, then a tap puts one in the bin");
+  await page.click('#bag [data-binmode="0"]'); await page.waitForTimeout(200); await page.click('#bag [data-binview="1"]'); await page.waitForTimeout(300);
+  await page.click('#bag [data-unbin="s_magnet"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().inv.s_magnet === 3 && !window.__hbGame.F().bin.length), "and The bin gives it back with Take back");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

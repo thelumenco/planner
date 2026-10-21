@@ -76,6 +76,7 @@ import * as TLA from "./tlacts.js";
 import * as LVA from "./lvacts.js";
 import { FIRE_FOLK } from "../data/bb-people.js";
 import { loftPanel, startBatch, collect as loftCollect, loftState, takeRaisins } from "./loft.js";
+import { binItem, unbin, binContents, purgeBin, binnable, BIN_KEEP } from "./bin.js";
 import { cinqueRoomArt } from "../art/cinque-rooms.js";
 import { saltwickArt, swFerryRideArt } from "../art/town-saltwick.js";
 import { saltwickRoomArt } from "../art/saltwick-rooms.js";
@@ -984,6 +985,7 @@ function giftHeart(w, id){
 const GIVE_KINDS = ["gift", "bouquet", "food", "ingredient", "flower", "keepsake"];
 function nearestVillager(){ const n = npcActors().map(([, e]) => e).filter(e => e.kind === "npc" && !e.def.tourist && !e.def.local).map(e => [e, Math.hypot(e.x - hero.x, e.y - hero.y)]).sort((a, b) => a[1] - b[1])[0]; return n && n[1] < 170 ? n[0] : null; }
 let giveMode = null;   // a villager id while "give something" is on
+let binMode = false, binView = false;   // round 231: throwing things away from the backpack, and looking in the bin (game/bin.js)
 const GIFT_THANKS = ["Oh, how thoughtful! Thank you.", "For me? You're so kind.", "That's made my day, thank you."], FAV_THANKS = ["My favourite! How did you know?", "Oh, I love these! Thank you!", "You remembered! Thank you so much."];
 function giveToVillager(id, w){
   const it = ITEMS[id], e = npcActors().map(([, x]) => x).find(x => x.def && x.def.id === w); if (!it || !F.inv[id]) return;
@@ -1730,7 +1732,7 @@ function ctx(){
   if (fishSpot) c.querySelectorAll("[data-fish]").forEach(b => b.onclick = () => fishGo(b.dataset.fish, b.dataset.k));
   c.querySelectorAll("[data-sup]").forEach(b => b.onclick = () => { goalView = null; ctx(); if (b.dataset.sup === "play") familyPaddle(); else paddleTo(b.dataset.sup); });
   c.querySelectorAll("[data-ride]").forEach(b => b.onclick = () => { F.ride = b.dataset.ride; sfx("paper", true); speak(F.ride === "car" ? "Keys in hand. You'll drive between screens." : F.ride === "scooter" ? "Helmet on. Scooter it is." : "On foot today. Nice and slow.", 3500); save(); ctx(); });
-  if (orView || (fieldView && scene === "field" && (stallAt(dayKey(), localHM(), +fieldView.slice(-1)) || {}).kind === "orchard")) wireOrchard(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, today: dayKey(), where: orAt && orAt.where, i: orAt && orAt.i, item: potItem,
+  if (orView || (fieldView && scene === "field" && (stallAt(dayKey(), localHM(), +fieldView.slice(-1)) || {}).kind === "orchard")) wireOrchard(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, undo: (m, f) => undoable(m, f), say: l => speak(l, 4500), sfx, today: dayKey(), where: orAt && orAt.where, i: orAt && orAt.i, item: potItem,
     tab: k => { orTab = k; ctx(); }, placed: () => { orView = null; potItem = null; ctx(); drawScene(); }, tea: haveTea});
   if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) wireVine(c, F, {harvest: (festivalOn(dayKey()) || {}).id === "harvest", save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, r: vyAt && vyAt.r, i: vyAt && vyAt.i});
   if (passView && scene === "cave") c.querySelectorAll("[data-pass]").forEach(b => b.onclick = () => { const a = b.dataset.pass, k = b.dataset.k;
@@ -1795,7 +1797,25 @@ function ctx(){
   c.querySelectorAll("[data-tool]").forEach(b => b.onclick = () => buyTool(b.dataset.tool));
 
 }
+// round 231: one thing from the backpack into the bin (with Undo); it can be taken back from the bin for a day
+function binOne(id){
+  const it = ITEMS[id]; if (!binnable(id)) { speak("That one stays: you'll need it.", 3000); return; }
+  if (!binItem(F, id)) return; sfx("paper", true); save();
+  undoable(`One ${it.n.toLowerCase()}, in the bin`, () => { unbin(F, id); save(); bag(); }); bag();
+}
+const leftWords = ms => { const h = Math.max(1, Math.ceil(ms/3600e3)); return h >= 2 ? `gone in ${h} hours` : "gone within the hour"; };
+function binHTML(){
+  const rows = binContents(F);
+  return `<div class="giftpick" style="grid-column:1/-1"><p><b>The bin</b></p><p class="muted">Things you've thrown away wait here for a day, then they're gone for good.</p>
+    ${rows.length ? `<ul class="hlist wlist">${rows.map(r => `<li><span class="wpic">${icon(ITEMS[r.id].ico || r.id, 28)}</span><span class="wtxt"><b>${esc(ITEMS[r.id].n)}</b><small>× ${r.n} · ${leftWords(r.left)}</small></span><button class="btn small alt" data-unbin="${r.id}">Take back</button></li>`).join("")}</ul>` : `<p class="muted">The bin's empty.</p>`}
+    <div class="actions"><button class="btn small alt" data-binview="0">Back to the backpack</button></div></div>`;
+}
 function bag(){
+  purgeBin(F);
+  if (binView) { $("bag").innerHTML = binHTML();
+    $("bag").querySelectorAll("[data-unbin]").forEach(b => b.onclick = ev => { ev.stopPropagation(); if (unbin(F, b.dataset.unbin)) { sfx("tap"); flash(`${ITEMS[b.dataset.unbin].n}, back in your backpack`); save(); } bag(); });
+    $("bag").querySelector("[data-binview]").onclick = ev => { ev.stopPropagation(); binView = false; bag(); };
+    $("bagHint").textContent = ""; return; }
   const ids = Object.keys(F.inv).filter(id => ITEMS[id] && F.inv[id] > 0);
   const order = ["gift","food","ingredient","feed","flower","use","tool","seed"];
   ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
@@ -1805,7 +1825,7 @@ function bag(){
     // (not on flowers: a friend's picked tulips kept "vanishing" from the backpack, sent off to the kitchen larder by one
     // tap on this little chip. Flowers still go to the kitchen from the larder itself, or by the delivery bike.)
     const kit = isGood(id) && it.kind !== "ingredient" && it.kind !== "flower" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
-    return itemBtn(id, lbl, it.kind === "seed", (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");
+    return itemBtn(id, lbl, it.kind === "seed" && !binMode, (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");
   if (giftPick && F.inv[giftPick]) $("bag").insertAdjacentHTML("afterbegin", giftPickHTML(giftPick)); else giftPick = null;
   { const nv = nearestVillager(); if (!nv || (giveMode && giveMode !== nv.def.id)) giveMode = null;
     if (nv && !giftPick) { const w = nv.def.id, done = QB.giftedToday(F, w);
@@ -1821,7 +1841,12 @@ function bag(){
   $("bag").querySelectorAll("[data-tovase]").forEach(b => b.onclick = ev => { ev.stopPropagation(); const id = giftPick; if (!id || !F.inv[id]) return; addInv(id, -1); F.pots = F.pots || {}; F.pots.vase = id; giftPick = null; sfx("chime");
     flash(`The ${ITEMS[id].n.toLowerCase()} is in the vase in your room`); speak("In the vase on your bedroom table. The whole room smells lovely.", 4000); save(true); if (scene === "room") drawScene(); render(); });
   $("bag").querySelectorAll("[data-keepit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); keepItem = giftPick; giftPick = null; openView = null; render(); });   // a souvenir kept: off to the shelf chooser
-  $("bag").querySelectorAll(".item").forEach(b => b.onclick = ev => { const k = ev.target.closest("[data-kit]"); if (k) { ev.stopPropagation(); toKitchen(k.dataset.kit); return; } useItem(b.dataset.id); });
+  // round 231: throwing away, and the bin (a quiet row at the bottom; a note at the top while it's on)
+  if (binMode) $("bag").insertAdjacentHTML("afterbegin", `<div class="giftpick" style="grid-column:1/-1"><p><b>Throwing things away:</b> tap anything to put one in the bin. It waits there for a day if you change your mind.</p><div class="actions"><button class="btn small alt" data-binmode="0">Done</button></div></div>`);
+  { const nb = (F.bin || []).length; $("bag").insertAdjacentHTML("beforeend", `<div class="actions binrow" style="grid-column:1/-1">${ids.length && !binMode ? `<button class="btn small alt" data-binmode="1">Throw something away</button>` : ""}${nb ? `<button class="btn small alt" data-binview="1">The bin (${nb})</button>` : ""}</div>`); }
+  $("bag").querySelectorAll("[data-binmode]").forEach(b => b.onclick = ev => { ev.stopPropagation(); binMode = b.dataset.binmode === "1"; giveMode = null; giftPick = null; sfx("tap"); bag(); });
+  $("bag").querySelectorAll("[data-binview]").forEach(b => b.onclick = ev => { ev.stopPropagation(); binView = true; binMode = false; sfx("paper", true); bag(); });
+  $("bag").querySelectorAll(".item").forEach(b => b.onclick = ev => { if (binMode) { ev.stopPropagation(); binOne(b.dataset.id); return; } const k = ev.target.closest("[data-kit]"); if (k) { ev.stopPropagation(); toKitchen(k.dataset.kit); return; } useItem(b.dataset.id); });
   $("bagHint").textContent = !ids.length ? "Your backpack's empty. Visit the market, or harvest something." : F.gift ? "A welcome bag of seeds is in here. Plant them in the garden, just along from the house." : "";
   $("play").innerHTML = [["pet","Pet"],["hide","Hide-and-seek"],["nap","Nap together"]].map(([k, n]) => `<button class="btn alt small" data-play="${k}">${n}</button>`).join("");
   $("play").querySelectorAll("[data-play]").forEach(b => b.onclick = () => playFree(b.dataset.play));
@@ -3573,7 +3598,7 @@ $("setStory").onclick = () => { closePanel(); openIntro({replay: true, trainArt:
 $("setQuiet").onchange = e => { F.quietEvening = e.target.checked; save(true); };
 $("setSfx").onchange = e => { setSfx(e.target.checked); if (e.target.checked) sfx("coin"); };
 ["pointerdown", "keydown"].forEach(t => document.addEventListener(t, () => { qnQuietUntil = 0; }, {capture: true, once: true}));
-document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; if (openView === "bag") { giveMode = null; bag(); } ctx(); });   // (the backpack checks who's nearby as it opens)
+document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openView = openView === b.dataset.open ? null : b.dataset.open; if (openView === "bag") { giveMode = null; binMode = false; binView = false; bag(); } ctx(); });   // (the backpack checks who's nearby as it opens)
 initNotebook({windDown, water:() => ({ml: S.waterMl || 0, goal: waterGoal(), glass: GLASS}), steps:() => ({n: S.steps, goal: stepGoal()}),
   addWater:ml => A.water(ml), setWater, setSteps, paperName, markRead, agentName, onClose:() => render()});
 // the add-a-task form on the quest board
