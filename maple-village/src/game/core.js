@@ -2544,6 +2544,11 @@ function nightLights(){
   if (scene !== "base") art.querySelectorAll(".lglow").forEach(g => { const c = g.querySelector("circle"), x = +c.getAttribute("cx"), y = +c.getAttribute("cy"), r = +c.getAttribute("r");
     h += `<g transform="${mtx(g)}"><circle cx="${x}" cy="${y + 6}" r="${r + 10}" fill="url(#lampg)"/><circle class="flick" cx="${x}" cy="${y}" r="${(r*.45).toFixed(1)}" fill="#FFE3A3" opacity=".4"/>${r > 30 ? `<rect x="${x - 5}" y="${y - 6}" width="10" height="12" rx="2" fill="#FFE9A8" stroke="#3b3530" stroke-width="1.1"/>` : ""}</g>`; });
   art.querySelectorAll(".nglow").forEach(g => { const k = g.cloneNode(true); k.setAttribute("transform", mtx(g)); k.removeAttribute("class"); h += k.outerHTML; });   // neon, fairy lights
+  // round 253 (Mel: "the windows of buildings to have the same light... that we have in our home until 11pm"): every
+  // window pane the art tags "wglow" lights up warm from 7 till 11pm, with a soft halo, like home's
+  if (sgHM() >= 19*60 && sgHM() < 23*60) art.querySelectorAll(".wglow").forEach(w => { if (w.closest(".nightcopy")) return; let bb; try { bb = w.getBBox(); } catch { return; } if (!bb.width || !bb.height) return;
+    const k = w.cloneNode(false); k.removeAttribute("class"); k.removeAttribute("filter"); k.setAttribute("style", "fill:#FFD98A"); k.setAttribute("stroke", "none"); k.setAttribute("transform", mtx(w));
+    h += `<g class="wlit">${`<rect x="${(bb.x - 7).toFixed(1)}" y="${(bb.y - 7).toFixed(1)}" width="${(bb.width + 14).toFixed(1)}" height="${(bb.height + 14).toFixed(1)}" rx="9" fill="#FFD98A" opacity=".18" transform="${mtx(w)}"/>`}${k.outerHTML}</g>`; });   // steady, not pulsing: dozens of animated panes would slow a phone
   art.querySelectorAll("text.lab").forEach(t => { const g = t.parentNode; if (!g || g.closest(".nightcopy")) return;
     const k = g.cloneNode(true), p = k.querySelector("path"); if (p) { p.style.fill = "#FFFDF6"; p.setAttribute("opacity", "1"); }
     k.setAttribute("transform", mtx(g)); k.setAttribute("class", "nightlab"); h += k.outerHTML; });

@@ -5018,6 +5018,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(c.recipe && /^Black Forest/.test(c.recipe.name) && !c.recipe.special, `dried cherries and chocolate: ${c.recipe && c.recipe.name} (no wine, so it's for everyone)`);
 }
 {
+  // round 253 (Mel: "I want the windows of buildings to have the same light... that we have in our home until 11pm")
+  console.log("\nWindows glow at night, till 11pm (round 253)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`windows pageerror: ${e.message}`));
+  const lit = async (t, sc) => { await page.goto(url + `?reset=1&seed=1&time=${t}&date=2026-10-16`); await page.waitForTimeout(700); await page.evaluate(s => window.__mapleScene(s), sc); await page.waitForTimeout(900);
+    return page.evaluate(() => ({tagged: document.querySelectorAll("#sceneArt .wglow").length, lit: document.querySelectorAll("#sceneArt .wlit").length})); };
+  const night = await lit("21:00", "village"), late = await lit("23:30", "village"), day = await lit("12:00", "village"), town = await lit("21:00", "sw_quay");
+  check(night.tagged >= 4 && night.lit === night.tagged, `the village's windows glow at 9pm (${night.lit} of ${night.tagged})`);
+  check(late.lit === 0 && day.lit === 0, "and they're dark again after 11pm, and by day");
+  check(town.tagged >= 2 && town.lit === town.tagged, `the towns' windows too: Saltwick's quay at 9pm (${town.lit})`);
+  await page.close();
+}
+{
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
   const missing = Object.entries(sd.STORIES).flatMap(([id, chs]) => chs.map((c, i) => i > 0 && !c.recap ? id + ":" + i : null).filter(Boolean));
