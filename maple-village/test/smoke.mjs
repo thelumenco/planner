@@ -2886,7 +2886,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForFunction(() => /market/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1500);
   check(await ids().then(a => a.includes("rafael") && a.includes("rocio")), "the covered market: Rafael at his stall, Rocío with her flowers");
   await page.locator('#world [data-rdspot="mercado"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-rbuy="almond"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-rbuy="vines"]').count() === 0 && await page.locator("#ctx [data-rbuy]").count() === 7, "the covered market: almonds, oranges, oil, jamón, payoyo, membrillo and a picnic basket (no vines for a stranger)");
+  check(await page.locator('#ctx [data-rbuy="vines"]').count() === 0 && await page.locator("#ctx [data-rbuy]").count() === 8 && await page.locator('#ctx [data-rbuy="dried_cherry"]').count() === 1, "the covered market: almonds, oranges, oil, jamón, payoyo, membrillo, dried cherries and a picnic basket (no vines for a stranger)");
   await page.click('#ctx [data-rbuy="almond"]'); await page.click('#ctx [data-rbuy="picnic"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.almond === 1 && f.inv.picnic === 1), "almonds and a picnic basket, into the backpack");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
