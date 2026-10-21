@@ -110,7 +110,8 @@ export const TASKS = {
   basket: {n: "Fill the fruit basket", floor: "down", spot: "basket", fruit: 3},
   fridge: {n: "Welcome treats in the fridge", floor: "down", spot: "fridge", treats: 2}
 };
-export const FRUIT = ["apple", "pear", "fig", "orange", "peach", "cherry", "lemon", "mango", "persimmon", "tangerine", "strawberry", "blueberry"];
+export const FRUIT = ["apple", "pear", "fig", "orange", "peach", "cherry", "lemon", "mango", "persimmon", "tangerine", "strawberry", "blueberry",
+  "raspberry", "blackberry", "banana", "hk_cherry", "hk_melon", "fm_fig", "hallabong", "salak"];   // round 254 (Mel had raspberries, and the basket wouldn't take them): any fresh fruit from home or a trip
 export const TREATS = ["milk", "egg", "honey", "cheese", "chz_fresh", "chz_cheddar", "chz_blue", "chz_brie", "chz_halloumi", "chz_havarti", "chz_banon", "chz_smoked"];
 export const HOUSEKEEPER = {n: "Hattie", fee: 14};   // does the beds, bathroom, tidy and hot tub at eleven; the basket and fridge stay Mel's
 export const CHECKOUT = 10*60, CHECKIN = 15*60, DELIVERY = 9*60 + 17;   // deliveries come off the 9:15 morning train

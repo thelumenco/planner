@@ -241,7 +241,8 @@ function dining(t, x, y){
 function fruitBowl(){   // the fruit basket on the dining table (filled when st.basket)
   const [dx, dy] = at("dining"), t = tier("dining"), x = dx - 14, y = t ? dy - 28 : dy - 4;
   const fruit = ST.basket ? `<circle cx="${x - 4}" cy="${y - 5}" r="3.2" fill="#D9433A"/><circle cx="${x + 2}" cy="${y - 6}" r="3.2" fill="#F2A03A"/><path d="M${x + 6} ${y - 3} q-3 -6 1 -8 q3 2 2 8z" fill="#A8C25A"/><circle cx="${x - 1}" cy="${y - 3}" r="2.8" fill="#7A4A66"/>` : "";
-  return otherSpot("basket", ST.basket ? "The fruit basket, full" : "The fruit basket, empty", hovE(x, y + 2, 13, 7),
+  return otherSpot("basket", ST.basket ? "The fruit basket, full" : "The fruit basket, empty", hovE(x, y + 2, 13, 7)
+    + `<rect x="${x - 22}" y="${y - 22}" width="44" height="32" rx="8" fill="transparent" pointer-events="all"/>`,   // round 254 (Mel: tapping the basket opened the dining table): a finger-sized tap area over the bowl, above the table's
     `<g pointer-events="none">${fruit}${D(`<path d="M${x - 9} ${y - 3} h18 q-2 6 -9 6 q-7 0 -9 -6z" style="fill:#C9A26A"/>`)}</g>`);
 }
 function rug(t, x, y){

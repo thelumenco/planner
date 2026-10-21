@@ -2701,3 +2701,9 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - Window glass on outdoor buildings carries `class="wglow"` (tagged in 21 art files, mostly inside each file's window or house helper: scenes.js `house()` except home, buildings.js, hlane, bay, vineyard, field (Santa's grotto only when shut), hwoods, terrace, lavender, coast, bellbird-vines `shed`, tablelands, and every town-*.js). Kyoto's machiya have no glass to tag (lattice fronts), so Kyoto stays dark.
 - core.js `nightLights()` (already copying lamp glows above the dusk wash) clones each `.wglow` pane from 7pm to 11pm, filled warm yellow at 70% (so bottles, chocolates and the odd cat behind shop glass still show) with a soft 18% halo; steady, not pulsing, since Portovenere and Cinque Terre have 60 to 90 panes. Home's own windows are unchanged (duskArt).
 - Test: "Windows glow at night, till 11pm (round 253)".
+
+## Round 254: the cottage fruit basket, and raspberries at the mill
+- Mel: "I can't click the fruit basket. When I click, the dining table catalogue shows up": the bowl's drawing ignored taps and its little hover ellipse sat inside the table's area. cottages.js `fruitBowl()` now has a finger-sized transparent tap area (44 x 32) over the bowl, above the table.
+- She had raspberries and the basket didn't take them: data/cottages.js `FRUIT` now takes raspberries, blackberries, bananas, Hokkaido cherries and melon, Formentera figs, hallabong and snake fruit too.
+- Mel: "how come I can't use raspberries for the mill stuff too": millcraft.js `HERB.raspberry` now goes into oils, soaps, lotions, balms and lip oils (it was soaps and lip oils only).
+- Tests in the cottage block ("inside Fig Tree").

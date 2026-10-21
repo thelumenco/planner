@@ -45,7 +45,8 @@ export const KINDS = {oil: {n: "Infused oils", max: 2, price: 28, sell: 24}, soa
 // The dye is a stem of any flower from Ma Ma's flower farm (its shed), or a tulip or sunflower from Mel's garden; the
 // tin's lid and the oil take its colour.
 for (const a of ["honey", "honey_lav", "honey_blossom", "honey_cream", "honey_sun", "honey_heath", "euchoney", "mint", "orange", "lemon", "bq_lavender", "bq_rose", "strawberry", "bq_sweetpea", "bq_camellia"]) if (HERB[a]) Object.assign(HERB[a], {balm: true, lipoil: true});
-if (HERB.raspberry) HERB.raspberry.lipoil = true;
+// round 254 (Mel: "how come I can't use raspberries for the mill stuff too"): raspberries go into everything at the bench
+if (HERB.raspberry) Object.assign(HERB.raspberry, {oil: true, soap: true, lotion: true, balm: true, lipoil: true});
 ITEMS.beeswax = Object.assign(ITEMS.beeswax || {}, {n: "A block of beeswax", kind: "ingredient", ico: "beeswax", price: 4, sell: 2});
 export const dyeHave = (F, d) => (((F.orch || {}).stock || {})["stem:" + d] || 0) + ((F.inv || {})[d] && ITEMS[d] && ITEMS[d].kind === "flower" ? F.inv[d] : 0);
 const useDye = (F, d) => { if ((F.inv || {})[d] > 0 && ITEMS[d] && ITEMS[d].kind === "flower") { F.inv[d]--; if (!F.inv[d]) delete F.inv[d]; return; } F.orch.stock["stem:" + d]--; if (F.orch.stock["stem:" + d] <= 0) delete F.orch.stock["stem:" + d]; };

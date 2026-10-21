@@ -4851,6 +4851,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="figtree"]').dispatchEvent("click"); await page.waitForFunction(() => /Fig Tree/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(1200);
   check(await page.locator('#world [data-cospot]').count() >= 14 && await page.locator('#world [data-cospot="sofa"]').count() === 1, "inside Fig Tree: the sitting room and kitchen, everything tappable");
+  // round 254 (Mel: "I can't click the fruit basket. When I click, the dining table catalogue shows up")
+  { const hit = await page.evaluate(() => { const g = document.querySelector('#world [data-cospot="basket"]'), r = g && g.querySelector("rect[pointer-events=all]"); if (!r) return "no tap area"; const b = r.getBoundingClientRect(); let n = 0;
+      for (const i of [1, 2, 3]) for (const j of [1, 2, 3]) { const e = document.elementFromPoint(b.left + b.width*i/4, b.top + b.height*j/4); if (e && e.closest('[data-cospot="basket"]')) n++; } return n; });
+    const C = await import(new URL("../src/data/cottages.js", import.meta.url));
+    check(hit >= 8 && C.FRUIT.includes("raspberry"), `tapping the fruit basket on the dining table reaches the basket, not the table (${hit}/9), and raspberries count as fruit`); }
+  { const MC = await import(new URL("../src/game/millcraft.js", import.meta.url)), r = MC.HERB.raspberry;
+    check(r.oil && r.soap && r.lotion && r.balm && r.lipoil, "raspberries go into everything at the mill's bench: oils, soaps, lotions, balms and lip oils"); }
   await page.locator('#world [data-cospot="calendar"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-co^="block:"]', { timeout: 20000 });
   check(/Buffer between guests/i.test(await page.locator("#ctx").textContent()), "the bookings calendar on the wall: five weeks, a buffer setting, block or unblock any week");
   const wk = await page.locator('#ctx [data-co^="block:"]').nth(2).getAttribute("data-co");

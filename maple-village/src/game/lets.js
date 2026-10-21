@@ -150,7 +150,7 @@ export function doTask(F, c, k){
   if (k === "basket" || k === "fridge") {
     const flag = k === "basket" ? L.basket : L.fridge; if (flag[c]) return {ok: false, msg: k === "basket" ? "The fruit basket's already full." : "The fridge is already stocked."};
     const list = k === "basket" ? FRUIT : TREATS, n = k === "basket" ? T.fruit : T.treats;
-    if (countOf(F, list) < n) return {ok: false, msg: k === "basket" ? `The basket needs ${n} pieces of fruit from your backpack: from the orchard, or the berry bushes.` : `The fridge needs ${n} treats from your backpack: milk, eggs, honey or cheese from the farm.`};
+    if (countOf(F, list) < n) return {ok: false, msg: k === "basket" ? `The basket needs ${n} pieces of fruit from your backpack: from the orchard, the berry bushes, or a trip.` : `The fridge needs ${n} treats from your backpack: milk, eggs, honey or cheese from the farm.`};
     const used = takeFrom(F, list, n); flag[c] = used; return {ok: true, used};
   }
   const t = L.turn[c]; if (!t) return {ok: false, msg: "All fresh already. Nothing to do here."};
