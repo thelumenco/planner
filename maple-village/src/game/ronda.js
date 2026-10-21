@@ -21,7 +21,7 @@ export const trusted = F => rondaState(F).days.length >= 2;
 
 export function buyGood(F, id, addInv){
   const g = TOWN_GOODS[id]; if (!g || F.coins < g.price) return null;
-  F.coins -= g.price; addInv(id, 1); return g;
+  F.coins -= g.price; if (g.gives) addInv(g.gives[0], g.gives[1]); else addInv(id, 1); return g;   // (a punnet is three cherries)
 }
 export function buyVines(F){ if (!trusted(F) || F.coins < VINES.price) return null; F.coins -= VINES.price; addCuttings(F, "tempranillo", VINES.n); return true; }
 export function taste(F, id){

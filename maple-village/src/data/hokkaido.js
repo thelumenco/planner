@@ -155,6 +155,9 @@ export const HK_GOODS = {
   hkmilk: {n: "Hokkaido milk", kind: "ingredient", price: 6, sell: 3, shop: "hk_dairy", art: ["bottle", "#FFFDF6", "#3E6BAE"], what: "rich milk from Furano's cows, in a glass bottle: gelato, bonbons, butter corn"},
   hkmelon: {n: "Furano melon", kind: "ingredient", price: 20, sell: 12, shop: "hk_dairy", art: ["disc", "#B9D98A", "#F2A65A"], what: "orange inside and sweet as honey: melon gelato, a melon bonbon"},
   scallop_hk: {n: "Hokkaido scallops", kind: "ingredient", price: 12, sell: 7, shop: "hkmarket", art: ["disc", "#F3E1C8", "#C98A5A"], what: "fat sweet scallops from the morning market: seared scallops with butter at the kitchen"},
+  // round 231: cherries all year (the orchard's only fruit in spring): a punnet from Yoichi, up the coast, is three of the
+  // same cherries the orchard grows, so they go into every cherry recipe; 5 each, and they sell back for 4
+  hk_cherries: {n: "Punnet of Yoichi cherries", kind: "ingredient", price: 15, gives: ["cherry", 3], shop: "hkmarket", art: ["box", "#C2334D", "#7FA35A"], what: "three cherries from the orchards at Yoichi, up the coast: fresh in summer, from the cold store the rest of the year"},
   sweetcorn: {n: "Sweetcorn", kind: "ingredient", price: 3, sell: 2, shop: "hkmarket", art: ["box", "#F3D34A", "#7FA35A"], what: "Hokkaido's sweet corn: butter corn at the kitchen, corn gelato"},
   kombu: {n: "Kombu", kind: "ingredient", price: 4, sell: 2, shop: "hkmarket", art: ["box", "#3A4A3A", "#7A8A6A"], what: "dried kelp from the Hokkaido coast: a dashi for miso ramen at home"},
   h_beer: {n: "Sapporo beer", kind: "gift", to: ["theo", "tomi", "bo", "farid"], price: 6, shop: "hk_beer", art: ["bottle", "#C9A24A", "#C8432F"], say: "A beer from the Sapporo factory! With the red star on it. Cold, please. Very cold."},

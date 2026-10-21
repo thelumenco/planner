@@ -4633,6 +4633,8 @@ if (want("\nWine in ice cream, and rum and raisin (round 231)")) try {
     check(Object.keys(vy.STYLES).every(k => its.ITEMS["wine_" + k] && its.ITEMS["wine_" + k].sell === vy.STYLES[k].price && sc.isIngr("wine_" + k)), "every style of your wine can go in a scoop, and sells for no more than on the shelf"); }
   { const F = {coins: 0, inv: {}}; const s = sc.scoopState(F); s.fridge = {wine_red: 1, cherry: 1};
     const r = sc.discover(F, ["wine_red", "cherry"]).recipe; check(r && /Red Wine/.test(r.name) && !r.dairy && !r.special, `wine makes a sorbet with fruit (${r && r.name})`); }
+  { const rd = await import(new URL("../src/game/ronda.js", import.meta.url)), tw = await import(new URL("../src/data/towns.js", import.meta.url)), F = {coins: 20, inv: {}}, add = (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; };
+    check(tw.TOWN_GOODS.hk_cherries.shop === "hkmarket" && rd.buyGood(F, "hk_cherries", add) && F.inv.cherry === 3 && F.coins === 5 && !F.inv.hk_cherries && its.ITEMS.cherry.sell < 5, "cherries all year: a punnet at Otaru's morning market is three of the orchard's cherries, 15 coins (they sell back for less)"); }
   { const rum = sw.SW_GOODS.rum; check(rum && rum.price === 15 && rum.sell < rum.price && rum.shop === "sw_chandlery" && sc.isIngr("rum"), "dark sailor's rum at Saltwick's chandlery: 15 coins (it sells back for less)"); }
   { const F = {inv: {}, towns: {cinque: 1}, cinque: {raisin: 1}}; const L = lf.loftState(F); L.rack = {at: Date.now() - 4*864e5, n: 6};
     check(lf.takeRaisins(F).n === 6 && F.inv.raisins === 6 && !L.rack && !L.cask && sc.isIngr("raisins"), "grapes dried on the loft's racks can be kept as raisins: six bags");
