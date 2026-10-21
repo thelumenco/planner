@@ -2671,6 +2671,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 248: tapping your boat in the boat towns (Mel: "I can't seem to click the boat easily to go home when I am in a boat town")
 - Every boat town drew your boat with `pointer-events="none"`, so only the small hover ellipse (often well away from the boat: Saltwick's was 90px off) caught a tap. Each town's art file now has `boatHit(x, y)`, a transparent tap area over the drawn boat, inside the boat's `data-place` group (Saltwick, Portovenere, Puffin Isle, Bali, Formentera, Hokkaido; Jeju's ferry pier gets the same over the ferry). Saltwick's also covers the pontoon and label, and Portovenere's the label, since both boats sit at the screen's bottom edge by the chat and zoom buttons.
+- The quest marker ("!", `#qmarkWrap`) that points to the way home sat over Portovenere's boat and swallowed taps (it has no action of its own); it now lets taps through (`pointer-events="none"`).
 - Test: "Tapping your boat in the boat towns" (a phone, zoomed out; most of each boat must reach its place, which fails on the old build in all seven towns).
 
 ## Round 249: a clearer clue trail, Mum's foot bath, and letters written fresh
