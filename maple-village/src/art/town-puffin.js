@@ -139,7 +139,8 @@ function landingScreen(){
       <path d="M378 604 h40" style="stroke:${C.wood}" stroke-width="2"/><text x="402" y="624" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="5.5" fill="${C.white}">PUFFIN</text>`,
       `<path d="M366 604 H460 Q458 618 444 628 H382 Q370 620 366 604z"/><rect x="426" y="584" width="22" height="20" rx="2"/>`)}</g>
     <path d="M366 606 Q360 600 355 597" fill="none" style="stroke:${C.rope}" stroke-width="1.4"/></g>`;
-  const pier = `<g data-place="pipier" aria-label="The jetty: the boat home to Honeybrook"><ellipse class="hov" cx="330" cy="560" rx="26" ry="12" style="fill:var(--butter)"/>${lab(408, 556, "Boat home", "#CFE2EE", 10)}</g>`;
+  // round 231: the boat home, its jetty and its label are all one big target (only the label used to take a tap)
+  const pier = `<g data-place="pipier" aria-label="The jetty: the boat home to Honeybrook"><rect x="296" y="500" width="66" height="140" fill="transparent" pointer-events="all"/><rect x="362" y="540" width="110" height="100" fill="transparent" pointer-events="all"/><ellipse class="hov" cx="330" cy="560" rx="26" ry="12" style="fill:var(--butter)"/>${lab(408, 556, "Boat home", "#CFE2EE", 10)}</g>`;
   const jettyBits = `<g pointer-events="none">${sk(`<rect x="371" y="512" width="3" height="24" style="fill:${C.wood2}"/><circle cx="372.5" cy="514" r="8" style="fill:none;stroke:#E8573A" stroke-width="4"/><path d="M366 510 l3 3 M378 510 l-3 3 M366 518 l3 -3 M378 518 l-3 -3" style="stroke:${C.white}" stroke-width="2"/>
     <ellipse cx="290" cy="514" rx="9" ry="4.5" style="fill:${C.rope}"/><ellipse cx="290" cy="514" rx="4" ry="2" style="fill:#8A7448"/>`, `<circle cx="372.5" cy="514" r="10"/><ellipse cx="290" cy="514" rx="9" ry="4.5"/>`)}</g>`;
   // the old tarred boathouse: black planks, a slate roof, wide doors onto a stone slipway

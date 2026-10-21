@@ -143,7 +143,8 @@ function harbourScreen(){
     <path d="${Array.from({length: 20}, (_, k) => `M206 ${444 + k*8} h50`).join(" ")}" style="stroke:#A89C84" stroke-width=".8"/>${[452, 512, 572].map(y => bollard(258, y)).join("")}${[480, 540].map(y => bollard(204, y)).join("")}
     <path d="M262 596 v14 M268 596 v14 M262 600 h6 M262 606 h6" style="stroke:#3A3836" stroke-width="1.2"/></g>`;
   // the ferry, tied up at the end of the pier
-  const ferry = `<g data-place="swpier" aria-label="The ferry pier: ferries home to Honeybrook"><ellipse class="hov" cx="230" cy="560" rx="28" ry="12" style="fill:var(--butter)"/>
+  // round 231: the boat home, its jetty and its label are all one big target (only the label used to take a tap)
+  const ferry = `<g data-place="swpier" aria-label="The ferry pier: ferries home to Honeybrook"><rect x="45" y="530" width="165" height="110" fill="transparent" pointer-events="all"/><ellipse class="hov" cx="230" cy="560" rx="28" ry="12" style="fill:var(--butter)"/>
     <g pointer-events="none"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.5;0 0" dur="4s" repeatCount="indefinite"/><ellipse cx="128" cy="628" rx="76" ry="5" fill="${C.foam}" opacity=".7"/>
       ${sk(`<path d="M56 592 H200 L188 628 H70z" style="fill:${C.white}"/><rect x="58" y="606" width="138" height="6" style="fill:#3E6A56"/><rect x="88" y="572" width="74" height="22" rx="3" style="fill:#EEF1EA"/>${[96, 114, 132, 150].map(x => `<rect x="${x - 4}" y="577" width="11" height="9" rx="2" style="fill:#9DB8C4"/>`).join("")}<rect x="112" y="558" width="12" height="16" style="fill:#C9483A"/><rect x="112" y="558" width="12" height="4" style="fill:#2F2B28"/>`,
         `<path d="M56 592 H200 L188 628 H70z"/><rect x="88" y="572" width="74" height="22" rx="3"/>`)}</g>

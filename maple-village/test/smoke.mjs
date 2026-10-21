@@ -4599,6 +4599,19 @@ if (want("\nAnother device never saves over newer progress (round 231)")) try {
   check((await cloud()).coins === 654, "and the paused copy never saves to the cloud");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe boat home is easy to tap (round 231)")) try {
+  // the creator: "make sure the boat in every boat town, the one I take to go home, is easy to hit"
+  console.log("\nThe boat home is easy to tap (round 231)");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`boat home pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-11-12"); await page.waitForTimeout(1200);
+  for (const [town, scene, pier] of [["jeju", "jj_harbour", "jjpier"], ["saltwick", "sw_harbour", "swpier"], ["puffin", "pi_landing", "pipier"], ["hokkaido", "hk_otaru", "hkpier"], ["bali", "ba_seminyak", "bajetty"]]) {
+    await page.evaluate(([town, scene]) => { const F = window.__hbGame.F(); F.trip = {town, by: "ferry", party: [], at: Date.now(), until: Date.now() + 8*3600e3}; window.__hbGame.save(); window.__hbScene(scene); }, [town, scene]); await page.waitForTimeout(900);
+    const r = await page.evaluate(pier => { const b = document.querySelector(`#world [data-place="${pier}"]`).getBoundingClientRect(); return [b.width, b.height]; }, pier);
+    check(r[0] >= 80 && r[1] >= 60, `${town}: the boat home, its jetty and its label are one big target on a phone (${Math.round(r[0])} by ${Math.round(r[1])})`);
+  }
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));
