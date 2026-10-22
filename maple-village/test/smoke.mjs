@@ -4769,6 +4769,32 @@ if (want("\nThe treehouse, and no toys left at the market (round 231)")) try {
   check(await page.evaluate(() => !window.__hbGame.F().dreams[0].done), "with Undo");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nMake another tray, and Your backpack (round 231)")) try {
+  // the creator: "when I try to click make another tray in the chocolatier, nothing happens"; and "it says spoil pet,
+  // but actually it should say backpack"
+  console.log("\nMake another tray, and Your backpack (round 231)");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`tray pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  await page.click('[data-open="bag"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => { const hs = [...document.querySelectorAll("h2")]; return hs.some(h => h.textContent.trim() === "Your backpack" && h.offsetParent) && !hs.some(h => /Spoil/.test(h.textContent)); }), "the backpack says Your backpack (not Spoil)");
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.goals = {...F.goals, cocoa: true}; window.__hbGame.save(); window.__hbScene("cocoakitchen"); }); await page.waitForTimeout(700);
+  await page.evaluate(() => { const c = window.__hbGame.F().cocoa; c.choc = {...(c.choc || {}), dark: 60}; c.pantry = {honey: 5, pandan: 1}; window.__hbGame.save(); });
+  await page.click('[data-spot="bonbon"]'); await page.waitForTimeout(2500);
+  await page.click('#ctx [data-cc="sel"][data-k="honey"]'); await page.waitForTimeout(200); await page.click('#ctx [data-cc="bonbon"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-cc="sel"][data-k="honey"]'); await page.waitForTimeout(200); await page.click('#ctx [data-cc="sel"][data-k="pandan"]'); await page.waitForTimeout(200);
+  await page.evaluate(() => { delete window.__hbGame.F().cocoa.pantry.pandan; }); await page.click('#ctx [data-cc="shell"][data-k="dark"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-cc="bonbon"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().cocoa.trays["dark+honey"] === 24), "Make another tray works even when a picked filling ran out while the table was open");
+  await page.click('#ctx [data-cc="again"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().cocoa.trays["dark+honey"] === 36), "and Another tray, from the list of your bonbons");
+  await page.click("#ctx [data-close]"); await page.evaluate(() => { const F = window.__hbGame.F(); F.inv.wine_red = 1; window.__hbGame.save(); });
+  await page.click('[data-spot="pantry"]'); await page.waitForTimeout(2500);
+  check(/Open a bottle \(4\)/.test(await page.locator('#ctx [data-cc="fill"][data-src="bag"][data-k="wine_red"][data-n="1"]').textContent()), "a bottle of wine in the backpack says Open a bottle (4) at the fillings shelf");
+  await page.click('#ctx [data-cc="fill"][data-src="bag"][data-k="wine_red"][data-n="1"]'); await page.waitForTimeout(300);
+  check(await page.evaluate(() => window.__hbGame.F().cocoa.pantry.wine_red === 4 && /\+4 on the fillings shelf/.test(document.getElementById("earn").textContent)), "and it's four fillings, and says so");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

@@ -1,7 +1,7 @@
 // The five pets (phase 4 of the public edition): fox, rabbit, tortoise, quokka and capybara. You choose one when you
 // start a game and it's yours for that game (species fixed; the name can change). Each species has the same five
 // drawings in the same frames, so the animations, accessories and poses fit them all:
-//   tail, body, head  the portrait in the backpack panel ("Spoil <name>"): an svg viewBox 0 0 120 120, sitting on the
+//   tail, body, head  the portrait in the backpack panel: an svg viewBox 0 0 120 120, sitting on the
 //                     rug with its feet at y≈118. #fTail swishes about (78,102), #fHead tilts about (60,76); the head
 //                     sits in the box x 22..98, y 8..78 with the eyes around y 50 (the scarf is drawn at y 72..95 and
 //                     the crown above the head), and the head art keeps the blinking eyes in a <g class="eyesOpen">

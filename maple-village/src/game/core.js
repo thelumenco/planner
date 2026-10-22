@@ -142,7 +142,7 @@ import { hfState, herdPanel, hivesPanel, standPanel, feedHerd, brush as hfBrush,
 import { UPGRADES as SC_UPGRADES, waiterOn, riderOn, scoopState, scoopTick, scoopNews, trolleyPanel, loadTrolley, returnTrolley, trolleySell, trolleyOn, trolleyMelted, TROLLEY, registerItems, makeNonna, counterPanel as scCounterPanel, menuPanel as scMenuPanel, fridgePanel, benchPanel, recipePanel, makeTub, freezerPanel, RENO_LINE, discover, stockFridge, unstockFridge, takeAway, eatOne, recipeOf, FORMATS, openNow, displayIds, setDisplay, SLOTS, upgradePanel, honestyPanel, dipPotsPanel, toppingsPanel, dipBarPanel, deliverPanel, buyUpgrade, buyDip, buyTopping, collectBox, makeDipped, hasUp, DIPS, TOPPINGS } from "./scoop.js";
 import { POOLS } from "../data/stall-goods.js";
 import { cocoaNews, cocoaState, cocoaTick, counterPanel as ccCounterPanel, barWallPanel, kitchenPanel as ccKitchenPanel, buyBeans, startRoast, startGrind, temper as ccTemper, mould as ccMould, takeBar, KINDS as CC_KINDS,
-  pantryPanel, bonbonPanel, casePanel, onDisplay as ccOnDisplay, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, toggleDisplay as ccToggle, packBox, eatBonbon,
+  pantryPanel, bonbonPanel, casePanel, onDisplay as ccOnDisplay, stockPantry, unstockPantry, makeBonbons, recipeOf as bonbonOf, fillName as ccFillName, WINE_FILL as CC_WINE_FILL, WINE_FILLS as CC_WINE_FILLS, toggleDisplay as ccToggle, packBox, eatBonbon,
   sendScoop, wineToPantry, packPairing, makeSpecial, takeSpecial, upsPanel as ccUpsPanel, buyCcUp, CC_UPS, haveHot, packGrand, readyPot, ccUp, emptyVending, pickAdd, pickFill,
   registerBoxes, makePralines, makeCoinTins } from "./cocoa.js";
 import { canKeep, keepPanel, placedPanel, placeKeep, takeKeep, keepsakesIn, adoptPanel, adopt as adoptPet, petPanel, petsIn, companions, playLine, ownerLine, fill as petFill, PET_HOMES, ownerName, PETS, petAt } from "./companions.js";
@@ -2331,7 +2331,7 @@ function render(redraw){
   if (redraw) drawScene();
   const L = level(), next = LEVELS[L+1];
   $("title").firstChild.textContent = (F.name || "").trim() ? `${F.name.trim()}'s village` : "Your village";   // (no name yet: "Your village", not "'s village")
-  $("trayName").textContent = F.name; if (document.activeElement !== $("paperNameIn")) $("paperNameIn").placeholder = paperName();
+  if (document.activeElement !== $("paperNameIn")) $("paperNameIn").placeholder = paperName();
   const d = new Date(now() + LOC());
   $("dateLine").textContent = d.toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long", timeZone:"UTC"}) + (F.streak >= 2 && F.lastActive === dayKey() ? ` · ${F.streak} cosy days in a row` : "");
   $("coins").textContent = F.coins;
@@ -2989,13 +2989,22 @@ function wireCocoa(c){
     else if (a === "hot") { const kk = haveHot(F); if (!kk) return; sfx("chime"); mprop("heart", hero.x, hero.y - 60, 1600); speak(pick(["Hot chocolate, from your own chocolate. Pure comfort.", "Mmm. Thick, rich, a little bit of foam.", "The perfect rainy-day cup."]), 4000); ; }
     else if (a === "grand") { const id = packGrand(F); if (!id) return; sfx("paper", true); flash(`${ITEMS[id].n} in your backpack`); }
     else if (a === "bprice") { const s = cocoaState(F); s.prices.bonbon = Math.max(1, Math.min(20, s.prices.bonbon + n)); }
-    else if (a === "fill") { const got = stockPantry(F, k, n, b.dataset.src, orchState(F)); if (got) { sfx("tap"); flash(`+${got} on the fillings shelf`); } }
+    else if (a === "fill") { const got = stockPantry(F, k, n, b.dataset.src, orchState(F)); if (got) { sfx("tap");   // round 231: a bottle of wine is four fillings, and says so
+      flash(k in CC_WINE_FILL && b.dataset.src === "bag" ? `${got === 1 ? "A bottle" : got + " bottles"} opened: +${got*CC_WINE_FILLS} on the fillings shelf` : `+${got} on the fillings shelf`); } }
     else if (a === "take") { const got = unstockPantry(F, k, n, orchState(F)); if (got) { sfx("tap"); flash(got.to === "bag" ? `${got.n} back into your backpack` : `${got.n} back to the farm shop shelf`); } }
     else if (a === "shell") { ccSt.shell = k; ccSt.made = null; }
     else if (a === "bshape") { ccSt.mould = k; ccSt.made = null; }   // round 176: the bonbon moulds (not "mould", which moulds bars)
     else if (a === "sel") { ccSt.made = null; const pan = cocoaState(F).pantry, cur = (ccSt.sel || []).filter(x => pan[x] > 0);   // round 193: a filling that's run out no longer holds one of the two places
       ccSt.sel = cur.includes(k) ? cur.filter(x => x !== k) : [...cur, k].slice(0, 2); }
-    else if (a === "bonbon" || a === "again") { const r0 = a === "again" ? bonbonOf(cocoaState(F), k) : null, out = r0 ? makeBonbons(F, r0.shell, r0.fills, ccSt.mould || r0.shape) : makeBonbons(F, ccSt.shell, ccSt.sel, ccSt.mould); if (!out) return;
+    // round 231 ("make another tray does nothing"): use the fillings the table is showing. A filling that ran out while
+    // it was open (Mateo's bonbon shelf, pralines, taken back to the backpack) used to stay picked out of sight, and the
+    // tray quietly failed; and say why when a tray really can't be made
+    else if (a === "bonbon" || a === "again") { const cs = cocoaState(F), r0 = a === "again" ? bonbonOf(cs, k) : null;
+      if (!r0) ccSt.sel = (ccSt.sel || []).filter(x => (cs.pantry[x] || 0) > 0);
+      const shell = r0 ? r0.shell : CC_KINDS[ccSt.shell] ? ccSt.shell : "dark", fills = r0 ? r0.fills : ccSt.sel;
+      const out = fills.length ? makeBonbons(F, shell, fills, r0 ? ccSt.mould || r0.shape : ccSt.mould) : null;
+      if (!out) { const short = fills.filter(x => !((cs.pantry[x] || 0) > 0)).map(x => ccFillName(x).toLowerCase());
+        speak(!fills.length ? "Pick a filling first." : short.length ? `The fillings shelf is out of ${short.join(" and ")}. Top it up and try again.` : `Not enough ${CC_KINDS[shell].n.toLowerCase()} for the shells: temper some more first.`, 4500); ctx(); return; }
       ccSt.sel = []; ccSt.made = out.r.id; ccSt.isNew = out.isNew; sfx("chime"); act("cheer"); gainXp(out.isNew ? 2 : 1);
       if (out.isNew) { [0, 250, 500].forEach((t, k2) => setTimeout(() => mprop("sparkle", hero.x + (k2 - 1)*22, hero.y - 60, 1600), t)); speak(`A new bonbon: ${out.r.name}! Twelve of them, ready for the display case.`, 5000); }
       else flash(`Another tray of ${out.r.name}`); }
