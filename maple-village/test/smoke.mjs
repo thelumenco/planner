@@ -1718,7 +1718,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   console.log("\nthe Scoop Shack");
   { const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), F = {inv: {}, scoop: {fridge: {milk: 3, fl_rose: 2}}, cocoa: {}}, orch = {stock: {}};
     check(sc.unstockFridge(F, "milk", 2, orch).to === "bag" && F.inv.milk === 2 && F.scoop.fridge.milk === 1 && sc.unstockFridge(F, "fl_rose", 99, orch).to === "farm" && orch.stock["stem:rose"] === 2, "things can come back out of the gelato fridge (flower stems go back to Ma Ma's shelf)");
-    cc.cocoaState(F).pantry = {honey: 2}; check(cc.unstockPantry(F, "honey", 99, orch).n === 2 && F.inv.honey === 2, "and off the Cocoa Room's fillings shelf"); }
+    cc.cocoaState(F).pantry = {honey: 2}; check(cc.unstockPantry(F, "honey", 99, orch).n === 2 && F.inv.honey === 2, "and off the Cocoa Room's fillings shelf");
+    F.inv.wine_red = 2; check(cc.stockPantry(F, "wine_red", 1, "bag", orch) === 4 && cc.cocoaState(F).pantry.wine_red === 4 && F.inv.wine_red === 1, "a bottle of wine from the backpack is four fillings, like opening one at the shelf"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => { errors.push(`scoop pageerror: ${e.message}`); console.log("PAGEERR", e.stack.slice(0, 600)); });
   page.on("dialog", d => { errors.push("the Scoop Shack used a browser pop-up"); d.dismiss(); });

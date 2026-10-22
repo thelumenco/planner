@@ -173,6 +173,8 @@ export function stockPantry(F, id, n, from, orch){
   const c = cocoaState(F); if (!isFilling(id)) return 0;
   if (from === "bag") { n = Math.min(n, (F.inv || {})[id] || 0); if (n <= 0) return 0; F.inv[id] -= n; if (F.inv[id] <= 0) delete F.inv[id]; }
   else { const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id; n = Math.min(n, orch.stock[key] || 0); if (n <= 0) return 0; orch.stock[key] -= n; if (orch.stock[key] <= 0) delete orch.stock[key]; }
+  // a wine bottle from the backpack fills the shelf like opening one there (Mel: it gave 1, "Open a bottle" gives 4)
+  if (from === "bag" && id in WINE_FILL) n *= WINE_FILLS;
   c.pantry[id] = (c.pantry[id] || 0) + n; return n;
 }
 // take fillings back off the shelf (into the backpack, or flower stems back to Ma Ma's shelf); wine fillings stay

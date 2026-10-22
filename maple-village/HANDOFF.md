@@ -2716,3 +2716,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Round 256: bonbon trays that "don't respond" (Mel: "when I click make another tray of bonbons, it doesn't respond")
 - With Mel's own save, "Another tray" did work (0 to 12), but the new tray's card shows at the top of the panel while she was scrolled down at the list (the flash was easy to miss), and 37 of her 61 bonbons were greyed out for want of a filling, with nothing to say so.
 - Now a made tray gets a speech line and the panel scrolls back to the top (core.js); a bonbon that can't be made says what it needs on its button ("Needs hazelnuts", "Needs fig and roses", "Needs milk chocolate"), on the list and on the main button (cocoa.js `shortBy`). Test: "Bonbon trays say what they need (round 256)".
+
+## Round 257: wine bottles on the fillings shelf (Mel: "when I put a bottle of wine into the chocolate fillings shelf, it becomes one filling, whereas Open a bottle gives four")
+- `stockPantry` in cocoa.js: a WINE_FILL bottle stocked from the backpack now adds `WINE_FILLS` (4) fillings per bottle, the same as opening a wine shop bottle at the shelf. `unstockPantry` already refuses wine, so a bottle can't be turned into 4 and taken back as 4.
+- Test in "the Scoop Shack" block.
