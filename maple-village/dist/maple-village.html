@@ -32171,6 +32171,11 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     c.res[k] -= r0;
     c.choc[k] -= n - r0;
   }
+  var shortBy = (c, shell3, fills) => {
+    const out = fills.filter((f5) => !((c.pantry[f5] || 0) >= 1)).map((f5) => fillName(f5).toLowerCase());
+    if (shellChoc(c, shell3) < SHELL) out.unshift(`${KINDS2[shell3].n.split(" ")[0].toLowerCase()} chocolate`);
+    return out.length ? `Needs ${out.join(" and ")}` : "Another tray";
+  };
   var canMakeBonbon = (c, shell3, fills) => shellChoc(c, shell3) >= SHELL && fills.length >= 1 && fills.every((f5) => (c.pantry[f5] || 0) >= 1);
   function makeBonbons(F2, shell3, fills, shape2) {
     const c = cocoaState(F2);
@@ -32642,10 +32647,10 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (made && !sel.length) h3 += card4(made.shell, made.col, made.name, st6.isNew ? "A new bonbon! The first tray's ready for the display case." : "Another tray of twelve, ready for the display case.", true, made.shape);
     else if (sel.length) h3 += card4(shell3, FL([...sel].sort()[0])[2], shapedName(known2 ? known2.base || known2.name : bonbonName(shell3, sel), shape2), known2 ? (known2.shape || "dome") !== shape2 ? `You know this one. A tray in the ${MOULDS[shape2].n.toLowerCase()} mould makes it a ${MOULDS[shape2].n.toLowerCase()} from now on.` : "You know this one. Make another tray?" : "Something new!", false, shape2);
     const ok = sel.length && canMakeBonbon(c, shell3, sel);
-    h3 += `<div class="actions"><button class="btn primary" data-cc="bonbon" ${ok ? "" : "disabled"}>${known2 ? "Make another tray" : "Make it"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
+    h3 += `<div class="actions"><button class="btn primary" data-cc="bonbon" ${ok ? "" : "disabled"}>${sel.length && !ok ? esc(shortBy(c, shell3, sel)) : known2 ? "Make another tray" : "Make it"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
     if (sel.length && shellChoc(c, shell3) < SHELL) h3 += `<p class="muted">Not enough ${KINDS2[shell3].n.toLowerCase()}: temper some more first, or raise its bonbon shelf target at the counter so Mateo makes some.</p>`;
     h3 += specialCard(c);
-    if (c.bonbons.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map((b) => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS2[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span><button class="btn small alt" data-cc="again" data-k="${esc(b.id)}" ${canMakeBonbon(c, b.shell, b.fills) ? "" : "disabled"}>Another tray</button></li>`).join("")}</ul>`;
+    if (c.bonbons.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map((b) => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS2[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span>${canMakeBonbon(c, b.shell, b.fills) ? `<button class="btn small alt" data-cc="again" data-k="${esc(b.id)}">Another tray</button>` : `<button class="btn small alt" disabled>${esc(shortBy(c, b.shell, b.fills))}</button>`}</li>`).join("")}</ul>`;
     return h3;
   }
   function specialCard(c) {
@@ -60082,7 +60087,16 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         if (out.isNew) {
           [0, 250, 500].forEach((t2, k2) => setTimeout(() => mprop("sparkle", mel.x + (k2 - 1) * 22, mel.y - 60, 1600), t2));
           speak(`A new bonbon: ${out.r.name}! Twelve of them, ready for the display case.`, 5e3);
-        } else flash(`Another tray of ${out.r.name}`);
+        } else {
+          flash(`Another tray of ${out.r.name}`);
+          speak(`Another tray of ${out.r.name}: twelve more for the display case.`, 4e3);
+        }
+        setTimeout(() => {
+          const pn = $("ctx");
+          if (pn) pn.scrollTop = 0;
+          const sc = pn && pn.closest(".panel");
+          if (sc) sc.scrollTop = 0;
+        }, 30);
       } else if (a === "case") {
         if (!toggleDisplay(cocoaState(F), k)) return;
         sfx("tap");

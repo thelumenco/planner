@@ -5061,6 +5061,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // round 256 (Mel: "make another tray of bonbons, it doesn't respond"): a bonbon that can't be made says what it needs
+  console.log("\nBonbon trays say what they need (round 256)");
+  const C = await import(new URL("../src/game/cocoa.js", import.meta.url));
+  const c = {res: {dark: 0, milk: 0, white: 0}, choc: {dark: 20, milk: 2, white: 20}, pantry: {mint: 3, lemon: 1}};
+  check(C.shortBy(c, "dark", ["lemon", "mint"]) === "Another tray" && C.shortBy(c, "dark", ["hazelnut", "mint"]) === "Needs hazelnuts" && /^Needs milk chocolate/.test(C.shortBy(c, "milk", ["mint"])), `a greyed-out tray button names what's missing (${C.shortBy(c, "dark", ["hazelnut", "mint"])}; ${C.shortBy(c, "milk", ["mint"])})`);
+}
+{
   console.log("\nStories pick up where they left off (round 203)");
   const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url));
   const missing = Object.entries(sd.STORIES).flatMap(([id, chs]) => chs.map((c, i) => i > 0 && !c.recap ? id + ":" + i : null).filter(Boolean));

@@ -3849,7 +3849,8 @@ function wireCocoa(c){
     else if (a === "bonbon" || a === "again") { const r0 = a === "again" ? bonbonOf(cocoaState(F), k) : null, out = r0 ? makeBonbons(F, r0.shell, r0.fills, ccSt.mould || r0.shape) : makeBonbons(F, ccSt.shell, ccSt.sel, ccSt.mould); if (!out) return;
       ccSt.sel = []; ccSt.made = out.r.id; ccSt.isNew = out.isNew; sfx("chime"); act("cheer"); gainXp(out.isNew ? 2 : 1);
       if (out.isNew) { [0, 250, 500].forEach((t, k2) => setTimeout(() => mprop("sparkle", mel.x + (k2 - 1)*22, mel.y - 60, 1600), t)); speak(`A new bonbon: ${out.r.name}! Twelve of them, ready for the display case.`, 5000); }
-      else flash(`Another tray of ${out.r.name}`); }
+      else { flash(`Another tray of ${out.r.name}`); speak(`Another tray of ${out.r.name}: twelve more for the display case.`, 4000); }
+      setTimeout(() => { const pn = $("ctx"); if (pn) pn.scrollTop = 0; const sc = pn && pn.closest(".panel"); if (sc) sc.scrollTop = 0; }, 30); }   // round 256: back to the top, where the new tray shows
     else if (a === "case") { if (!ccToggle(cocoaState(F), k)) return; sfx("tap"); }
     else if (a === "scoop") { const got = sendScoop(F, k); if (!got) return; sfx("paper", true); gainXp(1);
       speak(k === "dip" ? `${got} dips of house-made dark, off to the Scoop Shack's dip station. Cones dipped in it sell for more.` : `${got} bars of Cocoa Room chocolate, into the Scoop Shack's gelato fridge. Try it at the mixing bench!`, 5000); }

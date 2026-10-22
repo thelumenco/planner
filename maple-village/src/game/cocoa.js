@@ -141,6 +141,9 @@ export const recipeOf = (c, id) => c.bonbons.find(b => b.id === id);
 export const knownBonbon = (c, shell, fills) => recipeOf(c, keyOf(shell, fills));
 export const shellChoc = (c, k) => c.res[k] + c.choc[k];   // the bonbon shelf, then loose chocolate
 function takeChoc(c, k, n){ const r0 = Math.min(n, c.res[k]); c.res[k] -= r0; c.choc[k] -= n - r0; }
+// round 256 (Mel: "make another tray of bonbons, it doesn't respond"): a greyed-out button says what's missing
+export const shortBy = (c, shell, fills) => { const out = fills.filter(f => !((c.pantry[f] || 0) >= 1)).map(f => fillName(f).toLowerCase()); if (shellChoc(c, shell) < SHELL) out.unshift(`${KINDS[shell].n.split(" ")[0].toLowerCase()} chocolate`);
+  return out.length ? `Needs ${out.join(" and ")}` : "Another tray"; };
 export const canMakeBonbon = (c, shell, fills) => shellChoc(c, shell) >= SHELL && fills.length >= 1 && fills.every(f => (c.pantry[f] || 0) >= 1);
 // a tray of 12: discovers a new bonbon, or makes another tray of a known one
 export function makeBonbons(F, shell, fills, shape){
@@ -409,10 +412,10 @@ export function bonbonPanel(F, st){
   if (made && !sel.length) h += card(made.shell, made.col, made.name, st.isNew ? "A new bonbon! The first tray's ready for the display case." : "Another tray of twelve, ready for the display case.", true, made.shape);
   else if (sel.length) h += card(shell, FL([...sel].sort()[0])[2], shapedName(known ? known.base || known.name : bonbonName(shell, sel), shape), known ? (known.shape || "dome") !== shape ? `You know this one. A tray in the ${MOULDS[shape].n.toLowerCase()} mould makes it a ${MOULDS[shape].n.toLowerCase()} from now on.` : "You know this one. Make another tray?" : "Something new!", false, shape);
   const ok = sel.length && canMakeBonbon(c, shell, sel);
-  h += `<div class="actions"><button class="btn primary" data-cc="bonbon" ${ok ? "" : "disabled"}>${known ? "Make another tray" : "Make it"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  h += `<div class="actions"><button class="btn primary" data-cc="bonbon" ${ok ? "" : "disabled"}>${sel.length && !ok ? esc(shortBy(c, shell, sel)) : known ? "Make another tray" : "Make it"}</button><button class="btn alt small" data-close="1">Close</button></div>`;
   if (sel.length && shellChoc(c, shell) < SHELL) h += `<p class="muted">Not enough ${KINDS[shell].n.toLowerCase()}: temper some more first, or raise its bonbon shelf target at the counter so Mateo makes some.</p>`;
   h += specialCard(c);
-  if (c.bonbons.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map(b => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span><button class="btn small alt" data-cc="again" data-k="${esc(b.id)}" ${canMakeBonbon(c, b.shell, b.fills) ? "" : "disabled"}>Another tray</button></li>`).join("")}</ul>`;
+  if (c.bonbons.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map(b => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span>${canMakeBonbon(c, b.shell, b.fills) ? `<button class="btn small alt" data-cc="again" data-k="${esc(b.id)}">Another tray</button>` : `<button class="btn small alt" disabled>${esc(shortBy(c, b.shell, b.fills))}</button>`}</li>`).join("")}</ul>`;
   return h;
 }
 function specialCard(c){
