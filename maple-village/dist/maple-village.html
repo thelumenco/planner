@@ -32232,6 +32232,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       orch.stock[key] -= n;
       if (orch.stock[key] <= 0) delete orch.stock[key];
     }
+    if (from === "bag" && id in WINE_FILL) n *= WINE_FILLS;
     c.pantry[id] = (c.pantry[id] || 0) + n;
     return n;
   }
