@@ -28758,8 +28758,8 @@ Quests finished today: ${S4.doneIds.length}`;
 
   // src/game/feeds.js
   var APPS2 = { chord: { name: "Chord", room: "chord" }, chico: { name: "Chico", room: "chico" }, luna: { name: "Luna", room: "luna" }, ohayo: { name: "Ohayo", room: "ohayo" } };
-  var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "var(--peri)" } };
-  var DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-desk", "ohayo-hellos", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
+  var BRANDS = { chord: { name: "Chord", color: "var(--sage)" }, ambidextrous: { name: "Ambidextrous", color: "#C9B6E4" }, chico: { name: "Chico", color: "var(--sky)" } };
+  var DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-desk", "ohayo-hellos", "content-chord", "content-ambidextrous", "content-chico", "goodnews", "outfit"];
   var KEY4 = "fox.feeds";
   var D4 = (() => {
     try {
@@ -28912,8 +28912,8 @@ Quests finished today: ${S4.doneIds.length}`;
   function contentHTML() {
     const today2 = dayKey(), end = new Date(Date.parse(today2 + "T00:00:00Z") + 14 * 864e5).toISOString().slice(0, 10);
     const all = contentItems().filter((i) => i.date >= today2 && i.date < end && (brandFilter === "all" || i.brand === brandFilter));
-    let h3 = `<div class="chips cfilter">${[["all", "Both"], ...Object.entries(BRANDS).map(([k, v]) => [k, v.name])].map(([k, n]) => `<button type="button" data-cbrand="${k}" aria-pressed="${brandFilter === k}">${esc(n)}</button>`).join("")}</div>`;
-    if (!contentUpdated().length) return h3 + `<p class="muted">No content calendars have reported in yet. Once the Chord and Ambidextrous calendars send their plans, the next two weeks show here.</p>`;
+    let h3 = `<div class="chips cfilter">${[["all", "All"], ...Object.entries(BRANDS).map(([k, v]) => [k, v.name])].map(([k, n]) => `<button type="button" data-cbrand="${k}" aria-pressed="${brandFilter === k}">${esc(n)}</button>`).join("")}</div>`;
+    if (!contentUpdated().length) return h3 + `<p class="muted">No content calendars have reported in yet. Once the Content Command Centre sends its plans, the next two weeks show here.</p>`;
     if (!all.length) return h3 + `<p class="muted">Nothing planned in the next two weeks${brandFilter === "all" ? "" : " for " + BRANDS[brandFilter].name}.</p>`;
     const days2 = {};
     all.forEach((i) => (days2[i.date] = days2[i.date] || []).push(i));
