@@ -2727,5 +2727,5 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - Test at the end of the cottages unit block.
 
 ## Round 259: content calendar from the Command Centre only, with Chico (Mel: "all the routines write to command center now... colour coded according to Ambidextrous, Chord or Chico")
-- feeds.js: BRANDS gains `chico` (peach) and DOCS `content-chico`; the brand filter's first chip says "All".
+- feeds.js: BRANDS gains `chico`; colours per Mel: Chord sage, Ambidextrous lavender (#C9B6E4), Chico pale blue (--sky) and DOCS `content-chico`; the brand filter's first chip says "All".
 - Village feeds routine (trig_01FNvkV73ExnoXTpVsTYT6Bv) section 2 rewritten: reads only the Content Command Centre (RNDmVDv8eJagnZFUS7QTui), writes content-chord / content-ambidextrous / content-chico, no fallback to the old planner pages. The 23 Oct 7:05 run had failed on the usage limit; fired by hand after the change.

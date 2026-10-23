@@ -7,7 +7,7 @@
 import { esc, plain, dayKey } from "../util.js";
 
 export const APPS = {chord: {name: "Chord", room: "chord"}, chico: {name: "Chico", room: "chico"}, luna: {name: "Luna", room: "luna"}, ohayo: {name: "Ohayo", room: "ohayo"}};
-export const BRANDS = {chord: {name: "Chord", color: "var(--sage)"}, ambidextrous: {name: "Ambidextrous", color: "var(--peri)"}, chico: {name: "Chico", color: "var(--peach)"}};
+export const BRANDS = {chord: {name: "Chord", color: "var(--sage)"}, ambidextrous: {name: "Ambidextrous", color: "#C9B6E4"}, chico: {name: "Chico", color: "var(--sky)"}};   // Mel: lavender, sage, pale blue
 const DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-desk", "ohayo-hellos", "content-chord", "content-ambidextrous", "content-chico", "goodnews", "outfit"];
 const KEY = "fox.feeds";
 let D = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
