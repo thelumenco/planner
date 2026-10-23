@@ -17599,13 +17599,15 @@ ${p.sign}` };
   var setLetsGuests = (f5) => {
     letsGuests = f5;
   };
-  var letGuests = (day) => {
-    const g18 = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS), base = [g18.slice(0, 2), g18.slice(2, 4)], own = letsGuests && letsGuests(day);
-    return own ? base.map((b, i) => own[i] == null ? b : own[i]) : base;
+  var letGuests = (day, hm12) => {
+    const g18 = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS), base = [g18.slice(0, 2), g18.slice(2, 4)], own = letsGuests && letsGuests(day, hm12);
+    if (!own) return base;
+    const mine = letsGuests(day).flat().filter(Boolean);
+    return base.map((b, i) => own[i] == null ? b.filter((id) => !mine.includes(id)) : own[i]);
   };
   var LET_SEATS = [[[300, 292], [376, 292]], [[300, 466], [376, 466]]];
   function letSlot(id, day, hm12) {
-    const lets = letGuests(day), c = lets.findIndex((g18) => g18.includes(id));
+    const lets = letGuests(day, hm12), c = lets.findIndex((g18) => g18.includes(id));
     if (c < 0) return null;
     const k = lets[c].indexOf(id), at9 = LET_SEATS[c][k];
     if (hm12 >= 7 * 60 + 30 && hm12 < 9 * 60) return { from: 7 * 60 + 30, to: 9 * 60, scene: "hlane", at: at9, act: "sit", dir: k ? -1 : 1 };
@@ -35584,9 +35586,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var setKeeper = (F2, c, on) => {
     letState(F2).keeper[c] = !!on;
   };
-  var porchGuests = (F2, day) => ["bluebell", "figtree"].map((c) => {
+  var porchGuests = (F2, day, hm12) => ["bluebell", "figtree"].map((c) => {
     if (!owns(F2, c)) return null;
-    const s = letState(F2).stays[c].find((x) => x.in <= day && x.out > day && x.checkedIn !== false);
+    const s = letState(F2).stays[c].find((x) => x.in <= day && x.out > day && x.checkedIn !== false && !(hm12 != null && x.in === day && hm12 < CHECKIN));
     return s ? s.who : [];
   });
   function letsMail(F2, t2) {
@@ -62406,7 +62408,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     e.target.value = "";
   };
   setStallOwned(() => ({ cocoa: owns3(F, "cocoa"), millshop: owns3(F, "millshop"), cc_cart: !!(F.cocoa && F.cocoa.up && F.cocoa.up.cart), cc_workshop: !!(F.cocoa && F.cocoa.up && F.cocoa.up.workshop) }));
-  setLetsGuests((day) => porchGuests(F, day));
+  setLetsGuests((day, hm12) => porchGuests(F, day, hm12));
   initNpcs({
     sfx,
     story: (id) => tellStory(F, id, addInv),
