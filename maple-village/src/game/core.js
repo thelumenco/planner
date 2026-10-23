@@ -1159,7 +1159,7 @@ function journal(){
   if (key !== qnKey) { qnKey = key; if (Date.now() > qnQuietUntil) qnOpen = true; }
   const slim = !qnOpen || (route.length > 0 && !(say && say.buttons));
   j.classList.toggle("slim", slim);
-  j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Fold the note away">–</button>`;
+  j.innerHTML = h + `<button class="qnx" data-qn="min" aria-label="Hide the quest note">Hide <svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M2 8l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;   // round 231: a labelled button (the "–" wasn't clear)
   if (slim) j.innerHTML = `<button class="qnslim" data-qn="open" aria-label="Open the quest note">${icon("note", 20)} <b>${open.length ? `${open.length} task${open.length === 1 ? "" : "s"} to go` : "Quest board"}</b>${reqs.length ? `<span class="when">${reqs.length} request${reqs.length === 1 ? "" : "s"}</span>` : ""}<span class="more">open</span></button>`;
   j.classList.toggle("intop", !outside());
   j.querySelectorAll("[data-qn]").forEach(el => el.onclick = ev => { ev.stopPropagation(); qnOpen = el.dataset.qn === "open"; sfx("paper", true); journal(); });

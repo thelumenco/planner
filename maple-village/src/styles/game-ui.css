@@ -39,7 +39,7 @@
   background-color:var(--peri);background-image:radial-gradient(circle,rgba(255,255,255,.85) 1.4px,transparent 1.8px);background-size:8px 8px;
   clip-path:polygon(2% 10%,9% 0,18% 8%,28% 2%,40% 9%,52% 1%,64% 8%,76% 2%,88% 9%,98% 3%,96% 50%,99% 94%,89% 99%,77% 91%,65% 100%,53% 92%,41% 100%,29% 92%,17% 99%,7% 91%,0 97%,3% 50%)}
 .map .qnote:empty{display:none}
-.qnote h1{font-size:1.2rem;margin:0 26px 8px 0;line-height:1.25}
+.qnote h1{font-size:1.2rem;margin:0 74px 8px 0;line-height:1.25}
 .qnote .lbl{font-size:.6rem;margin:0 0 4px;letter-spacing:.2em}
 .qnote .bujo{gap:3px;margin:0 0 10px;font-size:.9rem;line-height:1.45}
 .qnote .bujo li{padding-left:20px}
@@ -57,8 +57,8 @@
 .qnote .timer .t{font-size:1.45rem}
 .qnote .note{margin:0 0 10px;font-size:.85rem;padding:8px 12px}
 .qnote .saybtns{margin:0 0 10px}
-.qnote .qnx{position:absolute;top:6px;right:8px;width:30px;height:30px;border:0;border-radius:50%;background:transparent;color:#8A8279;font-size:1.2rem;line-height:1}
-.qnote .qnx:hover{background:rgba(0,0,0,.05)}
+.qnote .qnx{position:absolute;top:8px;right:8px;display:inline-flex;align-items:center;gap:4px;min-height:30px;padding:4px 11px;border:1.4px solid rgba(120,104,84,.4);border-radius:999px;background:#EFE7DA;color:#4A4038;font:700 .8rem/1 Mulish,sans-serif;cursor:pointer}
+.qnote .qnx:hover{background:#E6DCCB}
 .map .qnote.low{top:auto;bottom:8px}
 /* collapsed: one line, tap to open */
 .map .qnote.slim{left:50%;right:auto;max-width:calc(100% - 16px);padding:0;transform:translateX(-50%) rotate(-.5deg);overflow:hidden}
