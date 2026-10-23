@@ -1,13 +1,14 @@
 // Reports other routines send to the village, all read-only here:
 //  - "health-chord" / "health-chico" / "health-luna" / "health-ohayo": the nightly bug checks. Shown as a standing health sign in each building
 //    and a little light on the building in the town square.
-//  - "content-chord" / "content-ambidextrous": the two content calendars. Shown on the calendar panel's Content tab.
+//  - "content-chord" / "content-ambidextrous" / "content-chico": the content calendars, all copied from Mel's Content Command
+//    Centre (round 259). Shown on the calendar panel's Content tab.
 // Docs live in the per-user collection; routines write them, the page only reads (see ROUTINE-STEPS.md).
 import { esc, plain, dayKey } from "../util.js";
 
 export const APPS = {chord: {name: "Chord", room: "chord"}, chico: {name: "Chico", room: "chico"}, luna: {name: "Luna", room: "luna"}, ohayo: {name: "Ohayo", room: "ohayo"}};
-export const BRANDS = {chord: {name: "Chord", color: "var(--sage)"}, ambidextrous: {name: "Ambidextrous", color: "var(--peri)"}};
-const DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-desk", "ohayo-hellos", "content-chord", "content-ambidextrous", "goodnews", "outfit"];
+export const BRANDS = {chord: {name: "Chord", color: "var(--sage)"}, ambidextrous: {name: "Ambidextrous", color: "var(--peri)"}, chico: {name: "Chico", color: "var(--peach)"}};
+const DOCS = ["health-chord", "health-chico", "health-luna", "health-ohayo", "ohayo-desk", "ohayo-hellos", "content-chord", "content-ambidextrous", "content-chico", "goodnews", "outfit"];
 const KEY = "fox.feeds";
 let D = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
 let onChange = () => {};
@@ -115,8 +116,8 @@ let brandFilter = "all";
 export function contentHTML(){
   const today = dayKey(), end = new Date(Date.parse(today + "T00:00:00Z") + 14*864e5).toISOString().slice(0, 10);
   const all = contentItems().filter(i => i.date >= today && i.date < end && (brandFilter === "all" || i.brand === brandFilter));
-  let h = `<div class="chips cfilter">${[["all", "Both"], ...Object.entries(BRANDS).map(([k, v]) => [k, v.name])].map(([k, n]) => `<button type="button" data-cbrand="${k}" aria-pressed="${brandFilter === k}">${esc(n)}</button>`).join("")}</div>`;
-  if (!contentUpdated().length) return h + `<p class="muted">No content calendars have reported in yet. Once the Chord and Ambidextrous calendars send their plans, the next two weeks show here.</p>`;
+  let h = `<div class="chips cfilter">${[["all", "All"], ...Object.entries(BRANDS).map(([k, v]) => [k, v.name])].map(([k, n]) => `<button type="button" data-cbrand="${k}" aria-pressed="${brandFilter === k}">${esc(n)}</button>`).join("")}</div>`;
+  if (!contentUpdated().length) return h + `<p class="muted">No content calendars have reported in yet. Once the Content Command Centre sends its plans, the next two weeks show here.</p>`;
   if (!all.length) return h + `<p class="muted">Nothing planned in the next two weeks${brandFilter === "all" ? "" : " for " + BRANDS[brandFilter].name}.</p>`;
   const days = {}; all.forEach(i => (days[i.date] = days[i.date] || []).push(i));
   h += Object.keys(days).map(d => { const dt = new Date(d + "T00:00:00Z");

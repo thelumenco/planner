@@ -2725,3 +2725,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - `porchGuests(F, day, hm)` in lets.js: with a time, a stay that starts today is left out before CHECKIN (3pm), so arriving guests aren't on the porch at 7:30 or in the woods at 10 before they've arrived. `letGuests(day, hm)`/`letSlot` in tours.js pass the time through; core.js's setter takes `(day, hm)`. Called without a time (tapping the cottage on the lane) it still lists the week's guests.
 - `letGuests` also drops Mel's own guests from Elena's tourist pair for the other cottage (a guest could be drawn for both, and showed up as Bluebell's before Fig Tree's check-in).
 - Test at the end of the cottages unit block.
+
+## Round 259: content calendar from the Command Centre only, with Chico (Mel: "all the routines write to command center now... colour coded according to Ambidextrous, Chord or Chico")
+- feeds.js: BRANDS gains `chico` (peach) and DOCS `content-chico`; the brand filter's first chip says "All".
+- Village feeds routine (trig_01FNvkV73ExnoXTpVsTYT6Bv) section 2 rewritten: reads only the Content Command Centre (RNDmVDv8eJagnZFUS7QTui), writes content-chord / content-ambidextrous / content-chico, no fallback to the old planner pages. The 23 Oct 7:05 run had failed on the usage limit; fired by hand after the change.

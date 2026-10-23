@@ -445,12 +445,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     localStorage.setItem("stub:data/users/me/content-chord", JSON.stringify({brand: "chord", at, items: [{date: d(0), time: "09:00", channel: "Instagram", title: "3 signs your client portal is costing you", status: "scheduled"}, {date: d(2), channel: "Blog", title: "HoneyBook alternatives outside the US", status: "draft"}]}));
     localStorage.setItem("stub:data/users/me/goodnews", JSON.stringify({at, world: [{title: "Coral reef bounces back", summary: "Scientists report record recovery.", source: "Example News", link: "https://example.com/reef"}], wins: ["Chord added 2 studios this week"]}));
     localStorage.setItem("stub:data/users/me/content-ambidextrous", JSON.stringify({brand: "ambidextrous", at, items: [{date: d(1), channel: "LinkedIn", title: "What I do and what Claude does", status: "idea"}]}));
+    localStorage.setItem("stub:data/users/me/content-chico", JSON.stringify({brand: "chico", at, items: [{date: d(3), channel: "Instagram", title: "Five minutes of logging, a week of calmer evenings", status: "draft"}]}));
   });
   await page.goto(url + "?nosample=1&time=10:30&date=2026-10-05");
   await page.waitForTimeout(700);
   await page.click('[data-open="cal"]');
   await page.click('[data-caltab="content"]');
-  check(await page.locator("#calBody .hlist.content li").count() === 3, "the content tab shows both calendars' next two weeks");
+  check(await page.locator("#calBody .hlist.content li").count() === 4, "the content tab shows all three calendars' next two weeks (Chord, Ambidextrous, Chico)");
   await page.click('[data-cbrand="chord"]');
   check(await page.locator("#calBody .hlist.content li").count() === 2, "and can show one brand at a time");
   await page.screenshot({ path: join(shots, "content-calendar.png") });
