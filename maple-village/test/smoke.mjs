@@ -1620,6 +1620,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await gf().then(f => f.goals.scooter && f.ride === "scooter"), "a scooter, kept in the garage");
   await page.click('#ctx [data-goal="car"]'); await page.waitForTimeout(400);
   check(await gf().then(f => f.goals.car && f.ride === "car" && f.coins === 13000 - 800 - 3500), "and a cream convertible");
+  check(await page.locator('#world [data-spot="car"] .hov').count() === 0, "with no highlight left under it after a tap (Mel: the car looked like it was floating)");
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click"); await page.waitForTimeout(250);
   check(await page.locator("#mel.drive").count() === 1 && await page.locator("#mel.withEvan").count() === 1, "outdoors Mel drives the convertible between places, with Evan and Maple aboard");
