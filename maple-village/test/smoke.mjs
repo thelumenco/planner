@@ -4795,6 +4795,28 @@ if (want("\nMake another tray, and Your backpack (round 231)")) try {
   check(await page.evaluate(() => window.__hbGame.F().cocoa.pantry.wine_red === 4 && /\+4 on the fillings shelf/.test(document.getElementById("earn").textContent)), "and it's four fillings, and says so");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe map, from the backpack (round 231)")) try {
+  // the creator: "a mini version of the map... it shows where you are and where certain landmarks are", in the backpack
+  console.log("\nThe map, from the backpack (round 231)");
+  const mm = await import(new URL("../src/game/minimap.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url)), wd = await import(new URL("../src/data/world.js", import.meta.url));
+  check(mm.TILES.length === 12 && mm.TILES.every(t => wd.OUTDOOR.includes(t[0])) && new Set(mm.TILES.map(t => t[2] + "," + t[3])).size === 12, "all twelve Honeybrook screens on a 4 by 3 grid");
+  { const gates = Object.values(wd.VILLAGE).filter(v => v.bridge && mm.tileOf(v.scene) && mm.tileOf(v.bridge)), has = (a, b) => mm.PATHS.some(p => p.includes(a) && p.includes(b));
+    const adj = (a, b) => { const A = mm.tileOf(a), B = mm.tileOf(b); return Math.abs(A[2] - B[2]) + Math.abs(A[3] - B[3]) === 1; };
+    check(gates.every(v => has(v.scene, v.bridge)) && mm.PATHS.every(([a, b]) => adj(a, b)), "every gate in the game is a path on the map, between neighbouring squares"); }
+  check(mm.LANDMARKS.every(l => ic.ICON_NAMES.includes(l[2])), "every landmark has a real icon");
+  check(!mm.landmarksOf({goals: {}}, "bay").some(l => /Cocoa/.test(l.n)) && mm.landmarksOf({goals: {cocoa: true}}, "bay").some(l => /Cocoa/.test(l.n)), "the Cocoa Room is on the map once it's done up");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`map pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  await page.click('[data-open="bag"]'); await page.waitForTimeout(400); await page.click("#mapOpen"); await page.waitForTimeout(400);
+  check(await page.evaluate(() => !document.getElementById("mmBox").hidden && /You're at home/.test(document.querySelector(".mmcard .sub").textContent) && !!document.querySelector(".mmhere")), "the backpack's Map button opens the map: a red dot, and You're at home");
+  await page.click('[data-mm="bay"]'); await page.waitForTimeout(200);
+  check(/Scoop Shack/.test(await page.locator(".mmlist").textContent()), "tap a place on the map to see what's there");
+  await page.click("[data-mmclose]"); await page.waitForTimeout(200);
+  await page.evaluate(() => window.__hbScene("haberdash")); await page.waitForTimeout(500); await page.click('[data-open="bag"]'); await page.waitForTimeout(400); await page.click("#mapOpen"); await page.waitForTimeout(300);
+  check(/in Ada's haberdashery, on Makers' Lane/.test(await page.locator(".mmcard .sub").textContent()), "inside a building, it says which, and where");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

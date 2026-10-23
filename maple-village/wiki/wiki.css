@@ -48,3 +48,7 @@ ul.plain{padding-left:1.1em}
 .face{flex:none}.card .face{margin:-6px 0}
 .banner{border-radius:18px;overflow:hidden;border:1.5px solid var(--line);line-height:0;margin-top:6px}.wscene{width:100%;height:auto;aspect-ratio:400/200;display:block}
 .wbadge{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);flex:none}
+
+/* round 231: the map of Honeybrook (game/minimap.js) */
+.mapfig{max-width:560px;margin:12px 0 18px}
+.mapfig > svg{display:block;width:100%;height:auto}

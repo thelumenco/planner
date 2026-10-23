@@ -364,3 +364,12 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
 - Wiki: a Home page (wiki/pages/23-home.mjs), the drying loft, seasons, the campervan mood board, Sunday lunch,
   shoppers, the salon and Mika's page.
 - Tests: "Mika's: hair, by appointment (round 231)" and the other round 231 sections in test/smoke.mjs.
+- Later in round 231: the Scoop Shack's story (Uncle Wilf opened it in the old beach café; intro.js, Sofia's intro, the
+  wiki); the windmill's label; the welcome screen and then the whole game kept light whatever the phone's dark mode
+  (index.html data-theme="light"); no toys at the market (balloon, wand, truck and the dino things off sale; a new
+  novel, a moon keychain, a band tee, a ship in a bottle); the treehouse as a room (ROOMS.treehouse: window seat, letters
+  shelf, floor cushions, the daydream jar in game/daydreams.js); Mika's salon; five more hairstyles; Make another tray
+  fixed when a picked filling ran out; Your backpack (not Spoil); wine at the fillings shelf says Open a bottle (4).
+- The map (game/minimap.js): the twelve screens on a 4 by 3 grid (TILES, PATHS, LANDMARKS), opened from the Map button
+  in the backpack, with a red dot where you are; the same map on the wiki's /map page (wiki/pages/21-map.mjs). A new
+  outdoor screen or gate needs a tile and a path there (the test checks every gate is a path).

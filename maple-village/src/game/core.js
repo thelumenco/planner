@@ -33,7 +33,8 @@ import * as KD from "./kudos.js";
 import * as AF from "./affirm.js";
 import * as VB from "./bank.js";
 import * as EJ from "./jars.js";
-import * as DD from "./daydreams.js";   // round 231: the daydream jar in the treehouse
+import * as DD from "./daydreams.js";
+import * as MM from "./minimap.js";   // round 231: the map, from the backpack   // round 231: the daydream jar in the treehouse
 import * as LTR from "./letters.js";   // and the letters: Dear future me, Dear Universe
 import { myName, dearMe } from "./me.js";
 import * as GU from "./guests.js";
@@ -3363,6 +3364,24 @@ $("setBed").onchange = e => { F.bedLock = e.target.checked; save(); bedtimeTick(
 ["keydown", "click", "pointerdown"].forEach(t => document.addEventListener(t, ev => { if (document.body.classList.contains("bedlocked") && !ev.target.closest("#bedLock")) { ev.stopPropagation(); ev.preventDefault(); } }, {capture: true}));
 
 /* ---------- Trophies ---------- */
+/* ---------- round 231: the map of Honeybrook (minimap.js), from the button in the backpack ---------- */
+let mapPick = null;
+function mapAt(){
+  const t = townOf(scene); if (t) return {screen: null, inside: "", trip: (TOWNS[t] && TOWNS[t].n) || "a day out"};
+  const o = outdoorOf(scene); if (!MM.tileOf(o)) return {screen: null, inside: "", trip: "a day out"};
+  return {screen: o, inside: OUTDOOR.includes(scene) ? "" : ROOMS[scene] ? ROOMS[scene].name : placeName(scene), trip: ""};
+}
+function openMap(){
+  let box = $("mmBox"); if (!box) { box = document.createElement("div"); box.id = "mmBox"; box.className = "mmbox"; document.body.appendChild(box);
+    box.onclick = ev => { if (ev.target === box || ev.target.closest("[data-mmclose]")) { closeMap(); return; }
+      const t = ev.target.closest("[data-mm]"); if (t) { mapPick = t.dataset.mm; sfx("tap"); drawMap(); } };
+    box.onkeydown = ev => { if (ev.key === "Escape") closeMap(); const t = ev.target.closest && ev.target.closest("[data-mm]"); if (t && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); mapPick = t.dataset.mm; drawMap(); } }; }
+  mapPick = null; drawMap(); box.hidden = false; sfx("paper", true); const b = box.querySelector("[data-mmclose]"); if (b) b.focus();
+}
+function drawMap(){ const box = $("mmBox"); if (box) box.innerHTML = MM.mapPanel(F, mapAt(), mapPick); }
+function closeMap(){ const box = $("mmBox"); if (box) box.hidden = true; const b = $("mapOpen"); if (b) b.focus(); }
+$("mapOpen").onclick = ev => { ev.stopPropagation(); openMap(); };
+
 /* ---------- round 227: kind words, affirmations, savings vaults and emotion jars (kudos.js, affirm.js, bank.js, jars.js) ---------- */
 const SELF_AT = {kudos: "trophy", affirm: "trophy", vault: "bank", bank: "bank", jars: "room", letters: "room|base|treehouse", dreams: "treehouse"};
 const selfHere = () => !!SELF_AT[selfView] && SELF_AT[selfView].split("|").includes(scene);

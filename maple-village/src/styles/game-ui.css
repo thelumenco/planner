@@ -1088,3 +1088,17 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ddlist.done li{background:#F3EFE7;color:#6E6258}
 .ddlist.done li span{text-decoration:line-through;text-decoration-color:rgba(110,98,88,.5)}
 .ddbtns{display:flex;align-items:center;gap:6px;flex:none}
+/* round 231: the map (game/minimap.js), from the backpack */
+.baghead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.baghead h2{margin-bottom:0}
+.baghead .btn{display:inline-flex;align-items:center;gap:6px}
+.mmbox{position:fixed;inset:0;z-index:58;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom));background:rgba(58,46,40,.45)}
+.mmbox[hidden]{display:none}
+.mmcard{position:relative;width:min(560px,100%);max-height:100%;overflow:auto;background:#FFFDF6;color:#2F2B28;border-radius:18px;padding:18px 16px 16px;box-shadow:0 10px 40px rgba(40,30,20,.25)}
+.mmcard h2{margin:.1em 0 .3em}
+.mmsvg{display:block;margin:6px 0 4px}
+.mmtile{cursor:pointer}
+.mmtile:focus-visible rect{stroke:#2F3B73;stroke-width:3}
+.mmdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#E8566C;border:2px solid #FFFDF6;box-shadow:0 0 0 1px #E8566C;margin-right:6px;vertical-align:0}
+.mmlist{list-style:none;padding:0;margin:4px 0 8px;display:flex;flex-wrap:wrap;gap:6px 14px}
+.mmlist li{display:flex;align-items:center;gap:6px;font-size:.92rem}
