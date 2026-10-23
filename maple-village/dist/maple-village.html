@@ -24379,7 +24379,7 @@ ${r.n}`;
         const j = G2.vault && G2.vault(s.x);
         return j ? j.label : "Empty";
       })() : s.name;
-      h3 += `<g data-spot="${s.id}" aria-label="${s.name || (nm6 ? "Trophy: " + nm6 : "Empty pedestal")}"><ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>${furn(s.kind, s.x, s.y)}${nm6 ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm6, "var(--card)") : s.kind === "gallerywall" ? tapeLabel(s.x, s.y - 108, nm6, "var(--card)", 11) : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm6.length > 10 ? nm6.slice(0, 9) + "…" : nm6, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm6.length > 15 ? nm6.slice(0, 14).trim() + "…" : nm6, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm6.length > 24 ? nm6.slice(0, 23) + "…" : nm6, "var(--card)") : ""}</g>`;
+      h3 += `<g data-spot="${s.id}" aria-label="${s.name || (nm6 ? "Trophy: " + nm6 : "Empty pedestal")}">${s.kind === "carbay" ? "" : `<ellipse class="hov" cx="${s.x}" cy="${s.y + 6}" rx="62" ry="12" style="fill:var(--butter)"/>`}${furn(s.kind, s.x, s.y)}${nm6 ? s.kind === "curtwindow" ? tapeLabel(s.x - 112, s.y - 126, nm6, "var(--card)") : s.kind === "gallerywall" ? tapeLabel(s.x, s.y - 108, nm6, "var(--card)", 11) : s.kind === "vaultjar" ? tapeLabel(s.x, s.y + 24, nm6.length > 10 ? nm6.slice(0, 9) + "…" : nm6, "var(--card)", 9.5) : s.kind === "pedestal" ? tapeLabel(s.x, s.y + 24, nm6.length > 15 ? nm6.slice(0, 14).trim() + "…" : nm6, "var(--card)", 9) : tapeLabel(s.x, s.y + (/door$/.test(s.kind) ? 34 : 24), nm6.length > 24 ? nm6.slice(0, 23) + "…" : nm6, "var(--card)") : ""}</g>`;
     });
     if (id === "kidroom") {
       const k = G2.kid ? G2.kid() : {};
