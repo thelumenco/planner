@@ -54,7 +54,8 @@ export function shoreArt(){
   const sea = dolphin(80, 200, 11, 1, false) + dolphin(64, 238, 11, 2.2, false) + dolphin(96, 470, 14, 6, true) + farPaddler(40, 330, 140, 70);
   const jetty = `<g pointer-events="none">${sk(`<rect x="34" y="454" width="176" height="18" rx="2" style="fill:#C9A27E"/>`, `<rect x="34" y="454" width="176" height="18" rx="2"/>${Array.from({length: 11}, (_, i) => `<path d="M${50 + i*15} 454 v18"/>`).join("")}${[44, 88, 132, 176].map(x => `<path d="M${x} 472 v10"/>`).join("")}`)}</g>`;
   // round 127: the ferry stop (Jeju; round 215: and the islands), a little blue signboard at the end of the jetty
-  const ferry = `<g data-place="ferry" aria-label="The ferry: boats to the islands"><ellipse class="hov" cx="78" cy="466" rx="24" ry="8" style="fill:var(--butter)"/>
+  // (round 231: a tap anywhere on the sign, its post or its label opens the ticket board; between them it used to miss)
+  const ferry = `<g data-place="ferry" aria-label="The ferry: boats to the islands"><rect x="44" y="404" width="68" height="106" fill="transparent"/><ellipse class="hov" cx="78" cy="466" rx="24" ry="8" style="fill:var(--butter)"/>
     ${sk(`<rect x="70" y="420" width="4" height="36" style="fill:#8A6A52"/><rect x="54" y="414" width="40" height="18" rx="2" style="fill:#3E7CC0"/><path d="M60 428 h6 M80 428 h8" style="stroke:#FFFDF6" stroke-width="1"/>`, `<rect x="54" y="414" width="40" height="18" rx="2"/><rect x="70" y="420" width="4" height="36"/>`)}
     <text x="74" y="426" text-anchor="middle" font-family="Klee One,serif" font-weight="700" font-size="6.4" fill="#FFFDF6" pointer-events="none">FERRY</text>${tapeLabel(78, 498, "Ferries", "#C3DDF3", 9)}</g>`;
   const rack = `<g data-place="suprack" aria-label="Paddleboard rack"><ellipse class="hov" cx="216" cy="480" rx="30" ry="9" style="fill:var(--butter)"/>

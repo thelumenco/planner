@@ -310,7 +310,6 @@ const SHELLS = {
   // the garage: a concrete floor with oil-stain shadows, a pegboard of tools, a roller door, a strip light
   garage: () => `<rect width="520" height="640" style="fill:#C9C6C0"/>
     <g opacity=".35" style="stroke:#A9A59D" stroke-width="1.2">${rows(4, i => `<path d="M0 ${250 + i*110} H520"/>`)}${rows(4, i => `<path d="M${130*i} 150 V640"/>`)}</g>
-    <ellipse cx="330" cy="500" rx="70" ry="14" style="fill:#AFAAA2" opacity=".6"/>
     ${wallBase("#E3E6EA", "#8FA3B8")}${skirting}
     ${sk(`<rect x="40" y="30" width="180" height="90" rx="3" style="fill:#D9B48A"/>${rows(6, i => `<circle cx="${60 + i*30}" cy="46" r="2" style="fill:#8A6A4A"/>`)}<path d="M60 52 v34 M90 52 l10 30 M120 52 v26 h8 M150 52 q10 16 0 30 M180 52 v40" style="stroke:#5E5A55" stroke-width="3" fill="none"/>`,
       `<rect x="40" y="30" width="180" height="90" rx="3"/>`)}

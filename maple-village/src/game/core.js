@@ -3496,10 +3496,21 @@ svg.addEventListener("click", ev => {
   // Fingers miss small people: a tap close to a villager or messenger counts as tapping them.
   const near = npcActors().map(([n, e]) => [n, Math.hypot(e.x - x, (e.y - 30) - y)]).filter(([, d]) => d < 34).sort((a, b) => a[1] - b[1])[0];
   if (near) { if (!(trolleyOn(F) && outside() && !townOf(scene) && trolleyOffer(near[0].dataset.npc)) && !offerHandOver(near[0].dataset.npc)) tapNpc(near[0].dataset.npc); return; }
+  // round 231 ("I clicked the ferry sign but nothing came up"): a sign, a gate or a bench only takes a tap on its painted
+  // parts, so a tap between them fell through to the ground. A tap that lands inside a place's drawing (its label
+  // included) and on nothing else counts as tapping that place; the smallest one wins where they overlap
+  const fp = outside() ? placeUnder(ev.clientX, ev.clientY) : null;
+  if (fp) { const id = fp.dataset.place, v = VILLAGE[id]; if (v) { if (v.spot) go(scene, v.door[0], v.door[1], () => arriveVillageSpot(id)); else go(id, 260, 560, null); return; } }
   route = []; atSpot = null;
   if (qnOpen) { qnOpen = false; journal(); }   // tapping the map to wander folds the note away
   walkTo(x, y);
 });
+function placeUnder(cx, cy){
+  const m = $("map").getBoundingClientRect(), most = m.width*m.height/6; let best = null, area = Infinity;
+  $("sceneArt").querySelectorAll("[data-place]").forEach(g => { const b = g.getBoundingClientRect(), a = b.width*b.height;
+    if (a > 4 && a < most && a < area && cx >= b.left && cx <= b.right && cy >= b.top && cy <= b.bottom) { best = g; area = a; } });
+  return best;
+}
 window.addEventListener("keydown", e => {
   if (e.target.closest("input") || notebookOpen()) return;
   const k = {ArrowUp:"u", ArrowDown:"d", ArrowLeft:"l", ArrowRight:"r", w:"u", s:"d", a:"l", d:"r"}[e.key];
