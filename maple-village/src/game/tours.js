@@ -460,11 +460,13 @@ export function trainSlot(id, day, hm){
 const weekOf = day => { const t = Date.parse(day + "T00:00:00Z"); return new Date(t - ((dow(day) + 6) % 7)*864e5).toISOString().slice(0, 10); };
 // round 236: once Mel owns a cottage its porch guests come from its bookings (lets.js porchGuests, set by core.js)
 let letsGuests = null; export const setLetsGuests = f => { letsGuests = f; };
-export const letGuests = day => { const g = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS), base = [g.slice(0, 2), g.slice(2, 4)], own = letsGuests && letsGuests(day);
-  return own ? base.map((b, i) => own[i] == null ? b : own[i]) : base; };
+// (Mel's own guests are left out of Elena's pair, so nobody's staying in two cottages, or about before their check-in)
+export const letGuests = (day, hm) => { const g = groupFor(weekOf(day) + ":lets", 4, [], TOURISTS), base = [g.slice(0, 2), g.slice(2, 4)], own = letsGuests && letsGuests(day, hm);
+  if (!own) return base; const mine = letsGuests(day).flat().filter(Boolean);
+  return base.map((b, i) => own[i] == null ? b.filter(id => !mine.includes(id)) : own[i]); };
 const LET_SEATS = [[[300, 292], [376, 292]], [[300, 466], [376, 466]]];
 export function letSlot(id, day, hm){
-  const lets = letGuests(day), c = lets.findIndex(g => g.includes(id)); if (c < 0) return null;
+  const lets = letGuests(day, hm), c = lets.findIndex(g => g.includes(id)); if (c < 0) return null;
   const k = lets[c].indexOf(id), at = LET_SEATS[c][k];
   if (hm >= 7*60 + 30 && hm < 9*60) return {from: 7*60 + 30, to: 9*60, scene: "hlane", at, act: "sit", dir: k ? -1 : 1};
   if (hm >= 18*60 && hm < 21*60 + 30) return {from: 18*60, to: 21*60 + 30, scene: "hlane", at, act: "sit", dir: k ? -1 : 1};

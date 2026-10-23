@@ -222,10 +222,11 @@ export function step(F, day, hm){
 export const setKeeper = (F, c, on) => { letState(F).keeper[c] = !!on; };
 
 // the porch guests on the lane (tours.js letSlot): [Bluebell's two, Fig Tree's two] while Mel owns a cottage;
-// null for one she doesn't (Elena's own lets carry on as before)
-export const porchGuests = (F, day) => ["bluebell", "figtree"].map(c => {
+// null for one she doesn't (Elena's own lets carry on as before). With the time of day (hm), arriving guests aren't
+// about till they've checked in at three (Mel: they shouldn't be out in the woods before they've arrived)
+export const porchGuests = (F, day, hm) => ["bluebell", "figtree"].map(c => {
   if (!owns(F, c)) return null;
-  const s = letState(F).stays[c].find(x => x.in <= day && x.out > day && x.checkedIn !== false);
+  const s = letState(F).stays[c].find(x => x.in <= day && x.out > day && x.checkedIn !== false && !(hm != null && x.in === day && hm < CHECKIN));
   return s ? s.who : [];
 });
 

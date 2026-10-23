@@ -2720,3 +2720,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Round 257: wine bottles on the fillings shelf (Mel: "when I put a bottle of wine into the chocolate fillings shelf, it becomes one filling, whereas Open a bottle gives four")
 - `stockPantry` in cocoa.js: a WINE_FILL bottle stocked from the backpack now adds `WINE_FILLS` (4) fillings per bottle, the same as opening a wine shop bottle at the shelf. `unstockPantry` already refuses wine, so a bottle can't be turned into 4 and taken back as 4.
 - Test in "the Scoop Shack" block.
+
+## Round 258: cottage guests wait for check-in (Mel: guests due today, nobody there yet; then "make them wait until after check-in")
+- `porchGuests(F, day, hm)` in lets.js: with a time, a stay that starts today is left out before CHECKIN (3pm), so arriving guests aren't on the porch at 7:30 or in the woods at 10 before they've arrived. `letGuests(day, hm)`/`letSlot` in tours.js pass the time through; core.js's setter takes `(day, hm)`. Called without a time (tapping the cottage on the lane) it still lists the week's guests.
+- `letGuests` also drops Mel's own guests from Elena's tourist pair for the other cottage (a guest could be drawn for both, and showed up as Bluebell's before Fig Tree's check-in).
+- Test at the end of the cottages unit block.

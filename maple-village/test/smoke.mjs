@@ -4827,7 +4827,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(F.coins === c0 + s0.n*s0.rate && L.letState(F).reviews.length === 1 && L.toDo(F, "figtree").length === 3, `the first guests check out: ${s0.n} nights paid, a review, and the changeover waiting (beds, bathroom, tidy)`);
     F.inv = {apple: 2, fig: 1, milk: 1, honey: 1};
     check(["beds", "bath", "tidy"].every(k => L.doTask(F, "figtree", k).ok) && L.ready(F, "figtree") && L.doTask(F, "figtree", "basket").ok && L.doTask(F, "figtree", "fridge").ok && !Object.keys(F.inv).length, "turned round, with a fruit basket and welcome treats from the backpack");
-    check(L.forSale(F, "bluebell"), "and Bluebell's for sale once Fig Tree has had guests"); }
+    check(L.forSale(F, "bluebell"), "and Bluebell's for sale once Fig Tree has had guests");
+    const s1 = L.staysFor(F, "figtree").find(s => !s.checkedIn), tr = await import(new URL("../src/game/tours.js", import.meta.url));
+    tr.setLetsGuests((day, hm) => L.porchGuests(F, day, hm)); const g0 = s1.who[0];
+    check(!tr.letSlot(g0, s1.in, 11*60) && !tr.letSlot(g0, s1.in, 8*60) && tr.letSlot(g0, s1.in, 18*60 + 30)?.scene === "hlane" && tr.letSlot(g0, L.addDays(s1.in, 1), 11*60)?.scene === "hwoods",
+      "arriving guests aren't out and about till they've checked in at three (on the porch that evening, the woods next day)");
+    tr.setLetsGuests(null); }
   // in the browser
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`cottages pageerror: ${e.message}`));
