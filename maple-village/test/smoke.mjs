@@ -5109,6 +5109,41 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/Vine 4\.1/.test(await page.locator("#ctx").innerText()), "tapping a vine down there opens it, like the ones up top");
   await page.close();
 }
+{
+  // rounds 262 to 264: the rest of the bottom row (Mel: "lighthouse point and the stables and the village green")
+  console.log("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)");
+  const so = await import(new URL("../src/game/south.js", import.meta.url)), w = await import(new URL("../src/data/world.js", import.meta.url));
+  const day = "2026-10-24";
+  { const F = {coins: 50, inv: {apple: 1, carrot: 1}};
+    const d1 = so.feedDucks(F, day, 10*60), d2 = so.feedDucks(F, day, 11*60);
+    check(d1.fed && F.coins === 49 && !d2.fed && !so.feedDucks({coins: 5}, day, 22*60).fed, "the ducks: a coin's worth of duck food once a day, and not at night");
+    const sw = so.swapCrate(F, day); check(sw.id && F.inv[sw.id] >= 1 && !so.swapCrate(F, day).id, "the allotment swap crate gives one thing a day");
+    check(so.feedPony(F, "biscuit", day).ok && F.south.ponies.biscuit.trust === 2 && !F.inv.apple && !so.feedPony(F, "biscuit", day).ok, "Biscuit loves apples (two hearts), once a day");
+    check(so.brushPony(F, "pebble", day).ok && so.feedPony(F, "pebble", day).ok && F.south.ponies.pebble.trust === 3, "Pebble: a brush and her favourite carrot");
+    check(!so.ponyRide(F, day, false).ok && so.ponyRide(F, day, true).ok && F.coins === 49 - so.RIDE_COST && !so.ponyRide(F, day, true).ok, "pony rides are for Evan, once Pebble knows you, once a day");
+    check(so.buyChips(F).ok && F.coins === 49 - so.RIDE_COST - so.CHIPS && /tide's in/.test(so.rockPools(F, day, "high").line), "fish and chips cost coins, and the rock pools need low tide"); }
+  check(["green", "stables", "lighthouse"].every(sc => Object.keys(w.BRIDGES[sc]).every(o => w.BRIDGES[o] && w.BRIDGES[o][sc] && w.ARRIVE[sc + ">" + o] && w.ARRIVE[o + ">" + sc])), "every new path goes both ways, with somewhere to arrive");
+  { const ids = ["hana", "juniper", "opal", "theo", "farid", "mei", "amara", "lila", "noor", "sofia"], band = ids.filter(i => (so.southSlot(i, "2026-10-25", 15*60) || {}).scene === "green");
+    check(band.length === 6 && (so.southSlot("gonggong", "2026-10-27", 8*60) || {}).scene === "green" && (so.southSlot("lila", "2026-10-27", 7*60 + 30) || {}).scene === "stables" && (so.southSlot("ines", "2026-10-27", 14*60 + 30) || {}).scene === "lowervine",
+      "villagers use the new screens: six at the Sunday band, Gong Gong at his allotment, Lila at the stables, Ines on the lower vines"); }
+  check(w.nextHop("lighthouse", "lowervine") === "stables" && w.nextHop("lowervine", "lighthouse") === "green", "the bottom row joins up end to end");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`south pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/so=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.inv = Object.assign(f.inv || {}, {apple: 2}); const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-24"); await page.waitForTimeout(800);
+  await page.goto(url + "?nosample=1&so=1&time=10:00&date=2026-10-24"); await page.waitForTimeout(900);
+  const hop = async (place, name) => { await page.locator(`#world [data-place="${place}"]`).dispatchEvent("click");
+    await page.waitForFunction(n => document.querySelector("#sceneName").textContent.includes(n), name, { timeout: 25000 }); await page.waitForTimeout(400); };
+  await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(600);
+  await hop("toGreenB", "Honeybrook Green"); await hop("toStablesG", "The Stables"); await hop("toLightS", "Lighthouse Point"); await hop("toFlowersL", "flower");
+  check(true, "home, down to the green, west to the Stables, on to Lighthouse Point and up the coast path to the flower farm");
+  await page.evaluate(() => window.__mapleScene("stables")); await page.waitForTimeout(600);
+  await page.locator('#world [data-place="spaddock"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pony="feed:biscuit"]', { timeout: 20000 });
+  await page.click('#ctx [data-pony="feed:biscuit"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).south.ponies.biscuit.trust === 2), "at the paddock: an apple for Biscuit");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

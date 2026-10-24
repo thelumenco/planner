@@ -36,5 +36,9 @@ export function lowerVineArt(v){
     ${tapeLabel(300, 540, "Valley bench", "var(--sky)", 10)}</g>`;
   const sign = sk(`<rect x="160" y="176" width="72" height="16" rx="2" style="fill:#FFFDF6"/>`, `<rect x="160" y="176" width="72" height="16" rx="2"/><path d="M196 192 v14"/>`)
     + `<text x="196" y="187.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9.5" style="fill:var(--line)" pointer-events="none">lower vines</text>`;
-  return ground + valley + up + sign + press + v.rows.slice(UPPER).map((row, k) => rowArt(row, UPPER + k)).join("") + bench;
+  // round 262: west over a little footbridge on the stream to Honeybrook Green
+  const west = `<g data-place="toGreenV" aria-label="Footbridge to Honeybrook Green"><ellipse class="hov" cx="24" cy="330" rx="28" ry="20" style="fill:var(--butter)"/>
+    ${sk(`<rect x="0" y="318" width="48" height="18" rx="2" style="fill:#C9A27E"/>`, `<rect x="0" y="318" width="48" height="18" rx="2"/><path d="M10 318 v18 M20 318 v18 M30 318 v18 M40 318 v18" opacity=".5"/><path d="M0 314 h48" stroke-width="2"/>`)}
+    ${tapeLabel(64, 362, "The green", "var(--sage)", 10)}</g>`;
+  return ground + valley + up + west + sign + press + v.rows.slice(UPPER).map((row, k) => rowArt(row, UPPER + k)).join("") + bench;
 }

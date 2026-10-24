@@ -2738,3 +2738,15 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - `lowervine` (art/lowervine.js): south of the vineyard, path down from a vine arch at the vineyard's bottom-right (`toLowerV`, `toVineD`). Four more trellis rows (rows 3 to 6 of F.vine.rows; `ROWS = 7` in vineyard.js, old saves are padded), the stream down the left, the old stone press (`vpress`) and the valley bench (`vbench`) above a misty valley along the bottom edge.
 - art/vineyard.js: `rowY`, `vineScene`, `LOW_ROWS`, `UPPER`; `rowArt` exported. The vineyard shows rows 0 to 2; the lower vineyard rows 3 to 6. The stall's trellis fills the first bare row, so the 4th trellis goes down the hill ("A new trellis row on the lower vineyard..."). Marco and Ines's picking and watering already cover every row.
 - Tests: "The lower vineyard (round 261)".
+
+## Rounds 262 to 265: the rest of the bottom row (Mel: "lighthouse point and the stables and the village green and the lower vineyard", the coast as "just a strip", "change some of the villagers' schedules")
+- Art by helper agents, wiring by hand: art/green.js (`greenArt`), art/stables.js (`stablesArt`), art/lighthouse.js (`lighthouseArt(night)`, lamp lit 7pm to 6am). `SOUTH` = lighthouse, stables, green, lowervine.
+- Paths (world.js BRIDGES/ARRIVE): base `toGreenB` (bottom, left of the firepit) <-> green `toBaseG`; green `toVineG` <-> lowervine `toGreenV` (a footbridge over its stream); green `toStablesG` <-> stables `toGreenS`; orchard `toStablesO` <-> stables `toOrchardS`; stables `toLightS` <-> lighthouse `toStablesL`; flowers `toLightF` <-> lighthouse `toFlowersL`.
+- The flower farm gets a strip of sand and sea down its west edge (orchard.js `coast`), joining the foreshore to Lighthouse Point; its bench moved to the east side.
+- game/south.js, all calm and none of it a money-maker:
+  - Green: feed the ducks (1 coin, once a day, not at night); the brass band on Sundays 2 to 4; cricket on Saturdays 2 to 5; the allotment swap crate (one free vegetable a day).
+  - Stables: Biscuit (chestnut, loves apples) and Pebble (dapple grey, loves carrots); a treat and a brush each a day build trust (max 10); at 3 trust Pebble gives Evan a ride round the ring (15 coins, once a day, Evan must be with Mel). Paddock panel (`woodsView = "paddock"`, `data-pony`).
+  - Lighthouse: climb it (the view by day, the lamp room at night); rock pools at low tide (6 to 11am, 5 to 8pm); fish and chips (9 coins); the beach huts are scenery for now.
+  - `southSlot` (npcs.js, just before each villager's routine): six villagers at the Sunday band, six at Saturday cricket, Gong Gong at his allotment Tue/Thu mornings, Mei on Saturdays, Lila at the stables weekday mornings, Ines and Marco on the lower vines in the afternoon, walkers at the lighthouse at weekends and most evenings.
+- core.js: `SOUTH_SPOTS` and `southSpot`; scene names; places for walking to by name.
+- Tests: "The green, the Stables and Lighthouse Point (rounds 262 to 264)".
