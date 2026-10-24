@@ -2766,3 +2766,9 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 269: the lighthouse glow (Mel: "Add the lighthouse glow")
 - art/lighthouse.js: at night (7pm to 6am) the lamp, a soft double halo and the two beams are one `nglow` group, which core.js `nightLights` copies above the evening darkening, so it shines instead of going dim. The fish and chip hatch's window is `wglow` (lit 7 to 11pm, like the other windows).
+
+## Round 270: a pony of your own, Bram the lighthouse keeper, mackerel off the rocks (Mel: "Yes to pony, lighthouse keeper villager and mackerel fishing off the rocks")
+- south.js `MY_PONY` (1,200 coins, keep included), `buyPony`, `ponyIds`, `stablePanel`: tap the stable block (7am to 7pm) to buy a bay and white pony and name her; she joins Biscuit and Pebble in the paddock (stables.js `stablesArt(mine)` draws her), same treat and brush, likes apples. `data-ponybuy`, `#ponyName`.
+- npcs.js `bram`: the keeper. Walks the point by day, lunch on the bench, by his door in the evening, fishes off the rocks on Sunday evenings. `TALES` / `keeperTale`: climb the lighthouse while he's there and he tells one tale a day, in turn.
+- fishing.js spot `rocks` (Lighthouse Point, `fishrocks`, art "Mackerel rocks"): mackerel and sardines as at the sea, plus pollack (any time) and sea bass (dusk), both new.
+- Tests in the bottom-row block.

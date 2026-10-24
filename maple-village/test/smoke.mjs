@@ -5126,6 +5126,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   { const ids = ["hana", "juniper", "opal", "theo", "farid", "mei", "amara", "lila", "noor", "sofia"], band = ids.filter(i => (so.southSlot(i, "2026-10-25", 15*60) || {}).scene === "green");
     check(band.length === 6 && (so.southSlot("gonggong", "2026-10-27", 8*60) || {}).scene === "green" && (so.southSlot("lila", "2026-10-27", 7*60 + 30) || {}).scene === "stables" && (so.southSlot("ines", "2026-10-27", 14*60 + 30) || {}).scene === "lowervine",
       "villagers use the new screens: six at the Sunday band, Gong Gong at his allotment, Lila at the stables, Ines on the lower vines"); }
+  { const fi = await import(new URL("../src/game/fishing.js", import.meta.url)), F = {coins: 1500, inv: {apple: 1}};
+    const r = so.buyPony(F, "Clementine", day);
+    check(r.ok && F.coins === 300 && so.ponyIds(F).includes("mine") && so.feedPony(F, "mine", day).ok && F.south.ponies.mine.trust === 2 && !so.buyPony(F, "Again", day).ok, "a pony of your own (1,200 coins), named by you, cared for like the others");
+    const t1 = so.keeperTale(F, day), t2 = so.keeperTale(F, day), t3 = so.keeperTale(F, "2026-10-25");
+    check(t1 && !t2 && t3 && t3 !== t1 && !/[\u2013\u2014]/.test(so.TALES.join("")), "Bram the keeper tells one tale a day, a new one each time");
+    check(fi.fishHere("rocks", day, 11*60).includes("mackerel") && fi.fishHere("rocks", day, 18*60 + 30).includes("bass"), "mackerel off the rocks at Lighthouse Point, and sea bass at dusk"); }
   check(w.nextHop("lighthouse", "lowervine") === "stables" && w.nextHop("lowervine", "lighthouse") === "green", "the bottom row joins up end to end");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`south pageerror: ${e.message}`));
@@ -5144,7 +5150,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).south.ponies.biscuit.trust === 2), "at the paddock: an apple for Biscuit");
   await page.click("#pclose").catch(() => {});
   await page.evaluate(() => window.__mapleScene("lighthouse")); await page.waitForTimeout(600);
-  check(await page.locator('#world [data-place="bikeslight"]').count() === 1, "bike hire at Lighthouse Point (and on the green)");
+  check(await page.locator('#world [data-place="bikeslight"]').count() === 1 && await page.locator('#world [data-place="fishrocks"]').count() === 1, "bike hire and the mackerel rocks at Lighthouse Point");
   await page.locator('#world [data-place="lsup"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 20000 });
   await page.click('#ctx [data-sup="shore"]'); await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "the paddleboard jetty at Lighthouse Point: paddle up the coast to the foreshore");

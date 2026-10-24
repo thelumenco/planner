@@ -2,9 +2,10 @@
 // Green (south of home), the Stables (south of the orchard) and Lighthouse Point (south of the flower farm, where the
 // coast path ends). Small, calm things to do; nothing here is a way to make money. State: F.south.
 import { pick } from "../util.js";
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
 export const southState = F => { F.south = F.south || {}; const s = F.south;
-  s.ponies = s.ponies || {}; for (const id of Object.keys(PONIES)) s.ponies[id] = Object.assign({trust: 0, fed: "", brushed: ""}, s.ponies[id] || {});
+  s.ponies = s.ponies || {}; for (const id of [...Object.keys(PONIES), ...(s.mine ? ["mine"] : [])]) s.ponies[id] = Object.assign({trust: 0, fed: "", brushed: ""}, s.ponies[id] || {});
   return s; };
 const dow = day => new Date(day + "T00:00:00Z").getUTCDay();
 
@@ -35,18 +36,31 @@ export function swapCrate(F, day){
 /* ---------- The Stables ---------- */
 export const PONIES = {biscuit: {n: "Biscuit", coat: "chestnut", like: "apple"}, pebble: {n: "Pebble", coat: "dapple grey", like: "carrot"}};
 export const TRUST_MAX = 10, RIDE_TRUST = 3, RIDE_COST = 15;
+// round 270 (Mel: "Yes to pony"): a pony of Mel's own, named by her, bought at the stable block; she lives in the
+// paddock with Biscuit and Pebble and is cared for the same way (her keep is included: no running costs)
+export const MY_PONY = {price: 1200, coat: "bay and white", like: "apple"};
+const ponyOf = (F, id) => id === "mine" ? (F.south && F.south.mine ? {n: F.south.mine.name, coat: MY_PONY.coat, like: MY_PONY.like} : null) : PONIES[id];
+export const ponyIds = F => [...Object.keys(PONIES), ...(F.south && F.south.mine ? ["mine"] : [])];
+export function buyPony(F, name, day){
+  const s = southState(F), n = String(name || "").replace(/[<>&"]/g, "").trim().slice(0, 16);
+  if (s.mine) return {line: `${s.mine.name}'s already yours.`};
+  if (!n) return {line: "She'll need a name first."};
+  if ((F.coins || 0) < MY_PONY.price) return {line: `A pony of your own is ${MY_PONY.price.toLocaleString("en-GB")} coins.`};
+  F.coins -= MY_PONY.price; s.mine = {name: n, since: day}; southState(F);
+  return {ok: true, line: `${n} is yours! A ${MY_PONY.coat} pony with a white star on her nose. Lila leads her out to the paddock, where Biscuit and Pebble come over to say hello.`};
+}
 const TREATS = ["apple", "carrot"];
 export const ponyTreat = F => TREATS.find(t => (F.inv || {})[t] > 0) || null;
 // feed a pony a treat from the backpack (once a day each); the one it likes best counts double
 export function feedPony(F, id, day){
-  const s = southState(F), p = s.ponies[id], P = PONIES[id]; if (!p) return null;
+  const s = southState(F), p = s.ponies[id], P = ponyOf(F, id); if (!p || !P) return null;
   if (p.fed === day) return {line: `${P.n} has had a treat today. She noses your pocket anyway, just in case.`};
   const t = ponyTreat(F); if (!t) return {line: `${P.n} would love an apple or a carrot. The orchard and the garden have both.`};
   F.inv[t]--; if (F.inv[t] <= 0) delete F.inv[t]; p.fed = day; p.trust = Math.min(TRUST_MAX, p.trust + (t === P.like ? 2 : 1));
   return {line: t === P.like ? `${P.n} crunches the ${t} with her eyes half closed. Her favourite.` : `${P.n} takes the ${t} very politely, lips first, and crunches it slowly.`, ok: true};
 }
 export function brushPony(F, id, day){
-  const s = southState(F), p = s.ponies[id], P = PONIES[id]; if (!p) return null;
+  const s = southState(F), p = s.ponies[id], P = ponyOf(F, id); if (!p || !P) return null;
   if (p.brushed === day) return {line: `${P.n} is already gleaming. Any more brushing and she'll start to glow.`};
   p.brushed = day; p.trust = Math.min(TRUST_MAX, p.trust + 1);
   return {line: pick([`You brush ${P.n} from her ears to her tail. She leans into it and sighs.`, `Long, slow strokes with the soft brush. ${P.n}'s ${P.coat} coat starts to shine.`, `${P.n} stands very still while you brush her, one back hoof tipped up, dozing.`]), ok: true};
@@ -62,6 +76,15 @@ export function ponyRide(F, day, withEvan){
   return {line: "Evan sits up very straight in the little saddle, both hands on the strap, and Pebble walks him round the ring twice, slow and careful.", ok: true};
 }
 
+export function stablePanel(F){
+  const s = southState(F);
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The stable block</h2>`;
+  if (s.mine) return h + `<p class="sub">${esc(s.mine.name)}'s stall is the one on the end, with her name painted over the door. She's out in the paddock most days.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  return h + `<p class="sub">There's an empty stall on the end. Lila says a ${MY_PONY.coat} pony from the farm over the hill needs a home: gentle, a bit greedy, very fond of apples. ${MY_PONY.price.toLocaleString("en-GB")} coins, and her keep's included.</p>
+    <label class="sub" for="ponyName">What will you call her?</label><input id="ponyName" class="input" maxlength="16" placeholder="Her name" style="margin:6px 0 10px;width:100%">
+    <div class="actions"><button class="btn primary" data-ponybuy="1"${(F.coins || 0) < MY_PONY.price ? " disabled" : ""}>Make her yours</button><button class="btn alt small" data-close="1">Not yet</button></div>`;
+}
+
 /* ---------- Lighthouse Point ---------- */
 export const CHIPS = 9;
 export function climb(F, day, hm){
@@ -69,6 +92,21 @@ export function climb(F, day, hm){
   if (night) return {line: "Up the spiral stairs to the lamp room. The great lens turns slowly, throwing its light out over the dark water, and somewhere out there a boat flashes back."};
   const first = s.climb !== day; s.climb = day;
   return {line: pick(["A hundred and eight steps, round and round. At the top, the whole coast: the bay, the shore, the flower fields, and the sea going on for ever.", "From the gallery you can see Honeybrook laid out like a map: the orchard, the green, the vines, and the smoke from your own chimney.", "The wind up here takes your breath away. Gulls hang level with you, not flapping at all."]), first};
+}
+// Bram's tales: one a day, in turn, when you climb the lighthouse and he's about
+export const TALES = [
+  "\"The winter of the big storm, a fishing boat lost her engine off the point. I kept the light turning by hand all night, and in the morning there she was, safe in the bay, the skipper waving his hat.\"",
+  "\"My father kept this light before me. He used to say the lamp's a promise: somebody's out there, and somebody's watching for them.\"",
+  "\"There's a seal that comes into the cove every September. Same scar on her nose, twelve years now. I call her Maud. She doesn't answer to it.\"",
+  "\"Saw the northern lights from up here once. Green, rippling, like the sky had a tide. Never again, mind. Once was plenty.\"",
+  "\"A little girl wrote to the light once, care of the lighthouse. Wanted to know if it got lonely. I wrote back: not with the gulls about.\"",
+  "\"The fog comes in so thick some nights you can't see the rail. That's when the foghorn earns its keep. Wakes half the village, mind.\"",
+  "\"Dolphins came right up the coast one summer, a whole pod, leaping in the lamp beam. Best night of my life, that, and I've had a few.\"",
+  "\"They say there's a wreck under the headland, an old trading ship, full of tea. On a still low tide you can smell it. Or I like to think so.\""
+];
+export function keeperTale(F, day){
+  const s = southState(F); if (s.tale && s.tale.day === day) return null;
+  const i = s.tale ? (s.tale.i + 1) % TALES.length : 0; s.tale = {day, i}; return TALES[i];
 }
 const POOLS = ["a hermit crab trying on a new shell", "a starfish the colour of a sunset", "a tiny fish that darts under a rock", "a sea anemone, closing up when you touch the water", "a crab scuttling sideways, very offended", "a periwinkle, slowly going somewhere"];
 export function rockPools(F, day, tide){
@@ -85,12 +123,12 @@ export function buyChips(F){
 }
 
 /* ---------- the paddock panel ---------- */
-const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 const hearts = n => "♥".repeat(Math.ceil(n/2)) + "♡".repeat(Math.max(0, TRUST_MAX/2 - Math.ceil(n/2)));
 export function paddockPanel(F, day){
   const s = southState(F), t = ponyTreat(F);
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The paddock</h2><p class="sub">Two ponies, Biscuit and Pebble. A treat and a brush each day and they'll get to know you. ${t ? `You've got ${t === "apple" ? "an apple" : "a carrot"} in your backpack.` : "Bring an apple or a carrot."}</p><ul class="hlist wlist">`;
-  for (const [id, P] of Object.entries(PONIES)) { const p = s.ponies[id];
+  const mine = s.mine ? s.mine.name : "";
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The paddock</h2><p class="sub">${mine ? `Biscuit, Pebble and your own ${esc(mine)}.` : "Two ponies, Biscuit and Pebble."} A treat and a brush each day and they'll get to know you. ${t ? `You've got ${t === "apple" ? "an apple" : "a carrot"} in your backpack.` : "Bring an apple or a carrot."}</p><ul class="hlist wlist">`;
+  for (const id of ponyIds(F)) { const P = ponyOf(F, id), p = s.ponies[id];
     h += `<li><span class="wtxt"><b>${esc(P.n)}</b><small>A ${esc(P.coat)} pony. Loves ${P.like === "apple" ? "apples" : "carrots"}. <span aria-label="${p.trust} of ${TRUST_MAX}">${hearts(p.trust)}</span></small>
       <span class="actions" style="margin-top:6px"><button class="btn small ${p.fed === day ? "alt" : "primary"}" data-pony="feed:${id}"${p.fed === day ? " disabled" : ""}>${p.fed === day ? "Fed" : "Give a treat"}</button>
       <button class="btn small ${p.brushed === day ? "alt" : "primary"}" data-pony="brush:${id}"${p.brushed === day ? " disabled" : ""}>${p.brushed === day ? "Brushed" : "Brush"}</button></span></span></li>`; }

@@ -939,6 +939,19 @@ export const NPCS = [
     actLines: {fish: ["Shh. Trout.", "Catch and release, mostly. Mostly."]},
     away: "Wren's off duty. The noticeboard at the cabin has everything."
   },
+  // round 270 (Mel: "lighthouse keeper villager"): Bram keeps the light at Lighthouse Point. Mornings polishing the
+  // lens and walking the point, a sit on the bench at lunch, evenings by his door as the lamp comes on; Sunday
+  // evenings he fishes off the rocks. Climb the lighthouse when he's there and he tells you one of his tales.
+  {
+    id: "bram", pitch: 0.82, name: "Bram", job: "The lighthouse keeper",
+    intro: "Bram. I keep the light. Forty years on this point, man and boy, and it's never once gone out on my watch.",
+    look: {skin: "#E2B895", hair: "#D8D2C8", hairStyle: "short", top: "#2F4A6B", bottom: "#4A4642", extra: "lantern", hat: "cap"},
+    routine: [slot("17:00", "19:00", "lighthouse", [196, 552], {act: "fish", dow: [0], dir: -1}), slot("7:00", "12:00", "lighthouse", [[150, 530], [200, 440], [260, 380], [180, 300], [140, 520]]),
+      slot("12:00", "13:00", "lighthouse", [324, 506], {act: "sit"}), slot("13:00", "18:30", "lighthouse", [[150, 530], [240, 470], [330, 420], [200, 360]]), slot("18:30", "22:00", "lighthouse", [160, 530])],
+    lines: ["Wind's backing south. Rain by teatime.", "Polished the lens this morning. You could see your face in it.", "Gulls know when I've got a sandwich. Every time.", "The light turns once every ten seconds. Ships know it by that.", "Mackerel are running off the rocks. You can see them flashing."],
+    actLines: {fish: ["Feathers on the line, and wait for the flash.", "Three at once, sometimes. Not tonight, mind."]},
+    away: "Bram's tucked up in the keeper's cottage. The light keeps itself till morning."
+  },
   {
     id: "pilar", pitch: 0.95, name: "Pilar", job: "Cooks in the wine shop kitchen",
     intro: "Pilar! I cook. You keep the larder full, I keep the oven warm, the cheese pressing and the tapas coming. Deal?",

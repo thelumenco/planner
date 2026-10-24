@@ -76,6 +76,7 @@ export const VILLAGE = {
   bikesgreen:{scene:"green", name:"Bike hire", door:[146,376], spot:true, mark:[146,316], line:"Hire bikes, on the green."},
   bikeslight:{scene:"lighthouse", name:"Bike hire", door:[268,350], spot:true, mark:[268,290], line:"Hire bikes, at Lighthouse Point."},
   lsup:{scene:"lighthouse", name:"Paddleboard jetty", door:[396,558], spot:true, mark:[390,470], line:"The paddleboard jetty. Fancy a paddle?"},
+  fishrocks:{scene:"lighthouse", name:"Mackerel rocks", door:[200,560], spot:true, mark:[200,500], line:"The rocks below the lighthouse: mackerel running."},
   lchips:{scene:"lighthouse", name:"The fish and chip hatch", door:[430,508], spot:true, mark:[430,380], line:"Fish and chips."},
   toLowerV:{scene:"vineyard", name:"Path down to the lower vineyard", door:[496,614], spot:true, bridge:"lowervine", mark:[474,540], line:"Down the hill to the lower vineyard."},
   toVineD:{scene:"lowervine", name:"Path up to the vineyard", door:[496,30], spot:true, bridge:"vineyard", mark:[450,90], line:"Up the hill to the vineyard."},

@@ -27,7 +27,7 @@ const ponyHead = (dx, c, mane, blaze) => sk(`<path d="M${dx - 9} 196 q-2 -16 4 -
     ${blaze ? `<path d="M${dx + 2} 175 v12" style="stroke:#FFFDF6" stroke-width="2.4"/>` : ""}<ellipse cx="${dx + 2}" cy="190" rx="5" ry="3.5" style="fill:#D9B9A0"/>`,
   `<ellipse cx="${dx + 2}" cy="183" rx="7" ry="10"/><circle cx="${dx - 2}" cy="180" r=".8"/><circle cx="${dx + 6}" cy="180" r=".8"/>`);
 
-export function stablesArt(){
+export function stablesArt(mine){   // mine: Mel's own pony, once she has one (round 270)
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="365" cy="490" rx="150" ry="110" style="fill:var(--grass2)"/><ellipse cx="80" cy="120" rx="90" ry="50" style="fill:var(--grass2)"/><ellipse cx="450" cy="100" rx="80" ry="40" style="fill:var(--grass2)"/></g>
     <g filter="url(#wob)"><path d="M260 0 V300 M22 330 C90 320 160 300 260 300 C360 300 430 320 498 330 M110 240 C130 270 180 290 230 298 M320 242 V300 M250 304 C230 340 214 380 214 420 M214 420 C206 500 200 560 110 572" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/>
@@ -78,7 +78,7 @@ export function stablesArt(){
     ${sk(`<rect x="420" y="410" width="54" height="16" rx="3" style="fill:#9AA9B8"/><rect x="424" y="412" width="46" height="5" style="fill:#9FD3E8"/>
       <rect x="268" y="540" width="40" height="30" style="fill:#E8C77A"/><path d="M262 538 h52 l-6 -18 h-40z" style="fill:#B98A5A"/>`,
       `<rect x="420" y="410" width="54" height="16" rx="3"/><path d="M426 426 v6 M468 426 v6"/><path d="M262 538 h52 l-6 -18 h-40z M272 538 v-18 M282 538 v-18 M292 538 v-18 M302 538 v-18"/><rect x="268" y="540" width="40" height="30"/><path d="M272 548 q8 -4 14 2 q8 -4 16 0" opacity=".5"/>`)}
-    ${pony(330, 470, "#B8693E", "#6B3A22", false, true, false)}${pony(420, 540, "#C9C6C0", "#8C8780", true, false, true)}
+    ${pony(330, 470, "#B8693E", "#6B3A22", false, true, false)}${pony(420, 540, "#C9C6C0", "#8C8780", true, false, true)}${mine ? pony(436, 466, "#6E4A34", "#F1E6D2", false, false, true) : ""}
     ${tapeLabel(365, 616, "Paddock", "var(--butter)", 10)}</g>`;
   // the pony-ride ring: soft sand inside a low rail, a mounting block and a red and white striped pole
   const ride = `<g data-place="sride" aria-label="Pony rides"><ellipse class="hov" cx="110" cy="570" rx="34" ry="10" style="fill:var(--butter)"/>
