@@ -56,10 +56,11 @@ const UPPER_ROWS = 3;
 // round 282 (Mel: "Make it such that the lower vineyard is actually Bram's and he's been looking to sell. So I buy from
 // him"): the four rows down the hill were Bram's father's. Bram can't keep them and the light both, so there's a For
 // Sale sign by the gate; until you buy, no trellis goes down there. His father's old posts in the first row come with it.
-export const LOWER = {price: 2500};
+export const LOWER = {price: 2500, notYet: "Bram shakes his head kindly. \"Get the old mill turning again first. Anyone who can bring that mill back can look after Father's vines.\""};
 export const lowerOwned = F => !!vineState(F).lower;
 export function buyLower(F, day){
   const v = vineState(F); if (v.lower) return {line: "The lower vineyard's yours already."};
+  if (!(F.goals && F.goals.mill)) return {line: LOWER.notYet};   // round 291 (Mel): only once the old mill's working
   if ((F.coins || 0) < LOWER.price) return {line: `Bram's asking ${LOWER.price.toLocaleString("en-GB")} coins for the lower vineyard.`};
   F.coins -= LOWER.price; v.lower = day; v.rows[UPPER_ROWS].trellis = true;
   return {ok: true, line: "Bram walks down from the lighthouse to shake on it, and pulls up the For Sale sign himself. \"Father's old trellis is still good on the first row. The rest is yours to plant. He'd be glad to see vines on it again.\""};
@@ -69,7 +70,8 @@ export function lowerSalePanel(F){
   if (v.lower) return h + `<p class="sub">The sign's gone. The lower vineyard's yours.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   return h + `<p class="sub">A note in a careful hand is pinned under the sign, in a plastic sleeve against the weather:</p>
     <p class="sub"><i>"Four rows of good south-facing slope, down to the sea, with the old stone press and the bench. My father planted vines here and tended them every morning after he came down from the light. I'm up there all night now and asleep half the day, and the rows have gone to grass. I'd like them to go to someone who'll plant them. ${LOWER.price.toLocaleString("en-GB")} coins. Ask at the lighthouse. Bram."</i></p>
-    <div class="actions"><button class="btn primary" data-lvbuy="1"${(F.coins || 0) < LOWER.price ? " disabled" : ""}>Buy it from Bram (${LOWER.price.toLocaleString("en-GB")} coins)</button><button class="btn alt small" data-close="1">Not yet</button></div>`;
+    ${F.goals && F.goals.mill ? "" : `<p class="sub">Someone's added underneath, in the same hand: <i>"Not till the old mill's turning again."</i></p>`}
+    <div class="actions"><button class="btn primary" data-lvbuy="1"${(F.coins || 0) < LOWER.price || !(F.goals && F.goals.mill) ? " disabled" : ""}>Buy it from Bram (${LOWER.price.toLocaleString("en-GB")} coins)</button><button class="btn alt small" data-close="1">Not yet</button></div>`;
 }
 export function vineState(F){
   F.vine = F.vine || {};

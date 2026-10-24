@@ -288,7 +288,8 @@ Object.assign(ITEMS, {kite: {n: "Kite", kind: "toy", price: 12, tab: "family", w
 // the herbs themselves (mint is already on Hana's deli shelf)
 Object.assign(ITEMS, {garlic: {n: "Garlic", kind: "ingredient", sell: 1, what: "from the greenhouse: gambas, garlicky tapas"}, basil: {n: "Basil", kind: "ingredient", sell: 1, what: "from the greenhouse: bruschetta, basil gelato, a bonbon filling"},
   rosemary: {n: "Rosemary", kind: "ingredient", sell: 1, what: "from the greenhouse: rosemary potatoes, a rosemary bonbon, gelato"}, chives: {n: "Chives", kind: "ingredient", sell: 1, what: "from the greenhouse: a chive omelette"},
-  thyme: {n: "Thyme", kind: "ingredient", sell: 1, what: "from the greenhouse: roast tapas, thyme and lemon gelato"}});
+  thyme: {n: "Thyme", kind: "ingredient", sell: 1, what: "from the greenhouse: roast tapas, thyme and lemon gelato"},
+  sage: {n: "Sage", kind: "ingredient", sell: 1, what: "from the priory garden on the lower vineyard: herby oils and soaps at the mill"}});   // round 291
 // round 153: the spices, on Hana's market shelves (items.js picks these up)
 Object.assign(ITEMS, {
   sp_cinnamon: {n: "Cinnamon sticks", kind: "ingredient", price: 2, sell: 1, tab: "deli", what: "for mulled wine (late November to Boxing Day), in the wine shop kitchen's big pot"},

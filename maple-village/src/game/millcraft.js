@@ -22,7 +22,7 @@ import { PRESS_MAX } from "./mill.js";
 export const CRAFT = {steep: 6*3600e3, cure: 24*3600e3, lotion: 3600e3, jars: 3, rack: 3, oilPer: 2, soapPer: 6, lotionPer: 3, balm: 3600e3, balmPer: 4, lipoil: 24*3600e3, lipoilPer: 3, rollers: 2, waxPer: 2};
 export const HERB = {
   rosemary: {n: "Rosemary", col: "#6E8A5A", oil: true, soap: true}, garlic: {n: "Garlic", col: "#EDE6D0", oil: true}, basil: {n: "Basil", col: "#4E8A4E", oil: true},
-  thyme: {n: "Thyme", col: "#8AA06A", oil: true, soap: true}, chives: {n: "Chives", col: "#5E9A4A", oil: true}, mint: {n: "Mint", col: "#7FCBA4", soap: true, lotion: true},
+  thyme: {n: "Thyme", col: "#8AA06A", oil: true, soap: true}, sage: {n: "Sage", col: "#9CB59A", oil: true, soap: true}, chives: {n: "Chives", col: "#5E9A4A", oil: true}, mint: {n: "Mint", col: "#7FCBA4", soap: true, lotion: true},
   lemon: {n: "Lemon", col: "#F3D24A", oil: true, soap: true, lotion: true}, orange: {n: "Orange", col: "#E8913A", oil: true, soap: true, lotion: true},
   raspberry: {n: "Raspberries", col: "#C2334D", soap: true}, honey: {n: "Honey", col: "#E3B04B", soap: true, lotion: true},
   bq_lavender: {n: "Lavender", col: "#A68FCB", oil: true, soap: true, lotion: true}, bq_rose: {n: "Rose", col: "#E8A0B4", soap: true, lotion: true},
@@ -240,7 +240,7 @@ export const millVisitSlot = (id, day, hm, open, tourists, busy = []) => { const
 
 /* ---------- Mel at a tasting ---------- */
 export const NOTES = ["Fruity", "Grassy", "Peppery", "Bitter", "Almond", "Tomato leaf", "Herby", "Citrus", "Floral", "Garlicky"];
-const ADD_NOTE = {rosemary: "Herby", thyme: "Herby", basil: "Herby", chives: "Herby", lemon: "Citrus", orange: "Citrus", bq_lavender: "Floral", garlic: "Garlicky"};
+const ADD_NOTE = {rosemary: "Herby", thyme: "Herby", sage: "Herby", basil: "Herby", chives: "Herby", lemon: "Citrus", orange: "Citrus", bq_lavender: "Floral", garlic: "Garlicky"};
 // the oils on the table today: Mel's own plain oil, then up to three of her infused ones -> [{name, notes}]
 export function tastingOils(F){ const c = craftState(F), out = [{name: "Your own olive oil, plain", notes: ["Fruity", "Grassy", "Peppery"]}];
   c.recipes.filter(r => r.kind === "oil").slice(0, 3).forEach(r => out.push({name: r.name, notes: [...new Set(["Fruity", ...r.adds.map(a => ADD_NOTE[a]).filter(Boolean), "Peppery"])].slice(0, 3)}));

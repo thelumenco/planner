@@ -265,6 +265,38 @@ export function buyChips(F){
   return {line: pick(["Hot chips and crisp battered cod, salt and vinegar, in paper. You eat them on the sea wall and fight off one very bold gull.", "A cone of chips, a piece of haddock, and a little wooden fork. The best thing you've eaten all week.", "Fish and chips, wrapped in paper, too hot to hold. You blow on every chip and burn your mouth anyway."]), ok: true};
 }
 
+/* ---------- the priory ruins (round 291) ---------- */
+// Mel: "Yes build the ruins... Can I just have sage and lavender for the herbs though, the rest I can get at home". Behind
+// the old press on the lower vineyard (once it's yours): a broken arch and the tumbled walls of the monks' herb garden.
+// Restore it a step a day (coins only); then sage and Ma Ma's lavender to pick once a day, and a seat in the low sun.
+export const RUIN_STEPS = [
+  {n: "Clear the brambles", cost: 40, line: "A whole day with loppers and thick gloves. Under the brambles: the old garden walls, tumbled, and the arch standing on its own like it's been waiting."},
+  {n: "Rebuild the wall", cost: 250, line: "A waller from over the hill spends the day fitting the old stones back together, dry, the way the monks did it. Not a drop of mortar."},
+  {n: "Hang a gate", cost: 120, line: "A little oak gate in the gap at the front, with a latch that clicks. The garden feels like a garden again."},
+  {n: "Plant sage and lavender", cost: 60, line: "Two rows of sage and two of lavender, the way a monks' garden would have had them. Hazel walks down to see and stands a long while under the arch. \"The brothers would be glad.\""}
+];
+export const ruinState = F => { const s = southState(F); return s.ruins = Object.assign({step: 0, day: "", picked: ""}, s.ruins || {}); };
+export function ruinStep(F, day){
+  const r = ruinState(F), st = RUIN_STEPS[r.step]; if (!st) return null;
+  if (r.day === day) return {line: "That's enough for one day. The ruins have waited six hundred years; they can wait till tomorrow."};
+  if ((F.coins || 0) < st.cost) return {line: `${st.n}: ${st.cost} coins.`};
+  F.coins -= st.cost; r.step++; r.day = day; return {ok: true, done: r.step === RUIN_STEPS.length, line: st.line};
+}
+export function pickHerbs(F, day){
+  const r = ruinState(F); if (r.step < RUIN_STEPS.length) return null; if (r.picked === day) return {line: "You've picked today. The sage needs a day to forgive you."};
+  r.picked = day; F.inv = F.inv || {}; F.inv.sage = (F.inv.sage || 0) + 3; F.inv.bq_lavender = (F.inv.bq_lavender || 0) + 2;
+  return {ok: true, line: "Three bunches of sage, soft and grey-green, and two of lavender. Your hands smell lovely for an hour."};
+}
+export const ruinSit = hm => hm >= 17*60 && hm < 20*60 ? "You sit on the warm wall. The low sun comes straight through the arch and lays a long golden doorway across the grass." : pick(["You sit on the wall among the sage and listen to the bees. Six hundred years of quiet, and it's still working.", "The cross and the vine are carved in the arch, worn soft. Someone's run their thumb over that a lot of times."]);
+export function ruinsPanel(F, day){
+  const r = ruinState(F), st = RUIN_STEPS[r.step], done = !st;
+  const desc = ["Brambles over everything: a broken stone arch standing on its own, and the tumbled walls of what was the monks' herb garden.", "The brambles are gone. The old walls lie tumbled in the grass, and the arch stands over them.", "The walls are back up, dry stone, the monks' way. There's a gap at the front for a gate.", "Walls, a gate with a latch, and bare earth inside, waiting for the herbs.", "The priory garden: sage and lavender inside the old walls, the arch over the gate, bees everywhere."][r.step];
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The priory ruins</h2><p class="sub">${desc}</p>`;
+  if (!done) h += `<p class="sub">Next: <b>${st.n}</b>, ${st.cost} coins. One step a day.</p><div class="actions"><button class="btn primary" data-ruin="step"${(F.coins || 0) < st.cost || r.day === day ? " disabled" : ""}>${st.n} (${st.cost} coins)</button></div>`;
+  else h += `<div class="actions"><button class="btn primary" data-ruin="pick"${r.picked === day ? " disabled" : ""}>${r.picked === day ? "Picked today" : "Pick sage and lavender"}</button></div>`;
+  return h + `<div class="actions"><button class="btn alt" data-ruin="sit">Sit a while</button><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+
 /* ---------- messages in bottles (round 288) ---------- */
 // Every third day or so a bottle bobs in the shallows on one of the bottom-row beaches, from first light till dusk.
 // Each one holds the next unread message (data/bottles.js); found ones go into the mailbox, already open, to reread.
