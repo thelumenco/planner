@@ -1904,7 +1904,9 @@ function setSteps(v){
 }
 function questMark(){ $("qmarkWrap").style.display = "none"; }   // the old one-quest-at-a-time marker; the quest board needs no arrow
 let rainWas = null;   // was it raining here at the last draw (the shower check below redraws when that changes)
-const safeArt = (f, what) => { try { return f() || ""; } catch (e) { console.error("drawing", what, e); return ""; } };
+const safeArt = (f, what) => { try { return f() || ""; } catch (e) { noteErr("drawing " + what, e); return ""; } };
+// the last few errors, kept in this browser so Settings' "Email us" can include them (round 231)
+function noteErr(what, e){ console.error(what, e); try { const L = JSON.parse(localStorage.getItem("hb.errors") || "[]"); L.push(`${new Date().toISOString().slice(0, 16)} ${what}: ${String(e && (e.stack || e.message) || e).split("\n").slice(0, 3).join(" | ")}`); localStorage.setItem("hb.errors", JSON.stringify(L.slice(-5))); } catch {} }
 // a way out of any room, if its own art couldn't be drawn
 const roomExitArt = () => outside() ? "" : `<g data-exit="1" aria-label="Exit"><rect x="200" y="590" width="120" height="40" rx="10" fill="#FFFDF6" stroke="#3B3530"/><text x="260" y="616" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="700" font-size="16" fill="#2F2B28">Exit</text></g>`;
 function drawScene(){
@@ -2329,7 +2331,11 @@ function dressMel(){
   dressRain();
   const m = $("hero"); if (m) m.style.visibility = (S.sleep && scene === "room") || cruisingNow() ? "hidden" : "";
 }
-function render(redraw){
+// round 231 (a friend stuck on "One moment..."): something in her save made the first draw throw, and everything after
+// it (the sign-in check included) never ran. A step that fails is logged and the rest carries on.
+let renderErr = 0;
+function render(redraw){ try { renderBody(redraw); } catch (e) { noteErr("render", e); } }
+function renderBody(redraw){
   if (S.day !== dayKey()) S = freshToday();
   storyFlags(F);   // story rewards that change the game (the koi tip, Farid's pastries)
   registerItems(F);   // each discovered gelato flavour is a gift item (one per type) in the backpack
@@ -3604,7 +3610,7 @@ let last = performance.now();
 let frameErr = 0;
 function frame(now){
   requestAnimationFrame(frame);
-  try { frameBody(now); } catch (e) { if (frameErr++ < 3) console.error("frame", e); }
+  try { frameBody(now); } catch (e) { if (frameErr++ < 3) noteErr("frame", e); }
 }
 function frameBody(now){
   const dt = Math.min(.05, (now - last)/1000); last = now;
@@ -3685,6 +3691,9 @@ $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
 $("setVol").oninput = e => setMusicVol(+e.target.value);
 $("setTest").onclick = () => { unlockAudio(); setTimeout(() => { alarm(); $("setTestNote").textContent = audioRunning() ? "Sound is on. If you heard nothing, check the volume and the silent switch." : "Your browser is still blocking sound. Tap anywhere on the map, then try again."; }, 120); };
+// round 231: Email us carries the last few errors from this browser, so a stuck game can be looked into
+$("setMail").addEventListener("click", () => { let L = []; try { L = JSON.parse(localStorage.getItem("hb.errors") || "[]"); } catch {}
+  $("setMail").href = "mailto:hi@ambidextrouslabs.com?subject=Honeybrook" + (L.length ? "&body=" + encodeURIComponent("\n\n\n(For the Honeybrook team, from this browser:)\n" + L.join("\n")) : ""); });
 $("setTitle").onclick = () => { closePanel(); save(); flushSaves(); showTitle(); };
 $("setStory").onclick = () => { closePanel(); openIntro({replay: true, trainArt: () => trainRideArt(false), sfx}); };
 $("setQuiet").onchange = e => { F.quietEvening = e.target.checked; save(true); };
@@ -3724,7 +3733,7 @@ function showTitle(){
 }
 { let skip = false; try { skip = !!sessionStorage.getItem("hb.skipTitle"); sessionStorage.removeItem("hb.skipTitle"); } catch {}
   if (skip || (window.__hbDevStub && !/[?&]title=1/.test(location.search))) needSetup(); else showTitle(); }
+initDb();   // round 231: sign-in starts before the first draw, so nothing in a save can hold it up
 render(true);
 if (F.gift) setTimeout(() => speak(`Your savings, ${START_COINS} coins, are in your purse, and the village has left you a welcome bag of seeds 🌷 There's a letter from Hana in the mailbox, too.`, 6500), 1200);
 requestAnimationFrame(frame);
-initDb();
