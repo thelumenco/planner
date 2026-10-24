@@ -12,15 +12,16 @@ export function lowerVineArt(v){
     <g filter="url(#wob)" fill="none" opacity=".4" style="stroke:var(--moss2)" stroke-width="3" stroke-dasharray="2 7">${[214, 296, 378, 460].map(y => `<path d="M200 ${y} Q330 ${y - 6} 476 ${y + 2}"/>`).join("")}</g>
     <g filter="url(#wob)"><g clip-path="url(#lvStream)"><path d="M14 0 C24 120 6 220 18 330 C28 430 8 520 20 640" fill="none" style="stroke:var(--water)" stroke-width="16"/><path d="M8 0 C18 120 0 220 12 330 C22 430 2 520 14 640 M22 0 C32 120 14 220 26 330 C36 430 16 520 28 640" fill="none" style="stroke:var(--line)" stroke-width="1.2" opacity=".6"/></g></g>
     <path class="ripple" d="M12 180 q4 -3 8 0 M16 470 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>
-    <g filter="url(#wob)"><path d="M502 0 C494 100 498 200 490 300 C484 400 478 480 430 560 C400 590 360 596 330 600 M490 300 C420 304 300 300 180 300 C150 300 130 310 118 330" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
+    <g filter="url(#wob)"><path d="M432 0 C452 90 498 190 490 300 C484 400 478 480 430 560 C400 590 360 596 330 600 M490 300 C420 304 300 300 180 300 C150 300 130 310 118 330" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
     ${flowers([[60, 90, "#EFA3A6"], [150, 200, "#F3C969"], [470, 180, "#C3CDEE"], [90, 420, "#EFA3A6"], [160, 520, "#F3C969"], [480, 420, "#EFA3A6"], [200, 120, "#C3CDEE"]])}
     ${tree(60, 96, .8)}${tree(220, 70, .7)}${tree(150, 530, .75)}`;
   // round 266: the sea along the bottom, carried on from Lighthouse Point (it used to be a misty valley)
   const shore = southShore();
-  const up = `<g data-place="toVineD" aria-label="Path up to the vineyard"><ellipse class="hov" cx="498" cy="26" rx="26" ry="18" style="fill:var(--butter)"/>
+  // round 281 (Mel: "Gate covered by tracker"): moved in from the top right corner, where the tracker column sits
+  const up = `<g data-place="toVineD" aria-label="Path up to the vineyard"><g transform="translate(-66 0)"><ellipse class="hov" cx="498" cy="26" rx="26" ry="18" style="fill:var(--butter)"/>
     ${sk(`<rect x="478" y="2" width="5" height="34" style="fill:var(--wood)"/><rect x="512" y="2" width="5" height="34" style="fill:var(--wood)"/><path d="M474 6 q24 -14 46 0 v5 q-23 -11 -46 0z" style="fill:#9CC27E"/>`,
       `<rect x="478" y="2" width="5" height="34"/><rect x="512" y="2" width="5" height="34"/><path d="M474 6 q24 -14 46 0 v5 q-23 -11 -46 0z"/>`)}
-    ${tapeLabel(450, 58, "The vineyard", "var(--sage)", 10)}</g>`;
+    ${tapeLabel(450, 58, "The vineyard", "var(--sage)", 10)}</g></g>`;
   // the old stone grape press: a round stone basin, a wooden screw and beam, a stone trough to catch the juice
   const press = `<g data-place="vpress" aria-label="The old grape press"><ellipse class="hov" cx="110" cy="368" rx="54" ry="11" style="fill:var(--butter)"/>
     ${sk(`<ellipse cx="110" cy="352" rx="44" ry="14" style="fill:#BDB3A4"/><rect x="66" y="330" width="88" height="22" style="fill:#CFC6B8"/><ellipse cx="110" cy="330" rx="44" ry="13" style="fill:#A99D8C"/><ellipse cx="110" cy="330" rx="34" ry="9" style="fill:#6B2A55" opacity=".55"/>

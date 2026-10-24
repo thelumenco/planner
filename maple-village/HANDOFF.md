@@ -2804,3 +2804,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 280: the river mouth grows out of the stream (Mel: "What's with this part? It doesn't look smooth")
 - The flat-topped fan met the narrow stream in a step, and the stream's banks showed through it. Now the stream is clipped at y 480 (`lvStream`) and the fan starts at the stream's own banks (x 11 and 26, y 474), flaring west to the edge and east down a long curve, with the stream's thin bank lines carried on round it; the white surf dashes start only where it meets the sand. Gradient fully opaque.
+
+## Round 281: the lower vineyard's gate out from under the tracker (Mel: "Gate covered by tracker")
+- The path up to the vineyard sat in the top right corner, under the tracker column. It moves 66 in (`translate(-66 0)`, door [430,30], arrive [430,80]) and the path curves up to it. The vineyard's own bottom gate stays where it is: nothing covers it there, and moving it put it on the seesaw.
