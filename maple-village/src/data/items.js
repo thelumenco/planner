@@ -60,7 +60,9 @@ export const ITEMS = {
   crown:{e:"🌸", n:"Flower crown", kind:"use", act:"crown", price:7, tab:"care", say:"Do I look regal? I feel regal."},
   fort:{e:"⛺", n:"Fort kit", kind:"use", act:"fort", price:20, need:30, xp:4, tab:"care", say:"Best. Fort. Ever."},
   // Family tab: little gifts go in the backpack and are handed over in person; keepsakes stay at home forever.
-  icecream:{n:"Ice cream", kind:"gift", to:"evan", price:6, tab:"family", say:"ICE CREAM!! *happy dance*"},
+  // round 279 (Mel: "remove the ice cream from Hana's market now that we have our scoop shack"): off the shelf, still
+  // in the item list so a scoop already in the backpack can be given
+  icecream:{n:"Ice cream", kind:"gift", to:"evan", price:6, say:"ICE CREAM!! *happy dance*"},
   balloon:{n:"Red balloon", kind:"gift", to:"evan", price:5, tab:"family", say:"Balloooon! Mine!"},
   wand:{n:"Bubble wand", kind:"gift", to:"evan", price:8, tab:"family", say:"Bubbles! Pop pop pop!"},
   storybook:{n:"Storybook", kind:"gift", to:"evan", price:10, tab:"family", say:"Read it! Again! Again!"},

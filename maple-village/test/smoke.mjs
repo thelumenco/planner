@@ -270,17 +270,18 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="market"]').dispatchEvent("click");
   await page.waitForSelector('#ctx [data-shop="family"]', { timeout: 20000 });
   await page.click('#ctx [data-shop="family"]');
-  for (const id of ["sandpit", "truck", "headphones", "hammock", "icecream", "kopi"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(150); }
+  for (const id of ["sandpit", "truck", "headphones", "hammock", "storybook", "kopi"]) { await page.click(`#ctx .item[data-id="${id}"]`); await page.waitForTimeout(150); }
   check(await page.locator('#ctx .item[data-id="hammock"]').textContent().then(t => /at home/.test(t)), "keepsakes are bought once and go home");
+  check(await page.locator('#ctx .item[data-id="icecream"]').count() === 0, "ice cream is off Hana's shelf now the Scoop Shack makes it");
   await page.waitForTimeout(800);
   await page.goto(url + "?seed=1&nosample=1&time=10:00&date=2026-10-05");
   await page.waitForTimeout(800);
   check(await page.locator("#evanHold rect").count() > 0, "Evan carries his toy truck");
   check(await page.locator("#sceneArt").innerHTML().then(h => /Sandpit/.test(h)), "the sandpit is at home base");
   await page.click('[data-open="bag"]');
-  await page.click('#bag .item[data-id="icecream"]'); await page.click('#bag [data-giveto="evan"]');
+  await page.click('#bag .item[data-id="storybook"]'); await page.click('#bag [data-giveto="evan"]');
   await page.waitForTimeout(300);
-  check(await page.locator("#evanHold path").count() > 0 && await page.locator("#evanSay").textContent().then(t => /ICE CREAM/.test(t)), "Evan gets his ice cream");
+  check(await page.locator("#evanHold path").count() > 0 && await page.locator("#evanSay").textContent().then(t => /Read it/.test(t)), "Evan gets his storybook");
   check(await page.locator("#panel").isHidden() && await page.locator("#evanSay .who").textContent() === "Evan", "the backpack closes so you can see Evan say thank you, with his name on the bubble");
   await page.click('[data-open="bag"]');
   await page.click('#bag .item[data-id="kopi"]');

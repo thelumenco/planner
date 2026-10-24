@@ -40,7 +40,10 @@ export function lowerVineArt(v){
     ${tapeLabel(64, 362, "The green", "var(--sage)", 10)}</g>`;
   // round 278 (Mel: "the same as how we did it for the bay, where it widens and enters the sea"): the stream crosses
   // the sand and fans out into a little river mouth where it meets the sea, like the river at the foreshore
-  const mouth = `<g filter="url(#wob)" pointer-events="none"><path d="M10 506 H30 C34 534 44 556 70 574 C88 586 104 594 112 600 H0 V506z" style="fill:var(--water)"/>
+  // round 279 (Mel: "the colour of the stream changes too abruptly into the sea"): the fan shades from the stream's pale
+  // blue into the sea's blue and runs on under the surf line, so the two waters merge
+  const mouth = `<defs><linearGradient id="lvMouth" gradientUnits="userSpaceOnUse" x1="0" y1="520" x2="0" y2="606"><stop offset="0" style="stop-color:var(--water)"/><stop offset=".55" style="stop-color:var(--water)" stop-opacity=".9"/><stop offset="1" style="stop-color:var(--sea)"/></linearGradient></defs>
+    <g filter="url(#wob)" pointer-events="none"><path d="M10 506 H30 C34 534 44 556 70 574 C88 586 104 594 112 600 C122 606 130 610 136 614 H0 V506z" style="fill:url(#lvMouth)"/>
     <path d="M30 506 C34 534 44 556 70 574 C88 586 104 594 112 600" fill="none" style="stroke:#FFFDF6" stroke-width="3" stroke-dasharray="9 6" opacity=".9"/><path d="M30 506 C34 534 44 556 70 574 C88 586 104 594 112 600" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".45"/>
     <path class="ripple" d="M24 560 q4 -3 8 0 M50 584 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/></g>`;
   // round 276 (Mel): the press sits higher, clear of the footbridge
