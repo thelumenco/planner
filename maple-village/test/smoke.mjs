@@ -5084,6 +5084,31 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const day = "2026-10-14", F = {met: {celeste: true}, storyDay: day, story: {heard: {celeste: 1}, day: {}, log: [], flags: {}}}, t = st.tellStory(F, "celeste", () => {}, day);
   check(t && t.lines[0] === sd.STORIES.celeste[1].recap && t.lines.length === sd.STORIES.celeste[1].lines.length + 1, "Celeste's second chapter opens with the reminder: " + (t ? t.lines[0] : ""));
 }
+{
+  // round 261 (Mel: "There's not enough vines for the variety we have... I need another 6"): the lower vineyard,
+  // down the hill from the vineyard, with four more trellis rows bought at the same stall
+  console.log("\nThe lower vineyard (round 261)");
+  const vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
+  { const F = {coins: 1000, vine: {rows: [0, 1, 2].map(() => ({trellis: true, vines: [null, null, null]}))}}, v = vy.vineState(F);
+    const say = vy.buy(F, "trellis");
+    check(v.rows.length === 7 && v.rows[3].trellis && !v.rows[4].trellis && /lower vineyard/.test(say) && F.coins === 920, "an old save with three full rows gets four more down the hill, and the next trellis goes there (80 coins)");
+    v.cuttings.red = 1; check(/planted/.test(vy.plantVine(F, 3, 0, "red") || "") && v.rows[3].vines[0].v === "red", "and a red cutting plants on it"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`lowervine pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/lv=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.vine = f.vine || {}; f.vine.rows = [0, 1, 2, 3, 4, 5, 6].map(i => ({trellis: i < 4, vines: i === 3 ? [{v: "red", planted: 1, wateredAt: Date.now() - 3600e3}, null, null] : [null, null, null]}));
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-24"); await page.waitForTimeout(800);
+  await page.goto(url + "?nosample=1&lv=1&time=10:00&date=2026-10-24"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(600);
+  await page.locator('#world [data-place="toLowerV"]').dispatchEvent("click");
+  await page.waitForFunction(() => /lower vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400);
+  check(await page.locator('#world [data-vine^="3-"]').count() === 3 && await page.locator('#world [data-vine^="0-"]').count() === 0 && await page.locator('#world [data-place="vpress"]').count() === 1,
+    "down the path past the seesaw: the lower vineyard, with its own rows, the old press and the valley bench");
+  await page.locator('#world [data-vine="3-0"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-vy]", { timeout: 15000 }).catch(() => {});
+  check(/Vine 4\.1/.test(await page.locator("#ctx").innerText()), "tapping a vine down there opens it, like the ones up top");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

@@ -49,10 +49,12 @@ export const GROVE_JARS = 12, TREE_JARS = 3;
 export const groveRipe = v => !!v.grove && Date.now() - (v.grove.pickedAt || v.grove.planted) >= OLIVE;
 export function pickGrove(F){ const v = vineState(F); if (!groveRipe(v)) return null; v.grove.pickedAt = Date.now(); F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + GROVE_JARS*(v.grove2 ? 2 : 1); return `${GROVE_JARS} jars of olives from the grove, into your backpack.`; }
 export function takeOliveCrate(F){ const v = vineState(F), n = v.oliveCrate || 0; if (!n) return null; v.oliveCrate = 0; F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + n; return `${n} jar${n > 1 ? "s" : ""} of olives from the crate, into your backpack.`; }
+export const ROWS = 7;   // three on the vineyard, four on the lower vineyard (round 261)
 export function vineState(F){
   F.vine = F.vine || {};
   const v = F.vine;
   v.rows = v.rows || [0, 1, 2].map(i => ({trellis: i === 0, vines: [null, null, null]}));
+  while (v.rows.length < ROWS) v.rows.push({trellis: false, vines: [null, null, null]});   // round 261: four more down on the lower vineyard
   v.cuttings = v.cuttings || {red: 1, white: 1}; v.grapes = v.grapes || {red: 0, white: 0}; v.keep = v.keep || {red: 0, white: 0};
   v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0; v.menu = v.menu || {}; v.plates = v.plates || 0; v.fruit = v.fruit || {};
   v.help = Object.assign({cook: true, pick: true, barrels: true, stock: true, fetch: false}, v.help || {}); v.names = v.names || {};
@@ -95,7 +97,8 @@ export function buy(F, id){
   else if (id === "olive") { if (v.olive) return "You've an olive tree already. One's plenty."; v.olive = {planted: Date.now(), pickedAt: 0}; }
   else if (id === "grove") { if (v.grove) return "The grove's already planted."; if (!v.olive) return "Plant the first olive tree by the path, then the grove."; v.grove = {planted: Date.now(), pickedAt: 0}; }
   else if (id === "grove2") { if (v.grove2) return "Both grove rows are planted."; if (!v.grove) return "Plant the first grove row, then the second."; v.grove2 = Date.now(); }
-  else if (id === "trellis") { const r = v.rows.find(x => !x.trellis); if (!r) return "Every row has a trellis already."; r.trellis = true; }
+  else if (id === "trellis") { const k = v.rows.findIndex(x => !x.trellis); if (k < 0) return "Every row has a trellis already, up top and down the hill."; v.rows[k].trellis = true;
+    if (k >= 3) { F.coins -= price; return "A new trellis row on the lower vineyard, down the hill, ready for three vines."; } }
   else if (id === "barrel") { if (v.barrels.length >= maxBarrels(F)) return v.barrels.length >= BARRELS.shed + BARRELS.cellar ? "Every rack's full: eighteen barrels, six in the shed and twelve in the cellar." : "The shed's full: six barrels. Open the cellar door and its racks take twelve more.";
     v.barrels.push(null); if (v.barrels.length > BARRELS.shed) { F.coins -= price; return "Another oak barrel, rolled down onto the racks in the cellar."; } }
   else v.cuttings[id === "cut_red" ? "red" : "white"]++;

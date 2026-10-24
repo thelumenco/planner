@@ -2732,3 +2732,9 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 260: no shadow under the car (Mel's screenshot: "Car is floating. Remove the shadow")
 - The "shadow" was the room spot's tap highlight (`.hov` ellipse, rx 62, a little below the spot), which stays visible after a tap on a phone. scenes.js room-spot loop leaves it out for `carbay`, so the car sits on its wheels. Test in "big goals".
+
+## Round 261: the lower vineyard (Mel: "There's not enough vines for the variety we have... I need another 6", option 2, and "I want the game to become a 4 by 4 screen eventually")
+- The outdoor screens already form a 4 by 4 grid with an empty bottom row. Rows, top to bottom, west to east: bay, hfarm, hlane, hwoods / shore, field, village, lane / flowers, orchard, base, vineyard / Lighthouse Point, the Stables, Honeybrook Green, the lower vineyard. `SOUTH` in world.js lists the new bottom-row screens (core.js uses it for Evan, bounds and walking to places).
+- `lowervine` (art/lowervine.js): south of the vineyard, path down from a vine arch at the vineyard's bottom-right (`toLowerV`, `toVineD`). Four more trellis rows (rows 3 to 6 of F.vine.rows; `ROWS = 7` in vineyard.js, old saves are padded), the stream down the left, the old stone press (`vpress`) and the valley bench (`vbench`) above a misty valley along the bottom edge.
+- art/vineyard.js: `rowY`, `vineScene`, `LOW_ROWS`, `UPPER`; `rowArt` exported. The vineyard shows rows 0 to 2; the lower vineyard rows 3 to 6. The stall's trellis fills the first bare row, so the 4th trellis goes down the hill ("A new trellis row on the lower vineyard..."). Marco and Ines's picking and watering already cover every row.
+- Tests: "The lower vineyard (round 261)".
