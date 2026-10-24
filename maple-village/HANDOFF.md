@@ -2750,3 +2750,9 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
   - `southSlot` (npcs.js, just before each villager's routine): six villagers at the Sunday band, six at Saturday cricket, Gong Gong at his allotment Tue/Thu mornings, Mei on Saturdays, Lila at the stables weekday mornings, Ines and Marco on the lower vines in the afternoon, walkers at the lighthouse at weekends and most evenings.
 - core.js: `SOUTH_SPOTS` and `southSpot`; scene names; places for walking to by name.
 - Tests: "The green, the Stables and Lighthouse Point (rounds 262 to 264)".
+
+## Round 266: the sea along the bottom row, and the home river in the vineyard (Mel: "that little water that's flowing east in the lighthouse screen... carry over on the stables and village green and lower vineyard too", "make sure the river in the home screen also shows a little in the vineyard")
+- art/southshore.js `southShore()`: the same strip of sand (from y 554) and sea (from y 592 at both edges) along the bottom of the Stables, the green and the lower vineyard, meeting Lighthouse Point's bottom edge. Walk obstacles [0, 596, 520, 640] on those three.
+- The lower vineyard's misty valley is now the sea; its stream runs across the sand into it; the "valley bench" is the "sea bench" (walking to "valley bench" still works).
+- The Stables' paddock sits 26 higher (door [214,394], obstacle [230,354,500,574]) so its fence stays on the sand; gate labels drawn after it. The green's bottom trees moved up off the beach.
+- The vineyard: the wide river from home shows at the top left (x 0 to 34, y 44 to 98), meeting the stream down its left edge.

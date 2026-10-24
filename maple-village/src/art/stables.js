@@ -2,6 +2,7 @@
 // the long timber stable block (three half-doors, two ponies looking out, a clock and weathervane on the roof) and the
 // tack room sit along the top of the yard, the gates to the green (east) and Lighthouse Point (west) either side,
 // the paddock with two grazing ponies fills the bottom right, and the little sand ring for pony rides the bottom left.
+import { southShore } from "./southshore.js";
 import { ink } from "../util.js";
 import { sk, tapeLabel, tree, flowers } from "./scenes.js";
 
@@ -32,7 +33,7 @@ export function stablesArt(){
     <g filter="url(#wob)"><path d="M260 0 V300 M22 330 C90 320 160 300 260 300 C360 300 430 320 498 330 M110 240 C130 270 180 290 230 298 M320 242 V300 M250 304 C230 340 214 380 214 420 M214 420 C206 500 200 560 110 572" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/>
       <ellipse cx="260" cy="300" rx="74" ry="30" style="fill:var(--path)"/><ellipse cx="260" cy="300" rx="74" ry="30" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[30, 270, "#EFA3A6"], [44, 278, "#F3C969"], [180, 360, "#C3CDEE"], [470, 290, "#EFA3A6"], [30, 610, "#F3C969"], [200, 620, "#EFA3A6"], [400, 270, "#F3C969"], [150, 130, "#C3CDEE"], [470, 620, "#C3CDEE"]])}
-    ${tree(460, 100, .9)}${tree(500, 230, .8)}${tree(36, 410, .75)}${tree(176, 600, .7)}`;
+    ${tree(460, 100, .9)}${tree(500, 230, .8)}${tree(36, 410, .75)}${tree(176, 560, .65)}`;
   // the hedge along the top, with a gap and a rose arch where the path comes down from the orchard
   const hedge = (x1, x2) => sk(`<path d="M${x1} 0 H${x2} V30 q-12 10 -24 2 q-12 10 -24 0 q-12 10 -24 2 H${x1}z" style="fill:var(--moss)"/>`, `<path d="M${x1} 30 H${x2}" opacity=".5"/>`);
   const north = hedge(0, 230) + hedge(290, 520) + `<g data-place="toOrchardS" aria-label="Path up to the orchard"><ellipse class="hov" cx="260" cy="24" rx="30" ry="18" style="fill:var(--butter)"/>
@@ -93,5 +94,6 @@ export function stablesArt(){
     <path d="M58 392 h34 l-6 14 h-24z" style="fill:#8EA3B5"/><path d="M60 390 q14 -8 30 0" style="fill:#EDD08A"/><circle cx="64" cy="410" r="5" style="fill:#4A3A30"/>`,
     `<rect x="156" y="208" width="20" height="14" rx="2"/><rect x="176" y="208" width="20" height="14" rx="2"/><rect x="166" y="194" width="20" height="14" rx="2"/><path d="M162 215 h10 M182 215 h10 M172 201 h10" opacity=".5"/>
     <path d="M58 392 h34 l-6 14 h-24z M92 392 l12 -4 M86 406 l4 10"/><circle cx="64" cy="410" r="5"/>`);
-  return ground + north + east + west + bits + tack + stable + paddock + ride;
+  // round 266: the paddock sits 26 higher so its bottom fence stays on the sand, clear of the sea
+  return ground + southShore() + north + bits + tack + stable + `<g transform="translate(0 -26)">${paddock}</g>` + east + west + ride;
 }

@@ -1,9 +1,10 @@
 // The lower vineyard (round 261, Mel: "There's not enough vines for the variety we have... I need another 6"): down
 // the hill from the vineyard, the bottom-right screen of the 4 by 4 grid. Four more trellis rows (rows 3 to 6 of
 // F.vine.rows, bought at the stall like the others), the stream carrying on down the left, an old stone grape press,
-// and a bench at the bottom looking out over the valley. Path up to the vineyard at the top right.
+// and a bench at the bottom looking out to sea. Path up to the vineyard at the top right.
 import { sk, tapeLabel, tree, flowers } from "./scenes.js";
 import { rowArt, UPPER } from "./vineyard.js";
+import { southShore } from "./southshore.js";
 
 export function lowerVineArt(v){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
@@ -14,11 +15,8 @@ export function lowerVineArt(v){
     <g filter="url(#wob)"><path d="M502 0 C494 100 498 200 490 300 C484 400 478 480 430 560 C400 590 360 596 330 600 M490 300 C420 304 300 300 180 300 C150 300 130 310 118 330" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
     ${flowers([[60, 90, "#EFA3A6"], [150, 200, "#F3C969"], [470, 180, "#C3CDEE"], [90, 420, "#EFA3A6"], [160, 520, "#F3C969"], [480, 420, "#EFA3A6"], [200, 120, "#C3CDEE"]])}
     ${tree(110, 110, .85)}${tree(200, 70, .7)}${tree(60, 560, .8)}`;
-  // the valley along the bottom: soft blue hills fading into mist, with a few far-off vine stripes
-  const valley = `<g pointer-events="none"><path d="M0 604 C80 586 150 598 220 590 C300 582 380 596 440 588 C480 584 506 590 520 588 V640 H0z" fill="#C9D9E8" opacity=".85"/>
-    <path d="M0 620 C100 606 200 616 300 608 C390 602 460 612 520 606 V640 H0z" fill="#B3C7DC" opacity=".9"/>
-    <g opacity=".45" style="stroke:#7C9F6C" stroke-width="1.6">${[0, 1, 2, 3].map(k => `<path d="M${60 + k*14} ${612 + k*3} l40 -4"/>`).join("")}</g>
-    <ellipse cx="260" cy="602" rx="240" ry="7" fill="#FFFDF6" opacity=".45"/></g>`;
+  // round 266: the sea along the bottom, carried on from Lighthouse Point (it used to be a misty valley)
+  const shore = southShore();
   const up = `<g data-place="toVineD" aria-label="Path up to the vineyard"><ellipse class="hov" cx="498" cy="26" rx="26" ry="18" style="fill:var(--butter)"/>
     ${sk(`<rect x="478" y="2" width="5" height="34" style="fill:var(--wood)"/><rect x="512" y="2" width="5" height="34" style="fill:var(--wood)"/><path d="M474 6 q24 -14 46 0 v5 q-23 -11 -46 0z" style="fill:#9CC27E"/>`,
       `<rect x="478" y="2" width="5" height="34"/><rect x="512" y="2" width="5" height="34"/><path d="M474 6 q24 -14 46 0 v5 q-23 -11 -46 0z"/>`)}
@@ -29,16 +27,18 @@ export function lowerVineArt(v){
       <rect x="104" y="270" width="12" height="62" style="fill:#8A6A4E"/><rect x="70" y="268" width="80" height="10" rx="3" style="fill:#A8754F"/><rect x="152" y="344" width="26" height="12" rx="3" style="fill:#BDB3A4"/>`,
       `<ellipse cx="110" cy="352" rx="44" ry="14"/><path d="M66 330 v22 M154 330 v22"/><ellipse cx="110" cy="330" rx="44" ry="13"/><path d="M110 278 v52 M104 290 h12 M104 302 h12 M104 314 h12" opacity=".6"/><rect x="70" y="268" width="80" height="10" rx="3"/><rect x="152" y="344" width="26" height="12" rx="3"/><path d="M80 346 h60" opacity=".35"/>`)}
     ${tapeLabel(110, 392, "Old press", "var(--peach)", 10)}</g>`;
-  // the bench at the bottom, facing the valley
-  const bench = `<g data-place="vbench" aria-label="The valley bench"><ellipse class="hov" cx="300" cy="590" rx="44" ry="9" style="fill:var(--butter)"/>
+  // the bench at the bottom, facing the sea
+  const bench = `<g data-place="vbench" aria-label="The sea bench"><ellipse class="hov" cx="300" cy="590" rx="44" ry="9" style="fill:var(--butter)"/>
     ${sk(`<rect x="266" y="566" width="68" height="8" rx="2" style="fill:#A8754F"/><rect x="266" y="552" width="68" height="8" rx="2" style="fill:#B98A5A"/>`,
       `<rect x="266" y="566" width="68" height="8" rx="2"/><rect x="266" y="552" width="68" height="8" rx="2"/><path d="M272 574 v12 M328 574 v12 M270 560 v6 M330 560 v6"/>`)}
-    ${tapeLabel(300, 540, "Valley bench", "var(--sky)", 10)}</g>`;
+    ${tapeLabel(300, 540, "Sea bench", "var(--sky)", 10)}</g>`;
   const sign = sk(`<rect x="160" y="176" width="72" height="16" rx="2" style="fill:#FFFDF6"/>`, `<rect x="160" y="176" width="72" height="16" rx="2"/><path d="M196 192 v14"/>`)
     + `<text x="196" y="187.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="9.5" style="fill:var(--line)" pointer-events="none">lower vines</text>`;
   // round 262: west over a little footbridge on the stream to Honeybrook Green
   const west = `<g data-place="toGreenV" aria-label="Footbridge to Honeybrook Green"><ellipse class="hov" cx="24" cy="330" rx="28" ry="20" style="fill:var(--butter)"/>
     ${sk(`<rect x="0" y="318" width="48" height="18" rx="2" style="fill:#C9A27E"/>`, `<rect x="0" y="318" width="48" height="18" rx="2"/><path d="M10 318 v18 M20 318 v18 M30 318 v18 M40 318 v18" opacity=".5"/><path d="M0 314 h48" stroke-width="2"/>`)}
     ${tapeLabel(64, 362, "The green", "var(--sage)", 10)}</g>`;
-  return ground + valley + up + west + sign + press + v.rows.slice(UPPER).map((row, k) => rowArt(row, UPPER + k)).join("") + bench;
+  // the stream runs out across the sand into the sea
+  const mouth = `<g filter="url(#wob)" pointer-events="none"><path d="M20 520 C24 556 22 578 34 606" fill="none" style="stroke:var(--water)" stroke-width="16" stroke-linecap="round"/><path d="M13 520 C17 556 15 578 27 606 M27 520 C31 556 29 578 41 606" fill="none" style="stroke:var(--line)" stroke-width="1.2" opacity=".6"/></g>`;
+  return ground + shore + mouth + up + west + sign + press + v.rows.slice(UPPER).map((row, k) => rowArt(row, UPPER + k)).join("") + bench;
 }

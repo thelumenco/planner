@@ -5104,7 +5104,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="toLowerV"]').dispatchEvent("click");
   await page.waitForFunction(() => /lower vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400);
   check(await page.locator('#world [data-vine^="3-"]').count() === 3 && await page.locator('#world [data-vine^="0-"]').count() === 0 && await page.locator('#world [data-place="vpress"]').count() === 1,
-    "down the path past the seesaw: the lower vineyard, with its own rows, the old press and the valley bench");
+    "down the path past the seesaw: the lower vineyard, with its own rows, the old press and the sea bench");
   await page.locator('#world [data-vine="3-0"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-vy]", { timeout: 15000 }).catch(() => {});
   check(/Vine 4\.1/.test(await page.locator("#ctx").innerText()), "tapping a vine down there opens it, like the ones up top");
   await page.close();

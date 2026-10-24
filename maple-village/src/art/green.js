@@ -1,6 +1,7 @@
 // Honeybrook Green: the village green, south of Mel's home. A hedge arch at the top leads home, wooden gates
 // east to the lower vineyard and west to the Stables, and round the green a duck pond, a Victorian bandstand,
 // the cricket lawn and the allotments. Paths cross in the middle, which stays open for walking.
+import { southShore } from "./southshore.js";
 import { sk, tapeLabel, tree, flowers } from "./scenes.js";
 
 // a little old lamp post (decoration only)
@@ -24,7 +25,7 @@ export function greenArt(){
     <g filter="url(#wob)" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"><path d="M260 24 C258 120 264 240 260 330 M22 330 C140 324 380 336 498 330 M260 330 C230 420 180 470 150 540 M260 330 C290 420 320 480 340 560 M300 330 C340 310 372 290 380 262 M210 328 C170 310 130 290 120 262"/></g>
     <g filter="url(#wob)"><ellipse cx="260" cy="330" rx="44" ry="22" style="fill:var(--path)"/><ellipse cx="260" cy="330" rx="44" ry="22" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[40, 260, "#EFA3A6"], [480, 250, "#F3C969"], [470, 400, "#C3CDEE"], [30, 410, "#F3C969"], [240, 470, "#EFA3A6"], [460, 560, "#C3CDEE"], [250, 600, "#F3C969"], [60, 600, "#EFA3A6"], [300, 120, "#C3CDEE"], [210, 90, "#EFA3A6"]])}
-    ${tree(30, 90, .9)}${tree(486, 96, .95)}${tree(44, 618, .85)}${tree(484, 626, .85)}${tree(250, 636, .7)}${tree(470, 470, .75)}`;
+    ${tree(30, 90, .9)}${tree(486, 96, .95)}${tree(44, 548, .8)}${tree(484, 556, .8)}${tree(470, 470, .75)}`;
 
   // the hedge arch at the top: two short hedges and a rose-covered arch over the path home
   const home = `<g data-place="toBaseG" aria-label="Path up home"><ellipse class="hov" cx="260" cy="26" rx="28" ry="16" style="fill:var(--butter)"/>
@@ -79,7 +80,7 @@ export function greenArt(){
       `<rect x="270" y="404" width="170" height="130" rx="14"/><path d="M398 440 h19 M398 440 v20 M404 440 v20 M410 440 v20 M416 440 v20 M400 439 h6 M408 439 h6"/><path d="M288 478 L338 470 L348 508 L296 516z"/><circle cx="380" cy="470" r="3"/>`)}
     ${tapeLabel(340, 582, "Cricket lawn", "var(--peach)", 10)}</g>`;
 
-  return ground + home + allot + band + pond + lawn
+  return ground + southShore() + home + allot + band + pond + lawn
     + sideGate("toVineG", "Gate to the lower vineyard", 512, "Lower vines", "#E8B4C0", 1)
     + sideGate("toStablesG", "Gate to the Stables", 6, "The Stables", "var(--butter)", -1)
     + lamp(222, 304) + lamp(300, 304) + bench(470, 210) + bench(470, 380) + bench(52, 390);
