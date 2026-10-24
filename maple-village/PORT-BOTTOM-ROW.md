@@ -15,8 +15,11 @@ Please port a feature from the personal edition of Honeybrook into this public e
 - `2f9c879` "A pony of your own, Bram the lighthouse keeper with his tales, and mackerel fishing off the rocks"
 - `26caa07` "The Sunday car boot sale on the green and the Monday lamp lighting at Lighthouse Point" (and `56d52c9`, the fish journal test count)
 - `363eb23` "The bottom row in the stories: the priory vine and Priory Red, the flask and the sea cave, Pebble and Juniper's poem, story finds at the car boot"
+- `009c495` "Bottom row fixes: jetty on the west beach, peas for the ducks, Dot's menu and buying fish, lighthouse and press moved; the allotments screen"
+- `20f040f` and `9ebe70d`: the lower vineyard's river mouth, and beachcombing (clams and mussels are the kitchen's existing items)
+- `f5972c9`: the river mouth shades into the sea (only the `lowervine.js` part; the ice cream change in that commit is personal-edition only, leave it out)
 
-Use `git show <commit>` to see each diff. HANDOFF.md rounds 261 to 275 on that branch describe the design. Don't merge or cherry-pick blindly: this edition has drifted, so apply the changes by hand where files differ, and keep this edition's own conventions.
+Use `git show <commit>` to see each diff. HANDOFF.md rounds 261 to 279 on that branch describe the design. Don't merge or cherry-pick blindly: this edition has drifted, so apply the changes by hand where files differ, and keep this edition's own conventions.
 
 ## What it is
 
@@ -104,6 +107,15 @@ It goes into `slotAt` in `game/npcs.js`, just before `routineAt`:
 
 These story threads hang off the personal edition's villagers and its secret passage arc (Hazel, Marco, Ines, Celeste, Theo, Juniper). Port them only where this edition has the same villagers and arc; otherwise keep the mechanics (the flask, the sea cave, Priory Red, story finds) and attach them to this edition's own characters, or leave them out and tell me.
 
+### 10. Fixes and additions (rounds 276 to 279)
+- **Paddleboard jetty:** moved to the west beach at Lighthouse Point, west of the beach huts (`JETTY.lighthouse`, `lsup`).
+- **Ducks:** fed with peas or corn from the bag for free, or 1 coin of duck food otherwise.
+- **Fish and chips:** the hatch opens a menu panel (`woodsView = "chips"`, `CHIP_MENU`), and the player can sell catch to the hatch (`CHIP_BUYS`, `sellCatch`, up to 6 a day). Keep the sell prices below buy prices.
+- **Positions:** the lighthouse moves up (translate 0 -36) and the old press moves up (translate 0 -120), clear of the mackerel rocks and the footbridge.
+- **The allotments screen:** new file `src/art/allotment.js`, an inside screen reached from the green (`gallot`), with six neighbours' plots (`PLOTS`, `data-aspot`) and the swap crate. Swap the plot holders for this edition's villagers.
+- **River mouth:** on the lower vineyard the stream fans out across the sand into the sea, filled with a gradient from `--water` to `--sea` so the two blend.
+- **Beachcombing:** two finds a day on each bottom-row beach (`BEACH_SPOTS`, `beachFinds`, `pickBeach`, `beachArt`, `data-shell`): seashells and conches (`BEACH` in `data/carboot.js`), plus the kitchen's existing `clams` and `mussels` if this edition has them; otherwise shells only.
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.
@@ -115,5 +127,6 @@ This edition has no personal family content, so adapt these:
 Port the two smoke-test blocks:
 - "The lower vineyard (round 261)"
 - "The green, the Stables and Lighthouse Point (rounds 262 to 264)"
+- "The bottom row in the stories (rounds 272 to 275)", only for the threads you ported
 
 Adjust their ids to this edition. Then run the full suite and publish only when it's green. Afterwards, tell me what you changed from the source and anything you couldn't port.
