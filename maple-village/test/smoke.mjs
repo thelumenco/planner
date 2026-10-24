@@ -4817,6 +4817,15 @@ if (want("\nThe map, from the backpack (round 231)")) try {
   check(/in Ada's haberdashery, on Makers' Lane/.test(await page.locator(".mmcard .sub").textContent()), "inside a building, it says which, and where");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nOlder phones, and a sign-in that never answers (round 231)")) try {
+  // the creator: "friend is stuck at the opening screen with One moment...". A regex lookbehind stops iPhones before
+  // iOS 16.4 reading the game at all; and the welcome screen gives up waiting for sign-in after eight seconds
+  console.log("\nOlder phones, and a sign-in that never answers (round 231)");
+  const { readFileSync } = await import("node:fs"), src = readFileSync(new URL("../dist/dev.html", import.meta.url), "utf8");
+  check(!/\(\?<[=!]/.test(src), "no regex lookbehinds in the game (older iPhones can't read them)");
+  const core = readFileSync(new URL("../src/game/core.js", import.meta.url), "utf8");
+  check(/answered && !player\) refreshTitle\(\{checking: false, slow/.test(core), "if sign-in doesn't answer in eight seconds, the welcome screen shows the sign-in buttons and what to try");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));

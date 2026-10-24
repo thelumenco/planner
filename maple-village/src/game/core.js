@@ -325,8 +325,13 @@ async function initDb(){
   const dev = window.__hbDevCloud;
   if (dev) { const [db, user] = await Promise.all([dev.use("db"), dev.use("user")]); if (!db || !user) return;
     const uid = await user.id(); if (uid) connect(db.collection("data/users/" + uid + (activeSlot() > 1 ? "/slot" + activeSlot() : ""))); return; }
-  CL.watchPlayer(p => {
-    const was = player; player = p; refreshTitle({checking: false});
+  // round 231 ("stuck on One moment..."): sign-in waits for Firebase to say who's signed in. If it can't start (no
+  // connection, an in-app browser, private browsing, blocked storage) the welcome screen used to wait for ever: after
+  // eight seconds, or straight away if it fails, it shows the sign-in buttons with a note on what to try
+  const slowNote = "Sign-in is taking a while. Check you're online, and if you opened Honeybrook from a link inside another app, try opening it in Safari or Chrome instead.";
+  let answered = false; setTimeout(() => { if (!answered && !player) refreshTitle({checking: false, slow: slowNote}); }, 8000);
+  try { CL.watchPlayer(p => { answered = true;
+    const was = player; player = p; refreshTitle({checking: false, slow: ""});
     // another account signed in on this browser: its own games only (this browser's copies belonged to someone else,
     // and are safe in their account)
     if (p) { let owner = null; try { owner = localStorage.getItem("hb.owner"); localStorage.setItem("hb.owner", p.uid); } catch {}
@@ -334,7 +339,7 @@ async function initDb(){
     if (p && !refs) connect(CL.slotCollection(p.uid, activeSlot()));
     if (was && !p) { leaving = true; location.reload(); return; }   // signed out: back to this browser's copy only
     if (p) cloudSummaries(); else refreshTitle({player: null, remote: {}});
-  });
+  }); } catch (e) { console.error(e); refreshTitle({checking: false, slow: slowNote}); }
 }
 async function cloudSummaries(){
   if (!player) return; remote = {};

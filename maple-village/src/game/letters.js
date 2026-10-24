@@ -119,7 +119,8 @@ export function themeOf(text){
 // a short phrase from the letter to quote back (its first sentence, if it's short and not just "Dear Universe")
 export function quoteOf(text){
   const body = String(text || "").replace(/^\s*dear\s+universe[,.!:]?\s*/i, "").trim();
-  const first = (body.split(/(?<=[.!?])\s+|\n+/)[0] || "").trim().replace(/[.!?,;:]+$/, "");
+  // the first sentence (round 231: without a lookbehind, which iPhones before iOS 16.4 can't read at all)
+  const line = body.split(/\n+/)[0] || "", m = line.match(/^.*?[.!?](?=\s|$)/), first = (m ? m[0] : line).trim().replace(/[.!?,;:]+$/, "");
   const w = first.split(/\s+/).filter(Boolean).length;
   return w >= 3 && w <= 14 && first.length <= 90 ? first : "";
 }

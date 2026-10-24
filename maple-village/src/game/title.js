@@ -31,7 +31,7 @@ function draw(){
     <h1 class="tttitle">Honeybrook</h1><p class="ttsub">A village, a vineyard, and a little more time.</p>`;
   // everyone plays with an account (the public game): sign in first, then the slots
   if (opts.needAccount && !P) { box.querySelector(".ttcard").innerHTML = head + (opts.checking ? `<p class="ttacct">One moment...</p>`
-    : `<button type="button" class="btn primary ttgo" data-tt="signin">Sign in with Google</button>
+    : `${opts.slow ? `<p class="ttmsg">${esc(opts.slow)}</p>` : ""}<button type="button" class="btn primary ttgo" data-tt="signin">Sign in with Google</button>
       <form class="ttmail" data-ttmail="1"><p class="eyebrow">Or with your email</p>
         <label class="sr" for="ttEmail">Email</label><input id="ttEmail" class="suinput" type="email" autocomplete="email" placeholder="email" value="${esc(mail.email)}">
         <label class="sr" for="ttPw">Password</label><input id="ttPw" class="suinput" type="password" autocomplete="${mail.mode === "new" ? "new-password" : "current-password"}" placeholder="password${mail.mode === "new" ? " (six characters or more)" : ""}">
