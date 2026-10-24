@@ -2832,3 +2832,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - core.js `paddleTo`: from Lighthouse Point you board at [36,264] (Evan [18,290]), out on the water below the west-beach jetty, not on its planks.
 - Dot's takeaway: south.js `TAKEAWAY` (9), `takeaway(F)` adds `chips_out` to the bag; a "To take away" row in `chipsPanel` (`data-chipsout`). items.js `chips_out`: a gift for any of the family (to "family", no shop tab), with a line for each; icon in icons.js.
 - Tests: in the round 283 block.
+
+## Round 287: seagulls at Lighthouse Point, and the river taxi stops at its jetty (Mel)
+- art/lighthouse.js `gulls`: herring gulls perched on the jetty end, a beach hut roof, the lighthouse rocks and Dot's roof, and three gliding slowly over the point by day (`.gullfly`, 16s, off for reduced motion, none at night). The one on Dot's roof is a spot (`lgull`, world.js; south.js `gullLine`, which notices a takeaway in your bag).
+- transport.js `STOPS.taxilight` (Lighthouse Point, stepping off at the west-beach jetty); no separate stop sign: the jetty panel (goals.js) has "Take the river taxi", like home's. The taxi tests now count five stops.

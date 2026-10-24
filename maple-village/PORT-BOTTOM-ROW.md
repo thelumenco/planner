@@ -120,6 +120,8 @@ These story threads hang off the personal edition's villagers and its secret pas
 
 - **Round 286:** the home jetty can paddle to Lighthouse Point; boarding at Lighthouse Point starts out on the water below the jetty (`paddleTo` offsets); Dot sells fish and chips to take away (`takeaway`, item `chips_out`), a gift for this edition's family or friends, or leave the gift lines out if it has none.
 
+- **Round 287:** seagulls at Lighthouse Point (perched, and gliding by day; the one on the chip hatch roof is tappable), and the river taxi stops at the Lighthouse Point jetty (`STOPS.taxilight`, a "Take the river taxi" button in its jetty panel). Update the taxi tests' stop count.
+
 ### 11. Weddings buy sparkling by the case (round 284, not part of the bottom row)
 If this edition has the terrace weddings (`game/occasions.js`), port this too: commit `4fea497` "Weddings order two to four cases of sparkling, brought up from the cellar on the day".
 - `occasions.js`: `weddingCases(day)` gives each couple an order of two to four cases; the bookings book note reads "N cases of sparkling ordered from your cellar".

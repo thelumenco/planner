@@ -2638,7 +2638,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator("#mel.biking").count() === 1, "Mel rides it (faster than walking, slower than the scooter)");
   await page.waitForTimeout(3500);
   await page.locator('#world [data-place="taxiwoods"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-taxi]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-taxi]').count() === 4, "the river taxi stops: Makers' Lane, home, the lake and the foreshore");
+  check(await page.locator('#ctx [data-taxi]').count() === 5, "the river taxi stops: Makers' Lane, home, the lake, the foreshore and Lighthouse Point");
   await page.click('#ctx [data-taxi="taxishore"]'); await page.waitForTimeout(800);
   check(await page.locator(".taxiride").count() === 1, "a little ride down the river on the launch");
   await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 15000 });
@@ -2646,7 +2646,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="homejetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-taxiopen]', { timeout: 15000 });
   await page.click('#ctx [data-taxiopen]'); await page.waitForTimeout(300);
-  check(await page.locator('#ctx [data-taxi]').count() === 4 && await page.locator('#world [data-place="taxihome"]').count() === 0, "at home the river taxi stops at the little jetty (no separate stop): paddle or take the taxi");
+  check(await page.locator('#ctx [data-taxi]').count() === 5 && await page.locator('#world [data-place="taxihome"]').count() === 0, "at home the river taxi stops at the little jetty (no separate stop): paddle or take the taxi");
   await page.locator('#ctx [data-close]').first().click();
   await page.evaluate(() => window.__mapleScene("lane")); await page.waitForTimeout(900);
   check(await page.locator('#world [data-place="toWoodsM"]').count() === 1 && await page.locator('#world [data-place="taxilane"]').count() === 1, "Makers' Lane: the river comes down from the woods, with a taxi stop and a path up the hill");
@@ -5240,6 +5240,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(so.LOGBOOK.some(e => /priory boat/.test(e)) && so.LOGBOOK.some(e => /vines/.test(e)), "the logbook has the vines below the press and the priory boat in it");
     check(["ship", "window", "fire"].every(k => so.bramSpot(F, k, day, true, false).line), "the ship in a bottle, the window and the fire"); }
   // round 286 (Mel): the home jetty paddles to Lighthouse Point too; fish and chips to take away, as a present
+  // round 287: seagulls at Lighthouse Point, and the river taxi stops at its jetty
+  { const tr = await import(new URL("../src/game/transport.js", import.meta.url)), lh = await import(new URL("../src/art/lighthouse.js", import.meta.url));
+    check(tr.STOPS.taxilight && tr.STOPS.taxilight.scene === "lighthouse" && /data-taxiopen="taxilight"/.test(gl.jettyPanel("lighthouse", true)), "the river taxi stops at the Lighthouse Point jetty");
+    check((lh.lighthouseArt(false).match(/gullfly/g) || []).length === 3 && !/gullfly/.test(lh.lighthouseArt(true)) && /data-place="lgull"/.test(lh.lighthouseArt(false)) && /takeaway/.test(so.gullLine({inv: {chips_out: 1}})), "seagulls: perched about the point, gliding over it by day, and one eyeing your chips"); }
   check(/data-sup="lighthouse"/.test(gl.jettyPanel("base", true)) && /data-sup="base"/.test(gl.jettyPanel("lighthouse", true)), "the home jetty paddles down to Lighthouse Point, and back");
   { const F = {coins: 15, inv: {}}, it = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS.chips_out;
     check(so.takeaway(F).ok && F.inv.chips_out === 1 && F.coins === 15 - so.TAKEAWAY && !so.takeaway(F).ok && F.coins === 6, "fish and chips to take away from Dot's, " + so.TAKEAWAY + " coins");

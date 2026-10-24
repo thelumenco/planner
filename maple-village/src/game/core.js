@@ -3389,12 +3389,13 @@ function arriveSpot(id){
   const s = spotObj(scene, id); if (s) speak(s.line, 3500); render();
 }
 // rounds 262 to 264: the green, the Stables and Lighthouse Point (game/south.js)
-const SOUTH_SPOTS = ["vsale", "stack", "lbram", "gboot", "gpond", "gband", "glawn", "gallot", "sstable", "spaddock", "sride", "llight", "lpools", "lchips"];
+const SOUTH_SPOTS = ["vsale", "stack", "lbram", "lgull", "gboot", "gpond", "gband", "glawn", "gallot", "sstable", "spaddock", "sride", "llight", "lpools", "lchips"];
 function southSpot(id){
   const day = dayKey(), hm = sgHM(), ev = evanHere() && !evanNight(), say = (r, ms = 5500) => { if (r) speak(r.line, ms); };
   if (id === "vsale") { woodsView = "lvsale"; sfx("paper", true); }   // round 282: Bram's sign
   else if (id === "stack" && SO.southState(F).mine) { woodsView = "tack"; sfx("paper", true); }   // round 283: riding your pony
   else if (id === "stack") speak("The tack room. Saddles on their racks, bridles on hooks, a rosette board, and the smell of leather soap.", 4000);
+  else if (id === "lgull") { speak(SO.gullLine(F), 4500); if (ev) setTimeout(() => evanSays(pick(["SEAGULL!", "it's looking at me", "hello, birdie"])), 1400); }   // round 287
   else if (id === "lbram" && (hm < 7*60 || hm >= 22*60)) speak("Bram's cottage is dark. Even the keeper has to sleep sometime.", 3500);
   else if (id === "lbram") { setScene("bramcot", [260, 580]); return; }   // round 283: Bram's cottage
   else if (id === "gboot") { if (SO.bootNow(day, hm)) { woodsView = "boot"; sfx("paper", true); } else speak("The car boot sale's on Sunday mornings, 8 till 12.", 3500); }

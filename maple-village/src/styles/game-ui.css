@@ -958,3 +958,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .ppstep.done{background:#DCE7D2;color:#4E6A3E}
 .ppstep.now{background:#F3D9A0;color:#5A3E1A;font-weight:600}
 .ppbatch{display:flex;justify-content:center;margin:2px 0 6px}
+
+/* round 287: seagulls gliding over Lighthouse Point, slow and calm */
+.map .gullfly{animation:gullfly 16s ease-in-out infinite alternate}
+@keyframes gullfly{0%{transform:translate(0,0)}50%{transform:translate(34px,-8px)}100%{transform:translate(70px,4px)}}
+@media (prefers-reduced-motion:reduce){.map .gullfly{animation:none}}

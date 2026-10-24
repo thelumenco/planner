@@ -228,6 +228,8 @@ export const CHIP_MENU = {
 };
 export const CHIP_BUYS = ["fish", "mackerel", "sardine", "anchovy", "seabream", "mullet", "squid", "clams", "mussels"], CHIP_CAP = 6;
 const chipSell = id => id === "fish" ? 3 : ((ITEMS[id] || {}).sell || 0);
+// round 287: the gull on Dot's roof
+export const gullLine = F => (F.inv || {}).chips_out ? "The gull on Dot's roof stares very hard at the takeaway in your backpack. You hold it a little tighter." : pick(["A herring gull on the chip hatch roof, one foot tucked up, watching everyone's chips.", "The gull puts its head back and laughs at the sky. Kee-ow, kee-ow, kee-ow.", "Dot says this one's called Gerald, and he's banned."]);
 // round 286 (Mel: "Can I also buy fish and chips as takeaway? As gifts"): wrapped in paper to take away, for the family
 export const TAKEAWAY = 9;
 export function takeaway(F){
