@@ -275,9 +275,13 @@ export const RUIN_STEPS = [
   {n: "Hang a gate", cost: 120, line: "A little oak gate in the gap at the front, with a latch that clicks. The garden feels like a garden again."},
   {n: "Plant sage and lavender", cost: 60, line: "Two rows of sage and two of lavender, the way a monks' garden would have had them. Hazel walks down to see and stands a long while under the arch. \"The brothers would be glad.\""}
 ];
+// round 292 (Mel: "I thought you can get the vineyard without the mill"): it's the ruins that wait for the old mill
+const millGoing = F => !!(F.goals && F.goals.mill);
+export const RUIN_WAIT = "One old ruin at a time. Get the windmill turning again first, then come back for the monks' garden.";
 export const ruinState = F => { const s = southState(F); return s.ruins = Object.assign({step: 0, day: "", picked: ""}, s.ruins || {}); };
 export function ruinStep(F, day){
   const r = ruinState(F), st = RUIN_STEPS[r.step]; if (!st) return null;
+  if (!millGoing(F)) return {line: RUIN_WAIT};   // round 292 (Mel): the ruins come after the mill
   if (r.day === day) return {line: "That's enough for one day. The ruins have waited six hundred years; they can wait till tomorrow."};
   if ((F.coins || 0) < st.cost) return {line: `${st.n}: ${st.cost} coins.`};
   F.coins -= st.cost; r.step++; r.day = day; return {ok: true, done: r.step === RUIN_STEPS.length, line: st.line};
@@ -292,7 +296,8 @@ export function ruinsPanel(F, day){
   const r = ruinState(F), st = RUIN_STEPS[r.step], done = !st;
   const desc = ["Brambles over everything: a broken stone arch standing on its own, and the tumbled walls of what was the monks' herb garden.", "The brambles are gone. The old walls lie tumbled in the grass, and the arch stands over them.", "The walls are back up, dry stone, the monks' way. There's a gap at the front for a gate.", "Walls, a gate with a latch, and bare earth inside, waiting for the herbs.", "The priory garden: sage and lavender inside the old walls, the arch over the gate, bees everywhere."][r.step];
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The priory ruins</h2><p class="sub">${desc}</p>`;
-  if (!done) h += `<p class="sub">Next: <b>${st.n}</b>, ${st.cost} coins. One step a day.</p><div class="actions"><button class="btn primary" data-ruin="step"${(F.coins || 0) < st.cost || r.day === day ? " disabled" : ""}>${st.n} (${st.cost} coins)</button></div>`;
+  if (!done && !millGoing(F)) h += `<p class="sub">${RUIN_WAIT}</p>`;
+  else if (!done) h += `<p class="sub">Next: <b>${st.n}</b>, ${st.cost} coins. One step a day.</p><div class="actions"><button class="btn primary" data-ruin="step"${(F.coins || 0) < st.cost || r.day === day ? " disabled" : ""}>${st.n} (${st.cost} coins)</button></div>`;
   else h += `<div class="actions"><button class="btn primary" data-ruin="pick"${r.picked === day ? " disabled" : ""}>${r.picked === day ? "Picked today" : "Pick sage and lavender"}</button></div>`;
   return h + `<div class="actions"><button class="btn alt" data-ruin="sit">Sit a while</button><button class="btn alt small" data-close="1">Close</button></div>`;
 }

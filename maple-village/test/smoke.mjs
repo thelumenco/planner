@@ -5105,8 +5105,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     // round 282 (Mel: "the lower vineyard is actually Bram's and he's been looking to sell. So I buy from him")
     check(v.rows.length === 7 && !vy.lowerOwned(F) && /Bram's/.test(vy.buy(F, "trellis")) && !v.rows[3].trellis && F.coins === 1000, "an old save with three full rows gets four more down the hill, but they're Bram's: no trellis goes there yet");
     check(!vy.buyLower(F, "2026-10-24").ok && F.coins === 1000 && /For Sale/.test(vy.lowerSalePanel(F)) && /Bram's/.test(vy.vinePanel(F, 4, 0)), "his For Sale sign asks " + vy.LOWER.price + " coins, and the rows down there are his till then");
-    F.coins = vy.LOWER.price + 100; check(!vy.buyLower(F, "2026-10-24").ok && /old mill/.test(vy.buyLower(F, "2026-10-24").line) && F.coins === vy.LOWER.price + 100, "round 291: Bram won't sell till the old mill's turning again");
-    F.goals = {mill: 1}; const bought = vy.buyLower(F, "2026-10-24");
+    F.coins = vy.LOWER.price + 100; const bought = vy.buyLower(F, "2026-10-24");   // (round 292: no mill needed)
     check(bought.ok && vy.lowerOwned(F) && v.rows[3].trellis && F.coins === 100 && !vy.buyLower(F, "2026-10-24").ok, "buying from Bram: the lower vineyard is yours, with his father's trellis on the first row");
     const say = vy.buy(F, "trellis");
     check(v.rows[4].trellis && /lower vineyard/.test(say) && F.coins === 20, "and the next trellis bought goes down the hill (80 coins)");
@@ -5257,7 +5256,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(["shore", "stables", "green", "lowervine"].every(sc => /gullperch/.test(gu.coastGulls(sc, false)) && /gulloff/.test(gu.coastGulls(sc, false))) && !/gullfly/.test(gu.coastGulls("shore", true)) && gu.coastGulls("vineyard", false) === "", "gulls all along the foreshore and the bottom-row beaches (resting at night)"); }
   // round 291 (Mel: "Yes build the ruins... just sage and lavender for the herbs"): the priory ruins behind the old press
   { const R = {coins: 1000, inv: {}}, d1 = "2026-10-24", d2 = "2026-10-25";
-    const s1 = so.ruinStep(R, d1);
+    check(!so.ruinStep(R, d1).ok && R.coins === 1000 && /windmill/.test(so.ruinsPanel(R, d1)) && !/data-ruin="step"/.test(so.ruinsPanel(R, d1)), "round 292: the ruins wait till the old mill's turning");
+    R.goals = {mill: 1}; const s1 = so.ruinStep(R, d1);
     check(s1.ok && R.coins === 1000 - so.RUIN_STEPS[0].cost && !so.ruinStep(R, d1).ok && !so.pickHerbs(R, d1), "restoring the ruins: one step a day, for coins, and nothing to pick yet");
     ["2026-10-25", "2026-10-26", "2026-10-27"].forEach(d => so.ruinStep(R, d));
     const tot = so.RUIN_STEPS.reduce((a, x) => a + x.cost, 0), p1 = so.pickHerbs(R, "2026-10-28");
