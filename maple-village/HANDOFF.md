@@ -2760,3 +2760,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Round 267: bike hire and a paddleboard jetty on the bottom row (Mel: "one or some of the new screens need the bike hire. And a paddleboard jetty too at the lighthouse screen")
 - transport.js `transportArt`: bike racks `bikesgreen` (green, by the pond path) and `bikeslight` (Lighthouse Point, mid-screen); same bike panel as the others.
 - `supJetty()` at Lighthouse Point (`lsup`): a jetty out into the bottom sea and a board rack. Its jetty panel (goals.js `jettyPanel("lighthouse")`) paddles to the foreshore or home; the foreshore's panel gains "Paddle to Lighthouse Point". `JETTY.lighthouse`, and `paddleTo` lines for the coast.
+
+## Round 268: the river fork in the vineyard (Mel: "The overlap between the wide river and the little stream is weird. That's not how nature would work")
+- art/vineyard.js: the separate river blob is gone. One shape at the top left: the stream from Makers' Lane widens into the river, which leaves by the west edge (y 44 to 98, meeting home's river), and a narrower branch carries on down the left side. Continuous banks, no overlap.
