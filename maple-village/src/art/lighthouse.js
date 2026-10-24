@@ -87,5 +87,6 @@ export function lighthouseArt(night){
   const bench = `<g pointer-events="none">${sk(`<rect x="300" y="486" width="48" height="7" rx="2" style="fill:#A8754F"/><rect x="300" y="474" width="48" height="6" rx="2" style="fill:#B98A5A"/>`,
     `<rect x="300" y="486" width="48" height="7" rx="2"/><rect x="300" y="474" width="48" height="6" rx="2"/><path d="M304 493 v9 M344 493 v9 M304 480 v6 M344 480 v6"/>`)}</g>`;
 
-  return ground + beam + up + stile + huts + bench + chips + light + pools;
+  // round 276 (Mel): the lighthouse sits 36 higher, leaving room between it and the mackerel rocks
+  return ground + `<g transform="translate(0 -36)">${beam}</g>` + up + stile + huts + bench + chips + `<g transform="translate(0 -36)">${light}</g>` + pools;
 }

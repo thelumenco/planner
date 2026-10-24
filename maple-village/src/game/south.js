@@ -3,6 +3,7 @@
 // coast path ends). Small, calm things to do; nothing here is a way to make money. State: F.south.
 import { pick } from "../util.js";
 import { CARBOOT } from "../data/carboot.js";
+import { ITEMS } from "../data/items.js";
 export { CARBOOT };
 import { icon } from "../art/icons.js";
 const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
@@ -23,7 +24,12 @@ export function feedDucks(F, day, hm){
   const s = southState(F);
   if (hm < 6*60 || hm >= 20*60) return {line: "The ducks are asleep on the bank, beaks tucked under their wings. Best let them be."};
   if (s.ducks === day) return {line: "The ducks have had their breakfast and lunch and, frankly, a second lunch. They paddle off, full."};
-  if ((F.coins || 0) < DUCK_FOOD) return {line: "A scoop of duck food from the honesty tin is a coin. You've nothing on you."};
+  // round 276 (Mel: "Can I bring something to feed the ducks? What do they eat?"): peas or sweetcorn from the garden
+  // are just right (bread's bad for them); otherwise a scoop of duck food from the honesty tin, a coin
+  const own = ["pea", "corn"].find(k => (F.inv || {})[k] > 0);
+  if (own) { F.inv[own]--; if (F.inv[own] <= 0) delete F.inv[own]; s.ducks = day;
+    return {fed: true, line: own === "pea" ? "You scatter a handful of peas from the garden. The ducks go wild: peas are their very favourite. One of them follows you halfway to the gate." : "You crumble a cob of sweetcorn into the water and the ducks come paddling from every corner of the pond, quacking about it."}; }
+  if ((F.coins || 0) < DUCK_FOOD) return {line: "Ducks love peas and sweetcorn (never bread, it's bad for them). Bring some from the garden, or a scoop of duck food from the honesty tin is a coin."};
   F.coins -= DUCK_FOOD; s.ducks = day;
   return {line: pick(["You scatter a scoop of duck food and the whole pond comes at once: three ducks, a moorhen, and a very determined duckling.", "The ducks waddle up the bank in a line, quacking about it. One of them eats from your hand.", "Splash, splash, splash. The ducks race for the food, and the smallest one wins."]), fed: true};
 }
@@ -35,6 +41,17 @@ export function swapCrate(F, day){
   const id = SWAP[h % SWAP.length]; s.swap = day; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1;
   return {id, line: "The swap crate by the potting shed: whoever grows too much leaves it out, with a note saying help yourself."};
 }
+
+// the allotment holders' plots (round 277): what each says about theirs, here or not
+export const PLOT_LINES = {
+  gonggong: {here: ["Pak choi, long beans, chillies. Ma Ma says I grow too much. Is there such thing?", "This one is for your ma ma's soup. That one also."], away: "Gong Gong's plot: pak choi in neat rows, long beans up the canes, and chillies going red. A little stool at the end for sitting and looking at it."},
+  mei: {here: ["Tomatoes, basil, and a bit of everything I miss from home.", "Pinch the side shoots off the tomatoes. Like this. See?"], away: "Mei's plot: tomatoes staked in a row, a jungle of basil, and a label for everything in her tiny handwriting."},
+  theo: {here: ["That pumpkin is entered in the county show. Don't tell it. It gets nervous.", "I talk to it every morning. For science."], away: "Theo's plot: mostly one enormous pumpkin, with a sign saying PLEASE DO NOT TOUCH (ROBERT)."},
+  juniper: {here: ["Sweet peas and cornflowers. For drying, and for poems.", "The more you pick sweet peas, the more they flower. Life lesson, that."], away: "Juniper's plot: sweet peas up the canes in every colour, and cornflowers going wild along the edge."},
+  bo: {here: ["Strawberries! Netted, because the blackbirds are criminals.", "Have one. Go on. Just the one. All right, two."], away: "Bo's plot: strawberries under netting, and a scarecrow in a bucket hat that looks suspiciously like Bo."},
+  felix: {here: ["Runner beans, and a bee hotel. The solitary bees love it.", "The bees from my hives come down here too. Busman's holiday."], away: "Felix's plot: runner beans with red flowers, and a little wooden bee hotel full of holes."}
+};
+export const plotLine = (id, here) => { const p = PLOT_LINES[id]; return p ? (here ? pick(p.here) : p.away) : null; };
 
 /* ---------- The Stables ---------- */
 export const PONIES = {biscuit: {n: "Biscuit", coat: "chestnut", like: "apple"}, pebble: {n: "Pebble", coat: "dapple grey", like: "carrot"}};
@@ -124,6 +141,38 @@ export function rockPools(F, day, tide){
 }
 // low tide in the morning and early evening (a simple daily rhythm, not the real tides)
 export const tideAt = hm => (hm >= 6*60 && hm < 11*60) || (hm >= 17*60 && hm < 20*60) ? "low" : "high";
+// round 276 (Mel: "Fish and chip shop should open a menu. I should also be able to sell fish to them"): Dot's
+// hatch. A menu to eat there and then, and she buys your catch for the fryer (fair prices, never more than the fish
+// fetches anywhere else; up to six a day)
+export const CHIP_MENU = {
+  cod: {n: "Cod and chips", price: 9, line: "Crisp battered cod, a mountain of chips, salt and vinegar, in paper. You eat it on the sea wall and fight off one very bold gull."},
+  haddock: {n: "Haddock and chips", price: 9, line: "Haddock, flakier than cod, Dot says, and she'd know. With chips, a wedge of lemon and a little wooden fork."},
+  mackerel: {n: "Grilled mackerel bap", price: 6, line: "Mackerel straight off the grill in a soft floury bap, with a bit of horseradish. Bram swears by it."},
+  chips: {n: "A cone of chips", price: 4, line: "A paper cone of chips, too hot to hold. You blow on every one and burn your mouth anyway."},
+  peas: {n: "Mushy peas", price: 2, line: "A little pot of mushy peas, bright green and very, very hot."}
+};
+export const CHIP_BUYS = ["fish", "mackerel", "sardine", "anchovy", "seabream", "mullet", "squid"], CHIP_CAP = 6;
+const chipSell = id => id === "fish" ? 3 : ((ITEMS[id] || {}).sell || 0);
+export function eatChips(F, k, withEvan){
+  const m = CHIP_MENU[k]; if (!m) return null;
+  if ((F.coins || 0) < m.price) return {line: `${m.n} is ${m.price} coins.`};
+  F.coins -= m.price; return {ok: true, line: m.line + (withEvan && k !== "peas" ? " Evan has most of your chips." : "")};
+}
+export function sellCatch(F, id, day){
+  const s = southState(F); s.chipSold = s.chipSold && s.chipSold.day === day ? s.chipSold : {day, n: 0};
+  if (!CHIP_BUYS.includes(id) || !((F.inv || {})[id] > 0)) return null;
+  if (s.chipSold.n >= CHIP_CAP) return {line: "\"That's my fryer full for today, love. Bring me more tomorrow.\""};
+  const c = chipSell(id); F.inv[id]--; if (F.inv[id] <= 0) delete F.inv[id]; F.coins = (F.coins || 0) + c; s.chipSold.n++;
+  return {ok: true, coins: c, line: `Dot weighs it, nods, and hands over ${c} coin${c === 1 ? "" : "s"}. "Lovely. That'll be in the fryer by teatime."`};
+}
+export function chipsPanel(F, day){
+  const s = southState(F), sold = s.chipSold && s.chipSold.day === day ? s.chipSold.n : 0, have = CHIP_BUYS.filter(id => (F.inv || {})[id] > 0);
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>Dot's fish and chips</h2><p class="sub">Dot leans out of the hatch in her striped apron. "What can I get you, love?"</p>
+    <ul class="hlist wlist">${Object.entries(CHIP_MENU).map(([k, m]) => `<li><span class="wtxt"><b>${esc(m.n)}</b></span><button class="btn small primary" data-chips="${k}"${(F.coins || 0) < m.price ? " disabled" : ""}>${m.price} coins</button></li>`).join("")}</ul>
+    <h3 class="ph3">Sell her your catch</h3><p class="sub">She buys fresh fish for the fryer, up to ${CHIP_CAP} a day (${sold} so far today).</p>
+    ${have.length ? `<ul class="hlist wlist">${have.map(id => `<li><span class="wpic">${icon(id, 26)}</span><span class="wtxt"><b>${esc((ITEMS[id] || {n: id}).n)}</b><small>You have ${F.inv[id]}.</small></span><button class="btn small alt" data-chipsell="${id}"${sold >= CHIP_CAP ? " disabled" : ""}>Sell for ${chipSell(id)}</button></li>`).join("")}</ul>` : `<p class="muted">Nothing in your backpack she can fry. Mackerel off the rocks is her favourite.</p>`}
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
 export function buyChips(F){
   if ((F.coins || 0) < CHIPS) return {line: `Fish and chips are ${CHIPS} coins.`};
   F.coins -= CHIPS;
@@ -159,8 +208,8 @@ export function southSlot(id, day, t){
   if (dw === BAND.dow && t >= BAND.from && t < BAND.to && some(BAND_POOL, 6, day + ":band").includes(id)) return W(BAND.from, BAND.to, "green", BAND_LAWN);
   if (dw === CRICKET.dow && t >= CRICKET.from && t < CRICKET.to && some(CRICKET_POOL, 6, day + ":cricket").includes(id)) return W(CRICKET.from, CRICKET.to, "green", CRICKET_LAWN);
   // Gong Gong's allotment, Tuesday and Thursday mornings; Mei's on Saturdays
-  if (id === "gonggong" && (dw === 2 || dw === 4) && t >= 7*60 + 30 && t < 9*60 + 30) return W(7*60 + 30, 9*60 + 30, "green", [[70, 222], [110, 230], [150, 214]], "farm");
-  if (id === "mei" && dw === 6 && t >= 9*60 && t < 11*60) return W(9*60, 11*60, "green", [[70, 222], [110, 230], [150, 214]], "farm");
+  if (id === "gonggong" && (dw === 2 || dw === 4) && t >= 7*60 + 30 && t < 9*60 + 30) return W(7*60 + 30, 9*60 + 30, "allotment", [[244, 214], [200, 270], [120, 270]], "farm");
+  if (id === "mei" && dw === 6 && t >= 9*60 && t < 11*60) return W(9*60, 11*60, "allotment", [[276, 214], [330, 270], [420, 270]], "farm");
   // a stable hand: Lila mucks out and turns the ponies out first thing, weekdays
   if (id === "lila" && !we && t >= 7*60 && t < 8*60 + 30) return W(7*60, 8*60 + 30, "stables", [[260, 300], [300, 320], [214, 420], [180, 300]], "farm");
   // Marco and Ines tend the lower rows too

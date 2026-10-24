@@ -5124,7 +5124,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(so.buyChips(F).ok && F.coins === 49 - so.RIDE_COST - so.CHIPS && /tide's in/.test(so.rockPools(F, day, "high").line), "fish and chips cost coins, and the rock pools need low tide"); }
   check(["green", "stables", "lighthouse"].every(sc => Object.keys(w.BRIDGES[sc]).every(o => w.BRIDGES[o] && w.BRIDGES[o][sc] && w.ARRIVE[sc + ">" + o] && w.ARRIVE[o + ">" + sc])), "every new path goes both ways, with somewhere to arrive");
   { const ids = ["hana", "juniper", "opal", "theo", "farid", "mei", "amara", "lila", "noor", "sofia"], band = ids.filter(i => (so.southSlot(i, "2026-10-25", 15*60) || {}).scene === "green");
-    check(band.length === 6 && (so.southSlot("gonggong", "2026-10-27", 8*60) || {}).scene === "green" && (so.southSlot("lila", "2026-10-27", 7*60 + 30) || {}).scene === "stables" && (so.southSlot("ines", "2026-10-27", 14*60 + 30) || {}).scene === "lowervine",
+    check(band.length === 6 && (so.southSlot("gonggong", "2026-10-27", 8*60) || {}).scene === "allotment" && (so.southSlot("lila", "2026-10-27", 7*60 + 30) || {}).scene === "stables" && (so.southSlot("ines", "2026-10-27", 14*60 + 30) || {}).scene === "lowervine",
       "villagers use the new screens: six at the Sunday band, Gong Gong at his allotment, Lila at the stables, Ines on the lower vines"); }
   { const fi = await import(new URL("../src/game/fishing.js", import.meta.url)), F = {coins: 1500, inv: {apple: 1}};
     const r = so.buyPony(F, "Clementine", day);
@@ -5132,6 +5132,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     const t1 = so.keeperTale(F, day), t2 = so.keeperTale(F, day), t3 = so.keeperTale(F, "2026-10-25");
     check(t1 && !t2 && t3 && t3 !== t1 && !/[\u2013\u2014]/.test(so.TALES.join("")), "Bram the keeper tells one tale a day, a new one each time");
     check(fi.fishHere("rocks", day, 11*60).includes("mackerel") && fi.fishHere("rocks", day, 18*60 + 30).includes("bass"), "mackerel off the rocks at Lighthouse Point, and sea bass at dusk"); }
+  { const F = {coins: 20, inv: {pea: 1, mackerel: 7}}; const d = "2026-10-24";
+    check(so.feedDucks(F, d, 10*60).fed && !F.inv.pea && F.coins === 20, "peas from the garden for the ducks, free (bread's bad for them)");
+    check(so.eatChips(F, "chips", false).ok && F.coins === 16 && so.sellCatch(F, "mackerel", d).ok && F.coins === 16 + 3, "Dot's hatch: a cone of chips to eat, and she buys your mackerel at the usual price");
+    for (let i = 0; i < 5; i++) so.sellCatch(F, "mackerel", d); check(F.inv.mackerel === 1 && !so.sellCatch(F, "mackerel", d).ok, "six fish a day is her fryer full");
+    check(so.plotLine("gonggong", false) && Object.keys(so.PLOT_LINES).length === 6, "six neighbours' plots at the allotments, each with something to say"); }
   check(w.nextHop("lighthouse", "lowervine") === "stables" && w.nextHop("lowervine", "lighthouse") === "green", "the bottom row joins up end to end");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`south pageerror: ${e.message}`));
@@ -5154,6 +5159,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="lsup"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 20000 });
   await page.click('#ctx [data-sup="shore"]'); await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "the paddleboard jetty at Lighthouse Point: paddle up the coast to the foreshore");
+  await page.evaluate(() => window.__mapleScene("green")); await page.waitForTimeout(600);
+  await page.locator('#world [data-place="gallot"]').dispatchEvent("click"); await page.waitForFunction(() => /allotments/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await page.locator('#world [data-aspot]').count() === 7, "the allotments have a screen of their own: six neighbours' plots and the swap crate");
+  await page.locator('#world [data-exit="green"]').dispatchEvent("click"); await page.waitForFunction(() => /Honeybrook Green/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "and the gate goes back to the green");
   await page.close();
 }
 {

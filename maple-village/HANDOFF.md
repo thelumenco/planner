@@ -2785,3 +2785,10 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - 3, Pebble and Juniper: Theo ch6 needs Pebble's trust at 5: Juniper's poem "The Grey Pony" (keepsake). Juniper ch6: Pebble was her pony as a girl.
 - 5, story finds at the car boot sale (`STORY_FINDS`, `storyFind`): one at a time, once each, on the table until bought, when that villager has told enough: Celeste's Marchand & Fille tin (celeste:2), Hazel's priory seal (hazel:7), Tomás's railway key for Ines (ines:7), Juniper's childhood notebook (juniper:6). Each opens a bonus chapter (Celeste, Hazel ch8, Ines ch8, Juniper ch7).
 - Tests: "The bottom row in the stories (rounds 272 to 275)".
+
+## Rounds 276 and 277: Mel's fixes to the bottom row, and the allotments screen
+- Paddleboard jetty moved to the west beach, beside the beach huts, out into the west sea (transport.js `supJetty`, `lsup` door [118,236], `JETTY.lighthouse`, paddle start in the west sea).
+- Ducks (Mel: "what do they eat?"): peas or sweetcorn from the backpack, free; otherwise a coin's scoop. Bread's bad for them (the line says so).
+- Dot's fish and chip hatch opens a menu (south.js `CHIP_MENU`, `eatChips`, `chipsPanel`, `woodsView = "chips"`, `data-chips`) and buys fish for the fryer (`sellCatch`, `data-chipsell`): fish 3, the others at their usual `sell`, up to six a day.
+- The lighthouse sits 36 higher (door [140,488]); the "Mackerel rocks" label moved below the post. The old press on the lower vineyard sits 120 higher, clear of the footbridge (door [110,258]); a tree moved.
+- The allotments (art/allotment.js, scene `allotment`): through the gate on the green. Six neighbours' plots (Gong Gong, Mei, Theo, Juniper, Bo, Felix; `PLOTS`, `PLOT_LINES`, `data-aspot`; a line from them if they're there, a description if not), the potting shed, a bench, and the swap crate. Gong Gong (Tue/Thu mornings) and Mei (Saturdays) garden in here now. The gate (`data-exit="green"`) goes back to the green.
