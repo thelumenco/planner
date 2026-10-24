@@ -222,7 +222,7 @@ const WALK_POOL = ["hana", "opal", "mei", "amara", "sofia", "elena", "bo", "noor
 const BAND_LAWN = [[290, 300], [340, 296], [420, 300], [460, 288], [320, 330], [400, 326]];
 const CRICKET_LAWN = [[300, 440], [360, 470], [420, 500], [330, 520], [400, 430], [290, 500]];
 const CLIFF_WALK = [[200, 300], [300, 380], [380, 330], [250, 420], [180, 260]];
-export function southSlot(id, day, t){
+export function southSlot(id, day, t, F){
   const dw = dow(day), we = dw === 0 || dw === 6, ev = eventSlotSouth(id, day, t); if (ev) return ev;
   if (dw === BAND.dow && t >= BAND.from && t < BAND.to && some(BAND_POOL, 6, day + ":band").includes(id)) return W(BAND.from, BAND.to, "green", BAND_LAWN);
   if (dw === CRICKET.dow && t >= CRICKET.from && t < CRICKET.to && some(CRICKET_POOL, 6, day + ":cricket").includes(id)) return W(CRICKET.from, CRICKET.to, "green", CRICKET_LAWN);
@@ -231,9 +231,10 @@ export function southSlot(id, day, t){
   if (id === "mei" && dw === 6 && t >= 9*60 && t < 11*60) return W(9*60, 11*60, "allotment", [[276, 214], [330, 270], [420, 270]], "farm");
   // a stable hand: Lila mucks out and turns the ponies out first thing, weekdays
   if (id === "lila" && !we && t >= 7*60 && t < 8*60 + 30) return W(7*60, 8*60 + 30, "stables", [[260, 300], [300, 320], [214, 420], [180, 300]], "farm");
-  // Marco and Ines tend the lower rows too
-  if (id === "ines" && dw !== 0 && t >= 14*60 && t < 15*60) return W(14*60, 15*60, "lowervine", [[262, 268], [340, 350], [418, 432], [300, 514]], "water");
-  if (id === "marco" && dw !== 0 && t >= 15*60 && t < 16*60) return W(15*60, 16*60, "lowervine", [[262, 268], [340, 350], [418, 432], [300, 514]], "farm");
+  // Marco and Ines tend the lower rows too, once they're yours (round 282: until then they're Bram's, gone to grass)
+  const lowerYours = !F || !!(F.vine && F.vine.lower);
+  if (id === "ines" && lowerYours && dw !== 0 && t >= 14*60 && t < 15*60) return W(14*60, 15*60, "lowervine", [[262, 268], [340, 350], [418, 432], [300, 514]], "water");
+  if (id === "marco" && lowerYours && dw !== 0 && t >= 15*60 && t < 16*60) return W(15*60, 16*60, "lowervine", [[262, 268], [340, 350], [418, 432], [300, 514]], "farm");
   // walks out to the lighthouse: a couple at weekends after breakfast, and someone most evenings
   if (we && t >= 9*60 && t < 10*60 + 30 && some(WALK_POOL, 2, day + ":lhm").includes(id)) return W(9*60, 10*60 + 30, "lighthouse", CLIFF_WALK);
   if (t >= 18*60 && t < 19*60 && some(WALK_POOL, 1, day + ":lhe").includes(id)) return W(18*60, 19*60, "lighthouse", CLIFF_WALK);

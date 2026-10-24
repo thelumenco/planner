@@ -52,11 +52,31 @@ export const groveRipe = v => !!v.grove && Date.now() - (v.grove.pickedAt || v.g
 export function pickGrove(F){ const v = vineState(F); if (!groveRipe(v)) return null; v.grove.pickedAt = Date.now(); F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + GROVE_JARS*(v.grove2 ? 2 : 1); return `${GROVE_JARS} jars of olives from the grove, into your backpack.`; }
 export function takeOliveCrate(F){ const v = vineState(F), n = v.oliveCrate || 0; if (!n) return null; v.oliveCrate = 0; F.inv = F.inv || {}; F.inv.olives = (F.inv.olives || 0) + n; return `${n} jar${n > 1 ? "s" : ""} of olives from the crate, into your backpack.`; }
 export const ROWS = 7;   // three on the vineyard, four on the lower vineyard (round 261)
+const UPPER_ROWS = 3;
+// round 282 (Mel: "Make it such that the lower vineyard is actually Bram's and he's been looking to sell. So I buy from
+// him"): the four rows down the hill were Bram's father's. Bram can't keep them and the light both, so there's a For
+// Sale sign by the gate; until you buy, no trellis goes down there. His father's old posts in the first row come with it.
+export const LOWER = {price: 2500};
+export const lowerOwned = F => !!vineState(F).lower;
+export function buyLower(F, day){
+  const v = vineState(F); if (v.lower) return {line: "The lower vineyard's yours already."};
+  if ((F.coins || 0) < LOWER.price) return {line: `Bram's asking ${LOWER.price.toLocaleString("en-GB")} coins for the lower vineyard.`};
+  F.coins -= LOWER.price; v.lower = day; v.rows[UPPER_ROWS].trellis = true;
+  return {ok: true, line: "Bram walks down from the lighthouse to shake on it, and pulls up the For Sale sign himself. \"Father's old trellis is still good on the first row. The rest is yours to plant. He'd be glad to see vines on it again.\""};
+}
+export function lowerSalePanel(F){
+  const v = vineState(F), h = `<span class="tape gingham" aria-hidden="true"></span><h2>For Sale: the lower vineyard</h2>`;
+  if (v.lower) return h + `<p class="sub">The sign's gone. The lower vineyard's yours.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  return h + `<p class="sub">A note in a careful hand is pinned under the sign, in a plastic sleeve against the weather:</p>
+    <p class="sub"><i>"Four rows of good south-facing slope, down to the sea, with the old stone press and the bench. My father planted vines here and tended them every morning after he came down from the light. I'm up there all night now and asleep half the day, and the rows have gone to grass. I'd like them to go to someone who'll plant them. ${LOWER.price.toLocaleString("en-GB")} coins. Ask at the lighthouse. Bram."</i></p>
+    <div class="actions"><button class="btn primary" data-lvbuy="1"${(F.coins || 0) < LOWER.price ? " disabled" : ""}>Buy it from Bram (${LOWER.price.toLocaleString("en-GB")} coins)</button><button class="btn alt small" data-close="1">Not yet</button></div>`;
+}
 export function vineState(F){
   F.vine = F.vine || {};
   const v = F.vine;
   v.rows = v.rows || [0, 1, 2].map(i => ({trellis: i === 0, vines: [null, null, null]}));
   while (v.rows.length < ROWS) v.rows.push({trellis: false, vines: [null, null, null]});   // round 261: four more down on the lower vineyard
+  if (v.lower === undefined) v.lower = v.rows.slice(UPPER_ROWS).some(r => r.trellis) ? "before" : false;   // round 282: a save already planting down there owns it
   v.cuttings = v.cuttings || {red: 1, white: 1}; v.grapes = v.grapes || {red: 0, white: 0}; v.keep = v.keep || {red: 0, white: 0};
   v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0; v.menu = v.menu || {}; v.plates = v.plates || 0; v.fruit = v.fruit || {};
   v.help = Object.assign({cook: true, pick: true, barrels: true, stock: true, fetch: false}, v.help || {}); v.names = v.names || {};
@@ -99,7 +119,7 @@ export function buy(F, id){
   else if (id === "olive") { if (v.olive) return "You've an olive tree already. One's plenty."; v.olive = {planted: Date.now(), pickedAt: 0}; }
   else if (id === "grove") { if (v.grove) return "The grove's already planted."; if (!v.olive) return "Plant the first olive tree by the path, then the grove."; v.grove = {planted: Date.now(), pickedAt: 0}; }
   else if (id === "grove2") { if (v.grove2) return "Both grove rows are planted."; if (!v.grove) return "Plant the first grove row, then the second."; v.grove2 = Date.now(); }
-  else if (id === "trellis") { const k = v.rows.findIndex(x => !x.trellis); if (k < 0) return "Every row has a trellis already, up top and down the hill."; v.rows[k].trellis = true;
+  else if (id === "trellis") { const k = v.rows.findIndex((x, i) => !x.trellis && (i < UPPER_ROWS || v.lower)); if (k < 0) return v.lower ? "Every row has a trellis already, up top and down the hill." : "All three rows up here have trellises. The rows down the hill are Bram's: there's a For Sale sign by the gate."; v.rows[k].trellis = true;
     if (k >= 3) { F.coins -= price; return "A new trellis row on the lower vineyard, down the hill, ready for three vines."; } }
   else if (id === "barrel") { if (v.barrels.length >= maxBarrels(F)) return v.barrels.length >= BARRELS.shed + BARRELS.cellar ? "Every rack's full: eighteen barrels, six in the shed and twelve in the cellar." : "The shed's full: six barrels. Open the cellar door and its racks take twelve more.";
     v.barrels.push(null); if (v.barrels.length > BARRELS.shed) { F.coins -= price; return "Another oak barrel, rolled down onto the racks in the cellar."; } }
@@ -338,6 +358,7 @@ export function vinePanel(F, r, i){
   const v = vineState(F), row = v.rows[r], vn = row && row.vines[i];
   let h = `<span class="tape stripe" aria-hidden="true"></span><h2>Vine ${r + 1}.${i + 1}</h2>`;
   h += vineCloseup(vn, vn ? growth(vn) : 0, row.trellis);
+  if (!row.trellis && r >= UPPER_ROWS && !v.lower) return h + `<p class="sub">This row's Bram's, with his father's old posts leaning in the long grass. There's a For Sale sign by the gate.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   if (!row.trellis) return h + `<p class="sub">This row needs a trellis before vines can climb it. The vineyard stall sells them.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   if (!vn) return h + `<p class="sub">An empty spot on the trellis. What shall we plant?</p><div class="actions">${grapeKinds(v).map(k => `<button class="btn ${v.cuttings[k] ? "primary" : "alt"} small" data-vy="plant" data-k="${k}" ${v.cuttings[k] ? "" : "disabled"}>${GRAPE_N[k]} vine (${v.cuttings[k]})</button>`).join("")}<button class="btn alt small" data-close="1">Close</button></div>${!v.cuttings.red && !v.cuttings.white ? `<p class="muted">No cuttings left: the stall has more.</p>` : ""}`;
   const g = growth(vn);
@@ -349,7 +370,7 @@ export function vinePanel(F, r, i){
 export function stallPanel(F){
   const v = vineState(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F.coins} coins. Cuttings: ${grapeKinds(v).map(k => `${v.cuttings[k]} ${gName(k)}`).join(", ")}. Grapes: ${grapeKinds(v).map(k => `${v.grapes[k]} ${gName(k)}`).join(", ")} bunches.</p>
-    <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], price = shopPrice(v, id), have = (id === "grove" && !!v.grove) || (id === "grove2" && (!!v.grove2 || !v.grove)) || (id === "trellis" && v.rows.every(r => r.trellis)) || (id === "barrel" && v.barrels.length >= maxBarrels(F)) || (id === "olive" && !!v.olive) || (id === "terrace" && !!v.terrace), off = have || F.coins < price;
+    <div class="items shop">${Object.keys(SHOP).map(id => { const it = SHOP[id], price = shopPrice(v, id), have = (id === "grove" && !!v.grove) || (id === "grove2" && (!!v.grove2 || !v.grove)) || (id === "trellis" && v.rows.every((r, i) => r.trellis || (i >= UPPER_ROWS && !v.lower))) || (id === "barrel" && v.barrels.length >= maxBarrels(F)) || (id === "olive" && !!v.olive) || (id === "terrace" && !!v.terrace), off = have || F.coins < price;
       return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c">${have ? "owned" : `<b>${price}</b> coins`}</span>${id === "terrace" ? `<span class="d">a third more customers</span>` : ""}</button>`; }).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }

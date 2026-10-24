@@ -8,7 +8,7 @@ import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLev
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, orchardArt, flowerFarmArt, setArtContext } from "../art/scenes.js";
 import { vineSpot, vineScene } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, tapasAll, TAPAS, cookTick, cookLine } from "./kitchen.js";
-import { questBoost } from "./vineyard.js";
+import { questBoost, lowerSalePanel, buyLower } from "./vineyard.js";
 import { wineNews, vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, cellarPanel, counterPanel, boxPanel, cafePanel, olivePanel, grovePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
@@ -1800,6 +1800,7 @@ function ctx(){
   else if (woodsView === "ranger" && scene === "hwoods") h = rangerPanel(F, isHere("wren"));
   else if (woodsView === "paddock" && scene === "stables") h = SO.paddockPanel(F, dayKey());
   else if (woodsView === "stable" && scene === "stables") h = SO.stablePanel(F);
+  else if (woodsView === "lvsale" && scene === "lowervine") h = lowerSalePanel(F);
   else if (woodsView === "boot" && scene === "green") h = SO.bootPanel(F, dayKey());
   else if (woodsView === "seacave" && scene === "lighthouse") h = SO.seaCavePanel(F);
   else if (woodsView === "chips" && scene === "lighthouse") h = SO.chipsPanel(F, dayKey());
@@ -2339,6 +2340,8 @@ function ctx(){
   c.querySelectorAll("[data-chips]").forEach(b => b.onclick = () => { const ev = evanHere() && !evanNight(), r = SO.eatChips(F, b.dataset.chips, ev); if (r) { speak(r.line, 6000); if (r.ok) { sfx("chaching"); if (ev) setTimeout(() => evanSays(pick(["chip please!", "more chips", "the seagull wants one"])), 1600); } } save(true); ctx(); });
   c.querySelectorAll("[data-chipsell]").forEach(b => b.onclick = () => { const r = SO.sellCatch(F, b.dataset.chipsell, dayKey()); if (r) { speak(r.line, 4500); if (r.ok) { sfx("coin"); flash(`+${r.coins} coins`); } } save(true); ctx(); });   // round 276: Dot's hatch
   c.querySelectorAll("[data-sea]").forEach(b => b.onclick = () => { const r = SO.seaCave(F, b.dataset.sea); if (r) { speak(r.line, 7000); if (r.ok) { sfx("chime"); gainXp(2); flash("+ a priory bottle"); } } save(true); ctx(); });   // round 274: the sea cave
+  c.querySelectorAll("[data-lvbuy]").forEach(b => b.onclick = () => { const r = buyLower(F, dayKey()); speak(r.line, 8000);   // round 282
+    if (r.ok) { sfx("chaching"); gainXp(3); woodsView = null; flash("The lower vineyard is yours"); drawScene(); } save(true); ctx(); });
   c.querySelectorAll("[data-ponybuy]").forEach(b => b.onclick = () => { const r = SO.buyPony(F, (c.querySelector("#ponyName") || {}).value, dayKey());
     speak(r.line, 6500); if (r.ok) { sfx("chaching"); gainXp(2); woodsView = "paddock"; if (evanHere() && !evanNight()) setTimeout(() => evanSays("she's OURS? she's ours!"), 1800); drawScene(); } save(true); ctx(); });   // round 270
   c.querySelectorAll("[data-pony]").forEach(b => b.onclick = () => { const [k, id] = b.dataset.pony.split(":"), r = k === "feed" ? SO.feedPony(F, id, dayKey()) : SO.brushPony(F, id, dayKey());
@@ -3380,10 +3383,11 @@ function arriveSpot(id){
   const s = spotObj(scene, id); if (s) speak(s.line, 3500); render();
 }
 // rounds 262 to 264: the green, the Stables and Lighthouse Point (game/south.js)
-const SOUTH_SPOTS = ["gboot", "gpond", "gband", "glawn", "gallot", "sstable", "spaddock", "sride", "llight", "lpools", "lchips"];
+const SOUTH_SPOTS = ["vsale", "gboot", "gpond", "gband", "glawn", "gallot", "sstable", "spaddock", "sride", "llight", "lpools", "lchips"];
 function southSpot(id){
   const day = dayKey(), hm = sgHM(), ev = evanHere() && !evanNight(), say = (r, ms = 5500) => { if (r) speak(r.line, ms); };
-  if (id === "gboot") { if (SO.bootNow(day, hm)) { woodsView = "boot"; sfx("paper", true); } else speak("The car boot sale's on Sunday mornings, 8 till 12.", 3500); }
+  if (id === "vsale") { woodsView = "lvsale"; sfx("paper", true); }   // round 282: Bram's sign
+  else if (id === "gboot") { if (SO.bootNow(day, hm)) { woodsView = "boot"; sfx("paper", true); } else speak("The car boot sale's on Sunday mornings, 8 till 12.", 3500); }
   else if (id === "gpond") { const c0 = F.coins, r = SO.feedDucks(F, day, hm); say(r); if (r.fed) { sfx("pop"); gainXp(1); if (ev) setTimeout(() => evanSays(pick(["quack quack!", "that one's MY duck", "the little one! the little one!"])), 1400); } }
   else if (id === "gband") speak(SO.bandNow(day, hm) ? "The Honeybrook brass band, in their red jackets, playing something jolly with a lot of trombone. Half the village is on the grass with a flask." : "The bandstand. On Sunday afternoons, two till four, the brass band plays and half the village brings a blanket.", 5500);
   else if (id === "glawn") speak(SO.cricketNow(day, hm) ? "Cricket! A gentle village match: someone's bowling underarm, someone's dog has the ball, and everyone's clapping politely." : "The cricket lawn, mown in stripes. There's a friendly match on Saturday afternoons, two till five.", 5500);

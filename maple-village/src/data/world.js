@@ -81,6 +81,7 @@ export const VILLAGE = {
   lchips:{scene:"lighthouse", name:"The fish and chip hatch", door:[430,508], spot:true, mark:[430,380], line:"Fish and chips."},
   toLowerV:{scene:"vineyard", name:"Path down to the lower vineyard", door:[496,614], spot:true, bridge:"lowervine", mark:[474,540], line:"Down the hill to the lower vineyard."},
   toVineD:{scene:"lowervine", name:"Path up to the vineyard", door:[430,30], spot:true, bridge:"vineyard", mark:[400,90], line:"Up the hill to the vineyard."},
+  vsale: {scene:"lowervine", name:"Bram's For Sale sign", door:[330,150], spot:true, mark:[330,90], line:"A For Sale sign by the path, with a note pinned under it."},   // round 282
   vpress: {scene:"lowervine", name:"The old grape press", door:[110,258], spot:true, mark:[110,120], line:"The old stone press. Marco says his grandfather trod grapes in it, barefoot, singing. Now it's for leaning on and looking at."},
   vbench: {scene:"lowervine", name:"The sea bench", door:[300,580], spot:true, mark:[300,500], line:"You sit a while. The sea goes silver all the way to the edge of the sky, the vines tick in the breeze behind you, and nobody needs anything from you."},
   olive:  {scene:"vineyard", name:"Olive tree", door:[250,262], spot:true, line:"The olive tree. Olives every few hours, once it's planted."},

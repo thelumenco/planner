@@ -2807,3 +2807,10 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 281: the lower vineyard's gate out from under the tracker (Mel: "Gate covered by tracker")
 - The path up to the vineyard sat in the top right corner, under the tracker column. It moves 66 in (`translate(-66 0)`, door [430,30], arrive [430,80]) and the path curves up to it. The vineyard's own bottom gate stays where it is: nothing covers it there, and moving it put it on the seesaw.
+
+## Round 282: the lower vineyard is Bram's, and you buy it from him (Mel: "Make it such that the lower vineyard is actually Bram's and he's been looking to sell. So I buy from him")
+- vineyard.js: `LOWER` (2,500 coins), `lowerOwned`, `buyLower`, `lowerSalePanel` (Bram's note pinned under the sign: his father planted the rows; he's up the light all night and they've gone to grass). `F.vine.lower` is the day bought; `vineState` sets it to "before" on any save that already has a trellis down there, else false.
+- Until bought: the stall's trellis only fills the three top rows ("the rows down the hill are Bram's"), the trellis button reads owned once those are full, and tapping a lower row says it's Bram's. Buying gives row 4 his father's old trellis free.
+- art/lowervine.js: a FOR SALE board ("ask Bram") by the path (`vsale`, world.js, a SOUTH_SPOTS spot opening `woodsView = "lvsale"`); gone once it's yours. `data-lvbuy` in core.js.
+- south.js `southSlot(id, day, t, F)`: Marco and Ines only work the lower rows once they're yours (npcs.js passes `api.F()`).
+- Screens: screens-bottom-row/sale-sign.png, sale-note.png.
