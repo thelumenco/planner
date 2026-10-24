@@ -62,6 +62,9 @@ export const ITEMS = {
   // Family tab: little gifts go in the backpack and are handed over in person; keepsakes stay at home forever.
   // round 279 (Mel: "remove the ice cream from Hana's market now that we have our scoop shack"): off the shelf, still
   // in the item list so a scoop already in the backpack can be given
+  // round 286: from Dot's hatch at Lighthouse Point (game/south.js takeaway), not sold anywhere else
+  chips_out:{n:"Fish and chips to take away", kind:"gift", to:"family", price:9, say:"Fish and chips! Still warm!",
+    says:{evan:"CHIPS! The fish is mine. No, the chips are mine.", darren:"Proper fish and chips. Sit with me, we'll share.", mama:"Wah, fried fish. Very crispy. Next time I add chilli.", gonggong:"Fish and chips! Very English. I like.", mum:"Fish and chips by the sea! Your dad's already stealing chips.", dad:"Salt and vinegar? Perfect. Don't tell your mum how many I ate.", marcus:"Fish is protein. I'm counting it. Thanks, Zeh.", angelina:"Chips! Exam brain fuel. Thank you!"}},
   icecream:{n:"Ice cream", kind:"gift", to:"evan", price:6, say:"ICE CREAM!! *happy dance*"},
   balloon:{n:"Red balloon", kind:"gift", to:"evan", price:5, tab:"family", say:"Balloooon! Mine!"},
   wand:{n:"Bubble wand", kind:"gift", to:"evan", price:8, tab:"family", say:"Bubbles! Pop pop pop!"},

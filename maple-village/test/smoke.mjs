@@ -5239,6 +5239,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(l1.ok && l1.line.includes(so.LOGBOOK[0]) && !so.bramSpot(F, "log", day, false, false).ok && so.bramSpot(F, "log", "2026-10-25", false, false).line.includes(so.LOGBOOK[1]), "his father's logbook, a page a day");
     check(so.LOGBOOK.some(e => /priory boat/.test(e)) && so.LOGBOOK.some(e => /vines/.test(e)), "the logbook has the vines below the press and the priory boat in it");
     check(["ship", "window", "fire"].every(k => so.bramSpot(F, k, day, true, false).line), "the ship in a bottle, the window and the fire"); }
+  // round 286 (Mel): the home jetty paddles to Lighthouse Point too; fish and chips to take away, as a present
+  check(/data-sup="lighthouse"/.test(gl.jettyPanel("base", true)) && /data-sup="base"/.test(gl.jettyPanel("lighthouse", true)), "the home jetty paddles down to Lighthouse Point, and back");
+  { const F = {coins: 15, inv: {}}, it = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS.chips_out;
+    check(so.takeaway(F).ok && F.inv.chips_out === 1 && F.coins === 15 - so.TAKEAWAY && !so.takeaway(F).ok && F.coins === 6, "fish and chips to take away from Dot's, " + so.TAKEAWAY + " coins");
+    check(it && it.kind === "gift" && it.to === "family" && !it.tab && Object.keys(it.says).length === 8 && /To take away/.test(so.chipsPanel(F, day)), "a present for any of the family (only from Dot's hatch)"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`bramcot pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=15:30&date=2026-10-24"); await page.waitForTimeout(800);

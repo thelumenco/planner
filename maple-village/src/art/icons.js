@@ -213,6 +213,7 @@ I.eggwaffle = [`<path d="M5 5c6-2 12 1 14 6s-2 9-7 9-8-3-8-8 0-6 1-7z" ${f("#F3C
 I.sugarcane = [`<path d="M7 6h10l-1.2 14H8.2z" ${f("#D8E8A8")}/>`, `<path d="M7 6h10l-1.2 14H8.2zM12 6l3-4"/><path d="M5 20l3-16M4 9h3M4 14h3" stroke="#7FA35A"/>`];
 I.grassjelly = [`<path d="M7 7h10l-1.2 13H8.2z" ${f("#3A3230")}/><path d="M7.5 10h9" ${f("#FFFDF6")}/>`, `<path d="M7 7h10l-1.2 13H8.2zM6.5 7h11M13 7l2-5"/>`];
 // gifts for Evan and Darren
+I.chips_out = [`<path d="M5 8l14 0-2 12H7z" ${f(C.paper)}/><path d="M8 8l1-4 2 4M11 8l1.5-5 1.5 5M14.5 8l1.5-3.5 1 3.5" ${f("#F3C969")}/><path d="M6 12h12" ${f("#9FC3D9")}/>`, `<path d="M5 8h14l-2 12H7zM6 12h12"/><path d="M8 8l1-4 2 4M11 8l1.5-5 1.5 5M14.5 8l1.5-3.5 1 3.5"/>`];   // round 286: Dot's takeaway, wrapped in paper
 I.icecream = [`<path d="M8.5 11h7L12 21z" ${f("#E8C48E")}/><circle cx="12" cy="8.5" r="4" ${f(C.blush)}/><circle cx="9.5" cy="10" r="2.4" ${f(C.paper)}/>`, `<path d="M8.5 11h7L12 21zM10 13.5l3.6 3M14 13.5l-3.4 3"/><path d="M8.2 10.6A4 4 0 1 1 15.8 10.6"/><circle cx="9.5" cy="10" r="2.4"/>`];
 I.balloon = [`<ellipse cx="12" cy="9" rx="5.5" ry="6.5" ${f("#E8574C")}/>`, `<ellipse cx="12" cy="9" rx="5.5" ry="6.5"/><path d="M11 15.5h2l-1 1.5zM12 17c-1 1.5 1 2.5 0 5"/><path d="M9.5 6.5c.5-1.2 1.4-1.8 2.4-2" opacity=".6"/>`];
 I.wand = [`<circle cx="15" cy="7" r="4" ${f("#D8ECF6")}/><circle cx="7" cy="6" r="2" ${f("#D8ECF6")}/>`, `<circle cx="15" cy="7" r="4"/><circle cx="15" cy="7" r="2.2"/><path d="M12.5 10l-6 10"/><circle cx="7" cy="6" r="2"/><circle cx="19.5" cy="14" r="1.3"/>`];

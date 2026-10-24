@@ -118,6 +118,8 @@ These story threads hang off the personal edition's villagers and its secret pas
 - **Riding your own pony and Bram's cottage (round 283):** tack from the tack room, an hour's ride a day as a ride mode ("pony" in `ride()`), and the keeper's cottage above the beach huts at Lighthouse Point (`art/bramcot.js`, scene `bramcot`, `bramSpot`). Swap Evan for this edition's companion, or drop him.
 - **Beachcombing:** two finds a day on each bottom-row beach (`BEACH_SPOTS`, `beachFinds`, `pickBeach`, `beachArt`, `data-shell`): seashells and conches (`BEACH` in `data/carboot.js`), plus the kitchen's existing `clams` and `mussels` if this edition has them; otherwise shells only.
 
+- **Round 286:** the home jetty can paddle to Lighthouse Point; boarding at Lighthouse Point starts out on the water below the jetty (`paddleTo` offsets); Dot sells fish and chips to take away (`takeaway`, item `chips_out`), a gift for this edition's family or friends, or leave the gift lines out if it has none.
+
 ### 11. Weddings buy sparkling by the case (round 284, not part of the bottom row)
 If this edition has the terrace weddings (`game/occasions.js`), port this too: commit `4fea497` "Weddings order two to four cases of sparkling, brought up from the cellar on the day".
 - `occasions.js`: `weddingCases(day)` gives each couple an order of two to four cases; the bookings book note reads "N cases of sparkling ordered from your cellar".

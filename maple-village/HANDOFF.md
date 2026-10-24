@@ -2826,3 +2826,9 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 285: Bram's cottage moves above the beach huts (Mel: "Why isn't Bram's cottage above the beach huts instead")
 - art/bramcot.js `bramCottageOut` is wrapped in `translate(130 -290)`, label above the roof; world.js `lbram` door [436,156]; paths.js obstacle [398,72,476,144]; leaving the cottage puts you at [436,158]. PORT-BOTTOM-ROW.md now also covers the wedding cases (round 284).
+
+## Round 286: paddle home to Lighthouse Point; boarding on the water; fish and chips to take away (Mel)
+- goals.js `jettyPanel("base")`: the home jetty now has "Paddle to Lighthouse Point" too.
+- core.js `paddleTo`: from Lighthouse Point you board at [36,264] (Evan [18,290]), out on the water below the west-beach jetty, not on its planks.
+- Dot's takeaway: south.js `TAKEAWAY` (9), `takeaway(F)` adds `chips_out` to the bag; a "To take away" row in `chipsPanel` (`data-chipsout`). items.js `chips_out`: a gift for any of the family (to "family", no shop tab), with a line for each; icon in icons.js.
+- Tests: in the round 283 block.

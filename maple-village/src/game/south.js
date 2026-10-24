@@ -228,6 +228,13 @@ export const CHIP_MENU = {
 };
 export const CHIP_BUYS = ["fish", "mackerel", "sardine", "anchovy", "seabream", "mullet", "squid", "clams", "mussels"], CHIP_CAP = 6;
 const chipSell = id => id === "fish" ? 3 : ((ITEMS[id] || {}).sell || 0);
+// round 286 (Mel: "Can I also buy fish and chips as takeaway? As gifts"): wrapped in paper to take away, for the family
+export const TAKEAWAY = 9;
+export function takeaway(F){
+  if ((F.coins || 0) < TAKEAWAY) return {line: `Fish and chips to take away are ${TAKEAWAY} coins.`};
+  F.coins -= TAKEAWAY; F.inv = F.inv || {}; F.inv.chips_out = (F.inv.chips_out || 0) + 1;
+  return {ok: true, line: "Dot wraps it up tight in paper, two layers, \"to keep the heat in, love,\" and tucks in a little wooden fork. Into your backpack, still hot."};
+}
 export function eatChips(F, k, withEvan){
   const m = CHIP_MENU[k]; if (!m) return null;
   if ((F.coins || 0) < m.price) return {line: `${m.n} is ${m.price} coins.`};
@@ -244,6 +251,7 @@ export function chipsPanel(F, day){
   const s = southState(F), sold = s.chipSold && s.chipSold.day === day ? s.chipSold.n : 0, have = CHIP_BUYS.filter(id => (F.inv || {})[id] > 0);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>Dot's fish and chips</h2><p class="sub">Dot leans out of the hatch in her striped apron. "What can I get you, love?"</p>
     <ul class="hlist wlist">${Object.entries(CHIP_MENU).map(([k, m]) => `<li><span class="wtxt"><b>${esc(m.n)}</b></span><button class="btn small primary" data-chips="${k}"${(F.coins || 0) < m.price ? " disabled" : ""}>${m.price} coins</button></li>`).join("")}</ul>
+    <h3 class="ph3">To take away</h3><ul class="hlist wlist"><li><span class="wpic">${icon("chips_out", 26)}</span><span class="wtxt"><b>Fish and chips, wrapped</b><small>A present for the family, in person or sent round.${(F.inv || {}).chips_out ? ` You have ${F.inv.chips_out}.` : ""}</small></span><button class="btn small primary" data-chipsout="1"${(F.coins || 0) < TAKEAWAY ? " disabled" : ""}>${TAKEAWAY} coins</button></li></ul>
     <h3 class="ph3">Sell her your catch</h3><p class="sub">She buys fresh fish for the fryer, up to ${CHIP_CAP} a day (${sold} so far today).</p>
     ${have.length ? `<ul class="hlist wlist">${have.map(id => `<li><span class="wpic">${icon(id, 26)}</span><span class="wtxt"><b>${esc((ITEMS[id] || {n: id}).n)}</b><small>You have ${F.inv[id]}.</small></span><button class="btn small alt" data-chipsell="${id}"${sold >= CHIP_CAP ? " disabled" : ""}>Sell for ${chipSell(id)}</button></li>`).join("")}</ul>` : `<p class="muted">Nothing in your backpack she can fry. Mackerel off the rocks is her favourite.</p>`}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
