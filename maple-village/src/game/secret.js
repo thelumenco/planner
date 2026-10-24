@@ -127,7 +127,7 @@ export function host(F, day){ const s = secretState(F); if (s.hosted[day]) retur
 
 /* ---------- the cave's panels (core.js opens them with caveView) ---------- */
 const tape = `<span class="tape gingham" aria-hidden="true"></span>`, shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
-const TYPE = {red: "Red", rose: "Rosé", white: "White", sparkling: "Sparkling", pinot: "Pinot noir", tempranillo: "Tempranillo", chardonnay: "Chardonnay"};
+const TYPE = {red: "Red", rose: "Rosé", white: "White", sparkling: "Sparkling", pinot: "Pinot noir", priory: "Priory red", tempranillo: "Tempranillo", chardonnay: "Chardonnay"};
 export function alcovesPanel(F, v, day){
   const s = secretState(F), n = laidCount(F);
   let h = `${tape}<h2>The ageing alcoves</h2><p class="sub">Cool and still, the way the monks built it. Wine laid down here gains ${AGE_PCT}% of its price for every week it rests, up to ${AGE_MAX*AGE_PCT}%. ${n} of ${CAVE_MAX} places taken.</p>`;

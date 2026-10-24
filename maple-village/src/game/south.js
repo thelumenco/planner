@@ -115,6 +115,11 @@ const POOLS = ["a hermit crab trying on a new shell", "a starfish the colour of 
 export function rockPools(F, day, tide){
   if (tide === "high") return {line: "The tide's in, and the rock pools are under the sea. Come back when it's out."};
   const s = southState(F); s.pools = day;
+  // round 273: once the cave's found and Bram has told you about the priory boat, the sea gives something back
+  const heard = id => (((F.story || {}).heard || {})[id] || 0);
+  if (!s.flask && F.secret && F.secret.step >= 5 && heard("bram") >= 2) { s.flask = day; F.inv = F.inv || {}; F.inv.s_flask = (F.inv.s_flask || 0) + 1;
+    return {flask: true, line: "Wedged between two rocks in the deepest pool: a stoneware flask, sealed with wax, a little cross and a vine stamped on its side. You lift it out, dripping. Hazel will want to see this."}; }
+  if (((F.story || {}).flags || {}).seacave) return {cave: true, line: "Behind the rock pools, where Bram said: a low arch in the rock, only above water at low tide. The sea door."};
   return {line: `You crouch over the rock pools. In the clearest one: ${pick(POOLS)}.`};
 }
 // low tide in the morning and early evening (a simple daily rhythm, not the real tides)
@@ -176,7 +181,23 @@ export const bootNow = (day, hm) => dow(day) === BOOT.dow && hm >= BOOT.from && 
 const CB_IDS = Object.keys(CARBOOT);
 // this Sunday's four (the same all morning, different next week)
 export function bootFinds(day){ return some(CB_IDS, 4, "boot:" + day); }
+// round 275: the story finds. Now and then (once each, in turn) something at the sale belongs to somebody's story;
+// it turns up once that villager has told enough, and stays on the table each Sunday till Mel buys it
+export const STORY_FINDS = [
+  {key: "tin", item: "s_tin", price: 8, who: "celeste", heard: 2, n: "An old chocolate tin", line: "A battered red tin with gold holly on the lid, and on the bottom, faintly: Marchand et Fille."},
+  {key: "seal", item: "s_seal", price: 8, who: "hazel", heard: 7, n: "A brass wax seal", line: "A heavy little brass seal. Pressed into the wax on the tray beside it: a cross, and a vine."},
+  {key: "railkey", item: "s_railkey", price: 6, who: "ines", heard: 7, n: "An old iron key", line: "A big iron key, the kind for a railway signal box, with a letter R worked into the bow."},
+  {key: "notebook", item: "s_notebook", price: 4, who: "juniper", heard: 6, n: "A child's notebook", line: "A little notebook with a pony on the cover, full of drawings and poems in a twelve-year-old's handwriting."}
+];
+export function storyFind(F){
+  const s = southState(F), found = s.finds || {}, heard = id => (((F.story || {}).heard || {})[id] || 0);
+  return STORY_FINDS.find(f => !found[f.key] && heard(f.who) >= f.heard) || null;
+}
 export function buyFind(F, id, day){
+  const sf = STORY_FINDS.find(f => f.key === id), s0 = southState(F);
+  if (sf) { if (!bootNow(day, 9*60) || storyFind(F) !== sf) return null; if ((F.coins || 0) < sf.price) return {line: `That's ${sf.price} coins.`};
+    F.coins -= sf.price; s0.finds = s0.finds || {}; s0.finds[sf.key] = day; F.inv = F.inv || {}; F.inv[sf.item] = (F.inv[sf.item] || 0) + 1;
+    return {ok: true, story: true, line: `"That old thing? ${sf.price} coins, love." You can't quite believe your luck.`}; }
   const it = CARBOOT[id], s = southState(F); if (!it || !bootFinds(day).includes(id)) return null;
   s.boot = s.boot && s.boot.day === day ? s.boot : {day, got: []};
   if (s.boot.got.includes(id)) return {line: "You've already bought that one."};
@@ -186,7 +207,7 @@ export function buyFind(F, id, day){
 }
 export function bootPanel(F, day){
   const s = southState(F), got = s.boot && s.boot.day === day ? s.boot.got : [];
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>The car boot sale</h2><p class="sub">Two car boots and a trestle table on the green. Everything's a few coins; most of it's wonderful.</p><ul class="hlist wlist">${bootFinds(day).map(id => { const it = CARBOOT[id], had = got.includes(id);
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>The car boot sale</h2><p class="sub">Two car boots and a trestle table on the green. Everything's a few coins; most of it's wonderful.</p><ul class="hlist wlist">${(() => { const sf = storyFind(F); return sf ? `<li><span class="wpic">${icon(sf.item, 28)}</span><span class="wtxt"><b>${esc(sf.n)}</b><small>${esc(sf.line)}</small></span><button class="btn small primary" data-boot="${sf.key}"${(F.coins || 0) < sf.price ? " disabled" : ""}>${sf.price} coins</button></li>` : ""; })()}${bootFinds(day).map(id => { const it = CARBOOT[id], had = got.includes(id);
     return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(it.n)}</b><small>${esc(it.line)}</small></span><button class="btn small ${had ? "alt" : "primary"}" data-boot="${id}"${had || (F.coins || 0) < it.price ? " disabled" : ""}>${had ? "Yours" : it.price + " coins"}</button></li>`; }).join("")}</ul>
     <p class="muted">Keepsakes: put them on a shelf at home from your backpack.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
@@ -206,3 +227,23 @@ export function eventSlotSouth(id, day, t){
   return null;
 }
 
+
+/* ---------- the sea cave (round 274): below the lighthouse, through the sea door at low tide ---------- */
+export function seaCavePanel(F){
+  const s = southState(F), got = !!s.cavebottle;
+  const pic = `<svg viewBox="0 0 300 150" width="100%" style="max-width:340px;display:block;margin:6px auto 10px" aria-hidden="true"><g filter="url(#wob)" style="stroke:#3b3530" stroke-width="1.3">
+    <rect width="300" height="150" fill="#3E4A55"/><path d="M0 150 V60 Q40 10 150 8 Q260 10 300 60 V150z" fill="#5B6772"/><path d="M0 150 V96 Q150 70 300 96 V150z" fill="#4F8FA8"/><path d="M20 120 q10 -4 20 0 M120 128 q10 -4 20 0 M220 118 q10 -4 20 0" fill="none" stroke="#DCEFF5"/>
+    <path d="M200 96 l12 -16 h16 l12 -16 h16 l12 -16" fill="none" stroke="#B9B0A4" stroke-width="5"/><path d="M118 40 v26 M108 50 h20" stroke="#E8D9B0" stroke-width="2.4"/><path d="M128 64 q8 -6 14 2 q-6 6 -14 -2z" fill="#9CC27E"/>
+    <rect x="44" y="52" width="34" height="26" rx="4" fill="#2E3740"/>${got ? "" : `<path d="M58 76 v-14 h6 v14z" fill="#3A1428"/>`}<circle cx="150" cy="30" r="3" fill="#FFE9A0" opacity=".7"/></g></svg>`;
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>The sea cave</h2>${pic}<p class="sub">Through the sea door, under the headland. Green light off the water, the sound of the tide in the rock. Worn stone steps climb away into the dark: the end of the monks' passage.</p>
+    <div class="actions" style="flex-wrap:wrap"><button class="btn alt" data-sea="carving">The carving</button><button class="btn alt" data-sea="steps">The old steps</button><button class="btn ${got ? "alt" : "primary"}" data-sea="niche">The niche in the rock</button></div><div class="actions"><button class="btn alt small" data-close="1">Back out at low tide</button></div>`;
+}
+export function seaCave(F, what){
+  const s = southState(F);
+  if (what === "carving") return {line: "Cut deep into the rock, worn soft by the sea: a cross, and a vine curling round it. The same mark as on the old press, the flask, and the seal."};
+  if (what === "steps") return {line: "You climb a little way. The steps go up and up into the dark, towards the bay and the Scoop Shack, and the cellar beyond. The monks rolled their barrels down here to the boats. You turn back before your candle does."};
+  if (what === "niche") { if (s.cavebottle) return {line: "The niche is empty now. You've the bottle at home."};
+    s.cavebottle = true; F.inv = F.inv || {}; F.inv.s_priorybottle = (F.inv.s_priorybottle || 0) + 1;
+    return {ok: true, line: "In a niche cut into the rock, behind a curtain of weed: one squat dark bottle, still corked, still sealed. The last of the brothers' wine, waiting six hundred years for somebody to come back for it."}; }
+  return null;
+}

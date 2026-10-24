@@ -5156,6 +5156,27 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(true, "the paddleboard jetty at Lighthouse Point: paddle up the coast to the foreshore");
   await page.close();
 }
+{
+  // rounds 272 to 275 (Mel: "1 2 3 and 5"): the bottom row joins the villagers' stories
+  console.log("\nThe bottom row in the stories (rounds 272 to 275)");
+  const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url)), so = await import(new URL("../src/game/south.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
+  const day = "2026-10-25", met = Object.fromEntries(Object.keys(sd.STORIES).map(id => [id, true]));
+  const len = id => sd.STORIES[id].length;
+  const mk = heard => ({coins: 100, inv: {}, met, storyDay: day, secret: {step: 5}, story: {heard, day: {}, log: [], flags: {}}, vine: {rows: [0, 1, 2, 3].map(i => ({trellis: true, vines: [null, null, null]}))}});
+  { const F = mk({hazel: 5, marco: len("marco") - 1}); F.met = {marco: true}; const t = st.tellStory(F, "marco", (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, day);
+    check(t && /monks' vine/.test(t.lines.join(" ")) && vy.vineState(F).cuttings.priory === 3 && vy.grapeKinds(vy.vineState(F)).includes("priory"), "the priory vine: Marco finds the monks' root behind the old press, and three Priory Red cuttings are yours");
+    check(vy.STYLES.priory && vy.STYLES.priory.price > 0, "Priory Red makes its own wine"); }
+  { const F = mk({bram: 2}); const r = so.rockPools(F, day, "low");
+    check(r.flask && F.inv.s_flask === 1 && !so.rockPools(F, day, "low").flask, "the rock pools give up the priory flask (once the cave's found and Bram's told you about the priory boat)");
+    F.story.flags.seacave = true; check(so.rockPools(F, day, "low").cave && !so.rockPools(F, day, "high").cave, "after Bram's directions: the sea door, only at low tide");
+    check(so.seaCave(F, "niche").ok && F.inv.s_priorybottle === 1 && !so.seaCave(F, "niche").ok, "in the sea cave, the last priory bottle, found once"); }
+  { const F = mk({celeste: 2}); check(so.storyFind(F).key === "tin" && so.buyFind(F, "tin", day).ok && F.inv.s_tin === 1 && (!so.storyFind(F) || so.storyFind(F).key !== "tin"), "the car boot sale turns up the Marchand & Fille tin for Celeste's story");
+    check(!so.buyFind(mk({celeste: 2}), "tin", "2026-10-24"), "story finds are only on the table on a Sunday morning"); }
+  { const F = mk({theo: len("theo") - 1, juniper: 5}); F.met = {theo: true}; F.south = {ponies: {pebble: {trust: 5}}};
+    const t = st.tellStory(F, "theo", (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, day);
+    check(t && /Grey Pony/.test(t.lines.join(" ")) && F.inv.s_ponypoem === 1, "once Pebble trusts you, Theo shows you Juniper's poem about her"); }
+  check(!/[\u2013\u2014]/.test(JSON.stringify([sd.STORIES.bram, so.TALES, so.STORY_FINDS])), "no dashes in the new chapters");
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

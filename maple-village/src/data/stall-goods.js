@@ -131,6 +131,14 @@ Object.assign(GOODS, {
   s_toast: G("Postman's toast", "family", 0, null, "Honey, butter and a pinch of sea salt. Hana's new favourite.", ["loaf", "#E3B04B"]),
   s_spoon: K("Tomás's olive-wood spoon", 0, "An olive-wood spoon Tomás Ruiz carved in 1913 from a branch of the tree by the mill. Worn smooth by four generations of soup.", ["roll", "#C9A27E"]),
   s_poem: K("A poem from Jason", 0, "In Jason's neat hand, on cream paper: 'The late train came. The harbour lights stayed on. / The pizza cooled; I'd read my book twice through. / Some evenings are not lost, they're only long. / I'd wait again. I'd always wait for you.'", ["roll", "#FFFDF6"]),
+  // rounds 272 to 275: the bottom row's story things (found, bought at the car boot sale, or given)
+  s_ponypoem: K("'The Grey Pony'", 0, "A copy of Juniper's poem about a dapple grey pony with a white star, in Theo's careful handwriting.", ["cloth", "#C3CDEE"]),
+  s_flask: K("The priory flask", 0, "A sealed stoneware flask from the rock pools, stamped with a little cross and a vine: the old priory's mark.", ["jar", "#B9A88A", "#6B5A44"]),
+  s_tin: K("A Marchand & Fille tin", 0, "Henri Marchand's Christmas truffle tin, with gold holly on the lid. Celeste was so happy to see it.", ["box", "#8E2C48"]),
+  s_seal: K("A priory wax seal", 0, "A brass seal with a cross and a vine. The monks sealed every barrel with one.", ["disc", "#C9A04A"]),
+  s_railkey: K("Tomás's railway key", 0, "A heavy iron railway key with an R on the bow. Tomás Ruiz's, from before he found the cave.", ["pin", "#6B6B6B"]),
+  s_notebook: K("Juniper's notebook", 0, "Juniper's notebook from when she was twelve: pony drawings, terrible poems, and a pressed sea pink.", ["cloth", "#F4C7CF"]),
+  s_priorybottle: K("A priory bottle", 0, "A squat, dark glass bottle from the sea cave, still corked. Nobody knows what's inside. Nobody wants to find out.", ["bottle", "#3A1428"]),
   s_nonna: G("Nonna's fior di latte", "family", 0, null, "Just milk and sugar, the way Sofia's nonna made it in Napoli.", ["cone", "#FFF6DC"])
 });
 Object.assign(GOODS, {

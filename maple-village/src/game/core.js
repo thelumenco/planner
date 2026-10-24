@@ -1800,6 +1800,7 @@ function ctx(){
   else if (woodsView === "paddock" && scene === "stables") h = SO.paddockPanel(F, dayKey());
   else if (woodsView === "stable" && scene === "stables") h = SO.stablePanel(F);
   else if (woodsView === "boot" && scene === "green") h = SO.bootPanel(F, dayKey());
+  else if (woodsView === "seacave" && scene === "lighthouse") h = SO.seaCavePanel(F);
   else if (woodsView === "bike" && outside()) h = bikePanel(F, F.ride === "car" && owns(F, "car") ? "car" : owns(F, "scooter") && F.ride !== "walk" ? "scooter" : "");
   else if (woodsView && TAXI_STOPS[woodsView] && TAXI_STOPS[woodsView].scene === scene) h = taxiPanel(F, woodsView);
   else if (vanView === "crate" && scene === "van") h = cratePanel(F, vineState(F));
@@ -2332,7 +2333,8 @@ function ctx(){
     speak(r.line + (r.fresh ? " You've got the recipe now: it's on your stove at home." : ""), 8000); if (inParty(F, "evan") && !evanNight()) setTimeout(() => evanSays(pick(["more!", "yummy!", "Mama, can I try?"])), 1800); save(); ctx(); });
   c.querySelectorAll("[data-rtile]").forEach(b => b.onclick = () => { const r = buyTile(F, b.dataset.rtile); if (!r) return; sfx("chaching"); flash(`Tile: ${r.t.n}`);
     speak(r.all ? "The eighth tile! Lucía claps. \"A bench! Send me a photo.\" Your tiled bench is waiting by the pond at home." : `Lucía wraps the tile in newspaper: ${r.t.n.toLowerCase()}.`, 6000); if (r.all) { gainXp(3); mprop("sparkle", mel.x, mel.y - 60, 1800); } save(); ctx(); });
-  c.querySelectorAll("[data-boot]").forEach(b => b.onclick = () => { const r = SO.buyFind(F, b.dataset.boot, dayKey()); if (r) { speak(r.line, 5000); if (r.ok) sfx("chaching"); } save(true); ctx(); });   // round 271
+  c.querySelectorAll("[data-boot]").forEach(b => b.onclick = () => { const r = SO.buyFind(F, b.dataset.boot, dayKey()); if (r) { speak(r.line, 5000); if (r.ok) sfx(r.story ? "chime" : "chaching"); } save(true); ctx(); });   // round 271
+  c.querySelectorAll("[data-sea]").forEach(b => b.onclick = () => { const r = SO.seaCave(F, b.dataset.sea); if (r) { speak(r.line, 7000); if (r.ok) { sfx("chime"); gainXp(2); flash("+ a priory bottle"); } } save(true); ctx(); });   // round 274: the sea cave
   c.querySelectorAll("[data-ponybuy]").forEach(b => b.onclick = () => { const r = SO.buyPony(F, (c.querySelector("#ponyName") || {}).value, dayKey());
     speak(r.line, 6500); if (r.ok) { sfx("chaching"); gainXp(2); woodsView = "paddock"; if (evanHere() && !evanNight()) setTimeout(() => evanSays("she's OURS? she's ours!"), 1800); drawScene(); } save(true); ctx(); });   // round 270
   c.querySelectorAll("[data-pony]").forEach(b => b.onclick = () => { const [k, id] = b.dataset.pony.split(":"), r = k === "feed" ? SO.feedPony(F, id, dayKey()) : SO.brushPony(F, id, dayKey());
@@ -3389,7 +3391,9 @@ function southSpot(id){
   else if (id === "llight" && SO.lampNow(day, hm)) { const r = SO.lampLighting(F, day, hm); say(r, 7000); if (r.first) { gainXp(1); sfx("chime"); } if (ev) setTimeout(() => evanSays(pick(["it's ON!", "the light! the light!", "night night, boats"])), 2200); }
   else if (id === "llight") { const r = SO.climb(F, day, hm), tale = isHere("bram") && SO.keeperTale(F, day); say(r, 6500); if (r.first) gainXp(1);
     if (tale) setTimeout(() => npcSay("bram", tale), 6800); }   // round 270: Bram tells a tale, one a day
-  else if (id === "lpools") { say(SO.rockPools(F, day, SO.tideAt(hm))); if (ev && SO.tideAt(hm) === "low") setTimeout(() => evanSays(pick(["a CRAB!", "can I keep it? no? ok", "it's tickly!"])), 1600); }
+  else if (id === "lpools") { const r = SO.rockPools(F, day, SO.tideAt(hm)); say(r, 7000);
+    if (r.flask) { sfx("chime"); gainXp(1); flash("+ the priory flask"); } if (r.cave) { woodsView = "seacave"; sfx("paper", true); }
+    if (ev && SO.tideAt(hm) === "low") setTimeout(() => evanSays(pick(["a CRAB!", "can I keep it? no? ok", "it's tickly!"])), 1600); }
   else if (id === "lchips") { const r = SO.buyChips(F); say(r, 6000); if (r.ok) { sfx("chaching"); if (ev) setTimeout(() => evanSays(pick(["chip please!", "more chips", "the seagull wants one"])), 1600); } }
   save(true); render();
 }

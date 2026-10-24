@@ -8,7 +8,7 @@
 import { esc, dayKey } from "../util.js";
 import { icon } from "../art/icons.js";
 
-export const MULL = {cups: 10, dur: 30*60000, base: ["red", "tempranillo", "pinot"], min: 2, max: 3};
+export const MULL = {cups: 10, dur: 30*60000, base: ["red", "tempranillo", "pinot", "priory"], min: 2, max: 3};
 export const ADDS = {
   sp_cinnamon: {n: "Cinnamon", col: "#A8693F", spice: true}, sp_clove: {n: "Cloves", col: "#5A3A2A", spice: true}, sp_anise: {n: "Star anise", col: "#7A4A30", spice: true},
   sp_cardamom: {n: "Cardamom", col: "#9CAA6A", spice: true}, sp_ginger: {n: "Ginger", col: "#E3B04B", spice: true},

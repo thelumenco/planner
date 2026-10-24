@@ -8,6 +8,7 @@ import { STORIES } from "../data/stories.js";
 import { esc, dayKey } from "../util.js";
 import { FISH } from "./fishing.js";
 import { TAPAS } from "./kitchen.js";
+import { addCuttings } from "./vineyard.js";
 
 export function storyState(F){ F.story = F.story || {}; const s = F.story; s.heard = s.heard || {}; s.day = s.day || {}; s.log = s.log || []; s.flags = s.flags || {}; return s; }
 const owns = (F, k) => !!(F.goals && F.goals[k]);
@@ -22,6 +23,11 @@ function gateOk(F, g){
   if (g === "ronda2") return ((F.ronda && F.ronda.days) || []).length >= 2;   // a second day in Ronda
   if (g === "tiles4") return Object.keys((F.ronda && F.ronda.tiles) || {}).length >= 4;
   if (g === "cave") return !!(F.secret && F.secret.step >= 5);   // round 245: the secret passage found
+  // rounds 272 to 275: the bottom row's threads
+  if (g === "lowertrellis") return !!(F.vine && (F.vine.rows || []).slice(3).some(r => r && r.trellis));
+  if (g === "pebble5") return ((((F.south || {}).ponies || {}).pebble || {}).trust || 0) >= 5;
+  if (g === "flask") return !!(F.south && F.south.flask);
+  if (["tin", "seal", "railkey", "notebook"].includes(g)) return !!(F.south && F.south.finds && F.south.finds[g]);
   if (g === "bouquet") return Object.keys(F.inv || {}).some(id => /^bq_/.test(id) && F.inv[id] > 0);
   return false;
 }
@@ -99,6 +105,9 @@ const REWARDS = {
   fmfig: (F, addInv) => { addInv("fm_fig", 2); return "two bags of dried figs from the old tree behind Margalida's bakery"; },
   fmbiscuits: (F, addInv) => { addInv("fm_biscuits", 1); return "a bag of almond biscuits baked by Margalida's niece Aina"; },
   fmbracelet: (F, addInv) => { addInv("fm_bracelet", 1); return "a turquoise bead bracelet from Rainbow's blanket at La Mola market"; },
+  priory: F => { addCuttings(F, "priory", 3); return "three cuttings of the monks' own grape, Priory Red, for your trellises"; },
+  seacave: F => { storyState(F).flags.seacave = true; return "Bram's directions to the sea door below the lighthouse (low tide only)"; },
+  ponypoem: (F, addInv) => { addInv("s_ponypoem", 1); return "a copy of Juniper's poem, 'The Grey Pony' (a keepsake)"; },
   fmring: (F, addInv) => { addInv("fm_ring", 1); return "a silver ring Rainbow made for you, with a tiny wave stamped inside (a keepsake)"; }
 };
 // flags that change the game: the koi tip, Farid's pastries on the menu
