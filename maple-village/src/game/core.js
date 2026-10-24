@@ -3669,13 +3669,12 @@ $("pet").onclick = () => { petSound(); hearts(2); speak(pick(["*leans into the p
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
 // Speech bubbles close with a tap (the next thing anyone says brings them back)
-// Tapping a speech bubble closes it, and the tap goes on to whatever's beneath: someone standing under it (Penny with
-// the post, a villager), a place, or the floor to walk to. (Round 231: "at the gift store the character stopped
-// moving": with shoppers, Posy and the post all chatting, taps on the floor kept landing on bubbles and went nowhere.)
+// Tapping a speech bubble closes it, and if someone's standing under it (Penny with the post, a villager), the tap
+// reaches them too: a bubble shouldn't make the person beneath it untappable. (A tap on a bubble over the floor only
+// closes it: the creator wants tap-to-close, not a walk.)
 ["speech", "npcSay", "melSay"].forEach(id => $(id).addEventListener("click", ev => { ev.stopPropagation(); $(id).hidden = true;
   const under = document.elementFromPoint(ev.clientX, ev.clientY), who = under && under.closest("#actors [data-npc], #actors [data-ent]");
-  const to = who || (under && under.closest("#map") && !under.closest("#speech, #npcSay, #melSay") ? under : null);
-  if (to) to.dispatchEvent(new MouseEvent("click", {bubbles: true, clientX: ev.clientX, clientY: ev.clientY})); }));
+  if (who) who.dispatchEvent(new MouseEvent("click", {bubbles: true, clientX: ev.clientX, clientY: ev.clientY})); }));
 $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
 $("setVol").oninput = e => setMusicVol(+e.target.value);
