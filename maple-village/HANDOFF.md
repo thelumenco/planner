@@ -2844,3 +2844,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 289: gulls flap off and come back (Mel: "Will gulls occasionally flap and fly off")
 - art/lighthouse.js `perched(x, y, flip, d, fly)`: with `fly = [seconds, delay]` the gull is wrapped in `.gulloff` and gets spread wings (`.gwup`, flapping `.gwflap`) that swap with the folded wing (`.gwdown`) on the same timing: about three-quarters of the way through each cycle it hops, flaps up and away over the sea, fades, and glides back to land. The jetty gull every 52s and the hut-roof gull every 67s; the rocks and Dot's roof gulls stay put. Off for reduced motion (folded wings, no flight).
+
+## Round 290: gulls all along the foreshore and the beaches (Mel: "can we then have gulls all along the foreshore and beach")
+- New art/gulls.js: `perched` and `flying` moved out of lighthouse.js (which imports them), plus `coastGulls(scene, night)` for the foreshore (on the Jeju jetty, the sand by the dolphin bench and the boat mooring, and up by the bay; three gliding over the sea) and the Stables, green and lower vineyard beaches (two on the sand each, one of them taking off now and then; one or two gliding low over the water). Gliders rest at night (7pm to 6am). core.js appends it after `transportArt`.
+- Bram's For Sale sign on the lower vineyard nudged down-left (translate(-40 24), door [290,174]), clear of the gate label and quest marker.

@@ -5252,6 +5252,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(/<div class="bottlenote">/.test(so.bottlePanel(m)) && (lh.lighthouseArt(false).match(/gullperch/g) || []).length === 4, "the note opens on paper; and the perched gulls tilt their heads now and then"); }
   { const lh = await import(new URL("../src/art/lighthouse.js", import.meta.url)), a = lh.lighthouseArt(false);
     check((a.match(/class="gulloff"/g) || []).length === 2 && (a.match(/class="gwup"/g) || []).length === 2 && /animation-duration:52s/.test(a) && /animation-duration:67s/.test(a), "two of the perched gulls now and then flap off over the sea and glide back, at different times"); }
+  { const gu = await import(new URL("../src/art/gulls.js", import.meta.url));
+    check(["shore", "stables", "green", "lowervine"].every(sc => /gullperch/.test(gu.coastGulls(sc, false)) && /gulloff/.test(gu.coastGulls(sc, false))) && !/gullfly/.test(gu.coastGulls("shore", true)) && gu.coastGulls("vineyard", false) === "", "gulls all along the foreshore and the bottom-row beaches (resting at night)"); }
   // round 287: seagulls at Lighthouse Point, and the river taxi stops at its jetty
   { const tr = await import(new URL("../src/game/transport.js", import.meta.url)), lh = await import(new URL("../src/art/lighthouse.js", import.meta.url));
     check(tr.STOPS.taxilight && tr.STOPS.taxilight.scene === "lighthouse" && /data-taxiopen="taxilight"/.test(gl.jettyPanel("lighthouse", true)), "the river taxi stops at the Lighthouse Point jetty");

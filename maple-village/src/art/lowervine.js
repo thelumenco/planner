@@ -51,7 +51,7 @@ export function lowerVineArt(v){
     <path d="${surf}" fill="none" style="stroke:#FFFDF6" stroke-width="3" stroke-dasharray="9 6" opacity=".9"/><path d="${bank}" fill="none" style="stroke:var(--line)" stroke-width="1.2" opacity=".6"/>
     <path class="ripple" d="M14 520 q4 -3 8 0 M50 584 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/></g>`;
   // round 282: Bram's For Sale sign by the path, until you buy the lower vineyard from him
-  const sale = v.lower ? "" : `<g data-place="vsale" aria-label="Bram's For Sale sign"><ellipse class="hov" cx="330" cy="152" rx="34" ry="9" style="fill:var(--butter)"/>
+  const sale = v.lower ? "" : `<g data-place="vsale" aria-label="Bram's For Sale sign" transform="translate(-40 24)"><ellipse class="hov" cx="330" cy="152" rx="34" ry="9" style="fill:var(--butter)"/>
     ${sk(`<rect x="327" y="112" width="6" height="40" style="fill:var(--wood)"/><rect x="302" y="104" width="56" height="26" rx="2" style="fill:#FFFDF6"/><rect x="318" y="132" width="24" height="14" rx="1" style="fill:#E8F0F6" transform="rotate(4 330 139)"/>`,
       `<rect x="327" y="112" width="6" height="40"/><rect x="302" y="104" width="56" height="26" rx="2"/><rect x="318" y="132" width="24" height="14" rx="1" transform="rotate(4 330 139)"/><path d="M322 137 h16 M322 141 h12" opacity=".5" transform="rotate(4 330 139)"/>`)}
     <text x="330" y="115.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="8.5" style="fill:#B5473A" pointer-events="none">FOR SALE</text>

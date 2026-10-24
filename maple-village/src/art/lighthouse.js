@@ -3,6 +3,7 @@
 // a fish and chip hatch, rock pools at the water's edge, and a stile east to the Stables.
 import { sk, tapeLabel, flowers } from "./scenes.js";
 import { bramCottageOut } from "./bramcot.js";
+import { perched, flying } from "./gulls.js";
 
 // the sea: a strip x 0 to 60 at the top edge (joins the flower farm), out to the headland, then along the bottom
 const SEA = "M0 0 H60 C66 110 56 220 72 320 C80 370 64 410 50 440 C40 480 46 520 72 548 C110 582 170 596 240 596 C330 592 430 600 520 592 V640 H0Z";
@@ -91,13 +92,6 @@ export function lighthouseArt(night){
   // round 276 (Mel): the lighthouse sits 36 higher, leaving room between it and the mackerel rocks
   // round 287 (Mel: "Would love seagulls at the lighthouse"): gulls perched on the jetty, a hut roof, Dot's roof (the
   // one eyeing your chips; tap it) and the rocks, and three gliding slowly over the point by day
-  // round 289 (Mel: "Will gulls occasionally flap and fly off"): with fly = [seconds, delay] a gull now and then
-  // spreads its wings, flaps off over the sea and glides back to land (.gulloff; its wings .gwup/.gwdown, same timing)
-  const perched = (x, y, flip = 1, d = 0, fly = null) => { const t = fly ? `animation-duration:${fly[0]}s;animation-delay:${fly[1]}s` : "";
-    return `<g transform="translate(${x} ${y}) scale(${flip} 1)"><g${fly ? ` class="gulloff" style="${t}"` : ""}><g class="gullperch" style="stroke:var(--line);animation-delay:${d}s" stroke-width=".8"><path d="M-2 0 l-1 4 M2 0 l1 4" style="stroke:#E8955A" stroke-width="1.2"/>
-    <ellipse cx="0" cy="-5" rx="8" ry="5" style="fill:#FFFDF6"/><g${fly ? ` class="gwdown" style="${t}"` : ""}><path d="M-8 -6 q6 -4 12 0 q-4 4 -12 0z" style="fill:#AEB7BF"/><path d="M-8 -6 l-4 -1 l3 3z" style="fill:#3B3530"/></g>
-    <circle cx="6" cy="-11" r="3.6" style="fill:#FFFDF6"/><circle cx="7" cy="-12" r=".7" style="fill:#2F2B28" stroke="none"/><path d="M9.4 -11.4 l4 .8 l-4 1z" style="fill:#F3C969"/></g>${fly ? `<g class="gwup" style="${t}"><g class="gwflap" style="stroke:var(--line)" stroke-width=".8"><path d="M-2 -8 q-8 -14 -18 -10 q8 2 14 12z M2 -8 q6 -14 16 -12 q-8 4 -12 14z" style="fill:#E6EBEF"/><path d="M-20 -18 l4 1 l-2 3z M18 -20 l-4 2 l2 2z" style="fill:#3B3530"/></g></g>` : ""}</g></g>`; };
-  const flying = (x, y, d) => `<g transform="translate(${x} ${y})"><g class="gullfly" style="animation-delay:${d}s"><path d="M-12 0 q6 -7 12 -1 q6 -6 12 1" fill="none" style="stroke:#66717B" stroke-width="2.8" stroke-linecap="round"/><path d="M-12 0 q6 -7 12 -1 q6 -6 12 1" fill="none" style="stroke:#FFFDF6" stroke-width="1"/></g></g>`;
   const gulls = `<g pointer-events="none">${perched(20, 176, 1, 0, [52, -20])}${perched(365, 176, -1, -3, [67, -48])}${perched(108, 452, -1, -6)}${night ? "" : flying(230, 110, 0) + flying(300, 140, -4) + flying(90, 300, -8)}</g>
     <g data-place="lgull" aria-label="A seagull on Dot's roof"><ellipse class="hov" cx="446" cy="406" rx="16" ry="6" style="fill:var(--butter)"/>${perched(446, 404, 1, -1.5)}</g>`;
   return ground + `<g transform="translate(0 -36)">${beam}</g>` + up + stile + huts + bench + chips + bramCottageOut() + `<g transform="translate(0 -36)">${light}</g>` + pools + gulls;
