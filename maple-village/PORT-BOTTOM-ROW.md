@@ -115,8 +115,14 @@ These story threads hang off the personal edition's villagers and its secret pas
 - **The allotments screen:** new file `src/art/allotment.js`, an inside screen reached from the green (`gallot`), with six neighbours' plots (`PLOTS`, `data-aspot`) and the swap crate. Swap the plot holders for this edition's villagers.
 - **River mouth:** on the lower vineyard the stream fans out across the sand into the sea, filled with a gradient from `--water` to `--sea` so the two blend.
 - **Buying the lower vineyard (round 282):** the four lower rows start as Bram's, with a For Sale sign (`vsale`, `lowerSalePanel`, `buyLower`, 2,500 coins); no trellis goes down there until you buy. Use this edition's keeper if Bram isn't ported.
-- **Riding your own pony and Bram's cottage (round 283):** tack from the tack room, an hour's ride a day as a ride mode ("pony" in `ride()`), and the keeper's cottage by the lighthouse (`art/bramcot.js`, scene `bramcot`, `bramSpot`). Swap Evan for this edition's companion, or drop him.
+- **Riding your own pony and Bram's cottage (round 283):** tack from the tack room, an hour's ride a day as a ride mode ("pony" in `ride()`), and the keeper's cottage above the beach huts at Lighthouse Point (`art/bramcot.js`, scene `bramcot`, `bramSpot`). Swap Evan for this edition's companion, or drop him.
 - **Beachcombing:** two finds a day on each bottom-row beach (`BEACH_SPOTS`, `beachFinds`, `pickBeach`, `beachArt`, `data-shell`): seashells and conches (`BEACH` in `data/carboot.js`), plus the kitchen's existing `clams` and `mussels` if this edition has them; otherwise shells only.
+
+### 11. Weddings buy sparkling by the case (round 284, not part of the bottom row)
+If this edition has the terrace weddings (`game/occasions.js`), port this too: commit `4fea497` "Weddings order two to four cases of sparkling, brought up from the cellar on the day".
+- `occasions.js`: `weddingCases(day)` gives each couple an order of two to four cases; the bookings book note reads "N cases of sparkling ordered from your cellar".
+- `vineyard.js` `sellTick`: once the wedding's on (`v.wedCases` marks the day), that many bottles (six a case) come straight out of the cellar's sparkling, kept-back lots included but nothing on the riddling rack, paid at the shelf price (`bottlePrice`, shared with `stock`). If there's not enough, they take what there is; guests still buy off the shelves as before. The day's report counts the couple's bottles (`today.cases`).
+- Test: the extra checks in "The terrace's week" block.
 
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:

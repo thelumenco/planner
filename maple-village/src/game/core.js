@@ -4421,7 +4421,7 @@ svg.addEventListener("click", ev => {
     return; }
   // round 277: the allotments, each neighbour's plot and the swap crate; the gate back to the green
   // round 283: Bram's cottage: the fire, the kettle (tea with Bram), the ship in a bottle, the window and the logbook
-  if (scene === "bramcot" && ev.target.closest("[data-exit]")) { go(scene, 260, 600, () => setScene("lighthouse", [306, 452])); return; }
+  if (scene === "bramcot" && ev.target.closest("[data-exit]")) { go(scene, 260, 600, () => setScene("lighthouse", [436, 158])); return; }
   const bsp = scene === "bramcot" && ev.target.closest("[data-bspot]");
   if (bsp) { const k = bsp.dataset.bspot, at = {fire: [104, 250], kettle: [200, 250], ship: [300, 250], window: [356, 252], log: [430, 300]}[k];
     go(scene, at[0], at[1], () => { const ev2 = evanHere() && !evanNight(), r = SO.bramSpot(F, k, dayKey(), isHere("bram"), ev2); if (!r) return;

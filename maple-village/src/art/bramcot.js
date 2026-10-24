@@ -4,13 +4,14 @@
 // the desk under the round window, and the door back out to the point.
 import { sk, tapeLabel } from "./scenes.js";
 
+// round 285 (Mel: "Why isn't Bram's cottage above the beach huts instead"): drawn at its first spot and moved up there
 export function bramCottageOut(){
-  return `<g data-place="lbram" aria-label="Bram's cottage"><ellipse class="hov" cx="306" cy="436" rx="44" ry="10" style="fill:var(--butter)"/>
+  return `<g data-place="lbram" aria-label="Bram's cottage" transform="translate(130 -290)"><ellipse class="hov" cx="306" cy="436" rx="44" ry="10" style="fill:var(--butter)"/>
     ${sk(`<rect x="272" y="390" width="68" height="44" style="fill:#F6F2EA"/><path d="M266 392 L306 364 L346 392z" style="fill:#6E7A86"/><rect x="322" y="362" width="9" height="18" style="fill:#BDB3A4"/>
       <rect x="298" y="408" width="15" height="26" rx="1" style="fill:#2F4A6B"/><rect class="wglow" x="278" y="400" width="13" height="11" style="fill:#DCE8F0"/><rect class="wglow" x="321" y="400" width="13" height="11" style="fill:#DCE8F0"/>`,
       `<rect x="272" y="390" width="68" height="44"/><path d="M266 392 L306 364 L346 392z"/><rect x="322" y="362" width="9" height="18"/><rect x="298" y="408" width="15" height="26" rx="1"/><rect x="278" y="400" width="13" height="11"/><rect x="321" y="400" width="13" height="11"/><path d="M284.5 400 v11 M278 405.5 h13 M327.5 400 v11 M321 405.5 h13" opacity=".5"/>`)}
     <path d="M326 356 q-4 -8 2 -14 q5 -6 0 -12" fill="none" style="stroke:#CFC8BE" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>
-    ${tapeLabel(306, 452, "Bram's cottage", "var(--sky)", 9.5)}</g>`;
+    ${tapeLabel(306, 344, "Bram's cottage", "var(--sky)", 9.5)}</g>`;
 }
 
 export function bramCottageArt(home){
