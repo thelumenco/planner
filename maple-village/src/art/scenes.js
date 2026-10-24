@@ -310,7 +310,10 @@ function diningChairs(x, y, host){
     l += `<rect x="${cx - 11}" y="${y + 4}" width="22" height="12" rx="${shape === "shell" ? 6 : 3}"/><path d="M${cx - 8} ${y + 16} v8 M${cx + 8} ${y + 16} v8"${legC ? ` style="stroke:${legC}"` : ""}/>`; }
   return sk(f, l);
 }
-export function furn(kind, x, y){
+// round 231 (a friend's game showed an empty room, then wouldn't move): one piece of furniture that can't draw from an
+// unusual save is left out and logged, rather than blanking the whole room and stopping the game
+export function furn(kind, x, y){ try { return furn0(kind, x, y); } catch (e) { console.error("furniture", kind, e); return ""; } }
+function furn0(kind, x, y){
   const W2 = "var(--wood)";
   const legs = (w, h) => `<path d="M${x-w/2+6} ${y} v${h} M${x+w/2-6} ${y} v${h}"/>`;
   if (kind.startsWith("dining:")) { const host = kind.slice(7); return diningChairs(x, y, host) + diningTable(x, y, host); }
@@ -405,7 +408,7 @@ export function furn(kind, x, y){
       return sk(fr.map((f, i) => { const fx = x - 108 + i*56;
         return `<rect x="${fx}" y="${y-92}" width="48" height="58" rx="2" style="fill:${f ? "#8A5A3A" : "#D9CBB6"}"/>${f ? `<svg x="${fx+5}" y="${y-87}" width="38" height="48" overflow="hidden">${paintSVG(0, 0, 38, 48, f)}</svg>` : `<rect x="${fx+5}" y="${y-87}" width="38" height="48" style="fill:#EFE8DC"/>`}${f && f.by ? `<rect x="${fx+16}" y="${y-30}" width="16" height="6" rx="1" style="fill:#FFFDF6"/>` : ""}`; }).join(""),
         fr.map((f, i) => `<rect x="${x - 108 + i*56}" y="${y-92}" width="48" height="58" rx="2"/>`).join("")); }
-    case "giftbasket": { const w = (((G.F && G.F()) || {}).giftshop || {}).wrapped || [], wraps = ((((G.F && G.F()) || {}).paperie || {}).wraps) || [], col = id => { const r = wraps.find(x => x.id === id) || {}; return PAPER_COL[r.col] || "#E8B4BC"; };   // round 202: wrapped gifts, out for sale
+    case "giftbasket": { const w0 = (((G.F && G.F()) || {}).giftshop || {}).wrapped, w = Array.isArray(w0) ? w0 : [], wr0 = (((G.F && G.F()) || {}).paperie || {}).wraps, wraps = Array.isArray(wr0) ? wr0 : [], col = id => { const r = wraps.find(x => x.id === id) || {}; return PAPER_COL[r.col] || "#E8B4BC"; };   // round 202: wrapped gifts, out for sale
       return sk(`${w.slice(0, 6).map((id, i) => `<rect x="${x - 30 + (i % 3)*20}" y="${y - 44 - Math.floor(i/3)*12}" width="16" height="13" rx="2" style="fill:${col(id)}"/><rect x="${x - 23 + (i % 3)*20}" y="${y - 44 - Math.floor(i/3)*12}" width="2" height="13" style="fill:#FFFDF6"/>`).join("")}
         <path d="M${x-38} ${y-34} h76 l-8 34 h-60z" style="fill:#C9A27E"/><path d="M${x-30} ${y-34} q30 -40 60 0" style="fill:none;stroke:#A8754F;stroke-width:3"/>${[-26, -13, 0, 13, 26].map(dx => `<path d="M${x + dx} ${y-32} v30" style="stroke:#A8754F;stroke-width:1.2"/>`).join("")}`,
         `<path d="M${x-38} ${y-34} h76 l-8 34 h-60z"/><path d="M${x-30} ${y-34} q30 -40 60 0"/>`); }

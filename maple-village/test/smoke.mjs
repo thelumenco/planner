@@ -4826,6 +4826,20 @@ if (want("\nOlder phones, and a sign-in that never answers (round 231)")) try {
   const core = readFileSync(new URL("../src/game/core.js", import.meta.url), "utf8");
   check(/answered && !player\) refreshTitle\(\{checking: false, slow/.test(core), "if sign-in doesn't answer in eight seconds, the welcome screen shows the sign-in buttons and what to try");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nA room still draws from an odd save (round 231)")) try {
+  // the creator: a friend's game showed an empty room on two phones, and the character wouldn't move
+  console.log("\nA room still draws from an odd save (round 231)");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } }); const logged = [];
+  page.on("console", m => { if (m.type() === "error") logged.push(m.text()); });
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  // a piece of furniture that can't draw: the room's others, its exit and walking all still work
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.goals = {...F.goals, giftshop: true}; F.giftshop = {...(F.giftshop || {}), makers: {stock: null}, wrapped: 5}; window.__hbGame.save(); window.__hbScene("giftshop"); }); await page.waitForTimeout(800);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.giftshop.gallery = {frames: "odd"}; F.giftshop.makers = 7; window.__hbGame.save(); window.__hbScene("lane"); window.__hbScene("giftshop"); }); await page.waitForTimeout(800);
+  check(await page.evaluate(() => document.querySelectorAll("#sceneArt [data-spot]").length >= 8 && !!document.querySelector("#sceneArt [data-exit]")), "a piece of furniture that can't draw is left out: the rest of the room and its exit still appear");
+  const a = await page.evaluate(() => document.getElementById("hero").getAttribute("transform")); await page.mouse.click(260, 560); await page.waitForTimeout(1500);
+  check(await page.evaluate(was => document.getElementById("hero").getAttribute("transform") !== was, a), "and the character still walks");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));
