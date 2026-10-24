@@ -10,8 +10,13 @@ Please port a feature from the personal edition of Honeybrook into this public e
 - `22452d3` "The bottom row: Honeybrook Green, the Stables, Lighthouse Point and the coast strip, with villagers visiting"
 - `cc9f65f` "The sea runs along the whole bottom row; the home river shows in the vineyard" (and the commit after it that tidies the paddock and labels)
 - `4e3b065` "Bike hire on the green and at Lighthouse Point; a paddleboard jetty at the lighthouse"
+- `32f0f9c` and `1cdf5d8`: the vineyard's river fork, redrawn with natural curves
+- `a825813` "Lighthouse Point: the lamp and beam glow at night; the chip hatch window lights up"
+- `2f9c879` "A pony of your own, Bram the lighthouse keeper with his tales, and mackerel fishing off the rocks"
+- `26caa07` "The Sunday car boot sale on the green and the Monday lamp lighting at Lighthouse Point" (and `56d52c9`, the fish journal test count)
+- `363eb23` "The bottom row in the stories: the priory vine and Priory Red, the flask and the sea cave, Pebble and Juniper's poem, story finds at the car boot"
 
-Use `git show <commit>` to see each diff. HANDOFF.md rounds 261 to 267 on that branch describe the design. Don't merge or cherry-pick blindly: this edition has drifted, so apply the changes by hand where files differ, and keep this edition's own conventions.
+Use `git show <commit>` to see each diff. HANDOFF.md rounds 261 to 275 on that branch describe the design. Don't merge or cherry-pick blindly: this edition has drifted, so apply the changes by hand where files differ, and keep this edition's own conventions.
 
 ## What it is
 
@@ -84,6 +89,20 @@ It goes into `slotAt` in `game/npcs.js`, just before `routineAt`:
 - **`core.js`:** the scene art, both scene-name maps (the `names` object in `drawScene`, and the "the lower vineyard" style map), and `SOUTH_SPOTS` with `southSpot`.
 - **Lists that check outdoor screens:** these use `SOUTH.includes(...)`: Evan's lists, `bounds()`, and `walkToPlace`.
 - **Vines:** the vine tap handler and the vine panels also work on `lowervine`.
+
+### 9. Later additions (rounds 268 to 275)
+- **Lighthouse glow:** the lighthouse lamp and beam glow above the night darkening (`nglow`).
+- **Bram:** the keeper villager, with his daily tales when you climb the lighthouse.
+- **A pony of your own:** 1,200 coins at the stable block, named by the player.
+- **Mackerel rocks:** a new fishing spot (`rocks`) with pollack and sea bass.
+- **Weekly events:** the Sunday car boot sale (curios in `data/carboot.js`) and the Monday lamp lighting.
+- **The story threads:**
+  - the priory vine and the new grape Priory Red, which is wired through all the wine code (grep `priory`)
+  - the flask and the sea cave panel
+  - Pebble and Juniper's poem
+  - story finds at the car boot sale
+
+These story threads hang off the personal edition's villagers and its secret passage arc (Hazel, Marco, Ines, Celeste, Theo, Juniper). Port them only where this edition has the same villagers and arc; otherwise keep the mechanics (the flask, the sea cave, Priory Red, story finds) and attach them to this edition's own characters, or leave them out and tell me.
 
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
