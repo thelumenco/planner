@@ -2535,7 +2535,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(got.length === 1 && ["roach", "trout", "perch", "boot"].includes(got[0]) && /New in the journal/.test(await page.locator("#ctx .fcatch").textContent()), "reel while the marker's in the green and it's landed: a river fish, new in the journal");
   check(["boot"].includes(got[0]) || (f1.inv[got[0] === "trout" ? "trout" : "fish"] || 0) >= 1, "and it's in the backpack (trout for the kitchen, others as fish)");
   await page.click('#ctx [data-fish="view"][data-k="journal"]'); await page.waitForTimeout(200);
-  check(await page.locator("#ctx li.locked").count() === 23 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, twenty-three still to find, each with a hint (the golden koi at dusk)");
+  check(await page.locator("#ctx li.locked").count() === 25 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, twenty-five still to find, each with a hint (the golden koi at dusk)");
   await page.click('#ctx [data-fish="view"][data-k="fish"]'); await page.waitForTimeout(200);
   await page.click('#ctx [data-fish="cast"]'); await page.waitForSelector("#ctx .fbar", { timeout: 9000 }); await page.waitForTimeout(3700);
   check(/slipped away/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 0), "wait too long after the bite and it slips away");
