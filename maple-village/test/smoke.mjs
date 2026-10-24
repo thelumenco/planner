@@ -5240,6 +5240,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(so.LOGBOOK.some(e => /priory boat/.test(e)) && so.LOGBOOK.some(e => /vines/.test(e)), "the logbook has the vines below the press and the priory boat in it");
     check(["ship", "window", "fire"].every(k => so.bramSpot(F, k, day, true, false).line), "the ship in a bottle, the window and the fire"); }
   // round 286 (Mel): the home jetty paddles to Lighthouse Point too; fish and chips to take away, as a present
+  // round 288 (Mel: "messages floating in a glass bottle in the sea... poems, affirmations, letters... all have dates")
+  { const bt = await import(new URL("../src/data/bottles.js", import.meta.url)), lh = await import(new URL("../src/art/lighthouse.js", import.meta.url));
+    const days = Array.from({length: 120}, (_, d) => new Date(Date.UTC(2026, 9, d + 1)).toISOString().slice(0, 10)), on = days.map(d => [d, so.bottleToday({}, d)]).filter(x => x[1]);
+    check(on.length > 25 && on.length < 55 && new Set(on.map(x => x[1].scene)).size === 4, `a bottle washes up every few days (${on.length} in 120), on each of the four bottom-row beaches`);
+    check(bt.BOTTLES.length >= 30 && bt.BOTTLES.every(m => /^\d{1,2} [A-Z][a-z]+ \d{4}$/.test(m.date) && ["poem", "kind", "letter"].includes(m.kind) && !/[\u2013\u2014]/.test(m.text + m.from)), "thirty or more messages, poems, kind words and letters, every one dated (and no long dashes)");
+    const G = {}, [d0] = on[0], m = so.pickBottle(G, d0, 1);
+    check(m && m.text && !so.bottleToday(G, d0) && !so.pickBottle(G, d0, 2) && so.bottleMail(G).length === 1 && /in a bottle/.test(so.bottleMail(G)[0].title) && so.bottleMail(G)[0].body.startsWith(m.date), "pick it up: the message is yours, kept in the mailbox with its date");
+    let n = 1; for (const [d] of on.slice(1)) if (so.pickBottle(G, d, 3)) n++;
+    check(new Set(G.south.bottles.found.map(f => f.i)).size === n, "never the same message twice");
+    check(/<div class="bottlenote">/.test(so.bottlePanel(m)) && (lh.lighthouseArt(false).match(/gullperch/g) || []).length === 4, "the note opens on paper; and the perched gulls tilt their heads now and then"); }
   // round 287: seagulls at Lighthouse Point, and the river taxi stops at its jetty
   { const tr = await import(new URL("../src/game/transport.js", import.meta.url)), lh = await import(new URL("../src/art/lighthouse.js", import.meta.url));
     check(tr.STOPS.taxilight && tr.STOPS.taxilight.scene === "lighthouse" && /data-taxiopen="taxilight"/.test(gl.jettyPanel("lighthouse", true)), "the river taxi stops at the Lighthouse Point jetty");

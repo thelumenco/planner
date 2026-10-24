@@ -25,6 +25,10 @@ export function carBootArt(){
     ${tapeLabel(348, 400, "Car boot sale", "var(--butter)", 10)}</g>`;
 }
 
+// round 288: a message in a bottle, bobbing in the shallows
+export const bottleArt = b => b ? `<g data-bottle="1" aria-label="A bottle in the shallows" transform="translate(${b.x} ${b.y}) scale(1.4)"><ellipse class="hov" cx="0" cy="2" rx="18" ry="7" style="fill:var(--butter)"/>
+  <g class="bottlebob"><g transform="rotate(-24)" style="stroke:var(--line)" stroke-width=".9"><rect x="-10" y="-5" width="16" height="10" rx="4" style="fill:#9FD3B8" opacity=".9"/><rect x="5" y="-2.6" width="6" height="5.2" rx="1" style="fill:#9FD3B8"/><rect x="10" y="-2.2" width="3" height="4.4" style="fill:#C9A27E"/>
+  <rect x="-7" y="-2.4" width="10" height="4.8" rx="1" style="fill:#FFFDF6"/><path d="M-6 0 h8" style="stroke:#E8566C" stroke-width=".8"/></g><path d="M-14 6 q4 -2 8 0 q4 2 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.1" opacity=".8"/></g></g>` : "";
 // round 278: the day's beach finds, little things on the sand to pick up
 export function beachArt(finds){
   const pic = {b_shell: `<path d="M-6 2 Q0 -8 6 2z" style="fill:#F6E3C6"/><path d="M-3 2 L0 -5 M3 2 L0 -5" style="stroke:#C98A6A" stroke-width=".8"/>`,

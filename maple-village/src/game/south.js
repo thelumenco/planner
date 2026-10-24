@@ -3,6 +3,7 @@
 // coast path ends). Small, calm things to do; nothing here is a way to make money. State: F.south.
 import { pick, now } from "../util.js";
 import { CARBOOT } from "../data/carboot.js";
+import { BOTTLES, BOTTLE_AFTER } from "../data/bottles.js";
 import { ITEMS } from "../data/items.js";
 export { CARBOOT };
 import { icon } from "../art/icons.js";
@@ -262,6 +263,31 @@ export function buyChips(F){
   if ((F.coins || 0) < CHIPS) return {line: `Fish and chips are ${CHIPS} coins.`};
   F.coins -= CHIPS;
   return {line: pick(["Hot chips and crisp battered cod, salt and vinegar, in paper. You eat them on the sea wall and fight off one very bold gull.", "A cone of chips, a piece of haddock, and a little wooden fork. The best thing you've eaten all week.", "Fish and chips, wrapped in paper, too hot to hold. You blow on every chip and burn your mouth anyway."]), ok: true};
+}
+
+/* ---------- messages in bottles (round 288) ---------- */
+// Every third day or so a bottle bobs in the shallows on one of the bottom-row beaches, from first light till dusk.
+// Each one holds the next unread message (data/bottles.js); found ones go into the mailbox, already open, to reread.
+const BOTTLE_X = {lighthouse: 380, stables: 300, green: 230, lowervine: 420};
+export function bottleToday(F, day){
+  const h = hsh(day + ":bottle"), s = southState(F); if (h % 3) return null;
+  const b = s.bottles || {found: []}; if (b.day === day || b.found.length >= BOTTLES.length) return null;
+  const scene = SOUTH_BEACH[hsh(day + ":where") % SOUTH_BEACH.length]; return {scene, x: BOTTLE_X[scene], y: 606};
+}
+export function pickBottle(F, day, at){
+  const s = southState(F), b = s.bottles = s.bottles || {found: []}; if (!bottleToday(F, day)) return null;
+  const left = BOTTLES.map((_, i) => i).filter(i => !b.found.some(f => f.i === i)), i = left[hsh(day + ":which") % left.length];
+  b.day = day; b.found.push({i, at});
+  return {i, ...BOTTLES[i], after: BOTTLE_AFTER[i] || ""};
+}
+export const bottleTitle = m => m.kind === "poem" ? "A poem in a bottle" : m.kind === "kind" ? "A kind word in a bottle" : "A letter in a bottle";
+export const bottleBody = m => `${m.date}\n\n${m.text}${m.from ? `\n\n${m.from}` : ""}`;
+// the mailbox keeps them (core.js marks them read when found)
+export const bottleMail = F => ((F.south && F.south.bottles && F.south.bottles.found) || []).map(f => ({id: "bottle-" + f.i, from: "postie", at: f.at, title: bottleTitle(BOTTLES[f.i]) + ", washed up " + new Date(f.at).toLocaleDateString("en-GB", {day: "numeric", month: "long"}), body: bottleBody(BOTTLES[f.i])}));
+export function bottlePanel(m){
+  return `<span class="tape stripe" aria-hidden="true"></span><h2>${esc(bottleTitle(m))}</h2><p class="sub">You work the cork out and shake the little roll of paper free. It's dry inside.</p>
+    <div class="bottlenote"><p class="muted" style="text-align:right">${esc(m.date)}</p>${m.text.split("\n\n").map(p => `<p>${esc(p).replace(/\n/g, "<br>")}</p>`).join("")}${m.from ? `<p style="text-align:right"><i>${esc(m.from)}</i></p>` : ""}</div>
+    ${m.after ? `<p class="sub">${esc(m.after)}</p>` : ""}<p class="muted">You keep it. It's in your mailbox to read again.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 
 /* ---------- beachcombing (round 278) ---------- */
