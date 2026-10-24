@@ -10,7 +10,7 @@ export function lowerVineArt(v){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="320" cy="380" rx="200" ry="200" style="fill:var(--grass2)"/><ellipse cx="120" cy="120" rx="120" ry="60" style="fill:var(--grass2)"/></g>
     <g filter="url(#wob)" fill="none" opacity=".4" style="stroke:var(--moss2)" stroke-width="3" stroke-dasharray="2 7">${[214, 296, 378, 460].map(y => `<path d="M200 ${y} Q330 ${y - 6} 476 ${y + 2}"/>`).join("")}</g>
-    <g filter="url(#wob)"><path d="M14 0 C24 120 6 220 18 330 C28 430 8 520 20 640" fill="none" style="stroke:var(--water)" stroke-width="16"/><path d="M8 0 C18 120 0 220 12 330 C22 430 2 520 14 640 M22 0 C32 120 14 220 26 330 C36 430 16 520 28 640" fill="none" style="stroke:var(--line)" stroke-width="1.2" opacity=".6"/></g>
+    <g filter="url(#wob)"><g clip-path="url(#lvStream)"><path d="M14 0 C24 120 6 220 18 330 C28 430 8 520 20 640" fill="none" style="stroke:var(--water)" stroke-width="16"/><path d="M8 0 C18 120 0 220 12 330 C22 430 2 520 14 640 M22 0 C32 120 14 220 26 330 C36 430 16 520 28 640" fill="none" style="stroke:var(--line)" stroke-width="1.2" opacity=".6"/></g></g>
     <path class="ripple" d="M12 180 q4 -3 8 0 M16 470 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>
     <g filter="url(#wob)"><path d="M502 0 C494 100 498 200 490 300 C484 400 478 480 430 560 C400 590 360 596 330 600 M490 300 C420 304 300 300 180 300 C150 300 130 310 118 330" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
     ${flowers([[60, 90, "#EFA3A6"], [150, 200, "#F3C969"], [470, 180, "#C3CDEE"], [90, 420, "#EFA3A6"], [160, 520, "#F3C969"], [480, 420, "#EFA3A6"], [200, 120, "#C3CDEE"]])}
@@ -42,10 +42,13 @@ export function lowerVineArt(v){
   // the sand and fans out into a little river mouth where it meets the sea, like the river at the foreshore
   // round 279 (Mel: "the colour of the stream changes too abruptly into the sea"): the fan shades from the stream's pale
   // blue into the sea's blue and runs on under the surf line, so the two waters merge
-  const mouth = `<defs><linearGradient id="lvMouth" gradientUnits="userSpaceOnUse" x1="0" y1="520" x2="0" y2="606"><stop offset="0" style="stop-color:var(--water)"/><stop offset=".55" style="stop-color:var(--water)" stop-opacity=".9"/><stop offset="1" style="stop-color:var(--sea)"/></linearGradient></defs>
-    <g filter="url(#wob)" pointer-events="none"><path d="M10 506 H30 C34 534 44 556 70 574 C88 586 104 594 112 600 C122 606 130 610 136 614 H0 V506z" style="fill:url(#lvMouth)"/>
-    <path d="M30 506 C34 534 44 556 70 574 C88 586 104 594 112 600" fill="none" style="stroke:#FFFDF6" stroke-width="3" stroke-dasharray="9 6" opacity=".9"/><path d="M30 506 C34 534 44 556 70 574 C88 586 104 594 112 600" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".45"/>
-    <path class="ripple" d="M24 560 q4 -3 8 0 M50 584 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/></g>`;
+  // round 280 (Mel: "it doesn't look smooth"): the stream stops at y 480 (clipped) and the fan grows out of its two
+  // banks there, flaring west to the screen edge and east along a long curve, so there is no step where they meet
+  const surf = "M30 520 C35 540 48 560 70 574 C88 586 104 594 112 600", bank = "M26 474 C26 486 27 494 28 506 C32 534 46 558 70 574 C88 586 104 594 112 600 M11 474 C10 500 6 516 0 530";
+  const mouth = `<defs><clipPath id="lvStream"><rect x="-20" y="-20" width="80" height="500"/></clipPath><linearGradient id="lvMouth" gradientUnits="userSpaceOnUse" x1="0" y1="474" x2="0" y2="608"><stop offset="0" style="stop-color:var(--water)"/><stop offset=".45" style="stop-color:var(--water)"/><stop offset="1" style="stop-color:var(--sea)"/></linearGradient></defs>
+    <g filter="url(#wob)" pointer-events="none"><path d="M11 474 C10 500 6 516 0 530 V614 H136 C130 610 122 606 112 600 C104 594 88 586 70 574 C46 558 32 534 28 506 C27 494 26 486 26 474Z" style="fill:url(#lvMouth)"/>
+    <path d="${surf}" fill="none" style="stroke:#FFFDF6" stroke-width="3" stroke-dasharray="9 6" opacity=".9"/><path d="${bank}" fill="none" style="stroke:var(--line)" stroke-width="1.2" opacity=".6"/>
+    <path class="ripple" d="M14 520 q4 -3 8 0 M50 584 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/></g>`;
   // round 276 (Mel): the press sits higher, clear of the footbridge
   return ground + shore + mouth + up + west + sign + `<g transform="translate(0 -120)">${press}</g>` + v.rows.slice(UPPER).map((row, k) => rowArt(row, UPPER + k)).join("") + bench;
 }

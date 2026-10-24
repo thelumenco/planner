@@ -2801,3 +2801,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Round 279: the river mouth blends into the sea; ice cream off Hana's shelf
 - Mel: "The colour of the stream changes too abruptly into the sea". art/lowervine.js `mouth` is filled with a gradient (`lvMouth`, userSpaceOnUse) from `--water` to `--sea`, and the fan runs on under the surf line, so the two waters merge. Screenshot: screens-bottom-row/lowervine-mouth.png.
 - Mel: "remove the ice cream from Hana's market now that we have our scoop shack". `icecream` in data/items.js lost its `tab`, so no shop lists it; the item stays so a scoop already in the backpack can still be given to Evan. The family gifts test buys and gives a storybook instead, and checks that ice cream is off the shelf.
+
+## Round 280: the river mouth grows out of the stream (Mel: "What's with this part? It doesn't look smooth")
+- The flat-topped fan met the narrow stream in a step, and the stream's banks showed through it. Now the stream is clipped at y 480 (`lvStream`) and the fan starts at the stream's own banks (x 11 and 26, y 474), flaring west to the edge and east down a long curve, with the stream's thin bank lines carried on round it; the white surf dashes start only where it meets the sand. Gradient fully opaque.
