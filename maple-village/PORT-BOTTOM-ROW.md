@@ -8,8 +8,10 @@ Please port a feature from the personal edition of Honeybrook into this public e
 
 - `09007fb` "The lower vineyard: a new screen down the hill with four more trellis rows"
 - `22452d3` "The bottom row: Honeybrook Green, the Stables, Lighthouse Point and the coast strip, with villagers visiting"
+- `cc9f65f` "The sea runs along the whole bottom row; the home river shows in the vineyard" (and the commit after it that tidies the paddock and labels)
+- `4e3b065` "Bike hire on the green and at Lighthouse Point; a paddleboard jetty at the lighthouse"
 
-Use `git show <commit>` to see each diff. HANDOFF.md rounds 261 to 265 on that branch describe the design. Don't merge or cherry-pick blindly: this edition has drifted, so apply the changes by hand where files differ, and keep this edition's own conventions.
+Use `git show <commit>` to see each diff. HANDOFF.md rounds 261 to 267 on that branch describe the design. Don't merge or cherry-pick blindly: this edition has drifted, so apply the changes by hand where files differ, and keep this edition's own conventions.
 
 ## What it is
 
@@ -48,6 +50,12 @@ If this edition is missing any of those top-row screens, tell me before you star
 
 ### 5. The coast strip on the flower farm
 In `art/orchard.js`, `flowerFarmArt` gets a strip of sand and sea down its west edge, so the coast runs unbroken from the foreshore to Lighthouse Point. The farm's bench moves to the east side. Update `paths.js` to match.
+
+### 5b. The sea along the bottom, the river and the transport
+- **The sea along the bottom (`art/southshore.js`):** the strip of sand and sea from the bottom of Lighthouse Point carries on along the bottom of the Stables, the green and the lower vineyard. The lower vineyard's valley becomes sea, and its bench becomes the sea bench. The Stables' paddock moves up 26.
+- **The home river in the vineyard:** the river from home shows at the vineyard's top left.
+- **Bike hire:** racks on the green and at Lighthouse Point (`transportArt`).
+- **Paddleboards:** a jetty at Lighthouse Point (`lsup`) for paddling to the foreshore or home, and the foreshore's jetty panel can paddle to Lighthouse Point.
 
 ### 6. Things to do: `src/game/south.js`
 - **Ducks:** feed them for 1 coin, once a day, not at night.
