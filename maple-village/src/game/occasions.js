@@ -31,6 +31,9 @@ export const OCC = {
 export const mothersDay = day => md(day).startsWith("05-") && dowOf(day) === 0 && +day.slice(8) >= 8 && +day.slice(8) <= 14;
 const weddingDay = day => { if (dowOf(day) !== 6) return false; const d = +day.slice(8), m = +day.slice(5, 7); return (d >= 8 && d <= 14) || (d >= 22 && d <= 28 && (m >= 10 || m <= 3)); };
 export function weddingOn(day){ if (!weddingDay(day)) return null; const m = +day.slice(5, 7) + +day.slice(0, 4)*12, n = (m*2 + (+day.slice(8) > 20 ? 1 : 0)) % WEDDINGS.length; return WEDDINGS[n]; }
+// round 284 (Mel: "it says they buy sparkling by the case, does that really happen?"): each couple orders two to four
+// cases of sparkling ahead; on the day Celeste brings them up from your cellar (vineyard.js sellTick)
+export const weddingCases = day => weddingOn(day) ? 2 + hash(day + ":cases") % 3 : 0;
 // what's on the terrace that day (the special days win), or null
 export function occasionOn(day){
   if (md(day) === "12-25") return "christmas"; if (md(day) === "12-31") return "nye"; if (md(day) === "02-14") return "valentine";
@@ -180,7 +183,7 @@ export function comingUp(day = dayKey()){
   for (let i = 0; i < 42; i++) { const d = addDays(day, i), k = occasionOn(d); if (!k) { if (mothersDay(d) && i < 31) out.push({day: d, n: "Mother's Day long lunch", when: "12 to 3pm", note: "Mum and Ma Ma are guests of honour"}); continue; }
     if ((k === "trivia" || k === "paint") && i >= 14) continue; if ((k === "christmas" || k === "nye" || k === "valentine") && i >= 31) continue;
     const o = OCC[k], w = k === "wedding" ? weddingOn(d) : null;
-    out.push({day: d, n: w ? `The wedding of ${w.couple}` : o.n, when: `${hhmm(o.from)} to ${hhmm(o.to)}`, note: w ? `${w.from}; sparkling by the case` : k === "trivia" ? "teams of three, 10 a team" : k === "paint" ? "Dad teaching" : ""}); }
+    out.push({day: d, n: w ? `The wedding of ${w.couple}` : o.n, when: `${hhmm(o.from)} to ${hhmm(o.to)}`, note: w ? `${w.from}; ${weddingCases(d)} cases of sparkling ordered from your cellar` : k === "trivia" ? "teams of three, 10 a team" : k === "paint" ? "Dad teaching" : ""}); }
   return out;
 }
 export function comingUpHTML(day = dayKey(), terrace = true){

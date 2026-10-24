@@ -11,7 +11,7 @@ import { eventNow, wineClubNow, aperitivoNow, discoNow } from "./tours.js";
 import { icon } from "../art/icons.js";
 import { DISHES, TAPAS, tapasPrice } from "./kitchen.js";
 import { bikeOwned, DELIVERY, deliveryHours } from "./scoop.js";
-import { occasionNow, OCC } from "./occasions.js";
+import { occasionNow, OCC, weddingCases } from "./occasions.js";
 import { mulledSeason, sellCup, mullState } from "./mulled.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
 import { agedCoins } from "./secret.js";
@@ -180,8 +180,9 @@ export const RIDDLE = {day: 2, max: 5};
 export const riddleDays = (c, now = Date.now()) => c && c.rack ? Math.min(RIDDLE.max, Math.floor((now - c.rack)/(24*H))) : 0;
 export const canRiddle = F => !!(F.bellbird && F.bellbird.riddle);
 export function onRack(F, id){ const c = vineState(F).cellar.find(x => x.id === id); if (!c || c.type !== "sparkling" || c.rack || !canRiddle(F)) return null; c.rack = Date.now(); return c; }
+const bottlePrice = c => STYLES[c.type].price + RIDDLE.day*riddleDays(c) + agedCoins(c.type, c.aged);
 export function stock(F, id){ const v = vineState(F), c = v.cellar.find(x => x.id === id); if (!c) return null;
-  const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: STYLES[c.type].price + RIDDLE.day*riddleDays(c) + agedCoins(c.type, c.aged), open: 0});   // round 244: + what it gained resting in the cave (10% of the style's price a week)
+  const s = v.shelf.find(x => x.id === id); if (s) s.n += c.n; else v.shelf.push({id: c.id, name: c.name, type: c.type, n: c.n, price: bottlePrice(c), open: 0});   // round 244: + what it gained resting in the cave (10% of the style's price a week)
   v.cellar = v.cellar.filter(x => x.id !== id); return `${c.name} is on the shelves.`; }
 // round 243 (Mel: "space for stocking wines I don't want to put on shelves yet"): the cellar is the store. A wine
 // kept back stays down here (Celeste won't stock it); bottles can come back down off the shelves too.
@@ -307,6 +308,11 @@ export function sellTick(F, opts = {}){
       // sip and paint (glasses), Valentine's, Christmas lunch, New Year's Eve. Mel out there hosting: faster, and tips
       const oc = occasionNow(lday, hm);
       if (oc) { const host = opts.lunch && k === 1 ? 1.5 : 1, stock = v.shelf.filter(x => x.n > 0), fizz = oc.kind === "wedding" || oc.kind === "nye";
+        // round 284: the couple's order, cases of sparkling straight from the cellar (kept-back ones too, not the
+        // riddling rack), at the shelf price, once the wedding's begun; anything short comes off the shelves as before
+        if (oc.kind === "wedding" && v.wedCases !== lday) { v.wedCases = lday; const want = weddingCases(lday)*BOTTLES; let took = 0;
+          for (const c of v.cellar.filter(x => x.type === "sparkling" && !x.rack)) { const n = Math.min(c.n, want - took); if (n <= 0) break; c.n -= n; took += n; out.coins += n*bottlePrice(c); }
+          v.cellar = v.cellar.filter(x => x.n > 0); if (took) { out.bottles += took; out.occB = (out.occB || 0) + took; out.cases = took; } }
         if (oc.glasses) { if (Math.random() < oc.guests/60*oc.drink*host) { const g = v.shelf.find(x => x.open > 0) || v.shelf.find(x => x.n > 0); if (g) { if (!g.open) { g.n--; g.open = GLASSES; } g.open--; out.glasses++; out.coins += Math.max(1, Math.round(g.price/4)); out.occB = (out.occB || 0) + 1; } } }
         else if (stock.length && Math.random() < oc.guests/2/60*oc.drink*host) { const w8 = stock.map(x => Math.pow(x.price, 1.5)*(fizz && x.type === "sparkling" ? 6 : 1)), tot = w8.reduce((a, b) => a + b, 0); let r = Math.random()*tot, i = 0; while (r > w8[i] && i < stock.length - 1) { r -= w8[i]; i++; }
           const b = stock[i]; b.n--; out.bottles++; out.coins += b.price; out.occB = (out.occB || 0) + 1; if (opts.lunch) out.lunchTips = (out.lunchTips || 0) + Math.max(1, Math.round(b.price*.15)); }
@@ -347,7 +353,7 @@ export function sellTick(F, opts = {}){
   v.sold += out.bottles; v.glasses += out.glasses;
   const day = new Date(t + 8*H).toISOString().slice(0, 10); if (v.today.day !== day) v.today = {day, bottles: 0, glasses: 0, plates: 0, coins: 0};
   ["picked", "filled", "stocked"].forEach(x => { v.today[x] = (v.today[x] || 0) + out[x]; });
-  v.today.plates = (v.today.plates || 0) + out.plates; v.today.deliv = (v.today.deliv || 0) + (out.deliv || 0); v.today.lunchB = (v.today.lunchB || 0) + (out.lunchB || 0); v.today.occB = (v.today.occB || 0) + (out.occB || 0); v.today.mulled = (v.today.mulled || 0) + (out.mulled || 0); v.today.occP = (v.today.occP || 0) + (out.occP || 0); if (out.occ) v.today.occ = out.occ; v.today.lunchP = (v.today.lunchP || 0) + (out.lunchP || 0); v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
+  v.today.plates = (v.today.plates || 0) + out.plates; v.today.deliv = (v.today.deliv || 0) + (out.deliv || 0); v.today.lunchB = (v.today.lunchB || 0) + (out.lunchB || 0); v.today.occB = (v.today.occB || 0) + (out.occB || 0); v.today.cases = (v.today.cases || 0) + (out.cases || 0); v.today.mulled = (v.today.mulled || 0) + (out.mulled || 0); v.today.occP = (v.today.occP || 0) + (out.occP || 0); if (out.occ) v.today.occ = out.occ; v.today.lunchP = (v.today.lunchP || 0) + (out.lunchP || 0); v.today.bottles += out.bottles; v.today.glasses += out.glasses; v.today.coins += out.coins;
   return out;
 }
 
@@ -520,5 +526,5 @@ export function wireVine(root, F, api){
 export function wineNews(F, day, hm){
   const v = vineState(F), t = v.today; if (hm < 22*60 || v.reported === day) return null; v.reported = day; if (!t || t.day !== day || !t.coins) return null;
   const bits = [t.bottles ? `${t.bottles} bottle${t.bottles === 1 ? "" : "s"}` : "", t.glasses ? `${t.glasses} glass${t.glasses === 1 ? "" : "es"}` : "", t.plates ? `${t.plates} plate${t.plates === 1 ? "" : "s"}` : ""].filter(Boolean);
-  return `Today ${shopName(F).replace(/^The /, "the ")} sold ${bits.length ? bits.join(", ").replace(/, ([^,]*)$/, " and $1") : "a little"}: ${t.coins} coins${t.deliv ? `, with ${t.deliv} order${t.deliv === 1 ? "" : "s"} out by bike` : ""}${t.lunchB || t.lunchP ? `. The Sunday lunch on the terrace: ${t.lunchB || 0} bottle${t.lunchB === 1 ? "" : "s"} and ${t.lunchP || 0} plate${t.lunchP === 1 ? "" : "s"}` : ""}${t.mulled ? `. ${t.mulled} cup${t.mulled === 1 ? "" : "s"} of mulled wine` : ""}${t.occ && (t.occB || t.occP) ? `. ${OCC[t.occ].n} on the terrace: ${t.occB || 0} ${t.occ === "paint" ? "glass" : "bottle"}${t.occB === 1 ? "" : t.occ === "paint" ? "es" : "s"}${t.occP ? ` and ${t.occP} plate${t.occP === 1 ? "" : "s"}` : ""}` : ""}. Anything you didn't serve yourself is waiting in the honesty box by the counter.`;
+  return `Today ${shopName(F).replace(/^The /, "the ")} sold ${bits.length ? bits.join(", ").replace(/, ([^,]*)$/, " and $1") : "a little"}: ${t.coins} coins${t.deliv ? `, with ${t.deliv} order${t.deliv === 1 ? "" : "s"} out by bike` : ""}${t.lunchB || t.lunchP ? `. The Sunday lunch on the terrace: ${t.lunchB || 0} bottle${t.lunchB === 1 ? "" : "s"} and ${t.lunchP || 0} plate${t.lunchP === 1 ? "" : "s"}` : ""}${t.mulled ? `. ${t.mulled} cup${t.mulled === 1 ? "" : "s"} of mulled wine` : ""}${t.occ && (t.occB || t.occP) ? `. ${OCC[t.occ].n} on the terrace: ${t.occB || 0} ${t.occ === "paint" ? "glass" : "bottle"}${t.occB === 1 ? "" : t.occ === "paint" ? "es" : "s"}${t.occP ? ` and ${t.occP} plate${t.occP === 1 ? "" : "s"}` : ""}${t.cases ? `, ${t.cases} of them the couple's sparkling, by the case from your cellar` : ""}` : ""}. Anything you didn't serve yourself is waiting in the honesty box by the counter.`;
 }
