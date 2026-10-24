@@ -122,7 +122,7 @@ These story threads hang off the personal edition's villagers and its secret pas
 
 - **Round 287:** seagulls at Lighthouse Point (perched, and gliding by day; the one on the chip hatch roof is tappable), and the river taxi stops at the Lighthouse Point jetty (`STOPS.taxilight`, a "Take the river taxi" button in its jetty panel). Update the taxi tests' stop count.
 
-- **Round 288:** messages in bottles on the bottom-row beaches (`data/bottles.js`, `bottleToday`, `pickBottle`, `bottlePanel`, `bottleMail`, `bottleArt`), kept in the mailbox; and the perched gulls tilt their heads now and then (`.gullperch`). The messages have no personal content, so they can go across as they are.
+- **Round 288:** messages in bottles on the bottom-row beaches (`data/bottles.js`, `bottleToday`, `pickBottle`, `bottlePanel`, `bottleMail`, `bottleArt`), kept in the mailbox; and the perched gulls tilt their heads now and then (`.gullperch`); round 289: two of them now and then flap off over the sea and glide back (`.gulloff`, `.gwup`, `.gwdown`, `.gwflap`). The messages have no personal content, so they can go across as they are.
 
 ### 11. Weddings buy sparkling by the case (round 284, not part of the bottom row)
 If this edition has the terrace weddings (`game/occasions.js`), port this too: commit `4fea497` "Weddings order two to four cases of sparkling, brought up from the cellar on the day".

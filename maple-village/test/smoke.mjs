@@ -5250,6 +5250,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     let n = 1; for (const [d] of on.slice(1)) if (so.pickBottle(G, d, 3)) n++;
     check(new Set(G.south.bottles.found.map(f => f.i)).size === n, "never the same message twice");
     check(/<div class="bottlenote">/.test(so.bottlePanel(m)) && (lh.lighthouseArt(false).match(/gullperch/g) || []).length === 4, "the note opens on paper; and the perched gulls tilt their heads now and then"); }
+  { const lh = await import(new URL("../src/art/lighthouse.js", import.meta.url)), a = lh.lighthouseArt(false);
+    check((a.match(/class="gulloff"/g) || []).length === 2 && (a.match(/class="gwup"/g) || []).length === 2 && /animation-duration:52s/.test(a) && /animation-duration:67s/.test(a), "two of the perched gulls now and then flap off over the sea and glide back, at different times"); }
   // round 287: seagulls at Lighthouse Point, and the river taxi stops at its jetty
   { const tr = await import(new URL("../src/game/transport.js", import.meta.url)), lh = await import(new URL("../src/art/lighthouse.js", import.meta.url));
     check(tr.STOPS.taxilight && tr.STOPS.taxilight.scene === "lighthouse" && /data-taxiopen="taxilight"/.test(gl.jettyPanel("lighthouse", true)), "the river taxi stops at the Lighthouse Point jetty");
