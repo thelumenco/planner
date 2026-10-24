@@ -4397,7 +4397,7 @@ svg.addEventListener("click", ev => {
   // round 278: beachcombing on the bottom row
   const shl = ev.target.closest("[data-shell]");
   if (shl) { const k = shl.dataset.shell, f = SO.beachFinds(F, scene, dayKey()).find(x => x.k === k);
-    if (f) go(scene, f.x, f.y - 8, () => { const r = SO.pickBeach(F, scene, k, dayKey()); if (r) { sfx("pop"); flash(`+1 ${ITEMS[r.id].n.toLowerCase()}`); speak(r.line, 4500); if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["can I hold it?", "a shell! for my collection", "it's got a crab in! no it hasn't"])), 1500); save(true); drawScene(); } });
+    if (f) go(scene, f.x, f.y - 8, () => { const r = SO.pickBeach(F, scene, k, dayKey()); if (r) { sfx("pop"); flash(`+${r.n} ${ITEMS[r.id].n.toLowerCase()}`); speak(r.line, 5500); if (evanHere() && !evanNight()) setTimeout(() => evanSays(pick(["can I hold it?", "a shell! for my collection", "it's got a crab in! no it hasn't"])), 1500); save(true); drawScene(); } });
     return; }
   // round 277: the allotments, each neighbour's plot and the swap crate; the gate back to the green
   if (scene === "allotment" && ev.target.closest("[data-exit]")) { go(scene, 260, 600, () => setScene("green", [120, 280])); return; }

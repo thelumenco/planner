@@ -18,11 +18,11 @@ export const CARBOOT = {
 Object.entries(CARBOOT).forEach(([id, c]) => { ITEMS[id] = {n: c.n, kind: "keepsake", price: c.price, art: c.art, line: c.line}; });
 
 // round 278 (Mel: "random seashells, clams and mussels along the beach that I can pick"): what washes up on the
-// bottom row's beaches. Shells and the odd conch are keepsakes; Dot buys the clams and mussels.
+// bottom row's beaches. Shells and the odd conch are keepsakes; clams and mussels go to the kitchen, or to Dot.
 export const BEACH = {
   b_shell: {n: "Seashell", kind: "keepsake", price: 0, art: ["disc", "#F6E3C6", "#E9B8A0"], line: "A ribbed seashell, pink inside, from the beach at the bottom of the village."},
   b_conch: {n: "Spiral conch", kind: "keepsake", price: 0, art: ["disc", "#F3D9B0", "#C98A4A"], line: "A spiral conch, rare on this coast. Hold it to your ear and there's the sea."},
-  b_clam: {n: "Clams", kind: "ingredient", price: 0, sell: 2, art: ["disc", "#D9CFC0", "#8A7A6A"], what: "dug from the sand: Dot at the fish and chip hatch will buy them"},
-  b_mussel: {n: "Mussels", kind: "ingredient", price: 0, sell: 2, art: ["disc", "#3A3A5A", "#7A7AA0"], what: "off the rocks at the beach: Dot at the fish and chip hatch will buy them"}
 };
+// (clams and mussels on the beach are the kitchen's own: "clams" for clams with garlic and lemon, "mussels" for
+// stuffed mussels; Mel pointed out the dishes were already there)
 Object.entries(BEACH).forEach(([id, c]) => { ITEMS[id] = {...c}; });
