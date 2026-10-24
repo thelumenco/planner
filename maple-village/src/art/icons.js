@@ -1,3 +1,4 @@
+import { CARBOOT } from "../data/carboot.js";
 import { TOWN_GOODS } from "../data/towns.js";
 import { paperIcon, wrapIcon } from "./paper-icons.js";
 import { lipIcon } from "./lip-icons.js";
@@ -411,6 +412,8 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
   I.housechoc = S.bar("#3F2519"); I.sp_log = I.logcake; I.sp_mooncake = I.mooncake;
   [["red", "#7A1F3D"], ["rose", "#E98AA0"], ["white", "#E8D57A"], ["sparkling", "#F3E7B0"]].forEach(([k, c]) => { I["wine_" + k] = S.bottle(c); });
   Object.entries(GOODS).forEach(([id, g]) => { if (I[id] || !g.art) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
+  // round 271: the car boot sale's curios (game/south.js)
+  Object.entries(CARBOOT).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   // round 107: Ronda's goods, and the Tempranillo grape and wine
   Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   // round 196: the makers' shelf in the gift shop (game/gallery.js)

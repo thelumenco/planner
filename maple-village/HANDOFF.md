@@ -2772,3 +2772,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - npcs.js `bram`: the keeper. Walks the point by day, lunch on the bench, by his door in the evening, fishes off the rocks on Sunday evenings. `TALES` / `keeperTale`: climb the lighthouse while he's there and he tells one tale a day, in turn.
 - fishing.js spot `rocks` (Lighthouse Point, `fishrocks`, art "Mackerel rocks"): mackerel and sardines as at the sea, plus pollack (any time) and sea bass (dusk), both new.
 - Tests in the bottom-row block.
+
+## Round 271: the car boot sale and the lamp lighting (Mel: "Car boot sale and lamp lighting")
+- Car boot sale: Sundays 8 to 12 on the green (south.js `BOOT`, `bootNow`, `bootFinds`, `buyFind`, `bootPanel`; art/southshore.js `carBootArt`, two cars and a trestle, place `gboot`, panel `woodsView = "boot"`, `data-boot`). Four curios a week from 12 (data/carboot.js `CARBOOT`, keepsakes 5 to 18 coins, their own file so icons.js can read them without a module cycle), each bought once. Five villagers browse.
+- Lamp lighting: Mondays 6:30 to 7:30pm at Lighthouse Point (`LAMP`, `lampNow`, `lampLighting`): seven villagers gather (`eventSlotSouth`, checked first in `southSlot`); tap the lighthouse to watch Bram light it (before 7, waiting; after, the beam and a cheer).
+- Tests in the bottom-row block.

@@ -2,6 +2,9 @@
 // Green (south of home), the Stables (south of the orchard) and Lighthouse Point (south of the flower farm, where the
 // coast path ends). Small, calm things to do; nothing here is a way to make money. State: F.south.
 import { pick } from "../util.js";
+import { CARBOOT } from "../data/carboot.js";
+export { CARBOOT };
+import { icon } from "../art/icons.js";
 const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
 export const southState = F => { F.south = F.south || {}; const s = F.south;
@@ -147,7 +150,7 @@ const BAND_LAWN = [[290, 300], [340, 296], [420, 300], [460, 288], [320, 330], [
 const CRICKET_LAWN = [[300, 440], [360, 470], [420, 500], [330, 520], [400, 430], [290, 500]];
 const CLIFF_WALK = [[200, 300], [300, 380], [380, 330], [250, 420], [180, 260]];
 export function southSlot(id, day, t){
-  const dw = dow(day), we = dw === 0 || dw === 6;
+  const dw = dow(day), we = dw === 0 || dw === 6, ev = eventSlotSouth(id, day, t); if (ev) return ev;
   if (dw === BAND.dow && t >= BAND.from && t < BAND.to && some(BAND_POOL, 6, day + ":band").includes(id)) return W(BAND.from, BAND.to, "green", BAND_LAWN);
   if (dw === CRICKET.dow && t >= CRICKET.from && t < CRICKET.to && some(CRICKET_POOL, 6, day + ":cricket").includes(id)) return W(CRICKET.from, CRICKET.to, "green", CRICKET_LAWN);
   // Gong Gong's allotment, Tuesday and Thursday mornings; Mei's on Saturdays
@@ -163,3 +166,43 @@ export function southSlot(id, day, t){
   if (t >= 18*60 && t < 19*60 && some(WALK_POOL, 1, day + ":lhe").includes(id)) return W(18*60, 19*60, "lighthouse", CLIFF_WALK);
   return null;
 }
+
+/* ---------- the car boot sale and the lamp lighting (round 271, Mel: "Car boot sale and lamp lighting") ---------- */
+// Sunday mornings, 8 till 12, on the green: two cars with their boots open and a trestle table. Four curios each week,
+// different every Sunday; keepsakes for the shelves at home, a few coins each. Buy each one once.
+export const BOOT = {dow: 0, from: 8*60, to: 12*60};
+export const bootNow = (day, hm) => dow(day) === BOOT.dow && hm >= BOOT.from && hm < BOOT.to;
+
+const CB_IDS = Object.keys(CARBOOT);
+// this Sunday's four (the same all morning, different next week)
+export function bootFinds(day){ return some(CB_IDS, 4, "boot:" + day); }
+export function buyFind(F, id, day){
+  const it = CARBOOT[id], s = southState(F); if (!it || !bootFinds(day).includes(id)) return null;
+  s.boot = s.boot && s.boot.day === day ? s.boot : {day, got: []};
+  if (s.boot.got.includes(id)) return {line: "You've already bought that one."};
+  if ((F.coins || 0) < it.price) return {line: `That's ${it.price} coins.`};
+  F.coins -= it.price; s.boot.got.push(id); F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1;
+  return {ok: true, line: pick([`"${it.n}? ${it.price} coins to you." Wrapped in yesterday's Gazette.`, `You haggle a little, out of politeness. ${it.price} coins, and a smile.`, `"Oh, that was my nan's. She'd love it going to a good home." ${it.price} coins.`])};
+}
+export function bootPanel(F, day){
+  const s = southState(F), got = s.boot && s.boot.day === day ? s.boot.got : [];
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>The car boot sale</h2><p class="sub">Two car boots and a trestle table on the green. Everything's a few coins; most of it's wonderful.</p><ul class="hlist wlist">${bootFinds(day).map(id => { const it = CARBOOT[id], had = got.includes(id);
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(it.n)}</b><small>${esc(it.line)}</small></span><button class="btn small ${had ? "alt" : "primary"}" data-boot="${id}"${had || (F.coins || 0) < it.price ? " disabled" : ""}>${had ? "Yours" : it.price + " coins"}</button></li>`; }).join("")}</ul>
+    <p class="muted">Keepsakes: put them on a shelf at home from your backpack.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+// Monday evenings: the lamp lighting. Half the village walks down to Lighthouse Point to watch Bram light the lamp.
+export const LAMP = {dow: 1, from: 18*60 + 30, to: 19*60 + 30, lit: 19*60};
+export const lampNow = (day, hm) => dow(day) === LAMP.dow && hm >= LAMP.from && hm < LAMP.to;
+export function lampLighting(F, day, hm){
+  const s = southState(F), first = s.lamp !== day; s.lamp = day;
+  if (hm < LAMP.lit) return {line: "Everyone's gathered at the foot of the lighthouse, hands in pockets, waiting. Bram's up the stairs. A hush, then a little cheer when his torch shows in the lamp room window.", first};
+  return {line: pick(["The lamp catches, the great lens starts to turn, and the beam sweeps out over the sea. Everyone cheers, as if it's the first time. Bram waves from the gallery.", "Click, a flicker, then the light, steady and gold, turning out over the water. Somebody starts clapping and everyone joins in."]), first};
+}
+const LAMP_POOL = ["hana", "juniper", "opal", "theo", "farid", "mei", "amara", "noor", "sofia", "felix", "elena", "wren"];
+const BOOT_POOL = ["hana", "opal", "mei", "amara", "sofia", "theo", "noor", "juniper"];
+export function eventSlotSouth(id, day, t){
+  if (lampNow(day, t) && some(LAMP_POOL, 7, day + ":lamp").includes(id)) return W(LAMP.from, LAMP.to, "lighthouse", [[200, 470], [250, 440], [300, 470], [230, 500], [280, 420]]);
+  if (bootNow(day, t) && some(BOOT_POOL, 5, day + ":boot").includes(id)) return W(BOOT.from, BOOT.to, "green", [[290, 400], [340, 396], [400, 402], [360, 410]]);
+  return null;
+}
+
