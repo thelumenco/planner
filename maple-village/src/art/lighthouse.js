@@ -38,7 +38,10 @@ export function lighthouseArt(night){
 
   // the lighthouse: white tower, two red bands, a black lamp room with a gallery rail, on rocks on the headland
   const lamp = night ? "#FFD98A" : "#CFE0EE";
-  const beam = night ? `<g pointer-events="none"><path d="M112 372 L0 300 L0 420z" fill="#FFE9A0" opacity=".28"/><path d="M112 378 L0 470 L0 520z" fill="#FFE9A0" opacity=".14"/><circle cx="120" cy="372" r="22" fill="#FFE9A0" opacity=".35"/></g>` : "";
+  // round 269 (Mel: "Add the lighthouse glow"): at night the lamp, its halo and the beam are tagged nglow, so core.js
+  // copies them above the evening darkening (like neon and fairy lights) and they shine instead of going dim
+  const beam = night ? `<g class="nglow" pointer-events="none"><path d="M112 372 L0 296 L0 424z" fill="#FFE9A0" opacity=".34"/><path d="M112 378 L0 466 L0 524z" fill="#FFE9A0" opacity=".18"/>
+    <circle cx="120" cy="373" r="34" fill="#FFE9A0" opacity=".22"/><circle cx="120" cy="373" r="20" fill="#FFE9A0" opacity=".4"/><rect x="110" y="362" width="20" height="22" rx="2" fill="#FFD98A"/><circle cx="120" cy="373" r="5" fill="#FFF6D8"/></g>` : "";
   const tower = "M104 500 L110 392 H130 L136 500z";
   const light = `<g data-place="llight" aria-label="The lighthouse"><ellipse class="hov" cx="140" cy="520" rx="46" ry="12" style="fill:var(--butter)"/>
     ${sk(`${rock(92, 510, 30, 14)}${rock(150, 514, 26, 12, "#A99D8C")}${rock(70, 486, 18, 10, "#A99D8C")}${rock(120, 502, 36, 10, "#CFC8BE")}
@@ -73,7 +76,7 @@ export function lighthouseArt(night){
   // the fish and chip hatch: a little kiosk with a striped awning, a hatch and a chalkboard
   const awn = Array.from({length: 7}, (_, i) => `<path d="M${394 + i*10} 430 h10 v10 q-5 5 -10 0z" style="fill:${i % 2 ? "#FFFDF6" : "#7FB8E8"}"/>`).join("");
   const chips = `<g data-place="lchips" aria-label="The fish and chip hatch"><ellipse class="hov" cx="430" cy="505" rx="46" ry="10" style="fill:var(--butter)"/>
-    ${sk(`<path d="M394 420 L430 400 L466 420z" style="fill:#3E6B8C"/><rect x="398" y="420" width="64" height="70" style="fill:#EAF2F5"/>${awn}<rect x="408" y="446" width="44" height="22" rx="2" style="fill:#F6E3A6"/><rect x="404" y="468" width="52" height="5" style="fill:var(--wood)"/>
+    ${sk(`<path d="M394 420 L430 400 L466 420z" style="fill:#3E6B8C"/><rect x="398" y="420" width="64" height="70" style="fill:#EAF2F5"/>${awn}<rect class="wglow" x="408" y="446" width="44" height="22" rx="2" style="fill:#F6E3A6"/><rect x="404" y="468" width="52" height="5" style="fill:var(--wood)"/>
       <rect x="470" y="462" width="20" height="26" rx="2" style="fill:#4A4642"/>`,
       `<path d="M394 420 L430 400 L466 420z"/><rect x="398" y="420" width="64" height="70"/><path d="M394 430 h70"/><rect x="408" y="446" width="44" height="22" rx="2"/><rect x="404" y="468" width="52" height="5"/>
       <rect x="470" y="462" width="20" height="26" rx="2"/><path d="M472 488 l-3 6 M488 488 l3 6"/>`)}

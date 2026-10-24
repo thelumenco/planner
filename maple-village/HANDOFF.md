@@ -2763,3 +2763,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 268: the river fork in the vineyard (Mel: "The overlap between the wide river and the little stream is weird. That's not how nature would work")
 - art/vineyard.js: the separate river blob is gone. One shape at the top left: the stream from Makers' Lane widens into the river, which leaves by the west edge (y 44 to 98, meeting home's river), and a narrower branch carries on down the left side. Continuous banks, no overlap, and long gentle curves where it widens and narrows (Mel: "not at right angles but more of natural curves").
+
+## Round 269: the lighthouse glow (Mel: "Add the lighthouse glow")
+- art/lighthouse.js: at night (7pm to 6am) the lamp, a soft double halo and the two beams are one `nglow` group, which core.js `nightLights` copies above the evening darkening, so it shines instead of going dim. The fish and chip hatch's window is `wglow` (lit 7 to 11pm, like the other windows).
