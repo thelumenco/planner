@@ -3408,7 +3408,7 @@ function arriveVillageSpot(id){
   if (id === "timetable" && scene === "hlane") { railOpen = true; sfx("paper", true); render(); return; }
   if (SOUTH_SPOTS.includes(id)) { southSpot(id); return; }
   if (id === "ranger") { woodsView = "ranger"; sfx("paper", true); if (isHere("wren")) npcSay("wren", pick(["Morning! Mind the roots on the top trail.", "Kettle's on. Have you been to the lookout yet?", "The pool's full of trout this week."])); render(); return; }
-  if (id === "bikeswoods" || id === "bikesst" || id === "bikesvillage") { woodsView = "bike"; sfx("paper", true); render(); return; }
+  if (id === "bikeswoods" || id === "bikesst" || id === "bikesvillage" || id === "bikesgreen" || id === "bikeslight") { woodsView = "bike"; sfx("paper", true); render(); return; }
   if (TAXI_STOPS[id]) { woodsView = id; sfx("paper", true); render(); return; }
   if (id === "forage") { const r = forage(F, addInv); if (!r) { speak("You've foraged here today. Come back tomorrow: the woods need time to grow back.", 4000); render(); return; }
     sfx("chime"); gainXp(1); act("cheer"); speak(`${r.line} +${r.n} ${ITEMS[r.id].n.toLowerCase()} in your backpack.`, 5500); mprop("sparkle", mel.x, mel.y - 60, 1600); if (evanHere()) setTimeout(() => evanSays(pick(["I found one!", "In the basket!", "Can I eat it?"])), 1200); save(); render(); return; }
@@ -3444,7 +3444,7 @@ function arriveVillageSpot(id){
   if (id === "jazzhat") { tipBand(); return; }
   if (id === "xgrotto") { fieldView = "xgrotto"; sfx("paper", true); if (evanHere()) evanSays(pick(["Santa?!", "is he IN there?", "Mama, hold my hand"])); render(); return; }
   if (id === "xtree") { fieldView = "xtree"; sfx("paper", true); if (treeLit(dayKey(), sgHM(), F)) mprop("heart", mel.x, mel.y - 60, 1600); render(); return; }
-  if (id === "suprack" || id === "homejetty") { goalView = "jetty"; sfx("paper", true); render(); return; }
+  if (id === "suprack" || id === "homejetty" || id === "lsup") { goalView = "jetty"; sfx("paper", true); render(); return; }
   if (id === "ferry") { railOpen = "ferry"; tripPick = []; sfx("paper", true); render(); return; }   // round 127: the Jeju ferry's ticket board
   if (id === "wishtower") { const w = F.wish = F.wish || {n: 3}; if (w.day === dayKey()) { speak("You've added your stone today. The wish is in there now: it just needs time.", 4000); render(); return; }
     w.day = dayKey(); if (w.n < 9) w.n++; sfx("chime"); gainXp(1); speak(pick(["You find a flat black-ish pebble by the river, balance it on top, and make a wish. Don't tell anyone what it was.", "Clack. One more stone on the tower. A wish for today.", "Very carefully... there. The tower's a little taller, and so is the wish."]), 5000);
@@ -4051,19 +4051,19 @@ function familyPaddle(){
 }
 // Paddling between the home jetty and the foreshore: the river, the lake and the stream join them. Board on, a blink,
 // and Mel steps off by the other jetty (Evan and Maple too)
-const JETTY = {shore: [216, 500], base: [150, 134]};
+const JETTY = {shore: [216, 500], base: [150, 134], lighthouse: [400, 552]};
 function paddleTo(dest){
   if (paddling || sup) return;
   const m = sgHM(); if (m >= 22*60 || m < 6*60) { speak("Too dark to paddle the river now. Walk tonight, paddle in the morning.", 3500); render(); return; }
-  const kid = evanHere(), off = scene === "shore" ? [[104, 372], [132, 404]] : [[124, 84], [96, 88]]; paddling = true; route = []; atSpot = null; mel.path = []; mel.sitting = false;
+  const kid = evanHere(), off = scene === "shore" ? [[104, 372], [132, 404]] : scene === "lighthouse" ? [[412, 612], [380, 618]] : [[124, 84], [96, 88]]; paddling = true; route = []; atSpot = null; mel.path = []; mel.sitting = false;
   mel.x = mel.tx = off[0][0]; mel.y = mel.ty = off[0][1]; maple.x = maple.tx = off[0][0] + 6; maple.y = maple.ty = off[0][1] - 2; nodes.mel.classList.remove("sit"); nodes.mel.classList.add("sup");
   if (kid) { evan.x = evan.tx = off[1][0]; evan.y = evan.ty = off[1][1]; evan.rk = off[1].join(","); evan.path = [off[1]]; evan.run = false; evan.wait = 99; evan.target = null; nodes.evan.classList.add("sup"); }
-  sfx("paper", true); speak(dest === "shore" ? (kid ? "Boards on! Evan's kneeling on his, Maple's on yours. Off down the river." : "Board on, Maple on the front. Off down the river.") : (kid ? "Boards on! Up the stream, across the lake and home." : "Board on. Up the stream and home."), 2500);
+  sfx("paper", true); speak(dest === "lighthouse" ? (kid ? "Boards on! Evan kneels on his, Maple rides on yours. Down the coast, past the cliffs." : "Board on, Maple on the front. Down the coast, past the cliffs.") : dest === "shore" ? (kid ? "Boards on! Evan's kneeling on his, Maple's on yours. Off down the river." : "Board on, Maple on the front. Off down the river.") : (kid ? "Boards on! Up the stream, across the lake and home." : "Board on. Up the stream and home."), 2500);
   setTimeout(() => {
     nodes.mel.classList.remove("sup"); nodes.evan.classList.remove("sup"); paddling = false;
     setScene(dest, JETTY[dest]);
     setTimeout(() => { if (evanHere()) { evan.x = evan.tx = JETTY[dest][0] + 26; evan.y = evan.ty = JETTY[dest][1] + 10; evan.run = false; evan.wait = 3; }
-      speak(dest === "shore" ? "Out at the foreshore. Salty air, and the dolphins are about." : "Home! Boards back on the rack.", 3500); }, 450);
+      speak(dest === "shore" ? "Out at the foreshore. Salty air, and the dolphins are about." : dest === "lighthouse" ? "Round the headland to Lighthouse Point. Boards up on the rack by the jetty." : "Home! Boards back on the rack.", 3500); }, 450);
   }, 1300);
 }
 // The dolphin cruise (once the boat's bought): the boat sails up the coast and back with Mel, Evan and Maple aboard

@@ -2756,3 +2756,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - The lower vineyard's misty valley is now the sea; its stream runs across the sand into it; the "valley bench" is the "sea bench" (walking to "valley bench" still works).
 - The Stables' paddock sits 26 higher (door [214,394], obstacle [230,354,500,574]) so its fence stays on the sand; gate labels drawn after it. The green's bottom trees moved up off the beach.
 - The vineyard: the wide river from home shows at the top left (x 0 to 34, y 44 to 98), meeting the stream down its left edge.
+
+## Round 267: bike hire and a paddleboard jetty on the bottom row (Mel: "one or some of the new screens need the bike hire. And a paddleboard jetty too at the lighthouse screen")
+- transport.js `transportArt`: bike racks `bikesgreen` (green, by the pond path) and `bikeslight` (Lighthouse Point, mid-screen); same bike panel as the others.
+- `supJetty()` at Lighthouse Point (`lsup`): a jetty out into the bottom sea and a board rack. Its jetty panel (goals.js `jettyPanel("lighthouse")`) paddles to the foreshore or home; the foreshore's panel gains "Paddle to Lighthouse Point". `JETTY.lighthouse`, and `paddleTo` lines for the coast.

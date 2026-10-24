@@ -5142,6 +5142,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="spaddock"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pony="feed:biscuit"]', { timeout: 20000 });
   await page.click('#ctx [data-pony="feed:biscuit"]'); await page.waitForTimeout(400);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).south.ponies.biscuit.trust === 2), "at the paddock: an apple for Biscuit");
+  await page.click("#pclose").catch(() => {});
+  await page.evaluate(() => window.__mapleScene("lighthouse")); await page.waitForTimeout(600);
+  check(await page.locator('#world [data-place="bikeslight"]').count() === 1, "bike hire at Lighthouse Point (and on the green)");
+  await page.locator('#world [data-place="lsup"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 20000 });
+  await page.click('#ctx [data-sup="shore"]'); await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "the paddleboard jetty at Lighthouse Point: paddle up the coast to the foreshore");
   await page.close();
 }
 await browser.close();

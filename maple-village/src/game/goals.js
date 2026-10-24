@@ -69,9 +69,11 @@ export function garagePanel(F){
 // paddle down the river and out to the foreshore (Evan and Maple come too)
 export function jettyPanel(where, evan){
   const fam = evan ? "Evan and Maple hop on with you." : "Maple hops on the front of your board.";
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${where === "shore" ? "The paddleboards" : "Your little jetty"}</h2>`;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${where === "shore" || where === "lighthouse" ? "The paddleboards" : "Your little jetty"}</h2>`;
+  // round 267: Lighthouse Point's jetty, along the coast from the foreshore
+  if (where === "lighthouse") return h + `<p class="sub">Up the coast, past the cliffs at the bottom of the flower farm, to the foreshore? Or the long way home, up the stream and down the river. ${fam}</p><div class="actions"><button class="btn primary" data-sup="shore">Paddle to the foreshore</button><button class="btn alt" data-sup="base">Paddle home</button></div><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   h += where === "shore"
-    ? `<p class="sub">A paddle about with the dolphins, or up the stream, across the lake and down the river home?</p><div class="actions"><button class="btn primary" data-sup="play">Paddle about</button><button class="btn alt" data-sup="base">Paddle home</button></div>`
+    ? `<p class="sub">A paddle about with the dolphins, or up the stream, across the lake and down the river home? Or down the coast to Lighthouse Point.</p><div class="actions"><button class="btn primary" data-sup="play">Paddle about</button><button class="btn alt" data-sup="base">Paddle home</button><button class="btn alt" data-sup="lighthouse">Paddle to Lighthouse Point</button></div>`
     : `<p class="sub">Down the river, across the lake and out along the stream to the sea. ${fam}</p><div class="actions"><button class="btn primary" data-sup="shore">Paddle to the foreshore</button></div>
       <p class="sub" style="margin-top:14px">The river taxi stops here too (7am to 9pm): up to the woods, Makers' Lane, the lake and the foreshore.</p><div class="actions"><button class="btn alt" data-taxiopen="taxihome">Take the river taxi</button></div>`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
