@@ -114,8 +114,8 @@ export function vineyardArt(){
     <g filter="url(#wob)" fill="none" opacity=".45" style="stroke:var(--moss2)" stroke-width="3" stroke-dasharray="2 7">${[24, 44, 64].map(y => `<path d="M190 ${y} Q300 ${y - 8} 510 ${y + 4}"/>`).join("")}</g>
     <g filter="url(#wob)"><path d="M14 0 C6 110 26 210 16 300 C8 390 28 500 14 640" fill="none" style="stroke:var(--water)" stroke-width="16"/><path d="M8 0 C0 110 20 210 10 300 C2 390 22 500 8 640 M22 0 C14 110 34 210 24 300 C16 390 36 500 22 640" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".5"/></g>
     <path class="ripple" d="M10 150 q4 -3 8 0 M14 460 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>
-    <g filter="url(#wob)"><path d="M6 0 H24 C30 24 40 44 38 66 C36 90 30 108 24 124 H8 C9 112 6 104 0 98 V44 C4 34 6 20 6 0Z" style="fill:var(--water)"/>
-      <path d="M24 0 C30 24 40 44 38 66 C36 90 30 108 24 124 M6 0 C6 20 4 34 0 44 M0 98 C6 104 9 112 8 124" fill="none" style="stroke:var(--line)" stroke-width="1.2" opacity=".6"/></g>
+    <g filter="url(#wob)"><path d="M6 0 H24 C26 22 36 38 40 62 C44 92 34 126 26 160 C24 170 24 180 25 190 H9 C9 172 8 150 4 132 C2 120 0 112 0 106 V36 C2 24 6 12 6 0Z" style="fill:var(--water)"/>
+      <path d="M24 0 C26 22 36 38 40 62 C44 92 34 126 26 160 C24 170 24 180 25 190 M6 0 C6 12 2 24 0 36 M0 106 C0 112 2 120 4 132 C8 150 9 172 9 190" fill="none" style="stroke:var(--line)" stroke-width="1.2" opacity=".6"/></g>
     <path class="ripple" d="M10 64 q4 -3 8 0 M18 84 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>
     <g filter="url(#wob)"><path d="M24 300 H486 M112 300 V238 M390 300 V222 M186 300 C186 400 190 480 210 548 M290 0 C296 100 284 200 296 300" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[30,140,"#EFA3A6"],[200,140,"#F3C969"],[480,250,"#C3CDEE"],[490,330,"#EFA3A6"],[150,350,"#F3C969"],[40,520,"#C3CDEE"],[480,520,"#F3C969"],[300,250,"#EFA3A6"]])}
