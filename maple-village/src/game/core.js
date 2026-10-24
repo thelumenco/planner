@@ -3593,7 +3593,14 @@ function bubbleAt(el, ex, ey, off, forceBelow){
   el.style.top = (below ? (ey + 8)*sc + cam.oy + 10 : py - 10) + "px";
 }
 let last = performance.now();
+// round 231: the next frame is asked for first, and an error in one frame is logged and skipped, so nothing can ever
+// freeze the character in place
+let frameErr = 0;
 function frame(now){
+  requestAnimationFrame(frame);
+  try { frameBody(now); } catch (e) { if (frameErr++ < 3) console.error("frame", e); }
+}
+function frameBody(now){
   const dt = Math.min(.05, (now - last)/1000); last = now;
   if (keys.size) {
     const v = 190*dt, b = bounds(); let dx = 0, dy = 0;
@@ -3648,7 +3655,6 @@ function frame(now){
   const close = Math.hypot(chum.x - hero.x, chum.y - hero.y) < 60;
   bubbleAt($("speech"), close ? (chum.x*0.35 + hero.x*0.65) : chum.x, close ? Math.min(chum.y, hero.y) : chum.y, close ? 76 : (sleeping ? 18 : 30));
   bubbleAt($("melSay"), hero.x, hero.y, 70);
-  requestAnimationFrame(frame);
 }
 
 /* =================== WIRING =================== */
@@ -3663,11 +3669,13 @@ $("pet").onclick = () => { petSound(); hearts(2); speak(pick(["*leans into the p
 document.querySelectorAll("[data-ico]").forEach(el => el.insertAdjacentHTML("afterbegin", icon(el.dataset.ico, +el.dataset.size || 20)));
 $("pclose").onclick = closePanel;
 // Speech bubbles close with a tap (the next thing anyone says brings them back)
-// Tapping a speech bubble closes it, and if someone's standing under it (Penny with the post, a villager), the tap
-// reaches them too: a bubble shouldn't make the person beneath it untappable.
+// Tapping a speech bubble closes it, and the tap goes on to whatever's beneath: someone standing under it (Penny with
+// the post, a villager), a place, or the floor to walk to. (Round 231: "at the gift store the character stopped
+// moving": with shoppers, Posy and the post all chatting, taps on the floor kept landing on bubbles and went nowhere.)
 ["speech", "npcSay", "melSay"].forEach(id => $(id).addEventListener("click", ev => { ev.stopPropagation(); $(id).hidden = true;
   const under = document.elementFromPoint(ev.clientX, ev.clientY), who = under && under.closest("#actors [data-npc], #actors [data-ent]");
-  if (who) who.dispatchEvent(new MouseEvent("click", {bubbles: true, clientX: ev.clientX, clientY: ev.clientY})); }));
+  const to = who || (under && under.closest("#map") && !under.closest("#speech, #npcSay, #melSay") ? under : null);
+  if (to) to.dispatchEvent(new MouseEvent("click", {bubbles: true, clientX: ev.clientX, clientY: ev.clientY})); }));
 $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
 $("setVol").oninput = e => setMusicVol(+e.target.value);
