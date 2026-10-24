@@ -14,7 +14,7 @@ export function lowerVineArt(v){
     <path class="ripple" d="M12 180 q4 -3 8 0 M16 470 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>
     <g filter="url(#wob)"><path d="M502 0 C494 100 498 200 490 300 C484 400 478 480 430 560 C400 590 360 596 330 600 M490 300 C420 304 300 300 180 300 C150 300 130 310 118 330" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"/></g>
     ${flowers([[60, 90, "#EFA3A6"], [150, 200, "#F3C969"], [470, 180, "#C3CDEE"], [90, 420, "#EFA3A6"], [160, 520, "#F3C969"], [480, 420, "#EFA3A6"], [200, 120, "#C3CDEE"]])}
-    ${tree(60, 96, .8)}${tree(220, 70, .7)}${tree(60, 560, .8)}`;
+    ${tree(60, 96, .8)}${tree(220, 70, .7)}${tree(150, 530, .75)}`;
   // round 266: the sea along the bottom, carried on from Lighthouse Point (it used to be a misty valley)
   const shore = southShore();
   const up = `<g data-place="toVineD" aria-label="Path up to the vineyard"><ellipse class="hov" cx="498" cy="26" rx="26" ry="18" style="fill:var(--butter)"/>
@@ -38,8 +38,11 @@ export function lowerVineArt(v){
   const west = `<g data-place="toGreenV" aria-label="Footbridge to Honeybrook Green"><ellipse class="hov" cx="24" cy="330" rx="28" ry="20" style="fill:var(--butter)"/>
     ${sk(`<rect x="0" y="318" width="48" height="18" rx="2" style="fill:#C9A27E"/>`, `<rect x="0" y="318" width="48" height="18" rx="2"/><path d="M10 318 v18 M20 318 v18 M30 318 v18 M40 318 v18" opacity=".5"/><path d="M0 314 h48" stroke-width="2"/>`)}
     ${tapeLabel(64, 362, "The green", "var(--sage)", 10)}</g>`;
-  // the stream runs out across the sand into the sea
-  const mouth = `<g filter="url(#wob)" pointer-events="none"><path d="M20 520 C24 556 22 578 34 606" fill="none" style="stroke:var(--water)" stroke-width="16" stroke-linecap="round"/><path d="M13 520 C17 556 15 578 27 606 M27 520 C31 556 29 578 41 606" fill="none" style="stroke:var(--line)" stroke-width="1.2" opacity=".6"/></g>`;
+  // round 278 (Mel: "the same as how we did it for the bay, where it widens and enters the sea"): the stream crosses
+  // the sand and fans out into a little river mouth where it meets the sea, like the river at the foreshore
+  const mouth = `<g filter="url(#wob)" pointer-events="none"><path d="M10 506 H30 C34 534 44 556 70 574 C88 586 104 594 112 600 H0 V506z" style="fill:var(--water)"/>
+    <path d="M30 506 C34 534 44 556 70 574 C88 586 104 594 112 600" fill="none" style="stroke:#FFFDF6" stroke-width="3" stroke-dasharray="9 6" opacity=".9"/><path d="M30 506 C34 534 44 556 70 574 C88 586 104 594 112 600" fill="none" style="stroke:var(--line)" stroke-width="1" opacity=".45"/>
+    <path class="ripple" d="M24 560 q4 -3 8 0 M50 584 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/></g>`;
   // round 276 (Mel): the press sits higher, clear of the footbridge
   return ground + shore + mouth + up + west + sign + `<g transform="translate(0 -120)">${press}</g>` + v.rows.slice(UPPER).map((row, k) => rowArt(row, UPPER + k)).join("") + bench;
 }

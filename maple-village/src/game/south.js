@@ -151,7 +151,7 @@ export const CHIP_MENU = {
   chips: {n: "A cone of chips", price: 4, line: "A paper cone of chips, too hot to hold. You blow on every one and burn your mouth anyway."},
   peas: {n: "Mushy peas", price: 2, line: "A little pot of mushy peas, bright green and very, very hot."}
 };
-export const CHIP_BUYS = ["fish", "mackerel", "sardine", "anchovy", "seabream", "mullet", "squid"], CHIP_CAP = 6;
+export const CHIP_BUYS = ["fish", "mackerel", "sardine", "anchovy", "seabream", "mullet", "squid", "b_clam", "b_mussel"], CHIP_CAP = 6;
 const chipSell = id => id === "fish" ? 3 : ((ITEMS[id] || {}).sell || 0);
 export function eatChips(F, k, withEvan){
   const m = CHIP_MENU[k]; if (!m) return null;
@@ -177,6 +177,25 @@ export function buyChips(F){
   if ((F.coins || 0) < CHIPS) return {line: `Fish and chips are ${CHIPS} coins.`};
   F.coins -= CHIPS;
   return {line: pick(["Hot chips and crisp battered cod, salt and vinegar, in paper. You eat them on the sea wall and fight off one very bold gull.", "A cone of chips, a piece of haddock, and a little wooden fork. The best thing you've eaten all week.", "Fish and chips, wrapped in paper, too hot to hold. You blow on every chip and burn your mouth anyway."]), ok: true};
+}
+
+/* ---------- beachcombing (round 278) ---------- */
+// Each day a couple of things wash up on each bottom-row beach, in different spots: shells (now and then a conch),
+// clams and mussels. Tap one to pick it up; it's gone till tomorrow's tide brings more.
+export const BEACH_SPOTS = {lighthouse: [130, 182, 352, 452, 492], stables: [56, 132, 206, 300, 420], green: [56, 140, 300, 420, 486], lowervine: [150, 220, 380, 456, 496]};
+const BEACH_Y = {lighthouse: 580, stables: 584, green: 580, lowervine: 580};
+export function beachFinds(F, scene, day){
+  const xs = BEACH_SPOTS[scene]; if (!xs) return [];
+  const got = (((F.south || {}).beach || {})[day]) || [];
+  return some(xs.map(String), 2, day + ":beach:" + scene).map(x => { const k = scene + ":" + x, h = hsh(day + k) % 20;
+    return {k, x: +x, y: BEACH_Y[scene], id: h === 0 ? "b_conch" : h < 9 ? "b_shell" : h < 15 ? "b_clam" : "b_mussel"}; }).filter(f => !got.includes(f.k));
+}
+export function pickBeach(F, scene, k, day){
+  const f = beachFinds(F, scene, day).find(x => x.k === k); if (!f) return null;
+  const s = southState(F); s.beach = s.beach && s.beach[day] ? s.beach : {[day]: []}; s.beach[day].push(k);
+  F.inv = F.inv || {}; F.inv[f.id] = (F.inv[f.id] || 0) + 1;
+  const line = {b_shell: "A seashell, ribbed and pink inside. Into your pocket it goes.", b_conch: "A spiral conch! You almost never find these here. You hold it to your ear: the sea.", b_clam: "You dig your fingers into the wet sand and come up with a handful of clams.", b_mussel: "A cluster of mussels on a rock, blue-black and shining. You twist a few off."}[f.id];
+  return {id: f.id, line};
 }
 
 /* ---------- the paddock panel ---------- */

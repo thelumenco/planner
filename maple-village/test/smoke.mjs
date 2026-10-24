@@ -5137,6 +5137,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(so.eatChips(F, "chips", false).ok && F.coins === 16 && so.sellCatch(F, "mackerel", d).ok && F.coins === 16 + 3, "Dot's hatch: a cone of chips to eat, and she buys your mackerel at the usual price");
     for (let i = 0; i < 5; i++) so.sellCatch(F, "mackerel", d); check(F.inv.mackerel === 1 && !so.sellCatch(F, "mackerel", d).ok, "six fish a day is her fryer full");
     check(so.plotLine("gonggong", false) && Object.keys(so.PLOT_LINES).length === 6, "six neighbours' plots at the allotments, each with something to say"); }
+  { const F = {coins: 0, inv: {}}, d = "2026-10-27", f = so.beachFinds(F, "lowervine", d);
+    check(f.length === 2 && so.beachFinds(F, "green", d).length === 2 && !so.beachFinds(F, "orchard", d).length, "beachcombing: a couple of finds wash up on each bottom-row beach every day");
+    const r = so.pickBeach(F, "lowervine", f[0].k, d); check(r && F.inv[r.id] === 1 && so.beachFinds(F, "lowervine", d).length === 1 && !so.pickBeach(F, "lowervine", f[0].k, d), "pick one up and it's yours (shells and conches for the shelf, clams and mussels for Dot); gone till tomorrow"); }
   check(w.nextHop("lighthouse", "lowervine") === "stables" && w.nextHop("lowervine", "lighthouse") === "green", "the bottom row joins up end to end");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`south pageerror: ${e.message}`));

@@ -24,3 +24,12 @@ export function carBootArt(){
   return `<g data-place="gboot" aria-label="The car boot sale"><g transform="translate(0 -10)"><ellipse class="hov" cx="348" cy="396" rx="90" ry="12" style="fill:var(--butter)"/>${car(286, 392, "#9FC3D9")}${table}${car(410, 392, "#F4C7CF")}</g>
     ${tapeLabel(348, 400, "Car boot sale", "var(--butter)", 10)}</g>`;
 }
+
+// round 278: the day's beach finds, little things on the sand to pick up
+export function beachArt(finds){
+  const pic = {b_shell: `<path d="M-6 2 Q0 -8 6 2z" style="fill:#F6E3C6"/><path d="M-3 2 L0 -5 M3 2 L0 -5" style="stroke:#C98A6A" stroke-width=".8"/>`,
+    b_conch: `<path d="M-6 3 Q-6 -6 2 -6 Q8 -4 5 3z" style="fill:#F3D9B0"/><path d="M-3 0 q3 -4 6 -1" fill="none" style="stroke:#C98A4A" stroke-width=".9"/>`,
+    b_clam: `<ellipse cx="0" cy="0" rx="6" ry="4" style="fill:#D9CFC0"/><path d="M-5 0 h10" style="stroke:#8A7A6A" stroke-width=".8"/>`,
+    b_mussel: `<ellipse cx="-2" cy="0" rx="6" ry="3" style="fill:#3A3A5A" transform="rotate(-20)"/><ellipse cx="4" cy="1" rx="5" ry="2.6" style="fill:#4A4A6A" transform="rotate(15)"/>`};
+  return finds.map(f => `<g data-shell="${f.k}" aria-label="Something on the sand" transform="translate(${f.x} ${f.y}) scale(1.35)"><ellipse class="hov" cx="0" cy="2" rx="14" ry="7" style="fill:var(--butter)"/><g style="stroke:var(--line)" stroke-width=".9">${pic[f.id]}</g><circle cx="0" cy="0" r="14" fill="transparent"/></g>`).join("");
+}
