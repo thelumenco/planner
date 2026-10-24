@@ -5203,6 +5203,46 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(t && /Grey Pony/.test(t.lines.join(" ")) && F.inv.s_ponypoem === 1, "once Pebble trusts you, Theo shows you Juniper's poem about her"); }
   check(!/[\u2013\u2014]/.test(JSON.stringify([sd.STORIES.bram, so.TALES, so.STORY_FINDS])), "no dashes in the new chapters");
 }
+{
+  // round 283 (Mel: "Riding pony, Bram's cottage"): riding your own pony about the village, and Bram's cottage
+  console.log("\nRiding your pony and Bram's cottage (round 283)");
+  const so = await import(new URL("../src/game/south.js", import.meta.url)), gl = await import(new URL("../src/game/goals.js", import.meta.url));
+  const day = "2026-10-24";
+  { const F = {coins: 200, south: {mine: {name: "Clover", since: day}}}; so.southState(F);
+    check(!so.saddleUp(F, day, 10*60).ok && /saddle and bridle/.test(so.saddleUp(F, day, 10*60).line), "no riding without tack");
+    check(so.buyTack(F).ok && F.coins === 200 - so.TACK && !so.buyTack(F).ok, "tack from the tack room, once (" + so.TACK + " coins)");
+    check(!so.saddleUp(F, day, 10*60).ok, "she has to know you first");
+    F.south.ponies.mine.trust = so.RIDE_TRUST;
+    check(!so.saddleUp(F, day, 20*60).ok, "no riding after dark");
+    const r = so.saddleUp(F, day, 10*60);
+    check(r.ok && so.riding(F) && gl.ride(F) === "pony" && gl.rideSpeed(F) > 1 && !so.saddleUp(F, day, 10*60 + 5).ok, "saddle up: you're riding her (a bit quicker than walking)");
+    const c = so.canter(F, day, "lighthouse", "low");
+    check(c && /canter|sand/.test(c.line) && F.south.ponies.mine.trust === so.RIDE_TRUST + 1 && !so.canter(F, day, "stables", "low") && !so.canter(F, "2026-10-25", "vineyard", "low"), "a canter on the sand once a day, and she likes you more for it");
+    check(so.unsaddle(F).ok && !so.riding(F) && gl.ride(F) !== "pony" && !so.saddleUp(F, day, 11*60).ok, "bring her home, and that's the ride for today");
+    check(so.saddleUp(F, "2026-10-25", 18*60 + 30).ok && F.south.hack.until - Date.now() <= 30*60000 + 5000, "a ride late in the day ends at 7"); }
+  { const F = {coins: 0, vine: {lower: "2026-10-01"}};
+    check(/kettle's cold/.test(so.bramSpot(F, "kettle", day, false, false).line), "no tea when Bram's out");
+    const t = so.bramSpot(F, "kettle", day, true, true);
+    check(t.ok && /lower rows/.test(t.line) && /Evan/.test(t.line) && !so.bramSpot(F, "kettle", day, true, false).ok, "tea with Bram once a day: he asks after the lower rows, and finds Evan a biscuit");
+    const l1 = so.bramSpot(F, "log", day, false, false);
+    check(l1.ok && l1.line.includes(so.LOGBOOK[0]) && !so.bramSpot(F, "log", day, false, false).ok && so.bramSpot(F, "log", "2026-10-25", false, false).line.includes(so.LOGBOOK[1]), "his father's logbook, a page a day");
+    check(so.LOGBOOK.some(e => /priory boat/.test(e)) && so.LOGBOOK.some(e => /vines/.test(e)), "the logbook has the vines below the press and the priory boat in it");
+    check(["ship", "window", "fire"].every(k => so.bramSpot(F, k, day, true, false).line), "the ship in a bottle, the window and the fire"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`bramcot pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=15:30&date=2026-10-24"); await page.waitForTimeout(800);
+  await page.goto(url + "?nosample=1&time=15:30&date=2026-10-24"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("lighthouse")); await page.waitForTimeout(600);
+  await page.locator('#world [data-place="lbram"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Bram's cottage/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(800);
+  check(await page.locator('#world [data-bspot]').count() === 5 && await page.locator('#world .flame').count() > 0, "Bram's cottage by the lighthouse: the fire's lit when he's in at three");
+  await page.locator('#world [data-bspot="kettle"]').dispatchEvent("click"); await page.waitForTimeout(3500);
+  check(/mug|tea|pot/i.test(await page.locator("#speech").innerText().catch(() => "")), "and he makes you a cup of tea");
+  await page.locator('#world [data-exit="lighthouse"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Lighthouse Point/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "out the door, back on the point");
+  await page.close();
+}
 await browser.close();
 if (errors.length) { console.log("\n" + errors.join("\n")); process.exit(1); }
 console.log("\nall good");

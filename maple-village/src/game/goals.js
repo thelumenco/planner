@@ -6,7 +6,7 @@ import { trolleyPace } from "./scoop.js";
 //   boat     a dolphin cruise boat moored at the jetty on the foreshore
 //   cellar   a cellar door extension off the wine shop: barrel racks, a tasting bar, Mel's wine wall (and a few more visitors)
 // Owned goals live in F.goals; how Mel gets about (walk / scooter / car) in F.ride.
-import { esc } from "../util.js";
+import { esc, now } from "../util.js";
 import { icon } from "../art/icons.js";
 
 export const GOALS = {
@@ -25,8 +25,8 @@ export const GOALS = {
 };
 export const owns = (F, k) => !!(F.goals && F.goals[k]);
 // how much faster Mel moves outdoors, and on what
-export const ride = F => { if (F.scoop && F.scoop.trolley) return "walk"; if (bikeOn(F)) return "bike"; const r = F.ride; return r === "car" && owns(F, "car") ? "car" : r === "scooter" && owns(F, "scooter") ? "scooter" : r === "walk" ? "walk" : owns(F, "car") ? "car" : owns(F, "scooter") ? "scooter" : "walk"; };
-export const rideSpeed = F => ({walk: 1, bike: 1.3, scooter: 1.6, car: 2.5})[ride(F)]*trolleyPace(F);   // (pushing the ice cream trolley: slower, round 137)   // a hire bike (transport.js) for an hour
+export const ride = F => { if (F.scoop && F.scoop.trolley) return "walk"; if (F.south && F.south.hack && F.south.hack.until > now()) return "pony"; if (bikeOn(F)) return "bike"; const r = F.ride; return r === "car" && owns(F, "car") ? "car" : r === "scooter" && owns(F, "scooter") ? "scooter" : r === "walk" ? "walk" : owns(F, "car") ? "car" : owns(F, "scooter") ? "scooter" : "walk"; };
+export const rideSpeed = F => ({walk: 1, bike: 1.3, pony: 1.4, scooter: 1.6, car: 2.5})[ride(F)]*trolleyPace(F);   // (pushing the ice cream trolley: slower, round 137)   // a hire bike (transport.js) for an hour
 
 // -> a line to say, or null if it can't be bought (yet)
 export function buyGoal(F, k){

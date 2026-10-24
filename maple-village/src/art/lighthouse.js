@@ -2,6 +2,7 @@
 // west side and along the bottom, meeting at a rocky headland with the lighthouse on it. Beach huts on the dunes,
 // a fish and chip hatch, rock pools at the water's edge, and a stile east to the Stables.
 import { sk, tapeLabel, flowers } from "./scenes.js";
+import { bramCottageOut } from "./bramcot.js";
 
 // the sea: a strip x 0 to 60 at the top edge (joins the flower farm), out to the headland, then along the bottom
 const SEA = "M0 0 H60 C66 110 56 220 72 320 C80 370 64 410 50 440 C40 480 46 520 72 548 C110 582 170 596 240 596 C330 592 430 600 520 592 V640 H0Z";
@@ -88,5 +89,5 @@ export function lighthouseArt(night){
     `<rect x="300" y="486" width="48" height="7" rx="2"/><rect x="300" y="474" width="48" height="6" rx="2"/><path d="M304 493 v9 M344 493 v9 M304 480 v6 M344 480 v6"/>`)}</g>`;
 
   // round 276 (Mel): the lighthouse sits 36 higher, leaving room between it and the mackerel rocks
-  return ground + `<g transform="translate(0 -36)">${beam}</g>` + up + stile + huts + bench + chips + `<g transform="translate(0 -36)">${light}</g>` + pools;
+  return ground + `<g transform="translate(0 -36)">${beam}</g>` + up + stile + huts + bench + chips + bramCottageOut() + `<g transform="translate(0 -36)">${light}</g>` + pools;
 }

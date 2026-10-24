@@ -1,7 +1,7 @@
 // The bottom row of the village (rounds 262 to 264, Mel: "I want the game to become a 4 by 4 screen"): Honeybrook
 // Green (south of home), the Stables (south of the orchard) and Lighthouse Point (south of the flower farm, where the
 // coast path ends). Small, calm things to do; nothing here is a way to make money. State: F.south.
-import { pick } from "../util.js";
+import { pick, now } from "../util.js";
 import { CARBOOT } from "../data/carboot.js";
 import { ITEMS } from "../data/items.js";
 export { CARBOOT };
@@ -84,6 +84,81 @@ export function brushPony(F, id, day){
   if (p.brushed === day) return {line: `${P.n} is already gleaming. Any more brushing and she'll start to glow.`};
   p.brushed = day; p.trust = Math.min(TRUST_MAX, p.trust + 1);
   return {line: pick([`You brush ${P.n} from her ears to her tail. She leans into it and sighs.`, `Long, slow strokes with the soft brush. ${P.n}'s ${P.coat} coat starts to shine.`, `${P.n} stands very still while you brush her, one back hoof tipped up, dozing.`]), ok: true};
+}
+// round 283 (Mel: "Riding pony"): riding your own pony about the village. Tack from the tack room once; then, when she
+// knows you, saddle up at the stable block for an hour's ride (once a day, 7am to 7pm), out on every screen at home.
+// Evan rides up in front of you. She trots home to the stables on her own when the hour's up. State: s.tack, s.hack.
+export const TACK = 150, HACK_MIN = 60;
+export const riding = F => !!(F.south && F.south.hack && F.south.hack.until > now());
+export function buyTack(F){
+  const s = southState(F); if (!s.mine) return null; if (s.tack) return {line: "Her saddle and bridle are on her peg in the tack room already."};
+  if ((F.coins || 0) < TACK) return {line: `A saddle, bridle and riding hat are ${TACK} coins.`};
+  F.coins -= TACK; s.tack = true;
+  return {ok: true, line: `Lila helps you choose a saddle, a bridle and a riding hat, and hangs them on a peg with ${s.mine.name}'s name over it.`};
+}
+export function saddleUp(F, day, hm){
+  const s = southState(F), p = s.mine && s.ponies.mine; if (!p) return null;
+  if (!s.tack) return {line: `You'll need a saddle and bridle first. The tack room has them, ${TACK} coins.`};
+  if (p.trust < RIDE_TRUST) return {line: `${s.mine.name} doesn't quite know you yet. A few more days of treats and brushing (${p.trust} of ${RIDE_TRUST}).`};
+  if (hm < 7*60 || hm >= 18*60 + 45) return {line: `${s.mine.name}'s settled for the night. Ride her in the daytime, 7am to 7pm.`};
+  if (riding(F)) return {line: `You're already out on ${s.mine.name}.`};
+  if (s.hack && s.hack.day === day) return {line: `${s.mine.name}'s had her ride today. Tomorrow.`};
+  const mins = Math.min(HACK_MIN, 19*60 - hm); s.hack = {until: now() + mins*60000, day};
+  return {ok: true, line: `You tack up ${s.mine.name}, swing up into the saddle, and off you go at a gentle walk. She knows her own way home when you're done.`};
+}
+export function unsaddle(F){
+  const s = southState(F); if (!riding(F)) return null; s.hack.until = 0;
+  return {ok: true, line: `You slide down and give ${s.mine.name} a pat. She ambles back to the paddock, swishing her tail.`};
+}
+export function tackPanel(F, day){
+  const s = southState(F), n = esc(s.mine.name), p = s.ponies.mine, out = riding(F), left = out ? Math.max(1, Math.ceil((s.hack.until - now())/60000)) : 0;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The tack room</h2>`;
+  if (!s.tack) return h + `<p class="sub">Saddles on their racks, bridles on hooks, a rosette board, and the smell of leather soap. To ride ${n} out you'll want a saddle, a bridle and a riding hat of your own: ${TACK} coins.</p>
+    <div class="actions"><button class="btn primary" data-ride="tack"${(F.coins || 0) < TACK ? " disabled" : ""}>Buy her tack (${TACK} coins)</button><button class="btn alt small" data-close="1">Not yet</button></div>`;
+  const ready = p.trust >= RIDE_TRUST, done = s.hack && s.hack.day === day && !out;
+  return h + `<p class="sub">${n}'s saddle and bridle hang on her own peg. ${out ? `You're out riding: ${left} minute${left === 1 ? "" : "s"} left before she heads home.` : done ? "She's had her ride today." : ready ? "An hour's ride, anywhere at home, once a day. Evan can sit up in front of you." : `She needs to know you a little better first (${p.trust} of ${RIDE_TRUST} hearts).`}</p>
+    <div class="actions">${out ? `<button class="btn primary" data-ride="stop">Bring her home</button>` : `<button class="btn primary" data-ride="go"${ready && !done ? "" : " disabled"}>Saddle up</button>`}<button class="btn alt small" data-close="1">Close</button></div>`;
+}
+// out on the sand along the bottom row, once a day: a canter at low tide, a walk in the shallows at high
+export function canter(F, day, scene, tide){
+  const s = southState(F); if (!riding(F) || !SOUTH_BEACH.includes(scene) || s.hack.beach === day) return null;
+  s.hack.beach = day; const p = s.ponies.mine, n = s.mine.name; p.trust = Math.min(TRUST_MAX, p.trust + 1);
+  return {line: tide === "low" ? pick([`The tide's out and the sand's hard and wet. ${n} breaks into a canter all on her own, and you whoop.`, `A long canter along the wet sand, the sea flashing beside you. A seal pokes its head up to watch you go by.`])
+    : pick([`${n} splashes through the shallows, lifting her feet high like she's dancing.`, `You walk ${n} along the tideline. She stops to sniff a crab, and snorts at it.`])};
+}
+const SOUTH_BEACH = ["lighthouse", "stables", "green", "lowervine"];
+// round 283 (Mel: "Bram's cottage"): the keeper's cottage at the foot of the lighthouse. Tea with Bram when he's in
+// (he comes in for a cup at three), a page of his father's keeper's log a day, and the things on his shelves.
+export const LOGBOOK = [
+  "12 March. Wind north-west, fresh. Lamp lit 18.40. Planted twelve vines on the slope below the old press. Bram, aged six, helped, and ate some of the soil.",
+  "3 June. Calm. Lamp lit 21.15. The vines have their first leaves. The old press is sound; only wants a new beam.",
+  "28 September. Gale from the south-west all night. Lamp kept. Picked the first grapes this morning, wet through. Small and sweet. Made four bottles. Terrible. Drank them all.",
+  "14 October. Fog. Foghorn sounded 02.00 till 07.30. Bram asked why the light has to turn. Told him so the ships know it's ours and not another.",
+  "2 January. Clear, frost. Found a cross and a vine cut in the rock by the pools. The same mark as on the press. Priory work, I think.",
+  "19 August. Calm, a big moon. Old Ned at the harbour says his grandfather told of a priory boat lost off this point with a cargo of wine. Bram wants to dive for it. Told him when he's taller."
+];
+const TEA = ["Bram pours two mugs, strong enough to stand a spoon in, and tells you about the winter the harbour nearly froze. \"Well. Very nearly.\"",
+  "Tea and a ginger biscuit by the fire. Bram talks about the ships he's watched go by, and which ones always toot.",
+  "Bram makes the tea in a brown pot with a knitted cosy. You sit by the round window and watch the gulls, not saying much. It's lovely.",
+  "He warms the pot first, the proper way, and tells you the light's lamp was made in Birmingham in 1889. He's very proud of Birmingham."];
+export function bramSpot(F, id, day, home, withEvan){
+  const s = southState(F), b = s.bram = Object.assign({tea: "", log: 0, logDay: ""}, s.bram || {});
+  if (id === "kettle") {
+    if (!home) return {line: "The kettle's cold on the hob. Bram's out on the point; he's usually in for a cup around three."};
+    if (b.tea === day) return {line: "Bram tops up your mug without asking. \"There's always another cup in that pot.\""};
+    b.tea = day; const vines = F.vine && F.vine.lower && F.vine.lower !== "before";
+    return {ok: true, line: pick(TEA) + (vines ? " He asks how the lower rows are coming on, and looks very pleased with the answer." : "") + (withEvan ? " He finds Evan a biscuit from a tin shaped like a lighthouse and lets him wear his cap." : "")};
+  }
+  if (id === "log") {
+    if (b.log >= LOGBOOK.length) return {line: "You've read the whole of his father's logbook. You turn back to the page about the priory boat and read it again."};
+    if (b.logDay === day) return {line: "You've read a page today. Bram says a keeper's log keeps better a page at a time."};
+    b.logDay = day; const e = LOGBOOK[b.log++];
+    return {ok: true, line: `His father's keeper's log, in faded pencil: "${e}"`};
+  }
+  if (id === "ship") return {line: "A little ship in a bottle on the mantel, every rope and sail. Bram built it one winter with tweezers and a knitting needle. It took him four months, and he says he'd do it again."};
+  if (id === "window") return {line: pick(["The round window looks straight out to sea. A fishing boat's heading home, gulls trailing it like kite tails.", "From the window you can see right along the coast: the beach huts, the Stables, and a sliver of the lower vineyard."])};
+  if (id === "fire") return {line: home ? "A driftwood fire, crackling green and blue from the salt. Bram's boots are steaming gently in front of it." : "The fire's banked down low, waiting for Bram to come in and poke it back to life."};
+  return null;
 }
 // a pony ride round the sand ring for Evan, on Pebble (she's the steady one), once a day
 export function ponyRide(F, day, withEvan){
