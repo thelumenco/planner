@@ -3,9 +3,11 @@
 // the cricket lawn and the allotments. Paths cross in the middle, which stays open for walking.
 import { southShore } from "./southshore.js";
 import { sk, tapeLabel, tree, flowers } from "./scenes.js";
+import { lampGlow, lampDefs } from "./village-extras.js";
 
-// a little old lamp post (decoration only)
-const lamp = (x, y) => `<g pointer-events="none">${sk(`<rect x="${x-2}" y="${y-44}" width="4" height="44" style="fill:#5E6B72"/><path d="M${x-7} ${y-46} h14 l-3 -10 h-8z" style="fill:#FFF1C2"/><path d="M${x-8} ${y-56} h16 l-8 -6z" style="fill:#5E6B72"/><rect x="${x-5}" y="${y-2}" width="10" height="4" style="fill:#5E6B72"/>`,
+// a little old lamp post (decoration only); lit after dark like the village's street lamps (Mel: "The lampposts in the
+// village green aren't lit")
+const lamp = (x, y) => `<g pointer-events="none">${lampGlow(x, y - 51, 32)}${sk(`<rect x="${x-2}" y="${y-44}" width="4" height="44" style="fill:#5E6B72"/><path class="lglass" d="M${x-7} ${y-46} h14 l-3 -10 h-8z" style="fill:#FFF1C2"/><path d="M${x-8} ${y-56} h16 l-8 -6z" style="fill:#5E6B72"/><rect x="${x-5}" y="${y-2}" width="10" height="4" style="fill:#5E6B72"/>`,
   `<rect x="${x-2}" y="${y-44}" width="4" height="44"/><path d="M${x-7} ${y-46} h14 l-3 -10 h-8z M${x-8} ${y-56} h16 l-8 -6z"/>`)}</g>`;
 // a plain wooden bench (decoration only)
 const bench = (x, y) => `<g pointer-events="none">${sk(`<rect x="${x-22}" y="${y-14}" width="44" height="6" rx="2" style="fill:#B98A5A"/><rect x="${x-22}" y="${y-4}" width="44" height="7" rx="2" style="fill:#A8754F"/>`,
@@ -80,7 +82,7 @@ export function greenArt(){
       `<rect x="270" y="404" width="170" height="130" rx="14"/><path d="M398 440 h19 M398 440 v20 M404 440 v20 M410 440 v20 M416 440 v20 M400 439 h6 M408 439 h6"/><path d="M288 478 L338 470 L348 508 L296 516z"/><circle cx="380" cy="470" r="3"/>`)}
     ${tapeLabel(340, 582, "Cricket lawn", "var(--peach)", 10)}</g>`;
 
-  return ground + southShore() + home + allot + band + pond + lawn
+  return lampDefs + ground + southShore() + home + allot + band + pond + lawn
     + sideGate("toVineG", "Gate to the lower vineyard", 512, "Lower vines", "#E8B4C0", 1)
     + sideGate("toStablesG", "Gate to the Stables", 6, "The Stables", "var(--butter)", -1)
     + lamp(222, 304) + lamp(300, 304) + bench(470, 210) + bench(470, 380) + bench(52, 390);
