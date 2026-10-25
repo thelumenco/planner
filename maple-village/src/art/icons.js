@@ -422,11 +422,6 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
   [["mk_cards", "tile", "#FFFDF6", "#F4C7CF"], ["mk_spoon", "disc", "#C9A27E", "#8A5A3A"], ["mk_pettoy", "tile", "#C3CDEE", "#F4C7CF"], ["mk_bird", "bird", "#C9A27E"], ["mk_honeybutter", "jar", "#F3D98A", "#FFFDF6"], ["mk_wraps", "cloth", "#F6E3A1", "#9EBE8C"]].forEach(([id, sh, a, b]) => { if (!I[id]) I[id] = (S[sh] || S.box)(a, b); });
   // round 132: what Mel makes in the loft (game/loft.js)
   [["w_raisin", "bottle", "#C98A2E", "#5A3A2E"], ["raisins", "bag", "#6B3A2A", "#C9A27E"], ["limoncino", "bottle", "#F3D34A", "#FFFDF6"], ["anchovy_salt", "jar", "#9FC3D9", "#F3ECDD"]].forEach(([id, sh, a, b]) => { if (!I[id]) I[id] = (S[sh] || S.box)(a, b); });
-  // round 294: the bakehouse's bakes (game/bakery.js) and its butter
-  I.bk_loaf = S.loaf("#C98A4A"); I.bk_focaccia = S.loaf("#D9B060"); [["bk_croissant", "#E3A857"], ["bk_cinnabun", "#B8743E"], ["bk_turnover", "#E8B86A"], ["bk_scone", "#E6C27A"]].forEach(([id, c]) => { I[id] = S.bun(c); });
-  if (!I.butter) I.butter = S.bar("#F3E09A");
-  I.bk_oatbread = S.loaf("#C9A06A"); I.bk_prioryloaf = S.loaf("#6E2A3E"); [["bk_berrytart", "#C8506A"], ["bk_pearcake", "#D8B26A"], ["bk_hotcross", "#C98A4A"], ["bk_mincepie", "#B8743E"]].forEach(([id, c]) => { I[id] = S.bun(c); });   // round 295
-  I.bk_box = S.box("#FFFDF6", "#E8B86A"); if (!I.oats) I.oats = I.flour;
   I.wine_tempranillo = S.bottle("#5A1630"); I.wine_pinot = S.bottle("#8A2E3E"); I.wine_priory = S.bottle("#4A1B2E"); I.wine_chardonnay = S.bottle("#E8C96A");
 }
 // round 109: greenhouse herbs, and shrimp from the sea

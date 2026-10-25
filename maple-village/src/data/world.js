@@ -155,8 +155,6 @@ export const VILLAGE = {
   hfreezer:{scene:"bay", name:"Honesty freezer", door:[432,290], spot:true, line:"The honesty freezer: little cups while the shop's shut."},
   dbike:  {scene:"bay", name:"Delivery bike", door:[300,290], spot:true, line:"The delivery bike."},
   cocoa:  {scene:"bay", name:"The Cocoa Room", short:"the Cocoa Room", door:[396,516], mark:[396,372]},
-  bakery: {scene:"green", name:"The Honeybrook Bakehouse", short:"the bakehouse", door:[108,116], mark:[108,30]},   // round 294
-  bakeshut: {scene:"green", name:"The old bakery", door:[108,116], spot:true, line:"The old bakery, shuttered since the baker retired."},
   toFarmB:{scene:"bay", name:"Gate to Wildflower Farm", door:[500,378], spot:true, bridge:"hfarm", mark:[490,320], line:"East through the gate to Wildflower Farm."},
   // Wildflower Farm (Felix and Elena's), east of the bay (art/hfarm.js, game/hfarm.js)
   toBayF: {scene:"hfarm", name:"Gate to the bay", door:[22,286], spot:true, bridge:"bay", mark:[30,226], line:"West through the gate to the bay."},
@@ -251,7 +249,6 @@ export const INNER = {
   scoopdip: {parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440]},
   // the Cocoa Room's kitchen, through the door on the shop's west wall
   cocoakitchen: {parent: "cocoa", door: [64, 400], arrive: [450, 440], exit: [486, 440]},
-  bakehouse: {parent: "bakery", door: [64, 400], arrive: [450, 440], exit: [486, 440]},   // round 294: the bakery's bakehouse, through the shop's west door
   millup: {parent: "mill", door: [326, 596], arrive: [96, 520], exit: [70, 584]},
   winecave: {parent: "cellar", door: [70, 440], arrive: [440, 455], exit: [486, 455]}   // round 244: the secret wine cave behind the cellar's old bricks   // round 154: upstairs in the old mill (the shop, the workbench, tastings)
 };
@@ -464,19 +461,6 @@ export const ROOMS = {
     ["barwall","Bar wall","W","barwall",null,"Wrapped bars of your own chocolate.",36],
     ["ckdoor","Kitchen","Z","gkdoor",null,"Into the chocolate kitchen.",0],
     ["ctables","Tables","T","cafetables",null,"A table for a little something.",34]]},
-  // round 294: the Honeybrook Bakehouse on the green (game/bakery.js), the shop and the bakehouse behind it
-  bakery: {name:"The Honeybrook Bakehouse", wall:"#F6EBDD", trim:"#B8743E", noBoard:true, pos:{S:[130,262], C:[330,330], Z:[40,400], T:[330,540]}, stations:[
-    ["bshelves","Bread shelves","S","bkshelves",null,"The bread shelves.",40],
-    ["bcounter","Counter","C","bkcounter",null,"The counter and the honesty tin.",46],
-    ["bkdoor","Bakehouse","Z","gkdoor",null,"Through to the bakehouse.",0],
-    ["bseat","Window seat","T","bkbench",null,"A seat in the window.",34]]},
-  bakehouse: {name:"The bakehouse", wall:"#F3E7D7", trim:"#8A5A3A", noBoard:true, pos:{O:[260,262], P:[96,262], R:[420,262], M:[250,450], C:[380,590], F:[110,590]}, stations:[
-    ["bmix","Mixing table","M","bkmix",null,"The mixing table, flour on everything.",40],
-    ["bproof","Proving shelf","P","bkproof",null,"Trays of dough rising under cloths.",34],
-    ["boven","Wood oven","O","bkoven",null,"The wood oven.",40],
-    ["brack","Cooling rack","R","bkrack",null,"The cooling rack.",34],
-    ["bchurn","Butter churn","C","bkchurn",null,"The butter churn.",30],
-    ["bflour","Flour sacks","F","bksacks",null,"Sacks of flour.",30]]},
   cocoakitchen: {name:"The chocolate kitchen", wall:"#F6EEE4", trim:"#8A5A3A", noBoard:true, pos:{S:[96,262], R:[260,262], G:[420,262], M:[170,560], O:[370,560], P:[70,420], B:[270,410]}, stations:[
     ["pantry","Fillings shelf","P","pantry",null,"The fillings shelf: what goes inside the bonbons.",30],
     ["bonbon","Bonbon table","B","bonbontable",null,"The bonbon table: a shell and a filling or two.",30],
