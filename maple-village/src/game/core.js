@@ -1245,7 +1245,7 @@ function stampsPanel(){ const it = ITEMS.rubberstamp, n = F.inv.rubberstamp || 0
     <div class="items shop">${itemBtn("rubberstamp", `<b>${it.price}</b> ${icon("coin", 13)}`, F.coins < it.price, n ? `<span class="cnt">×${n}</span>` : "")}</div><p class="muted">A rubber stamp to give. It goes in your backpack.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`; }
 function itemBtn(id, label, disabled, extra){
   const it = ITEMS[id];
-  return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${icon(it.ico, 34)}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra || ""}</button>`;
+  return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${icon(it.ico || id, 34)}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra || ""}</button>`;
 }
 function ctx(){ try { ctxBody(); } catch (e) { noteErr("panel", e); } }
 function ctxBody(){

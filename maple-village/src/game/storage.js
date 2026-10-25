@@ -56,7 +56,7 @@ const nm = id => ITEMS[id] ? ITEMS[id].n : id;
 export function storePanel(F, where, o = {}){
   const s = storeState(F)[where], ids = Object.keys(s).filter(id => s[id] > 0 && ITEMS[id]).sort((a, b) => nm(a).localeCompare(nm(b)));
   const bag = Object.keys(F.inv || {}).filter(id => F.inv[id] > 0 && placeFor(id) === where).sort((a, b) => nm(a).localeCompare(nm(b)));
-  const cell = (id, sub, btns) => `<li><span class="wpic">${icon(ITEMS[id].ico, 30)}</span><span class="wtxt"><b>${esc(nm(id))}</b><small>${sub}</small></span><span class="orbtns">${btns}</span></li>`;
+  const cell = (id, sub, btns) => `<li><span class="wpic">${icon(ITEMS[id].ico || id, 30)}</span><span class="wtxt"><b>${esc(nm(id))}</b><small>${sub}</small></span><span class="orbtns">${btns}</span></li>`;
   let h = where === "fridge" ? `<p class="sub">Food, ingredients and flowers keep in here as long as you like. Take them out, or send them to a shop: Tomo drops them off on the bike.</p>`
     : `<span class="tape gingham" aria-hidden="true"></span><h2>The storage shelf</h2><p class="sub">Next to the boxes labelled "Christmas" and "misc": soaps, oils, gifts, seeds, anything that isn't for the fridge. Take them out, or send them to a shop.</p>`;
   h += ids.length ? `<ul class="hlist wlist orflowers">${ids.map(id => cell(id, `${s[id]} stored`, `<button class="btn small alt" data-st="take" data-id="${id}" data-n="1">Take 1</button><button class="btn small alt" data-st="take" data-id="${id}" data-n="99">All</button>`

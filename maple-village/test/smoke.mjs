@@ -4839,9 +4839,11 @@ if (want("\nA room still draws from an odd save (round 231)")) try {
   const a = await page.evaluate(() => document.getElementById("hero").getAttribute("transform")); await page.mouse.click(260, 560); await page.waitForTimeout(1500);
   check(await page.evaluate(was => document.getElementById("hero").getAttribute("transform") !== was, a), "and the character still walks");
   // a friend then couldn't open her backpack: odd made-things in a save, and the backpack still opens with its items
-  await page.evaluate(() => { const F = window.__hbGame.F(); F.scoop = {...(F.scoop || {}), recipes: 5}; F.sew = {clothes: 5}; F.inv = {...F.inv, zz_gone: 2, honey: 2}; window.__hbGame.save(); window.__hbScene("base"); }); await page.waitForTimeout(400);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.scoop = {...(F.scoop || {}), recipes: 5}; F.sew = {clothes: 5}; F.inv = {...F.inv, zz_gone: 2, honey: 2, mk_honeybutter: 1, mk_cards: 1, limoncino: 1}; window.__hbGame.save(); window.__hbScene("base"); }); await page.waitForTimeout(400);
   await page.click('[data-open="bag"]'); await page.waitForTimeout(500);
   check(await page.evaluate(() => !document.getElementById("panel").hidden && !!document.querySelector('#bag .item[data-id="honey"]')), "and the backpack still opens, with what's in it");
+  // her error report: the makers' gifts from the gift shop (and the loft's drinks) have no icon name of their own
+  check(await page.evaluate(() => ["mk_honeybutter", "mk_cards", "limoncino"].every(id => document.querySelector(`#bag .item[data-id="${id}"] svg`)) && !(JSON.parse(localStorage.getItem("hb.errors") || "[]")).some(x => /backpack item/.test(x))), "Hana's honey butter, Auntie Lin's cards and the loft's limoncino show in the backpack, with their pictures");
   // and Settings can copy what went wrong, for a message to us (each error once, with which browser it is)
   const errs = await page.evaluate(() => JSON.parse(localStorage.getItem("hb.errors") || "[]"));
   check(errs.length >= 1 && errs.length <= 5 && new Set(errs.map(x => x.slice(17))).size === errs.length && errs.some(x => /gelato/.test(x)), "the game notes what went wrong, each error once");
