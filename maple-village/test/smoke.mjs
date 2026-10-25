@@ -4696,6 +4696,9 @@ if (want("\nWindows glow in the evening (round 231)")) try {
     check(before > 0 && after === 0, `standing on the lane as 11pm comes, the windows go out (${before} lit, then ${after})`); }
   const seven = await lit("19:02", "lane"); check(seven >= 6, `and they're on from 7pm (${seven} lit at 7:02)`);
   const woods = await lit("21:30", "hwoods"); check(woods >= 2, "a window drawn in its own colour can be marked to glow too (the ranger's cabin)");
+  // round 232 (the creator: "Why is the swing glowing"): a sky-blue swing seat or the well's water isn't a window
+  const vine = await lit("20:00", "vineyard"), sq = await lit("20:00", "village");
+  check(vine === 2 && sq === 7, `only windows glow: the wine shop's two on the vineyard (${vine}), not the swing seat; the square's seven (${sq}), not the well`);
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe cottage fruit basket takes any fruit (round 231)")) try {
   // the creator: "can't seem to put stuff in the fruit basket in the cottage": only orchard fruit was allowed

@@ -86,7 +86,7 @@ function lowerGate(){
 }
 function playArt(){
   // each seat swings from its own hook on the top bar (pivot set per seat; .map .pswing in npcs.css)
-  const seat = (x, col, d) => `<g class="pswing" style="transform-origin:${x + 6}px 527px;animation-delay:${d}s">${sk(`<rect x="${x - 2}" y="574" width="16" height="4" rx="2" style="fill:${col}"/>`, `<path d="M${x} 527 v47 M${x + 12} 527 v47"/><rect x="${x - 2}" y="574" width="16" height="4" rx="2"/>`)}</g>`;
+  const seat = (x, col, d) => `<g class="pswing" data-nowin="1" style="transform-origin:${x + 6}px 527px;animation-delay:${d}s">${sk(`<rect x="${x - 2}" y="574" width="16" height="4" rx="2" style="fill:${col}"/>`, `<path d="M${x} 527 v47 M${x + 12} 527 v47"/><rect x="${x - 2}" y="574" width="16" height="4" rx="2"/>`)}</g>`;
   const swing = `<g data-place="pswing" aria-label="Swings"><ellipse class="hov" cx="110" cy="592" rx="40" ry="9" style="fill:var(--butter)"/>
     ${sk("", `<path d="M76 590 l10 -64 l10 64 M124 590 l10 -64 l10 64 M86 526 h48" stroke-width="2.2" style="stroke:#C46A4A"/>`)}
     ${seat(92, "var(--rose)", 0)}${seat(116, "var(--sky)", -1.4)}

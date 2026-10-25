@@ -82,7 +82,7 @@ export function villageArt(){
     `<g data-place="board" aria-label="Quest board"><ellipse class="hov" cx="260" cy="330" rx="40" ry="8" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M238 330 v-40 M282 330 v-40"/><rect x="230" y="282" width="60" height="38" rx="3" style="fill:var(--wood)"/>${notesArt(236, 288, G.boardCount())}</g>
       ${tapeLabel(260, 280, "Quests", "var(--butter)", 11)}</g>
-    <g transform="translate(36 64)"><g data-place="well" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
+    <g transform="translate(36 64)"><g data-place="well" data-nowin="1" aria-label="Well"><ellipse class="hov" cx="160" cy="342" rx="26" ry="7" style="fill:var(--butter)"/>
       <g filter="url(#wob)" ${ink}><path d="M146 312 v20 M174 312 v20"/><path d="M140 314 l20 -12 l20 12z" style="fill:var(--peach)"/><ellipse cx="160" cy="334" rx="17" ry="7" style="fill:var(--stone)"/><path d="M143 334 v6 a17 7 0 0 0 34 0 v-6" style="fill:var(--stone)"/><ellipse cx="160" cy="333" rx="11" ry="4" style="fill:var(--water)"/></g>
       ${tapeLabel(160, 360, "Well", "var(--sky)", 11)}</g></g>
     <g data-place="market" aria-label="Market"><ellipse class="hov" cx="362" cy="342" rx="32" ry="8" style="fill:var(--butter)"/>
