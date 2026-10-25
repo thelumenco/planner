@@ -469,7 +469,7 @@ export const ROOMS = {
     ["bshelves","Bread shelves","S","bkshelves",null,"The bread shelves.",40],
     ["bcounter","Counter","C","bkcounter",null,"The counter and the honesty tin.",46],
     ["bkdoor","Bakehouse","Z","gkdoor",null,"Through to the bakehouse.",0],
-    ["bseat","Window seat","T","cafetables",null,"A seat in the window.",34]]},
+    ["bseat","Window seat","T","bkbench",null,"A seat in the window.",34]]},
   bakehouse: {name:"The bakehouse", wall:"#F3E7D7", trim:"#8A5A3A", noBoard:true, pos:{O:[260,262], P:[96,262], R:[420,262], M:[250,450], C:[380,590], F:[110,590]}, stations:[
     ["bmix","Mixing table","M","bkmix",null,"The mixing table, flour on everything.",40],
     ["bproof","Proving shelf","P","bkproof",null,"Trays of dough rising under cloths.",34],

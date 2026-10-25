@@ -217,6 +217,31 @@ const SHELLS = {
     ${sk(`<rect x="0" y="20" width="520" height="10" style="fill:#7A4A32"/><rect x="226" y="40" width="68" height="60" style="fill:#F6E6B8"/>`, `<path d="M0 20 H520 M0 30 H520"/><rect x="226" y="40" width="68" height="60"/><path d="M260 40 v60 M226 70 h68"/>`)}
     ${[90, 430].map(x => sk(`<path d="M${x} 30 v14"/><rect x="${x-7}" y="44" width="14" height="18" rx="3" style="fill:#F3C969"/>`, `<path d="M${x} 30 v14"/><rect x="${x-7}" y="44" width="14" height="18" rx="3"/>`)).join("")}`,
   // the chocolate kitchen: white tiles, a window, copper pans on a rail
+  // round 294 (Mel: "Interior of bakery look too similar to ice cream shop and winery"): the Honeybrook Bakehouse.
+  // The shop: terracotta and cream diamond tiles, red brick to dado height under cream plaster, dark oak beams with
+  // bunches of wheat hanging from them, pendant lamps, and a chalkboard of today's prices
+  bakery: () => `<rect width="520" height="640" style="fill:#EADBC4"/>
+    <g opacity=".75">${rows(13, r => rows(14, c => (r + c) % 2 ? `<path d="M${c*40} ${170 + r*36} l20 -18 l20 18 l-20 18z" style="fill:#D9A07A"/>` : ""))}</g>
+    <rect width="520" height="150" style="fill:#F4E9D6"/>
+    <g style="fill:#C9754E">${rows(4, r => rows(14, c => `<rect x="${c*40 + (r % 2)*20 - 20}" y="${96 + r*12}" width="37" height="10" rx="1"/>`))}</g><rect y="92" width="520" height="4" style="fill:#8A5A3A"/>
+    ${sk(`${[60, 200, 320, 460].map(x => `<rect x="${x - 7}" y="0" width="14" height="92" style="fill:#6B4A36"/>`).join("")}<rect x="0" y="0" width="520" height="10" style="fill:#5E4030"/>`, `${[60, 200, 320, 460].map(x => `<rect x="${x - 7}" y="0" width="14" height="92"/>`).join("")}`)}
+    <g pointer-events="none">${[[100, 10], [160, 10], [380, 10], [420, 10]].map(([x, y]) => `<path d="M${x} ${y} v14" style="stroke:#8A6A4E" stroke-width="1"/><g transform="translate(${x} ${y + 14})">${[-6, -2, 2, 6].map(d => `<path d="M${d*.6} 0 q${d} 14 ${d*1.2} 30" fill="none" style="stroke:#D9B060" stroke-width="2.4"/><ellipse cx="${d*1.2}" cy="32" rx="2" ry="5" style="fill:#E3C27A"/>`).join("")}</g>`).join("")}
+      ${[130, 390].map(x => `<path d="M${x} 10 v26" style="stroke:#3B3530" stroke-width="1"/><path d="M${x - 12} 46 q12 -14 24 0z" style="fill:#5E7A6A"/><ellipse class="wglow" cx="${x}" cy="47" rx="6" ry="3" style="fill:#FFE6A0"/>`).join("")}</g>
+    ${sk(`<rect x="216" y="20" width="88" height="62" rx="3" style="fill:#3E4A43"/><rect x="212" y="16" width="96" height="70" rx="4" fill="none" style="stroke:#A8754F" stroke-width="4"/>`, `<rect x="212" y="16" width="96" height="70" rx="4"/>`)}
+    <g font-family="Klee One,serif" font-weight="600" pointer-events="none"><text x="260" y="34" text-anchor="middle" font-size="9.5" fill="#F3C969">fresh today</text>
+      ${[["loaf", 5], ["croissant", 6], ["bun", 5], ["turnover", 5], ["scone", 5], ["focaccia", 6]].map(([n, p], i) => `<text x="${222 + (i % 2)*44}" y="${48 + Math.floor(i/2)*11}" font-size="7" fill="#F6EFE3">${n} ${p}</text>`).join("")}</g>
+    ${plant(30, 612, .9)}`,
+  // the bakehouse: worn flagstones dusted with flour, whitewashed brick, a long shelf of flour and sugar jars, copper
+  // pans, the bread peel on its hook and a big kitchen clock
+  bakehouse: () => `<rect width="520" height="640" style="fill:#D9D0C2"/>
+    <g opacity=".7" style="stroke:#BDB3A4" stroke-width="1.4" fill="none">${rows(9, r => rows(6, c => `<rect x="${c*90 + (r % 2)*45 - 45}" y="${150 + r*56}" width="86" height="52" rx="8"/>`))}</g>
+    <g filter="url(#wash)" opacity=".45">${[[180, 470, 90, 40], [400, 300, 60, 24], [90, 360, 50, 22]].map(([x, y, rx, ry]) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:#FFFDF6"/>`).join("")}</g>
+    <rect width="520" height="150" style="fill:#F2EEE6"/><g opacity=".5" style="fill:#E3DCCF">${rows(11, r => rows(14, c => `<rect x="${c*40 + (r % 2)*20 - 20}" y="${r*13}" width="37" height="11" rx="1"/>`))}</g><rect y="138" width="520" height="12" style="fill:#8A5A3A" opacity=".9"/>${skirting}
+    ${sk(`<rect x="150" y="70" width="190" height="7" rx="1" style="fill:#A8754F"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${160 + i*36}" y="${46}" width="22" height="24" rx="4" style="fill:#EAF2F5" opacity=".9"/><rect x="${162 + i*36}" y="${56}" width="18" height="12" rx="2" style="fill:${["#F4EEE3", "#FFFDF6", "#C98A4A", "#E3C27A", "#F4EEE3"][i]}"/>`).join("")}`,
+      `<rect x="150" y="70" width="190" height="7" rx="1"/>${[0, 1, 2, 3, 4].map(i => `<rect x="${160 + i*36}" y="46" width="22" height="24" rx="4"/>`).join("")}`)}
+    ${sk(`<circle cx="390" cy="56" r="20" style="fill:#FFFDF6"/><path d="M390 56 v-12 M390 56 h9" style="stroke:var(--line)" stroke-width="1.6"/>${[0, 1, 2].map(i => `<circle cx="${436 + i*24}" cy="${60 + (i % 2)*6}" r="${11 - i}" style="fill:#C8763E"/>`).join("")}`,
+      `<circle cx="390" cy="56" r="20"/>${[0, 1, 2].map(i => `<circle cx="${436 + i*24}" cy="${60 + (i % 2)*6}" r="${11 - i}"/><path d="M${436 + i*24} ${49 + (i % 2)*6} v-10" />`).join("")}`)}
+    ${sk(`<rect x="70" y="20" width="10" height="80" rx="3" style="fill:#B98A5A"/><ellipse cx="75" cy="106" rx="24" ry="12" style="fill:#C9A27E"/>`, `<rect x="70" y="20" width="10" height="80" rx="3"/><ellipse cx="75" cy="106" rx="24" ry="12"/>`)}`,
   cocoakitchen: () => `<rect width="520" height="640" style="fill:#F2EBE2"/>
     <g opacity=".5">${rows(12, r => rows(13, c => (r + c) % 2 ? `<rect x="${c*40}" y="${150 + r*42}" width="40" height="42" style="fill:#E6D9C8"/>` : ""))}</g>
     ${wallBase("#F6EEE4", "#8A5A3A")}<g opacity=".35" style="stroke:#D8C8B4">${rows(13, i => `<path d="M${i*40} 0 V138"/>`)}${rows(4, i => `<path d="M0 ${i*36 + 18} H520"/>`)}</g>${skirting}
