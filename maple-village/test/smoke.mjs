@@ -3736,7 +3736,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const mm = lu.bookingsFor("2026-10-25").find(b => b.ids.includes("mama")); check(!mm || mm.at >= 13*60, "Ma Ma comes after her market stall shuts");
   // sales: a pair gets through about a bottle an hour, the dearer ones more
   const F = {coins: 0, inv: {}, vine: {terrace: true}}; const v = vy.vineState(F); v.shelf = [{id: "a", name: "House red", type: "red", n: 40, price: 18, open: 0}, {id: "b", name: "Reserva", type: "tempranillo", n: 40, price: 28, open: 0}];
-  const realNow = Date.now, t0 = Date.parse("2026-10-11T07:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 180*60000; const out = vy.sellTick(F, {}); Date.now = realNow;
+  // (a fixed seed for the afternoon's dice, so the count doesn't drift below six on an unlucky run)
+  const realNow = Date.now, realRand = Math.random, t0 = Date.parse("2026-10-11T07:00:00Z"); let sd = 12345; Math.random = () => (sd = (sd*16807) % 2147483647)/2147483647;
+  Date.now = () => t0; v.lastTick = t0 - 180*60000; const out = vy.sellTick(F, {}); Date.now = realNow; Math.random = realRand;
   check(out && out.lunchB >= 6 && out.lunchB <= 30 && v.today.lunchB === out.lunchB, `three hours of lunch: ${out && out.lunchB} bottles to the table`);
   check(80 - v.shelf.reduce((n, x) => n + x.n, 0) >= out.lunchB, "the bottles come off the shelves");
   { const B = {coins: 9999, inv: {}, goals: {}}, bv = vy.vineState(B); let spent = 0; for (let i = 0; i < 8; i++) { const c = B.coins; vy.buy(B, "barrel"); spent += c - B.coins; }
@@ -3881,13 +3883,16 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(oc.paintDone(ps) && oc.finishPaint(G, ps, add) === "p_view" && G.inv.p_view === 1 && !oc.finishPaint(G, ps, add), "sip and paint: three layers, and your painting comes home");
   // sales: a wedding afternoon sells sparkling
   { const W = {coins: 0, inv: {}, vine: {terrace: true}}, v = vy.vineState(W); v.shelf = [{id: "s", name: "Cuvée", type: "sparkling", n: 40, price: 24, open: 0}, {id: "r", name: "House red", type: "red", n: 40, price: 24, open: 0}];
-    const realNow = Date.now, t0 = Date.parse("2026-10-24T11:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 300*60000; const out = vy.sellTick(W, {}); Date.now = realNow;
-    check(out && out.occB >= 6 && 40 - v.shelf[0].n > 40 - v.shelf[1].n, `a wedding on the terrace: ${out && out.occB} bottles, mostly sparkling`); }
+    const realNow = Date.now, realRand = Math.random, t0 = Date.parse("2026-10-24T11:00:00Z"); let sd = 20261024; Math.random = () => (sd = (sd*16807) % 2147483647)/2147483647;   // (a fixed seed: the sales are dice)
+    Date.now = () => t0; v.lastTick = t0 - 300*60000; const out = vy.sellTick(W, {}); Date.now = realNow; Math.random = realRand;
+    const left = id => { const x = v.shelf.find(b => b.id === id); return x ? x.n : 0; };   // (a sold-out wine leaves the shelf)
+    check(out && out.occB >= 6 && 40 - left("s") > 40 - left("r"), `a wedding on the terrace: ${out && out.occB} bottles, mostly sparkling`); }
   // round 284 (Mel: "it says they buy sparkling by the case, does that really happen?"): the couple's cases come up from the cellar
   { const W = {coins: 0, inv: {}, vine: {terrace: true}}, v = vy.vineState(W), cases = oc.weddingCases("2026-10-24");
     v.cellar = [{id: "a", name: "Kept fizz", type: "sparkling", n: 12, hold: true}, {id: "b", name: "More fizz", type: "sparkling", n: 30}, {id: "c", name: "On the rack", type: "sparkling", n: 6, rack: Date.parse("2026-10-24T10:00:00Z")}, {id: "d", name: "Red", type: "red", n: 6, hold: true}];
     v.shelf = [{id: "r", name: "House red", type: "red", n: 40, price: 16, open: 0}]; v.help.stock = false;
-    const realNow = Date.now, t0 = Date.parse("2026-10-24T11:00:00Z"); Date.now = () => t0; v.lastTick = t0 - 300*60000; const out = vy.sellTick(W, {}); Date.now = realNow;
+    const realNow = Date.now, realRand = Math.random, t0 = Date.parse("2026-10-24T11:00:00Z"); let sd = 20261024; Math.random = () => (sd = (sd*16807) % 2147483647)/2147483647;   // (a fixed seed: the sales are dice)
+    Date.now = () => t0; v.lastTick = t0 - 300*60000; const out = vy.sellTick(W, {}); Date.now = realNow; Math.random = realRand;
     const left = id => (v.cellar.find(c => c.id === id) || {n: 0}).n;
     check(cases >= 2 && cases <= 4 && out.cases === cases*6 && left("a") + left("b") === 42 - cases*6 && left("c") === 6 && left("d") === 6, `a wedding's ${cases} cases of sparkling come up from the cellar, kept-back ones too, but not off the riddling rack or any red`);
     check(out.coins >= cases*6*vy.STYLES.sparkling.price && oc.comingUp("2026-10-12").some(e => /cases of sparkling/.test(e.note || "")), "paid at the shelf price, and the order's in the bookings book");
