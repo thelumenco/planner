@@ -171,7 +171,13 @@ export const LOVES = {
       {id: "clawclip", thanks: "A claw clip, tortoiseshell. Grandmother wore one just like it. I'll wear it on Saturdays, for her."},
       {id: "h_lamp", thanks: "A glass lamp from Otaru! Now there are two by the mirror. Twice the light."},
       {id: "hojicha", thanks: "Hōjicha. Grandpa will say it's for me, and then drink most of it."}],
-    everyday: ["peach", "pearlclip", "mochi"]}
+    everyday: ["peach", "pearlclip", "mochi"]},
+  // round 232: Bram the lighthouse keeper (the bottom row): his father's Sunday kippers, a brew on the gallery, the tea towel by the lamp-room kettle
+  bram: {story: [
+      {id: "s_kipperbox", thanks: "Kippers! Father had kippers every Sunday of his life, up in the watch room. The whole tower smelled of them."},
+      {id: "b_billytea", thanks: "Tea you brew over a fire? I'll take it up to the gallery and brew it in the wind. Proper keeper's tea."},
+      {id: "b_teatowel", thanks: "A tea towel with a coast on it. It'll hang by the lamp-room kettle, where I can see it every night."}],
+    everyday: ["fudge", "chrystea", "j_jam"]}
 };
 // every love of one villager, as [{kind, id?, match?, what?, thanks?}]
 export const lovesOf = w => { const L = LOVES[w]; if (!L) return [];

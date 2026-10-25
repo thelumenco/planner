@@ -327,7 +327,7 @@ if (want("\nvillagers' loves")) try {
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), sc = await import(new URL("../src/game/scoop.js", import.meta.url)), kt = await import(new URL("../src/game/kitchen.js", import.meta.url));
   const xm = await import(new URL("../src/game/xmas.js", import.meta.url)), orch = await import(new URL("../src/data/orchard.js", import.meta.url)), T = its.ITEMS;
   const res = np.NPCS.filter(n => !n.tourist && !n.local && !n.kid).map(n => n.id);
-  check(res.length === 29 && res.every(w => LV.LOVES[w] && LV.lovesOf(w).length >= 6 && LV.lovesOf(w).length <= 10), "all 29 Honeybrook villagers have 6 to 10 loves");
+  check(res.length === 30 && res.every(w => LV.LOVES[w] && LV.lovesOf(w).length >= 6 && LV.lovesOf(w).length <= 10), "all 30 Honeybrook villagers have 6 to 10 loves");
   check(res.every(w => LV.lovesOf(w).filter(l => l.kind === "combo").length <= 1 && LV.lovesOf(w).filter(l => l.kind === "story").every(l => l.thanks && !/—/.test(l.thanks))), "at most one combination each; every story love has its own thank-you (no em dashes)");
   check(res.every(w => LV.lovesOf(w).every(l => l.match ? typeof l.match === "function" && l.what && l.thanks : typeof l.id === "string")), "every love is an item id or a matcher (with what it's for and a thank-you)");
   // matchers, on made things the way their ITEMS entries look
@@ -2048,7 +2048,7 @@ if (want("\nfishing")) try {
   check(got.length === 1 && ["roach", "trout", "perch", "boot"].includes(got[0]) && /New in the journal/.test(await page.locator("#ctx .fcatch").textContent()), "reel while the marker's in the green and it's landed: a river fish, new in the journal");
   check(["boot"].includes(got[0]) || (f1.inv[got[0] === "trout" ? "trout" : "fish"] || 0) >= 1, "and it's in the backpack (trout for the kitchen, others as fish)");
   await page.click('#ctx [data-fish="view"][data-k="journal"]'); await page.waitForTimeout(200);
-  check(await page.locator("#ctx li.locked").count() === 23 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, twenty-three still to find, each with a hint (the golden koi at dusk)");
+  check(await page.locator("#ctx li.locked").count() === 25 && /dusk/i.test(await page.locator("#ctx").textContent()), "the journal: one found, twenty-five still to find, each with a hint (the golden koi at dusk)");
   await page.click('#ctx [data-fish="view"][data-k="fish"]'); await page.waitForTimeout(200);
   await page.click('#ctx [data-fish="cast"]'); await page.waitForSelector("#ctx .fbar", { timeout: 9000 }); await page.waitForTimeout(3700);
   check(/slipped away/.test(await page.locator("#ctx").textContent()) && await fox().then(f => f.fish.bait === 0), "wait too long after the bite and it slips away");
@@ -4345,7 +4345,7 @@ if (want("\nNobody stands on tables or stalls (round 228)")) try {
   const SEATED = ["sit", "doze", "beanbag", "footbath", "wheel", "sunbathe"];
   // ground, seats and walkways that are drawn as places (decks, rugs, lawns, paths, platforms, pens, a stage for the
   // performers), and shopkeepers standing behind their counters (the counter's front is drawn below their feet)
-  const OPEN = new Set(["deck", "picnic", "exlawn", "glawn", "pround", "jardin", "bvhpiste", "bvboardwalk", "ctpadlock", "kttorii", "bandstand", "bvhmeadow", "stairs", "pigoats",
+  const OPEN = new Set(["deck", "picnic", "exlawn", "glawn", "llight", "fishrocks", "pround", "jardin", "bvhpiste", "bvboardwalk", "ctpadlock", "kttorii", "bandstand", "bvhmeadow", "stairs", "pigoats",
     "bvtplatypus", "cttrain", "basubak", "run", "bvplayground", "bvbeanbags", "bvrows", "bvbellbirds", "bvballoons", "bvswing", "bvnippers", "bvkoalas", "ctbeach",
     "bvsurf", "swscar", "bvtrock", "bvttrees", "bvtpark", "ctboats", "flamenco", "market:stall", "hk_ramen:hk_ramen",
     "hk_glass:hk_glass", "pi_post:pi_post", "sw_chandlery:sw_chandlery"]);
@@ -4886,6 +4886,16 @@ if (want("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)")) t
     check(so.brushPony(F, "pebble", day).ok && so.feedPony(F, "pebble", day).ok && F.south.ponies.pebble.trust === 3, "Pebble: a brush and her favourite carrot");
     check(so.ponyRide(F, day).ok && F.coins === 49 - so.RIDE_COST && !so.ponyRide(F, day).ok, "then a ride round the ring, once a day");
     check(so.buyChips(F).ok && F.coins === 49 - so.RIDE_COST - so.CHIPS && /tide's in/.test(so.rockPools(F, day, "high").line), "fish and chips cost coins, and the rock pools need low tide"); }
+  { const fi = await import(new URL("../src/game/fishing.js", import.meta.url)), F = {coins: 1500, inv: {apple: 1}};
+    const r = so.buyPony(F, "Clementine", day);
+    check(r.ok && F.coins === 300 && so.ponyIds(F).includes("mine") && so.feedPony(F, "mine", day).ok && F.south.ponies.mine.trust === 2 && !so.buyPony(F, "Again", day).ok, "a pony of your own (1,200 coins), named by you, cared for like the others");
+    const t1 = so.keeperTale(F, day), t2 = so.keeperTale(F, day), t3 = so.keeperTale(F, "2026-10-25");
+    check(t1 && !t2 && t3 && t3 !== t1 && !/[\u2013\u2014]/.test(so.TALES.join("")), "Bram the keeper tells one tale a day, a new one each time");
+    check(fi.fishHere("rocks", day, 11*60).includes("mackerel") && fi.fishHere("rocks", day, 18*60 + 30).includes("bass"), "mackerel off the rocks at Lighthouse Point, and sea bass at dusk"); }
+  { const F = {coins: 50}, finds = so.bootFinds("2026-10-25");
+    check(so.bootNow("2026-10-25", 9*60) && !so.bootNow("2026-10-24", 9*60) && finds.length === 4 && so.buyFind(F, finds[0], "2026-10-25").ok && F.inv[finds[0]] === 1 && !so.buyFind(F, finds[0], "2026-10-25").ok,
+      "the Sunday car boot sale: four curios a week, each bought once");
+    check(so.lampNow("2026-10-26", 19*60) && !so.lampNow("2026-10-27", 19*60) && /cheer|clap/i.test(so.lampLighting(F, "2026-10-26", 19*60 + 5).line), "the Monday lamp lighting at Lighthouse Point"); }
   check(["green", "stables", "lighthouse", "lowervine"].every(sc => Object.keys(w.BRIDGES[sc]).every(o => w.BRIDGES[o] && w.BRIDGES[o][sc] && w.ARRIVE[sc + ">" + o] && w.ARRIVE[o + ">" + sc])), "every new path goes both ways, with somewhere to arrive");
   { const ids = ["hana", "juniper", "opal", "theo", "farid", "mei", "amara", "lila", "noor", "sofia"], band = ids.filter(i => (so.southSlot(i, "2026-10-25", 15*60) || {}).scene === "green");
     check(band.length === 6 && (so.southSlot("okada", "2026-10-27", 8*60) || {}).scene === "green" && (so.southSlot("lila", "2026-10-27", 7*60 + 30) || {}).scene === "stables" && (so.southSlot("ines", "2026-10-27", 14*60 + 30) || {}).scene === "lowervine",
@@ -4907,11 +4917,33 @@ if (want("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)")) t
   await page.click('#ctx [data-pony="feed:biscuit"]'); await page.waitForTimeout(400);
   check(await page.evaluate(() => window.__hbGame.F().south.ponies.biscuit.trust === 2), "at the paddock: an apple for Biscuit");
   await page.evaluate(() => window.__hbScene("lighthouse")); await page.waitForTimeout(600);
-  check(await page.locator('#world [data-place="bikeslight"]').count() === 1, "bike hire at Lighthouse Point (and on the green)");
+  check(await page.locator('#world [data-place="bikeslight"]').count() === 1 && await page.locator('#world [data-place="fishrocks"]').count() === 1, "bike hire and the mackerel rocks at Lighthouse Point");
   await page.locator('#world [data-place="lsup"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 20000 });
   await page.click('#ctx [data-sup="shore"]'); await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "the paddleboard jetty at Lighthouse Point: paddle up the coast to the foreshore");
   await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe bottom row in the stories (rounds 272 to 275)")) try {
+  // the bottom row joins the villagers' stories
+  console.log("\nThe bottom row in the stories (rounds 272 to 275)");
+  const st = await import(new URL("../src/game/stories.js", import.meta.url)), sd = await import(new URL("../src/data/stories.js", import.meta.url)), so = await import(new URL("../src/game/south.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
+  const day = "2026-10-25", met = Object.fromEntries(Object.keys(sd.STORIES).map(id => [id, true]));
+  const len = id => sd.STORIES[id].length;
+  const mk = heard => ({coins: 100, inv: {}, met, storyDay: day, passage: {step: 5}, board: {hearts: Object.fromEntries(Object.keys(sd.STORIES).map(id => [id, 10]))}, story: {heard, day: {}, log: [], flags: {}}, vine: {rows: [0, 1, 2, 3].map(i => ({trellis: true, vines: [null, null, null]}))}});
+  { const F = mk({hazel: 5, marco: len("marco") - 1}); F.met = {marco: true}; const t = st.tellStory(F, "marco", (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, day);
+    check(t && /monks' vine/.test(t.lines.join(" ")) && vy.vineState(F).cuttings.priory === 3 && vy.grapeKinds(vy.vineState(F)).includes("priory"), "the priory vine: Marco finds the monks' root behind the old press, and three Priory Red cuttings are yours");
+    check(vy.STYLES.priory && vy.STYLES.priory.price > 0, "Priory Red makes its own wine"); }
+  { const F = mk({bram: 2}); const r = so.rockPools(F, day, "low");
+    check(r.flask && F.inv.s_flask === 1 && !so.rockPools(F, day, "low").flask, "the rock pools give up the priory flask (once the cave's found and Bram's told you about the priory boat)");
+    F.story.flags.seacave = true; check(so.rockPools(F, day, "low").cave && !so.rockPools(F, day, "high").cave, "after Bram's directions: the sea door, only at low tide");
+    check(so.seaCave(F, "niche").ok && F.inv.s_priorybottle === 1 && !so.seaCave(F, "niche").ok, "in the sea cave, the last priory bottle, found once"); }
+  { const F = mk({celeste: 2}); check(so.storyFind(F).key === "tin" && so.buyFind(F, "tin", day).ok && F.inv.s_tin === 1 && (!so.storyFind(F) || so.storyFind(F).key !== "tin"), "the car boot sale turns up the Marchand & Fille tin for Celeste's story");
+    check(!so.buyFind(mk({celeste: 2}), "tin", "2026-10-24"), "story finds are only on the table on a Sunday morning"); }
+  { const F = mk({theo: len("theo") - 1, juniper: 6}); F.met = {theo: true}; F.south = {ponies: {pebble: {trust: 5}}};
+    const t = st.tellStory(F, "theo", (id, n) => { F.inv[id] = (F.inv[id] || 0) + n; }, day);
+    check(t && /Grey Pony/.test(t.lines.join(" ")) && F.inv.s_ponypoem === 1, "once Pebble trusts you, Theo shows you Juniper's poem about her"); }
+  { const F = mk({juniper: 7}); check(so.storyFind(F) && so.storyFind(F).key === "notebook" && !so.storyFind(mk({juniper: 6})), "Juniper's old notebook turns up once she's told you about Pebble"); }
+  check(!/[–—]/.test(JSON.stringify([sd.STORIES.bram, so.TALES, so.STORY_FINDS])), "no dashes in the new chapters");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");

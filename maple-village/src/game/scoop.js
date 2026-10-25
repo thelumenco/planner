@@ -51,7 +51,7 @@ export const INGR = {
   chocolate: ["Dark chocolate", "Chocolate", "#5A3A2A"], vanilla: ["Vanilla", "Vanilla", "#F6EBC8"], coffee: ["Coffee", "Coffee", "#8A5A3A"], pistachio: ["Pistachios", "Pistachio", "#A8C98A"],
   hazelnut: ["Hazelnuts", "Hazelnut", "#B98A5A"], coconut: ["Coconut", "Coconut", "#F6F1E8"], matcha: ["Matcha", "Matcha", "#8FB86A"], pandan: ["Pandan", "Pandan", "#7FB86A"],
   gulamelaka: ["Gula melaka", "Gula Melaka", "#9A5A2E"], sesame: ["Black sesame", "Black Sesame", "#4A4440"], mint: ["Mint", "Mint", "#9FD3B2"], banana: ["Bananas", "Banana", "#F3E07A"],
-  grape_red: ["Red grapes", "Red Grape", "#7A2E5A"], grape_white: ["White grapes", "White Grape", "#C9D98A"], grape_tempranillo: ["Tempranillo grapes", "Tempranillo", "#3A2050"], grape_pinot: ["Pinot Noir grapes", "Pinot Noir", "#4A2A4E"], grape_chardonnay: ["Chardonnay grapes", "Chardonnay", "#D9D27A"],
+  grape_red: ["Red grapes", "Red Grape", "#7A2E5A"], grape_white: ["White grapes", "White Grape", "#C9D98A"], grape_tempranillo: ["Tempranillo grapes", "Tempranillo", "#3A2050"], grape_priory: ["Priory Red grapes", "Priory Red", "#3A1428"], grape_pinot: ["Pinot Noir grapes", "Pinot Noir", "#4A2A4E"], grape_chardonnay: ["Chardonnay grapes", "Chardonnay", "#D9D27A"],
   basil: ["Basil", "Basil", "#7FB86A"], rosemary: ["Rosemary", "Rosemary", "#8FA88A"], thyme: ["Thyme", "Thyme", "#9DB08A"],   // greenhouse herbs (round 109)
   almond: ["Marcona almonds", "Almond", "#E8D3A8"], sevilla: ["Seville oranges", "Bitter Orange", "#F28C28"], membrillo: ["Membrillo", "Quince", "#D98A4A"], oliveoil: ["Olive oil", "Olive Oil", "#C9C25A"],   // from Ronda (round 107)
   yuzu: ["Yuzu", "Yuzu", "#F3D34A"], hojicha: ["Hōjicha", "Hōjicha", "#A8754F"], mochi: ["Mochi", "Mochi", "#FBEFF2"], sakura: ["Sakura", "Sakura", "#F6C7D6"],   // from Kyoto (round 122)
@@ -60,7 +60,7 @@ export const INGR = {
   // round 231: a bottle of your own wine (taken from the cellar's wine store), Saltwick's dark rum, and raisins dried in the loft
   wine_red: ["Your red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Your rosé", "Rosé", "#E98AA0"], wine_white: ["Your white wine", "White Wine", "#E8D57A"],
   wine_sparkling: ["Your sparkling wine", "Sparkling Wine", "#F3E7B0"], wine_tempranillo: ["Your Tempranillo", "Tempranillo Wine", "#5A1630"],
-  wine_pinot: ["Your Pinot Noir", "Pinot Noir", "#8A2E3E"], wine_chardonnay: ["Your Chardonnay", "Chardonnay", "#E8C96A"],
+  wine_pinot: ["Your Pinot Noir", "Pinot Noir", "#8A2E3E"], wine_priory: ["Your Priory Red", "Priory Red", "#4A1B2E"], wine_chardonnay: ["Your Chardonnay", "Chardonnay", "#E8C96A"],
   rum: ["Sailor's dark rum", "Rum", "#8A4A1E"], raisins: ["Raisins", "Raisin", "#5A2E3A"],
   pinenuts: ["Pine nuts", "Pine Nut", "#F3E7C8"], limoncino: ["Your limoncino", "Limoncino", "#F6E27A"],   // from Cinque Terre (round 132; basil and lemon were already here)   // from Jeju (round 128; tangerines come in as an orchard fruit)
   wattleseed: ["Wattleseed", "Wattleseed", "#8A5A3A"], raspberry: ["Raspberries", "Raspberry", "#D9435A"], goldensyrup: ["Golden syrup", "Golden Syrup", "#E8A83A"], honey_heath: ["Coastal heath honey", "Heath Honey", "#E3B04B"], honey_cream: ["Creamed honey", "Creamed Honey", "#F3E1A0"], honeycomb: ["Honeycomb", "Honeycomb", "#E8B04A"], euchoney: ["Eucalyptus honey", "Eucalyptus Honey", "#C98A2E"], macadamia: ["Macadamias", "Macadamia", "#E8D9B8"], fingerlime: ["Finger limes", "Finger Lime", "#9CC45A"], honey_sun: ["Sunflower honey", "Sunflower Honey", "#E3B04B"],   // from the Tablelands (round 158)

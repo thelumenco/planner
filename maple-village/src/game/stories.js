@@ -10,6 +10,7 @@ import { NPCS } from "../data/npcs.js";
 import { esc, dayKey } from "../util.js";
 import { FISH } from "./fishing.js";
 import { TAPAS } from "./kitchen.js";
+import { addCuttings } from "./vineyard.js";
 
 export function storyState(F){ F.story = F.story || {}; const s = F.story; s.heard = s.heard || {}; s.day = s.day || {}; s.log = s.log || []; s.flags = s.flags || {}; return s; }
 const owns = (F, k) => !!(F.goals && F.goals[k]);
@@ -21,6 +22,11 @@ function gateOk(F, g){
   if (g === "fish5") return Object.keys((F.fish && F.fish.caught) || {}).length >= 5;
   if (g === "mill") return owns(F, "mill");
   if (g === "passage") return ((F.passage && F.passage.step) || 0) >= 5;   // round 229: the secret passage found
+  // rounds 272 to 275: the bottom row's threads
+  if (g === "lowertrellis") return !!(F.vine && (F.vine.rows || []).slice(3).some(r => r && r.trellis));
+  if (g === "pebble5") return ((((F.south || {}).ponies || {}).pebble || {}).trust || 0) >= 5;
+  if (g === "flask") return !!(F.south && F.south.flask);
+  if (["tin", "seal", "railkey", "notebook"].includes(g)) return !!(F.south && F.south.finds && F.south.finds[g]);
   if (g === "oil") return ((F.mill && F.mill.made) || 0) > 0;   // the first bottle pressed at the old mill
   if (g === "ronda2") return ((F.ronda && F.ronda.days) || []).length >= 2;   // a second day in Ronda
   if (g === "tiles4") return Object.keys((F.ronda && F.ronda.tiles) || {}).length >= 4;
@@ -59,6 +65,9 @@ export function storyReady(F, id, day = dayKey()){
 }
 // the chapter's rewards, applied once when it's told; addInv adds to the backpack; -> a line for the flash, or ""
 const REWARDS = {
+  priory: F => { addCuttings(F, "priory", 3); return "three cuttings of the monks' own grape, Priory Red, for your trellises"; },
+  seacave: F => { storyState(F).flags.seacave = true; return "Bram's directions to the sea door below the lighthouse (low tide only)"; },
+  ponypoem: (F, addInv) => { addInv("s_ponypoem", 1); return "a copy of Juniper's poem, 'The Grey Pony' (a keepsake)"; },
   henri: (F, addInv) => { addInv("s_recipebook", 1); addInv("s_praline", 2); return "Henri's recipe book (a keepsake) and two boxes of his hazelnut pralines"; },
   margaux: F => { F.vine = F.vine || {}; F.vine.cellar = F.vine.cellar || []; F.vine.cellar.push({id: "wmargaux", name: "Margaux 1984", type: "red", n: 1}); return "a bottle of Margaux 1984, in your cellar"; },
   label: (F, addInv) => { addInv("s_label", 1); return "Theo's Marchand label (a keepsake for a shelf)"; },

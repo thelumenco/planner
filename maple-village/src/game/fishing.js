@@ -19,6 +19,8 @@ export const SPOTS = {
   sea: {scene: "shore", n: "The sea by the pier", place: "fishsea", line: "Waves on the sand, and gulls hoping you're bad at this."},
   pool: {scene: "hwoods", n: "The waterfall pool", place: "fishpool", line: "Cold, clear water under the falls. The trout here are wily."},
   // round 114: sunset fishing off the bay, Friday evenings 5 to 8 only (red mullet, and once in a blue moon a tuna)
+  // round 270 (Mel: "mackerel fishing off the rocks"): the rocks below the lighthouse, where the mackerel run
+  rocks: {scene: "lighthouse", n: "The rocks at Lighthouse Point", place: "fishrocks", line: "Spray on the rocks, the lighthouse behind you, and the mackerel flashing silver below."},
   bay: {scene: "bay", n: "Sunset fishing at the bay", place: "fishbay", line: "Friday evening, the sun going down over the sea, and the fish coming up to feed.", open: (day, hm) => new Date(day + "T00:00:00Z").getUTCDay() === 5 && hm >= 17*60 && hm < 20*60}
 };
 export const spotIn = scene => Object.keys(SPOTS).find(k => SPOTS[k].scene === scene) || null;
@@ -38,8 +40,8 @@ export const FISH = {
   crayfish: {n: "Crayfish", spot: "lake", w: 16, cm: [8, 15], hard: 1, item: "crayfish", hint: "The lake, at night or in the rain."},
   eel: {n: "Eel", spot: "lake", w: 9, when: "night", cm: [40, 90], hard: 4, item: "fish", hint: "The lake, at night."},
   anchovy: {n: "Anchovy", spot: "sea", also: ["bay"], w: 26, cm: [8, 15], hard: 1, item: "anchovy", hint: "The sea, in a silver shoal, any time."},   // round 132
-  sardine: {n: "Sardine", spot: "sea", also: ["bay"], w: 32, cm: [12, 20], hard: 1, item: "sardine", hint: "The sea, any time."},
-  mackerel: {n: "Mackerel", spot: "sea", also: ["bay"], w: 24, when: "day", cm: [25, 40], hard: 2, item: "mackerel", hint: "The sea, in daylight."},
+  sardine: {n: "Sardine", spot: "sea", also: ["bay", "rocks"], w: 32, cm: [12, 20], hard: 1, item: "sardine", hint: "The sea, any time."},
+  mackerel: {n: "Mackerel", spot: "sea", also: ["bay", "rocks"], w: 24, when: "day", cm: [25, 40], hard: 2, item: "mackerel", hint: "The sea, in daylight."},
   seabream: {n: "Sea bream", spot: "sea", also: ["bay"], w: 14, cm: [25, 45], hard: 3, item: "seabream", hint: "The sea, any time. Fussy."},
   squid: {n: "Squid", spot: "sea", w: 14, when: "night", cm: [20, 40], hard: 3, item: "squid", hint: "The sea, after dark."},
   octopus: {n: "Octopus", spot: "sea", w: 8, rain: true, cm: [40, 80], hard: 4, item: "octopus", hint: "The sea, when it's raining."},
@@ -49,6 +51,8 @@ export const FISH = {
   shrimp: {n: "Shrimp", spot: "sea", w: 26, when: "dawn", cm: [6, 12], hard: 1, item: "shrimp", hint: "The sea, in the morning. For gambas!"},   // round 109
   mullet: {n: "Red mullet", spot: "bay", w: 16, cm: [15, 30], hard: 3, item: "mullet", hint: "The bay, on a Friday at sunset."},
   tuna: {n: "Bluefin tuna", spot: "bay", w: 2, cm: [80, 160], hard: 5, item: "tuna", rare: true, hint: "The bay at sunset. Once in a blue moon."},
+  bass: {n: "Sea bass", spot: "rocks", w: 10, when: "dusk", cm: [30, 60], hard: 4, item: "fish", hint: "Off the rocks at Lighthouse Point, as the sun goes down."},   // round 270
+  pollack: {n: "Pollack", spot: "rocks", w: 16, cm: [25, 50], hard: 2, item: "fish", hint: "Off the rocks at Lighthouse Point, any time."},
   seaglass: {n: "Sea glass", spot: "sea", w: 6, cm: [2, 4], hard: 1, item: null, junk: true, hint: "The sea. Smoothed by the waves; it goes on the windowsill."}
 };
 // crayfish come out at night or in the rain

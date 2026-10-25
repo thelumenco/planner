@@ -385,5 +385,9 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   personal edition is Mr Okada's here, and the pony ride is the player's own (no child).
 - The vineyard has 7 rows now (`ROWS`): rows 3 to 6 are on the lower vineyard. Bike hire on the green and at the
   lighthouse; a paddleboard jetty at Lighthouse Point (`lsup`). The map (minimap.js) has the new row.
-- Rounds 2 to 4 of the port (Bram, your own pony, the story threads, the allotments screen, beachcombing, bottles, the
-  priory ruins, inside the lighthouse) follow.
+- Round 2: Bram the lighthouse keeper (npcs.js, stories, loves written here), his tales (`keeperTale`), a pony of your
+  own (1,200, `buyPony`), the mackerel rocks (`fishrocks`: pollack and sea bass), the Sunday car boot sale (data/carboot.js)
+  and the Monday lamp lighting (`eventSlotSouth`). The story threads: Priory Red (a new grape, wired through the wine
+  code), the flask and the sea cave (gated on `F.passage.step >= 5` here), Theo and Juniper's pony poem, and the car boot
+  story finds. This edition's Juniper has one more chapter, so her notebook needs 7 chapters heard, not 6.
+- Rounds 3 and 4 of the port (the allotments screen, beachcombing, bottles, the priory ruins, inside the lighthouse) follow.

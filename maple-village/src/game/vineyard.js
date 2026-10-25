@@ -22,11 +22,13 @@ export const STYLES = {red: {n: "Red", grape: "red", dur: 10*H, price: 18, col: 
   // round 107: from Rafael's cuttings in Ronda. A deep Spanish red: longer in the barrel, dearer on the shelf
   tempranillo: {n: "Tempranillo", grape: "tempranillo", dur: 12*H, price: 28, col: "#5A1630"},
   // round 145: from Kel's cuttings in Bellbird Valley. A light, cherry-ish Pinot Noir and a buttery Chardonnay
-  pinot: {n: "Pinot Noir", grape: "pinot", dur: 11*H, price: 24, col: "#8A2E3E"}, chardonnay: {n: "Chardonnay", grape: "chardonnay", dur: 9*H, price: 22, col: "#E8C96A"}};
+  pinot: {n: "Pinot Noir", grape: "pinot", dur: 11*H, price: 24, col: "#8A2E3E"}, chardonnay: {n: "Chardonnay", grape: "chardonnay", dur: 9*H, price: 22, col: "#E8C96A"},
+  // round 272: the monks' own grape, found alive behind the old press on the lower vineyard (Marco's story)
+  priory: {n: "Priory Red", grape: "priory", dur: 13*H, price: 30, col: "#4A1B2E"}};
 // the grapes the player can grow (Tempranillo once she's brought cuttings home from Ronda)
-export const grapeKinds = v => ["red", "white", ...(v.tempra ? ["tempranillo"] : []), ...(v.pinot ? ["pinot"] : []), ...(v.chard ? ["chardonnay"] : [])];
-const GRAPE_N = {red: "Red", white: "White", tempranillo: "Tempranillo", pinot: "Pinot Noir", chardonnay: "Chardonnay"};
-const FLAG = {tempranillo: "tempra", pinot: "pinot", chardonnay: "chard"};
+export const grapeKinds = v => ["red", "white", ...(v.tempra ? ["tempranillo"] : []), ...(v.pinot ? ["pinot"] : []), ...(v.chard ? ["chardonnay"] : []), ...(v.priory ? ["priory"] : [])];
+const GRAPE_N = {red: "Red", white: "White", tempranillo: "Tempranillo", pinot: "Pinot Noir", chardonnay: "Chardonnay", priory: "Priory Red"};
+const FLAG = {tempranillo: "tempra", pinot: "pinot", chardonnay: "chard", priory: "priory"};
 const gName = k => k === "red" || k === "white" ? k : GRAPE_N[k];
 export const hasGrape = (v, k) => !FLAG[k] || !!v[FLAG[k]];
 export function addCuttings(F, kind, n){ const v = vineState(F); v.cuttings[kind] = (v.cuttings[kind] || 0) + n; if (FLAG[kind]) v[FLAG[kind]] = true; }
@@ -57,7 +59,7 @@ export function vineState(F){
   v.cuttings = v.cuttings || {red: 1, white: 1}; v.grapes = v.grapes || {red: 0, white: 0}; v.keep = v.keep || {red: 0, white: 0};
   v.barrels = v.barrels || [null]; v.cellar = v.cellar || []; v.shelf = v.shelf || []; v.box = v.box || 0; v.sold = v.sold || 0; v.glasses = v.glasses || 0; v.menu = v.menu || {}; v.plates = v.plates || 0; v.fruit = v.fruit || {};
   v.help = Object.assign({cook: true, pick: true, barrels: true, stock: true, fetch: false}, v.help || {}); v.names = v.names || {};
-  ["tempranillo", "pinot", "chardonnay"].forEach(k => { v.cuttings[k] = v.cuttings[k] || 0; v.grapes[k] = v.grapes[k] || 0; v.keep[k] = v.keep[k] || 0; });
+  ["tempranillo", "pinot", "chardonnay", "priory"].forEach(k => { v.cuttings[k] = v.cuttings[k] || 0; v.grapes[k] = v.grapes[k] || 0; v.keep[k] = v.keep[k] || 0; });
   if (v.tapas) { v.tapasList = [v.tapas]; delete v.tapas; }   // (saves from before round 108 had one tapas a day)
   v.tapasList = v.tapasList || [];
   v.lastTick = v.lastTick || Date.now(); v.today = v.today || {day: "", bottles: 0, glasses: 0, coins: 0};
@@ -132,8 +134,8 @@ export function secondFerment(F, slot){ const v = vineState(F), b = v.barrels[sl
 // the shelves are skipped. k picks the next suggestion.
 const W_PLACE = ["Jetty Sunset", "Dolphin Bay", "Lantern Night", "Low Tide", "Sea Breeze", "Golden Hour", "Swan Lake", "Porch Swing", "First Light", "Rainy Window", "Orchard Hill", "Wildflower", "Night Market", "Paddleboard", "Harvest Moon", "Morning Mist", "Kite Day", "Sunday Picnic", "Firefly", "Boardwalk", "Lighthouse", "Monsoon", "Frangipani", "Hammock"];
 const W_WHO = ["Meadow", "Farid's", "Mei's", "Hana's", "Bo's", "Pip's", "Marco's", "Ines's", "Harbourmaster's", "Ferryman's"];
-const W_WORD = {pinot: ["Pinot", "Pinot Noir", "Reserve", "Cherry Hill"], chardonnay: ["Chardonnay", "Chardy", "Golden", "Reserve"], tempranillo: ["Tempranillo", "Reserva", "Crianza", "Tinto"], red: ["Red", "Reserve", "Rouge", "Old Vine"], rose: ["Rosé", "Blush", "Pink"], white: ["White", "Blanc", "Crisp"], sparkling: ["Bubbles", "Fizz", "Brut", "Sparkle"]};
-const W_FR = {pinot: ["Bellbird Ridge", "Gum Creek Pinot", "Kel's Row"], chardonnay: ["Wattle Hill", "Balloon Lookout", "Riverside Chardonnay"], tempranillo: ["Puente Nuevo", "Tajo Reserva", "Viña Ronda", "Bodega del Pozo"], red: ["Château du Verger", "Clos de la Baie", "Domaine du Lac", "Grand Cru du Verger"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée du Pré", "Crémant de la Baie", "Pétillant du Lac"]};
+const W_WORD = {priory: ["Priory Red", "Vinum Prioris", "Brothers' Red", "Old Root"], pinot: ["Pinot", "Pinot Noir", "Reserve", "Cherry Hill"], chardonnay: ["Chardonnay", "Chardy", "Golden", "Reserve"], tempranillo: ["Tempranillo", "Reserva", "Crianza", "Tinto"], red: ["Red", "Reserve", "Rouge", "Old Vine"], rose: ["Rosé", "Blush", "Pink"], white: ["White", "Blanc", "Crisp"], sparkling: ["Bubbles", "Fizz", "Brut", "Sparkle"]};
+const W_FR = {priory: ["The Priory Vine", "Monks' Hill", "Lower Press"], pinot: ["Bellbird Ridge", "Gum Creek Pinot", "Kel's Row"], chardonnay: ["Wattle Hill", "Balloon Lookout", "Riverside Chardonnay"], tempranillo: ["Puente Nuevo", "Tajo Reserva", "Viña Ronda", "Bodega del Pozo"], red: ["Château du Verger", "Clos de la Baie", "Domaine du Lac", "Grand Cru du Verger"], rose: ["Rosé de la Jetée", "Vie en Rose", "Clos des Cygnes"], white: ["Blanc de la Baie", "Domaine des Lanternes", "Clos du Matin"], sparkling: ["Cuvée du Pré", "Crémant de la Baie", "Pétillant du Lac"]};
 export function wineNames(F, slot){
   const v = vineState(F), b = v.barrels[slot]; if (!b) return [];
   const used = new Set([...v.cellar, ...v.shelf].map(x => x.name.toLowerCase())), st = b.style, seed = Math.floor(b.start || 0) + slot*7919, out = [];
@@ -223,7 +225,7 @@ export function sellTick(F, opts = {}){
       v.rows.forEach(row => row.trellis && row.vines.forEach(vn => { if (vn && !vn.wateredAt) { vn.wateredAt = at; out.watered++; } }));
       if (v.help.pick) { if (v.olive && at - (v.olive.pickedAt || v.olive.planted) >= OLIVE) { v.olive.pickedAt = at; v.oliveCrate = (v.oliveCrate || 0) + TREE_JARS; out.olives = (out.olives || 0) + TREE_JARS; }
         if (v.grove && at - (v.grove.pickedAt || v.grove.planted) >= OLIVE) { v.grove.pickedAt = at; const n = GROVE_JARS*(v.grove2 ? 2 : 1); v.oliveCrate = (v.oliveCrate || 0) + n; out.olives = (out.olives || 0) + n; } }
-      if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const spare = c => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st = spare("tempranillo") ? "tempranillo" : spare("pinot") ? "pinot" : spare("chardonnay") ? "chardonnay" : spare("red") ? "red" : spare("white") ? "white" : null;
+      if (v.help.barrels) v.barrels.forEach((b, i) => { if (b) return; const spare = c => v.grapes[c] - (v.keep[c] || 0) >= PER_BATCH, st = spare("priory") ? "priory" : spare("tempranillo") ? "tempranillo" : spare("pinot") ? "pinot" : spare("chardonnay") ? "chardonnay" : spare("red") ? "red" : spare("white") ? "white" : null;
         if (st) { v.grapes[st] -= PER_BATCH; v.barrels[i] = {style: st, start: at, dur: STYLES[st].dur, stage: 1}; out.filled++; } });
     }
     if (w.staff && v.help.stock && v.cellar.some(c => !c.rack && !c.keep)) { const go = v.cellar.filter(c => !c.rack && !c.keep); out.stocked += go.reduce((n, c) => n + c.n, 0); go.forEach(c => stock(F, c.id)); }   // (never the ones you're keeping in the cellar)
@@ -322,7 +324,7 @@ export function stallPanel(F){
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 export const vy = {name: {}};
-export const GRAPE_COL = {red: "#7A2E5A", white: "#C9D98A", tempranillo: "#3A2050", pinot: "#4A2A4E", chardonnay: "#D9D27A"};
+export const GRAPE_COL = {priory: "#3A1428", red: "#7A2E5A", white: "#C9D98A", tempranillo: "#3A2050", pinot: "#4A2A4E", chardonnay: "#D9D27A"};
 const grapePic = c => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="${GRAPE_COL[c] || "#C9D98A"}" stroke="#3A2E28" stroke-width="1"/>`).join("")}<path d="M12 5 V2" stroke="#3A2E28" stroke-width="1.2"/></svg>`;
 /* ---------- round 228: the wine store at the cellar door ---------- */
 // The creator: "I thought I'd get extra space for stocking wines that I don't want to put on shelves yet". Bottled wine

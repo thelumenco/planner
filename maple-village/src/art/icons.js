@@ -4,6 +4,7 @@ import { dipIcon } from "./scoop-icons.js";
 import { lipIcon } from "./lip-icons.js";
 import { TREES, FLOWERS } from "../data/orchard.js";
 import { GOODS } from "../data/stall-goods.js";
+import { CARBOOT } from "../data/carboot.js";
 import { CR_BOUQUETS } from "../data/bouquets.js";
 // Hand-drawn icon set (ink outline + marker fill, same look as the map). No emoji anywhere in the game.
 //   icon(name, size)        -> inline <svg> for HTML (buttons, panels, notes)
@@ -196,7 +197,7 @@ I.sp_cardamom = [`<ellipse cx="8" cy="13" rx="3" ry="5" transform="rotate(-20 8 
 I.sp_ginger = [`<path d="M4 14c0-3 3-4 5-3 0-3 3-4 4-2 2-2 5-1 5 2 2 0 3 3 1 5-2 2-6 1-8 2-3 1-7 0-7-4z" ${f("#E3C08A")}/>`, `<path d="M4 14c0-3 3-4 5-3 0-3 3-4 4-2 2-2 5-1 5 2 2 0 3 3 1 5-2 2-6 1-8 2-3 1-7 0-7-4zM9 11c1 1 1 3 0 4M14 10c0 2 1 3 2 3"/>`];
 I.banana = [`<path d="M5 8c2 8 9 11 14 8-1 3-5 5-9 4S4 14 5 8z" ${f("#F3E07A")}/>`, `<path d="M5 8c2 8 9 11 14 8-1 3-5 5-9 4S4 14 5 8zM5 8l-1-2"/>`];
 const grapes = c => [`${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3" ${f(c)}/>`).join("")}`, `${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3"/>`).join("")}<path d="M12 5V2"/>`];
-I.grape_red = grapes("#7A2E5A"); I.grape_white = grapes("#C9D98A"); I.grape_tempranillo = grapes("#3A2050"); I.grape_pinot = grapes("#4A2A4E"); I.grape_chardonnay = grapes("#D9D27A");
+I.grape_red = grapes("#7A2E5A"); I.grape_white = grapes("#C9D98A"); I.grape_tempranillo = grapes("#3A2050"); I.grape_pinot = grapes("#4A2A4E"); I.grape_priory = grapes("#3A1428"); I.grape_chardonnay = grapes("#D9D27A");
 I.loaf = [`<path d="M4 15c0-6 4-8 8-8s8 2 8 8v4H4z" ${f("#D9A066")}/>`, `<path d="M4 15c0-6 4-8 8-8s8 2 8 8v4H4zM9 9l1 4M13 8l1 4M17 9l-1 4"/>`];
 // the Scoop Shack: an ice cream to give, by type
 I.ic_cup = [`<path d="M6 12h12l-1.6 8h-8.8z" ${f("#F4C7CF")}/><path d="M7 12c0-4 2.5-6 5-6s5 2 5 6z" ${f("#FFF6DC")}/>`, `<path d="M6 12h12l-1.6 8h-8.8zM7 12c0-4 2.5-6 5-6s5 2 5 6"/><path d="M14 6l3-3"/>`];
@@ -446,12 +447,14 @@ CR_BOUQUETS.forEach(b => { I[b.id] = [`<path d="M7.5 12.5l4.5 9.5 4.5-9.5z" ${f(
   I.coin_tin = [`<ellipse cx="12" cy="15.5" rx="8" ry="4" ${f("#C2505F")}/><path d="M4 12.5v3c0 2.2 3.6 4 8 4s8-1.8 8-4v-3" ${f("#C2505F")}/><ellipse cx="12" cy="12.5" rx="8" ry="4" ${f("#D9433A")}/><circle cx="12" cy="12.4" r="2.6" ${f("#F3C969")}/>`,
     `<ellipse cx="12" cy="12.5" rx="8" ry="4"/><path d="M4 12.5v3c0 2.2 3.6 4 8 4s8-1.8 8-4v-3"/><circle cx="12" cy="12.4" r="2.6"/><path d="M11.2 12.4h1.6" opacity=".6"/>`];
   // round 107: Ronda's goods, and the Tempranillo grape and wine
+  // round 271: the car boot sale's curios (game/south.js)
+  Object.entries(CARBOOT).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   // round 196: the makers' shelf in the gift shop (game/gallery.js)
   [["mk_cards", "tile", "#FFFDF6", "#F4C7CF"], ["mk_spoon", "disc", "#C9A27E", "#8A5A3A"], ["mk_pettoy", "tile", "#C3CDEE", "#F4C7CF"], ["mk_bird", "bird", "#C9A27E"], ["mk_honeybutter", "jar", "#F3D98A", "#FFFDF6"], ["mk_wraps", "cloth", "#F6E3A1", "#9EBE8C"]].forEach(([id, sh, a, b]) => { if (!I[id]) I[id] = (S[sh] || S.box)(a, b); });
   // round 132: what you make in the loft (game/loft.js)
   [["w_raisin", "bottle", "#C98A2E", "#5A3A2E"], ["limoncino", "bottle", "#F3D34A", "#FFFDF6"], ["anchovy_salt", "jar", "#9FC3D9", "#F3ECDD"], ["raisins", "jar", "#5A2E3A", "#F3ECDD"], ["rum", "bottle", "#5A2E1A", "#C98A4E"]].forEach(([id, sh, a, b]) => { if (!I[id]) I[id] = (S[sh] || S.box)(a, b); });
-  I.wine_tempranillo = S.bottle("#5A1630"); I.wine_pinot = S.bottle("#8A2E3E"); I.wine_chardonnay = S.bottle("#E8C96A");
+  I.wine_tempranillo = S.bottle("#5A1630"); I.wine_pinot = S.bottle("#8A2E3E"); I.wine_priory = S.bottle("#4A1B2E"); I.wine_chardonnay = S.bottle("#E8C96A");
 }
 // round 109: greenhouse herbs, and shrimp from the sea
 I.garlic = [`<path d="M12 4c1 3 6 5 6 10a6 5 0 0 1-12 0c0-5 5-7 6-10z" ${f("#F6F1E8")}/><path d="M12 4v-2" ${f("none")}/>`, `<path d="M12 4c1 3 6 5 6 10a6 5 0 0 1-12 0c0-5 5-7 6-10zM12 9v10M9 10c-1 3-1 6 0 9M15 10c1 3 1 6 0 9" /><path d="M12 4v-2"/>`];

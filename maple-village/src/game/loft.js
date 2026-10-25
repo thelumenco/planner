@@ -29,7 +29,7 @@ export const loftState = F => { F.loft = F.loft || {}; F.loft.made = F.loft.made
 const ct = F => F.cinque || {};
 export const loftOpen = F => !!(F.towns && F.towns.cinque);
 export const canRaisin = F => !!ct(F).raisin, canPesto = F => !!ct(F).pestoLesson;
-const GRAPES = ["grape_red", "grape_white", "grape_tempranillo", "grape_pinot", "grape_chardonnay"];
+const GRAPES = ["grape_red", "grape_white", "grape_tempranillo", "grape_pinot", "grape_chardonnay", "grape_priory"];
 const grapesHave = inv => GRAPES.reduce((n, k) => n + (inv[k] || 0), 0);
 const cheeseOf = inv => ["cheese", ...Object.keys(inv).filter(k => /^chz_/.test(k))].find(k => inv[k] > 0);
 const take = (inv, k, n) => { inv[k] -= n; if (!inv[k]) delete inv[k]; };

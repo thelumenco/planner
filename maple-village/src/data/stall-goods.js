@@ -127,6 +127,14 @@ const P = (n, price, line, art, pet) => ({n, kind: "pet", price, line, art, pet,
 Object.assign(GOODS, {
   s_recipebook: K("Henri's recipe book", 0, "Henri Marchand's chocolate recipes, in faded ink, 1962 onwards.", ["box", "#8A5A3A"]),
   s_label: K("The first Marchand label", 0, "Theo's painting of the Marchand & Fille label: a ribbon and a copper pot.", ["star", "#E8C48E"]),
+  // rounds 272 to 275: the bottom row's story things (found, bought at the car boot sale, or given)
+  s_ponypoem: K("'The Grey Pony'", 0, "A copy of Juniper's poem about a dapple grey pony with a white star, in Theo's careful handwriting.", ["cloth", "#C3CDEE"]),
+  s_flask: K("The priory flask", 0, "A sealed stoneware flask from the rock pools, stamped with a little cross and a vine: the old priory's mark.", ["jar", "#B9A88A", "#6B5A44"]),
+  s_tin: K("A Marchand & Fille tin", 0, "Henri Marchand's Christmas truffle tin, with gold holly on the lid. Celeste was so happy to see it.", ["box", "#8E2C48"]),
+  s_seal: K("A priory wax seal", 0, "A brass seal with a cross and a vine. The monks sealed every barrel with one.", ["disc", "#C9A04A"]),
+  s_railkey: K("Tomás's railway key", 0, "A heavy iron railway key with an R on the bow. Tomás Ruiz's, from before he found the cave.", ["pin", "#6B6B6B"]),
+  s_notebook: K("Juniper's notebook", 0, "Juniper's notebook from when she was twelve: pony drawings, terrible poems, and a pressed sea pink.", ["cloth", "#F4C7CF"]),
+  s_priorybottle: K("A priory bottle", 0, "A squat, dark glass bottle from the sea cave, still corked. Nobody knows what's inside. Nobody wants to find out.", ["bottle", "#3A1428"]),
   // (the loves round: once their chapters are told, the pralines are made at the Cocoa Room from Henri's book, Hana
   // sells Postman's toast on her Treats shelf and the Scoop Shack makes Nonna's fior di latte; `story` is the reward)
   s_praline: {...G("Henri's hazelnut pralines", "family", 14, null, "Hazelnut pralines, from Henri's own recipe. Melt-in-the-mouth.", ["box", "#C98A4A"]), dairy: true},

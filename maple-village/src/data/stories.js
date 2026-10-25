@@ -232,3 +232,35 @@ export const STORIES = {
   ],
 
 };
+
+// Rounds 272 to 275 (the creator: "how can these new screens tie in more closely with the villagers' stories and overall
+// arc"): the bottom row joins the threads. The priory's vine (Marco, Hazel), the flask and the sea cave (Hazel, Ines,
+// Bram), Pebble and Juniper's poem (Theo, Juniper), and the car boot sale's story finds (Celeste, Hazel, Ines,
+// Juniper). Gates: "lowertrellis" (and "passage" for the cave), , "flask", "pebble5", "tin", "seal", "railkey", "notebook" (game/stories.js).
+STORIES.marco.push(
+  {recap: "I gave you my Margaux 1984, remember. Open it on a good day.", needs: ["passage", "hazel:3", "lowertrellis"], lines: ["I was clearing behind the old press on the lower vineyard and there it was. A root as thick as my arm, still putting out leaves.", "The monks' vine. Six hundred years in the ground and still alive. I took three cuttings, very carefully. They're yours."], reward: "priory"}
+);
+STORIES.hazel.push(
+  {recap: "My gran's café, salt on the windows, and now it's yours.", needs: ["marco:6"], lines: ["Marco found the brothers' own vine? Gran used to talk about it. A dark wine they called Vinum Prioris. The priory's red.", "She said they drank it at Easter and sold the rest to the boats. Make it again, love. Make it properly."]},
+  {recap: "Vinum Prioris, the monks' red. Gran would be so proud you're growing it.", needs: ["flask"], lines: ["Let me see that flask. A cross and a vine: that's the priory's mark, the same as on the old press.", "But if it washed up below the lighthouse, love, the passage didn't stop at the Scoop Shack. It went on, down to the sea. Ask Ines. Tomás kept notes."]},
+  {recap: "The priory's flask, washed up below the lighthouse. The passage went on to the sea.", needs: ["seal"], lines: ["A priory wax seal, at the car boot? Who'd sell that for eight coins?", "The brothers sealed every barrel with one. Gran had one just like it on her mantelpiece. Keep it safe."]}
+);
+STORIES.ines.push(
+  {recap: "Abuela's olive oil cake is on your menu now. A royal decree.", needs: ["hazel:7"], lines: ["Tomás's notebook! Abuela still has it. Listen: 'The passage goes down past the cellar, past the bay, under the headland to a door in the rock. The sea comes in at high water.'", "A sea door below the lighthouse. Bram would know. He's lived on that point his whole life."]},
+  {recap: "Tomás wrote about a sea door, under the headland below the lighthouse.", needs: ["railkey"], lines: ["Is that a railway key? That's Tomás's! See the R on the bow. He was the stationmaster's lad before he found the cave.", "Abuela will cry. In a good way. Can I take it to show her? I'll bring it straight back."]}
+);
+STORIES.bram = [
+  {lines: ["Forty years I've kept this light, and my father before me.", "People think it's lonely. It's not. The sea's always saying something."]},
+  {recap: "My father kept this light before me, I told you.", needs: ["bram:1"], lines: ["That wreck I told you about, full of tea? I've a confession. Father always said it was wine, not tea.", "A little boat from the old priory, going down the coast in the dark. I always thought it was just a story."]},
+  {recap: "Father said the wreck under the headland was a priory boat, carrying wine.", needs: ["ines:7"], lines: ["A sea door, Tomás wrote? I know it. Below the point, behind the rock pools. You can only get in at the lowest tide.", "Go at low water, mornings or evenings. Mind your feet on the weed. And tell me what you find."], reward: "seacave"}
+];
+STORIES.theo.push(
+  {recap: "Juniper's reading at the night market. Front row, second row, for nerves.", needs: ["pebble5"], lines: ["I've found something in Juniper's old poems. Look: 'The Grey Pony'. All about a dapple grey with a white star, and a girl who rode her on the beach.", "That's Pebble, at the Stables. It must be. Juniper doesn't know I know. Don't tell her yet."], reward: "ponypoem"}
+);
+STORIES.juniper.push(
+  {recap: "Lin in the front row at my reading. I'd never have got up there without her.", needs: ["theo:6"], lines: ["Theo showed you 'The Grey Pony', didn't he. Of course he did.", "Pebble was mine when I was eleven. I had to sell her when I went away to college. I cried for a week. I go and see her sometimes, very early, before anyone's up."]},
+  {recap: "Pebble was my pony when I was a girl. I still visit her.", needs: ["notebook"], lines: ["Where did you find this? It's my notebook from when I was twelve! Pony drawings, terrible poems, a pressed sea pink.", "Oh, look: 'When I grow up I will write books and live by the sea.' Well. Half right, so far."]}
+);
+STORIES.celeste.push(
+  {recap: "Maman always said wine and chocolate are old friends.", needs: ["tin"], lines: ["A Marchand et Fille tin! Grand-père's! He used them for the Christmas truffles, see the gold holly on the lid.", "Keep it on your shelf at home, please. It should be somewhere it's loved."]}
+);
