@@ -4178,11 +4178,12 @@ function paddleTo(dest){
 const cruisingNow = () => !!(S.cruise && Date.now() < S.cruise.until && scene === "shore");
 function startCruise(){
   if (S.cruise && Date.now() < S.cruise.until) return;
-  const m = sgHM(); if (m >= 19*60 || m < 6*60) { speak("Too dark for a cruise. The dolphins are tucked up for the night.", 3500); render(); return; }
+  // round 297 (Mel: "Should be no restriction on time of setting off. That's the whole point of having my own boat"): any hour; after dark, a moonlit one
+  const m = sgHM(), dark = m >= 19*60 || m < 6*60;
   S.cruise = {until: Date.now() + 45000}; route = []; mel.path = []; atSpot = null;
   [nodes.mel, nodes.maple, nodes.evan].forEach(n => n.style.visibility = "hidden"); sfx("chime"); drawScene();
-  speak(evanHere() ? "All aboard! Evan's at the front, Maple's on your lap. Off up the coast." : "All aboard! Maple's on your lap. Off up the coast.", 5000);
-  setTimeout(() => { if (S.cruise && scene === "shore") { speak("Dolphins! A whole pod, right alongside the boat. One jumps clean out of the water.", 5500); [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("heart", 90 + k*20, 260, 1800), d)); } }, 16000);
+  speak(dark ? `All aboard for a moonlit cruise! ${evanHere() && !evanNight() ? "Evan's in his pyjamas under a blanket, " : ""}Maple's on your lap, and the lighthouse beam sweeps over you. Off up the coast.` : evanHere() ? "All aboard! Evan's at the front, Maple's on your lap. Off up the coast." : "All aboard! Maple's on your lap. Off up the coast.", 5000);
+  setTimeout(() => { if (S.cruise && scene === "shore") { speak(dark ? "Dolphins! You hear them first, puffing in the dark, then see them: streaks of green light in the water where they swim through the glow." : "Dolphins! A whole pod, right alongside the boat. One jumps clean out of the water.", 5500); [0, 300, 600].forEach((d, k) => setTimeout(() => mprop("heart", 90 + k*20, 260, 1800), d)); } }, 16000);
   render();
 }
 function endCruise(){
