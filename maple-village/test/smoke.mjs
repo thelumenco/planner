@@ -4842,6 +4842,10 @@ if (want("\nA room still draws from an odd save (round 231)")) try {
   await page.evaluate(() => { const F = window.__hbGame.F(); F.scoop = {...(F.scoop || {}), recipes: 5}; F.sew = {clothes: 5}; F.inv = {...F.inv, zz_gone: 2, honey: 2}; window.__hbGame.save(); window.__hbScene("base"); }); await page.waitForTimeout(400);
   await page.click('[data-open="bag"]'); await page.waitForTimeout(500);
   check(await page.evaluate(() => !document.getElementById("panel").hidden && !!document.querySelector('#bag .item[data-id="honey"]')), "and the backpack still opens, with what's in it");
+  // and Settings can copy what went wrong, for a message to us (each error once, with which browser it is)
+  const errs = await page.evaluate(() => JSON.parse(localStorage.getItem("hb.errors") || "[]"));
+  check(errs.length >= 1 && errs.length <= 5 && new Set(errs.map(x => x.slice(17))).size === errs.length && errs.some(x => /gelato/.test(x)), "the game notes what went wrong, each error once");
+  check(await page.locator("#setErrs").count() === 1 && await page.locator("#setErrs").textContent() === "Copy error details", "Settings has a Copy error details button");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {

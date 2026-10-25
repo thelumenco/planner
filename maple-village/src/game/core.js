@@ -1909,7 +1909,9 @@ function questMark(){ $("qmarkWrap").style.display = "none"; }   // the old one-
 let rainWas = null;   // was it raining here at the last draw (the shower check below redraws when that changes)
 const safeArt = (f, what) => { try { return f() || ""; } catch (e) { noteErr("drawing " + what, e); return ""; } };
 // the last few errors, kept in this browser so Settings' "Email us" can include them (round 231)
-function noteErr(what, e){ console.error(what, e); try { const L = JSON.parse(localStorage.getItem("hb.errors") || "[]"); L.push(`${new Date().toISOString().slice(0, 16)} ${what}: ${String(e && (e.stack || e.message) || e).split("\n").slice(0, 3).join(" | ")}`); localStorage.setItem("hb.errors", JSON.stringify(L.slice(-5))); } catch {} }
+function noteErr(what, e){ console.error(what, e); try {
+  const msg = `${what}: ${String(e && (e.stack || e.message) || e).split("\n").slice(0, 3).map(l => l.trim().replace(/\(?[a-z-]+:\/\/[^\s)]*?:(\d+):(\d+)\)?/g, "@$1")).join(" | ")}`;   // each error once, with just its line
+  const L = JSON.parse(localStorage.getItem("hb.errors") || "[]").filter(x => x.slice(17) !== msg); L.push(`${new Date().toISOString().slice(0, 16)} ${msg}`); localStorage.setItem("hb.errors", JSON.stringify(L.slice(-5))); } catch {} }
 // a way out of any room, if its own art couldn't be drawn
 const roomExitArt = () => outside() ? "" : `<g data-exit="1" aria-label="Exit"><rect x="200" y="590" width="120" height="40" rx="10" fill="#FFFDF6" stroke="#3B3530"/><text x="260" y="616" text-anchor="middle" font-family="Mulish,sans-serif" font-weight="700" font-size="16" fill="#2F2B28">Exit</text></g>`;
 function drawScene(){
@@ -3696,6 +3698,12 @@ $("zoomBtn").onclick = () => toggleZoom();
 $("setMusic").onchange = e => setMusic(e.target.checked);
 $("setVol").oninput = e => setMusicVol(+e.target.value);
 $("setTest").onclick = () => { unlockAudio(); setTimeout(() => { alarm(); $("setTestNote").textContent = audioRunning() ? "Sound is on. If you heard nothing, check the volume and the silent switch." : "Your browser is still blocking sound. Tap anywhere on the map, then try again."; }, 120); };
+// round 231: Copy error details, for when Email us can't open a mail app: this browser's last few errors and which
+// browser it is, to paste into a message. Copying blocked: the text shows, selected, to copy by hand
+$("setErrs").onclick = () => { let L = []; try { L = JSON.parse(localStorage.getItem("hb.errors") || "[]"); } catch {}
+  const text = `Honeybrook error details\n${navigator.userAgent}\n${L.length ? L.join("\n") : "No errors recorded in this browser."}`, box = $("setErrsText");
+  const show = () => { box.value = text; box.hidden = false; box.focus(); box.select(); flash("Copying's blocked here: the details are selected, ready to copy"); };
+  try { navigator.clipboard.writeText(text).then(() => { box.hidden = true; sfx("paper", true); flash(L.length ? "Error details copied: paste them into a message to us" : "Copied. No errors recorded in this browser, which is good news"); }, show); } catch { show(); } };
 // round 231: Email us carries the last few errors from this browser, so a stuck game can be looked into
 $("setMail").addEventListener("click", () => { let L = []; try { L = JSON.parse(localStorage.getItem("hb.errors") || "[]"); } catch {}
   $("setMail").href = "mailto:hi@ambidextrouslabs.com?subject=Honeybrook" + (L.length ? "&body=" + encodeURIComponent("\n\n\n(For the Honeybrook team, from this browser:)\n" + L.join("\n")) : ""); });
