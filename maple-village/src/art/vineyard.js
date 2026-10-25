@@ -119,7 +119,7 @@ export function vineyardArt(){
     <path class="ripple" d="M10 64 q4 -3 8 0 M18 84 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/>
     <g filter="url(#wob)"><path d="M24 300 H486 M112 300 V238 M390 300 V222 M186 300 C186 400 190 480 210 548 M290 0 C296 100 284 200 296 300" fill="none" style="stroke:var(--path)" stroke-width="22" stroke-linecap="round"/></g>
     ${flowers([[30,140,"#EFA3A6"],[200,140,"#F3C969"],[480,250,"#C3CDEE"],[490,330,"#EFA3A6"],[150,350,"#F3C969"],[40,520,"#C3CDEE"],[480,520,"#F3C969"],[300,250,"#EFA3A6"]])}
-    ${tree(250,130,.9)}${tree(495,150,.9)}${tree(26,620,.8)}${tree(500,620,.85)}${tree(40,380,.8)}`;
+    ${tree(250,130,.9)}${tree(495,150,.9)}${tree(26,620,.8)}${tree(40,380,.8)}`;
   const gate = `<g data-place="toBaseV" aria-label="Gate home"><ellipse class="hov" cx="24" cy="300" rx="26" ry="30" style="fill:var(--butter)"/>
     ${sk(`<rect x="0" y="290" width="40" height="22" rx="2" style="fill:var(--wood)"/><rect x="42" y="262" width="6" height="52" style="fill:var(--wood)"/><path d="M38 266 q12 -14 20 0" style="fill:var(--moss)"/>`,
       `<rect x="0" y="290" width="40" height="22" rx="2"/><path d="M8 290 v22 M16 290 v22 M24 290 v22 M32 290 v22" opacity=".6"/><rect x="42" y="262" width="6" height="52"/>`)}
