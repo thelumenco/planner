@@ -5134,6 +5134,48 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // round 294 (Mel: "Own and run it, on the green"): the Honeybrook Bakehouse
+  console.log("\nThe Honeybrook Bakehouse (round 294)");
+  const bk = await import(new URL("../src/game/bakery.js", import.meta.url)), gl = await import(new URL("../src/game/goals.js", import.meta.url)), M = 60e3;
+  { const F = {coins: 50, inv: {flour: 5, milk: 5, apple: 3}};
+    check(!bk.mix(F, "croissant", 0).ok && /butter/.test(bk.mix(F, "croissant", 0).line), "a recipe needs all its ingredients");
+    check(bk.churn(F).ok && F.inv.butter === 1 && F.inv.milk === 3, "two milk churn into a pat of butter");
+    check(bk.mix(F, "turnover", 0).ok && F.inv.flour === 4 && !F.inv.apple && !F.inv.butter && bk.bakeryState(F).proof.length === 1, "mix: the ingredients go, a tray of dough goes onto the proving shelf");
+    check(!bk.bake(F, 30*M).ok && bk.bake(F, 61*M).ok && bk.bakeryState(F).oven, "it has to prove for an hour, then into the oven");
+    const b = bk.bakeryState(F); b.lastTick = Date.now() - 40*M; b.oven.at = Date.now() - 35*M; const t1 = bk.bakeryTick(F);
+    check(t1.baked === "turnover" && b.rack.length === 1 && !b.oven, "half an hour in the oven, then out onto the cooling rack on its own");
+    check(bk.carry(F).ok && b.stock.turnover === bk.TRAY && !b.rack.length, "carried through: a tray of six on the shop shelves");
+    check(bk.takeOne(F, "turnover").ok && F.inv.bk_turnover === 1 && b.stock.turnover === bk.TRAY - 1, "take one to eat or give");
+    check(bk.buyFlour(F).ok && F.coins === 50 - bk.FLOUR && F.inv.flour === 5, "flour from the sacks, same price as Hana's");
+    b.stock = {loaf: 30}; b.tin = 0; b.lastTick = Date.parse("2026-10-24T00:00:00Z"); const realNow = Date.now; Date.now = () => Date.parse("2026-10-24T04:00:00Z"); const t2 = bk.bakeryTick(F); Date.now = realNow;
+    check(t2.n > 10 && b.tin === t2.n*bk.RECIPES.loaf.price && b.stock.loaf === 30 - t2.n && F.coins === 47 + 0, `a Saturday morning, 8 till 12: ${t2.n} sold, the money in the honesty tin`);
+    const tin = bk.collectTin(F); check(tin > 0 && F.coins === 47 + tin && !bk.collectTin(F), "empty the tin into your coins");
+    check(gl.GOALS.bakery && gl.GOALS.bakery.price === 1200 && Object.values(bk.RECIPES).every(r => r.price <= 6), "the bakehouse is a big goal, 1,200 coins; nothing costs more than 6"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`bakehouse pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/bk=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 1500; f.inv = Object.assign(f.inv || {}, {flour: 4, milk: 3});
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=09:00&date=2026-10-24"); await page.waitForTimeout(800);
+  await page.goto(url + "?nosample=1&bk=1&time=09:00&date=2026-10-24"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("green")); await page.waitForTimeout(600);
+  check(await page.locator('#world [data-place="bakeshut"]').count() === 1 && await page.locator('#world [data-place="bakery"]').count() === 0, "on the green: the old bakery, shuttered");
+  await page.locator('#world [data-place="bakeshut"]').dispatchEvent("click"); await page.waitForSelector("#ctx button.primary", { timeout: 20000 });
+  await page.locator("#ctx button.primary").first().click(); await page.waitForTimeout(800);
+  check(await page.locator('#world [data-place="bakery"]').count() === 1, "bought: the Bakehouse opens, awning and all");
+  await page.locator('#world [data-place="bakery"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Honeybrook Bakehouse/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400);
+  check(await page.locator('#world [data-spot="bshelves"]').count() === 1 && await page.locator('#world [data-spot="bcounter"]').count() === 1, "inside: the bread shelves, the counter and a window seat");
+  await page.locator('#world [data-spot="bkdoor"]').dispatchEvent("click");
+  await page.waitForFunction(() => /bakehouse/i.test(document.querySelector("#sceneName").textContent) && !/Honeybrook/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400);
+  check(await page.locator('#world [data-spot="boven"]').count() === 1 && await page.locator('#world [data-spot="bmix"]').count() === 1, "through the back: the bakehouse with its wood oven");
+  await page.locator('#world [data-spot="bmix"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bk="mix:loaf"]', { timeout: 20000 });
+  await page.click('#ctx [data-bk="mix:loaf"]'); await page.waitForTimeout(500);
+  const fox = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  check(fox.bakery && fox.bakery.proof.length === 1 && fox.inv.flour === 2, "mixing a farmhouse loaf at the table");
+  await page.close();
+}
+{
   // round 293 (Mel: "I want to be able to go to the library to read my digests"): her morning digests from Notion on Juniper's shelf
   console.log("\nMorning digests in the library (round 293)");
   const bdg = await import(new URL("../src/game/bookdigests.js", import.meta.url));
