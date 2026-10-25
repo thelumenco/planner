@@ -24078,9 +24078,9 @@ ${r.n}`;
         );
       // the campervan's furniture, coloured by what's been chosen on the mood board (game/van.js)
       case "vanbed": {
-        const bd = vanSt("bedding"), cu = vanSt("cushions"), q = bd ? bd.a : "#F6F1E8", q2 = bd ? bd.b : "#E3DDD4";
+        const bd2 = vanSt("bedding"), cu = vanSt("cushions"), q = bd2 ? bd2.a : "#F6F1E8", q2 = bd2 ? bd2.b : "#E3DDD4";
         return sk(
-          `<rect x="${x - 70}" y="${y - 30}" width="140" height="30" rx="6" style="fill:#C9A27E"/><rect x="${x - 66}" y="${y - 44}" width="132" height="20" rx="8" style="fill:${q}"/>${bd ? [0, 1, 2, 3].map((i) => `<rect x="${x - 56 + i * 30}" y="${y - 42}" width="14" height="16" rx="3" style="fill:${q2}" opacity=".7"/>`).join("") : ""}<rect x="${x - 62}" y="${y - 56}" width="34" height="16" rx="7" style="fill:${cu ? cu.a : "#FFFDF6"}"/><rect x="${x - 24}" y="${y - 56}" width="30" height="16" rx="7" style="fill:${cu ? cu.b : "#FFFDF6"}"/>`,
+          `<rect x="${x - 70}" y="${y - 30}" width="140" height="30" rx="6" style="fill:#C9A27E"/><rect x="${x - 66}" y="${y - 44}" width="132" height="20" rx="8" style="fill:${q}"/>${bd2 ? [0, 1, 2, 3].map((i) => `<rect x="${x - 56 + i * 30}" y="${y - 42}" width="14" height="16" rx="3" style="fill:${q2}" opacity=".7"/>`).join("") : ""}<rect x="${x - 62}" y="${y - 56}" width="34" height="16" rx="7" style="fill:${cu ? cu.a : "#FFFDF6"}"/><rect x="${x - 24}" y="${y - 56}" width="30" height="16" rx="7" style="fill:${cu ? cu.b : "#FFFDF6"}"/>`,
           `<rect x="${x - 70}" y="${y - 30}" width="140" height="30" rx="6"/><rect x="${x - 66}" y="${y - 44}" width="132" height="20" rx="8"/><rect x="${x - 62}" y="${y - 56}" width="34" height="16" rx="7"/><rect x="${x - 24}" y="${y - 56}" width="30" height="16" rx="7"/>`
         );
       }
@@ -28486,11 +28486,11 @@ ${r.n}`;
   }
   function digestPage(item) {
     return `<button class="nbx" data-nb="close" aria-label="Close digest">✕</button>
-    <p class="nbmeta">book digest · from Juniper's shelf${item.gen ? " · picked by Juniper" : ""}</p>
+    <p class="nbmeta">book digest · ${item.notion ? "your morning digest, from Notion" : "from Juniper's shelf"}${item.gen ? " · picked by Juniper" : ""}</p>
     <h2 id="nbTitle">${esc(item.title || "A book")}${item.author ? `<small class="nbby">by ${esc(item.author)}</small>` : ""}</h2>
     <div class="nbbody">${item.body ? `<div class="nbnotes">${notesHTML(item.body)}</div>` : ""}${sectionsHTML(item.sections)}
-    ${item.try ? `<p class="nbpep">♡ Try today: ${esc(item.try)}</p>` : ""}
-    ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Read more ↗</a></div>` : ""}</div>
+    ${item.try ? `<p class="nbpep">♡ ${item.notion ? "Your one move" : "Try today"}: ${esc(item.try)}</p>` : ""}
+    ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">${item.notion ? "Open in Notion" : "Read more"} ↗</a></div>` : ""}</div>
     <div class="nbactions"><button class="btn yes" data-nb="thanks">Back on the shelf</button></div>`;
   }
   var safeUrl = (u) => typeof u === "string" && /^https?:\/\//i.test(u) ? u : null;
@@ -28565,6 +28565,169 @@ Quests finished today: ${S4.doneIds.length}`;
     } else if (!ev.shiftKey && document.activeElement === last2) {
       ev.preventDefault();
       first.focus();
+    }
+  }
+
+  // src/game/plans.js
+  var NOTION = "Notion";
+  var PLANS_DS = "collection://ccad9e3d-7bc6-415b-85f3-1f396982d597";
+  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var MONTH = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  function planTitles(day = dayKey()) {
+    const d = /* @__PURE__ */ new Date(day + "T00:00:00Z"), y = d.getUTCFullYear(), m = d.getUTCMonth();
+    const mon2 = new Date(d.getTime() - (d.getUTCDay() + 6) % 7 * 864e5);
+    return { quarter: `Q${Math.floor(m / 3) + 1} ${y}`, month: `${MONTH[m]} ${y}`, week: `Week of ${mon2.getUTCDate()} ${MON[mon2.getUTCMonth()]} ${mon2.getUTCFullYear()}` };
+  }
+  var unwrap = (r) => {
+    let p = r && r.payload !== void 0 ? r.payload : r;
+    if (typeof p === "string") {
+      try {
+        p = JSON.parse(p);
+      } catch {
+        return p;
+      }
+    }
+    if (p && Array.isArray(p.content) && p.content[0] && typeof p.content[0].text === "string") {
+      try {
+        return JSON.parse(p.content[0].text);
+      } catch {
+        return p.content[0].text;
+      }
+    }
+    return p;
+  };
+  var pageText = (p) => {
+    const t2 = typeof p === "string" ? p : p && (p.text || p.content || "") || "";
+    const m = /<content>([\s\S]*?)<\/content>/.exec(String(t2));
+    return (m ? m[1] : String(t2)).replace(/\\\$/g, "$").trim();
+  };
+  async function readPlan(level2, opts = {}) {
+    const title = planTitles()[level2];
+    if (!title) return { level: level2, error: "unknown level" };
+    let mcp5 = null;
+    try {
+      mcp5 = window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+    }
+    if (!mcp5) return { level: level2, title, error: "unavailable" };
+    const cache5 = { staleTime: 30 * 6e4 }, signal = opts.signal;
+    try {
+      const s = unwrap(await mcp5.callTool(NOTION, "notion-search", { query: title, data_source_url: PLANS_DS, page_size: 5 }, { cache: cache5, signal }));
+      const list11 = s && Array.isArray(s.results) ? s.results : [];
+      const hit2 = list11.find((x) => x && String(x.title || "").trim() === title) || null;
+      if (!hit2) return { level: level2, title, error: "not found" };
+      const page = unwrap(await mcp5.callTool(NOTION, "notion-fetch", { id: hit2.id || hit2.url }, { cache: cache5, signal }));
+      const raw = typeof page === "string" ? page : page && (page.text || "") || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(raw);
+      let props2 = {};
+      try {
+        props2 = pm ? JSON.parse(pm[1]) : {};
+      } catch {
+      }
+      return { level: level2, title, text: pageText(page).slice(0, 5e3), theme: String(props2.Theme || "").slice(0, 160), start: props2["date:Period Start:start"] || "", end: props2["date:Period End:start"] || "", url: /^https:\/\//.test(props2.url || "") ? props2.url : hit2.url && /^https:\/\//.test(hit2.url) ? hit2.url : "" };
+    } catch (e) {
+      return { level: level2, title, error: e && e.code || "upstream_error" };
+    }
+  }
+  var PLAN_WORDS = /\b(plan|plans|planned|quarter|q[1-4]|month|monthly|week|weekly|goal|goals|objective|priorit|focus|theme|revenue|target|on track|this week|next week)\b/i;
+
+  // src/game/bookdigests.js
+  var BOOK_DS = "collection://21f2e1e3-6461-48c3-a2fb-1c3cab6dc9af";
+  var bd = { list: null, busy: false, error: "", opening: "" };
+  var ERR = {
+    unavailable: "Notion isn't reachable from this view.",
+    needs_reauth: "Notion needs reconnecting: claude.ai Settings → Connectors.",
+    server_not_connected: "Add the Notion connector in claude.ai Settings → Connectors.",
+    not_in_manifest: "Notion is switched off for this page. Turn it on in the page's Permissions."
+  };
+  var unwrap2 = (r) => {
+    let p = r && r.payload !== void 0 ? r.payload : r;
+    if (typeof p === "string") {
+      try {
+        p = JSON.parse(p);
+      } catch {
+        return p;
+      }
+    }
+    if (p && Array.isArray(p.content) && p.content[0] && typeof p.content[0].text === "string") {
+      try {
+        return JSON.parse(p.content[0].text);
+      } catch {
+        return p.content[0].text;
+      }
+    }
+    return p;
+  };
+  async function mcp() {
+    try {
+      return window.claude && claude.use ? await claude.use("mcp") : null;
+    } catch {
+      return null;
+    }
+  }
+  var cache2 = { staleTime: 10 * 6e4 };
+  var clean2 = (s) => String(s || "").replace(/<br\s*\/?>/g, "\n").replace(/<[^>]+>/g, "").replace(/\\\$/g, "$").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").trim();
+  async function loadMyDigests(rerender) {
+    if (bd.busy) return;
+    bd.busy = true;
+    bd.error = "";
+    rerender && rerender();
+    const m = await mcp();
+    if (!m) {
+      bd.busy = false;
+      bd.error = ERR.unavailable;
+      rerender && rerender();
+      return;
+    }
+    try {
+      const seen3 = /* @__PURE__ */ new Map();
+      for (const query of ["key ideas", "your one move today"]) {
+        const s = unwrap2(await m.callTool(NOTION, "notion-search", { query, data_source_url: BOOK_DS, page_size: 30, max_highlight_length: 0 }, { cache: cache2 }));
+        for (const r of s && Array.isArray(s.results) ? s.results : []) if (r && r.id && r.title && !seen3.has(r.id)) seen3.set(r.id, { id: r.id, title: String(r.title).slice(0, 120), url: /^https:\/\//.test(r.url || "") ? r.url : "", at: Date.parse(r.timestamp || "") || 0 });
+      }
+      bd.list = [...seen3.values()].sort((a, b) => b.at - a.at).slice(0, 40);
+    } catch (e) {
+      bd.error = ERR[e && e.code] || "Couldn't reach your digests in Notion just now. Try again in a minute.";
+    }
+    bd.busy = false;
+    rerender && rerender();
+  }
+  function parseDigest(raw, fallback = {}) {
+    const text = typeof raw === "string" ? raw : raw && raw.text || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(text);
+    let p = {};
+    try {
+      p = pm ? JSON.parse(pm[1]) : {};
+    } catch {
+    }
+    const cm = /<content>([\s\S]*?)<\/content>/.exec(text), body2 = cm ? cm[1] : "";
+    const main = body2.split(/\n---\n|\n## /)[0];
+    const sections2 = main.split(/\n?### /).slice(1).map((chunk) => {
+      const [h3, ...rest] = chunk.split("\n");
+      const para2 = clean2(rest.join("\n")).split(/\n\s*\n/).map((x) => x.replace(/\s*\n\s*/g, " ").trim()).filter(Boolean);
+      return { heading: clean2(h3).replace(/^\d+\.\s*/, ""), lines: para2 };
+    }).filter((s) => s.heading);
+    const move = /Your one move today:?\s*<\/b>:?\s*([^\n]+)/i.exec(body2) || /Your one move today:?\**\s*([^\n]+)/i.exec(clean2(body2));
+    const hl = /## Highlights[^\n]*\n([\s\S]*?)(?:\n## |$)/.exec(body2);
+    const highlights = hl ? hl[1].split("\n").map((l) => /^\s*-\s+(.*)/.exec(l)).filter(Boolean).map((x) => clean2(x[1])).filter(Boolean) : [];
+    if (highlights.length) sections2.push({ heading: "Your highlights", lines: highlights });
+    const date = p["date:Date:start"] ? (/* @__PURE__ */ new Date(p["date:Date:start"] + "T00:00:00Z")).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }) : "";
+    return {
+      id: "n" + (fallback.id || ""),
+      notion: true,
+      title: clean2(p.Book || fallback.title || "A book"),
+      author: clean2(p.Author || ""),
+      body: [p.Category, p.Type, date].filter(Boolean).map(clean2).join(" · "),
+      sections: sections2,
+      try: move ? clean2(move[1]) : "",
+      link: /^https:\/\//.test(p.url || fallback.url || "") ? p.url || fallback.url : ""
+    };
+  }
+  async function openMyDigest(d) {
+    const m = await mcp();
+    if (!m) return { error: ERR.unavailable };
+    try {
+      return parseDigest(unwrap2(await m.callTool(NOTION, "notion-fetch", { id: d.id }, { cache: cache2 })), d);
+    } catch (e) {
+      return { error: ERR[e && e.code] || "Couldn't open that digest just now." };
     }
   }
 
@@ -28671,42 +28834,42 @@ Quests finished today: ${S4.doneIds.length}`;
     return list11.filter((t2) => t2 && t2._id && t2.title && !t2.deleted && !t2.isArchived && !t2.isBacklogged).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map(toQuest);
   }
   async function subtaskInSunsama(taskId, subtaskId, done) {
-    let mcp4 = null;
+    let mcp5 = null;
     try {
-      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp5 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp4 || !taskId || !subtaskId) return false;
+    if (!mcp5 || !taskId || !subtaskId) return false;
     try {
-      await mcp4.callTool(SUNSAMA, done ? "mark_subtask_as_completed" : "mark_subtask_as_incomplete", { taskId, subtaskId });
+      await mcp5.callTool(SUNSAMA, done ? "mark_subtask_as_completed" : "mark_subtask_as_incomplete", { taskId, subtaskId });
       return true;
     } catch (e) {
       return false;
     }
   }
   async function completeInSunsama(taskId, day) {
-    let mcp4 = null;
+    let mcp5 = null;
     try {
-      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp5 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp4 || !taskId) return false;
+    if (!mcp5 || !taskId) return false;
     try {
-      await mcp4.callTool(SUNSAMA, "mark_task_as_completed", { taskId, finishedDay: day });
+      await mcp5.callTool(SUNSAMA, "mark_task_as_completed", { taskId, finishedDay: day });
       return true;
     } catch (e) {
       return false;
     }
   }
   async function pullSunsama(day, opts = {}) {
-    let mcp4 = null;
+    let mcp5 = null;
     try {
-      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp5 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp4) return { error: "unavailable" };
+    if (!mcp5) return { error: "unavailable" };
     try {
-      const res = await mcp4.callTool(SUNSAMA, "read_resource", { uri: `sunsama://tasks/${day}` }, { cache: { staleTime: opts.fresh ? 0 : 6e4, refresh: !!opts.fresh } });
+      const res = await mcp5.callTool(SUNSAMA, "read_resource", { uri: `sunsama://tasks/${day}` }, { cache: { staleTime: opts.fresh ? 0 : 6e4, refresh: !!opts.fresh } });
       let p = res && res.payload;
       if (typeof p === "string") {
         try {
@@ -28745,19 +28908,19 @@ Quests finished today: ${S4.doneIds.length}`;
     { id: "5ie48aa9lld2tmkqvfrs4t0lqs@group.calendar.google.com", name: "Personal", color: "var(--rose)" },
     { id: "28c6d66a29b701bf4e58ccb22983ebfc2c4ac34fccb42fd7f0dc5e5239e72665@group.calendar.google.com", name: "The Tans", color: "var(--sage)" }
   ];
-  var cache2 = { day: "", at: 0, events: [], error: null };
+  var cache3 = { day: "", at: 0, events: [], error: null };
   async function todaysEvents(day, fresh3) {
-    if (!fresh3 && cache2.day === day && Date.now() - cache2.at < 5 * 6e4) return cache2;
-    let mcp4 = null;
+    if (!fresh3 && cache3.day === day && Date.now() - cache3.at < 5 * 6e4) return cache3;
+    let mcp5 = null;
     try {
-      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp5 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp4) return cache2 = { day, at: Date.now(), events: [], error: "unavailable" };
+    if (!mcp5) return cache3 = { day, at: Date.now(), events: [], error: "unavailable" };
     const startTime = `${day}T00:00:00+08:00`, end = new Date(Date.parse(startTime) + 864e5).toISOString().replace(".000Z", "Z");
     const results = await Promise.all(CALENDARS.map(async (c) => {
       try {
-        const r = await mcp4.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh3 ? 0 : 12e4, refresh: !!fresh3 } });
+        const r = await mcp5.callTool(GCAL, "list_events", { calendarId: c.id, startTime, endTime: end, orderBy: "startTime", timeZone: "Asia/Singapore", pageSize: 60 }, { cache: { staleTime: fresh3 ? 0 : 12e4, refresh: !!fresh3 } });
         let p = r && r.payload;
         if (typeof p === "string") {
           try {
@@ -28788,7 +28951,7 @@ Quests finished today: ${S4.doneIds.length}`;
     }));
     events.sort((a, b) => (a.allDay ? -1 : a.start) - (b.allDay ? -1 : b.start));
     const failed = results.filter((r) => r.error);
-    return cache2 = { day, at: Date.now(), events, error: failed.length === results.length ? failed[0].error : null };
+    return cache3 = { day, at: Date.now(), events, error: failed.length === results.length ? failed[0].error : null };
   }
   var CAL_ERRORS = {
     unavailable: "Your calendar isn't reachable from this view.",
@@ -28934,18 +29097,18 @@ Quests finished today: ${S4.doneIds.length}`;
 
   // src/game/postbox.js
   var GMAIL = "Gmail";
-  var cache3 = { at: 0, threads: [], error: null, busy: false };
+  var cache4 = { at: 0, threads: [], error: null, busy: false };
   async function fetchPost(fresh3) {
-    if (cache3.busy || !fresh3 && Date.now() - cache3.at < 2 * 6e4) return cache3;
-    let mcp4 = null;
+    if (cache4.busy || !fresh3 && Date.now() - cache4.at < 2 * 6e4) return cache4;
+    let mcp5 = null;
     try {
-      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp5 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp4) return cache3 = { at: Date.now(), threads: [], error: "unavailable", busy: false };
-    cache3.busy = true;
+    if (!mcp5) return cache4 = { at: Date.now(), threads: [], error: "unavailable", busy: false };
+    cache4.busy = true;
     try {
-      const r = await mcp4.callTool(GMAIL, "search_threads", { query: "is:unread in:inbox category:primary", pageSize: 15, view: "THREAD_VIEW_MINIMAL" }, { cache: { staleTime: fresh3 ? 0 : 6e4, refresh: !!fresh3 } });
+      const r = await mcp5.callTool(GMAIL, "search_threads", { query: "is:unread in:inbox category:primary", pageSize: 15, view: "THREAD_VIEW_MINIMAL" }, { cache: { staleTime: fresh3 ? 0 : 6e4, refresh: !!fresh3 } });
       let p = r && r.payload;
       if (typeof p === "string") {
         try {
@@ -28965,13 +29128,13 @@ Quests finished today: ${S4.doneIds.length}`;
           url: t2.viewUrl || last2.viewUrl || ""
         };
       }).sort((a, b) => b.at - a.at);
-      cache3 = { at: Date.now(), threads, error: null, busy: false };
+      cache4 = { at: Date.now(), threads, error: null, busy: false };
     } catch (e) {
-      cache3 = { at: Date.now(), threads: cache3.threads, error: e && e.code || "upstream_error", busy: false };
+      cache4 = { at: Date.now(), threads: cache4.threads, error: e && e.code || "upstream_error", busy: false };
     }
-    return cache3;
+    return cache4;
   }
-  var postCount = () => cache3.threads.length;
+  var postCount = () => cache4.threads.length;
   var ago = (ms) => {
     const m = Math.round((Date.now() - ms) / 6e4);
     return m < 60 ? `${Math.max(1, m)}m` : m < 1440 ? `${Math.round(m / 60)}h` : `${Math.round(m / 1440)}d`;
@@ -28989,7 +29152,7 @@ Quests finished today: ${S4.doneIds.length}`;
     server_unavailable: "Gmail didn't answer. Try again in a minute."
   };
   function postPanel() {
-    const c = cache3;
+    const c = cache4;
     let h3 = `<span class="tape stripe" aria-hidden="true"></span><h2>Your post box</h2><p class="sub">Unread in your work inbox (Primary). Tap a letter to open it in Gmail.</p>`;
     if (c.busy && !c.threads.length) h3 += `<p class="muted">Penny's checking the post…</p>`;
     else if (c.error && !c.threads.length) h3 += `<p class="muted">${esc(POST_ERRORS[c.error] || "Couldn't fetch your post just now. Try again in a minute.")}</p>`;
@@ -29181,9 +29344,9 @@ Quests finished today: ${S4.doneIds.length}`;
     return d && d.at ? d : null;
   }
   function goodNewsHTML(localWins, cal, tab = "wins") {
-    const d = goodNews(), clean3 = (s) => plain(String(s || "")).slice(0, 220);
+    const d = goodNews(), clean4 = (s) => plain(String(s || "")).slice(0, 220);
     const world = (d && d.world || []).slice(0, 6).filter((x) => x && x.title);
-    const wins = [...localWins || [], ...(d && d.wins || []).map(clean3)].filter(Boolean).slice(0, 8);
+    const wins = [...localWins || [], ...(d && d.wins || []).map(clean4)].filter(Boolean).slice(0, 8);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><p class="eyebrow" style="margin:0 0 2px">The Honeybrook Gazette</p><h2>Good news</h2><p class="sub">${d ? `Pinned up ${new Date(d.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Singapore" })}.` : "Fresh every morning."}</p>`;
     h3 += `<div class="tabs" role="tablist">${[["wins", "Your wins"], ["events", "Events"], ["news", "In the world"]].map(([k, n]) => `<button role="tab" data-newstab="${k}" aria-selected="${k === tab}">${n}</button>`).join("")}</div>`;
     if (tab === "wins") h3 += wins.length ? `<ul class="hlist gnews">${wins.map((w) => `<li><span>${esc(w)}</span></li>`).join("")}</ul>` : `<p class="muted">Your wins show up here as the day goes on.</p>`;
@@ -29192,7 +29355,7 @@ Quests finished today: ${S4.doneIds.length}`;
       if (cal.fests.length) h3 += `<ul class="hlist gnews vcal fests">${cal.fests.map((f5) => `<li><span><b>${esc(f5.name)}</b><small>${esc(f5.when)} · ${esc(f5.until)}</small></span></li>`).join("")}</ul>`;
       h3 += cal.days.length ? `<ul class="hlist gnews vcal">${cal.days.map((d2) => `<li><span><b>${esc(d2.when)}</b>${d2.list.map((x) => `<small>${esc(x)}</small>`).join("")}</span></li>`).join("")}</ul>` : `<p class="muted">A quiet fortnight in the village.</p>`;
     }
-    if (tab === "news") h3 += world.length ? `<ul class="hlist gnews world">${world.map((x) => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean3(x.title))}</a>` : esc(clean3(x.title))}${x.summary ? `<small>${esc(clean3(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean3(x.source))}</small>` : ""}</span></li>`).join("")}</ul>` : `<p class="muted">The morning's good news hasn't arrived yet.</p>`;
+    if (tab === "news") h3 += world.length ? `<ul class="hlist gnews world">${world.map((x) => `<li><span>${/^https:\/\//.test(x.link || "") ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(clean4(x.title))}</a>` : esc(clean4(x.title))}${x.summary ? `<small>${esc(clean4(x.summary))}</small>` : ""}${x.source ? `<small class="src">${esc(clean4(x.source))}</small>` : ""}</span></li>`).join("")}</ul>` : `<p class="muted">The morning's good news hasn't arrived yet.</p>`;
     return h3;
   }
 
@@ -29987,7 +30150,7 @@ Quests finished today: ${S4.doneIds.length}`;
     <button class="btn small ${wearing(F2, k) ? "primary" : "alt"}" data-acc="${k}" aria-pressed="${wearing(F2, k)}">${wearing(F2, k) ? "Wearing" : "Put on"}</button></div>`).join("")}</div>`;
   }
   var FIELDS = [["top", "Top"], ["dress", "Dress"], ["bottom", "Bottom"], ["shoes", "Shoes"], ["bag", "Bag"], ["jewellery", "Jewellery"], ["sunglasses", "Sunglasses"], ["layer", "Layer"], ["hair", "Hair"]];
-  var clean2 = (s, n = 140) => plain(String(s || "")).slice(0, n);
+  var clean3 = (s, n = 140) => plain(String(s || "")).slice(0, n);
   var todayDoc = () => {
     const d = outfitDoc();
     return d && d.day === dayKey() ? d : null;
@@ -30001,20 +30164,20 @@ Quests finished today: ${S4.doneIds.length}`;
   var FIELD_NAME = Object.fromEntries(FIELDS);
   function card(o, i) {
     if (!o) return "";
-    const rows2 = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><span class="gpic">${garment(k === "layer" ? "layer" : k, o[k])}</span><span><small>${n}</small>${esc(clean2(o[k]))}</span></li>`).join("");
-    return `<div class="outfit"><p class="olabel">${esc(clean2(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows2}</ul>${o.why ? `<p class="owhy">${esc(clean2(o.why, 220))}</p>` : ""}<div class="actions"><button class="btn small primary" data-wear="${i}">Wear this</button></div></div>`;
+    const rows2 = FIELDS.filter(([k]) => o[k]).map(([k, n]) => `<li><span class="gpic">${garment(k === "layer" ? "layer" : k, o[k])}</span><span><small>${n}</small>${esc(clean3(o[k]))}</span></li>`).join("");
+    return `<div class="outfit"><p class="olabel">${esc(clean3(o.label, 50) || `Option ${i + 1}`)}</p><ul>${rows2}</ul>${o.why ? `<p class="owhy">${esc(clean3(o.why, 220))}</p>` : ""}<div class="actions"><button class="btn small primary" data-wear="${i}">Wear this</button></div></div>`;
   }
   function wardrobePanel(F2, st6) {
     const d = todayDoc(), more = extras(F2), inv = inventory();
     let h3 = `<span class="tape stripe" aria-hidden="true"></span><h2>The wardrobe</h2>`;
-    if (d) h3 += `<p class="sub">${[d.weather && esc(clean2(d.weather, 60)), d.on && esc(clean2(d.on, 160))].filter(Boolean).join(" · ") || "Today's picks from your stylist."}</p>`;
+    if (d) h3 += `<p class="sub">${[d.weather && esc(clean3(d.weather, 60)), d.on && esc(clean3(d.on, 160))].filter(Boolean).join(" · ") || "Today's picks from your stylist."}</p>`;
     else h3 += `<p class="sub">Your stylist hasn't been by yet today. The morning briefing hangs three outfits in here.</p>`;
     const all = outfitsToday(F2), w = F2.wear && F2.wear.day === dayKey() ? F2.wear : null;
     if (w) h3 += `<p class="muted">Wearing today: <b>${esc(w.label || "your outfit")}</b>. <button class="btn small alt" data-wearoff="1">Back to my usual clothes</button></p>`;
     const pick5 = st6.pick != null ? all[st6.pick] : null;
     if (pick5) {
       const fs = FIELDS.filter(([k]) => pick5[k]);
-      h3 += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean2(pick5.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick5[k])}</span><span><small>${n}</small>${esc(clean2(pick5[k]))}</span></label></li>`).join("")}</ul>
+      h3 += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean3(pick5.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick5[k])}</span><span><small>${n}</small>${esc(clean3(pick5[k]))}</span></label></li>`).join("")}</ul>
       <div class="actions"><button class="btn primary" data-wearok="${st6.pick}">Put it on</button><button class="btn alt small" data-wearback="1">Back</button></div></div>`;
     } else if (all.length) h3 += `<div class="outfits">${all.map(card).join("")}</div>`;
     if (!pick5) h3 += accessories(F2);
@@ -30038,90 +30201,28 @@ Dress for the day below: the most important event decides how polished it is; if
 Use ONLY items from this wardrobe list (copy their names). If a piece that would complete the look isn't there, add "(not currently in wardrobe)" after it.
 Wardrobe: ${JSON.stringify(inv).slice(0, 6e3)}
 Today: ${(/* @__PURE__ */ new Date(dayKey() + "T00:00:00Z")).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })}, Singapore.
-Weather: ${d && d.day === dayKey() && d.weather ? clean2(d.weather, 80) : "not checked yet; assume Singapore's usual: hot and humid, maybe an afternoon shower, cold aircon indoors"}.
-Calendar: ${(events || []).length ? events.slice(0, 12).map((e) => `${e.allDay ? "all day" : new Date(e.start).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore" })} ${clean2(e.title, 60)}${e.where ? ` (${clean2(e.where, 40)})` : ""}`).join("; ") : d && d.day === dayKey() && d.on ? clean2(d.on, 200) : "nothing on the calendar (a home or WFH day)"}.
+Weather: ${d && d.day === dayKey() && d.weather ? clean3(d.weather, 80) : "not checked yet; assume Singapore's usual: hot and humid, maybe an afternoon shower, cold aircon indoors"}.
+Calendar: ${(events || []).length ? events.slice(0, 12).map((e) => `${e.allDay ? "all day" : new Date(e.start).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore" })} ${clean3(e.title, 60)}${e.where ? ` (${clean3(e.where, 40)})` : ""}`).join("; ") : d && d.day === dayKey() && d.on ? clean3(d.on, 200) : "nothing on the calendar (a home or WFH day)"}.
 Already suggested today (make this one clearly different): ${shown.join(" | ") || "none"}
-Mel's request: ${clean2(ask2, 120) || "something different"}
+Mel's request: ${clean3(ask2, 120) || "something different"}
 Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "", "shoes": "", "bag": "", "jewellery": "", "sunglasses": "", "layer": "", "hair": "up|down + short note", "why": "one sentence"} (leave fields empty when not used: dress OR top+bottom).`;
     const o = await sample.json(prompt, { modelTier: "quick", cache: false });
     if (!o || typeof o !== "object") return null;
     const out = {};
     FIELDS.forEach(([k]) => {
-      if (o[k]) out[k] = clean2(o[k]);
+      if (o[k]) out[k] = clean3(o[k]);
     });
-    out.label = clean2(o.label, 50) || "Fresh pick";
-    if (o.why) out.why = clean2(o.why, 220);
+    out.label = clean3(o.label, 50) || "Fresh pick";
+    if (o.why) out.why = clean3(o.why, 220);
     if (!out.top && !out.dress) return null;
     if (!F2.outfits || F2.outfits.day !== dayKey()) F2.outfits = { day: dayKey(), list: [] };
     F2.outfits.list = [...F2.outfits.list, out].slice(-2);
     return out;
   }
 
-  // src/game/plans.js
-  var NOTION = "Notion";
-  var PLANS_DS = "collection://ccad9e3d-7bc6-415b-85f3-1f396982d597";
-  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  var MONTH = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  function planTitles(day = dayKey()) {
-    const d = /* @__PURE__ */ new Date(day + "T00:00:00Z"), y = d.getUTCFullYear(), m = d.getUTCMonth();
-    const mon2 = new Date(d.getTime() - (d.getUTCDay() + 6) % 7 * 864e5);
-    return { quarter: `Q${Math.floor(m / 3) + 1} ${y}`, month: `${MONTH[m]} ${y}`, week: `Week of ${mon2.getUTCDate()} ${MON[mon2.getUTCMonth()]} ${mon2.getUTCFullYear()}` };
-  }
-  var unwrap = (r) => {
-    let p = r && r.payload !== void 0 ? r.payload : r;
-    if (typeof p === "string") {
-      try {
-        p = JSON.parse(p);
-      } catch {
-        return p;
-      }
-    }
-    if (p && Array.isArray(p.content) && p.content[0] && typeof p.content[0].text === "string") {
-      try {
-        return JSON.parse(p.content[0].text);
-      } catch {
-        return p.content[0].text;
-      }
-    }
-    return p;
-  };
-  var pageText = (p) => {
-    const t2 = typeof p === "string" ? p : p && (p.text || p.content || "") || "";
-    const m = /<content>([\s\S]*?)<\/content>/.exec(String(t2));
-    return (m ? m[1] : String(t2)).replace(/\\\$/g, "$").trim();
-  };
-  async function readPlan(level2, opts = {}) {
-    const title = planTitles()[level2];
-    if (!title) return { level: level2, error: "unknown level" };
-    let mcp4 = null;
-    try {
-      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
-    } catch {
-    }
-    if (!mcp4) return { level: level2, title, error: "unavailable" };
-    const cache4 = { staleTime: 30 * 6e4 }, signal = opts.signal;
-    try {
-      const s = unwrap(await mcp4.callTool(NOTION, "notion-search", { query: title, data_source_url: PLANS_DS, page_size: 5 }, { cache: cache4, signal }));
-      const list11 = s && Array.isArray(s.results) ? s.results : [];
-      const hit2 = list11.find((x) => x && String(x.title || "").trim() === title) || null;
-      if (!hit2) return { level: level2, title, error: "not found" };
-      const page = unwrap(await mcp4.callTool(NOTION, "notion-fetch", { id: hit2.id || hit2.url }, { cache: cache4, signal }));
-      const raw = typeof page === "string" ? page : page && (page.text || "") || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(raw);
-      let props2 = {};
-      try {
-        props2 = pm ? JSON.parse(pm[1]) : {};
-      } catch {
-      }
-      return { level: level2, title, text: pageText(page).slice(0, 5e3), theme: String(props2.Theme || "").slice(0, 160), start: props2["date:Period Start:start"] || "", end: props2["date:Period End:start"] || "", url: /^https:\/\//.test(props2.url || "") ? props2.url : hit2.url && /^https:\/\//.test(hit2.url) ? hit2.url : "" };
-    } catch (e) {
-      return { level: level2, title, error: e && e.code || "upstream_error" };
-    }
-  }
-  var PLAN_WORDS = /\b(plan|plans|planned|quarter|q[1-4]|month|monthly|week|weekly|goal|goals|objective|priorit|focus|theme|revenue|target|on track|this week|next week)\b/i;
-
   // src/game/clients.js
   var CHORD = "Chord";
-  var unwrap2 = (r) => {
+  var unwrap3 = (r) => {
     let p = r && r.payload !== void 0 ? r.payload : r;
     if (typeof p === "string") {
       try {
@@ -30146,9 +30247,9 @@ Return JSON only: {"label": "2-4 word name", "top": "", "dress": "", "bottom": "
     }
   }
   async function call(tool, input, fresh3) {
-    const mcp4 = await mcpUse();
-    if (!mcp4) throw { code: "unavailable" };
-    return unwrap2(await mcp4.callTool(CHORD, tool, input || {}, { cache: { staleTime: fresh3 ? 0 : 5 * 6e4, refresh: !!fresh3 } }));
+    const mcp5 = await mcpUse();
+    if (!mcp5) throw { code: "unavailable" };
+    return unwrap3(await mcp5.callTool(CHORD, tool, input || {}, { cache: { staleTime: fresh3 ? 0 : 5 * 6e4, refresh: !!fresh3 } }));
   }
   var CLIENT_ERRORS = {
     unavailable: "Chord isn't reachable from this view.",
@@ -30408,7 +30509,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   }
 
   // src/game/revenue.js
-  var unwrap3 = (r) => {
+  var unwrap4 = (r) => {
     let p = r && r.payload !== void 0 ? r.payload : r;
     if (typeof p === "string") {
       try {
@@ -30425,13 +30526,13 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     return p;
   };
   async function call2(tool, input, fresh3) {
-    let mcp4 = null;
+    let mcp5 = null;
     try {
-      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp5 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp4) throw { code: "unavailable" };
-    return unwrap3(await mcp4.callTool(CHORD, tool, input, { cache: { staleTime: fresh3 ? 0 : 10 * 6e4, refresh: !!fresh3 } }));
+    if (!mcp5) throw { code: "unavailable" };
+    return unwrap4(await mcp5.callTool(CHORD, tool, input, { cache: { staleTime: fresh3 ? 0 : 10 * 6e4, refresh: !!fresh3 } }));
   }
   var st3 = { data: null, busy: false, error: null, editing: false };
   var monthKey = (d) => String(d || "").slice(0, 7);
@@ -30736,7 +30837,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   var sgMidnight = (d) => Date.parse(d + "T00:00:00+08:00");
   var fmtDay = (d) => (/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
   var rw = { obj: null, objErr: false, objFor: "", sending: false, draft: null, showPast: false };
-  var mcp = async () => {
+  var mcp2 = async () => {
     try {
       return window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
@@ -30745,7 +30846,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   };
   async function loadObjectives(day = dayKey()) {
     if (rw.objFor === day && rw.obj) return;
-    const m = await mcp();
+    const m = await mcp2();
     if (!m) {
       rw.objErr = true;
       rw.noMcp = true;
@@ -30774,7 +30875,7 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
     }
   }
   async function createObjective(title, weekStartDay) {
-    const m = await mcp();
+    const m = await mcp2();
     if (!m) return false;
     try {
       await m.callTool(SUNSAMA, "create_weekly_objective", { title, weekStartDay });
@@ -31137,7 +31238,7 @@ ${e.text}`;
     "If this week had one word, a feeling to return to when things wobble, what is it?"
   ];
   var vz = { step: "menu", answers: [], reflect: "", look: null, lookA: "", month: "", sum: null, pick: [], busy: false, error: "", draft: "", saved: null };
-  var unwrap4 = (r) => {
+  var unwrap5 = (r) => {
     let p = r && r.payload !== void 0 ? r.payload : r;
     if (typeof p === "string") {
       try {
@@ -31154,7 +31255,7 @@ ${e.text}`;
     }
     return p;
   };
-  async function mcp2() {
+  async function mcp3() {
     try {
       return window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
@@ -31169,14 +31270,14 @@ ${e.text}`;
   };
   var nice = (d) => (/* @__PURE__ */ new Date(d + "T00:00:00Z")).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   async function lastVision() {
-    const m = await mcp2();
+    const m = await mcp3();
     if (!m) return null;
     try {
-      const s = unwrap4(await m.callTool(NOTION, "notion-search", { query: "Week of", data_source_url: "collection://" + VIS_DS, page_size: 5 }, { cache: { staleTime: 30 * 6e4 } }));
+      const s = unwrap5(await m.callTool(NOTION, "notion-search", { query: "Week of", data_source_url: "collection://" + VIS_DS, page_size: 5 }, { cache: { staleTime: 30 * 6e4 } }));
       const hits = s && Array.isArray(s.results) ? s.results : [];
       let best = null;
       for (const h3 of hits.slice(0, 3)) {
-        const page = unwrap4(await m.callTool(NOTION, "notion-fetch", { id: h3.id || h3.url }, { cache: { staleTime: 30 * 6e4 } }));
+        const page = unwrap5(await m.callTool(NOTION, "notion-fetch", { id: h3.id || h3.url }, { cache: { staleTime: 30 * 6e4 } }));
         const raw = typeof page === "string" ? page : page && page.text || "", pm = /<properties>\s*(\{[\s\S]*?\})\s*<\/properties>/.exec(raw);
         let p = {};
         try {
@@ -31192,11 +31293,11 @@ ${e.text}`;
     return null;
   }
   async function cyclePhase() {
-    const m = await mcp2(), tans = CALENDARS.find((c) => c.name === "The Tans");
+    const m = await mcp3(), tans = CALENDARS.find((c) => c.name === "The Tans");
     if (!m || !tans) return "";
     try {
       const end = (/* @__PURE__ */ new Date()).toISOString().replace(/\.\d+Z$/, "Z"), start = new Date(Date.now() - 45 * 864e5).toISOString().replace(/\.\d+Z$/, "Z");
-      const p = unwrap4(await m.callTool(GCAL, "list_events", { calendarId: tans.id, startTime: start, endTime: end, timeZone: "Asia/Singapore", pageSize: 100 }));
+      const p = unwrap5(await m.callTool(GCAL, "list_events", { calendarId: tans.id, startTime: start, endTime: end, timeZone: "Asia/Singapore", pageSize: 100 }));
       const d1 = (p && p.events || []).filter((e) => /period day 1/i.test(e.summary || "")).map((e) => (e.start && (e.start.date || e.start.dateTime) || "").slice(0, 10)).filter(Boolean).sort().pop();
       if (!d1) return "";
       const n = Math.floor((Date.parse(dayKey() + "T00:00:00Z") - Date.parse(d1 + "T00:00:00Z")) / 864e5) + 1;
@@ -31338,7 +31439,7 @@ Return JSON only: {"summary": "...", "theme": "...", "word": "...", "actions": [
           vz.busy = true;
           vz.error = "";
           api4.rerender();
-          const m = await mcp2();
+          const m = await mcp3();
           if (!m) {
             vz.busy = false;
             vz.error = "Notion and Sunsama aren't reachable from this view. Your visualisation is kept here.";
@@ -31855,7 +31956,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   var ZAP_GMAIL = { selected_api: "GoogleMailV2CLIAPI", action: "message", tool_name: "gmail_find_email", connection_id: "0259b139-2fcc-8b64-a2ef-82ac9a87ed8c" };
   var PERSONAL_QUERY = "in:inbox category:primary is:unread newer_than:3d";
   var st4 = { mine: null, mineErr: null, busy: false };
-  var unwrap5 = (r) => {
+  var unwrap6 = (r) => {
     let p = r && r.payload !== void 0 ? r.payload : r;
     if (typeof p === "string") {
       try {
@@ -31872,17 +31973,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return p;
   };
   async function fetchPersonal(fresh3) {
-    let mcp4 = null;
+    let mcp5 = null;
     try {
-      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp5 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp4) {
+    if (!mcp5) {
       st4.mineErr = "unavailable";
       return;
     }
     try {
-      const p = unwrap5(await mcp4.callTool(ZAPIER, "execute_zapier_read_action", { ...ZAP_GMAIL, params: { query: PERSONAL_QUERY } }, { cache: { staleTime: fresh3 ? 0 : 5 * 6e4, refresh: !!fresh3 } }));
+      const p = unwrap6(await mcp5.callTool(ZAPIER, "execute_zapier_read_action", { ...ZAP_GMAIL, params: { query: PERSONAL_QUERY } }, { cache: { staleTime: fresh3 ? 0 : 5 * 6e4, refresh: !!fresh3 } }));
       const list11 = p && Array.isArray(p.results) ? p.results : [];
       st4.mine = list11.slice(0, 12).map((m) => ({
         from: plain(String(m.from && (m.from.name || m.from.email) || "")).slice(0, 40),
@@ -32148,7 +32249,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!a.date && t2 <= Date.now() + 3e4) t2 += 864e5;
     return t2 > Date.now() && t2 < Date.now() + 366 * 864e5 ? t2 : null;
   }
-  async function mcp3() {
+  async function mcp4() {
     try {
       return window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
@@ -32173,7 +32274,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return typeof id === "string" ? id : null;
   }
   async function createEvent(text, at9) {
-    const m = await mcp3();
+    const m = await mcp4();
     if (!m) throw { code: "unavailable" };
     const r = await m.callTool(GCAL, "create_event", {
       calendarId: CAL.id,
@@ -32209,7 +32310,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!r) return null;
     r.cancelled = true;
     save3();
-    const m = await mcp3();
+    const m = await mcp4();
     if (m && r.eventId) {
       try {
         await m.callTool(GCAL, "delete_event", { calendarId: r.cal || CAL.id, eventId: r.eventId, notificationLevel: "NONE" });
@@ -54878,8 +54979,16 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       const ready2 = digestReady(), next = nextDigest(), past = pastDigests();
       const wait = Math.max(1, Math.ceil(((F.digest.lastAt || 0) + DIGEST_GAP - Date.now()) / M));
       h3 = `<span class="tape stripe" aria-hidden="true"></span><h2>Juniper's digest shelf</h2>
-      <p class="sub">One book digest an hour, or one after each quest you finish.</p>
+      <p class="sub">Your morning digests, any time. Juniper's own picks come one an hour, or one after each quest you finish.</p>
       <div class="shelf">`;
+      if (!bd.list && !bd.busy && !bd.error) loadMyDigests(() => {
+        if (shelfOpen) ctx();
+      });
+      h3 += `<p class="eyebrow" style="margin:6px 0 6px">Your morning digests</p>`;
+      if (bd.list && bd.list.length) h3 += `<ul class="qlist">${bd.list.slice(0, 14).map((d, i) => `<li><span><b>${esc(d.title)}</b><small>${i === 0 && Date.now() - d.at < 20 * H ? "today's" : d.at ? new Date(d.at).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Singapore" }) : ""}</small></span><button class="next" data-dig="mine" data-i="${i}"${bd.opening === d.id ? " disabled" : ""}>${bd.opening === d.id ? "opening…" : "read"}</button></li>`).join("")}</ul>`;
+      else h3 += `<p class="status">${bd.busy ? "Juniper's fetching your digests from Notion…" : bd.error ? esc(bd.error) : "No digests in Notion yet."}</p>`;
+      if (bd.error && !bd.busy) h3 += `<div class="actions"><button class="btn alt small" data-dig="retry">Try again</button></div>`;
+      h3 += `<p class="eyebrow" style="margin:22px 0 6px">Juniper's picks</p>`;
       if (ready2 && next) h3 += `<p class="status"><b>A digest is ready:</b> ${esc(next.title)}${next.author ? ` by ${esc(next.author)}` : ""}.</p><div class="actions"><button class="btn primary" data-dig="next">Read it</button></div>`;
       else if (ready2 && sampleCap) h3 += `<p class="status">The shelf's empty for now. Ask chat for more digests, or let Juniper pick a book.</p><div class="actions"><button class="btn primary" data-dig="ask" ${digestBusy ? "disabled" : ""}>${digestBusy ? "Juniper's choosing…" : "Ask Juniper to pick one"}</button></div>`;
       else if (ready2) h3 += `<p class="status">The shelf's empty for now. Ask chat to stock it with your book digests.</p>`;
@@ -57412,6 +57521,25 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       else if (k === "past") {
         const d = pastDigests()[+b.dataset.i];
         if (d) openDigest(d);
+      } else if (k === "retry") {
+        bd.error = "";
+        loadMyDigests(() => {
+          if (shelfOpen) ctx();
+        });
+      } else if (k === "mine") {
+        const d = (bd.list || [])[+b.dataset.i];
+        if (!d || bd.opening) return;
+        bd.opening = d.id;
+        ctx();
+        openMyDigest(d).then((item) => {
+          bd.opening = "";
+          if (item.error) speak(item.error, 4500);
+          else {
+            gainXp(1);
+            openDigest(item);
+          }
+          if (shelfOpen) ctx();
+        });
       }
     });
   }
@@ -62975,12 +63103,12 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
   async function fetchObjectives() {
     if (Date.now() - objAt < 20 * 6e4) return;
     objAt = Date.now();
-    let mcp4 = null;
+    let mcp5 = null;
     try {
-      mcp4 = window.claude && claude.use ? await claude.use("mcp") : null;
+      mcp5 = window.claude && claude.use ? await claude.use("mcp") : null;
     } catch {
     }
-    if (!mcp4) return;
+    if (!mcp5) return;
     const monday = (d) => {
       const t2 = /* @__PURE__ */ new Date(d + "T00:00:00Z");
       return new Date(t2.getTime() - (t2.getUTCDay() + 6) % 7 * 864e5).toISOString().slice(0, 10);
@@ -62988,7 +63116,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     const days2 = [dayKey(), new Date(Date.parse(dayKey() + "T00:00:00Z") - 7 * 864e5).toISOString().slice(0, 10)];
     for (const d of days2) {
       try {
-        const r = await mcp4.callTool(SUNSAMA, "read_resource", { uri: `sunsama://objectives/${d}` }, { cache: { staleTime: 10 * 6e4 } });
+        const r = await mcp5.callTool(SUNSAMA, "read_resource", { uri: `sunsama://objectives/${d}` }, { cache: { staleTime: 10 * 6e4 } });
         let p = r && r.payload;
         if (typeof p === "string") {
           try {
