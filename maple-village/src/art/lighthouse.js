@@ -20,11 +20,14 @@ function hatchOpen(){
   return `<g pointer-events="none">${sk(`<rect x="408" y="446" width="44" height="22" style="fill:#F3D9A6"/><rect x="408" y="446" width="44" height="6" style="fill:#E8C48E"/>
       <rect x="440" y="452" width="10" height="7" rx="1" style="fill:#B9C4CC"/>
       <path d="M418 468 v-7 q12 -6 24 0 v7z" style="fill:#FFFDF6"/><path d="M423 468 v-8 M428 468 v-9 M433 468 v-9 M438 468 v-8" style="stroke:#7FB8E8" stroke-width="1.6"/>
-      <circle cx="430" cy="455" r="5.2" style="fill:#F2D3BC"/><path d="M424.6 454 q0 -6.5 5.4 -6.5 q5.4 0 5.4 6.5 q-1.5 -3.4 -5.4 -3.6 q-3.9 .2 -5.4 3.6z" style="fill:#C9C4BE"/><circle cx="430" cy="447.4" r="2.4" style="fill:#C9C4BE"/>
+      <path style="stroke:#A99D8C;stroke-width:.5" d="M423.2 457 q-2.2 -2 -1 -4.6 q-1.4 -3 1.2 -5 q.4 -3.4 3.6 -3.6 q2.4 -2.4 5.4 -.6 q3.6 -.4 4.4 2.8 q2.8 1.6 1.4 4.6 q1.6 2.6 -.6 4.8 q.6 2.6 -2 3.2 h-10.4 q-2.6 -.6 -2 -3.2z" style="fill:#D9D4CE"/>
+      <circle cx="430" cy="455" r="5.2" style="fill:#F2D3BC;stroke:#8A6A5A;stroke-width:.6"/><path d="M424.8 452.6 q.6 -4.2 3 -4 q1 -1.6 2.4 -.4 q1.6 -1.4 2.8 .4 q2.4 .2 2.2 4 q-1.2 -2.2 -2.6 -1.4 q-1 -1.6 -2.4 -.4 q-1.4 -1.4 -2.6 .2 q-1.6 -.6 -2.8 1.6z" style="fill:#E6E2DC"/><path d="M425.4 449.6 q4.6 -3.4 9.2 0" fill="none" style="stroke:#E88AA0" stroke-width="1.3" stroke-linecap="round"/>
       <rect x="406" y="443" width="48" height="5" rx="2.5" style="fill:#F6E3A6"/>
       <path d="M450 466 l4 -9 l4 9z" style="fill:#FFFDF6"/><path d="M451.5 458 l1 -4 M454 457 l.5 -4.5 M456.5 458 l-1 -4" style="stroke:#E3B24A" stroke-width="1.4" stroke-linecap="round"/>`,
-    `<rect x="408" y="446" width="44" height="22"/><rect x="406" y="443" width="48" height="5" rx="2.5"/><circle cx="430" cy="455" r="5.2"/><path d="M418 468 v-7 q12 -6 24 0 v7"/><path d="M450 466 l4 -9 l4 9z"/>`)}
-    <circle cx="428.2" cy="455" r=".7" style="fill:#3B3530"/><circle cx="431.8" cy="455" r=".7" style="fill:#3B3530"/><path d="M428.6 457.4 q1.4 1 2.8 0" fill="none" style="stroke:#3B3530" stroke-width=".7" stroke-linecap="round"/></g>`;
+    `<rect x="408" y="446" width="44" height="22"/><rect x="406" y="443" width="48" height="5" rx="2.5"/><path d="M418 468 v-7 q12 -6 24 0 v7"/><path d="M450 466 l4 -9 l4 9z"/>`)}
+    <circle cx="428.1" cy="455.2" r=".65" style="fill:#3B3530"/><circle cx="431.9" cy="455.2" r=".65" style="fill:#3B3530"/>
+    <ellipse cx="426.6" cy="457.2" rx="1.2" ry=".8" style="fill:#F2A6A6" opacity=".7"/><ellipse cx="433.4" cy="457.2" rx="1.2" ry=".8" style="fill:#F2A6A6" opacity=".7"/>
+    <path d="M428.7 457.9 q1.3 1.1 2.6 0" fill="none" style="stroke:#D9707E" stroke-width=".8" stroke-linecap="round"/><circle cx="424.9" cy="457" r=".7" style="fill:#FFFDF6"/><circle cx="435.1" cy="457" r=".7" style="fill:#FFFDF6"/></g>`;
 }
 export function lighthouseArt(night, chipsOpen = false){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
