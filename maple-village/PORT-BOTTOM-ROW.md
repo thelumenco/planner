@@ -126,6 +126,18 @@ These story threads hang off the personal edition's villagers and its secret pas
 
 - **Round 291/292:** the priory ruins behind the old press (they wait until the old mill is unlocked: `F.goals.mill`, or this edition's equivalent; buying the lower vineyard needs no mill), restored a step a day (`RUIN_STEPS`, `ruinStep`, `pickHerbs`, `ruinsPanel`, art in `lowerVineArt(v, ruin)`), giving sage (a new item and mill herb) and lavender once done. Hazel's line in the last step is personal-edition; swap it for this edition's villager or drop it.
 
+### 12. Dot's hatch, inside the lighthouse, and the boat (rounds 296 and 297)
+Commits (the HANDOFF.md entries for rounds 296 and 297 describe them; leave out the bakery revert and its save migration in `ce7e5e6`, which is personal-edition only):
+- `bb16c97` and `63e011a`: **Dot's hatch opens and shuts.** `CHIP_HOURS` 11:30 to 20:30 and `chipsOpen(hm)` in `south.js`, and `chipsPanel(F, day, hm)` shows her note when she's shut. `lighthouseArt(night, chipsOpen)` draws her at the open hatch (`hatchOpen`) with curls, a pink hairband, rosy cheeks and earrings, and only a thin outline, because a thick one read as a beard. When shut there's a slatted roller shutter.
+- `dcc59a5`: **inside the lighthouse, three floors.** New files `src/game/lhtower.js` and `src/art/lhtower.js`, scenes `lhtower1` to `lhtower3`, with `towerSpot` and `TOWER_AT` in `core.js`, and walls in `paths.js`. Tapping the lighthouse goes in; its old climb line moves to the gallery.
+  - The ground floor: the wreck case (twelve curios from the rock pools, `poolFind`, `placeCurio`), the visitor book, the tide board, oilskins and the fog bell.
+  - The watch room: the telescope and spotting list (`lookOut`, `SIGHTS`), the weather log (`writeLog`, a week running gives a treat) and the keeper's armchair (his tales; Bram sits there from 16:30 to 17:30 in `npcs.js`).
+  - The lamp room: polish the lens (`polishLens`; treats only, never coins), the beam turning after dark (`.lhspin`), the Monday lamp lighting from up there, and the gallery view.
+  - Nothing pays coins and finishing a collection earns nothing; keep it that way. Swap Bram for this edition's keeper, and Evan's lines for this edition's companion, or drop them. The puffin sighting mentions Puffin Isle; reword it if this edition has no Puffin Isle trip.
+- `d4fdc40`: **the dolphin cruise sets off at any hour** (`startCruise`; after dark it's a moonlit cruise). The two dolphins beside the cruising boat now leap on the seaward side; they used to jump onto the beach. If this edition has the cruise boat, port both.
+- `0e74f1c`: **your own boat sails to towns at any hour and comes home whenever you're ready.** In `trips.js`, `canLeave(..., "boat")` is always true, `BOAT_OUT` is gone and `BOAT_HOME` is midnight. The call back aboard comes only just before the day turns over, between 1:45 and 2am (`timeToGo`, `BOAT_LATE`). The boat towns' lines say "whenever you're ready". Apply it to whichever boat towns this edition has.
+- Tests: the "Inside the lighthouse (round 297)" block; the extra check for the hatch's hours at the end of the "Riding your pony and Bram's cottage (round 283)" block; and the "your own boat sails to towns (round 205)" block, where the 8am and 2pm checks became "set off at six in the morning" and "half nine at night".
+
 ### 11. Weddings buy sparkling by the case (round 284, not part of the bottom row)
 If this edition has the terrace weddings (`game/occasions.js`), port this too: commit `4fea497` "Weddings order two to four cases of sparkling, brought up from the cellar on the day".
 - `occasions.js`: `weddingCases(day)` gives each couple an order of two to four cases; the bookings book note reads "N cases of sparkling ordered from your cellar".
@@ -140,9 +152,10 @@ This edition has no personal family content, so adapt these:
 - **House rules, as here:** British spelling, no em or en dashes in game text, calm screens, and sell prices never above buy prices.
 
 ## Tests
-Port the two smoke-test blocks:
+Port these smoke-test blocks:
 - "The lower vineyard (round 261)"
 - "The green, the Stables and Lighthouse Point (rounds 262 to 264)"
 - "The bottom row in the stories (rounds 272 to 275)", only for the threads you ported
+- "Inside the lighthouse (round 297)", plus the changed checks listed in section 12
 
 Adjust their ids to this edition. Then run the full suite and publish only when it's green. Afterwards, tell me what you changed from the source and anything you couldn't port.
