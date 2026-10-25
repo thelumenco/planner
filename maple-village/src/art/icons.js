@@ -4,7 +4,7 @@ import { dipIcon } from "./scoop-icons.js";
 import { lipIcon } from "./lip-icons.js";
 import { TREES, FLOWERS } from "../data/orchard.js";
 import { GOODS } from "../data/stall-goods.js";
-import { CARBOOT } from "../data/carboot.js";
+import { CARBOOT, BEACH } from "../data/carboot.js";
 import { CR_BOUQUETS } from "../data/bouquets.js";
 // Hand-drawn icon set (ink outline + marker fill, same look as the map). No emoji anywhere in the game.
 //   icon(name, size)        -> inline <svg> for HTML (buttons, panels, notes)
@@ -112,6 +112,7 @@ I.calendar = [`<rect x="3.5" y="5" width="17" height="15.5" rx="2" style="fill:#
 I.gear = [`<circle cx="12" cy="12" r="6.5" style="fill:var(--oat)"/><circle cx="12" cy="12" r="2.6" style="fill:#FFFDF6"/>`, `<path d="M12 2.8l1.5 2.4 2.8-.6.6 2.8 2.4 1.5-1.2 2.6 1.2 2.6-2.4 1.5-.6 2.8-2.8-.6L12 21.2l-1.5-2.4-2.8.6-.6-2.8-2.4-1.5 1.2-2.6-1.2-2.6 2.4-1.5.6-2.8 2.8.6z"/><circle cx="12" cy="12" r="2.6"/>`];
 I.music = [`<circle cx="7" cy="17.5" r="2.8" style="fill:var(--peri)"/><circle cx="17" cy="15.5" r="2.8" style="fill:var(--peri)"/>`, `<circle cx="7" cy="17.5" r="2.8"/><circle cx="17" cy="15.5" r="2.8"/><path d="M9.8 17.5V6l10-2v11.5M9.8 9l10-2"/>`];
 I.farm = I.sprout;
+I.chips_out = [`<path d="M5 8l14 0-2 12H7z" ${f(C.cream)}/><path d="M8 8l1-4 2 4M11 8l1.5-5 1.5 5M14.5 8l1.5-3.5 1 3.5" ${f("#F3C969")}/><path d="M6 12h12" ${f("#9FC3D9")}/>`, `<path d="M5 8h14l-2 12H7zM6 12h12"/><path d="M8 8l1-4 2 4M11 8l1.5-5 1.5 5M14.5 8l1.5-3.5 1 3.5"/>`];   // round 286: Dot's takeaway, wrapped in paper
 // round 232: the bottom row on the map (a lighthouse, a pony's head, a duck)
 I.lighthouse = [`<path d="M9.5 8 h5 l1.5 13 h-8z" ${f("#FFFDF6")}/><path d="M9.1 11.5 h5.8 l.4 3.2 h-6.6z M8.5 17.5 h7 l.3 2.5 h-7.6z" ${f("#E8566C")}/><rect x="9.5" y="4.5" width="5" height="3.5" ${f("#F3C969")}/><path d="M9 4.5 l3 -2.5 l3 2.5z" ${f("#3B3530")}/>`,
   `<path d="M9.5 8 h5 l1.5 13 h-8z"/><rect x="9.5" y="4.5" width="5" height="3.5"/><path d="M9 4.5 l3 -2.5 l3 2.5 M7 21 h10 M4 6.2 h3 M17 6.2 h3" />`];
@@ -448,6 +449,7 @@ CR_BOUQUETS.forEach(b => { I[b.id] = [`<path d="M7.5 12.5l4.5 9.5 4.5-9.5z" ${f(
     `<ellipse cx="12" cy="12.5" rx="8" ry="4"/><path d="M4 12.5v3c0 2.2 3.6 4 8 4s8-1.8 8-4v-3"/><circle cx="12" cy="12.4" r="2.6"/><path d="M11.2 12.4h1.6" opacity=".6"/>`];
   // round 107: Ronda's goods, and the Tempranillo grape and wine
   // round 271: the car boot sale's curios (game/south.js)
+  Object.entries(BEACH).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   Object.entries(CARBOOT).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   // round 196: the makers' shelf in the gift shop (game/gallery.js)
@@ -459,6 +461,7 @@ CR_BOUQUETS.forEach(b => { I[b.id] = [`<path d="M7.5 12.5l4.5 9.5 4.5-9.5z" ${f(
 // round 109: greenhouse herbs, and shrimp from the sea
 I.garlic = [`<path d="M12 4c1 3 6 5 6 10a6 5 0 0 1-12 0c0-5 5-7 6-10z" ${f("#F6F1E8")}/><path d="M12 4v-2" ${f("none")}/>`, `<path d="M12 4c1 3 6 5 6 10a6 5 0 0 1-12 0c0-5 5-7 6-10zM12 9v10M9 10c-1 3-1 6 0 9M15 10c1 3 1 6 0 9" /><path d="M12 4v-2"/>`];
 I.basil = [`<ellipse cx="8" cy="13" rx="5" ry="3.4" transform="rotate(-30 8 13)" ${f("#5E9A4A")}/><ellipse cx="16" cy="13" rx="5" ry="3.4" transform="rotate(30 16 13)" ${f("#6FAE58")}/><ellipse cx="12" cy="8" rx="3.4" ry="5" ${f("#7FB86A")}/>`, `<path d="M12 21v-9"/><ellipse cx="8" cy="13" rx="5" ry="3.4" transform="rotate(-30 8 13)"/><ellipse cx="16" cy="13" rx="5" ry="3.4" transform="rotate(30 16 13)"/><ellipse cx="12" cy="8" rx="3.4" ry="5"/>`];
+I.sage = [`${[[8, 9, -30], [15, 8, 30], [9, 15, -20], [15, 15, 20]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="4" ry="2.4" transform="rotate(${r} ${x} ${y})" ${f("#9CB59A")}/>`).join("")}<path d="M12 21V6" ${f("none")}/>`, `${[[8, 9, -30], [15, 8, 30], [9, 15, -20], [15, 15, 20]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="4" ry="2.4" transform="rotate(${r} ${x} ${y})"/>`).join("")}<path d="M12 21V6"/>`];   // round 291
 I.rosemary = [`${[5, 8, 11, 14, 17].map((y, i) => `<ellipse cx="${i % 2 ? 15 : 9}" cy="${y}" rx="3" ry="1.2" transform="rotate(${i % 2 ? -30 : 30} ${i % 2 ? 15 : 9} ${y})" ${f("#6F8F6A")}/>`).join("")}`, `<path d="M12 21V3"/>${[5, 8, 11, 14, 17].map((y, i) => `<ellipse cx="${i % 2 ? 15 : 9}" cy="${y}" rx="3" ry="1.2" transform="rotate(${i % 2 ? -30 : 30} ${i % 2 ? 15 : 9} ${y})"/>`).join("")}`];
 I.chives = [`<path d="M8 21V6M11 21V3M14 21V5M17 21V8" ${f("none")} style="stroke:#5E9A4A" stroke-width="2.4"/><circle cx="11" cy="3" r="2" ${f("#C9A3E0")}/>`, `<path d="M6 21h13"/><circle cx="11" cy="3" r="2"/>`];
 I.thyme = [`${[[8, 8], [12, 6], [16, 9], [10, 12], [14, 13], [12, 16]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" ${f("#8FA88A")}/>`).join("")}`, `<path d="M12 21V7M12 12l-3-3M12 14l3-3"/>`];

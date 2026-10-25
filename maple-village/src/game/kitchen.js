@@ -386,7 +386,7 @@ export const SOURCE = {
   farmcheese: "your farm's cheese", halloumi: "your farm's cheese", bluecheese: "your farm's cheese", cheddar: "your farm's cheese",
   apple: "the orchard", pear: "the orchard", lemon: "the orchard's lemon tree or the Friday fish van", fish: "the market or fishing",
   sardine: "the sea or bay", mackerel: "the sea or bay, daytime", squid: "the sea, at night", octopus: "the sea, on rainy days", seabream: "the sea or bay",
-  trout: "the river, daytime", crayfish: "the lake", shrimp: "the sea, at dawn", anchovy: "the sea or bay", clams: "the Friday fish van at the bay",
+  trout: "the river, daytime", crayfish: "the lake", shrimp: "the sea, at dawn", anchovy: "the sea or bay", clams: "the Friday fish van at the bay, or the beach along the bottom of the village",
   wildgarlic: "the woods in spring", mushroom: "the woods in autumn", chestnut: "the woods in winter",
   oliveoil: "your olive mill (or Ronda)", anchovy_salt: "your drying loft", pesto: "your drying loft (or Cinque Terre)", pinenuts: "the market, once you've been to Cinque Terre",
   almond: "Ronda's market", sevilla: "Ronda's market", jamon: "Ronda's market", payoyo: "Ronda's market", membrillo: "Ronda's market",

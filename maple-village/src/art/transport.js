@@ -39,13 +39,14 @@ export function transportArt(scene){
     : scene === "green" ? bikeRack("bikesgreen", 146, 372) : scene === "lighthouse" ? bikeRack("bikeslight", 268, 346) + supJetty() : "";   // round 267
 }
 // round 267 (Mel): a little paddleboard jetty at Lighthouse Point, out into the sea along the bottom, with a board rack
-function supJetty(){
-  return `<g data-place="lsup" aria-label="Paddleboard jetty"><ellipse class="hov" cx="396" cy="560" rx="40" ry="10" style="fill:var(--butter)"/>
-    ${sk(`<rect x="398" y="548" width="26" height="86" rx="2" style="fill:#C9A27E"/><rect x="340" y="520" width="40" height="34" rx="2" style="fill:#A8754F"/>
-      <ellipse cx="352" cy="528" rx="5" ry="16" style="fill:#7FB8E8"/><ellipse cx="362" cy="530" rx="5" ry="16" style="fill:#F3C969"/><ellipse cx="372" cy="528" rx="5" ry="16" style="fill:#EFA3A6"/>`,
-      `<rect x="398" y="548" width="26" height="86" rx="2"/><path d="M398 568 h26 M398 588 h26 M398 608 h26" opacity=".5"/><path d="M402 634 v6 M420 634 v6"/><rect x="340" y="520" width="40" height="34" rx="2"/><ellipse cx="352" cy="528" rx="5" ry="16"/><ellipse cx="362" cy="530" rx="5" ry="16"/><ellipse cx="372" cy="528" rx="5" ry="16"/>`)}
-    ${tapeLabel(472, 604, "Paddleboards", "var(--sky)", 9.5)}</g>`;
+function supJetty(){   // round 276 (Mel): moved to the west beach, beside the beach huts, out into the sea on the left
+  return `<g data-place="lsup" aria-label="Paddleboard jetty"><ellipse class="hov" cx="118" cy="234" rx="36" ry="10" style="fill:var(--butter)"/>
+    ${sk(`<rect x="6" y="176" width="96" height="18" rx="2" style="fill:#C9A27E"/><rect x="104" y="192" width="40" height="34" rx="2" style="fill:#A8754F"/>
+      <ellipse cx="116" cy="200" rx="5" ry="16" style="fill:#7FB8E8"/><ellipse cx="126" cy="202" rx="5" ry="16" style="fill:#F3C969"/><ellipse cx="136" cy="200" rx="5" ry="16" style="fill:#EFA3A6"/>`,
+      `<rect x="6" y="176" width="96" height="18" rx="2"/><path d="M26 176 v18 M46 176 v18 M66 176 v18 M86 176 v18" opacity=".5"/><path d="M12 194 v6 M50 194 v6 M90 194 v6"/><rect x="104" y="192" width="40" height="34" rx="2"/><ellipse cx="116" cy="200" rx="5" ry="16"/><ellipse cx="126" cy="202" rx="5" ry="16"/><ellipse cx="136" cy="200" rx="5" ry="16"/>`)}
+    ${tapeLabel(124, 254, "Paddleboards", "var(--sky)", 9.5)}</g>`;
 }
+
 // the riverbank going by during the ride: a row of trees and reeds (scrolls past, CSS .taxibank)
 export const taxiBank = `<svg class="taxibank" viewBox="0 0 600 90" preserveAspectRatio="none" aria-hidden="true"><g style="stroke:#3b3530" stroke-width="1.2">${[20, 90, 150, 230, 300, 360, 440, 510, 570].map((x, i) => i % 3 === 1
   ? `<path d="M${x} 86 l18 -50 l18 50z" fill="#5E8A5A"/>` : `<rect x="${x + 14}" y="62" width="6" height="24" fill="#7A5638"/><circle cx="${x + 17}" cy="50" r="${18 + (i % 2)*5}" fill="${i % 2 ? "#9CC27E" : "#E8913A"}"/>`).join("")}</g></svg>`;

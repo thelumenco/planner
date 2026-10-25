@@ -6,7 +6,7 @@ import { trolleyPace } from "./scoop.js";
 //   boat     a dolphin cruise boat moored at the jetty on the foreshore
 //   cellar   a cellar door extension off the wine shop: barrel racks, a tasting bar, the player's wine wall (and a few more visitors)
 // Owned goals live in F.goals; how the player gets about (walk / scooter / car) in F.ride.
-import { esc } from "../util.js";
+import { esc, now } from "../util.js";
 import { icon } from "../art/icons.js";
 
 export const GOALS = {
@@ -25,8 +25,8 @@ export const GOALS = {
 };
 export const owns = (F, k) => !!(F.goals && F.goals[k]);
 // how much faster the player moves outdoors, and on what
-export const ride = F => { if (F.scoop && F.scoop.trolley) return "walk"; if (bikeOn(F)) return "bike"; const r = F.ride; return r === "car" && owns(F, "car") ? "car" : r === "scooter" && owns(F, "scooter") ? "scooter" : r === "walk" ? "walk" : owns(F, "car") ? "car" : owns(F, "scooter") ? "scooter" : "walk"; };
-export const rideSpeed = F => ({walk: 1, bike: 1.3, scooter: 1.6, car: 2.5})[ride(F)]*trolleyPace(F);   // (pushing the ice cream trolley: slower, round 137)   // a hire bike (transport.js) for an hour
+export const ride = F => { if (F.scoop && F.scoop.trolley) return "walk"; if (F.south && F.south.hack && F.south.hack.until > now()) return "pony"; if (bikeOn(F)) return "bike"; const r = F.ride; return r === "car" && owns(F, "car") ? "car" : r === "scooter" && owns(F, "scooter") ? "scooter" : r === "walk" ? "walk" : owns(F, "car") ? "car" : owns(F, "scooter") ? "scooter" : "walk"; };
+export const rideSpeed = F => ({walk: 1, bike: 1.3, pony: 1.4, scooter: 1.6, car: 2.5})[ride(F)]*trolleyPace(F);   // (pushing the ice cream trolley: slower, round 137)   // a hire bike (transport.js) for an hour
 
 // -> a line to say, or null if it can't be bought (yet)
 export function buyGoal(F, k){
@@ -72,10 +72,11 @@ export function jettyPanel(where, _unused){
   const fam = "Your pet hops on the front of your board.";
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${where === "shore" || where === "lighthouse" ? "The paddleboards" : "Your little jetty"}</h2>`;
   // round 267: Lighthouse Point's jetty, along the coast from the foreshore
-  if (where === "lighthouse") return h + `<p class="sub">Up the coast, past the cliffs at the bottom of the flower farm, to the foreshore? Or the long way home, up the stream and down the river. ${fam}</p><div class="actions"><button class="btn primary" data-sup="shore">Paddle to the foreshore</button><button class="btn alt" data-sup="base">Paddle home</button></div><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  if (where === "lighthouse") return h + `<p class="sub">Up the coast, past the cliffs at the bottom of the flower farm, to the foreshore? Or the long way home, up the stream and down the river. ${fam}</p><div class="actions"><button class="btn primary" data-sup="shore">Paddle to the foreshore</button><button class="btn alt" data-sup="base">Paddle home</button></div>
+    <p class="sub" style="margin-top:14px">The river taxi stops at this jetty too (7am to 9pm): the foreshore, the lake, home, Makers' Lane and the woods.</p><div class="actions"><button class="btn alt" data-taxiopen="taxilight">Take the river taxi</button></div><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   h += where === "shore"
     ? `<p class="sub">A paddle about with the dolphins, or up the stream, across the lake and down the river home? Or down the coast to Lighthouse Point.</p><div class="actions"><button class="btn primary" data-sup="play">Paddle about</button><button class="btn alt" data-sup="base">Paddle home</button><button class="btn alt" data-sup="lighthouse">Paddle to Lighthouse Point</button></div>`
-    : `<p class="sub">Down the river, across the lake and out along the stream to the sea. ${fam}</p><div class="actions"><button class="btn primary" data-sup="shore">Paddle to the foreshore</button></div>
-      <p class="sub" style="margin-top:14px">The river taxi stops here too (7am to 9pm): up to the woods, Makers' Lane, the lake and the foreshore.</p><div class="actions"><button class="btn alt" data-taxiopen="taxihome">Take the river taxi</button></div>`;
+    : `<p class="sub">Down the river, across the lake and out along the stream to the sea. ${fam} Or right on down the coast to Lighthouse Point.</p><div class="actions"><button class="btn primary" data-sup="shore">Paddle to the foreshore</button><button class="btn alt" data-sup="lighthouse">Paddle to Lighthouse Point</button></div>
+      <p class="sub" style="margin-top:14px">The river taxi stops here too (7am to 9pm): up to the woods, Makers' Lane, the lake, the foreshore and Lighthouse Point.</p><div class="actions"><button class="btn alt" data-taxiopen="taxihome">Take the river taxi</button></div>`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }

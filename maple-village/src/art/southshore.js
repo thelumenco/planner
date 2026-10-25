@@ -24,3 +24,16 @@ export function carBootArt(){
   return `<g data-place="gboot" aria-label="The car boot sale"><g transform="translate(0 -10)"><ellipse class="hov" cx="348" cy="396" rx="90" ry="12" style="fill:var(--butter)"/>${car(286, 392, "#9FC3D9")}${table}${car(410, 392, "#F4C7CF")}</g>
     ${tapeLabel(348, 400, "Car boot sale", "var(--butter)", 10)}</g>`;
 }
+
+// round 288: a message in a bottle, bobbing in the shallows
+export const bottleArt = b => b ? `<g data-bottle="1" aria-label="A bottle in the shallows" transform="translate(${b.x} ${b.y}) scale(1.4)"><ellipse class="hov" cx="0" cy="2" rx="18" ry="7" style="fill:var(--butter)"/>
+  <g class="bottlebob"><g transform="rotate(-24)" style="stroke:var(--line)" stroke-width=".9"><rect x="-10" y="-5" width="16" height="10" rx="4" style="fill:#9FD3B8" opacity=".9"/><rect x="5" y="-2.6" width="6" height="5.2" rx="1" style="fill:#9FD3B8"/><rect x="10" y="-2.2" width="3" height="4.4" style="fill:#C9A27E"/>
+  <rect x="-7" y="-2.4" width="10" height="4.8" rx="1" style="fill:#FFFDF6"/><path d="M-6 0 h8" style="stroke:#E8566C" stroke-width=".8"/></g><path d="M-14 6 q4 -2 8 0 q4 2 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.1" opacity=".8"/></g></g>` : "";
+// round 278: the day's beach finds, little things on the sand to pick up
+export function beachArt(finds){
+  const pic = {b_shell: `<path d="M-6 2 Q0 -8 6 2z" style="fill:#F6E3C6"/><path d="M-3 2 L0 -5 M3 2 L0 -5" style="stroke:#C98A6A" stroke-width=".8"/>`,
+    b_conch: `<path d="M-6 3 Q-6 -6 2 -6 Q8 -4 5 3z" style="fill:#F3D9B0"/><path d="M-3 0 q3 -4 6 -1" fill="none" style="stroke:#C98A4A" stroke-width=".9"/>`,
+    clams: `<ellipse cx="0" cy="0" rx="6" ry="4" style="fill:#D9CFC0"/><path d="M-5 0 h10" style="stroke:#8A7A6A" stroke-width=".8"/>`,
+    mussels: `<ellipse cx="-2" cy="0" rx="6" ry="3" style="fill:#3A3A5A" transform="rotate(-20)"/><ellipse cx="4" cy="1" rx="5" ry="2.6" style="fill:#4A4A6A" transform="rotate(15)"/>`};
+  return finds.map(f => `<g data-shell="${f.k}" aria-label="Something on the sand" transform="translate(${f.x} ${f.y}) scale(1.35)"><ellipse class="hov" cx="0" cy="2" rx="14" ry="7" style="fill:var(--butter)"/><g style="stroke:var(--line)" stroke-width=".9">${pic[f.id]}</g><circle cx="0" cy="0" r="14" fill="transparent"/></g>`).join("");
+}

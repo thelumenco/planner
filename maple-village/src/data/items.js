@@ -60,6 +60,8 @@ export const ITEMS = {
   crown:{e:"🌸", n:"Flower crown", kind:"use", act:"crown", price:7, tab:"care", say:"Do I look regal? I feel regal."},
   fort:{e:"⛺", n:"Fort kit", kind:"use", act:"fort", price:20, need:30, xp:4, tab:"care", say:"Best. Fort. Ever."},
   // Family tab: little gifts go in the backpack and are handed over in person; keepsakes stay at home forever.
+  // round 286: from Dot's hatch at Lighthouse Point (game/south.js takeaway), not sold anywhere else
+  chips_out:{n:"Fish and chips to take away", kind:"gift", to:"family", price:9, say:"Fish and chips! Still warm! Shall we eat them on the sea wall?"},
   icecream:{n:"Ice cream", kind:"gift", to:"family", price:6, tab:"family", say:"Ice cream! I'm eating it right now, before it melts.",
     says:{tomi:"Ice cream! Two scoops would've been better. Kidding. Thank you!", hana:"Ice cream! Don't tell my Zumba class, love."}},
   balloon:{n:"Red balloon", kind:"gift", to:["posy", "mei"], price:5, say:"A red balloon! It's made my whole afternoon.",
@@ -295,7 +297,8 @@ Object.assign(ITEMS, {kite: {n: "Kite", kind: "toy", price: 12, tab: "family", w
 // the herbs themselves (mint is already on Hana's deli shelf)
 Object.assign(ITEMS, {garlic: {n: "Garlic", kind: "ingredient", sell: 1, what: "from the greenhouse: gambas, garlicky tapas"}, basil: {n: "Basil", kind: "ingredient", sell: 1, what: "from the greenhouse: bruschetta, basil gelato, a bonbon filling"},
   rosemary: {n: "Rosemary", kind: "ingredient", sell: 1, what: "from the greenhouse: rosemary potatoes, a rosemary bonbon, gelato"}, chives: {n: "Chives", kind: "ingredient", sell: 1, what: "from the greenhouse: a chive omelette"},
-  thyme: {n: "Thyme", kind: "ingredient", sell: 1, what: "from the greenhouse: roast tapas, thyme and lemon gelato"}});
+  thyme: {n: "Thyme", kind: "ingredient", sell: 1, what: "from the greenhouse: roast tapas, thyme and lemon gelato"},
+  sage: {n: "Sage", kind: "ingredient", sell: 1, what: "from the priory garden on the lower vineyard: herby oils and soaps at the mill"}});   // round 291
 // round 153: the spices, on Hana's market shelves (items.js picks these up)
 Object.assign(ITEMS, {
   sp_cinnamon: {n: "Cinnamon sticks", kind: "ingredient", price: 2, sell: 1, tab: "deli", what: "for mulled wine (late November to Boxing Day), in the wine shop kitchen's big pot"},

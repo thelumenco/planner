@@ -1,8 +1,10 @@
-// The bottom row of the village (rounds 262 to 264, the creator: "I want the game to become a 4 by 4 screen"): Honeybrook
+// The bottom row of the village (rounds 262 to 264, Mel: "I want the game to become a 4 by 4 screen"): Honeybrook
 // Green (south of home), the Stables (south of the orchard) and Lighthouse Point (south of the flower farm, where the
 // coast path ends). Small, calm things to do; nothing here is a way to make money. State: F.south.
-import { pick } from "../util.js";
+import { pick, now } from "../util.js";
 import { CARBOOT } from "../data/carboot.js";
+import { BOTTLES, BOTTLE_AFTER } from "../data/bottles.js";
+import { ITEMS } from "../data/items.js";
 export { CARBOOT };
 import { icon } from "../art/icons.js";
 const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
@@ -23,7 +25,12 @@ export function feedDucks(F, day, hm){
   const s = southState(F);
   if (hm < 6*60 || hm >= 20*60) return {line: "The ducks are asleep on the bank, beaks tucked under their wings. Best let them be."};
   if (s.ducks === day) return {line: "The ducks have had their breakfast and lunch and, frankly, a second lunch. They paddle off, full."};
-  if ((F.coins || 0) < DUCK_FOOD) return {line: "A scoop of duck food from the honesty tin is a coin. You've nothing on you."};
+  // round 276 (Mel: "Can I bring something to feed the ducks? What do they eat?"): peas or sweetcorn from the garden
+  // are just right (bread's bad for them); otherwise a scoop of duck food from the honesty tin, a coin
+  const own = ["pea", "corn"].find(k => (F.inv || {})[k] > 0);
+  if (own) { F.inv[own]--; if (F.inv[own] <= 0) delete F.inv[own]; s.ducks = day;
+    return {fed: true, line: own === "pea" ? "You scatter a handful of peas from the garden. The ducks go wild: peas are their very favourite. One of them follows you halfway to the gate." : "You crumble a cob of sweetcorn into the water and the ducks come paddling from every corner of the pond, quacking about it."}; }
+  if ((F.coins || 0) < DUCK_FOOD) return {line: "Ducks love peas and sweetcorn (never bread, it's bad for them). Bring some from the garden, or a scoop of duck food from the honesty tin is a coin."};
   F.coins -= DUCK_FOOD; s.ducks = day;
   return {line: pick(["You scatter a scoop of duck food and the whole pond comes at once: three ducks, a moorhen, and a very determined duckling.", "The ducks waddle up the bank in a line, quacking about it. One of them eats from your hand.", "Splash, splash, splash. The ducks race for the food, and the smallest one wins."]), fed: true};
 }
@@ -36,10 +43,21 @@ export function swapCrate(F, day){
   return {id, line: "The swap crate by the potting shed: whoever grows too much leaves it out, with a note saying help yourself."};
 }
 
+// the allotment holders' plots (round 277): what each says about theirs, here or not
+export const PLOT_LINES = {
+  okada: {here: ["Daikon, shiso, and mizuna. Mika says I grow too much. Is there such a thing?", "The shiso is for Mika's rice balls. The rest is for whoever walks past."], away: "Mr Okada's plot: daikon in neat rows, a tangle of purple shiso, and a little stool at the end for sitting and looking at it."},
+  mei: {here: ["Tomatoes, basil, and a bit of everything I miss from home.", "Pinch the side shoots off the tomatoes. Like this. See?"], away: "Mei's plot: tomatoes staked in a row, a jungle of basil, and a label for everything in her tiny handwriting."},
+  theo: {here: ["That pumpkin is entered in the county show. Don't tell it. It gets nervous.", "I talk to it every morning. For science."], away: "Theo's plot: mostly one enormous pumpkin, with a sign saying PLEASE DO NOT TOUCH (ROBERT)."},
+  juniper: {here: ["Sweet peas and cornflowers. For drying, and for poems.", "The more you pick sweet peas, the more they flower. Life lesson, that."], away: "Juniper's plot: sweet peas up the canes in every colour, and cornflowers going wild along the edge."},
+  bo: {here: ["Strawberries! Netted, because the blackbirds are criminals.", "Have one. Go on. Just the one. All right, two."], away: "Bo's plot: strawberries under netting, and a scarecrow in a bucket hat that looks suspiciously like Bo."},
+  felix: {here: ["Runner beans, and a bee hotel. The solitary bees love it.", "The bees from my hives come down here too. Busman's holiday."], away: "Felix's plot: runner beans with red flowers, and a little wooden bee hotel full of holes."}
+};
+export const plotLine = (id, here) => { const p = PLOT_LINES[id]; return p ? (here ? pick(p.here) : p.away) : null; };
+
 /* ---------- The Stables ---------- */
 export const PONIES = {biscuit: {n: "Biscuit", coat: "chestnut", like: "apple"}, pebble: {n: "Pebble", coat: "dapple grey", like: "carrot"}};
 export const TRUST_MAX = 10, RIDE_TRUST = 3, RIDE_COST = 15;
-// round 270 (the creator: "Yes to pony"): a pony of your own, named by you, bought at the stable block; she lives in the
+// round 270 (Mel: "Yes to pony"): a pony of your own, named by you, bought at the stable block; she lives in the
 // paddock with Biscuit and Pebble and is cared for the same way (her keep is included: no running costs)
 export const MY_PONY = {price: 1200, coat: "bay and white", like: "apple"};
 const ponyOf = (F, id) => id === "mine" ? (F.south && F.south.mine ? {n: F.south.mine.name, coat: MY_PONY.coat, like: MY_PONY.like} : null) : PONIES[id];
@@ -67,6 +85,81 @@ export function brushPony(F, id, day){
   if (p.brushed === day) return {line: `${P.n} is already gleaming. Any more brushing and she'll start to glow.`};
   p.brushed = day; p.trust = Math.min(TRUST_MAX, p.trust + 1);
   return {line: pick([`You brush ${P.n} from her ears to her tail. She leans into it and sighs.`, `Long, slow strokes with the soft brush. ${P.n}'s ${P.coat} coat starts to shine.`, `${P.n} stands very still while you brush her, one back hoof tipped up, dozing.`]), ok: true};
+}
+// round 283 (Mel: "Riding pony"): riding your own pony about the village. Tack from the tack room once; then, when she
+// knows you, saddle up at the stable block for an hour's ride (once a day, 7am to 7pm), out on every screen at home.
+// Your pet trots alongside. She trots home to the stables on her own when the hour's up. State: s.tack, s.hack.
+export const TACK = 150, HACK_MIN = 60;
+export const riding = F => !!(F.south && F.south.hack && F.south.hack.until > now());
+export function buyTack(F){
+  const s = southState(F); if (!s.mine) return null; if (s.tack) return {line: "Her saddle and bridle are on her peg in the tack room already."};
+  if ((F.coins || 0) < TACK) return {line: `A saddle, bridle and riding hat are ${TACK} coins.`};
+  F.coins -= TACK; s.tack = true;
+  return {ok: true, line: `Lila helps you choose a saddle, a bridle and a riding hat, and hangs them on a peg with ${s.mine.name}'s name over it.`};
+}
+export function saddleUp(F, day, hm){
+  const s = southState(F), p = s.mine && s.ponies.mine; if (!p) return null;
+  if (!s.tack) return {line: `You'll need a saddle and bridle first. The tack room has them, ${TACK} coins.`};
+  if (p.trust < RIDE_TRUST) return {line: `${s.mine.name} doesn't quite know you yet. A few more days of treats and brushing (${p.trust} of ${RIDE_TRUST}).`};
+  if (hm < 7*60 || hm >= 18*60 + 45) return {line: `${s.mine.name}'s settled for the night. Ride her in the daytime, 7am to 7pm.`};
+  if (riding(F)) return {line: `You're already out on ${s.mine.name}.`};
+  if (s.hack && s.hack.day === day) return {line: `${s.mine.name}'s had her ride today. Tomorrow.`};
+  const mins = Math.min(HACK_MIN, 19*60 - hm); s.hack = {until: now() + mins*60000, day};
+  return {ok: true, line: `You tack up ${s.mine.name}, swing up into the saddle, and off you go at a gentle walk. She knows her own way home when you're done.`};
+}
+export function unsaddle(F){
+  const s = southState(F); if (!riding(F)) return null; s.hack.until = 0;
+  return {ok: true, line: `You slide down and give ${s.mine.name} a pat. She ambles back to the paddock, swishing her tail.`};
+}
+export function tackPanel(F, day){
+  const s = southState(F), n = esc(s.mine.name), p = s.ponies.mine, out = riding(F), left = out ? Math.max(1, Math.ceil((s.hack.until - now())/60000)) : 0;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The tack room</h2>`;
+  if (!s.tack) return h + `<p class="sub">Saddles on their racks, bridles on hooks, a rosette board, and the smell of leather soap. To ride ${n} out you'll want a saddle, a bridle and a riding hat of your own: ${TACK} coins.</p>
+    <div class="actions"><button class="btn primary" data-ponyride="tack"${(F.coins || 0) < TACK ? " disabled" : ""}>Buy her tack (${TACK} coins)</button><button class="btn alt small" data-close="1">Not yet</button></div>`;
+  const ready = p.trust >= RIDE_TRUST, done = s.hack && s.hack.day === day && !out;
+  return h + `<p class="sub">${n}'s saddle and bridle hang on her own peg. ${out ? `You're out riding: ${left} minute${left === 1 ? "" : "s"} left before she heads home.` : done ? "She's had her ride today." : ready ? "An hour's ride, anywhere at home, once a day. Your pet trots alongside." : `She needs to know you a little better first (${p.trust} of ${RIDE_TRUST} hearts).`}</p>
+    <div class="actions">${out ? `<button class="btn primary" data-ponyride="stop">Bring her home</button>` : `<button class="btn primary" data-ponyride="go"${ready && !done ? "" : " disabled"}>Saddle up</button>`}<button class="btn alt small" data-close="1">Close</button></div>`;
+}
+// out on the sand along the bottom row, once a day: a canter at low tide, a walk in the shallows at high
+export function canter(F, day, scene, tide){
+  const s = southState(F); if (!riding(F) || !SOUTH_BEACH.includes(scene) || s.hack.beach === day) return null;
+  s.hack.beach = day; const p = s.ponies.mine, n = s.mine.name; p.trust = Math.min(TRUST_MAX, p.trust + 1);
+  return {line: tide === "low" ? pick([`The tide's out and the sand's hard and wet. ${n} breaks into a canter all on her own, and you whoop.`, `A long canter along the wet sand, the sea flashing beside you. A seal pokes its head up to watch you go by.`])
+    : pick([`${n} splashes through the shallows, lifting her feet high like she's dancing.`, `You walk ${n} along the tideline. She stops to sniff a crab, and snorts at it.`])};
+}
+const SOUTH_BEACH = ["lighthouse", "stables", "green", "lowervine"];
+// round 283 (Mel: "Bram's cottage"): the keeper's cottage at the foot of the lighthouse. Tea with Bram when he's in
+// (he comes in for a cup at three), a page of his father's keeper's log a day, and the things on his shelves.
+export const LOGBOOK = [
+  "12 March. Wind north-west, fresh. Lamp lit 18.40. Planted twelve vines on the slope below the old press. Bram, aged six, helped, and ate some of the soil.",
+  "3 June. Calm. Lamp lit 21.15. The vines have their first leaves. The old press is sound; only wants a new beam.",
+  "28 September. Gale from the south-west all night. Lamp kept. Picked the first grapes this morning, wet through. Small and sweet. Made four bottles. Terrible. Drank them all.",
+  "14 October. Fog. Foghorn sounded 02.00 till 07.30. Bram asked why the light has to turn. Told him so the ships know it's ours and not another.",
+  "2 January. Clear, frost. Found a cross and a vine cut in the rock by the pools. The same mark as on the press. Priory work, I think.",
+  "19 August. Calm, a big moon. Old Ned at the harbour says his grandfather told of a priory boat lost off this point with a cargo of wine. Bram wants to dive for it. Told him when he's taller."
+];
+const TEA = ["Bram pours two mugs, strong enough to stand a spoon in, and tells you about the winter the harbour nearly froze. \"Well. Very nearly.\"",
+  "Tea and a ginger biscuit by the fire. Bram talks about the ships he's watched go by, and which ones always toot.",
+  "Bram makes the tea in a brown pot with a knitted cosy. You sit by the round window and watch the gulls, not saying much. It's lovely.",
+  "He warms the pot first, the proper way, and tells you the light's lamp was made in Birmingham in 1889. He's very proud of Birmingham."];
+export function bramSpot(F, id, day, home){
+  const s = southState(F), b = s.bram = Object.assign({tea: "", log: 0, logDay: ""}, s.bram || {});
+  if (id === "kettle") {
+    if (!home) return {line: "The kettle's cold on the hob. Bram's out on the point; he's usually in for a cup around three."};
+    if (b.tea === day) return {line: "Bram tops up your mug without asking. \"There's always another cup in that pot.\""};
+    b.tea = day; const vines = F.vine && F.vine.lower && F.vine.lower !== "before";
+    return {ok: true, line: pick(TEA) + (vines ? " He asks how the lower rows are coming on, and looks very pleased with the answer." : "")};
+  }
+  if (id === "log") {
+    if (b.log >= LOGBOOK.length) return {line: "You've read the whole of his father's logbook. You turn back to the page about the priory boat and read it again."};
+    if (b.logDay === day) return {line: "You've read a page today. Bram says a keeper's log keeps better a page at a time."};
+    b.logDay = day; const e = LOGBOOK[b.log++];
+    return {ok: true, line: `His father's keeper's log, in faded pencil: "${e}"`};
+  }
+  if (id === "ship") return {line: "A little ship in a bottle on the mantel, every rope and sail. Bram built it one winter with tweezers and a knitting needle. It took him four months, and he says he'd do it again."};
+  if (id === "window") return {line: pick(["The round window looks straight out to sea. A fishing boat's heading home, gulls trailing it like kite tails.", "From the window you can see right along the coast: the beach huts, the Stables, and a sliver of the lower vineyard."])};
+  if (id === "fire") return {line: home ? "A driftwood fire, crackling green and blue from the salt. Bram's boots are steaming gently in front of it." : "The fire's banked down low, waiting for Bram to come in and poke it back to life."};
+  return null;
 }
 // a pony ride round the sand ring on Pebble (she's the steady one), once a day
 export function ponyRide(F, day){
@@ -123,10 +216,133 @@ export function rockPools(F, day, tide){
 }
 // low tide in the morning and early evening (a simple daily rhythm, not the real tides)
 export const tideAt = hm => (hm >= 6*60 && hm < 11*60) || (hm >= 17*60 && hm < 20*60) ? "low" : "high";
+// round 276 (Mel: "Fish and chip shop should open a menu. I should also be able to sell fish to them"): Dot's
+// hatch. A menu to eat there and then, and she buys your catch for the fryer (fair prices, never more than the fish
+// fetches anywhere else; up to six a day)
+export const CHIP_MENU = {
+  cod: {n: "Cod and chips", price: 9, line: "Crisp battered cod, a mountain of chips, salt and vinegar, in paper. You eat it on the sea wall and fight off one very bold gull."},
+  haddock: {n: "Haddock and chips", price: 9, line: "Haddock, flakier than cod, Dot says, and she'd know. With chips, a wedge of lemon and a little wooden fork."},
+  mackerel: {n: "Grilled mackerel bap", price: 6, line: "Mackerel straight off the grill in a soft floury bap, with a bit of horseradish. Bram swears by it."},
+  chips: {n: "A cone of chips", price: 4, line: "A paper cone of chips, too hot to hold. You blow on every one and burn your mouth anyway."},
+  peas: {n: "Mushy peas", price: 2, line: "A little pot of mushy peas, bright green and very, very hot."}
+};
+export const CHIP_BUYS = ["fish", "mackerel", "sardine", "anchovy", "seabream", "mullet", "squid", "clams"], CHIP_CAP = 6;
+const chipSell = id => id === "fish" ? 3 : ((ITEMS[id] || {}).sell || 0);
+// round 287: the gull on Dot's roof
+export const gullLine = F => (F.inv || {}).chips_out ? "The gull on Dot's roof stares very hard at the takeaway in your backpack. You hold it a little tighter." : pick(["A herring gull on the chip hatch roof, one foot tucked up, watching everyone's chips.", "The gull puts its head back and laughs at the sky. Kee-ow, kee-ow, kee-ow.", "Dot says this one's called Gerald, and he's banned."]);
+// round 286 (Mel: "Can I also buy fish and chips as takeaway? As gifts"): wrapped in paper to take away, as a present
+export const TAKEAWAY = 9;
+export function takeaway(F){
+  if ((F.coins || 0) < TAKEAWAY) return {line: `Fish and chips to take away are ${TAKEAWAY} coins.`};
+  F.coins -= TAKEAWAY; F.inv = F.inv || {}; F.inv.chips_out = (F.inv.chips_out || 0) + 1;
+  return {ok: true, line: "Dot wraps it up tight in paper, two layers, \"to keep the heat in, love,\" and tucks in a little wooden fork. Into your backpack, still hot."};
+}
+export function eatChips(F, k){
+  const m = CHIP_MENU[k]; if (!m) return null;
+  if ((F.coins || 0) < m.price) return {line: `${m.n} is ${m.price} coins.`};
+  F.coins -= m.price; return {ok: true, line: m.line};
+}
+export function sellCatch(F, id, day){
+  const s = southState(F); s.chipSold = s.chipSold && s.chipSold.day === day ? s.chipSold : {day, n: 0};
+  if (!CHIP_BUYS.includes(id) || !((F.inv || {})[id] > 0)) return null;
+  if (s.chipSold.n >= CHIP_CAP) return {line: "\"That's my fryer full for today, love. Bring me more tomorrow.\""};
+  const c = chipSell(id); F.inv[id]--; if (F.inv[id] <= 0) delete F.inv[id]; F.coins = (F.coins || 0) + c; s.chipSold.n++;
+  return {ok: true, coins: c, line: `Dot weighs it, nods, and hands over ${c} coin${c === 1 ? "" : "s"}. "Lovely. That'll be in the fryer by teatime."`};
+}
+export function chipsPanel(F, day){
+  const s = southState(F), sold = s.chipSold && s.chipSold.day === day ? s.chipSold.n : 0, have = CHIP_BUYS.filter(id => (F.inv || {})[id] > 0);
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>Dot's fish and chips</h2><p class="sub">Dot leans out of the hatch in her striped apron. "What can I get you, love?"</p>
+    <ul class="hlist wlist">${Object.entries(CHIP_MENU).map(([k, m]) => `<li><span class="wtxt"><b>${esc(m.n)}</b></span><button class="btn small primary" data-chips="${k}"${(F.coins || 0) < m.price ? " disabled" : ""}>${m.price} coins</button></li>`).join("")}</ul>
+    <h3 class="ph3">To take away</h3><ul class="hlist wlist"><li><span class="wpic">${icon("chips_out", 26)}</span><span class="wtxt"><b>Fish and chips, wrapped</b><small>A present for the family, in person or sent round.${(F.inv || {}).chips_out ? ` You have ${F.inv.chips_out}.` : ""}</small></span><button class="btn small primary" data-chipsout="1"${(F.coins || 0) < TAKEAWAY ? " disabled" : ""}>${TAKEAWAY} coins</button></li></ul>
+    <h3 class="ph3">Sell her your catch</h3><p class="sub">She buys fresh fish for the fryer, up to ${CHIP_CAP} a day (${sold} so far today).</p>
+    ${have.length ? `<ul class="hlist wlist">${have.map(id => `<li><span class="wpic">${icon(id, 26)}</span><span class="wtxt"><b>${esc((ITEMS[id] || {n: id}).n)}</b><small>You have ${F.inv[id]}.</small></span><button class="btn small alt" data-chipsell="${id}"${sold >= CHIP_CAP ? " disabled" : ""}>Sell for ${chipSell(id)}</button></li>`).join("")}</ul>` : `<p class="muted">Nothing in your backpack she can fry. Mackerel off the rocks is her favourite.</p>`}
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
 export function buyChips(F){
   if ((F.coins || 0) < CHIPS) return {line: `Fish and chips are ${CHIPS} coins.`};
   F.coins -= CHIPS;
   return {line: pick(["Hot chips and crisp battered cod, salt and vinegar, in paper. You eat them on the sea wall and fight off one very bold gull.", "A cone of chips, a piece of haddock, and a little wooden fork. The best thing you've eaten all week.", "Fish and chips, wrapped in paper, too hot to hold. You blow on every chip and burn your mouth anyway."]), ok: true};
+}
+
+/* ---------- the priory ruins (round 291) ---------- */
+// Mel: "Yes build the ruins... Can I just have sage and lavender for the herbs though, the rest I can get at home". Behind
+// the old press on the lower vineyard (once it's yours): a broken arch and the tumbled walls of the monks' herb garden.
+// Restore it a step a day (coins only); then sage and lavender to pick once a day, and a seat in the low sun.
+export const RUIN_STEPS = [
+  {n: "Clear the brambles", cost: 40, line: "A whole day with loppers and thick gloves. Under the brambles: the old garden walls, tumbled, and the arch standing on its own like it's been waiting."},
+  {n: "Rebuild the wall", cost: 250, line: "A waller from over the hill spends the day fitting the old stones back together, dry, the way the monks did it. Not a drop of mortar."},
+  {n: "Hang a gate", cost: 120, line: "A little oak gate in the gap at the front, with a latch that clicks. The garden feels like a garden again."},
+  {n: "Plant sage and lavender", cost: 60, line: "Two rows of sage and two of lavender, the way a monks' garden would have had them. Hazel walks down to see and stands a long while under the arch. \"The brothers would be glad.\""}
+];
+// round 292 (Mel: "I thought you can get the vineyard without the mill"): it's the ruins that wait for the old mill
+const millGoing = F => !!(F.goals && F.goals.mill);
+export const RUIN_WAIT = "One old ruin at a time. Get the windmill turning again first, then come back for the monks' garden.";
+export const ruinState = F => { const s = southState(F); return s.ruins = Object.assign({step: 0, day: "", picked: ""}, s.ruins || {}); };
+export function ruinStep(F, day){
+  const r = ruinState(F), st = RUIN_STEPS[r.step]; if (!st) return null;
+  if (!millGoing(F)) return {line: RUIN_WAIT};   // round 292 (Mel): the ruins come after the mill
+  if (r.day === day) return {line: "That's enough for one day. The ruins have waited six hundred years; they can wait till tomorrow."};
+  if ((F.coins || 0) < st.cost) return {line: `${st.n}: ${st.cost} coins.`};
+  F.coins -= st.cost; r.step++; r.day = day; return {ok: true, done: r.step === RUIN_STEPS.length, line: st.line};
+}
+export function pickHerbs(F, day){
+  const r = ruinState(F); if (r.step < RUIN_STEPS.length) return null; if (r.picked === day) return {line: "You've picked today. The sage needs a day to forgive you."};
+  r.picked = day; F.inv = F.inv || {}; F.inv.sage = (F.inv.sage || 0) + 3; F.inv.bq_lavender = (F.inv.bq_lavender || 0) + 2;
+  return {ok: true, line: "Three bunches of sage, soft and grey-green, and two of lavender. Your hands smell lovely for an hour."};
+}
+export const ruinSit = hm => hm >= 17*60 && hm < 20*60 ? "You sit on the warm wall. The low sun comes straight through the arch and lays a long golden doorway across the grass." : pick(["You sit on the wall among the sage and listen to the bees. Six hundred years of quiet, and it's still working.", "The cross and the vine are carved in the arch, worn soft. Someone's run their thumb over that a lot of times."]);
+export function ruinsPanel(F, day){
+  const r = ruinState(F), st = RUIN_STEPS[r.step], done = !st;
+  const desc = ["Brambles over everything: a broken stone arch standing on its own, and the tumbled walls of what was the monks' herb garden.", "The brambles are gone. The old walls lie tumbled in the grass, and the arch stands over them.", "The walls are back up, dry stone, the monks' way. There's a gap at the front for a gate.", "Walls, a gate with a latch, and bare earth inside, waiting for the herbs.", "The priory garden: sage and lavender inside the old walls, the arch over the gate, bees everywhere."][r.step];
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The priory ruins</h2><p class="sub">${desc}</p>`;
+  if (!done && !millGoing(F)) h += `<p class="sub">${RUIN_WAIT}</p>`;
+  else if (!done) h += `<p class="sub">Next: <b>${st.n}</b>, ${st.cost} coins. One step a day.</p><div class="actions"><button class="btn primary" data-ruin="step"${(F.coins || 0) < st.cost || r.day === day ? " disabled" : ""}>${st.n} (${st.cost} coins)</button></div>`;
+  else h += `<div class="actions"><button class="btn primary" data-ruin="pick"${r.picked === day ? " disabled" : ""}>${r.picked === day ? "Picked today" : "Pick sage and lavender"}</button></div>`;
+  return h + `<div class="actions"><button class="btn alt" data-ruin="sit">Sit a while</button><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+
+/* ---------- messages in bottles (round 288) ---------- */
+// Every third day or so a bottle bobs in the shallows on one of the bottom-row beaches, from first light till dusk.
+// Each one holds the next unread message (data/bottles.js); found ones go into the mailbox, already open, to reread.
+const BOTTLE_X = {lighthouse: 380, stables: 300, green: 230, lowervine: 420};
+export function bottleToday(F, day){
+  const h = hsh(day + ":bottle"), s = southState(F); if (h % 3) return null;
+  const b = s.bottles || {found: []}; if (b.day === day || b.found.length >= BOTTLES.length) return null;
+  const scene = SOUTH_BEACH[hsh(day + ":where") % SOUTH_BEACH.length]; return {scene, x: BOTTLE_X[scene], y: 606};
+}
+export function pickBottle(F, day, at){
+  const s = southState(F), b = s.bottles = s.bottles || {found: []}; if (!bottleToday(F, day)) return null;
+  const left = BOTTLES.map((_, i) => i).filter(i => !b.found.some(f => f.i === i)), i = left[hsh(day + ":which") % left.length];
+  b.day = day; b.found.push({i, at});
+  return {i, ...BOTTLES[i], after: BOTTLE_AFTER[i] || ""};
+}
+export const bottleTitle = m => m.kind === "poem" ? "A poem in a bottle" : m.kind === "kind" ? "A kind word in a bottle" : "A letter in a bottle";
+export const bottleBody = m => `${m.date}\n\n${m.text}${m.from ? `\n\n${m.from}` : ""}`;
+// the mailbox keeps them (core.js marks them read when found)
+export const bottleMail = F => ((F.south && F.south.bottles && F.south.bottles.found) || []).map(f => ({id: "bottle-" + f.i, from: "postie", at: f.at, title: bottleTitle(BOTTLES[f.i]) + ", washed up " + new Date(f.at).toLocaleDateString("en-GB", {day: "numeric", month: "long"}), body: bottleBody(BOTTLES[f.i])}));
+export function bottlePanel(m){
+  return `<span class="tape stripe" aria-hidden="true"></span><h2>${esc(bottleTitle(m))}</h2><p class="sub">You work the cork out and shake the little roll of paper free. It's dry inside.</p>
+    <div class="bottlenote"><p class="muted" style="text-align:right">${esc(m.date)}</p>${m.text.split("\n\n").map(p => `<p>${esc(p).replace(/\n/g, "<br>")}</p>`).join("")}${m.from ? `<p style="text-align:right"><i>${esc(m.from)}</i></p>` : ""}</div>
+    ${m.after ? `<p class="sub">${esc(m.after)}</p>` : ""}<p class="muted">You keep it. It's in your mailbox to read again.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+
+/* ---------- beachcombing (round 278) ---------- */
+// Each day a couple of things wash up on each bottom-row beach, in different spots: shells (now and then a conch),
+// and clams. Tap one to pick it up; it's gone till tomorrow's tide brings more.
+export const BEACH_SPOTS = {lighthouse: [130, 182, 352, 452, 492], stables: [56, 132, 206, 300, 420], green: [56, 140, 300, 420, 486], lowervine: [150, 220, 380, 456, 496]};
+const BEACH_Y = {lighthouse: 580, stables: 584, green: 580, lowervine: 580};
+export function beachFinds(F, scene, day){
+  const xs = BEACH_SPOTS[scene]; if (!xs) return [];
+  const got = (((F.south || {}).beach || {})[day]) || [];
+  return some(xs.map(String), 2, day + ":beach:" + scene).map(x => { const k = scene + ":" + x, h = hsh(day + k) % 20;
+    return {k, x: +x, y: BEACH_Y[scene], id: h === 0 ? "b_conch" : h < 11 ? "b_shell" : "clams"}; }).filter(f => !got.includes(f.k));
+}
+export function pickBeach(F, scene, k, day){
+  const f = beachFinds(F, scene, day).find(x => x.k === k); if (!f) return null;
+  const s = southState(F); s.beach = s.beach && s.beach[day] ? s.beach : {[day]: []}; s.beach[day].push(k);
+  const n = f.id === "clams" ? 2 : 1; F.inv = F.inv || {}; F.inv[f.id] = (F.inv[f.id] || 0) + n;
+  const line = {b_shell: "A seashell, ribbed and pink inside. Into your pocket it goes.", b_conch: "A spiral conch! You almost never find these here. You hold it to your ear: the sea.", clams: "You dig your fingers into the wet sand and come up with a couple of clams. Four make clams with garlic and lemon at the kitchen."}[f.id];
+  return {id: f.id, n, line};
 }
 
 /* ---------- the paddock panel ---------- */
@@ -142,7 +358,7 @@ export function paddockPanel(F, day){
   return h + `</ul><p class="muted">Once Pebble knows you (${RIDE_TRUST} hearts' worth), you can have a ride round the sand ring, ${RIDE_COST} coins.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 
-/* ---------- who's about on the bottom row (round 265, the creator: "change some of the villagers' schedules so they're also moving around those screens") ---------- */
+/* ---------- who's about on the bottom row (round 265, Mel: "change some of the villagers' schedules so they're also moving around those screens") ---------- */
 const hsh = s => { let h = 0; for (const c of s) h = (h*31 + c.charCodeAt(0)) >>> 0; return h; };
 // a steady handful from a pool, different each day (or week)
 const some = (pool, n, key) => pool.map(id => [id, hsh(key + id)]).sort((a, b) => a[1] - b[1]).slice(0, n).map(x => x[0]);
@@ -153,25 +369,26 @@ const WALK_POOL = ["hana", "opal", "mei", "amara", "sofia", "elena", "bo", "noor
 const BAND_LAWN = [[290, 300], [340, 296], [420, 300], [460, 288], [320, 330], [400, 326]];
 const CRICKET_LAWN = [[300, 440], [360, 470], [420, 500], [330, 520], [400, 430], [290, 500]];
 const CLIFF_WALK = [[200, 300], [300, 380], [380, 330], [250, 420], [180, 260]];
-export function southSlot(id, day, t){
+export function southSlot(id, day, t, F){
   const dw = dow(day), we = dw === 0 || dw === 6, ev = eventSlotSouth(id, day, t); if (ev) return ev;
   if (dw === BAND.dow && t >= BAND.from && t < BAND.to && some(BAND_POOL, 6, day + ":band").includes(id)) return W(BAND.from, BAND.to, "green", BAND_LAWN);
   if (dw === CRICKET.dow && t >= CRICKET.from && t < CRICKET.to && some(CRICKET_POOL, 6, day + ":cricket").includes(id)) return W(CRICKET.from, CRICKET.to, "green", CRICKET_LAWN);
   // Mr Okada's allotment, Tuesday and Thursday mornings; Mei's on Saturdays
-  if (id === "okada" && (dw === 2 || dw === 4) && t >= 7*60 + 30 && t < 9*60 + 30) return W(7*60 + 30, 9*60 + 30, "green", [[70, 222], [110, 230], [150, 214]], "farm");
-  if (id === "mei" && dw === 6 && t >= 9*60 && t < 11*60) return W(9*60, 11*60, "green", [[70, 222], [110, 230], [150, 214]], "farm");
+  if (id === "okada" && (dw === 2 || dw === 4) && t >= 7*60 + 30 && t < 9*60 + 30) return W(7*60 + 30, 9*60 + 30, "allotment", [[244, 214], [200, 270], [120, 270]], "farm");
+  if (id === "mei" && dw === 6 && t >= 9*60 && t < 11*60) return W(9*60, 11*60, "allotment", [[276, 214], [330, 270], [420, 270]], "farm");
   // a stable hand: Lila mucks out and turns the ponies out first thing, weekdays
   if (id === "lila" && !we && t >= 7*60 && t < 8*60 + 30) return W(7*60, 8*60 + 30, "stables", [[260, 300], [300, 320], [214, 420], [180, 300]], "farm");
-  // Marco and Ines tend the lower rows too
-  if (id === "ines" && dw !== 0 && t >= 14*60 && t < 15*60) return W(14*60, 15*60, "lowervine", [[262, 268], [340, 350], [418, 432], [300, 514]], "water");
-  if (id === "marco" && dw !== 0 && t >= 15*60 && t < 16*60) return W(15*60, 16*60, "lowervine", [[262, 268], [340, 350], [418, 432], [300, 514]], "farm");
+  // Marco and Ines tend the lower rows too, once they're yours (round 282: until then they're Bram's, gone to grass)
+  const lowerYours = !F || !!(F.vine && F.vine.lower);
+  if (id === "ines" && lowerYours && dw !== 0 && t >= 14*60 && t < 15*60) return W(14*60, 15*60, "lowervine", [[262, 268], [340, 350], [418, 432], [300, 514]], "water");
+  if (id === "marco" && lowerYours && dw !== 0 && t >= 15*60 && t < 16*60) return W(15*60, 16*60, "lowervine", [[262, 268], [340, 350], [418, 432], [300, 514]], "farm");
   // walks out to the lighthouse: a couple at weekends after breakfast, and someone most evenings
   if (we && t >= 9*60 && t < 10*60 + 30 && some(WALK_POOL, 2, day + ":lhm").includes(id)) return W(9*60, 10*60 + 30, "lighthouse", CLIFF_WALK);
   if (t >= 18*60 && t < 19*60 && some(WALK_POOL, 1, day + ":lhe").includes(id)) return W(18*60, 19*60, "lighthouse", CLIFF_WALK);
   return null;
 }
 
-/* ---------- the car boot sale and the lamp lighting (round 271, the creator: "Car boot sale and lamp lighting") ---------- */
+/* ---------- the car boot sale and the lamp lighting (round 271, Mel: "Car boot sale and lamp lighting") ---------- */
 // Sunday mornings, 8 till 12, on the green: two cars with their boots open and a trestle table. Four curios each week,
 // different every Sunday; keepsakes for the shelves at home, a few coins each. Buy each one once.
 export const BOOT = {dow: 0, from: 8*60, to: 12*60};

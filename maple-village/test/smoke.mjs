@@ -2146,7 +2146,7 @@ if (want("\nHoneybrook Woods, bikes and the river taxi")) try {
   check(await page.locator("#hero.biking").count() === 1, "you ride it (faster than walking, slower than the scooter)");
   await page.waitForTimeout(3500);
   await page.locator('#world [data-place="taxiwoods"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-taxi]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-taxi]').count() === 4, "the river taxi stops: Makers' Lane, home, the lake and the foreshore");
+  check(await page.locator('#ctx [data-taxi]').count() === 5, "the river taxi stops: Makers' Lane, home, the lake, the foreshore and Lighthouse Point");
   await page.click('#ctx [data-taxi="taxishore"]'); await page.waitForTimeout(800);
   check(await page.locator(".taxiride").count() === 1, "a little ride down the river on the launch");
   await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 15000 });
@@ -2154,7 +2154,7 @@ if (want("\nHoneybrook Woods, bikes and the river taxi")) try {
   await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="homejetty"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-taxiopen]', { timeout: 15000 });
   await page.click('#ctx [data-taxiopen]'); await page.waitForTimeout(300);
-  check(await page.locator('#ctx [data-taxi]').count() === 4 && await page.locator('#world [data-place="taxihome"]').count() === 0, "at home the river taxi stops at the little jetty (no separate stop): paddle or take the taxi");
+  check(await page.locator('#ctx [data-taxi]').count() === 5 && await page.locator('#world [data-place="taxihome"]').count() === 0, "at home the river taxi stops at the little jetty (no separate stop): paddle or take the taxi");
   await page.locator('#ctx [data-close]').first().click();
   await page.evaluate(() => window.__hbScene("lane")); await page.waitForTimeout(900);
   check(await page.locator('#world [data-place="toWoodsM"]').count() === 1 && await page.locator('#world [data-place="taxilane"]').count() === 1, "Makers' Lane: the river comes down from the woods, with a taxi stop and a path up the hill");
@@ -3707,6 +3707,17 @@ if (want("\nThe terrace's week: weddings, trivia, sip and paint, and the special
   check(oc.occasionSlot("amara", "2026-10-14", 19*60 + 30, true).act === "point" && oc.occasionSlot("theo", "2026-10-15", 14*60 + 30, true).act === "point" && oc.occasionSlot("juniper", "2026-10-15", 14*60 + 30, true).act === "paint", "Amara runs the quiz; Theo teaches the painting");
   const md = lu.bookingsFor("2027-05-09"); check(!md.some(b => b.mothers) && lu.seatsTaken(md) <= 12, "Mother's Day is an ordinary long lunch now");
   const cu = oc.comingUp("2026-10-12"); check(cu.some(e => /wedding of/.test(e.n)) && cu.some(e => e.n === "Trivia night") && cu.every(e => e.day >= "2026-10-12"), "the bookings book: what's coming up");
+  // round 284: the couple's cases of sparkling come up from the cellar
+  { const W = {coins: 0, inv: {}, vine: {terrace: true}}, v = vy.vineState(W), cases = oc.weddingCases("2026-10-24");
+    v.cellar = [{id: "a", name: "Kept fizz", type: "sparkling", n: 12, hold: true}, {id: "b", name: "More fizz", type: "sparkling", n: 30}, {id: "c", name: "On the rack", type: "sparkling", n: 6, rack: Date.parse("2026-10-24T10:00:00Z")}, {id: "d", name: "Red", type: "red", n: 6, hold: true}];
+    v.shelf = [{id: "r", name: "House red", type: "red", n: 40, price: 16, open: 0}]; v.help.stock = false;
+    const realNow = Date.now, t0 = Date.parse("2026-10-24T16:00:00Z") - (await import(new URL("../src/util.js", import.meta.url))).LOC(); Date.now = () => t0; v.lastTick = t0 - 300*60000; const out = vy.sellTick(W, {}); Date.now = realNow;
+    const left = id => (v.cellar.find(c => c.id === id) || {n: 0}).n;
+    check(cases >= 2 && cases <= 4 && out.cases === cases*6 && left("a") + left("b") === 42 - cases*6 && left("c") === 6 && left("d") === 6, `a wedding's ${cases} cases of sparkling come up from the cellar, kept-back ones too, but not off the riddling rack or any red`);
+    check(out.coins >= cases*6*vy.STYLES.sparkling.price && oc.comingUp("2026-10-12").some(e => /cases of sparkling/.test(e.note || "")), "paid at the shelf price, and the order's in the bookings book");
+    const W2 = {coins: 0, inv: {}, vine: {terrace: true}}, v2 = vy.vineState(W2); v2.cellar = [{id: "e", name: "Last fizz", type: "sparkling", n: 4}]; v2.shelf = []; v2.help.stock = false;
+    Date.now = () => t0; v2.lastTick = t0 - 300*60000; const o2 = vy.sellTick(W2, {}); Date.now = realNow;
+    check(o2.cases === 4 && !v2.cellar.length, "short of the order, they take what you have"); }
   // trivia: twenty questions, all with three answers; a perfect score wins the pot
   const qz = oc.quizFor("2026-10-14"); check(qz.length === 5 && qz.every(r => r.qs.length === 4 && r.qs.every(q => q[1].length === 3 && q[2] >= 0 && q[2] < 3)), "trivia: five rounds of four, three answers each");
   const st = oc.triviaStart("2026-10-14", "The Marvels"); while (!st.done) { oc.triviaAnswer(st, st.rounds[st.r].qs[st.q][2]); oc.triviaNext(st); }
@@ -4855,13 +4866,19 @@ if (want("\nThe lower vineyard (round 261)")) try {
   console.log("\nThe lower vineyard (round 261)");
   const vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
   { const F = {coins: 1000, vine: {rows: [0, 1, 2].map(() => ({trellis: true, vines: [null, null, null]}))}}, v = vy.vineState(F);
+    check(v.rows.length === 7 && !vy.lowerOwned(F) && /Bram's/.test(vy.buy(F, "trellis")) && !v.rows[3].trellis && F.coins === 1000, "an old save with three full rows gets four more down the hill, but they're Bram's: no trellis goes there yet");
+    check(!vy.buyLower(F, "2026-10-24").ok && F.coins === 1000 && /For Sale/.test(vy.lowerSalePanel(F)) && /Bram's/.test(vy.vinePanel(F, 4, 0)), "his For Sale sign asks " + vy.LOWER.price + " coins, and the rows down there are his till then");
+    F.coins = vy.LOWER.price + 100; const bought = vy.buyLower(F, "2026-10-24");
+    check(bought.ok && vy.lowerOwned(F) && v.rows[3].trellis && F.coins === 100 && !vy.buyLower(F, "2026-10-24").ok, "buying from Bram: the lower vineyard is yours, with his father's trellis on the first row");
     const say = vy.buy(F, "trellis");
-    check(v.rows.length === 7 && v.rows[3].trellis && !v.rows[4].trellis && /lower vineyard/.test(say) && F.coins === 920, "an old save with three full rows gets four more down the hill, and the next trellis goes there (80 coins)");
+    check(v.rows[4].trellis && /lower vineyard/.test(say) && F.coins === 20, "and the next trellis bought goes down the hill (80 coins)");
+    const old = {coins: 0, vine: {rows: [0, 1, 2, 3].map(() => ({trellis: true, vines: [null, null, null]}))}};
+    check(vy.lowerOwned(old), "a save already planting down there owns the lower vineyard");
     v.cuttings.red = 1; check(/planted/.test(vy.plantVine(F, 3, 0, "red") || "") && v.rows[3].vines[0].v === "red", "and a red cutting plants on it"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`lowervine pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-24"); await page.waitForTimeout(1000);
-  await page.evaluate(() => { const F = window.__hbGame.F(); F.vine = F.vine || {}; F.vine.rows = [0, 1, 2, 3, 4, 5, 6].map(i => ({trellis: i < 4, vines: i === 3 ? [{v: "red", planted: 1, wateredAt: Date.now() - 3600e3}, null, null] : [null, null, null]})); window.__hbGame.save(); window.__hbScene("vineyard"); });
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.vine = F.vine || {}; delete F.vine.lower; F.vine.rows = [0, 1, 2, 3, 4, 5, 6].map(i => ({trellis: i < 4, vines: i === 3 ? [{v: "red", planted: 1, wateredAt: Date.now() - 3600e3}, null, null] : [null, null, null]})); window.__hbGame.save(); window.__hbScene("vineyard"); });
   await page.waitForTimeout(700);
   await page.locator('#world [data-place="toLowerV"]').dispatchEvent("click");
   await page.waitForFunction(() => /lower vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400);
@@ -4869,6 +4886,11 @@ if (want("\nThe lower vineyard (round 261)")) try {
     "down the path past the seesaw: the lower vineyard, with its own rows, the old press and the sea bench");
   await page.locator('#world [data-vine="3-0"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-vy]", { timeout: 15000 }).catch(() => {});
   check(/Vine 4\.1/.test(await page.locator("#ctx").innerText()), "tapping a vine down there opens it, like the ones up top");
+  check(await page.locator('#world [data-place="vsale"]').count() === 0, "once it's yours there's no For Sale sign");
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-24"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("lowervine")); await page.waitForTimeout(700);
+  await page.locator('#world [data-place="vsale"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-lvbuy]", { timeout: 20000 }).catch(() => {});
+  check(/Bram/.test(await page.locator("#ctx").innerText()) && await page.locator("#ctx [data-lvbuy]").count() === 1, "on a new game the lower vineyard is Bram's, with his For Sale sign and note");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)")) try {
@@ -4886,6 +4908,17 @@ if (want("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)")) t
     check(so.brushPony(F, "pebble", day).ok && so.feedPony(F, "pebble", day).ok && F.south.ponies.pebble.trust === 3, "Pebble: a brush and her favourite carrot");
     check(so.ponyRide(F, day).ok && F.coins === 49 - so.RIDE_COST && !so.ponyRide(F, day).ok, "then a ride round the ring, once a day");
     check(so.buyChips(F).ok && F.coins === 49 - so.RIDE_COST - so.CHIPS && /tide's in/.test(so.rockPools(F, day, "high").line), "fish and chips cost coins, and the rock pools need low tide"); }
+  await import(new URL("../src/game/fishing.js", import.meta.url));   // (the catch's prices)
+  { const F = {coins: 20, inv: {pea: 1, mackerel: 7}}; const d = "2026-10-24";
+    check(so.feedDucks(F, d, 10*60).fed && !F.inv.pea && F.coins === 20, "peas from the garden for the ducks, free (bread's bad for them)");
+    check(so.eatChips(F, "chips").ok && F.coins === 16 && so.sellCatch(F, "mackerel", d).ok && F.coins === 16 + 3, "Dot's hatch: a cone of chips to eat, and she buys your mackerel at the usual price");
+    for (let i = 0; i < 5; i++) so.sellCatch(F, "mackerel", d); check(F.inv.mackerel === 1 && !so.sellCatch(F, "mackerel", d).ok, "six fish a day is her fryer full");
+    const it = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS;
+    check(so.CHIP_BUYS.every(id => id === "fish" || (it[id] && (it[id].sell || 0) <= so.CHIP_MENU.cod.price)), "Dot never pays more for a fish than her fish and chips cost");
+    check(so.plotLine("okada", false) && Object.keys(so.PLOT_LINES).length === 6, "six neighbours' plots at the allotments (Mr Okada's among them), each with something to say"); }
+  { const F = {coins: 0, inv: {}}, d = "2026-10-27", f = so.beachFinds(F, "lowervine", d);
+    check(f.length === 2 && so.beachFinds(F, "green", d).length === 2 && !so.beachFinds(F, "orchard", d).length, "beachcombing: a couple of finds wash up on each bottom-row beach every day");
+    const r = so.pickBeach(F, "lowervine", f[0].k, d); check(r && F.inv[r.id] === r.n && so.beachFinds(F, "lowervine", d).length === 1 && !so.pickBeach(F, "lowervine", f[0].k, d), "pick one up and it's yours (shells and conches for the shelf, clams for the kitchen); gone till tomorrow"); }
   { const fi = await import(new URL("../src/game/fishing.js", import.meta.url)), F = {coins: 1500, inv: {apple: 1}};
     const r = so.buyPony(F, "Clementine", day);
     check(r.ok && F.coins === 300 && so.ponyIds(F).includes("mine") && so.feedPony(F, "mine", day).ok && F.south.ponies.mine.trust === 2 && !so.buyPony(F, "Again", day).ok, "a pony of your own (1,200 coins), named by you, cared for like the others");
@@ -4898,7 +4931,7 @@ if (want("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)")) t
     check(so.lampNow("2026-10-26", 19*60) && !so.lampNow("2026-10-27", 19*60) && /cheer|clap/i.test(so.lampLighting(F, "2026-10-26", 19*60 + 5).line), "the Monday lamp lighting at Lighthouse Point"); }
   check(["green", "stables", "lighthouse", "lowervine"].every(sc => Object.keys(w.BRIDGES[sc]).every(o => w.BRIDGES[o] && w.BRIDGES[o][sc] && w.ARRIVE[sc + ">" + o] && w.ARRIVE[o + ">" + sc])), "every new path goes both ways, with somewhere to arrive");
   { const ids = ["hana", "juniper", "opal", "theo", "farid", "mei", "amara", "lila", "noor", "sofia"], band = ids.filter(i => (so.southSlot(i, "2026-10-25", 15*60) || {}).scene === "green");
-    check(band.length === 6 && (so.southSlot("okada", "2026-10-27", 8*60) || {}).scene === "green" && (so.southSlot("lila", "2026-10-27", 7*60 + 30) || {}).scene === "stables" && (so.southSlot("ines", "2026-10-27", 14*60 + 30) || {}).scene === "lowervine",
+    check(band.length === 6 && (so.southSlot("okada", "2026-10-27", 8*60) || {}).scene === "allotment" && (so.southSlot("lila", "2026-10-27", 7*60 + 30) || {}).scene === "stables" && (so.southSlot("ines", "2026-10-27", 14*60 + 30) || {}).scene === "lowervine",
       "villagers use the new screens: six at the Sunday band, Mr Okada at his allotment, Lila at the stables, Ines on the lower vines"); }
   { const npc = await import(new URL("../src/data/npcs.js", import.meta.url)), ids = new Set(npc.NPCS.map(n => n.id)), src = (await import("node:fs")).readFileSync(new URL("../src/game/south.js", import.meta.url), "utf8");
     const named = [...new Set((src.match(/"[a-z]+"/g) || []).map(x => x.slice(1, -1)).filter(x => /^(hana|juniper|opal|theo|farid|mei|amara|lila|noor|sofia|bo|felix|wren|elena|okada|marco|ines)$/.test(x)))];
@@ -4916,6 +4949,11 @@ if (want("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)")) t
   await page.locator('#world [data-place="spaddock"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pony="feed:biscuit"]', { timeout: 20000 });
   await page.click('#ctx [data-pony="feed:biscuit"]'); await page.waitForTimeout(400);
   check(await page.evaluate(() => window.__hbGame.F().south.ponies.biscuit.trust === 2), "at the paddock: an apple for Biscuit");
+  await page.evaluate(() => window.__hbScene("green")); await page.waitForTimeout(600);
+  await page.locator('#world [data-place="gallot"]').dispatchEvent("click"); await page.waitForFunction(() => /allotments/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(await page.locator('#world [data-aspot]').count() === 7, "the allotments have a screen of their own: six neighbours' plots and the swap crate");
+  await page.locator('#world [data-exit="green"]').dispatchEvent("click"); await page.waitForFunction(() => /Honeybrook Green/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "and the gate goes back to the green");
   await page.evaluate(() => window.__hbScene("lighthouse")); await page.waitForTimeout(600);
   check(await page.locator('#world [data-place="bikeslight"]').count() === 1 && await page.locator('#world [data-place="fishrocks"]').count() === 1, "bike hire and the mackerel rocks at Lighthouse Point");
   await page.locator('#world [data-place="lsup"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 20000 });
@@ -4944,6 +4982,75 @@ if (want("\nThe bottom row in the stories (rounds 272 to 275)")) try {
     check(t && /Grey Pony/.test(t.lines.join(" ")) && F.inv.s_ponypoem === 1, "once Pebble trusts you, Theo shows you Juniper's poem about her"); }
   { const F = mk({juniper: 7}); check(so.storyFind(F) && so.storyFind(F).key === "notebook" && !so.storyFind(mk({juniper: 6})), "Juniper's old notebook turns up once she's told you about Pebble"); }
   check(!/[–—]/.test(JSON.stringify([sd.STORIES.bram, so.TALES, so.STORY_FINDS])), "no dashes in the new chapters");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nRiding your pony and Bram's cottage (round 283)")) try {
+  // riding your own pony about the village, Bram's cottage, the gulls, bottles and the priory ruins (rounds 283 to 292)
+  console.log("\nRiding your pony and Bram's cottage (round 283)");
+  const so = await import(new URL("../src/game/south.js", import.meta.url)), gl = await import(new URL("../src/game/goals.js", import.meta.url));
+  const day = "2026-10-24";
+  { const F = {coins: 200, south: {mine: {name: "Clover", since: day}}}; so.southState(F);
+    check(!so.saddleUp(F, day, 10*60).ok && /saddle and bridle/.test(so.saddleUp(F, day, 10*60).line), "no riding without tack");
+    check(so.buyTack(F).ok && F.coins === 200 - so.TACK && !so.buyTack(F).ok, "tack from the tack room, once (" + so.TACK + " coins)");
+    check(!so.saddleUp(F, day, 10*60).ok, "she has to know you first");
+    F.south.ponies.mine.trust = so.RIDE_TRUST;
+    check(!so.saddleUp(F, day, 20*60).ok, "no riding after dark");
+    const r = so.saddleUp(F, day, 10*60);
+    check(r.ok && so.riding(F) && gl.ride(F) === "pony" && gl.rideSpeed(F) > 1 && !so.saddleUp(F, day, 10*60 + 5).ok, "saddle up: you're riding her (a bit quicker than walking)");
+    const c = so.canter(F, day, "lighthouse", "low");
+    check(c && /canter|sand/.test(c.line) && F.south.ponies.mine.trust === so.RIDE_TRUST + 1 && !so.canter(F, day, "stables", "low") && !so.canter(F, "2026-10-25", "vineyard", "low"), "a canter on the sand once a day, and she likes you more for it");
+    check(so.unsaddle(F).ok && !so.riding(F) && gl.ride(F) !== "pony" && !so.saddleUp(F, day, 11*60).ok, "bring her home, and that's the ride for today");
+    check(so.saddleUp(F, "2026-10-25", 18*60 + 30).ok && F.south.hack.until - Date.now() <= 30*60000 + 5000, "a ride late in the day ends at 7");
+    check(/data-ponyride="stop"/.test(so.tackPanel(F, "2026-10-25")) && !/Evan/.test(so.tackPanel(F, "2026-10-25")), "the tack room brings her home (its buttons don't clash with walk, scooter or car)"); }
+  { const F = {coins: 0, vine: {lower: "2026-10-01"}};
+    check(/kettle's cold/.test(so.bramSpot(F, "kettle", day, false).line), "no tea when Bram's out");
+    const t = so.bramSpot(F, "kettle", day, true);
+    check(t.ok && /lower rows/.test(t.line) && !so.bramSpot(F, "kettle", day, true).ok, "tea with Bram once a day: he asks after the lower rows");
+    const l1 = so.bramSpot(F, "log", day, false);
+    check(l1.ok && l1.line.includes(so.LOGBOOK[0]) && !so.bramSpot(F, "log", day, false).ok && so.bramSpot(F, "log", "2026-10-25", false).line.includes(so.LOGBOOK[1]), "his father's logbook, a page a day");
+    check(so.LOGBOOK.some(e => /priory boat/.test(e)) && so.LOGBOOK.some(e => /vines/.test(e)), "the logbook has the vines below the press and the priory boat in it");
+    check(["ship", "window", "fire"].every(k => so.bramSpot(F, k, day, true).line), "the ship in a bottle, the window and the fire"); }
+  { const bt = await import(new URL("../src/data/bottles.js", import.meta.url)), lh = await import(new URL("../src/art/lighthouse.js", import.meta.url));
+    const days = Array.from({length: 120}, (_, d) => new Date(Date.UTC(2026, 9, d + 1)).toISOString().slice(0, 10)), on = days.map(d => [d, so.bottleToday({}, d)]).filter(x => x[1]);
+    check(on.length > 25 && on.length < 55 && new Set(on.map(x => x[1].scene)).size === 4, `a bottle washes up every few days (${on.length} in 120), on each of the four bottom-row beaches`);
+    check(bt.BOTTLES.length >= 30 && bt.BOTTLES.every(m => /^\d{1,2} [A-Z][a-z]+ \d{4}$/.test(m.date) && ["poem", "kind", "letter"].includes(m.kind) && !/[–—]/.test(m.text + m.from)), "thirty or more messages, poems, kind words and letters, every one dated (and no long dashes)");
+    const G = {}, [d0] = on[0], m = so.pickBottle(G, d0, 1);
+    check(m && m.text && !so.bottleToday(G, d0) && !so.pickBottle(G, d0, 2) && so.bottleMail(G).length === 1 && /in a bottle/.test(so.bottleMail(G)[0].title) && so.bottleMail(G)[0].body.startsWith(m.date), "pick it up: the message is yours, kept in the mailbox with its date");
+    let n = 1; for (const [d] of on.slice(1)) if (so.pickBottle(G, d, 3)) n++;
+    check(new Set(G.south.bottles.found.map(f => f.i)).size === n, "never the same message twice");
+    check(/<div class="bottlenote">/.test(so.bottlePanel(m)) && (lh.lighthouseArt(false).match(/gullperch/g) || []).length === 4, "the note opens on paper; and the perched gulls tilt their heads now and then"); }
+  { const lh = await import(new URL("../src/art/lighthouse.js", import.meta.url)), a = lh.lighthouseArt(false);
+    check((a.match(/class="gulloff"/g) || []).length === 2 && (a.match(/class="gwup"/g) || []).length === 2 && /animation-duration:52s/.test(a) && /animation-duration:67s/.test(a), "two of the perched gulls now and then flap off over the sea and glide back, at different times"); }
+  { const gu = await import(new URL("../src/art/gulls.js", import.meta.url));
+    check(["shore", "stables", "green", "lowervine"].every(sc => /gullperch/.test(gu.coastGulls(sc, false)) && /gulloff/.test(gu.coastGulls(sc, false))) && !/gullfly/.test(gu.coastGulls("shore", true)) && gu.coastGulls("vineyard", false) === "", "gulls all along the foreshore and the bottom-row beaches (resting at night)"); }
+  { const R = {coins: 1000, inv: {}}, d1 = "2026-10-24", d2 = "2026-10-25";
+    check(!so.ruinStep(R, d1).ok && R.coins === 1000 && /windmill/.test(so.ruinsPanel(R, d1)) && !/data-ruin="step"/.test(so.ruinsPanel(R, d1)), "the priory ruins wait till the old mill's turning");
+    R.goals = {mill: 1}; const s1 = so.ruinStep(R, d1);
+    check(s1.ok && R.coins === 1000 - so.RUIN_STEPS[0].cost && !so.ruinStep(R, d1).ok && !so.pickHerbs(R, d1), "restoring the ruins: one step a day, for coins, and nothing to pick yet");
+    ["2026-10-25", "2026-10-26", "2026-10-27"].forEach(d => so.ruinStep(R, d));
+    const tot = so.RUIN_STEPS.reduce((a, x) => a + x.cost, 0), p1 = so.pickHerbs(R, "2026-10-28");
+    check(so.ruinState(R).step === 4 && R.coins === 1000 - tot && p1.ok && R.inv.sage === 3 && R.inv.bq_lavender === 2 && !so.pickHerbs(R, "2026-10-28").ok, `four steps (${tot} coins), then sage and lavender to pick once a day`);
+    const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), it = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS;
+    check(mc.HERB.sage && mc.HERB.sage.oil && it.sage && !it.sage.tab && /sun/.test(so.ruinSit(18*60)) && /The priory ruins/.test(so.ruinsPanel(R, d2)), "sage works in the mill's oils and soaps; sit in the low sun through the arch"); }
+  { const tr = await import(new URL("../src/game/transport.js", import.meta.url)), lh = await import(new URL("../src/art/lighthouse.js", import.meta.url));
+    check(tr.STOPS.taxilight && tr.STOPS.taxilight.scene === "lighthouse" && /data-taxiopen="taxilight"/.test(gl.jettyPanel("lighthouse", true)), "the river taxi stops at the Lighthouse Point jetty");
+    check((lh.lighthouseArt(false).match(/gullfly/g) || []).length === 3 && !/gullfly/.test(lh.lighthouseArt(true)) && /data-place="lgull"/.test(lh.lighthouseArt(false)) && /takeaway/.test(so.gullLine({inv: {chips_out: 1}})), "seagulls: perched about the point, gliding over it by day, and one eyeing your chips"); }
+  check(/data-sup="lighthouse"/.test(gl.jettyPanel("base", true)) && /data-sup="base"/.test(gl.jettyPanel("lighthouse", true)), "the home jetty paddles down to Lighthouse Point, and back");
+  { const F = {coins: 15, inv: {}}, it = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS.chips_out;
+    check(so.takeaway(F).ok && F.inv.chips_out === 1 && F.coins === 15 - so.TAKEAWAY && !so.takeaway(F).ok && F.coins === 6, "fish and chips to take away from Dot's, " + so.TAKEAWAY + " coins");
+    check(it && it.kind === "gift" && !it.tab && !it.says && /To take away/.test(so.chipsPanel(F, day)), "a present for a friend (only from Dot's hatch)"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`bramcot pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=15:30&date=2026-10-24"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("lighthouse")); await page.waitForTimeout(700);
+  await page.locator('#world [data-place="lbram"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Bram's cottage/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(800);
+  check(await page.locator('#world [data-bspot]').count() === 5 && await page.locator('#world .flame').count() > 0, "Bram's cottage by the lighthouse: the fire's lit when he's in at three");
+  await page.locator('#world [data-bspot="kettle"]').dispatchEvent("click"); await page.waitForTimeout(3500);
+  check(/mug|tea|pot/i.test(await page.locator("#speech").innerText().catch(() => "")), "and he makes you a cup of tea");
+  await page.locator('#world [data-exit="lighthouse"]').dispatchEvent("click");
+  await page.waitForFunction(() => /Lighthouse Point/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "out the door, back on the point");
+  await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");

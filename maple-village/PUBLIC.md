@@ -390,4 +390,10 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   and the Monday lamp lighting (`eventSlotSouth`). The story threads: Priory Red (a new grape, wired through the wine
   code), the flask and the sea cave (gated on `F.passage.step >= 5` here), Theo and Juniper's pony poem, and the car boot
   story finds. This edition's Juniper has one more chapter, so her notebook needs 7 chapters heard, not 6.
-- Rounds 3 and 4 of the port (the allotments screen, beachcombing, bottles, the priory ruins, inside the lighthouse) follow.
+- Round 3: the allotments screen (art/allotment.js; Mr Okada keeps Gong Gong's plot), the lower vineyard starts as Bram's
+  (`buyLower`, 2,500; a save with trellis down there already owns it), riding your own pony (`buyTack`, `saddleUp`;
+  the panel's buttons are `data-ponyride`, since `data-ride` is walk/scooter/car here), Bram's cottage (art/bramcot.js),
+  Dot's menu, takeaway and buying fish (never above her prices, 6 a day), beachcombing (shells, conches and clams; this
+  edition has no mussels), gulls (art/gulls.js), messages in bottles (data/bottles.js, kept in the mailbox), the priory
+  ruins (after the mill: sage and lavender), the river taxi's Lighthouse Point stop and weddings' cases of sparkling.
+- Round 4 (Dot's hours, inside the lighthouse, the cruise and own boat at any hour, the green's lamp posts) follows.

@@ -9,7 +9,7 @@ import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLev
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, orchardArt, flowerFarmArt, setArtContext } from "../art/scenes.js";
 import { vineSpot, vineScene } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, tapasAll, TAPAS, cookTick, cookLine } from "./kitchen.js";
-import { questBoost } from "./vineyard.js";
+import { questBoost, lowerSalePanel, buyLower } from "./vineyard.js";
 import { wineNews, vineState, sellTick, vinePanel, stallPanel, barrelPanel, storePanel as wineStorePanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, grovePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { isLove, loveThanks } from "../data/loves.js";
@@ -62,7 +62,10 @@ import { lowerVineArt } from "../art/lowervine.js";
 import { greenArt } from "../art/green.js";
 import { stablesArt } from "../art/stables.js";
 import { lighthouseArt } from "../art/lighthouse.js";
-import { carBootArt } from "../art/southshore.js";
+import { carBootArt, beachArt, bottleArt } from "../art/southshore.js";
+import { allotmentArt } from "../art/allotment.js";
+import { bramCottageArt } from "../art/bramcot.js";
+import { coastGulls } from "../art/gulls.js";
 import * as SO from "./south.js";
 import { greenhouseArt, GH_BED_AT, GH_POT_AT } from "../art/greenhouse.js";
 import { millArt } from "../art/mill.js";
@@ -410,7 +413,7 @@ let friView = null, lastFri = "";   // round 112: the fishmonger's van panel (or
 let xmPick = null;   // round 174: the hamper picked to post
 let ghBed = null, millOpen = false, lastMill = "";   // round 110: the olive press panel, and the mill's art key   // round 109: the greenhouse bed being looked at
 let rondaView = null;   // round 107: a Ronda shop (ronda.js): "mercado", "tapas", "dulces", "convento", "azulejos"
-let woodsView = null;   // round 103: "ranger", "bike" or a river taxi stop id (transport.js, woods.js)
+let woodsView = null, bottleMsg = null;   // (bottleMsg: round 288, the bottle letter just opened)   // round 103: "ranger", "bike" or a river taxi stop id (transport.js, woods.js)
 let fishSpot = null, fishSt = {}, fishT = null;   // fishing: which spot you're at, and the cast in progress (fishing.js)
 let railOpen = false, lastTrain = "", tripPick = [], tripTown = "ronda", ferryTown = "saltwick", boatTown = "saltwick";   // (round 215: the ferry goes to the islands too)   // the timetable board on Honeybrook's platform
 let lastFarm = 0;
@@ -758,7 +761,7 @@ const sgAt = (day, h, m = 0) => Date.UTC(+day.slice(0, 4), +day.slice(5, 7) - 1,
 const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 let localCache = {key: "", items: []};
 function localMail(){
-  const day = dayKey(), hm = localHM(), key = `${day}:${Math.floor(hm/10)}:${doneToday()}:${QB.villageLetters(F).length}:${thanksMail().length}:${slowMail(F).length}:${PP.bloomMail(F).length}:${BK.bookMail(F).length}:${GAL.galleryMail(F, Date.now()).length}:${((F.creator || {}).sent || []).length}`;
+  const day = dayKey(), hm = localHM(), key = `${day}:${Math.floor(hm/10)}:${doneToday()}:${QB.villageLetters(F).length}:${thanksMail().length}:${slowMail(F).length}:${PP.bloomMail(F).length}:${BK.bookMail(F).length}:${GAL.galleryMail(F, Date.now()).length}:${((F.creator || {}).sent || []).length}:${SO.bottleMail(F).length}`;
   if (key === localCache.key) return localCache.items;
   const out = [], wd = new Date(day + "T00:00:00Z").getUTCDay();
   if ((wd === 5 && hm >= 900) || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
@@ -766,6 +769,7 @@ function localMail(){
     title: "Time to close the day", body: "Meet me at the pond. Each of today's wins gets a lantern on the water."});
   { const gl = GU.thanksLetter(F, dearMe(F)); if (gl) out.push(gl); }
   out.push(...LT.letsMail(F, QB.hearts(F, "elena"), (F.lets && F.lets.offerAt) || 0));   // round 219: Elena's offer
+  out.push(...SO.bottleMail(F));   // round 288: messages in bottles, kept to reread
   if (F.welcomeAt) out.push(welcomeLetter(F.welcomeAt));   // round 225: Hana's welcome, with how coins come in
   out.push(...QB.villageLetters(F), ...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__hbOffset || 0)), ...PP.bloomMail(F), ...BK.bookMail(F), ...GAL.galleryMail(F, Date.now()), ...creatorMail(F));   // round 129: Jeju's slow-post postcards, two weeks on
   return (localCache = {key, items: out}).items;
@@ -1303,8 +1307,13 @@ function ctxBody(){
   else if (woodsView === "ranger" && scene === "hwoods") h = rangerPanel(F, isHere("wren"));
   else if (woodsView === "paddock" && scene === "stables") h = SO.paddockPanel(F, dayKey());
   else if (woodsView === "stable" && scene === "stables") h = SO.stablePanel(F);
+  else if (woodsView === "lvsale" && scene === "lowervine") h = lowerSalePanel(F);
+  else if (woodsView === "ruins" && scene === "lowervine") h = SO.ruinsPanel(F, dayKey());
+  else if (woodsView === "bottle" && bottleMsg) h = SO.bottlePanel(bottleMsg);
+  else if (woodsView === "tack" && scene === "stables" && SO.southState(F).mine) h = SO.tackPanel(F, dayKey());
   else if (woodsView === "boot" && scene === "green") h = SO.bootPanel(F, dayKey());
   else if (woodsView === "seacave" && scene === "lighthouse") h = SO.seaCavePanel(F);
+  else if (woodsView === "chips" && scene === "lighthouse") h = SO.chipsPanel(F, dayKey());
   else if (woodsView === "bike" && outside()) h = bikePanel(F, F.ride === "car" && owns(F, "car") ? "car" : owns(F, "scooter") && F.ride !== "walk" ? "scooter" : "");
   else if (woodsView && TAXI_STOPS[woodsView] && TAXI_STOPS[woodsView].scene === scene) h = taxiPanel(F, woodsView);
   else if (vanView === "crate" && scene === "van") h = cratePanel(F, vineState(F));
@@ -1768,6 +1777,17 @@ function ctxBody(){
   c.querySelectorAll("[data-taxiopen]").forEach(b => b.onclick = () => { goalView = null; woodsView = b.dataset.taxiopen; sfx("paper", true); ctx(); });   // the home jetty: the taxi stops there too
   if (fishSpot) c.querySelectorAll("[data-fish]").forEach(b => b.onclick = () => fishGo(b.dataset.fish, b.dataset.k));
   c.querySelectorAll("[data-sup]").forEach(b => b.onclick = () => { goalView = null; ctx(); if (b.dataset.sup === "play") familyPaddle(); else paddleTo(b.dataset.sup); });
+  c.querySelectorAll("[data-chips]").forEach(b => b.onclick = () => { const r = SO.eatChips(F, b.dataset.chips); if (r) { speak(r.line, 6000); if (r.ok) sfx("chaching"); } save(true); ctx(); });
+  c.querySelectorAll("[data-chipsout]").forEach(b => b.onclick = () => { const r = SO.takeaway(F); speak(r.line, 5000); if (r.ok) { sfx("chaching"); flash("+ fish and chips to take away"); } save(true); ctx(); });   // round 286
+  c.querySelectorAll("[data-chipsell]").forEach(b => b.onclick = () => { const r = SO.sellCatch(F, b.dataset.chipsell, dayKey()); if (r) { speak(r.line, 4500); if (r.ok) { sfx("coin"); flash(`+${r.coins} coins`); } } save(true); ctx(); });   // round 276: Dot's hatch
+  c.querySelectorAll("[data-ponyride]").forEach(b => b.onclick = () => { const k = b.dataset.ponyride, r = k === "tack" ? SO.buyTack(F) : k === "go" ? SO.saddleUp(F, dayKey(), localHM()) : SO.unsaddle(F); if (!r) return;   // round 283
+    speak(r.line, 6000); if (r.ok) { sfx(k === "tack" ? "chaching" : "chime"); if (k === "go") { gainXp(1); woodsView = null; } } save(true); ctx(); render(); });
+  c.querySelectorAll("[data-ruin]").forEach(b => b.onclick = () => { const k = b.dataset.ruin;   // round 291: the priory ruins
+    if (k === "sit") { speak(SO.ruinSit(localHM()), 6000); return; }
+    const r = k === "step" ? SO.ruinStep(F, dayKey()) : SO.pickHerbs(F, dayKey()); if (!r) return; speak(r.line, 7000);
+    if (r.ok) { sfx(k === "pick" ? "pop" : "chime"); gainXp(r.done ? 3 : 1); if (k === "pick") flash("+3 sage, +2 lavender"); if (r.done) flash("The priory garden is restored"); drawScene(); } save(true); ctx(); });
+  c.querySelectorAll("[data-lvbuy]").forEach(b => b.onclick = () => { const r = buyLower(F, dayKey()); speak(r.line, 8000);   // round 282
+    if (r.ok) { sfx("chaching"); gainXp(3); woodsView = null; flash("The lower vineyard is yours"); drawScene(); } save(true); ctx(); });
   c.querySelectorAll("[data-boot]").forEach(b => b.onclick = () => { const r = SO.buyFind(F, b.dataset.boot, dayKey()); if (r) { speak(r.line, 5000); if (r.ok) sfx(r.story ? "chime" : "chaching"); } save(true); ctx(); });   // round 271
   c.querySelectorAll("[data-sea]").forEach(b => b.onclick = () => { const r = SO.seaCave(F, b.dataset.sea); if (r) { speak(r.line, 7000); if (r.ok) { sfx("chime"); gainXp(2); flash("+ a priory bottle"); } } save(true); ctx(); });   // round 274: the sea cave
   c.querySelectorAll("[data-ponybuy]").forEach(b => b.onclick = () => { const r = SO.buyPony(F, (c.querySelector("#ponyName") || {}).value, dayKey());
@@ -1942,11 +1962,11 @@ function drawScene(){
   tableKey = "";
   // round 231: each layer is drawn on its own, so one that fails (from an unusual save) is left out and logged, and the
   // room, its exit and everything else still appear
-  $("sceneArt").innerHTML = safeArt(() => scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : scene === "lowervine" ? lowerVineArt(vineState(F)) : scene === "green" ? greenArt() : scene === "stables" ? stablesArt(!!(F.south && F.south.mine)) : scene === "lighthouse" ? lighthouseArt(localHM() >= 19*60 || localHM() < 6*60) : townRoom(scene) ? (townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "puffin" ? puffinRoomArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoRoomArt(scene) : townOf(scene) === "bali" ? baliRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene): TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene): TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "puffin" ? puffinArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoArt(scene) : townOf(scene) === "bali" ? baliArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "cave" ? caveArt(PS.caveInfo(F, dayKey(), localHM())) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene), "scene") || safeArt(() => roomShell(scene) + roomExitArt(), "shell");
-  $("sceneArt").insertAdjacentHTML("beforeend", safeArt(() => keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + (scene === "green" && SO.bootNow(dayKey(), localHM()) ? carBootArt() : "") + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), localHM()) ? discoArt() : "") + (scene === "cellar" && owns(F, "cellar") ? cellarPassArt(PS.passState(F).step) : "") + (scene === "scoopkitchen" && PS.passState(F).kitchen ? kitchenPanelArt() : "") + vanCrateArt() + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""), "layers"));   // shelves with keepsakes, and pets at home here
-  if ((outside() || scene === "terrace") && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(localHM()));   // (round 153: the terrace too)   // the same evening light everywhere outdoors
-  if ((outside() || scene === "terrace") && isDusk()) safeArt(() => { nightLights(); return ""; }, "night lights");
-  const names = {lowervine: "The lower vineyard", green: "Honeybrook Green", stables: "The Stables", lighthouse: "Lighthouse Point", village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), terrace:"The terrace", millup:"The old mill: upstairs", orchard:"The orchard", flowers:"The flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, ct_vernazza:"Cinque Terre: Vernazza", ct_corniglia:"Cinque Terre: Corniglia", ct_monterosso:"Cinque Terre: Monterosso", ct_manarola:"Cinque Terre: Manarola", ...Object.fromEntries(Object.entries(BB_NAMES).map(([k, v]) => [k, "Bellbird Valley: " + v])), ba_seminyak:"Bali: Seminyak", ba_ubud:"Bali: Ubud", ba_tegallalang:"Bali: Tegallalang", ba_uluwatu:"Bali: Uluwatu", hk_otaru:"Hokkaido: Otaru", hk_sapporo:"Hokkaido: Sapporo", hk_niseko:"Hokkaido: Niseko", hk_furano:"Hokkaido: Furano", pi_landing:"Puffin Isle: the landing", pi_village:"Puffin Isle: the village", pi_lighthouse:"Puffin Isle: the lighthouse", pi_cliffs:"Puffin Isle: the cliffs", sw_harbour:"Saltwick: the harbour", sw_wynds:"Saltwick: the wynds", sw_beach:"Saltwick: the beach", sw_clifftop:"Saltwick: the clifftop", jj_shore:"Jeju: Seongsan", jj_farms:"Jeju: the tangerine farms", jj_harbour:"Jeju: the harbour", jj_village:"Jeju: the stone village", kt_station:"Kyoto: the station", kt_lane:"Kyoto: Higashiyama", kt_temple:"Kyoto: the temple", kt_river:"Kyoto: the river", rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
+  $("sceneArt").innerHTML = safeArt(() => scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : scene === "lowervine" ? lowerVineArt(vineState(F), SO.ruinState(F).step) : scene === "green" ? greenArt() : scene === "allotment" ? allotmentArt() : scene === "bramcot" ? bramCottageArt(isHere("bram")) : scene === "stables" ? stablesArt(!!(F.south && F.south.mine)) : scene === "lighthouse" ? lighthouseArt(localHM() >= 19*60 || localHM() < 6*60) : townRoom(scene) ? (townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "puffin" ? puffinRoomArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoRoomArt(scene) : townOf(scene) === "bali" ? baliRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene): TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene): TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "puffin" ? puffinArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoArt(scene) : townOf(scene) === "bali" ? baliArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "cave" ? caveArt(PS.caveInfo(F, dayKey(), localHM())) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene), "scene") || safeArt(() => roomShell(scene) + roomExitArt(), "shell");
+  $("sceneArt").insertAdjacentHTML("beforeend", safeArt(() => keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + coastGulls(scene, localHM() >= 19*60 || localHM() < 6*60) + (scene === "green" && SO.bootNow(dayKey(), localHM()) ? carBootArt() : "") + beachArt(SO.beachFinds(F, scene, dayKey())) + bottleHere() + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), localHM()) ? discoArt() : "") + (scene === "cellar" && owns(F, "cellar") ? cellarPassArt(PS.passState(F).step) : "") + (scene === "scoopkitchen" && PS.passState(F).kitchen ? kitchenPanelArt() : "") + vanCrateArt() + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""), "layers"));   // shelves with keepsakes, and pets at home here
+  if ((outside() || scene === "terrace" || scene === "allotment") && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(localHM()));   // (round 153: the terrace too)   // the same evening light everywhere outdoors
+  if ((outside() || scene === "terrace" || scene === "allotment") && isDusk()) safeArt(() => { nightLights(); return ""; }, "night lights");
+  const names = {allotment: "The allotments", bramcot: "Bram's cottage", lowervine: "The lower vineyard", green: "Honeybrook Green", stables: "The Stables", lighthouse: "Lighthouse Point", village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), terrace:"The terrace", millup:"The old mill: upstairs", orchard:"The orchard", flowers:"The flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, ct_vernazza:"Cinque Terre: Vernazza", ct_corniglia:"Cinque Terre: Corniglia", ct_monterosso:"Cinque Terre: Monterosso", ct_manarola:"Cinque Terre: Manarola", ...Object.fromEntries(Object.entries(BB_NAMES).map(([k, v]) => [k, "Bellbird Valley: " + v])), ba_seminyak:"Bali: Seminyak", ba_ubud:"Bali: Ubud", ba_tegallalang:"Bali: Tegallalang", ba_uluwatu:"Bali: Uluwatu", hk_otaru:"Hokkaido: Otaru", hk_sapporo:"Hokkaido: Sapporo", hk_niseko:"Hokkaido: Niseko", hk_furano:"Hokkaido: Furano", pi_landing:"Puffin Isle: the landing", pi_village:"Puffin Isle: the village", pi_lighthouse:"Puffin Isle: the lighthouse", pi_cliffs:"Puffin Isle: the cliffs", sw_harbour:"Saltwick: the harbour", sw_wynds:"Saltwick: the wynds", sw_beach:"Saltwick: the beach", sw_clifftop:"Saltwick: the clifftop", jj_shore:"Jeju: Seongsan", jj_farms:"Jeju: the tangerine farms", jj_harbour:"Jeju: the harbour", jj_village:"Jeju: the stone village", kt_station:"Kyoto: the station", kt_lane:"Kyoto: Higashiyama", kt_temple:"Kyoto: the temple", kt_river:"Kyoto: the river", rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || (townRoom(scene) ? `${TOWNS[townOf(scene)].n}: ${townRoom(scene).n.replace(/^The /, "the ")}` : ROOMS[scene].name))}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
   $("maphint").textContent = townRoom(scene) ? `${townRoom(scene).say} Exit at the bottom, back out the way you came.` : townOf(scene) && TOWNS[townOf(scene)].hints ? TOWNS[townOf(scene)].hints[scene] : townOf(scene) ? {rd_station: "Ronda's station (trains home till 10pm) and the Alameda balcony over the valley. East: the plaza. South: steps down into the gorge.", rd_plaza: "The plaza: the market, the tapas bar, Doña Carmen's sweets. West: the station. South: over Puente Nuevo.", rd_bridge: "Puente Nuevo over the gorge, the viewpoint and the Moorish garden. North: back over the bridge. West: the old town.", rd_old: "La Ciudad: the convent hatch, the tile shop, the Arab baths. North: the gorge steps up to the station. East: the bridge."}[scene] : scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Hana's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Farid and Mei's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Bo's workshop, and Auntie Lin's, Juniper's and Mr Okada's homes. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
@@ -2447,6 +2467,7 @@ function setScene(id, at){
     const p = at || [260, 596];
     hero.x = hero.tx = p[0]; hero.y = hero.ty = p[1]; hero.path = []; chum.x = chum.tx = p[0] - 22; chum.y = chum.ty = p[1] + 2;
     render(true); w.classList.remove("fading");
+    if (ride(F) === "pony" && SOUTH.includes(id)) { const r = SO.canter(F, dayKey(), id, SO.tideAt(localHM())); if (r) setTimeout(() => speak(r.line, 6000), 900); }   // round 283
     if (id === "bv_hpaper" && owns(F, "paperie")) { ppCame = PP.collectScraps(F, dayKey()); if (ppCame) setTimeout(() => speak(`${ppCame} bundle${ppCame === 1 ? "" : "s"} of scraps from your shops came up in the van: wine labels, chocolate wrappers, receipts. Into the scrap bin.`, 5500), 900); }
     if (townOf(id)) save();   // a day out: remember which screen of the town (reopening puts you back there)
     if (route.length) nextLeg();
@@ -2639,14 +2660,22 @@ function arriveSpot(id){
   const s = spotObj(scene, id); if (s) speak(s.line, 3500); render();
 }
 // rounds 262 to 264: the green, the Stables and Lighthouse Point (game/south.js)
-const SOUTH_SPOTS = ["gboot", "gpond", "gband", "glawn", "gallot", "sstable", "spaddock", "sride", "llight", "lpools", "lchips"];
+const SOUTH_SPOTS = ["vruins", "vsale", "stack", "lbram", "lgull", "gboot", "gpond", "gband", "glawn", "gallot", "sstable", "spaddock", "sride", "llight", "lpools", "lchips"];
 function southSpot(id){
   const day = dayKey(), hm = localHM(), say = (r, ms = 5500) => { if (r) speak(r.line, ms); };
-  if (id === "gboot") { if (SO.bootNow(day, hm)) { woodsView = "boot"; sfx("paper", true); } else speak("The car boot sale's on Sunday mornings, 8 till 12.", 3500); }
+  if (id === "vruins" && !vineState(F).lower) speak("The priory ruins: a broken arch and tumbled walls under the brambles. They're on Bram's land.", 4500);   // round 291
+  else if (id === "vruins") { woodsView = "ruins"; sfx("paper", true); }
+  else if (id === "vsale") { woodsView = "lvsale"; sfx("paper", true); }   // round 282: Bram's sign
+  else if (id === "stack" && SO.southState(F).mine) { woodsView = "tack"; sfx("paper", true); }   // round 283: riding your pony
+  else if (id === "stack") speak("The tack room. Saddles on their racks, bridles on hooks, a rosette board, and the smell of leather soap.", 4000);
+  else if (id === "lgull") speak(SO.gullLine(F), 4500);   // round 287
+  else if (id === "lbram" && (hm < 7*60 || hm >= 22*60)) speak("Bram's cottage is dark. Even the keeper has to sleep sometime.", 3500);
+  else if (id === "lbram") { setScene("bramcot", [260, 580]); return; }   // round 283: Bram's cottage
+  else if (id === "gboot") { if (SO.bootNow(day, hm)) { woodsView = "boot"; sfx("paper", true); } else speak("The car boot sale's on Sunday mornings, 8 till 12.", 3500); }
   else if (id === "gpond") { const r = SO.feedDucks(F, day, hm); say(r); if (r.fed) { sfx("pop"); gainXp(1); } }
   else if (id === "gband") speak(SO.bandNow(day, hm) ? "The Honeybrook brass band, in their red jackets, playing something jolly with a lot of trombone. Half the village is on the grass with a flask." : "The bandstand. On Sunday afternoons, two till four, the brass band plays and half the village brings a blanket.", 5500);
   else if (id === "glawn") speak(SO.cricketNow(day, hm) ? "Cricket! A gentle village match: someone's bowling underarm, someone's dog has the ball, and everyone's clapping politely." : "The cricket lawn, mown in stripes. There's a friendly match on Saturday afternoons, two till five.", 5500);
-  else if (id === "gallot") { const r = SO.swapCrate(F, day); if (r.id) { sfx("chime"); flash(`+1 ${(ITEMS[r.id] || {n: r.id}).n.toLowerCase()}`); speak(`${r.line} Today: ${(ITEMS[r.id] || {n: r.id}).n.toLowerCase()}. You take one.`, 6000); } else say(r); }
+  else if (id === "gallot") { setScene("allotment", [260, 580]); return; }   // round 277: the allotments have their own screen
   else if (id === "sstable" && !SO.southState(F).mine && hm >= 7*60 && hm < 19*60) { woodsView = "stable"; sfx("paper", true); }
   else if (id === "sstable") speak(hm >= 20*60 || hm < 6*60 ? "The stable's quiet. Biscuit and Pebble are dozing in their stalls, one ear each turned towards you." : "Biscuit puts her head over the half-door and blows warm air at you. Pebble, next door, pretends not to have noticed you, then gives in.", 5000);
   else if (id === "spaddock") { woodsView = "paddock"; sfx("paper", true); }
@@ -2656,9 +2685,16 @@ function southSpot(id){
     if (tale) setTimeout(() => npcSay("bram", tale), 6800); }   // round 270: Bram tells a tale, one a day
   else if (id === "lpools") { const r = SO.rockPools(F, day, SO.tideAt(hm)); say(r, 7000);
     if (r.flask) { sfx("chime"); gainXp(1); flash("+ the priory flask"); } if (r.cave) { woodsView = "seacave"; sfx("paper", true); } }
-  else if (id === "lchips") { const r = SO.buyChips(F); say(r, 6000); if (r.ok) sfx("chaching"); }
+  else if (id === "lchips") { woodsView = "chips"; sfx("paper", true); }   // round 276: Dot's menu
   save(true); render();
 }
+function allotSpot(id){
+  if (id === "crate") { const r = SO.swapCrate(F, dayKey()); if (r.id) { sfx("chime"); flash(`+1 ${(ITEMS[r.id] || {n: r.id}).n.toLowerCase()}`); speak(`${r.line} Today: ${(ITEMS[r.id] || {n: r.id}).n.toLowerCase()}. You take one.`, 6000); } else speak(r.line, 5000); save(true); render(); return; }
+  const here = isHere(id); if (here) npcSay(id, SO.plotLine(id, true)); else speak(SO.plotLine(id, false), 5500); render();
+}
+// round 288: today's bottle, if it's on this screen and it's light (6am to 8pm)
+function bottleNow(){ const b = SO.bottleToday(F, dayKey()), hm = localHM(); return b && b.scene === scene && hm >= 6*60 && hm < 20*60 ? b : null; }
+function bottleHere(){ return bottleArt(bottleNow()); }
 function arriveVillageSpot(id){
   atSpot = id;
   const v = VILLAGE[id];
@@ -3228,6 +3264,12 @@ const SUP_BOARD = k => `<g class="supboard"><ellipse cx="0" cy="${-1*k}" rx="${2
   b.insertAdjacentHTML("afterend", `<g class="rideBike" transform="translate(0 7)" style="stroke:var(--line)" stroke-width="1">
     <path d="M14 -24 h12 l-2 9 h-8z" style="fill:#C9A27E"/><path d="M15 -21 h10 M16 -18 h8" opacity=".5"/><g class="bikeChum petPeek" transform="translate(21 -26) scale(.72)"></g></g>`);
   // the ice cream trolley (round 137): a little pink push-cart in front of her, like the night market's but no parasol
+  // round 283: your own pony, bay and white with a star on her nose, under you while you're out riding
+  b.insertAdjacentHTML("afterend", `<g class="ridePony" transform="translate(0 6)" style="stroke:var(--line)" stroke-width="1"><path d="M-21 -20 q-8 6 -5 18 q3 -6 4 -14z" style="fill:#3A2A22"/>
+    <rect x="-17" y="-12" width="4" height="17" rx="1.5" style="fill:#8A5A3A"/><rect x="-10" y="-12" width="4" height="17" rx="1.5" style="fill:#F6EFE3"/><rect x="8" y="-12" width="4" height="17" rx="1.5" style="fill:#8A5A3A"/><rect x="14" y="-12" width="4" height="17" rx="1.5" style="fill:#F6EFE3"/>
+    <ellipse cx="0" cy="-15" rx="22" ry="9" style="fill:#8A5A3A"/><path d="M-6 -23 q8 4 6 15 q-10 2 -14 -4 q2 -9 8 -11z" style="fill:#F6EFE3" stroke="none"/><path d="M-9 -23 h16 l-2 12 h-12z" style="fill:#5E8A5A"/>
+    <path d="M14 -20 q6 -10 10 -18 l8 6 q-4 8 -8 16z" style="fill:#8A5A3A"/><ellipse cx="31" cy="-35" rx="8" ry="5" transform="rotate(20 31 -35)" style="fill:#8A5A3A"/><path d="M33 -38 l3 2 l-2 1z" style="fill:#FFFDF6" stroke="none"/>
+    <path d="M24 -41 l1 -6 l3 5z" style="fill:#8A5A3A"/><path d="M15 -22 q4 -12 10 -19" fill="none" style="stroke:#3A2A22" stroke-width="3"/><circle cx="31" cy="-37" r="1" style="fill:#2F2B28" stroke="none"/><path d="M25 -35 q-8 6 -16 6" fill="none" stroke-width=".8"/></g>`);
   b.insertAdjacentHTML("afterend", `<g class="rideTrolley" style="stroke:var(--line)" stroke-width="1"><path d="M10 -22 l6 3" stroke-width="1.6" fill="none"/><rect x="15" y="-24" width="26" height="17" rx="2" style="fill:#F4C7CF"/><rect x="15" y="-24" width="26" height="4" rx="1.5" style="fill:#FFFDF6"/><path d="M15 -15 h26" stroke-width="2.2" style="stroke:#FFFDF6"/><path d="M24 -12 l2 5 l2 -5z" style="fill:#E8C48E"/><circle cx="26" cy="-13" r="2" style="fill:#F8D59A"/><path d="M32 -12 l2 5 l2 -5z" style="fill:#E8C48E"/><circle cx="34" cy="-13" r="2" style="fill:#C3E8B8"/><circle cx="19" cy="-3" r="3" style="fill:#2F2B28"/><circle cx="37" cy="-3" r="3" style="fill:#2F2B28"/></g>`);
   b.insertAdjacentHTML("beforebegin", `<g class="rideScoot" style="stroke:var(--line)" stroke-width="1"><rect x="-15" y="-3" width="30" height="3.4" rx="1.6" style="fill:#7FB8E8"/><circle cx="-12" cy="1" r="2.6" style="fill:#2F2B28"/><circle cx="12" cy="1" r="2.6" style="fill:#2F2B28"/><path d="M12 -3 l3 -26 M10 -29 h9" fill="none" stroke-width="2"/></g>`);
   // the cream convertible, roof down: the player at the wheel, the pet in the back
@@ -3248,11 +3290,11 @@ function familyPaddle(){
 }
 // Paddling between the home jetty and the foreshore: the river, the lake and the stream join them. Board on, a blink,
 // and the player steps off by the other jetty (the pet too)
-const JETTY = {shore: [216, 500], base: [150, 134], lighthouse: [400, 552]};
+const JETTY = {shore: [216, 500], base: [150, 134], lighthouse: [118, 240]};
 function paddleTo(dest){
   if (paddling || sup) return;
   const m = localHM(); if (m >= 22*60 || m < 6*60) { speak("Too dark to paddle the river now. Walk tonight, paddle in the morning.", 3500); render(); return; }
-  const kid = false, off = scene === "shore" ? [[104, 372], [132, 404]] : scene === "lighthouse" ? [[412, 612], [380, 618]] : [[124, 84], [96, 88]]; paddling = true; route = []; atSpot = null; hero.path = []; hero.sitting = false;
+  const kid = false, off = scene === "shore" ? [[104, 372], [132, 404]] : scene === "lighthouse" ? [[36, 264], [18, 290]] : [[124, 84], [96, 88]]; paddling = true; route = []; atSpot = null; hero.path = []; hero.sitting = false;
   hero.x = hero.tx = off[0][0]; hero.y = hero.ty = off[0][1]; chum.x = chum.tx = off[0][0] + 6; chum.y = chum.ty = off[0][1] - 2; nodes.hero.classList.remove("sit"); nodes.hero.classList.add("sup");
   sfx("paper", true); speak(dest === "lighthouse" ? `Board on, ${F.name} on the front. Down the coast, past the cliffs.` : dest === "shore" ? `Board on, ${F.name} on the front. Off down the river.` : "Board on. Up the stream and home.", 2500);
   setTimeout(() => {
@@ -3515,6 +3557,27 @@ svg.addEventListener("click", ev => {
   const vt = ev.target.closest("[data-vine]");
   if (vt && (scene === "vineyard" || scene === "lowervine")) { const [r, i] = vt.dataset.vine.split("-").map(Number), p = vineSpot(r, i);
     go(vineScene(r), p.x, p.y, () => { atSpot = "vine"; vyAt = {r, i}; vyView = "vine"; sfx("paper", true); render(); }); return; }
+  // round 278: beachcombing on the bottom row
+  // round 288: a message in a bottle bobbing in the shallows
+  const btl = ev.target.closest("[data-bottle]"), bt = btl && bottleNow();
+  if (bt) { go(scene, bt.x, 590, () => { const m = SO.pickBottle(F, dayKey(), Date.now()); if (!m) return; F.mailRead["bottle-" + m.i] = Date.now(); bottleMsg = m; woodsView = "bottle";
+      sfx("paper", true); gainXp(1); save(true); drawScene(); render(); }); return; }
+  const shl = ev.target.closest("[data-shell]");
+  if (shl) { const k = shl.dataset.shell, f = SO.beachFinds(F, scene, dayKey()).find(x => x.k === k);
+    if (f) go(scene, f.x, f.y - 8, () => { const r = SO.pickBeach(F, scene, k, dayKey()); if (r) { sfx("pop"); flash(`+${r.n} ${ITEMS[r.id].n.toLowerCase()}`); speak(r.line, 5500); save(true); drawScene(); } });
+    return; }
+  // round 277: the allotments, each neighbour's plot and the swap crate; the gate back to the green
+  // round 283: Bram's cottage: the fire, the kettle (tea with Bram), the ship in a bottle, the window and the logbook
+  if (scene === "bramcot" && ev.target.closest("[data-exit]")) { go(scene, 260, 600, () => setScene("lighthouse", [436, 158])); return; }
+  const bsp = scene === "bramcot" && ev.target.closest("[data-bspot]");
+  if (bsp) { const k = bsp.dataset.bspot, at = {fire: [104, 250], kettle: [200, 250], ship: [300, 250], window: [356, 252], log: [430, 300]}[k];
+    go(scene, at[0], at[1], () => { const r = SO.bramSpot(F, k, dayKey(), isHere("bram")); if (!r) return;
+      if (k === "kettle" && r.ok) { speak(r.line, 8000); sfx("chime"); gainXp(1); }
+      else speak(r.line, 7000);
+      if (k === "log" && r.ok) { sfx("paper", true); gainXp(1); } save(true); render(); }); return; }
+  if (scene === "allotment" && ev.target.closest("[data-exit]")) { go(scene, 260, 600, () => setScene("green", [120, 280])); return; }
+  const asp = scene === "allotment" && ev.target.closest("[data-aspot]");
+  if (asp) { go(scene, +asp.dataset.x, +asp.dataset.y, () => allotSpot(asp.dataset.aspot)); return; }
   const ts = ev.target.closest("[data-tspot]");
   if (ts && scene === "terrace") { go(scene, +ts.dataset.x, +ts.dataset.y, () => terraceSpot(ts.dataset.tspot)); return; }
   const rs = ev.target.closest("[data-rdspot]");
@@ -3681,9 +3744,9 @@ function frameBody(now){
     }
   }
   if (S.cruise && (scene !== "shore" || Date.now() > S.cruise.until)) endCruise();
-  { const rd = outside() && !townOf(scene) ? ride(F) : "walk", drive = rd === "car" && hero.moving && !sup, carry = (drive || rd === "bike") && hero.moving && !sup;
+  { const rd = outside() && !townOf(scene) ? ride(F) : "walk", drive = rd === "car" && hero.moving && !sup, carry = (drive || rd === "bike" || rd === "pony") && hero.moving && !sup;
     nodes.hero.classList.toggle("trolley", trolleyOn(F) && outside() && !townOf(scene) && !sup);
-    nodes.hero.classList.toggle("scoot", rd === "scooter" && hero.moving && !sup); nodes.hero.classList.toggle("biking", rd === "bike" && hero.moving && !sup);
+    nodes.hero.classList.toggle("scoot", rd === "scooter" && hero.moving && !sup); nodes.hero.classList.toggle("biking", rd === "bike" && hero.moving && !sup); nodes.hero.classList.toggle("riding", rd === "pony" && !sup);
     if (rd === "bike" && F.bike && nodes.hero.dataset.bikeCol !== F.bike.col) { nodes.hero.dataset.bikeCol = F.bike.col; nodes.hero.querySelectorAll(".rideBike .bikeArt > path").forEach(p => p.style.stroke = F.bike.col); } nodes.hero.classList.toggle("drive", drive);
     // the pet rides along in the convertible (or in the hire bike's front basket), and hops out beside the player
     // when they stop

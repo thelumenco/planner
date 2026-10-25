@@ -289,3 +289,4 @@
 .ch.npc.act-jungleswing:not(.walk) .bob{animation:blswing 2.4s ease-in-out infinite alternate;transform-origin:0 -90px}
 @keyframes blswing{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-riceplant .armR,.ch.npc.act-offering .armR,.ch.npc.act-gamelan .armR,.ch.npc.act-coconut .tool,.ch.npc.act-jungleswing .bob{animation:none}}
+.ridePony{display:none}#hero.riding .ridePony{display:inline}/* round 283: riding your own pony */

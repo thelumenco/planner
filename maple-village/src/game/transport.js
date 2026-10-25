@@ -38,14 +38,15 @@ export const STOPS = {
   taxilane: {scene: "lane", n: "Makers' Lane", at: [62, 236], line: "Makers' Lane"},
   taxihome: {scene: "base", n: "Home jetty", at: [150, 140], line: "home, at your little jetty"},
   taxilake: {scene: "field", n: "The lake", at: [300, 372], line: "the lake on the field (one gate from the orchard)"},
-  taxishore: {scene: "shore", n: "The foreshore", at: [214, 168], line: "the foreshore (one gate from Mei's flower farm)"}
+  taxishore: {scene: "shore", n: "The foreshore", at: [214, 168], line: "the foreshore (one gate from Mei's flower farm)"},
+  taxilight: {scene: "lighthouse", n: "Lighthouse Point", at: [118, 240], line: "Lighthouse Point, round the headland to the jetty on the west beach"}   // round 287
 };
 export const TAXI_FEE = 4, TAXI_FROM = 7*60, TAXI_TO = 21*60;
 export const taxiRunning = (hm = localHM()) => hm >= TAXI_FROM && hm < TAXI_TO;
 export const stopIn = scene => Object.keys(STOPS).find(k => STOPS[k].scene === scene) || null;
 export function taxiPanel(F, from){
   const here = STOPS[from], on = taxiRunning();
-  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>River taxi</h2><p class="sub">${esc(here.n)}. The little launch runs the river from the waterfall to the sea, 7am to 9pm. Any stop, ${TAXI_FEE} ${coin()}.</p>`;
+  let h = `<span class="tape gingham" aria-hidden="true"></span><h2>River taxi</h2><p class="sub">${esc(here.n)}. The little launch runs the river from the waterfall to the sea, and round the headland to Lighthouse Point, 7am to 9pm. Any stop, ${TAXI_FEE} ${coin()}.</p>`;
   if (!on) return h + `<p class="muted">The taxi's tied up for the night. First boat at 7am.</p>` + shut;
   h += `<ul class="hlist wlist">${Object.entries(STOPS).filter(([k]) => k !== from).map(([k, s]) => `<li><span class="wtxt"><b>${esc(s.n)}</b><small>${esc(s.line)}</small></span><button class="btn small primary" data-taxi="${k}" ${F.coins >= TAXI_FEE ? "" : "disabled"}>Go · ${TAXI_FEE} ${coin()}</button></li>`).join("")}</ul>`;
   return h + shut;
