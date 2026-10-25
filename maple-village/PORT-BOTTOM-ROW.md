@@ -4,7 +4,7 @@ Paste everything below the line into the chat that works on the public edition (
 
 ---
 
-Please port a feature from the personal edition of Honeybrook into this public edition. The source is the personal edition's branch `ccr-896057b5-con92k` in the same repository (`thelumenco/planner`, folder `maple-village`). Fetch it with `git fetch origin ccr-896057b5-con92k` and read the changes from these two commits:
+Please port a feature from the personal edition of Honeybrook into this public edition. The source is the personal edition's branch `ccr-896057b5-con92k` in the same repository (`thelumenco/planner`, folder `maple-village`). Fetch it with `git fetch origin ccr-896057b5-con92k` and read the changes from these commits:
 
 - `09007fb` "The lower vineyard: a new screen down the hill with four more trellis rows"
 - `22452d3` "The bottom row: Honeybrook Green, the Stables, Lighthouse Point and the coast strip, with villagers visiting"
@@ -19,7 +19,7 @@ Please port a feature from the personal edition of Honeybrook into this public e
 - `20f040f` and `9ebe70d`: the lower vineyard's river mouth, and beachcombing (clams and mussels are the kitchen's existing items)
 - `f5972c9`: the river mouth shades into the sea (only the `lowervine.js` part; the ice cream change in that commit is personal-edition only, leave it out)
 
-Use `git show <commit>` to see each diff. HANDOFF.md rounds 261 to 283 on that branch describe the design. Don't merge or cherry-pick blindly: this edition has drifted, so apply the changes by hand where files differ, and keep this edition's own conventions.
+Use `git show <commit>` to see each diff. HANDOFF.md rounds 261 to 297 on that branch describe the design. Don't merge or cherry-pick blindly: this edition has drifted, so apply the changes by hand where files differ, and keep this edition's own conventions.
 
 ## What it is
 
@@ -107,7 +107,7 @@ It goes into `slotAt` in `game/npcs.js`, just before `routineAt`:
 
 These story threads hang off the personal edition's villagers and its secret passage arc (Hazel, Marco, Ines, Celeste, Theo, Juniper). Port them only where this edition has the same villagers and arc; otherwise keep the mechanics (the flask, the sea cave, Priory Red, story finds) and attach them to this edition's own characters, or leave them out and tell me.
 
-### 10. Fixes and additions (rounds 276 to 283)
+### 10. Fixes and additions (rounds 276 to 292)
 - **Paddleboard jetty:** moved to the west beach at Lighthouse Point, west of the beach huts (`JETTY.lighthouse`, `lsup`).
 - **Ducks:** fed with peas or corn from the bag for free, or 1 coin of duck food otherwise.
 - **Fish and chips:** the hatch opens a menu panel (`woodsView = "chips"`, `CHIP_MENU`), and the player can sell catch to the hatch (`CHIP_BUYS`, `sellCatch`, up to 6 a day). Keep the sell prices below buy prices.
