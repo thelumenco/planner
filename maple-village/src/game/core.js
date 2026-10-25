@@ -12,6 +12,7 @@ import { questBoost, lowerSalePanel, buyLower } from "./vineyard.js";
 import { wineNews, vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, cellarPanel, counterPanel, boxPanel, cafePanel, olivePanel, grovePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
+import { bd, loadMyDigests, openMyDigest } from "./bookdigests.js";
 import { pullSunsama, SUNSAMA_ERRORS, SUNSAMA, completeInSunsama, subtaskInSunsama } from "./sunsama.js";
 import { unlockAudio, audioRunning, sfx, alarm, settings as sound, setMusic, setMusicVol, setSfx, TRACKS, setTrack, currentTrack, setLive } from "./audio.js";
 import { todaysEvents, CAL_ERRORS } from "./calendar.js";
@@ -1925,8 +1926,15 @@ function ctx(){
     const ready = digestReady(), next = nextDigest(), past = pastDigests();
     const wait = Math.max(1, Math.ceil(((F.digest.lastAt || 0) + DIGEST_GAP - Date.now())/M));
     h = `<span class="tape stripe" aria-hidden="true"></span><h2>Juniper's digest shelf</h2>
-      <p class="sub">One book digest an hour, or one after each quest you finish.</p>
+      <p class="sub">Your morning digests, any time. Juniper's own picks come one an hour, or one after each quest you finish.</p>
       <div class="shelf">`;
+    // round 293 (Mel): her morning digests from the book-digest skill, straight from Notion, any time
+    if (!bd.list && !bd.busy && !bd.error) loadMyDigests(() => { if (shelfOpen) ctx(); });
+    h += `<p class="eyebrow" style="margin:6px 0 6px">Your morning digests</p>`;
+    if (bd.list && bd.list.length) h += `<ul class="qlist">${bd.list.slice(0, 14).map((d, i) => `<li><span><b>${esc(d.title)}</b><small>${i === 0 && Date.now() - d.at < 20*H ? "today's" : d.at ? new Date(d.at).toLocaleDateString("en-GB", {day: "numeric", month: "short", timeZone: "Asia/Singapore"}) : ""}</small></span><button class="next" data-dig="mine" data-i="${i}"${bd.opening === d.id ? " disabled" : ""}>${bd.opening === d.id ? "opening…" : "read"}</button></li>`).join("")}</ul>`;
+    else h += `<p class="status">${bd.busy ? "Juniper's fetching your digests from Notion…" : bd.error ? esc(bd.error) : "No digests in Notion yet."}</p>`;
+    if (bd.error && !bd.busy) h += `<div class="actions"><button class="btn alt small" data-dig="retry">Try again</button></div>`;
+    h += `<p class="eyebrow" style="margin:22px 0 6px">Juniper's picks</p>`;
     if (ready && next) h += `<p class="status"><b>A digest is ready:</b> ${esc(next.title)}${next.author ? ` by ${esc(next.author)}` : ""}.</p><div class="actions"><button class="btn primary" data-dig="next">Read it</button></div>`;
     else if (ready && sampleCap) h += `<p class="status">The shelf's empty for now. Ask chat for more digests, or let Juniper pick a book.</p><div class="actions"><button class="btn primary" data-dig="ask" ${digestBusy ? "disabled" : ""}>${digestBusy ? "Juniper's choosing…" : "Ask Juniper to pick one"}</button></div>`;
     else if (ready) h += `<p class="status">The shelf's empty for now. Ask chat to stock it with your book digests.</p>`;
@@ -2465,6 +2473,9 @@ function ctx(){
     if (k === "next") { const d = nextDigest(); if (d && digestReady()) readDigest(d); }
     else if (k === "ask") askJuniper();
     else if (k === "past") { const d = pastDigests()[+b.dataset.i]; if (d) openDigest(d); }
+    else if (k === "retry") { bd.error = ""; loadMyDigests(() => { if (shelfOpen) ctx(); }); }
+    else if (k === "mine") { const d = (bd.list || [])[+b.dataset.i]; if (!d || bd.opening) return; bd.opening = d.id; ctx();   // round 293
+      openMyDigest(d).then(item => { bd.opening = ""; if (item.error) speak(item.error, 4500); else { gainXp(1); openDigest(item); } if (shelfOpen) ctx(); }); }
   });
 }
 let binTidy = false, binOpen = false;   // round 255: throwing things away, and looking in the bin

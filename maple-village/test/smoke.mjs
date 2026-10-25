@@ -5134,6 +5134,26 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // round 293 (Mel: "I want to be able to go to the library to read my digests"): her morning digests from Notion on Juniper's shelf
+  console.log("\nMorning digests in the library (round 293)");
+  const bdg = await import(new URL("../src/game/bookdigests.js", import.meta.url));
+  const pageTxt = `<page url="x">\n<properties>\n{"Author":"Dan Martell","Book":"Buy Back Your Time","Category":"Founder Growth","Type":"Daily pick","date:Date:start":"2026-10-25","url":"https://app.notion.com/p/abc"}\n</properties>\n<content>\n### 1. Know your Buyback Rate\n\nWork out what an hour of your time is worth.\n\n### 2. Live in the Production quadrant\n\nSort your work by money and energy.\n\n---\n\n<b>Your one move today:</b> Calculate your Buyback Rate.\n\n## Highlights — 25 Oct 2026\n\n- Tasks that drain you get delegated.\n</content>\n</page>`;
+  const it = bdg.parseDigest(pageTxt, {id: "abc"});
+  check(it.title === "Buy Back Your Time" && it.author === "Dan Martell" && it.sections.length === 3 && it.sections[0].heading === "Know your Buyback Rate" && it.sections[2].heading === "Your highlights" && /Buyback Rate/.test(it.try) && /notion/.test(it.link), "a digest page from Notion: the insights, your one move and your highlights");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`digests pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-25"); await page.waitForTimeout(800);
+  await page.goto(url + "?nosample=1&notion=1&time=10:00&date=2026-10-25"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("fresh")); await page.waitForTimeout(600);
+  await page.locator('#world [data-spot="digest"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-dig="mine"]', { timeout: 20000 }).catch(() => {});
+  check(await page.locator('#ctx [data-dig="mine"]').count() === 2 && /today's/.test(await page.locator("#ctx").innerText()), "Juniper's shelf lists your morning digests from Notion, today's first");
+  await page.click('#ctx [data-dig="mine"][data-i="0"]'); await page.waitForTimeout(800);
+  const nb = await page.locator("#notebook").innerText().catch(() => "");
+  check(/Buy Back Your Time/.test(nb) && /Know your Buyback Rate/.test(nb) && /Your one move/.test(nb) && /Your highlights/.test(nb), "and opens it to read: the insights, your one move and your highlights");
+  await page.close();
+}
+{
   // rounds 262 to 264: the rest of the bottom row (Mel: "lighthouse point and the stables and the village green")
   console.log("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)");
   const so = await import(new URL("../src/game/south.js", import.meta.url)), w = await import(new URL("../src/data/world.js", import.meta.url));

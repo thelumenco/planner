@@ -109,6 +109,11 @@ window.__mapleDevStub = true;   // dev only: lets test scripts jump between scen
         if (!P[tool]) throw { code: "not_in_manifest", message: "not declared" };
         return { content: [], payload: P[tool] };
       }
+      // round 293: the Book Digests database (the library's "Your morning digests")
+      if (server === "Notion" && tool === "notion-search" && /21f2e1e3/.test(String(input.data_source_url || ""))) return { content: [], payload: { results: [
+        { id: "bd-1", title: "Buy Back Your Time", url: "https://app.notion.com/p/bd1", timestamp: new Date().toISOString() },
+        { id: "bd-2", title: "The Mom Test", url: "https://app.notion.com/p/bd2", timestamp: "2026-10-21T23:39:00.000Z" }] } };
+      if (server === "Notion" && tool === "notion-fetch" && /^bd-/.test(String(input.id || ""))) return { content: [], payload: { title: "Buy Back Your Time", text: `<page url="x">\n<properties>\n{"Author":"Dan Martell","Book":"Buy Back Your Time","Category":"Founder Growth","Type":"Daily pick","date:Date:start":"2026-10-25","url":"https://app.notion.com/p/bd1"}\n</properties>\n<content>\n### 1. Know your Buyback Rate\n\nWork out what an hour of your time is worth.\n\n### 2. Live in the Production quadrant\n\nSort your work by money and energy.\n\n---\n\n<b>Your one move today:</b> Calculate your Buyback Rate.\n\n## Highlights \u2014 25 Oct 2026\n\n- Tasks that drain you get delegated.\n</content>\n</page>` } };
       if (server === "Notion" && tool === "notion-search") {
         const q = String(input.query || "");
         return { content: [], payload: { results: [{ id: "plan-" + q.replace(/\W+/g, "-"), title: q, url: "https://app.notion.com/p/x", type: "page" }], type: "ai_search" } };

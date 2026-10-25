@@ -2857,3 +2857,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 292: the mill gates the ruins, not the land (Mel: "I thought you can get the vineyard without the mill")
 - Round 291 misread "gate it after the mill": it meant the ruins. `buyLower` and Bram's note are back as they were (no mill needed). south.js `millGoing`, `RUIN_WAIT`: the ruins' steps wait for `F.goals.mill`, and the panel says so instead of showing the step button.
+
+## Round 293: Mel's morning book digests in the library (Mel: "They come every morning as my skill but I don't get to read it. I want to be able to go to the library to read my digests")
+- Her book-digest skill files each digest in the Book Digests database in Notion (data source 21f2e1e3-6461-48c3-a2fb-1c3cab6dc9af); the game's library only showed the `library` doc, which the skill never writes. New game/bookdigests.js: `loadMyDigests` (two notion-search queries over that data source, merged, newest edited first, 10-minute cache), `parseDigest` (properties Book/Author/Category/Type/Date; the five H3 insights; "Your one move today"; the "## Highlights" list), `openMyDigest` (notion-fetch). Errors in plain words (not reachable / reconnect / switched off).
+- Juniper's shelf (core.js `shelfOpen`): "Your morning digests" at the top, today's marked, no hourly ration, each opening in the notebook (`openDigest`, meta "your morning digest, from Notion", "Your one move", "Open in Notion"). Juniper's own picks follow, still rationed.
+- dev/claude-stub.js: with ?notion=1, Book Digests search and fetch answers. Test block "Morning digests in the library (round 293)". Uses the page's existing Notion capability (notion-search, notion-fetch); no new capability.

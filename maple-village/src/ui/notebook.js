@@ -235,11 +235,11 @@ function trackerAct(k, b){
 }
 function digestPage(item){
   return `<button class="nbx" data-nb="close" aria-label="Close digest">✕</button>
-    <p class="nbmeta">book digest · from Juniper's shelf${item.gen ? " · picked by Juniper" : ""}</p>
+    <p class="nbmeta">book digest · ${item.notion ? "your morning digest, from Notion" : "from Juniper's shelf"}${item.gen ? " · picked by Juniper" : ""}</p>
     <h2 id="nbTitle">${esc(item.title || "A book")}${item.author ? `<small class="nbby">by ${esc(item.author)}</small>` : ""}</h2>
     <div class="nbbody">${item.body ? `<div class="nbnotes">${notesHTML(item.body)}</div>` : ""}${sectionsHTML(item.sections)}
-    ${item.try ? `<p class="nbpep">♡ Try today: ${esc(item.try)}</p>` : ""}
-    ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">Read more ↗</a></div>` : ""}</div>
+    ${item.try ? `<p class="nbpep">♡ ${item.notion ? "Your one move" : "Try today"}: ${esc(item.try)}</p>` : ""}
+    ${safeUrl(item.link) ? `<div class="nbrow"><a class="btn primary small" href="${esc(safeUrl(item.link))}" target="_blank" rel="noopener noreferrer">${item.notion ? "Open in Notion" : "Read more"} ↗</a></div>` : ""}</div>
     <div class="nbactions"><button class="btn yes" data-nb="thanks">Back on the shelf</button></div>`;
 }
 const safeUrl = u => (typeof u === "string" && /^https?:\/\//i.test(u)) ? u : null;
