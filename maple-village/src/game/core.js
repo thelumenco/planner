@@ -1183,7 +1183,7 @@ function myWins(){
   if (F.streak >= 2) w.push(`${F.streak} cosy days in a row with ${F.name}`);
   if (S.harvested) w.push(`${S.harvested} harvest${S.harvested > 1 ? "s" : ""} from the garden today`);
   if (F.scoop && F.scoop.up && F.scoop.up.bike) { const sg = new Date(Date.now() + (globalThis.__mapleOffset || 0) + 8*H).toISOString().slice(0, 10), v = vineState(F);
-    const n = (((scoopState(F).sold || {})[sg] || {}).deliv || 0) + (((cocoaState(F).sold || {})[sg] || {}).deliv || 0) + (v.today && v.today.day === sg ? v.today.deliv || 0 : 0);
+    const n = (((scoopState(F).sold || {})[sg] || {}).deliv || 0) + (((cocoaState(F).sold || {})[sg] || {}).deliv || 0) + (v.today && v.today.day === sg ? v.today.deliv || 0 : 0) + (F.bakery && F.bakery.deliv && F.bakery.deliv.day === sg ? F.bakery.deliv.n : 0);
     if (n) w.push(`Tomo delivered ${n} order${n > 1 ? "s" : ""} on the bike today`); }
   APP_IDS.forEach(a => { const h = health(a); if (h && h.status === "green") w.push(`${APP_NAME[a]}: all checks green last night`); });
   if (ST.chord && ST.chord.users) w.push(`Chord is home to ${ST.chord.users} ${ST.chord.label || "studios"}`);
@@ -1997,7 +1997,11 @@ function ctx(){
   wireCompanions(c);
   if (ccView || (fieldView && scene === "field" && fieldKind() === "cocoa")) wireCocoa(c);
   if (bkView) c.querySelectorAll("[data-bk]").forEach(b => b.onclick = () => { const [a, r] = b.dataset.bk.split(":");   // round 294: the bakehouse
-    const out = a === "mix" ? BAKE.mix(F, r) : a === "bake" ? BAKE.bake(F) : a === "carry" ? BAKE.carry(F) : a === "churn" ? BAKE.churn(F) : a === "flour" ? BAKE.buyFlour(F) : a === "take" ? BAKE.takeOne(F, r) : null;
+    if (a === "view") { bkView = r; ctx(); return; }
+    if (a === "pick") { BAKE.togglePick(F, r); sfx("tap"); save(); ctx(); return; }
+    const out = a === "mix" ? BAKE.mix(F, r) : a === "bake" ? BAKE.bake(F) : a === "carry" ? BAKE.carry(F) : a === "churn" ? BAKE.churn(F) : a === "flour" ? BAKE.buyFlour(F, r || "flour") : a === "take" ? BAKE.takeOne(F, r)
+      : a === "try" ? BAKE.tryBake(F) : a === "box" ? BAKE.packBox(F) : a === "loaves" ? BAKE.sendLoaves(F) : null;   // round 295: trying new things, the pastry box, loaves for the kitchen
+    if (out && out.found) { bkView = "mix"; gainXp(3); }
     if (a === "tin") { const c2 = BAKE.collectTin(F); if (c2) { sfx("coin"); flash(`+${c2} coins from the honesty tin`); speak(`You tip out the honesty tin: ${c2} coins, and a note that says "best buns in Honeybrook".`, 4500); } }
     else if (out) { speak(out.line, 5000); if (out.ok) { sfx(a === "flour" ? "chaching" : a === "take" ? "pop" : "chime"); if (a === "mix") gainXp(1); } }
     save(true); ctx(); drawScene(); });
@@ -3900,6 +3904,7 @@ function bakeryNow(){
   lastBake = Date.now(); if (!owns(F, "bakery")) return;
   const out = BAKE.bakeryTick(F, {serving: scene === "bakery" && atSpot === "bcounter"});
   if (out.baked && BAKE_IN.includes(scene)) speak(`Ding! ${BAKE.RECIPES[out.baked].n} out of the oven and onto the cooling rack.`, 4500);
+  if (out.mins < 30) orderNote(out.orders, "Bakehouse", true);   // round 295: Tomo takes bags of bakes round on the bike
   if (out.coins) { sfx("coin"); flash(`+${out.coins} coins: the bakehouse`); }
   else if (out.tin && out.mins >= 30) setTimeout(() => speak(`While you were out, the bakehouse sold ${out.n} thing${out.n > 1 ? "s" : ""}: ${out.tin} coins in the honesty tin.`, 5000), 2500);
   if (out.n || out.baked || out.mins >= 5) save(); if (bkView) ctx(); if (BAKE_IN.includes(scene) && (out.n || out.baked)) drawScene();

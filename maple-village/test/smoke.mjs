@@ -5134,6 +5134,48 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // round 295 (Mel: "Go ahead with round 2"): secret recipes, seasonal bakes, crowds, loaves for the kitchen, the pastry box
+  console.log("\nThe Bakehouse, round 2 (round 295)");
+  const bk = await import(new URL("../src/game/bakery.js", import.meta.url)), kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), M = 60e3;
+  check(bk.easterOf(2026) === "2026-04-05" && bk.easterOf(2027) === "2027-03-28" && bk.easterOn("2026-03-25") && bk.easterOn("2026-04-06") && !bk.easterOn("2026-04-08"), "Easter: hot cross buns for the fortnight before, to Easter Monday");
+  check(bk.seasonOn("mincepie", "2026-12-10") && !bk.seasonOn("mincepie", "2026-10-25") && bk.seasonOn("loaf", "2026-10-25"), "mince pies only in the Christmas season");
+  { const F = {coins: 20, inv: {flour: 6, butter: 2, strawberry: 2, raspberry: 1, cherry: 2, honey: 1}, vine: {shelf: [{id: "w1", type: "priory", name: "Vinum Prioris", n: 1}]}}, b = bk.bakeryState(F);
+    check(!bk.onTable(F).includes("berrytart") && bk.mix(F, "berrytart") === null, "secret recipes aren't on the table until she finds them");
+    b.pick = ["flour", "honey"]; const no = bk.tryBake(F); check(!no.ok && F.inv.flour === 6 && F.inv.honey === 1, "a combination that doesn't work: everything goes back, nothing lost");
+    b.pick = ["flour", "butter", "berry"]; const yes = bk.tryBake(F);
+    check(yes.found === "berrytart" && b.known.berrytart && b.proof.length === 1 && !F.inv.strawberry && !F.inv.raspberry && F.inv.flour === 5, "flour, butter and berries (strawberries and raspberries together): berry tarts found, first tray proving");
+    check(bk.onTable(F).includes("berrytart") && /list already/.test((b.pick = ["flour", "butter", "berry"], F.inv.strawberry = 3, bk.tryBake(F)).line), "found once, then it's on her list");
+    b.pick = ["flour", "cherry", "priory"]; const pr = bk.tryBake(F);
+    check(pr.found === "prioryloaf" && F.vine.shelf[0].n === 0 && !F.inv.cherry, "cherries and a bottle of Priory Red from the wine shop shelf: the brothers' fruit loaf");
+    check(/Pencilled/.test(bk.bakeryPanel(F, "try")) && /pears/i.test(bk.bakeryPanel(F, "try")) && !/cherries, soaked/.test(bk.bakeryPanel(F, "try")), "the try panel: clues for the ones still to find");
+    b.stock = {croissant: 4, turnover: 2, loaf: 3}; const box = bk.packBox(F);
+    check(box && F.inv.bk_box === 1 && b.stock.loaf === 3 && !b.stock.turnover && bk.pastryCount(b) === 0, "a pastry box: six pastries (not the bread), as varied as the shelves allow");
+    const sl = bk.sendLoaves(F); check(sl && sl.n === 3 && kit.kitchenState(F).larder.loaf === 3 && !b.stock.loaf, "farmhouse loaves off to the wine shop kitchen's larder");
+    check(bk.buyFlour(F, "oats").ok && F.inv.oats === 1 && F.coins === 20 - bk.OATS, "oats from the sacks, 2 coins"); }
+  { const F = {coins: 0, inv: {}, scoop: {up: {bike: true}}}, b = bk.bakeryState(F); b.stock = {loaf: 200}; b.tin = 0; b.lastTick = Date.parse("2026-10-24T22:00:00Z");
+    const realNow = Date.now; Date.now = () => Date.parse("2026-10-25T09:00:00Z"); const t = bk.bakeryTick(F); Date.now = realNow;
+    check(t.orders && t.orders.length && b.deliv.n === t.orders.length && /farmhouse loa/.test(t.orders[0].what), `Tomo's bike: ${t.orders ? t.orders.length : 0} bags of bakes delivered on a Sunday`);
+    const G = {coins: 0, inv: {}}, g = bk.bakeryState(G); let quiet = 0, busy = 0;
+    for (let i = 0; i < 6; i++) { g.stock = {loaf: 400}; g.lastTick = Date.parse("2026-10-22T06:00:00Z"); Date.now = () => Date.parse("2026-10-22T09:00:00Z"); quiet += bk.bakeryTick(G).n;   // a Thursday, 2 to 5pm
+      g.stock = {loaf: 400}; g.lastTick = Date.parse("2026-10-24T06:00:00Z"); Date.now = () => Date.parse("2026-10-24T09:00:00Z"); busy += bk.bakeryTick(G).n; }   // a Saturday, cricket on
+    Date.now = realNow; check(busy > quiet*1.6, `busier while the cricket's on: ${busy} sold on Saturday afternoons, ${quiet} on Thursdays`); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`bakehouse r2 pageerror: ${e.message}`));
+  await page.addInitScript(() => { if (!/bk2=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.coins = 100; f.goals = Object.assign(f.goals || {}, {bakery: true}); f.inv = Object.assign(f.inv || {}, {flour: 4, milk: 2, oats: 2, honey: 1}); f.bakery = {stock: {cinnabun: 6}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=09:00&date=2026-10-24"); await page.waitForTimeout(800);
+  await page.goto(url + "?nosample=1&bk2=1&time=09:00&date=2026-10-24"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("bakehouse")); await page.waitForTimeout(600);
+  await page.locator('#world [data-spot="bmix"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-bk="view:try"]', { timeout: 20000 });
+  await page.click('#ctx [data-bk="view:try"]'); await page.waitForSelector('#ctx [data-bk="pick:oats"]', { timeout: 20000 });
+  for (const k of ["flour", "oats", "milk", "honey"]) { await page.click(`#ctx [data-bk="pick:${k}"]`); await page.waitForTimeout(150); }
+  await page.click('#ctx [data-bk="try"]'); await page.waitForTimeout(600);
+  const fox = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  check(fox.bakery.known && fox.bakery.known.oatbread && fox.bakery.proof.length === 1 && await page.locator('#ctx [data-bk="mix:oatbread"]').count() === 1, "in the bakehouse: flour, oats, milk and honey together make honey and oat bread, now on the recipe list");
+  await page.close();
+}
+{
   // round 294 (Mel: "Own and run it, on the green"): the Honeybrook Bakehouse
   console.log("\nThe Honeybrook Bakehouse (round 294)");
   const bk = await import(new URL("../src/game/bakery.js", import.meta.url)), gl = await import(new URL("../src/game/goals.js", import.meta.url)), M = 60e3;
@@ -5150,7 +5192,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     b.stock = {loaf: 30}; b.tin = 0; b.lastTick = Date.parse("2026-10-24T00:00:00Z"); const realNow = Date.now; Date.now = () => Date.parse("2026-10-24T04:00:00Z"); const t2 = bk.bakeryTick(F); Date.now = realNow;
     check(t2.n > 10 && b.tin === t2.n*bk.RECIPES.loaf.price && b.stock.loaf === 30 - t2.n && F.coins === 47 + 0, `a Saturday morning, 8 till 12: ${t2.n} sold, the money in the honesty tin`);
     const tin = bk.collectTin(F); check(tin > 0 && F.coins === 47 + tin && !bk.collectTin(F), "empty the tin into your coins");
-    check(gl.GOALS.bakery && gl.GOALS.bakery.price === 1200 && Object.values(bk.RECIPES).every(r => r.price <= 6), "the bakehouse is a big goal, 1,200 coins; nothing costs more than 6"); }
+    check(gl.GOALS.bakery && gl.GOALS.bakery.price === 1200 && Object.values(bk.RECIPES).every(r => r.price <= (r.secret ? 8 : 6)), "the bakehouse is a big goal, 1,200 coins; nothing costs more than 6 (8 for the secret ones)"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`bakehouse pageerror: ${e.message}`));
   await page.addInitScript(() => { if (!/bk=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
