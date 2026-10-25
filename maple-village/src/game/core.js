@@ -1247,7 +1247,8 @@ function itemBtn(id, label, disabled, extra){
   const it = ITEMS[id];
   return `<button class="item" data-id="${id}" ${disabled ? "disabled" : ""}><span class="e">${icon(it.ico, 34)}</span><span class="n">${esc(it.n)}</span><span class="c">${label}</span>${extra || ""}</button>`;
 }
-function ctx(){
+function ctx(){ try { ctxBody(); } catch (e) { noteErr("panel", e); } }
+function ctxBody(){
   if (selfView && !selfForce && !$("panel").hidden && !openView && (selfSt.pouring || (document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && $("ctx").contains(document.activeElement)))) return;   // never mid-pour or mid-sentence
   const c = $("ctx"); let h = "";
   if (guestView && scene === "guestroom") h = GU.guestBookHTML(F);
@@ -1836,22 +1837,24 @@ function binHTML(){
     ${rows.length ? `<ul class="hlist wlist">${rows.map(r => `<li><span class="wpic">${icon(ITEMS[r.id].ico || r.id, 28)}</span><span class="wtxt"><b>${esc(ITEMS[r.id].n)}</b><small>× ${r.n} · ${leftWords(r.left)}</small></span><button class="btn small alt" data-unbin="${r.id}">Take back</button></li>`).join("")}</ul>` : `<p class="muted">The bin's empty.</p>`}
     <div class="actions"><button class="btn small alt" data-binview="0">Back to the backpack</button></div></div>`;
 }
-function bag(){
-  purgeBin(F);
+// round 231 (a friend couldn't open her backpack): an item that can't be shown is left out, and the backpack still opens
+function bag(){ try { bagBody(); } catch (e) { noteErr("backpack", e); } }
+function bagBody(){
+  step("bin", () => purgeBin(F));
   if (binView) { $("bag").innerHTML = binHTML();
     $("bag").querySelectorAll("[data-unbin]").forEach(b => b.onclick = ev => { ev.stopPropagation(); if (unbin(F, b.dataset.unbin)) { sfx("tap"); flash(`${ITEMS[b.dataset.unbin].n}, back in your backpack`); save(); } bag(); });
     $("bag").querySelector("[data-binview]").onclick = ev => { ev.stopPropagation(); binView = false; bag(); };
     $("bagHint").textContent = ""; return; }
   const ids = Object.keys(F.inv).filter(id => ITEMS[id] && F.inv[id] > 0);
   const order = ["gift","food","ingredient","feed","flower","use","tool","seed"];
-  ids.sort((a, b) => order.indexOf(ITEMS[a].kind) - order.indexOf(ITEMS[b].kind));
-  $("bag").innerHTML = ids.map(id => { const it = ITEMS[id];
+  ids.sort((a, b) => order.indexOf((ITEMS[a] || {}).kind) - order.indexOf((ITEMS[b] || {}).kind));
+  $("bag").innerHTML = ids.map(id => { try { const it = ITEMS[id];
     const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? "give to someone" : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed your pet" : it.kind === "ingredient" ? (it.scoop ? "for ice cream or bonbons" : "send to the kitchen") : it.kind === "flower" ? "give" : "use";
     // kitchen ingredients can go to the wine shop's larder instead (food can still be fed to the pet)
     // (not on flowers: a friend's picked tulips kept "vanishing" from the backpack, sent off to the kitchen larder by one
     // tap on this little chip. Flowers still go to the kitchen from the larder itself, or by the delivery bike.)
     const kit = isGood(id) && it.kind !== "ingredient" && it.kind !== "flower" ? `<span class="tokit" role="button" tabindex="0" data-kit="${id}">to the kitchen</span>` : "";
-    return itemBtn(id, lbl, it.kind === "seed" && !binMode, (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); }).join("");
+    return itemBtn(id, lbl, it.kind === "seed" && !binMode, (it.kind === "tool" ? "" : `<span class="cnt">×${F.inv[id]}</span>`) + kit); } catch (e) { noteErr("backpack item " + id, e); return ""; } }).join("");
   if (giftPick && F.inv[giftPick]) $("bag").insertAdjacentHTML("afterbegin", giftPickHTML(giftPick)); else giftPick = null;
   { const nv = nearestVillager(); if (!nv || (giveMode && giveMode !== nv.def.id)) giveMode = null;
     if (nv && !giftPick) { const w = nv.def.id, done = QB.giftedToday(F, w);
@@ -2334,16 +2337,18 @@ function dressMel(){
 // round 231 (a friend stuck on "One moment..."): something in her save made the first draw throw, and everything after
 // it (the sign-in check included) never ran. A step that fails is logged and the rest carries on.
 let renderErr = 0;
+const step = (what, f) => { try { f(); } catch (e) { noteErr(what, e); } };
 function render(redraw){ try { renderBody(redraw); } catch (e) { noteErr("render", e); } }
 function renderBody(redraw){
   if (S.day !== dayKey()) S = freshToday();
-  storyFlags(F);   // story rewards that change the game (the koi tip, Farid's pastries)
-  registerItems(F);   // each discovered gelato flavour is a gift item (one per type) in the backpack
-  registerCraft(F);   // round 153: and each oil, soap and lotion you've worked out at the mill
-  registerHampers(F);   // round 173: and each hamper she's packed
-  registerBoxes(F);   // the loves round: and each bonbon box, by what's in it
-  registerBottles(F);   // round 188: bottles taken from the gift shop's wine corner
-  WR.registerWraps(F);   // round 185: and every gift she's wrapped
+  // (round 231: each step on its own, so one odd entry in a save can't stop the rest)
+  step("story flags", () => storyFlags(F));   // story rewards that change the game (the koi tip, Farid's pastries)
+  step("gelato", () => registerItems(F));   // each discovered gelato flavour is a gift item (one per type) in the backpack
+  step("mill crafts", () => registerCraft(F));   // round 153: and each oil, soap and lotion you've worked out at the mill
+  step("hampers", () => registerHampers(F));   // round 173: and each hamper she's packed
+  step("bonbon boxes", () => registerBoxes(F));   // the loves round: and each bonbon box, by what's in it
+  step("bottles", () => registerBottles(F));   // round 188: bottles taken from the gift shop's wine corner
+  step("wrapped gifts", () => WR.registerWraps(F));   // round 185: and every gift she's wrapped
   setLive(liveNow());   // the jazz duo at the night market, the guitar in Ronda: live, over the record player
   QB.noteSeen(F); dressMel();
   if (redraw) drawScene();

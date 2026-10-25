@@ -4838,6 +4838,10 @@ if (want("\nA room still draws from an odd save (round 231)")) try {
   check(await page.evaluate(() => document.querySelectorAll("#sceneArt [data-spot]").length >= 8 && !!document.querySelector("#sceneArt [data-exit]")), "a piece of furniture that can't draw is left out: the rest of the room and its exit still appear");
   const a = await page.evaluate(() => document.getElementById("hero").getAttribute("transform")); await page.mouse.click(260, 560); await page.waitForTimeout(1500);
   check(await page.evaluate(was => document.getElementById("hero").getAttribute("transform") !== was, a), "and the character still walks");
+  // a friend then couldn't open her backpack: odd made-things in a save, and the backpack still opens with its items
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.scoop = {...(F.scoop || {}), recipes: 5}; F.sew = {clothes: 5}; F.inv = {...F.inv, zz_gone: 2, honey: 2}; window.__hbGame.save(); window.__hbScene("base"); }); await page.waitForTimeout(400);
+  await page.click('[data-open="bag"]'); await page.waitForTimeout(500);
+  check(await page.evaluate(() => !document.getElementById("panel").hidden && !!document.querySelector('#bag .item[data-id="honey"]')), "and the backpack still opens, with what's in it");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
