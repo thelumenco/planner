@@ -5291,7 +5291,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/data-sup="lighthouse"/.test(gl.jettyPanel("base", true)) && /data-sup="base"/.test(gl.jettyPanel("lighthouse", true)), "the home jetty paddles down to Lighthouse Point, and back");
   { const F = {coins: 15, inv: {}}, it = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS.chips_out;
     check(so.takeaway(F).ok && F.inv.chips_out === 1 && F.coins === 15 - so.TAKEAWAY && !so.takeaway(F).ok && F.coins === 6, "fish and chips to take away from Dot's, " + so.TAKEAWAY + " coins");
-    check(it && it.kind === "gift" && it.to === "family" && !it.tab && Object.keys(it.says).length === 8 && /To take away/.test(so.chipsPanel(F, day)), "a present for any of the family (only from Dot's hatch)"); }
+    check(it && it.kind === "gift" && it.to === "family" && !it.tab && Object.keys(it.says).length === 8 && /To take away/.test(so.chipsPanel(F, day)), "a present for any of the family (only from Dot's hatch)");
+    check(so.chipsOpen(12*60) && !so.chipsOpen(21*60) && !so.chipsOpen(11*60) && /hatch is down/.test(so.chipsPanel(F, day, 21*60)) && /To take away/.test(so.chipsPanel(F, day, 12*60)), "Dot's hatch: open half eleven to half eight, shuttered otherwise"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`bramcot pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=15:30&date=2026-10-24"); await page.waitForTimeout(800);

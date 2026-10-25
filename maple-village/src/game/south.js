@@ -250,7 +250,13 @@ export function sellCatch(F, id, day){
   const c = chipSell(id); F.inv[id]--; if (F.inv[id] <= 0) delete F.inv[id]; F.coins = (F.coins || 0) + c; s.chipSold.n++;
   return {ok: true, coins: c, line: `Dot weighs it, nods, and hands over ${c} coin${c === 1 ? "" : "s"}. "Lovely. That'll be in the fryer by teatime."`};
 }
-export function chipsPanel(F, day){
+// Dot's opening hours (Mel: "Can the hatch be open with someone inside when the fish and chip shop is open"): the hatch
+// is propped up with Dot behind it from half eleven to half eight; otherwise it's down, with a note in the window
+export const CHIP_HOURS = [11*60 + 30, 20*60 + 30];
+export const chipsOpen = hm => hm >= CHIP_HOURS[0] && hm < CHIP_HOURS[1];
+export function chipsPanel(F, day, hm){
+  if (hm != null && !chipsOpen(hm)) return `<span class="tape gingham" aria-hidden="true"></span><h2>Dot's fish and chips</h2><p class="sub">The hatch is down. A note taped inside the glass: "Frying from half eleven till half eight. Dot x"</p>
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   const s = southState(F), sold = s.chipSold && s.chipSold.day === day ? s.chipSold.n : 0, have = CHIP_BUYS.filter(id => (F.inv || {})[id] > 0);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>Dot's fish and chips</h2><p class="sub">Dot leans out of the hatch in her striped apron. "What can I get you, love?"</p>
     <ul class="hlist wlist">${Object.entries(CHIP_MENU).map(([k, m]) => `<li><span class="wtxt"><b>${esc(m.n)}</b></span><button class="btn small primary" data-chips="${k}"${(F.coins || 0) < m.price ? " disabled" : ""}>${m.price} coins</button></li>`).join("")}</ul>
