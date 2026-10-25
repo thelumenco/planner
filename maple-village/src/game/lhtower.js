@@ -57,7 +57,7 @@ export const VISITORS = [
   "\"Proposed on the gallery. She said yes. Bram cried. Don't tell him we said.\"",
   "\"Lovely clean lens. 10/10 would climb again.\"",
   "\"The view! I could see my house! (I live in the house next door.)\"",
-  "\"Dad said there'd be a gift shop at the top. There wasn't. 4/5.\"",
+  "\"Grandad said there'd be a gift shop at the top. There wasn't. 4/5.\"",
   "\"Came every summer as a girl. Brought my granddaughter today. Nothing's changed but me.\"",
   "\"Counted 108 steps up, 109 down. Investigating.\"",
   "\"Rain all day, but the fog bell was worth it.\"",
