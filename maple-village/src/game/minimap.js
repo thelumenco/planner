@@ -1,5 +1,5 @@
 // The map (round 231, the creator: "a mini version of the map... it shows where you are and where certain landmarks
-// are", kept in the backpack; and the same map on the wiki). Honeybrook's twelve outdoor screens sit on a 4 by 3 grid,
+// are", kept in the backpack; and the same map on the wiki). Honeybrook's sixteen outdoor screens sit on a 4 by 4 grid,
 // the way their gates join up; each shows its name and a few landmarks, and a pulsing dot marks where you are. Things
 // you haven't built or bought yet stay off the map until you have them. Pure: game/core.js and the wiki both draw it.
 import { esc } from "../util.js";
@@ -9,11 +9,13 @@ import { icon, iconAt } from "../art/icons.js";
 export const TILES = [
   ["bay", "The bay", 0, 0, "#CFE6F2", "at the bay"], ["hfarm", "Wildflower Farm", 1, 0, "#E3EDC8", "at Wildflower Farm"], ["hlane", "Cottage lane", 2, 0, "#E8EDD8", "on the cottage lane"], ["hwoods", "The woods", 3, 0, "#CFE0C2", "in the woods"],
   ["shore", "Foreshore", 0, 1, "#F2E2B8", "on the foreshore"], ["field", "The field", 1, 1, "#DDEACB", "in the field"], ["village", "Town square", 2, 1, "#EFE4CF", "in the town square"], ["lane", "Makers' Lane", 3, 1, "#EDE3D6", "on Makers' Lane"],
-  ["flowers", "Flower farm", 0, 2, "#F4DDE4", "at the flower farm"], ["orchard", "The orchard", 1, 2, "#DCE9C6", "in the orchard"], ["base", "Home", 2, 2, "#E4ECD6", "at home"], ["vineyard", "The vineyard", 3, 2, "#E6DCEB", "at the vineyard"]];
+  ["flowers", "Flower farm", 0, 2, "#F4DDE4", "at the flower farm"], ["orchard", "The orchard", 1, 2, "#DCE9C6", "in the orchard"], ["base", "Home", 2, 2, "#E4ECD6", "at home"], ["vineyard", "The vineyard", 3, 2, "#E6DCEB", "at the vineyard"],
+  ["lighthouse", "Lighthouse Point", 0, 3, "#D6E6EF", "at Lighthouse Point"], ["stables", "The Stables", 1, 3, "#EADFCB", "at the Stables"], ["green", "Honeybrook Green", 2, 3, "#DCEBCB", "on Honeybrook Green"], ["lowervine", "Lower vineyard", 3, 3, "#E3DCE8", "in the lower vineyard"]];
 // the paths between screens (each gate, both ways)
 export const PATHS = [["bay", "hfarm"], ["hfarm", "hlane"], ["hlane", "hwoods"], ["bay", "shore"], ["hfarm", "field"], ["hlane", "village"], ["hwoods", "lane"],
   ["shore", "field"], ["field", "village"], ["village", "lane"], ["shore", "flowers"], ["field", "orchard"], ["village", "base"], ["lane", "vineyard"],
-  ["flowers", "orchard"], ["orchard", "base"], ["base", "vineyard"]];
+  ["flowers", "orchard"], ["orchard", "base"], ["base", "vineyard"],
+  ["flowers", "lighthouse"], ["orchard", "stables"], ["base", "green"], ["vineyard", "lowervine"], ["lighthouse", "stables"], ["stables", "green"], ["green", "lowervine"]];
 const goal = k => F => !!(F && F.goals && F.goals[k]);
 // [screen, landmark, icon, shown when (F => bool; always on the wiki's map), wiki note]
 export const LANDMARKS = [
@@ -29,11 +31,15 @@ export const LANDMARKS = [
   ["bay", "The Scoop Shack", "icecream"], ["bay", "The Cocoa Room", "chocolate", goal("cocoa"), "once it's done up"], ["bay", "Sunset fishing", "fish"],
   ["hfarm", "The farmhouse", "home"], ["hfarm", "The goats", "goat"], ["hfarm", "The hives", "honey"],
   ["hlane", "Honeybrook station", "taxi"], ["hlane", "Elena's cottages", "bed"], ["hlane", "The windmill", "oliveoil", F => !(F && F.goals && F.goals.mill), "until it's an olive mill"], ["hlane", "The olive mill", "oliveoil", goal("mill"), "once it's opened up"],
-  ["hwoods", "The lookout", "eyes"], ["hwoods", "Foraging", "mushroom"], ["hwoods", "The pool", "water"]];
+  ["hwoods", "The lookout", "eyes"], ["hwoods", "Foraging", "mushroom"], ["hwoods", "The pool", "water"],
+  ["lighthouse", "The lighthouse", "lighthouse"], ["lighthouse", "Fish and chips", "fish"], ["lighthouse", "Rock pools", "water"], ["lighthouse", "Paddleboard jetty", "water"],
+  ["stables", "The paddock", "horse"], ["stables", "Pony rides", "horse"], ["stables", "The tack room", "home"],
+  ["green", "The duck pond", "duck"], ["green", "The bandstand", "music"], ["green", "The cricket lawn", "ball"], ["green", "The allotments", "sprout"],
+  ["lowervine", "Four more rows of vines", "grape_red"], ["lowervine", "The old press", "wine_red"], ["lowervine", "The sea bench", "water"]];
 // what's on one screen: [{n, ico, note}] (F null: everything, for the wiki)
 export const landmarksOf = (F, screen) => LANDMARKS.filter(([s, , , when]) => s === screen && (!F || !when || when(F))).map(([, n, ico, , note]) => ({n, ico, note}));
 export const tileOf = screen => TILES.find(t => t[0] === screen);
-export const W = 484, H = 364;
+export const W = 484, H = 484;
 const X = c => 12 + c*120, Y = r => 12 + r*120;   // tiles are 100 square, 20 apart
 // the map as an svg. opts: {here: screen with the dot, pick: highlighted screen, tap: tiles get data-mm (in the game)}
 export function mapSVG(F, opts = {}){

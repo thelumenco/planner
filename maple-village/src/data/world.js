@@ -5,7 +5,9 @@ import { TOWNS, TOWN_PLACES, TOWN_BRIDGES, TOWN_ARRIVE } from "./towns.js";
 // Outdoor screens. "base" is home (house, garden, pond, shed, swing); "village" is the town square with the work
 // buildings. A river joins them: walk onto the bridge to cross. A new screen would be one more
 // OUTDOOR entry, a pair of bridge places and a BRIDGES/ARRIVE line.
-export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay", "hfarm", "hlane", "hwoods", ...Object.values(TOWNS).flatMap(t => t.screens)];   // + the towns (towns.js)
+// round 261: the bottom row of the 4 by 4 grid, west to east: Lighthouse Point, the Stables, Honeybrook Green, the lower vineyard
+export const SOUTH = ["lighthouse", "stables", "green", "lowervine"];
+export const OUTDOOR = ["base", "village", "lane", "vineyard", "orchard", "flowers", "field", "shore", "bay", "hfarm", "hlane", "hwoods", ...SOUTH, ...Object.values(TOWNS).flatMap(t => t.screens)];   // + the towns (towns.js)
 export const VILLAGE = {
   // town square
   hall:   {scene:"village", name:"Town hall", short:"the town hall", door:[170,180], mark:[132,64]},
@@ -49,6 +51,38 @@ export const VILLAGE = {
   grove:  {scene:"vineyard", name:"Olive grove", door:[205,142], spot:true, line:"The olive grove along the top terrace."},
   // round 110: the old mill (the windmill on the cottage lane, once it's opened up as an olive mill): its inside
   mill:   {scene:"hlane", name:"The old mill", short:"the old mill", door:[440,356]},
+  // round 262 to 264: the rest of the bottom row
+  toGreenB:{scene:"base", name:"Path down to Honeybrook Green", door:[205,618], spot:true, bridge:"green", mark:[205,560], line:"Down the path to the green."},
+  toStablesO:{scene:"orchard", name:"Path down to the Stables", door:[260,618], spot:true, bridge:"stables", mark:[260,560], line:"Down the lane to the Stables."},
+  toLightF:{scene:"flowers", name:"Coast path to Lighthouse Point", door:[160,618], spot:true, bridge:"lighthouse", mark:[160,560], line:"Along the coast path to Lighthouse Point."},
+  toGreenV:{scene:"lowervine", name:"Footbridge to Honeybrook Green", door:[26,330], spot:true, bridge:"green", mark:[40,270], line:"Over the footbridge to the green."},
+  toBaseG:{scene:"green", name:"Path up home", door:[260,30], spot:true, bridge:"base", mark:[260,90], line:"Up the path home."},
+  toVineG:{scene:"green", name:"Gate to the lower vineyard", door:[494,330], spot:true, bridge:"lowervine", mark:[470,270], line:"East through the gate to the lower vineyard."},
+  toStablesG:{scene:"green", name:"Gate to the Stables", door:[26,330], spot:true, bridge:"stables", mark:[50,270], line:"West through the gate to the Stables."},
+  gpond:{scene:"green", name:"The duck pond", door:[150,540], spot:true, mark:[150,400], line:"The duck pond."},
+  gband:{scene:"green", name:"The bandstand", door:[380,262], spot:true, mark:[380,100], line:"The bandstand."},
+  glawn:{scene:"green", name:"The cricket lawn", door:[340,560], spot:true, mark:[340,400], line:"The cricket lawn."},
+  gallot:{scene:"green", name:"The allotments", door:[120,262], spot:true, mark:[120,110], line:"The allotments."},
+  toOrchardS:{scene:"stables", name:"Path up to the orchard", door:[260,40], spot:true, bridge:"orchard", mark:[260,100], line:"Up the lane to the orchard."},
+  toGreenS:{scene:"stables", name:"Gate to the green", door:[494,330], spot:true, bridge:"green", mark:[470,270], line:"East through the gate to the green."},
+  toLightS:{scene:"stables", name:"Path to Lighthouse Point", door:[26,330], spot:true, bridge:"lighthouse", mark:[50,270], line:"West to Lighthouse Point."},
+  sstable:{scene:"stables", name:"The stable block", door:[320,244], spot:true, mark:[320,90], line:"The stable block."},
+  stack:{scene:"stables", name:"The tack room", door:[110,244], spot:true, mark:[110,110], line:"The tack room. Saddles on their racks, bridles on hooks, a rosette board, and the smell of leather soap."},
+  spaddock:{scene:"stables", name:"The paddock", door:[214,394], spot:true, mark:[330,334], line:"The paddock."},
+  sride:{scene:"stables", name:"Pony rides", door:[110,574], spot:true, mark:[110,430], line:"Pony rides."},
+  toFlowersL:{scene:"lighthouse", name:"Coast path to the flower farm", door:[150,30], spot:true, bridge:"flowers", mark:[150,90], line:"Up the coast path to the flower farm."},
+  toStablesL:{scene:"lighthouse", name:"Path to the Stables", door:[494,330], spot:true, bridge:"stables", mark:[470,270], line:"East to the Stables."},
+  llight:{scene:"lighthouse", name:"The lighthouse", door:[140,524], spot:true, mark:[120,300], line:"The lighthouse."},
+  lpools:{scene:"lighthouse", name:"The rock pools", door:[270,556], spot:true, mark:[270,500], line:"The rock pools."},
+  lhuts:{scene:"lighthouse", name:"The beach huts", door:[390,264], spot:true, mark:[390,140], line:"Four beach huts in a row, rose, sky, butter and sage. Their owners only come at weekends, and leave the doors propped open with a shell."},
+  bikesgreen:{scene:"green", name:"Bike hire", door:[146,376], spot:true, mark:[146,316], line:"Hire bikes, on the green."},
+  bikeslight:{scene:"lighthouse", name:"Bike hire", door:[268,350], spot:true, mark:[268,290], line:"Hire bikes, at Lighthouse Point."},
+  lsup:{scene:"lighthouse", name:"Paddleboard jetty", door:[396,558], spot:true, mark:[390,470], line:"The paddleboard jetty. Fancy a paddle?"},
+  lchips:{scene:"lighthouse", name:"The fish and chip hatch", door:[430,508], spot:true, mark:[430,380], line:"Fish and chips."},
+  toLowerV:{scene:"vineyard", name:"Path down to the lower vineyard", door:[496,614], spot:true, bridge:"lowervine", mark:[474,540], line:"Down the hill to the lower vineyard."},
+  toVineD:{scene:"lowervine", name:"Path up to the vineyard", door:[496,30], spot:true, bridge:"vineyard", mark:[450,90], line:"Up the hill to the vineyard."},
+  vpress: {scene:"lowervine", name:"The old grape press", door:[110,378], spot:true, mark:[110,240], line:"The old stone press. Marco says his grandfather trod grapes in it, barefoot, singing. Now it's for leaning on and looking at."},
+  vbench: {scene:"lowervine", name:"The sea bench", door:[300,580], spot:true, mark:[300,500], line:"You sit a while. The sea goes silver all the way to the edge of the sky, the vines tick in the breeze behind you, and nobody needs anything from you."},
   olive:  {scene:"vineyard", name:"Olive tree", door:[250,262], spot:true, line:"The olive tree. Olives every few hours, once it's planted."},
   pround: {scene:"vineyard", name:"Roundabout", door:[188,598], spot:true, line:"The roundabout. Round and round and round!"},
   pseesaw:{scene:"vineyard", name:"Seesaw", door:[410,600], spot:true, line:"The seesaw. Up, down, up, down."},
@@ -171,9 +205,9 @@ VILLAGE.base = {scene:"(base)", name:"Home base", short:"home base"};
 // Saturday or Sunday, on the local clock
 export const isWeekend = () => [0, 6].includes(new Date(now() + LOC()).getUTCDay());
 // bridges: from outdoor scene -> {to outdoor scene: bridge place}; ARRIVE: where the player steps off on the other side
-export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField", hlane:"toStationV"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard"}, lane:{village:"toTownE", vineyard:"toVineL", hwoods:"toWoodsM"}, vineyard:{base:"toBaseV", lane:"toLaneV"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF", hfarm:"toFarmN"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB", hfarm:"toFarmB"}, hfarm:{bay:"toBayF", hlane:"hfEast", field:"toFieldH"}, hlane:{hfarm:"toFarmL", village:"toTownL", hwoods:"toWoodsL"}, hwoods:{hlane:"toLaneW", lane:"toMakersW"}, ...TOWN_BRIDGES};
+export const BRIDGES = {village:{base:"toBase", lane:"toLane", field:"toField", hlane:"toStationV"}, base:{village:"toTown", vineyard:"toVine", orchard:"toOrchard", green:"toGreenB"}, lane:{village:"toTownE", vineyard:"toVineL", hwoods:"toWoodsM"}, vineyard:{base:"toBaseV", lane:"toLaneV", lowervine:"toLowerV"}, lowervine:{vineyard:"toVineD", green:"toGreenV"}, green:{base:"toBaseG", lowervine:"toVineG", stables:"toStablesG"}, stables:{orchard:"toOrchardS", green:"toGreenS", lighthouse:"toLightS"}, lighthouse:{flowers:"toFlowersL", stables:"toStablesL"}, orchard:{base:"toBaseO", flowers:"toFlowers", field:"toFieldO", stables:"toStablesO"}, field:{village:"toTownF", orchard:"toOrchardN", shore:"toShoreF", hfarm:"toFarmN"}, flowers:{orchard:"toOrchardF", shore:"toShoreFl", lighthouse:"toLightF"}, shore:{field:"toFieldS", flowers:"toFlowersS", bay:"toBay"}, bay:{shore:"toShoreB", hfarm:"toFarmB"}, hfarm:{bay:"toBayF", hlane:"hfEast", field:"toFieldH"}, hlane:{hfarm:"toFarmL", village:"toTownL", hwoods:"toWoodsL"}, hwoods:{hlane:"toLaneW", lane:"toMakersW"}, ...TOWN_BRIDGES};
 // where the player steps off, by "from>to"
-export const ARRIVE = {"field>hfarm":[260,592], "hfarm>field":[366,76], "village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190], "shore>bay":[250,590], "bay>shore":[250,96], "bay>hfarm":[60,284], "hfarm>bay":[462,374], "hfarm>hlane":[60,560], "hlane>hfarm":[462,560], "hlane>village":[281,170], "village>hlane":[280,590], "hlane>hwoods":[60,330], "hwoods>hlane":[462,186], "lane>hwoods":[330,590], "hwoods>lane":[330,170], ...TOWN_ARRIVE};
+export const ARRIVE = {"base>green":[260,80], "green>base":[205,575], "lowervine>green":[470,330], "green>lowervine":[60,330], "green>stables":[470,330], "stables>green":[60,330], "orchard>stables":[260,80], "stables>orchard":[260,570], "stables>lighthouse":[470,330], "lighthouse>stables":[60,330], "flowers>lighthouse":[150,80], "lighthouse>flowers":[160,570], "vineyard>lowervine":[490,80], "lowervine>vineyard":[478,560], "field>hfarm":[260,592], "hfarm>field":[366,76], "village>base":[260,132], "base>village":[260,578], "village>lane":[48,330], "lane>village":[426,238], "base>vineyard":[52,300], "vineyard>base":[462,470], "lane>vineyard":[290,72], "vineyard>lane":[262,586], "base>orchard":[470,278], "orchard>base":[60,196], "orchard>flowers":[466,293], "flowers>orchard":[56,278], "village>field":[470,198], "field>village":[52,212], "orchard>field":[260,592], "field>orchard":[260,184], "field>shore":[470,304], "shore>field":[56,300], "flowers>shore":[250,590], "shore>flowers":[56,190], "shore>bay":[250,590], "bay>shore":[250,96], "bay>hfarm":[60,284], "hfarm>bay":[462,374], "hfarm>hlane":[60,560], "hlane>hfarm":[462,560], "hlane>village":[281,170], "village>hlane":[280,590], "hlane>hwoods":[60,330], "hwoods>hlane":[462,186], "lane>hwoods":[330,590], "hwoods>lane":[330,170], ...TOWN_ARRIVE};
 // the next outdoor screen on the way from one to another (screens form a little chain: base - village - lane)
 export function nextHop(from, to){
   if (from === to) return null; if (BRIDGES[from] && BRIDGES[from][to]) return to;

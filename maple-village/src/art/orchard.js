@@ -116,6 +116,7 @@ export function orchardArt(){
     + archGate("toFieldO", 260, 150, "The field", 318, 178, "var(--peri)", "Path to the field and the lake")
     + archGate("toBaseO", 500, 270, "Home", 474, 316, "var(--butter)", "Gate home")
     + archGate("toFlowers", 20, 270, "Flower farm", 70, 300, "var(--blush)", "Gate to the flower farm")
+    + archGate("toStablesO", 260, 622, "The Stables", 326, 600, "var(--peach)", "Path down to the Stables")
     + [[220, 252], [334, 252]].map(([x, y]) => streetLamp(x, y)).join("") + trees;
 }
 export function flowerFarmArt(){
@@ -125,13 +126,19 @@ export function flowerFarmArt(){
     ${tree(40, 50, .8)}${tree(170, 44, .7)}${tree(330, 50, .75)}${tree(480, 44, .8)}${hedge}
     <g filter="url(#wob)"><path d="M60 285 H520 M160 285 V600 M260 285 V600 M360 285 V600 M60 285 C60 230 52 200 52 150" fill="none" style="stroke:var(--path)" stroke-width="18" stroke-linecap="round"/></g>
     ${flowers([[30, 200, "#EFA3A6"], [44, 214, "#F3C969"], [30, 600, "#C3CDEE"], [490, 600, "#EFA3A6"], [480, 400, "#F3C969"], [40, 420, "#C3CDEE"]])}
-    <g ${W}><rect x="20" y="470" width="44" height="8" rx="2" style="fill:var(--wood)"/><path d="M24 478 v14 M60 478 v14 M20 470 v-14 h44 v14" fill="none"/>
+    <g ${W}><rect x="466" y="470" width="44" height="8" rx="2" style="fill:var(--wood)"/><path d="M470 478 v14 M506 478 v14 M466 470 v-14 h44 v14" fill="none"/>
       <path d="M470 236 q8 -10 16 0 v12 h-16z" style="fill:var(--peri)"/><path d="M486 240 q8 -4 10 -10" fill="none"/></g>`;
   const bushes = FLOWER_XS.map((x, i) => { const p = o.bushes[i], st = stateOf("bush", p, today);
     return `<g data-bush="${i}" aria-label="Bush spot ${i + 1}"><ellipse class="hov" cx="${x}" cy="${BUSH_Y + 4}" rx="28" ry="8" style="fill:var(--butter)"/><g transform="translate(${x} ${BUSH_Y})" ${W}>${bushBody(p && p.k, st.stage, st.g)}</g></g>`; }).join("");
   const beds = BED_ROWS.map((y, r) => FLOWER_XS.map((x, c) => { const i = r*4 + c, p = o.beds[i], st = stateOf("bed", p, today);
     return `<g data-bed="${i}" aria-label="Flower bed ${i + 1}"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="36" ry="10" style="fill:var(--butter)"/><g transform="translate(${x} ${y})" ${W}>${bedBody(p && p.k, st.stage, st.g)}</g></g>`; }).join("")).join("");
-  return lampDefs + ground + archGate("toOrchardF", 500, 285, "Orchard", 466, 316, "var(--sage)", "Gate to the orchard")
+  // round 264 (Mel: "just a strip"): the coast carries on down the farm's west edge, from the foreshore to Lighthouse Point
+  const coast = `<g pointer-events="none"><path d="M0 250 C20 270 34 300 40 340 C46 400 38 470 46 540 C50 590 52 620 60 640 H0z" style="fill:var(--sand)"/>
+    <g filter="url(#wob)"><path d="M0 262 C14 282 22 310 26 344 C32 400 24 470 32 540 C36 590 38 620 46 640 H0z" style="fill:var(--sea)"/><path d="M0 300 C8 330 12 380 14 430 C16 500 14 580 24 640 H0z" style="fill:var(--sea2)" opacity=".7"/>
+    <path d="M0 262 C14 282 22 310 26 344 C32 400 24 470 32 540 C36 590 38 620 46 640" fill="none" style="stroke:var(--line)" stroke-width="1.2"/></g>
+    <path class="ripple" d="M8 360 q4 -3 8 0 M12 500 q4 -3 8 0 M16 600 q4 -3 8 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2" opacity=".8"/></g>`;
+  return lampDefs + ground + coast + archGate("toOrchardF", 500, 285, "Orchard", 466, 316, "var(--sage)", "Gate to the orchard")
+    + archGate("toLightF", 160, 622, "Lighthouse Point", 228, 600, "var(--sky)", "Coast path to Lighthouse Point")
     + archGate("toShoreFl", 52, 144, "Foreshore", 112, 176, "var(--sky)", "Gate to the foreshore")
     + tapeLabel(260, 168, "Mei's flower farm", "var(--blush)", 12) + bushes + beds;
 }

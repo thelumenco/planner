@@ -4345,7 +4345,7 @@ if (want("\nNobody stands on tables or stalls (round 228)")) try {
   const SEATED = ["sit", "doze", "beanbag", "footbath", "wheel", "sunbathe"];
   // ground, seats and walkways that are drawn as places (decks, rugs, lawns, paths, platforms, pens, a stage for the
   // performers), and shopkeepers standing behind their counters (the counter's front is drawn below their feet)
-  const OPEN = new Set(["deck", "picnic", "exlawn", "pround", "jardin", "bvhpiste", "bvboardwalk", "ctpadlock", "kttorii", "bandstand", "bvhmeadow", "stairs", "pigoats",
+  const OPEN = new Set(["deck", "picnic", "exlawn", "glawn", "pround", "jardin", "bvhpiste", "bvboardwalk", "ctpadlock", "kttorii", "bandstand", "bvhmeadow", "stairs", "pigoats",
     "bvtplatypus", "cttrain", "basubak", "run", "bvplayground", "bvbeanbags", "bvrows", "bvbellbirds", "bvballoons", "bvswing", "bvnippers", "bvkoalas", "ctbeach",
     "bvsurf", "swscar", "bvtrock", "bvttrees", "bvtpark", "ctboats", "flamenco", "market:stall", "hk_ramen:hk_ramen",
     "hk_glass:hk_glass", "pi_post:pi_post", "sw_chandlery:sw_chandlery"]);
@@ -4799,7 +4799,7 @@ if (want("\nThe map, from the backpack (round 231)")) try {
   // the creator: "a mini version of the map... it shows where you are and where certain landmarks are", in the backpack
   console.log("\nThe map, from the backpack (round 231)");
   const mm = await import(new URL("../src/game/minimap.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url)), wd = await import(new URL("../src/data/world.js", import.meta.url));
-  check(mm.TILES.length === 12 && mm.TILES.every(t => wd.OUTDOOR.includes(t[0])) && new Set(mm.TILES.map(t => t[2] + "," + t[3])).size === 12, "all twelve Honeybrook screens on a 4 by 3 grid");
+  check(mm.TILES.length === 16 && mm.TILES.every(t => wd.OUTDOOR.includes(t[0])) && new Set(mm.TILES.map(t => t[2] + "," + t[3])).size === 16, "all sixteen Honeybrook screens on a 4 by 4 grid");
   { const gates = Object.values(wd.VILLAGE).filter(v => v.bridge && mm.tileOf(v.scene) && mm.tileOf(v.bridge)), has = (a, b) => mm.PATHS.some(p => p.includes(a) && p.includes(b));
     const adj = (a, b) => { const A = mm.tileOf(a), B = mm.tileOf(b); return Math.abs(A[2] - B[2]) + Math.abs(A[3] - B[3]) === 1; };
     check(gates.every(v => has(v.scene, v.bridge)) && mm.PATHS.every(([a, b]) => adj(a, b)), "every gate in the game is a path on the map, between neighbouring squares"); }
@@ -4848,6 +4848,69 @@ if (want("\nA room still draws from an odd save (round 231)")) try {
   const errs = await page.evaluate(() => JSON.parse(localStorage.getItem("hb.errors") || "[]"));
   check(errs.length >= 1 && errs.length <= 5 && new Set(errs.map(x => x.slice(17))).size === errs.length && errs.some(x => /gelato/.test(x)), "the game notes what went wrong, each error once");
   check(await page.locator("#setErrs").count() === 1 && await page.locator("#setErrs").textContent() === "Copy error details", "Settings has a Copy error details button");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe lower vineyard (round 261)")) try {
+  // the lower vineyard, down the hill from the vineyard, with four more trellis rows bought at the same stall
+  console.log("\nThe lower vineyard (round 261)");
+  const vy = await import(new URL("../src/game/vineyard.js", import.meta.url));
+  { const F = {coins: 1000, vine: {rows: [0, 1, 2].map(() => ({trellis: true, vines: [null, null, null]}))}}, v = vy.vineState(F);
+    const say = vy.buy(F, "trellis");
+    check(v.rows.length === 7 && v.rows[3].trellis && !v.rows[4].trellis && /lower vineyard/.test(say) && F.coins === 920, "an old save with three full rows gets four more down the hill, and the next trellis goes there (80 coins)");
+    v.cuttings.red = 1; check(/planted/.test(vy.plantVine(F, 3, 0, "red") || "") && v.rows[3].vines[0].v === "red", "and a red cutting plants on it"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`lowervine pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-24"); await page.waitForTimeout(1000);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.vine = F.vine || {}; F.vine.rows = [0, 1, 2, 3, 4, 5, 6].map(i => ({trellis: i < 4, vines: i === 3 ? [{v: "red", planted: 1, wateredAt: Date.now() - 3600e3}, null, null] : [null, null, null]})); window.__hbGame.save(); window.__hbScene("vineyard"); });
+  await page.waitForTimeout(700);
+  await page.locator('#world [data-place="toLowerV"]').dispatchEvent("click");
+  await page.waitForFunction(() => /lower vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400);
+  check(await page.locator('#world [data-vine^="3-"]').count() === 3 && await page.locator('#world [data-vine^="0-"]').count() === 0 && await page.locator('#world [data-place="vpress"]').count() === 1,
+    "down the path past the seesaw: the lower vineyard, with its own rows, the old press and the sea bench");
+  await page.locator('#world [data-vine="3-0"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-vy]", { timeout: 15000 }).catch(() => {});
+  check(/Vine 4\.1/.test(await page.locator("#ctx").innerText()), "tapping a vine down there opens it, like the ones up top");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)")) try {
+  // the rest of the bottom row: Honeybrook Green, the Stables and Lighthouse Point
+  console.log("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)");
+  const so = await import(new URL("../src/game/south.js", import.meta.url)), w = await import(new URL("../src/data/world.js", import.meta.url));
+  const day = "2026-10-24";
+  { const F = {coins: 50, inv: {apple: 1, carrot: 1}};
+    const d1 = so.feedDucks(F, day, 10*60), d2 = so.feedDucks(F, day, 11*60);
+    check(d1.fed && F.coins === 49 && !d2.fed && !so.feedDucks({coins: 5}, day, 22*60).fed, "the ducks: a coin's worth of duck food once a day, and not at night");
+    const sw = so.swapCrate(F, day); check(sw.id && F.inv[sw.id] >= 1 && !so.swapCrate(F, day).id, "the allotment swap crate gives one thing a day");
+    check(so.feedPony(F, "biscuit", day).ok && F.south.ponies.biscuit.trust === 2 && !F.inv.apple && !so.feedPony(F, "biscuit", day).ok, "Biscuit loves apples (two hearts), once a day");
+    const G = {coins: 50, south: {ponies: {pebble: {trust: 0}}}};
+    check(!so.ponyRide(G, day).ok && G.coins === 50, "no ride until Pebble knows you");
+    check(so.brushPony(F, "pebble", day).ok && so.feedPony(F, "pebble", day).ok && F.south.ponies.pebble.trust === 3, "Pebble: a brush and her favourite carrot");
+    check(so.ponyRide(F, day).ok && F.coins === 49 - so.RIDE_COST && !so.ponyRide(F, day).ok, "then a ride round the ring, once a day");
+    check(so.buyChips(F).ok && F.coins === 49 - so.RIDE_COST - so.CHIPS && /tide's in/.test(so.rockPools(F, day, "high").line), "fish and chips cost coins, and the rock pools need low tide"); }
+  check(["green", "stables", "lighthouse", "lowervine"].every(sc => Object.keys(w.BRIDGES[sc]).every(o => w.BRIDGES[o] && w.BRIDGES[o][sc] && w.ARRIVE[sc + ">" + o] && w.ARRIVE[o + ">" + sc])), "every new path goes both ways, with somewhere to arrive");
+  { const ids = ["hana", "juniper", "opal", "theo", "farid", "mei", "amara", "lila", "noor", "sofia"], band = ids.filter(i => (so.southSlot(i, "2026-10-25", 15*60) || {}).scene === "green");
+    check(band.length === 6 && (so.southSlot("okada", "2026-10-27", 8*60) || {}).scene === "green" && (so.southSlot("lila", "2026-10-27", 7*60 + 30) || {}).scene === "stables" && (so.southSlot("ines", "2026-10-27", 14*60 + 30) || {}).scene === "lowervine",
+      "villagers use the new screens: six at the Sunday band, Mr Okada at his allotment, Lila at the stables, Ines on the lower vines"); }
+  { const npc = await import(new URL("../src/data/npcs.js", import.meta.url)), ids = new Set(npc.NPCS.map(n => n.id)), src = (await import("node:fs")).readFileSync(new URL("../src/game/south.js", import.meta.url), "utf8");
+    const named = [...new Set((src.match(/"[a-z]+"/g) || []).map(x => x.slice(1, -1)).filter(x => /^(hana|juniper|opal|theo|farid|mei|amara|lila|noor|sofia|bo|felix|wren|elena|okada|marco|ines)$/.test(x)))];
+    check(named.every(id => ids.has(id)) && !/gonggong|evan/i.test(src), "everyone on the bottom row is a villager here (no family)"); }
+  check(w.nextHop("lighthouse", "lowervine") === "stables" && w.nextHop("lowervine", "lighthouse") === "green", "the bottom row joins up end to end");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`south pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-10-24"); await page.waitForTimeout(1000);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.inv = Object.assign(F.inv || {}, {apple: 2}); window.__hbGame.save(); window.__hbScene("base"); }); await page.waitForTimeout(600);
+  const hop = async (place, name) => { await page.locator(`#world [data-place="${place}"]`).dispatchEvent("click");
+    await page.waitForFunction(n => document.querySelector("#sceneName").textContent.includes(n), name, { timeout: 25000 }); await page.waitForTimeout(400); };
+  await hop("toGreenB", "Honeybrook Green"); await hop("toStablesG", "The Stables"); await hop("toLightS", "Lighthouse Point"); await hop("toFlowersL", "flower");
+  check(true, "home, down to the green, west to the Stables, on to Lighthouse Point and up the coast path to the flower farm");
+  await page.evaluate(() => window.__hbScene("stables")); await page.waitForTimeout(600);
+  await page.locator('#world [data-place="spaddock"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pony="feed:biscuit"]', { timeout: 20000 });
+  await page.click('#ctx [data-pony="feed:biscuit"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => window.__hbGame.F().south.ponies.biscuit.trust === 2), "at the paddock: an apple for Biscuit");
+  await page.evaluate(() => window.__hbScene("lighthouse")); await page.waitForTimeout(600);
+  check(await page.locator('#world [data-place="bikeslight"]').count() === 1, "bike hire at Lighthouse Point (and on the green)");
+  await page.locator('#world [data-place="lsup"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-sup="shore"]', { timeout: 20000 });
+  await page.click('#ctx [data-sup="shore"]'); await page.waitForFunction(() => /foreshore/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(true, "the paddleboard jetty at Lighthouse Point: paddle up the coast to the foreshore");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {

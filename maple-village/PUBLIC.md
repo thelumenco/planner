@@ -373,3 +373,17 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
 - The map (game/minimap.js): the twelve screens on a 4 by 3 grid (TILES, PATHS, LANDMARKS), opened from the Map button
   in the backpack, with a red dot where you are; the same map on the wiki's /map page (wiki/pages/21-map.mjs). A new
   outdoor screen or gate needs a tile and a path there (the test checks every gate is a path).
+
+## Round 232: the bottom row (ported from the personal edition, 2026-10-25)
+- The village is now a 4 by 4 grid. The new bottom row, west to east: Lighthouse Point, the Stables, Honeybrook Green and
+  the lower vineyard (`SOUTH` in data/world.js; art in art/lighthouse.js, stables.js, green.js, lowervine.js, and the sea
+  strip in art/southshore.js). Gates down from the flower farm, orchard, home and vineyard. The flower farm has a coast
+  strip down its west edge.
+- game/south.js: ducks (1 coin, once a day), the Sunday band and Saturday cricket, the allotment swap crate, the ponies
+  (Biscuit and Pebble: a treat and a brush a day; a ride round the ring at 3 trust, 15 coins), the rock pools at low tide,
+  and fish and chips (9). Nothing here earns coins. `southSlot` puts villagers there; Gong Gong's allotment from the
+  personal edition is Mr Okada's here, and the pony ride is the player's own (no child).
+- The vineyard has 7 rows now (`ROWS`): rows 3 to 6 are on the lower vineyard. Bike hire on the green and at the
+  lighthouse; a paddleboard jetty at Lighthouse Point (`lsup`). The map (minimap.js) has the new row.
+- Rounds 2 to 4 of the port (Bram, your own pony, the story threads, the allotments screen, beachcombing, bottles, the
+  priory ruins, inside the lighthouse) follow.

@@ -2,12 +2,12 @@
 import { H, M, W, HH, now, dayKey, localHM, prevDay, $, esc, pick, rnd, clamp, dur, plain, hash, LOC } from "../util.js";
 import { icon, progressBar, progressBarV } from "../art/icons.js";
 import { roomShell } from "../art/interiors.js";   // round 231: the fallback when a room can't be drawn
-import { VILLAGE, ROOMS, PET_BED, OUTDOOR, BRIDGES, ARRIVE, INNER, nextHop, outdoorOf, isWeekend, stationsOf, spotObj } from "../data/world.js";
+import { VILLAGE, ROOMS, PET_BED, OUTDOOR, BRIDGES, ARRIVE, INNER, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, SOUTH } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, YAY, itemIco, seasonOf, SEASONS } from "../data/items.js";
 import { brollyArt, hoodArt } from "../art/people.js";
 import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLevel, FESTIVALS } from "../art/village-extras.js";
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, orchardArt, flowerFarmArt, setArtContext } from "../art/scenes.js";
-import { vineSpot } from "../art/vineyard.js";
+import { vineSpot, vineScene } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, tapasAll, TAPAS, cookTick, cookLine } from "./kitchen.js";
 import { questBoost } from "./vineyard.js";
 import { wineNews, vineState, sellTick, vinePanel, stallPanel, barrelPanel, storePanel as wineStorePanel, shelfPanel, counterPanel, boxPanel, cafePanel, olivePanel, grovePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
@@ -58,6 +58,11 @@ import { bayArt, DECK_SEATS } from "../art/bay.js";
 import { hfarmArt } from "../art/hfarm.js";
 import { hlaneArt } from "../art/hlane.js";
 import { hwoodsArt } from "../art/hwoods.js";
+import { lowerVineArt } from "../art/lowervine.js";
+import { greenArt } from "../art/green.js";
+import { stablesArt } from "../art/stables.js";
+import { lighthouseArt } from "../art/lighthouse.js";
+import * as SO from "./south.js";
 import { greenhouseArt, GH_BED_AT, GH_POT_AT } from "../art/greenhouse.js";
 import { millArt } from "../art/mill.js";
 import { fishVanArt, kiteArt, bayStallArt, kiteSellerArt, movieArt } from "../art/friday.js";
@@ -1295,6 +1300,7 @@ function ctxBody(){
   else if (rondaView && townOf(scene)) h = rondaPanel(F, rondaView, {flam: flamSt, hm: localHM(), tea: teaSt, amina: isHere("amina"), paint: paintSt});
   else if (fishSpot && FISH_SPOTS[fishSpot].scene === scene) h = fishPanel(F, fishSpot, fishSt);
   else if (woodsView === "ranger" && scene === "hwoods") h = rangerPanel(F, isHere("wren"));
+  else if (woodsView === "paddock" && scene === "stables") h = SO.paddockPanel(F, dayKey());
   else if (woodsView === "bike" && outside()) h = bikePanel(F, F.ride === "car" && owns(F, "car") ? "car" : owns(F, "scooter") && F.ride !== "walk" ? "scooter" : "");
   else if (woodsView && TAXI_STOPS[woodsView] && TAXI_STOPS[woodsView].scene === scene) h = taxiPanel(F, woodsView);
   else if (vanView === "crate" && scene === "van") h = cratePanel(F, vineState(F));
@@ -1313,7 +1319,7 @@ function ctxBody(){
   else if (kView === "mull" && scene === "kitchen") h = mullPanel(F, vineState(F), mullSt);   // round 153: mulled wine
   else if (kView && scene === "kitchen") h = kView === "oven" ? ovenPanel(F) : kView === "press" ? pressPanel(F) : kView === "stove" ? stovePanel(F, dayKey()) : larderPanel(F);
   else if (loftView && scene === "vineyard") h = loftPanel(F);
-  else if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) h = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "store" ? wineStorePanel(F)
+  else if (vyView && (scene === "vineyard" || scene === "lowervine" || scene === "wineshop" || scene === "cellar")) h = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "store" ? wineStorePanel(F)
     : vyView === "mcrate" ? wineCratePanel(F, dayKey()) : vyView === "shelf" ? shelfPanel(F) : vyView === "menu" ? menuPanel(F, dayKey()) : vyView === "counter" ? counterPanel(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter(n => n.id !== "celeste" && isHere(n.id)).map(n => n.name), dayKey());
   else if (selfView && selfHere()) h = selfPanel();
   else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
@@ -1758,10 +1764,12 @@ function ctxBody(){
   c.querySelectorAll("[data-taxiopen]").forEach(b => b.onclick = () => { goalView = null; woodsView = b.dataset.taxiopen; sfx("paper", true); ctx(); });   // the home jetty: the taxi stops there too
   if (fishSpot) c.querySelectorAll("[data-fish]").forEach(b => b.onclick = () => fishGo(b.dataset.fish, b.dataset.k));
   c.querySelectorAll("[data-sup]").forEach(b => b.onclick = () => { goalView = null; ctx(); if (b.dataset.sup === "play") familyPaddle(); else paddleTo(b.dataset.sup); });
+  c.querySelectorAll("[data-pony]").forEach(b => b.onclick = () => { const [k, id] = b.dataset.pony.split(":"), r = k === "feed" ? SO.feedPony(F, id, dayKey()) : SO.brushPony(F, id, dayKey());
+    if (r) { speak(r.line, 5000); if (r.ok) { sfx("chime"); gainXp(1); } } save(true); ctx(); });   // round 263: the ponies
   c.querySelectorAll("[data-ride]").forEach(b => b.onclick = () => { F.ride = b.dataset.ride; sfx("paper", true); speak(F.ride === "car" ? "Keys in hand. You'll drive between screens." : F.ride === "scooter" ? "Helmet on. Scooter it is." : "On foot today. Nice and slow.", 3500); save(); ctx(); });
   if (orView || (fieldView && scene === "field" && (stallAt(dayKey(), localHM(), +fieldView.slice(-1)) || {}).kind === "orchard")) wireOrchard(c, F, {save: () => save(true), rerender: () => { ctx(); drawScene(); }, undo: (m, f) => undoable(m, f), say: l => speak(l, 4500), sfx, today: dayKey(), where: orAt && orAt.where, i: orAt && orAt.i, item: potItem,
     tab: k => { orTab = k; ctx(); }, placed: () => { orView = null; potItem = null; ctx(); drawScene(); }, tea: haveTea});
-  if (vyView && (scene === "vineyard" || scene === "wineshop" || scene === "cellar")) wireVine(c, F, {harvest: (festivalOn(dayKey()) || {}).id === "harvest", save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, r: vyAt && vyAt.r, i: vyAt && vyAt.i});
+  if (vyView && (scene === "vineyard" || scene === "lowervine" || scene === "wineshop" || scene === "cellar")) wireVine(c, F, {harvest: (festivalOn(dayKey()) || {}).id === "harvest", save: () => save(true), rerender: () => { ctx(); drawScene(); }, say: l => speak(l, 4500), sfx, r: vyAt && vyAt.r, i: vyAt && vyAt.i});
   if (passView && scene === "cave") c.querySelectorAll("[data-pass]").forEach(b => b.onclick = () => { const a = b.dataset.pass, k = b.dataset.k;
     if (a === "lay") { const n = PS.layDown(F, k); if (n) { sfx("paper", true); speak(`${n} bottle${n === 1 ? "" : "s"} laid down in the brothers' alcoves, neck out, to rest.`, 4000); } }
     else if (a === "up") { const c2 = PS.bringUp(F, +k); if (c2) { sfx("paper", true); speak(`${c2.name} goes back up to the cellar, kept back from the shelves till you stock it${c2.bonus ? `: ${c2.price} a bottle now, ${c2.bonus} more for its rest` : ""}.`, 5500); } }
@@ -1926,11 +1934,11 @@ function drawScene(){
   tableKey = "";
   // round 231: each layer is drawn on its own, so one that fails (from an unusual save) is left out and logged, and the
   // room, its exit and everything else still appear
-  $("sceneArt").innerHTML = safeArt(() => scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : townRoom(scene) ? (townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "puffin" ? puffinRoomArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoRoomArt(scene) : townOf(scene) === "bali" ? baliRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene): TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene): TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "puffin" ? puffinArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoArt(scene) : townOf(scene) === "bali" ? baliArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "cave" ? caveArt(PS.caveInfo(F, dayKey(), localHM())) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene), "scene") || safeArt(() => roomShell(scene) + roomExitArt(), "shell");
+  $("sceneArt").innerHTML = safeArt(() => scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : scene === "lowervine" ? lowerVineArt(vineState(F)) : scene === "green" ? greenArt() : scene === "stables" ? stablesArt() : scene === "lighthouse" ? lighthouseArt(localHM() >= 19*60 || localHM() < 6*60) : townRoom(scene) ? (townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "puffin" ? puffinRoomArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoRoomArt(scene) : townOf(scene) === "bali" ? baliRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene): TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene): TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "puffin" ? puffinArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoArt(scene) : townOf(scene) === "bali" ? baliArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "cave" ? caveArt(PS.caveInfo(F, dayKey(), localHM())) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene), "scene") || safeArt(() => roomShell(scene) + roomExitArt(), "shell");
   $("sceneArt").insertAdjacentHTML("beforeend", safeArt(() => keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), localHM()) ? discoArt() : "") + (scene === "cellar" && owns(F, "cellar") ? cellarPassArt(PS.passState(F).step) : "") + (scene === "scoopkitchen" && PS.passState(F).kitchen ? kitchenPanelArt() : "") + vanCrateArt() + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""), "layers"));   // shelves with keepsakes, and pets at home here
   if ((outside() || scene === "terrace") && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(localHM()));   // (round 153: the terrace too)   // the same evening light everywhere outdoors
   if ((outside() || scene === "terrace") && isDusk()) safeArt(() => { nightLights(); return ""; }, "night lights");
-  const names = {village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), terrace:"The terrace", millup:"The old mill: upstairs", orchard:"The orchard", flowers:"The flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, ct_vernazza:"Cinque Terre: Vernazza", ct_corniglia:"Cinque Terre: Corniglia", ct_monterosso:"Cinque Terre: Monterosso", ct_manarola:"Cinque Terre: Manarola", ...Object.fromEntries(Object.entries(BB_NAMES).map(([k, v]) => [k, "Bellbird Valley: " + v])), ba_seminyak:"Bali: Seminyak", ba_ubud:"Bali: Ubud", ba_tegallalang:"Bali: Tegallalang", ba_uluwatu:"Bali: Uluwatu", hk_otaru:"Hokkaido: Otaru", hk_sapporo:"Hokkaido: Sapporo", hk_niseko:"Hokkaido: Niseko", hk_furano:"Hokkaido: Furano", pi_landing:"Puffin Isle: the landing", pi_village:"Puffin Isle: the village", pi_lighthouse:"Puffin Isle: the lighthouse", pi_cliffs:"Puffin Isle: the cliffs", sw_harbour:"Saltwick: the harbour", sw_wynds:"Saltwick: the wynds", sw_beach:"Saltwick: the beach", sw_clifftop:"Saltwick: the clifftop", jj_shore:"Jeju: Seongsan", jj_farms:"Jeju: the tangerine farms", jj_harbour:"Jeju: the harbour", jj_village:"Jeju: the stone village", kt_station:"Kyoto: the station", kt_lane:"Kyoto: Higashiyama", kt_temple:"Kyoto: the temple", kt_river:"Kyoto: the river", rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
+  const names = {lowervine: "The lower vineyard", green: "Honeybrook Green", stables: "The Stables", lighthouse: "Lighthouse Point", village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), terrace:"The terrace", millup:"The old mill: upstairs", orchard:"The orchard", flowers:"The flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, ct_vernazza:"Cinque Terre: Vernazza", ct_corniglia:"Cinque Terre: Corniglia", ct_monterosso:"Cinque Terre: Monterosso", ct_manarola:"Cinque Terre: Manarola", ...Object.fromEntries(Object.entries(BB_NAMES).map(([k, v]) => [k, "Bellbird Valley: " + v])), ba_seminyak:"Bali: Seminyak", ba_ubud:"Bali: Ubud", ba_tegallalang:"Bali: Tegallalang", ba_uluwatu:"Bali: Uluwatu", hk_otaru:"Hokkaido: Otaru", hk_sapporo:"Hokkaido: Sapporo", hk_niseko:"Hokkaido: Niseko", hk_furano:"Hokkaido: Furano", pi_landing:"Puffin Isle: the landing", pi_village:"Puffin Isle: the village", pi_lighthouse:"Puffin Isle: the lighthouse", pi_cliffs:"Puffin Isle: the cliffs", sw_harbour:"Saltwick: the harbour", sw_wynds:"Saltwick: the wynds", sw_beach:"Saltwick: the beach", sw_clifftop:"Saltwick: the clifftop", jj_shore:"Jeju: Seongsan", jj_farms:"Jeju: the tangerine farms", jj_harbour:"Jeju: the harbour", jj_village:"Jeju: the stone village", kt_station:"Kyoto: the station", kt_lane:"Kyoto: Higashiyama", kt_temple:"Kyoto: the temple", kt_river:"Kyoto: the river", rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || (townRoom(scene) ? `${TOWNS[townOf(scene)].n}: ${townRoom(scene).n.replace(/^The /, "the ")}` : ROOMS[scene].name))}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
   $("maphint").textContent = townRoom(scene) ? `${townRoom(scene).say} Exit at the bottom, back out the way you came.` : townOf(scene) && TOWNS[townOf(scene)].hints ? TOWNS[townOf(scene)].hints[scene] : townOf(scene) ? {rd_station: "Ronda's station (trains home till 10pm) and the Alameda balcony over the valley. East: the plaza. South: steps down into the gorge.", rd_plaza: "The plaza: the market, the tapas bar, Doña Carmen's sweets. West: the station. South: over Puente Nuevo.", rd_bridge: "Puente Nuevo over the gorge, the viewpoint and the Moorish garden. North: back over the bridge. West: the old town.", rd_old: "La Ciudad: the convent hatch, the tile shop, the Arab baths. North: the gorge steps up to the station. East: the bridge."}[scene] : scene === "shore" ? "Watch for dolphins from the bench, or take the paddleboards out. Gates: the field (east), the flower farm (south)." : scene === "field" ? "Feed the swans, picnic, kick a ball about, or join Hana's class at 8. Paths: town (east), orchard (south), foreshore (west)." : scene === "orchard" ? "Buy saplings at the farm shop (or tap a tree spot). Right gate: home. Left: flowers." : scene === "flowers" ? "Tap a bed or bush to plant, or buy at the farm shop. Right arch: the orchard." : scene === "cottage" ? "Farid and Mei's cottage. Tap the table for tea and cake." : scene === "kitchen" ? "Bake bread, press cheese, cook small plates and today's tapas. The mat at the bottom goes back to the shop." : scene === "vineyard" ? "Tap a vine to plant, water or pick. Left gate: home. Top path: Makers' Lane." : scene === "wineshop" ? "Stock the shelves, stand behind the counter to serve, and check the honesty box." : scene === "village" ? "Tap a building to go inside. The bridge at the bottom goes home." : scene === "base" ? "Tap to walk. The bridge at the top goes to town, the gate on the right to the vineyard." : scene === "lane" ? "Bo's workshop, and Auntie Lin's, Juniper's and Mr Okada's homes. Left gate: town square. Bottom path: vineyard." : scene === "farm" ? "Tap a plot to plant, water or harvest." : scene === "market" ? "Tap the counter to open the shop." : scene === "room" ? "Just you. Nap in bed, decompress in the calm corner, write at the desk." : "Tap furniture to walk to it. The board on the wall lists this building's quests.";
 }
@@ -2420,7 +2428,7 @@ const chum = {x:hero.x - 24, y:hero.y + 2, tx:hero.x - 24, ty:hero.y + 2, dir:1,
 let route = [], keys = new Set();
 const svg = $("world");
 function outside(){ return OUTDOOR.includes(scene); }
-const bounds = () => TOWN_BOUNDS[scene] ? TOWN_BOUNDS[scene] : scene === "van" ? [182, 210, 338, 612] : LET_SMALL.test(scene) ? LET_ROOM : scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : (scene === "lane" || scene === "vineyard" || scene === "orchard" || scene === "flowers") ? [14, 140, W - 14, HH - 14] : scene === "field" ? [14, 150, W - 14, HH - 14] : scene === "shore" ? [186, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
+const bounds = () => TOWN_BOUNDS[scene] ? TOWN_BOUNDS[scene] : scene === "van" ? [182, 210, 338, 612] : LET_SMALL.test(scene) ? LET_ROOM : scene === "village" ? [14, 150, W - 14, 598] : scene === "base" ? [14, 114, W - 14, HH - 14] : (scene === "lane" || scene === "vineyard" || scene === "orchard" || scene === "flowers") ? [14, 140, W - 14, HH - 14] : SOUTH.includes(scene) ? [14, 60, W - 14, HH - 14] : scene === "field" ? [14, 150, W - 14, HH - 14] : scene === "shore" ? [186, 140, W - 14, HH - 14] : [34, 168, W - 34, 612];
 
 function setScene(id, at){
   const w = $("world"), from = scene; w.classList.add("fading");
@@ -2622,10 +2630,27 @@ function arriveSpot(id){
   if (scene === "hall" && id === "whiteboard") { speak(pick(["A whiteboard with half a sum on it. Theo's, probably.", "Fresh marker, blank board."]), 3000); return; }
   const s = spotObj(scene, id); if (s) speak(s.line, 3500); render();
 }
+// rounds 262 to 264: the green, the Stables and Lighthouse Point (game/south.js)
+const SOUTH_SPOTS = ["gpond", "gband", "glawn", "gallot", "sstable", "spaddock", "sride", "llight", "lpools", "lchips"];
+function southSpot(id){
+  const day = dayKey(), hm = localHM(), say = (r, ms = 5500) => { if (r) speak(r.line, ms); };
+  if (id === "gpond") { const r = SO.feedDucks(F, day, hm); say(r); if (r.fed) { sfx("pop"); gainXp(1); } }
+  else if (id === "gband") speak(SO.bandNow(day, hm) ? "The Honeybrook brass band, in their red jackets, playing something jolly with a lot of trombone. Half the village is on the grass with a flask." : "The bandstand. On Sunday afternoons, two till four, the brass band plays and half the village brings a blanket.", 5500);
+  else if (id === "glawn") speak(SO.cricketNow(day, hm) ? "Cricket! A gentle village match: someone's bowling underarm, someone's dog has the ball, and everyone's clapping politely." : "The cricket lawn, mown in stripes. There's a friendly match on Saturday afternoons, two till five.", 5500);
+  else if (id === "gallot") { const r = SO.swapCrate(F, day); if (r.id) { sfx("chime"); flash(`+1 ${(ITEMS[r.id] || {n: r.id}).n.toLowerCase()}`); speak(`${r.line} Today: ${(ITEMS[r.id] || {n: r.id}).n.toLowerCase()}. You take one.`, 6000); } else say(r); }
+  else if (id === "sstable") speak(hm >= 20*60 || hm < 6*60 ? "The stable's quiet. Biscuit and Pebble are dozing in their stalls, one ear each turned towards you." : "Biscuit puts her head over the half-door and blows warm air at you. Pebble, next door, pretends not to have noticed you, then gives in.", 5000);
+  else if (id === "spaddock") { woodsView = "paddock"; sfx("paper", true); }
+  else if (id === "sride") { const r = SO.ponyRide(F, day); say(r, 6000); if (r.ok) { sfx("chime"); gainXp(1); } }
+  else if (id === "llight") { const r = SO.climb(F, day, hm); say(r, 6500); if (r.first) gainXp(1); }
+  else if (id === "lpools") say(SO.rockPools(F, day, SO.tideAt(hm)));
+  else if (id === "lchips") { const r = SO.buyChips(F); say(r, 6000); if (r.ok) sfx("chaching"); }
+  save(true); render();
+}
 function arriveVillageSpot(id){
   atSpot = id;
   const v = VILLAGE[id];
   if (v.bridge) { atSpot = null; setScene(v.bridge, ARRIVE[scene + ">" + v.bridge]); return; }
+  if (SOUTH_SPOTS.includes(id)) { southSpot(id); return; }
   if (townOf(scene)) { townSpot(id); return; }
   if (id === "plot3" || id === "plot4") { speak(v.line, 4000); render(); return; }
   if (id === "olive") { vyView = "olive"; sfx("paper", true); render(); return; }
@@ -2643,7 +2668,7 @@ function arriveVillageSpot(id){
   if (id === "vanspot" && scene === "hlane") { if (!owns(F, "van")) { goalView = "van"; sfx("paper", true); speak("A gravel spot just big enough for a campervan...", 4000); } render(); return; }
   if (id === "timetable" && scene === "hlane") { railOpen = true; sfx("paper", true); render(); return; }
   if (id === "ranger") { woodsView = "ranger"; sfx("paper", true); if (isHere("wren")) npcSay("wren", pick(["Morning! Mind the roots on the top trail.", "Kettle's on. Have you been to the lookout yet?", "The pool's full of trout this week."])); render(); return; }
-  if (id === "bikeswoods" || id === "bikesst" || id === "bikesvillage") { woodsView = "bike"; sfx("paper", true); render(); return; }
+  if (id === "bikeswoods" || id === "bikesst" || id === "bikesvillage" || id === "bikesgreen" || id === "bikeslight") { woodsView = "bike"; sfx("paper", true); render(); return; }
   if (TAXI_STOPS[id]) { woodsView = id; sfx("paper", true); render(); return; }
   if (id === "forage") { const r = forage(F, addInv); if (!r) { speak("You've foraged here today. Come back tomorrow: the woods need time to grow back.", 4000); render(); return; }
     sfx("chime"); gainXp(1); act("cheer"); speak(`${r.line} +${r.n} ${ITEMS[r.id].n.toLowerCase()} in your backpack.`, 5500); mprop("sparkle", hero.x, hero.y - 60, 1600); ; save(); render(); return; }
@@ -2680,7 +2705,7 @@ function arriveVillageSpot(id){
   if (id === "jazzhat") { tipBand(); return; }
   if (id === "xgrotto") { fieldView = "xgrotto"; sfx("paper", true); ; render(); return; }
   if (id === "xtree") { fieldView = "xtree"; sfx("paper", true); if (treeLit(dayKey(), localHM(), F)) mprop("heart", hero.x, hero.y - 60, 1600); render(); return; }
-  if (id === "suprack" || id === "homejetty") { goalView = "jetty"; sfx("paper", true); render(); return; }
+  if (id === "suprack" || id === "homejetty" || id === "lsup") { goalView = "jetty"; sfx("paper", true); render(); return; }
   if (id === "ferry") { railOpen = "ferry"; tripPick = []; sfx("paper", true); render(); return; }   // round 127: the Jeju ferry's ticket board
   if (id === "wishtower") { const w = F.wish = F.wish || {n: 3}; if (w.day === dayKey()) { speak("You've added your stone today. The wish is in there now: it just needs time.", 4000); render(); return; }
     w.day = dayKey(); if (w.n < 9) w.n++; sfx("chime"); gainXp(1); speak(pick(["You find a flat black-ish pebble by the river, balance it on top, and make a wish. Don't tell anyone what it was.", "Clack. One more stone on the tower. A wish for today.", "Very carefully... there. The tower's a little taller, and so is the wish."]), 5000);
@@ -3210,18 +3235,18 @@ function familyPaddle(){
 }
 // Paddling between the home jetty and the foreshore: the river, the lake and the stream join them. Board on, a blink,
 // and the player steps off by the other jetty (the pet too)
-const JETTY = {shore: [216, 500], base: [150, 134]};
+const JETTY = {shore: [216, 500], base: [150, 134], lighthouse: [400, 552]};
 function paddleTo(dest){
   if (paddling || sup) return;
   const m = localHM(); if (m >= 22*60 || m < 6*60) { speak("Too dark to paddle the river now. Walk tonight, paddle in the morning.", 3500); render(); return; }
-  const kid = false, off = scene === "shore" ? [[104, 372], [132, 404]] : [[124, 84], [96, 88]]; paddling = true; route = []; atSpot = null; hero.path = []; hero.sitting = false;
+  const kid = false, off = scene === "shore" ? [[104, 372], [132, 404]] : scene === "lighthouse" ? [[412, 612], [380, 618]] : [[124, 84], [96, 88]]; paddling = true; route = []; atSpot = null; hero.path = []; hero.sitting = false;
   hero.x = hero.tx = off[0][0]; hero.y = hero.ty = off[0][1]; chum.x = chum.tx = off[0][0] + 6; chum.y = chum.ty = off[0][1] - 2; nodes.hero.classList.remove("sit"); nodes.hero.classList.add("sup");
-  sfx("paper", true); speak(dest === "shore" ? `Board on, ${F.name} on the front. Off down the river.` : "Board on. Up the stream and home.", 2500);
+  sfx("paper", true); speak(dest === "lighthouse" ? `Board on, ${F.name} on the front. Down the coast, past the cliffs.` : dest === "shore" ? `Board on, ${F.name} on the front. Off down the river.` : "Board on. Up the stream and home.", 2500);
   setTimeout(() => {
     nodes.hero.classList.remove("sup"); paddling = false;
     setScene(dest, JETTY[dest]);
     setTimeout(() => { ;
-      speak(dest === "shore" ? "Out at the foreshore. Salty air, and the dolphins are about." : "Home! Boards back on the rack.", 3500); }, 450);
+      speak(dest === "shore" ? "Out at the foreshore. Salty air, and the dolphins are about." : dest === "lighthouse" ? "Round the headland to Lighthouse Point. Boards up on the rack by the jetty." : "Home! Boards back on the rack.", 3500); }, 450);
   }, 1300);
 }
 // The dolphin cruise (once the boat's bought): the boat sails up the coast and back with the player and the pet aboard
@@ -3251,7 +3276,7 @@ function endPaddle(walkBack){
 }
 // Who's where today: everyone's day at a glance (in the friendship view), family first, then the village
 const PLACE_NAME = {greenhouse: "the greenhouse", mill: "the old mill", rd_station: "Ronda (the station)", rd_plaza: "Ronda (the plaza)", rd_bridge: "Ronda (the bridge)", rd_old: "Ronda (the old town)", base: "outside at home", home: "your house", farm: "the garden", village: "the town square", lane: "Makers' Lane", vineyard: "the vineyard",
-  orchard: "the orchard", flowers: "the flower farm", field: "the field", shore: "the foreshore", kitchen: "the wine shop kitchen", bay: "the bay", hfarm: "Wildflower Farm", hwoods: "Honeybrook Woods", hlane: "the cottage lane", van: "the campervan", honeysuckle: "Honeysuckle cottage", clover: "Clover cottage", barn: "the barn at Wildflower Farm", scoopshop: "the Scoop Shack", scoopkitchen: "the gelato kitchen", scoopdip: "the dip station", cocoa: "the Cocoa Room", cocoakitchen: "the chocolate kitchen", cave: "the wine cave"};
+  orchard: "the orchard", flowers: "the flower farm", field: "the field", shore: "the foreshore", kitchen: "the wine shop kitchen", bay: "the bay", hfarm: "Wildflower Farm", hwoods: "Honeybrook Woods", lowervine: "the lower vineyard", green: "Honeybrook Green", stables: "the Stables", lighthouse: "Lighthouse Point", hlane: "the cottage lane", van: "the campervan", honeysuckle: "Honeysuckle cottage", clover: "Clover cottage", barn: "the barn at Wildflower Farm", scoopshop: "the Scoop Shack", scoopkitchen: "the gelato kitchen", scoopdip: "the dip station", cocoa: "the Cocoa Room", cocoakitchen: "the chocolate kitchen", cave: "the wine cave"};
 const ACT_WORD = {water: "watering", farm: "gardening", sit: "sitting down", game: "gaming", sup: "paddleboarding", guide: "leading a tour", lead: "leading the class",
   exercise: "exercise class", cone: "with an ice cream", cook: "cooking", rest: "in the hammock", repair: "fixing things", type: "busy", play: "playing"};
 const placeName = sc => PLACE_NAME[sc] || (ROOMS[sc] && ROOMS[sc].name) || sc;
@@ -3475,8 +3500,8 @@ svg.addEventListener("click", ev => {
     const x = where === "tree" ? TREE_XS[i % 4] : FLOWER_XS[i % 4], y = where === "tree" ? TREE_ROWS[Math.floor(i/4)] + 20 : where === "bush" ? BUSH_Y + 18 : BED_ROWS[Math.floor(i/4)] + 20;
     go(scene, x, y, () => { atSpot = where; orAt = {where, i}; orView = "spot"; sfx("paper", true); render(); }); return; }
   const vt = ev.target.closest("[data-vine]");
-  if (vt && scene === "vineyard") { const [r, i] = vt.dataset.vine.split("-").map(Number), p = vineSpot(r, i);
-    go("vineyard", p.x, p.y, () => { atSpot = "vine"; vyAt = {r, i}; vyView = "vine"; sfx("paper", true); render(); }); return; }
+  if (vt && (scene === "vineyard" || scene === "lowervine")) { const [r, i] = vt.dataset.vine.split("-").map(Number), p = vineSpot(r, i);
+    go(vineScene(r), p.x, p.y, () => { atSpot = "vine"; vyAt = {r, i}; vyView = "vine"; sfx("paper", true); render(); }); return; }
   const ts = ev.target.closest("[data-tspot]");
   if (ts && scene === "terrace") { go(scene, +ts.dataset.x, +ts.dataset.y, () => terraceSpot(ts.dataset.tspot)); return; }
   const rs = ev.target.closest("[data-rdspot]");

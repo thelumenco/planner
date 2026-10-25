@@ -111,6 +111,13 @@ I.calendar = [`<rect x="3.5" y="5" width="17" height="15.5" rx="2" style="fill:#
 I.gear = [`<circle cx="12" cy="12" r="6.5" style="fill:var(--oat)"/><circle cx="12" cy="12" r="2.6" style="fill:#FFFDF6"/>`, `<path d="M12 2.8l1.5 2.4 2.8-.6.6 2.8 2.4 1.5-1.2 2.6 1.2 2.6-2.4 1.5-.6 2.8-2.8-.6L12 21.2l-1.5-2.4-2.8.6-.6-2.8-2.4-1.5 1.2-2.6-1.2-2.6 2.4-1.5.6-2.8 2.8.6z"/><circle cx="12" cy="12" r="2.6"/>`];
 I.music = [`<circle cx="7" cy="17.5" r="2.8" style="fill:var(--peri)"/><circle cx="17" cy="15.5" r="2.8" style="fill:var(--peri)"/>`, `<circle cx="7" cy="17.5" r="2.8"/><circle cx="17" cy="15.5" r="2.8"/><path d="M9.8 17.5V6l10-2v11.5M9.8 9l10-2"/>`];
 I.farm = I.sprout;
+// round 232: the bottom row on the map (a lighthouse, a pony's head, a duck)
+I.lighthouse = [`<path d="M9.5 8 h5 l1.5 13 h-8z" ${f("#FFFDF6")}/><path d="M9.1 11.5 h5.8 l.4 3.2 h-6.6z M8.5 17.5 h7 l.3 2.5 h-7.6z" ${f("#E8566C")}/><rect x="9.5" y="4.5" width="5" height="3.5" ${f("#F3C969")}/><path d="M9 4.5 l3 -2.5 l3 2.5z" ${f("#3B3530")}/>`,
+  `<path d="M9.5 8 h5 l1.5 13 h-8z"/><rect x="9.5" y="4.5" width="5" height="3.5"/><path d="M9 4.5 l3 -2.5 l3 2.5 M7 21 h10 M4 6.2 h3 M17 6.2 h3" />`];
+I.horse = [`<path d="M8 21 c0 -5 1 -8 3 -10 l-1 -5 l2.5 2 l1.5 -3 l1 3.5 c2 1.5 3.5 4 4 7 c.3 1.5 -1 2.2 -2.2 1.6 l-2.3 -1.4 c-1 2 -1.5 3.5 -1.5 5.3z" ${f("#C98A4E")}/><path d="M11 9 c-1.5 2 -2.5 5 -2.6 8" ${f("none")}/>`,
+  `<path d="M8 21 c0 -5 1 -8 3 -10 l-1 -5 l2.5 2 l1.5 -3 l1 3.5 c2 1.5 3.5 4 4 7 c.3 1.5 -1 2.2 -2.2 1.6 l-2.3 -1.4 c-1 2 -1.5 3.5 -1.5 5.3"/><circle cx="15" cy="10.5" r=".6"/><path d="M11 8 c-1.6 2 -2.6 5 -2.7 8.5" stroke-dasharray="1.2 1.4"/>`];
+I.duck = [`<path d="M4 15 c0 3.5 3.5 5 8 5 s8 -1.5 8.5 -5 c-2 1 -4 1 -5.5 0 c0 -2 -1 -3.5 -1 -5.5 a3 3 0 0 0 -6 .5 c0 2 1.5 3 1 5 c-2 .5 -3.5 .3 -5 0z" ${f("#FFFDF6")}/><path d="M14 9.5 l3 .6 l-3 1.2z" ${f("#F3A04A")}/><path d="M2 20.5 c3 1.5 17 1.5 20 0" ${f("#BFDCEC")}/>`,
+  `<path d="M4 15 c0 3.5 3.5 5 8 5 s8 -1.5 8.5 -5 c-2 1 -4 1 -5.5 0 c0 -2 -1 -3.5 -1 -5.5 a3 3 0 0 0 -6 .5 c0 2 1.5 3 1 5 c-2 .5 -3.5 .3 -5 0z"/><path d="M14 9.5 l3 .6 l-3 1.2"/><circle cx="11.6" cy="9.4" r=".5"/><path d="M8 16 q2.5 1.5 5 0"/>`];
 I.water = I.drop;
 I.well = I.drop;
 
