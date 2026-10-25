@@ -8469,12 +8469,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     [["w_raisin", "bottle", "#C98A2E", "#5A3A2E"], ["raisins", "bag", "#6B3A2A", "#C9A27E"], ["limoncino", "bottle", "#F3D34A", "#FFFDF6"], ["anchovy_salt", "jar", "#9FC3D9", "#F3ECDD"]].forEach(([id, sh, a, b]) => {
       if (!I[id]) I[id] = (S4[sh] || S4.box)(a, b);
     });
-    I.bk_loaf = S4.loaf("#C98A4A");
-    I.bk_focaccia = S4.loaf("#D9B060");
-    [["bk_croissant", "#E3A857"], ["bk_cinnabun", "#B8743E"], ["bk_turnover", "#E8B86A"], ["bk_scone", "#E6C27A"]].forEach(([id, c]) => {
-      I[id] = S4.bun(c);
-    });
-    if (!I.butter) I.butter = S4.bar("#F3E09A");
     I.wine_tempranillo = S4.bottle("#5A1630");
     I.wine_pinot = S4.bottle("#8A2E3E");
     I.wine_priory = S4.bottle("#4A1B2E");
@@ -8670,9 +8664,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     hfreezer: { scene: "bay", name: "Honesty freezer", door: [432, 290], spot: true, line: "The honesty freezer: little cups while the shop's shut." },
     dbike: { scene: "bay", name: "Delivery bike", door: [300, 290], spot: true, line: "The delivery bike." },
     cocoa: { scene: "bay", name: "The Cocoa Room", short: "the Cocoa Room", door: [396, 516], mark: [396, 372] },
-    bakery: { scene: "green", name: "The Honeybrook Bakehouse", short: "the bakehouse", door: [108, 116], mark: [108, 30] },
-    // round 294
-    bakeshut: { scene: "green", name: "The old bakery", door: [108, 116], spot: true, line: "The old bakery, shuttered since the baker retired." },
     toFarmB: { scene: "bay", name: "Gate to Wildflower Farm", door: [500, 378], spot: true, bridge: "hfarm", mark: [490, 320], line: "East through the gate to Wildflower Farm." },
     // Wildflower Farm (Felix and Elena's), east of the bay (art/hfarm.js, game/hfarm.js)
     toBayF: { scene: "hfarm", name: "Gate to the bay", door: [22, 286], spot: true, bridge: "bay", mark: [30, 226], line: "West through the gate to the bay." },
@@ -8772,8 +8763,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     scoopdip: { parent: "scoopshop", door: [456, 410], arrive: [70, 450], exit: [34, 440] },
     // the Cocoa Room's kitchen, through the door on the shop's west wall
     cocoakitchen: { parent: "cocoa", door: [64, 400], arrive: [450, 440], exit: [486, 440] },
-    bakehouse: { parent: "bakery", door: [64, 400], arrive: [450, 440], exit: [486, 440] },
-    // round 294: the bakery's bakehouse, through the shop's west door
     millup: { parent: "mill", door: [326, 596], arrive: [96, 520], exit: [70, 584] },
     winecave: { parent: "cellar", door: [70, 440], arrive: [440, 455], exit: [486, 455] }
     // round 244: the secret wine cave behind the cellar's old bricks   // round 154: upstairs in the old mill (the shop, the workbench, tastings)
@@ -9014,21 +9003,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["barwall", "Bar wall", "W", "barwall", null, "Wrapped bars of your own chocolate.", 36],
       ["ckdoor", "Kitchen", "Z", "gkdoor", null, "Into the chocolate kitchen.", 0],
       ["ctables", "Tables", "T", "cafetables", null, "A table for a little something.", 34]
-    ] },
-    // round 294: the Honeybrook Bakehouse on the green (game/bakery.js), the shop and the bakehouse behind it
-    bakery: { name: "The Honeybrook Bakehouse", wall: "#F6EBDD", trim: "#B8743E", noBoard: true, pos: { S: [130, 262], C: [330, 330], Z: [40, 400], T: [330, 540] }, stations: [
-      ["bshelves", "Bread shelves", "S", "bkshelves", null, "The bread shelves.", 40],
-      ["bcounter", "Counter", "C", "bkcounter", null, "The counter and the honesty tin.", 46],
-      ["bkdoor", "Bakehouse", "Z", "gkdoor", null, "Through to the bakehouse.", 0],
-      ["bseat", "Window seat", "T", "bkbench", null, "A seat in the window.", 34]
-    ] },
-    bakehouse: { name: "The bakehouse", wall: "#F3E7D7", trim: "#8A5A3A", noBoard: true, pos: { O: [260, 262], P: [96, 262], R: [420, 262], M: [250, 450], C: [380, 590], F: [110, 590] }, stations: [
-      ["bmix", "Mixing table", "M", "bkmix", null, "The mixing table, flour on everything.", 40],
-      ["bproof", "Proving shelf", "P", "bkproof", null, "Trays of dough rising under cloths.", 34],
-      ["boven", "Wood oven", "O", "bkoven", null, "The wood oven.", 40],
-      ["brack", "Cooling rack", "R", "bkrack", null, "The cooling rack.", 34],
-      ["bchurn", "Butter churn", "C", "bkchurn", null, "The butter churn.", 30],
-      ["bflour", "Flour sacks", "F", "bksacks", null, "Sacks of flour.", 30]
     ] },
     cocoakitchen: { name: "The chocolate kitchen", wall: "#F6EEE4", trim: "#8A5A3A", noBoard: true, pos: { S: [96, 262], R: [260, 262], G: [420, 262], M: [170, 560], O: [370, 560], P: [70, 420], B: [270, 410] }, stations: [
       ["pantry", "Fillings shelf", "P", "pantry", null, "The fillings shelf: what goes inside the bonbons.", 30],
@@ -16240,35 +16214,6 @@ ${p.sign}` };
     ${sk(`<rect x="0" y="20" width="520" height="10" style="fill:#7A4A32"/><rect x="226" y="40" width="68" height="60" style="fill:#F6E6B8"/>`, `<path d="M0 20 H520 M0 30 H520"/><rect x="226" y="40" width="68" height="60"/><path d="M260 40 v60 M226 70 h68"/>`)}
     ${[90, 430].map((x) => sk(`<path d="M${x} 30 v14"/><rect x="${x - 7}" y="44" width="14" height="18" rx="3" style="fill:#F3C969"/>`, `<path d="M${x} 30 v14"/><rect x="${x - 7}" y="44" width="14" height="18" rx="3"/>`)).join("")}`,
     // the chocolate kitchen: white tiles, a window, copper pans on a rail
-    // round 294 (Mel: "Interior of bakery look too similar to ice cream shop and winery"): the Honeybrook Bakehouse.
-    // The shop: terracotta and cream diamond tiles, red brick to dado height under cream plaster, dark oak beams with
-    // bunches of wheat hanging from them, pendant lamps, and a chalkboard of today's prices
-    bakery: () => `<rect width="520" height="640" style="fill:#EADBC4"/>
-    <g opacity=".75">${rows(13, (r) => rows(14, (c) => (r + c) % 2 ? `<path d="M${c * 40} ${170 + r * 36} l20 -18 l20 18 l-20 18z" style="fill:#D9A07A"/>` : ""))}</g>
-    <rect width="520" height="150" style="fill:#F4E9D6"/>
-    <g style="fill:#C9754E">${rows(4, (r) => rows(14, (c) => `<rect x="${c * 40 + r % 2 * 20 - 20}" y="${96 + r * 12}" width="37" height="10" rx="1"/>`))}</g><rect y="92" width="520" height="4" style="fill:#8A5A3A"/>
-    ${sk(`${[60, 200, 320, 460].map((x) => `<rect x="${x - 7}" y="0" width="14" height="92" style="fill:#6B4A36"/>`).join("")}<rect x="0" y="0" width="520" height="10" style="fill:#5E4030"/>`, `${[60, 200, 320, 460].map((x) => `<rect x="${x - 7}" y="0" width="14" height="92"/>`).join("")}`)}
-    <g pointer-events="none">${[[100, 10], [160, 10], [380, 10], [420, 10]].map(([x, y]) => `<path d="M${x} ${y} v14" style="stroke:#8A6A4E" stroke-width="1"/><g transform="translate(${x} ${y + 14})">${[-6, -2, 2, 6].map((d) => `<path d="M${d * 0.6} 0 q${d} 14 ${d * 1.2} 30" fill="none" style="stroke:#D9B060" stroke-width="2.4"/><ellipse cx="${d * 1.2}" cy="32" rx="2" ry="5" style="fill:#E3C27A"/>`).join("")}</g>`).join("")}
-      ${[130, 390].map((x) => `<path d="M${x} 10 v26" style="stroke:#3B3530" stroke-width="1"/><path d="M${x - 12} 46 q12 -14 24 0z" style="fill:#5E7A6A"/><ellipse class="wglow" cx="${x}" cy="47" rx="6" ry="3" style="fill:#FFE6A0"/>`).join("")}</g>
-    ${sk(`<rect x="216" y="20" width="88" height="62" rx="3" style="fill:#3E4A43"/><rect x="212" y="16" width="96" height="70" rx="4" fill="none" style="stroke:#A8754F" stroke-width="4"/>`, `<rect x="212" y="16" width="96" height="70" rx="4"/>`)}
-    <g font-family="Klee One,serif" font-weight="600" pointer-events="none"><text x="260" y="34" text-anchor="middle" font-size="9.5" fill="#F3C969">fresh today</text>
-      ${[["loaf", 5], ["croissant", 6], ["bun", 5], ["turnover", 5], ["scone", 5], ["focaccia", 6]].map(([n, p], i) => `<text x="${222 + i % 2 * 44}" y="${48 + Math.floor(i / 2) * 11}" font-size="7" fill="#F6EFE3">${n} ${p}</text>`).join("")}</g>
-    ${plant(30, 612, 0.9)}`,
-    // the bakehouse: worn flagstones dusted with flour, whitewashed brick, a long shelf of flour and sugar jars, copper
-    // pans, the bread peel on its hook and a big kitchen clock
-    bakehouse: () => `<rect width="520" height="640" style="fill:#D9D0C2"/>
-    <g opacity=".7" style="stroke:#BDB3A4" stroke-width="1.4" fill="none">${rows(9, (r) => rows(6, (c) => `<rect x="${c * 90 + r % 2 * 45 - 45}" y="${150 + r * 56}" width="86" height="52" rx="8"/>`))}</g>
-    <g filter="url(#wash)" opacity=".45">${[[180, 470, 90, 40], [400, 300, 60, 24], [90, 360, 50, 22]].map(([x, y, rx, ry]) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:#FFFDF6"/>`).join("")}</g>
-    <rect width="520" height="150" style="fill:#F2EEE6"/><g opacity=".5" style="fill:#E3DCCF">${rows(11, (r) => rows(14, (c) => `<rect x="${c * 40 + r % 2 * 20 - 20}" y="${r * 13}" width="37" height="11" rx="1"/>`))}</g><rect y="138" width="520" height="12" style="fill:#8A5A3A" opacity=".9"/>${skirting}
-    ${sk(
-      `<rect x="150" y="70" width="190" height="7" rx="1" style="fill:#A8754F"/>${[0, 1, 2, 3, 4].map((i) => `<rect x="${160 + i * 36}" y="${46}" width="22" height="24" rx="4" style="fill:#EAF2F5" opacity=".9"/><rect x="${162 + i * 36}" y="${56}" width="18" height="12" rx="2" style="fill:${["#F4EEE3", "#FFFDF6", "#C98A4A", "#E3C27A", "#F4EEE3"][i]}"/>`).join("")}`,
-      `<rect x="150" y="70" width="190" height="7" rx="1"/>${[0, 1, 2, 3, 4].map((i) => `<rect x="${160 + i * 36}" y="46" width="22" height="24" rx="4"/>`).join("")}`
-    )}
-    ${sk(
-      `<circle cx="390" cy="56" r="20" style="fill:#FFFDF6"/><path d="M390 56 v-12 M390 56 h9" style="stroke:var(--line)" stroke-width="1.6"/>${[0, 1, 2].map((i) => `<circle cx="${436 + i * 24}" cy="${60 + i % 2 * 6}" r="${11 - i}" style="fill:#C8763E"/>`).join("")}`,
-      `<circle cx="390" cy="56" r="20"/>${[0, 1, 2].map((i) => `<circle cx="${436 + i * 24}" cy="${60 + i % 2 * 6}" r="${11 - i}"/><path d="M${436 + i * 24} ${49 + i % 2 * 6} v-10" />`).join("")}`
-    )}
-    ${sk(`<rect x="70" y="20" width="10" height="80" rx="3" style="fill:#B98A5A"/><ellipse cx="75" cy="106" rx="24" ry="12" style="fill:#C9A27E"/>`, `<rect x="70" y="20" width="10" height="80" rx="3"/><ellipse cx="75" cy="106" rx="24" ry="12"/>`)}`,
     cocoakitchen: () => `<rect width="520" height="640" style="fill:#F2EBE2"/>
     <g opacity=".5">${rows(12, (r) => rows(13, (c) => (r + c) % 2 ? `<rect x="${c * 40}" y="${150 + r * 42}" width="40" height="42" style="fill:#E6D9C8"/>` : ""))}</g>
     ${wallBase("#F6EEE4", "#8A5A3A")}<g opacity=".35" style="stroke:#D8C8B4">${rows(13, (i) => `<path d="M${i * 40} 0 V138"/>`)}${rows(4, (i) => `<path d="M0 ${i * 36 + 18} H520"/>`)}</g>${skirting}
@@ -16986,10 +16931,10 @@ ${p.sign}` };
   function award(F2, list11) {
     const first = !Array.isArray(F2.trophies);
     if (first) F2.trophies = [];
-    const have3 = new Set(F2.trophies.map((t2) => t2.id)), now6 = Date.now(), fresh3 = [];
+    const have2 = new Set(F2.trophies.map((t2) => t2.id)), now5 = Date.now(), fresh3 = [];
     list11.forEach((m, i) => {
-      if (have3.has(m.id)) return;
-      const t2 = { ...m, at: now6 + i, book: false };
+      if (have2.has(m.id)) return;
+      const t2 = { ...m, at: now5 + i, book: false };
       F2.trophies.push(t2);
       fresh3.push(t2);
     });
@@ -16997,14 +16942,14 @@ ${p.sign}` };
     const moved = shown.slice(PEDESTALS);
     moved.forEach((t2) => {
       t2.book = true;
-      t2.bookAt = now6;
+      t2.bookAt = now5;
     });
     return { fresh: fresh3, first, moved };
   }
   var onPedestals = (F2) => (F2.trophies || []).filter((t2) => !t2.book).sort((a, b) => b.at - a.at).slice(0, PEDESTALS);
   var inBook2 = (F2) => (F2.trophies || []).filter((t2) => t2.book).sort((a, b) => b.at - a.at);
   function nextUp(c) {
-    const rows2 = [], row14 = (label2, have3, need3) => rows2.push({ label: label2, have: have3, need: need3 });
+    const rows2 = [], row14 = (label2, have2, need3) => rows2.push({ label: label2, have: have2, need: need3 });
     const q = TH.quests.find((t2) => (c.F.totalQuests || 0) < t2);
     if (q) row14(`${fmt(q)} quests`, c.F.totalQuests || 0, q);
     Object.entries(APPS).forEach(([k2, a]) => {
@@ -18134,8 +18079,8 @@ ${p.sign}` };
       }
       h3 += `<p class="muted">You have ${F2.coins} coins. Ma Ma does the watering and the picking. Trees and flowers last for their seasons, then the spot needs replanting.</p>`;
     } else if (tab === "fruit") {
-      const have3 = fruit.filter((id) => o.stock[id] > 0);
-      h3 += have3.length ? `<ul class="hlist wlist">${have3.map((id) => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(fruitName(id, 2)[0].toUpperCase() + fruitName(id, 2).slice(1))}</b><small>${o.stock[id]} on the shelf</small></span><button class="btn small primary" data-or="take" data-k="${id}">Take one</button>${o.stock[id] > 1 ? `<button class="btn small alt" data-or="takeall" data-k="${id}">All</button>` : ""}</li>`).join("")}</ul>` : `<p class="muted">${o.trees.some(Boolean) ? "Nothing picked yet. Ma Ma picks the fruit as soon as it's ripe." : "No fruit yet. Plant some trees (the Plant tab) and Ma Ma will pick the fruit once it's ripe."}</p>`;
+      const have2 = fruit.filter((id) => o.stock[id] > 0);
+      h3 += have2.length ? `<ul class="hlist wlist">${have2.map((id) => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(fruitName(id, 2)[0].toUpperCase() + fruitName(id, 2).slice(1))}</b><small>${o.stock[id]} on the shelf</small></span><button class="btn small primary" data-or="take" data-k="${id}">Take one</button>${o.stock[id] > 1 ? `<button class="btn small alt" data-or="takeall" data-k="${id}">All</button>` : ""}</li>`).join("")}</ul>` : `<p class="muted">${o.trees.some(Boolean) ? "Nothing picked yet. Ma Ma picks the fruit as soon as it's ripe." : "No fruit yet. Plant some trees (the Plant tab) and Ma Ma will pick the fruit once it's ripe."}</p>`;
       h3 += `<p class="muted">Fruit can go to the wine shop's fruit crate, or to Maple.</p>`;
     } else {
       const ids = Object.keys(FLOWERS).filter((id) => stemsOf(o, id) > 0);
@@ -18293,7 +18238,7 @@ ${p.sign}` };
   }
   var kindsOut = (st6) => Object.keys(st6.goods).filter((id) => st6.goods[id] > 0).length + Object.keys(st6.wine).filter((id) => st6.wine[id].n > 0).length;
   function putOut(F2, id, n = 99) {
-    const st6 = stallState(F2), have3 = (F2.inv || {})[id] || 0, k = Math.min(n, have3);
+    const st6 = stallState(F2), have2 = (F2.inv || {})[id] || 0, k = Math.min(n, have2);
     if (!k || !stallGood(id) || !(st6.goods[id] > 0) && kindsOut(st6) >= STALL_KINDS) return 0;
     F2.inv[id] -= k;
     if (F2.inv[id] <= 0) delete F2.inv[id];
@@ -18579,18 +18524,18 @@ Marcus and Angellina`
     const it = hp.items.find((x) => typeof x === "string") || hp.items[0];
     return (typeof it === "object" ? `bottle of ${it.wine}` : (ITEMS[it] || { n: "treats" }).n).replace(/^(A|An) /, "").toLowerCase();
   };
-  function sendHamper(F2, id, to, now6) {
+  function sendHamper(F2, id, to, now5) {
     const r = RECIPS.find((x2) => x2.id === to), hp = (xmasState(F2).hampers || []).find((h3) => h3.id === id);
     if (!r || !hp || !((F2.inv || {})[id] > 0)) return null;
     F2.inv[id]--;
     if (F2.inv[id] <= 0) delete F2.inv[id];
-    const x = xmasState(F2), M4 = 6e4, at9 = now6 + (r.kind === "family" ? 10 * M4 : r.kind === "village" ? 30 * M4 : 864e5);
-    x.replies = [...x.replies || [], { id: `hreply-${to}-${now6}`, to, hamper: id, at: at9, order: r.kind === "village" && hash(id + to) % 2 === 0 }].slice(-40);
+    const x = xmasState(F2), M3 = 6e4, at9 = now5 + (r.kind === "family" ? 10 * M3 : r.kind === "village" ? 30 * M3 : 864e5);
+    x.replies = [...x.replies || [], { id: `hreply-${to}-${now5}`, to, hamper: id, at: at9, order: r.kind === "village" && hash(id + to) % 2 === 0 }].slice(-40);
     x.sent = (x.sent || 0) + 1;
     return { r, hp };
   }
-  function hamperMail(F2, now6) {
-    return (xmasState(F2).replies || []).filter((p) => p.at <= now6).map((p) => {
+  function hamperMail(F2, now5) {
+    return (xmasState(F2).replies || []).filter((p) => p.at <= now5).map((p) => {
       const r = RECIPS.find((x) => x.id === p.to) || { n: "someone" }, hp = (xmasState(F2).hampers || []).find((h3) => h3.id === p.hamper) || { name: "Honeybrook", items: [] }, i = firstName(hp);
       const body2 = r.kind === "family" ? FAM_NOTE[r.id](i, hp) : r.kind === "friend" ? `${r.body(i)}
 
@@ -18602,9 +18547,9 @@ ${r.n}`;
       return { id: p.id, from: "postie", at: p.at, title: r.kind === "friend" ? `A postcard from ${r.n.replace(/ at .*$/, "")}` : `Thank you from ${r.n}`, body: body2 };
     });
   }
-  function collectReplies(F2, now6) {
+  function collectReplies(F2, now5) {
     const x = xmasState(F2), out = [];
-    (x.replies || []).filter((p) => p.at <= now6 && !p.done).forEach((p) => {
+    (x.replies || []).filter((p) => p.at <= now5 && !p.done).forEach((p) => {
       p.done = true;
       const r = RECIPS.find((y) => y.id === p.to) || {};
       if (r.gift) {
@@ -19019,21 +18964,21 @@ ${r.n}`;
   var cache = {};
   function bookingsFor(sunday) {
     if (cache[sunday]) return cache[sunday];
-    const out = [], used = /* @__PURE__ */ new Set(), take4 = (p) => {
+    const out = [], used = /* @__PURE__ */ new Set(), take3 = (p) => {
       if (p.ids.some((id) => used.has(id))) return false;
       p.ids.forEach((id) => used.add(id));
       out.push({ ...p, size: p.ids.length });
       return true;
     };
     const mday = sunday.slice(5, 7) === "05" && +sunday.slice(8) >= 8 && +sunday.slice(8) <= 14;
-    if (mday) take4({ ids: ["mum", "mama", "dad", "gonggong", "marcus", "angelina", "darren"], family: true, mothers: true });
-    else take4(FAMILY_TURNS[weekNo(sunday) % FAMILY_TURNS.length]);
-    if (!mday && hash(sunday + ":bday") % 3 === 0) take4(BIRTHDAY);
+    if (mday) take3({ ids: ["mum", "mama", "dad", "gonggong", "marcus", "angelina", "darren"], family: true, mothers: true });
+    else take3(FAMILY_TURNS[weekNo(sunday) % FAMILY_TURNS.length]);
+    if (!mday && hash(sunday + ":bday") % 3 === 0) take3(BIRTHDAY);
     const order3 = PARTIES.map((p, i) => [hash(sunday + ":" + i), p]).sort((a, b) => a[0] - b[0]).map(([, p]) => p);
     const want = 9 + hash(sunday) % 3;
     for (const p of order3) {
       if (out.reduce((n, b) => n + b.size, 0) + p.ids.length > Math.min(want + 1, LUNCH.seats)) continue;
-      take4(p);
+      take3(p);
       if (out.reduce((n, b) => n + b.size, 0) >= want) break;
     }
     out.forEach((b, i) => {
@@ -20360,14 +20305,14 @@ ${r.n}`;
   function stockFridge(F2, id, n, from, orch) {
     const s = scoopState(F2);
     if (from === "bag") {
-      const have3 = (F2.inv || {})[id] || 0;
-      n = Math.min(n, have3);
+      const have2 = (F2.inv || {})[id] || 0;
+      n = Math.min(n, have2);
       if (n <= 0) return 0;
       F2.inv[id] -= n;
       if (F2.inv[id] <= 0) delete F2.inv[id];
     } else {
-      const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id, have3 = orch.stock[key] || 0;
-      n = Math.min(n, have3);
+      const key = id.startsWith("fl_") ? "stem:" + id.slice(3) : id, have2 = orch.stock[key] || 0;
+      n = Math.min(n, have2);
       if (n <= 0) return 0;
       orch.stock[key] -= n;
       if (orch.stock[key] <= 0) delete orch.stock[key];
@@ -20376,8 +20321,8 @@ ${r.n}`;
     return n;
   }
   function takeBack2(store, id, n, F2, orch) {
-    const have3 = store[id] || 0;
-    n = Math.min(n, have3);
+    const have2 = store[id] || 0;
+    n = Math.min(n, have2);
     if (n <= 0) return null;
     store[id] -= n;
     if (store[id] <= 0) delete store[id];
@@ -20469,13 +20414,13 @@ ${r.n}`;
     return { coins, fmt: fmt7, r, dipped };
   }
   function scoopTick(F2, opts = {}) {
-    const s = scoopState(F2), now6 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now6, now6 - 864e5);
+    const s = scoopState(F2), now5 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now5, now5 - 864e5);
     if (s.batch) {
       s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB;
       s.batch = null;
     }
-    const out = { coins: 0, n: 0, mins: 0, box: 0, churned: finishChurn(s, now6) };
-    for (let at9 = from + 6e4; at9 <= now6; at9 += 6e4) {
+    const out = { coins: 0, n: 0, mins: 0, box: 0, churned: finishChurn(s, now5) };
+    for (let at9 = from + 6e4; at9 <= now5; at9 += 6e4) {
       const sg = new Date(at9 + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm12 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
       const sale = saleMinute(s, day, hm12, opts);
       if (sale && sale.box) out.box += sale.coins;
@@ -20844,9 +20789,9 @@ ${r.n}`;
       return `<li><span class="wpic">${dot(r ? r.col : "#EEE")}</span><span class="wtxt"><b>${esc(r ? r.name : id)}</b><small>${n} scoop${n === 1 ? "" : "s"} left</small></span></li>`;
     }).join("")}</ul>
     <p class="muted">${trolleyMelted(s) ? "The ice packs have given up: what's left has melted." : `Sold so far: ${tr.n} (${tr.coins} ${coin2()}).`} Tap people outdoors to offer them one.</p><div class="actions"><button class="btn small primary" data-gtrolley="back">Put it away</button><button class="btn alt small" data-close="1">Close</button></div>`;
-    const have3 = s.recipes.filter((r) => s.tubs[r.id] > 0);
-    if (!have3.length) return h3 + `<p class="muted">No tubs to load: make some in the kitchen first.</p>` + shut4;
-    return h3 + `<p class="eyebrow" style="margin:8px 0 6px">Pick up to ${TROLLEY.flavours} (${sel.length} chosen)</p><div class="gchips">${have3.map((r) => `<button class="gchip${sel.includes(r.id) ? " on" : ""}" data-gtsel="${esc(r.id)}" aria-pressed="${sel.includes(r.id)}">${dot(r.col)} ${esc(r.name)} <small>(${s.tubs[r.id]})</small></button>`).join("")}</div>
+    const have2 = s.recipes.filter((r) => s.tubs[r.id] > 0);
+    if (!have2.length) return h3 + `<p class="muted">No tubs to load: make some in the kitchen first.</p>` + shut4;
+    return h3 + `<p class="eyebrow" style="margin:8px 0 6px">Pick up to ${TROLLEY.flavours} (${sel.length} chosen)</p><div class="gchips">${have2.map((r) => `<button class="gchip${sel.includes(r.id) ? " on" : ""}" data-gtsel="${esc(r.id)}" aria-pressed="${sel.includes(r.id)}">${dot(r.col)} ${esc(r.name)} <small>(${s.tubs[r.id]})</small></button>`).join("")}</div>
     <div class="actions"><button class="btn primary" data-gtrolley="go" ${sel.length ? "" : "disabled"}>Load up and head out</button><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   var DELIVERY = { fee: 2, scoop: 0.045, cocoa: 0.036, winery: 0.04 };
@@ -21293,7 +21238,7 @@ ${r.n}`;
       const r = m.recipes.find((x) => x.id === m.cupId) || { name: "Mulled wine", adds: [] };
       return h3 + `<p class="sub">${m.cups} cups of ${esc(r.name)} left in the pot, ${m.price} coins a cup. Celeste ladles it out at the counter, and out on the terrace.</p>` + shut6;
     }
-    const reds = v.shelf.filter(isBase), have3 = Object.keys(ADDS).filter((a) => got(F2, m, a) > 0), pick5 = st6.adds || [];
+    const reds = v.shelf.filter(isBase), have2 = Object.keys(ADDS).filter((a) => got(F2, m, a) > 0), pick5 = st6.adds || [];
     h3 += `<p class="sub">A bottle of your red, and two or three things to mull it with. Half an hour on a low heat, then ten cups.</p>`;
     if (m.recipes.length) h3 += `<p class="eyebrow" style="margin:10px 0 6px">Make one you know</p><ul class="hlist wlist">${m.recipes.map((r) => {
       const ok = r.adds.every((a) => got(F2, m, a) > 0) && reds.length;
@@ -21301,7 +21246,7 @@ ${r.n}`;
     }).join("")}</ul>`;
     if (!reds.length) return h3 + `<p class="muted">You'll need a bottle of red on the shelves for the base: Merlot-ish house red, Tempranillo or Pinot.</p>` + shut6;
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">The wine</p><div class="gchips">${reds.map((s) => `<button class="gchip${st6.base === s.id ? " on" : ""}" data-mull="base:${s.id}" aria-pressed="${st6.base === s.id}">${esc(s.name)} (${s.n})</button>`).join("")}</div>`;
-    h3 += `<p class="eyebrow" style="margin:10px 0 6px">Mull it with (two or three)</p>${have3.length ? `<div class="gchips">${have3.map((a) => `<button class="gchip${pick5.includes(a) ? " on" : ""}" data-mull="add:${a}" aria-pressed="${pick5.includes(a)}"><i class="mulldot" style="background:${ADDS[a].col}"></i>${esc(ADDS[a].n)} (${got(F2, m, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing to mull with yet: spices from Hana's market; oranges, lemons and apples from Ma Ma's orchard; raspberries; honey from the farm.</p>`}`;
+    h3 += `<p class="eyebrow" style="margin:10px 0 6px">Mull it with (two or three)</p>${have2.length ? `<div class="gchips">${have2.map((a) => `<button class="gchip${pick5.includes(a) ? " on" : ""}" data-mull="add:${a}" aria-pressed="${pick5.includes(a)}"><i class="mulldot" style="background:${ADDS[a].col}"></i>${esc(ADDS[a].n)} (${got(F2, m, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing to mull with yet: spices from Hana's market; oranges, lemons and apples from Ma Ma's orchard; raspberries; honey from the farm.</p>`}`;
     h3 += rackHTML(F2, m);
     const ready2 = st6.base && pick5.length >= MULL.min && pick5.length <= MULL.max, known2 = ready2 && m.recipes.some((r) => r.id === keyOf2(pick5));
     return h3 + `<div class="actions"><button class="btn primary" data-mull="go" ${ready2 ? "" : "disabled"}>${ready2 ? known2 ? `Mull ${esc(mullName(pick5))} again` : "Into the pot: something new" : "Into the pot"}</button></div>` + shut6;
@@ -21777,7 +21722,7 @@ ${r.n}`;
     return `${BOTTLES} bottles of ${nm6}, into the cellar. Stock them on the shop shelves.`;
   }
   var RIDDLE = { day: 2, max: 5 };
-  var riddleDays = (c, now6 = Date.now()) => c && c.rack ? Math.min(RIDDLE.max, Math.floor((now6 - c.rack) / (24 * H))) : 0;
+  var riddleDays = (c, now5 = Date.now()) => c && c.rack ? Math.min(RIDDLE.max, Math.floor((now5 - c.rack) / (24 * H))) : 0;
   var canRiddle = (F2) => !!(F2.bellbird && F2.bellbird.riddle);
   function onRack(F2, id) {
     const c = vineState(F2).cellar.find((x) => x.id === id);
@@ -22277,8 +22222,8 @@ ${r.n}`;
     const v = vineState(F2);
     return `<span class="tape gingham" aria-hidden="true"></span><h2>Vineyard stall</h2><p class="sub">You have ${F2.coins} coins. Cuttings: ${grapeKinds(v).map((k) => `${v.cuttings[k]} ${gName(k)}`).join(", ")}. Grapes: ${grapeKinds(v).map((k) => `${v.grapes[k]} ${gName(k)}`).join(", ")} bunches.</p>
     <div class="items shop">${Object.keys(SHOP).map((id) => {
-      const it = SHOP[id], price = shopPrice(v, id), have3 = id === "grove" && !!v.grove || id === "grove2" && (!!v.grove2 || !v.grove) || id === "trellis" && v.rows.every((r, i) => r.trellis || i >= UPPER_ROWS && !v.lower) || id === "barrel" && v.barrels.length >= maxBarrels(F2) || id === "olive" && !!v.olive || id === "terrace" && !!v.terrace, off = have3 || F2.coins < price;
-      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c">${have3 ? "owned" : `<b>${price}</b> coins`}</span>${id === "terrace" ? `<span class="d">a third more customers</span>` : ""}</button>`;
+      const it = SHOP[id], price = shopPrice(v, id), have2 = id === "grove" && !!v.grove || id === "grove2" && (!!v.grove2 || !v.grove) || id === "trellis" && v.rows.every((r, i) => r.trellis || i >= UPPER_ROWS && !v.lower) || id === "barrel" && v.barrels.length >= maxBarrels(F2) || id === "olive" && !!v.olive || id === "terrace" && !!v.terrace, off = have2 || F2.coins < price;
+      return `<button class="item" data-vybuy="${id}" ${off ? "disabled" : ""}><span class="e">${stallIcon(id, off)}</span><span class="n">${esc(it.n)}</span><span class="c">${have2 ? "owned" : `<b>${price}</b> coins`}</span>${id === "terrace" ? `<span class="d">a third more customers</span>` : ""}</button>`;
     }).join("")}</div>
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -24125,65 +24070,6 @@ ${r.n}`;
         return sk(
           `${[[-24, 0, 26], [8, 0, 24], [-8, -26, 20]].map(([dx, dy, w]) => `<path d="M${x + dx - w / 2} ${y + dy} q-3 -26 ${w / 2} -30 q${w / 2} 4 ${w / 2} 30z" style="fill:#C9A27E"/>`).join("")}<ellipse cx="${x - 24}" cy="${y - 28}" rx="8" ry="3" style="fill:#6B4430"/>`,
           `${[[-24, 0, 26], [8, 0, 24], [-8, -26, 20]].map(([dx, dy, w]) => `<path d="M${x + dx - w / 2} ${y + dy} q-3 -26 ${w / 2} -30 q${w / 2} 4 ${w / 2} 30z"/>`).join("")}<path d="M${x - 30} ${y - 14} h12 M${x + 2} ${y - 12} h12" opacity=".5"/>`
-        );
-      // round 294: the Honeybrook Bakehouse (game/bakery.js): the shop's bread shelves and counter, and the bakehouse
-      case "bkshelves": {
-        const b = G2.bakery ? G2.bakery() : { stock: {} }, cols = { loaf: "#C98A4A", croissant: "#E3A857", cinnabun: "#B8743E", turnover: "#E8B86A", scone: "#E6C27A", focaccia: "#D9B060" };
-        const items = Object.keys(cols).flatMap((r) => Array.from({ length: Math.min(4, Math.ceil(((b.stock || {})[r] || 0) / 2)) }, () => cols[r])).slice(0, 15);
-        return sk(
-          `<rect x="${x - 56}" y="${y - 120}" width="112" height="120" rx="3" style="fill:#B98A5A"/><rect x="${x - 50}" y="${y - 114}" width="100" height="108" style="fill:#F6EBDD"/>${[0, 1, 2].map((r) => `<rect x="${x - 50}" y="${y - 80 + r * 34}" width="100" height="4" style="fill:#A8754F"/>`).join("")}
-        ${items.map((c, i) => `<ellipse cx="${x - 38 + i % 5 * 19}" cy="${y - 86 + Math.floor(i / 5) * 34}" rx="8" ry="5.5" style="fill:${c}"/>`).join("")}`,
-          `<rect x="${x - 56}" y="${y - 120}" width="112" height="120" rx="3"/><path d="M${x - 50} ${y - 80} h100 M${x - 50} ${y - 46} h100 M${x - 50} ${y - 12} h100"/>`
-        );
-      }
-      case "bkcounter": {
-        const b = G2.bakery ? G2.bakery() : { tin: 0 };
-        return sk(
-          `<rect x="${x - 90}" y="${y - 48}" width="180" height="48" rx="3" style="fill:#C9A27E"/><rect x="${x - 94}" y="${y - 54}" width="188" height="8" rx="2" style="fill:#A8754F"/><rect x="${x + 50}" y="${y - 70}" width="22" height="16" rx="3" style="fill:#9FC3D9"/>
-        <ellipse cx="${x - 30}" cy="${y - 58}" rx="16" ry="5" style="fill:#FFFDF6"/><ellipse cx="${x - 34}" cy="${y - 62}" rx="6" ry="4" style="fill:#E3A857"/><ellipse cx="${x - 24}" cy="${y - 62}" rx="6" ry="4" style="fill:#B8743E"/>${b.tin ? `<circle cx="${x + 61}" cy="${y - 72}" r="3" style="fill:#F3C969"/>` : ""}`,
-          `<rect x="${x - 90}" y="${y - 48}" width="180" height="48" rx="3"/><rect x="${x - 94}" y="${y - 54}" width="188" height="8" rx="2"/><rect x="${x + 50}" y="${y - 70}" width="22" height="16" rx="3"/><path d="M${x + 56} ${y - 70} h10" />`
-        );
-      }
-      case "bkoven": {
-        const b = G2.bakery ? G2.bakery() : {}, on = !!b.oven;
-        return sk(
-          `<path d="M${x - 70} ${y} V${y - 60} Q${x} ${y - 140} ${x + 70} ${y - 60} V${y}z" style="fill:#C9754E"/><path d="M${x - 30} ${y} V${y - 36} Q${x} ${y - 66} ${x + 30} ${y - 36} V${y}z" style="fill:#3B3530"/>${on ? `<ellipse class="glow" cx="${x}" cy="${y - 14}" rx="24" ry="9" style="fill:#F2A65A" opacity=".75"/>` : ""}<rect x="${x - 12}" y="${y - 138}" width="24" height="30" style="fill:#BDB3A4"/>`,
-          `<path d="M${x - 70} ${y} V${y - 60} Q${x} ${y - 140} ${x + 70} ${y - 60} V${y}z"/><path d="M${x - 30} ${y} V${y - 36} Q${x} ${y - 66} ${x + 30} ${y - 36} V${y}z"/><path d="M${x - 60} ${y - 40} h20 M${x + 40} ${y - 40} h20 M${x - 50} ${y - 80} h14 M${x + 36} ${y - 80} h14" opacity=".4"/>`
-        );
-      }
-      case "bkbench":
-        return sk(
-          `<rect x="${x - 110}" y="${y - 30}" width="220" height="30" rx="4" style="fill:#B98A5A"/><rect x="${x - 104}" y="${y - 44}" width="208" height="16" rx="6" style="fill:#E8A0A0"/>${[-70, 0, 70].map((d) => `<rect x="${x + d - 24}" y="${y - 60}" width="48" height="20" rx="8" style="fill:${d ? "#F3C969" : "#9FC3D9"}"/>`).join("")}<ellipse cx="${x + 140}" cy="${y - 30}" rx="26" ry="10" style="fill:#C9A27E"/><ellipse cx="${x + 140}" cy="${y - 34}" rx="10" ry="4" style="fill:#FFFDF6"/><ellipse cx="${x + 140}" cy="${y - 37}" rx="6" ry="3" style="fill:#E3A857"/>`,
-          `<rect x="${x - 110}" y="${y - 30}" width="220" height="30" rx="4"/><rect x="${x - 104}" y="${y - 44}" width="208" height="16" rx="6"/>${[-70, 0, 70].map((d) => `<rect x="${x + d - 24}" y="${y - 60}" width="48" height="20" rx="8"/>`).join("")}<ellipse cx="${x + 140}" cy="${y - 30}" rx="26" ry="10"/><path d="M${x + 140} ${y - 20} v20"/>`
-        );
-      case "bkmix":
-        return sk(
-          `<rect x="${x - 80}" y="${y - 34}" width="160" height="34" rx="3" style="fill:#E3C59F"/><ellipse cx="${x - 30}" cy="${y - 38}" rx="22" ry="8" style="fill:#FFFDF6"/><ellipse cx="${x - 30}" cy="${y - 40}" rx="16" ry="5" style="fill:#F3E2C0"/><rect x="${x + 14}" y="${y - 48}" width="40" height="8" rx="4" style="fill:#B98A5A"/><path d="M${x - 70} ${y - 30} q20 -6 40 0" fill="none" style="stroke:#FFFDF6" stroke-width="3" opacity=".7"/>`,
-          `<rect x="${x - 80}" y="${y - 34}" width="160" height="34" rx="3"/><ellipse cx="${x - 30}" cy="${y - 38}" rx="22" ry="8"/><rect x="${x + 14}" y="${y - 48}" width="40" height="8" rx="4"/><path d="M${x - 74} ${y} v10 M${x + 74} ${y} v10"/>`
-        );
-      case "bkproof": {
-        const b = G2.bakery ? G2.bakery() : { proof: [] }, n = (b.proof || []).length;
-        return sk(
-          `<rect x="${x - 40}" y="${y - 110}" width="80" height="110" rx="3" style="fill:#B98A5A"/>${[0, 1, 2].map((r) => `<rect x="${x - 34}" y="${y - 100 + r * 34}" width="68" height="22" rx="2" style="fill:${r < n ? "#F4C7CF" : "#E9DCC6"}"/>`).join("")}`,
-          `<rect x="${x - 40}" y="${y - 110}" width="80" height="110" rx="3"/>${[0, 1, 2].map((r) => `<rect x="${x - 34}" y="${y - 100 + r * 34}" width="68" height="22" rx="2"/>`).join("")}`
-        );
-      }
-      case "bkrack": {
-        const b = G2.bakery ? G2.bakery() : { rack: [] }, n = (b.rack || []).length;
-        return sk(
-          `<rect x="${x - 36}" y="${y - 110}" width="72" height="110" rx="2" style="fill:none"/>${[0, 1, 2, 3].map((r) => `<rect x="${x - 34}" y="${y - 100 + r * 26}" width="68" height="4" style="fill:#8A8A8A"/>${r < n ? [0, 1, 2].map((i) => `<ellipse cx="${x - 20 + i * 20}" cy="${y - 104 + r * 26}" rx="8" ry="4.5" style="fill:#C98A4A"/>`).join("") : ""}`).join("")}`,
-          `<path d="M${x - 36} ${y} V${y - 110} M${x + 36} ${y} V${y - 110}"/>${[0, 1, 2, 3].map((r) => `<path d="M${x - 34} ${y - 100 + r * 26} h68"/>`).join("")}`
-        );
-      }
-      case "bkchurn":
-        return sk(
-          `<path d="M${x - 18} ${y} l-4 -50 h44 l-4 50z" style="fill:#C9A27E"/><rect x="${x - 2}" y="${y - 74}" width="4" height="26" style="fill:#8A6A4E"/><ellipse cx="${x}" cy="${y - 50}" rx="22" ry="5" style="fill:#A8754F"/>`,
-          `<path d="M${x - 18} ${y} l-4 -50 h44 l-4 50z"/><path d="M${x - 20} ${y - 34} h40 M${x - 19} ${y - 16} h38" opacity=".5"/><ellipse cx="${x}" cy="${y - 50}" rx="22" ry="5"/>`
-        );
-      case "bksacks":
-        return sk(
-          `${[-26, 0, 26].map((d, i) => `<path d="M${x + d - 18} ${y} q-4 -40 4 -50 h28 q8 10 4 50z" style="fill:${i === 1 ? "#F4EEE3" : "#EDE3D2"}"/>`).join("")}`,
-          `${[-26, 0, 26].map((d) => `<path d="M${x + d - 18} ${y} q-4 -40 4 -50 h28 q8 10 4 50z"/><path d="M${x + d - 6} ${y - 30} h12" opacity=".5"/>`).join("")}`
         );
       case "roaster":
         return sk(
@@ -29091,7 +28977,7 @@ Quests finished today: ${S4.doneIds.length}`;
     vineyard: [[52, 126, 172, 226], [318, 80, 462, 212], [58, 388, 122, 440], [228, 200, 272, 252]],
     lowervine: [[40, 30, 212, 130], [64, 142, 156, 238], [0, 596, 520, 640]],
     // round 261: the old press (the stream's crossed by the footbridge)
-    green: [[30, 14, 188, 108], [0, 596, 520, 640], [58, 420, 242, 520], [322, 110, 438, 256], [40, 112, 166, 198], [174, 124, 244, 190]],
+    green: [[0, 596, 520, 640], [58, 420, 242, 520], [322, 110, 438, 256], [40, 112, 166, 198], [174, 124, 244, 190]],
     // pond, bandstand, allotments, shed
     stables: [[0, 596, 520, 640], [194, 116, 446, 232], [18, 128, 150, 230], [154, 192, 198, 224], [230, 354, 500, 574], [32, 452, 188, 548], [56, 386, 106, 416]],
     bramcot: [[0, 0, 520, 200], [56, 284, 152, 362], [250, 280, 350, 342], [376, 204, 486, 268], [478, 196, 520, 290]],
@@ -30703,10 +30589,10 @@ ${history ? "Conversation so far:\n" + history + "\n" : ""}Mel: ${text}`;
   function revenuePanel(F2) {
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>Revenue</h2>`;
     if (!st3.data) return h3 + (st3.error ? `<p class="sub">${esc(CLIENT_ERRORS[st3.error] || "Couldn't reach Chord just now.")}</p><div class="actions"><button class="btn alt small" data-rv="refresh">Try again</button></div>` : `<p class="sub">Counting it up from Chord…</p>`);
-    const d = st3.data, c = d.currency, ms = Object.keys(d.byMonth), now6 = d.byMonth[ms[ms.length - 1]], target = Number(F2.revTarget) || 0;
-    const pct = target ? Math.min(100, Math.round(100 * now6 / target)) : 0, retTotal = Number(d.retTotal) || d.retainers.reduce((s, r) => s + (Number(r.monthly_amount) || 0), 0);
+    const d = st3.data, c = d.currency, ms = Object.keys(d.byMonth), now5 = d.byMonth[ms[ms.length - 1]], target = Number(F2.revTarget) || 0;
+    const pct = target ? Math.min(100, Math.round(100 * now5 / target)) : 0, retTotal = Number(d.retTotal) || d.retainers.reduce((s, r) => s + (Number(r.monthly_amount) || 0), 0);
     h3 += `<p class="sub">Studio income from Chord: paid invoices, by the month they were paid${st3.busy ? " · refreshing…" : ""}.</p>
-    <div class="rhero"><p class="rbig">${money3(now6, c)}</p><p class="muted">${esc((/* @__PURE__ */ new Date(ms[ms.length - 1] + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }))} so far${target ? ` · ${pct}% of your ${money3(target, c)} target` : ""}</p>
+    <div class="rhero"><p class="rbig">${money3(now5, c)}</p><p class="muted">${esc((/* @__PURE__ */ new Date(ms[ms.length - 1] + "-01T00:00:00Z")).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" }))} so far${target ? ` · ${pct}% of your ${money3(target, c)} target` : ""}</p>
       ${target ? `<span class="clbar rprog"><i style="width:${pct}%"></i></span>` : ""}
       ${st3.editing || !target ? `<form class="row rtarget" id="rvForm"><label for="rvIn" class="muted">Monthly target</label><input id="rvIn" type="number" min="0" step="50" inputmode="numeric" value="${target || ""}" placeholder="e.g. 6000"><button class="btn small" type="submit">Set</button></form>` : `<button class="btn alt small" data-rv="edit">Change target</button>`}</div>
     ${chart(d, target)}
@@ -31248,11 +31134,11 @@ ${e.text}`, { modelTier: "default", cache: false });
       return h3 + `<h2>${open2 ? `From you, ${esc(shortWhen(e.at))}` : "A sealed letter"}</h2>${open2 ? `<div class="lletter mine">${para(e.text)}</div>` : `<p class="muted">Sealed until ${esc(longDate(e.deliver))}. No peeking.</p>`}
       <div class="actions">${open2 ? `<button class="btn alt small" data-lt="journal" data-id="${esc(e.id)}" ${e.journaled ? "disabled" : ""}>${e.journaled ? "In your journal" : "Save to my journal"}</button>` : ""}<button class="btn alt small" data-lt="home">Back</button></div>`;
     }
-    const u = universe(), f5 = future(), now6 = Date.now(), news = arrived();
+    const u = universe(), f5 = future(), now5 = Date.now(), news = arrived();
     h3 += `<h2>Letters</h2><p class="sub">Write to the universe, or to the you of later on.</p>
     <div class="vmenu"><button class="btn primary" data-lt="universe">Dear Universe…</button><button class="btn alt" data-lt="future">Dear future me…</button></div>`;
     if (news.length) h3 += `<p class="eyebrow" style="margin-top:14px">Arrived</p><ul class="hlist lnew">${news.map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${e.kind === "universe" ? "A letter from the universe" : "A letter from your past self"}</b><small>${e.kind === "universe" ? "in reply to " + esc(shortWhen(e.at)) : "written " + esc(shortWhen(e.at))}</small></span><span class="hbadge now">new</span></li>`).join("")}</ul>`;
-    if (u.length) h3 += `<p class="eyebrow" style="margin-top:14px">Pen pals with the universe</p><ul class="hlist">${u.slice().reverse().slice(0, 12).map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${esc(e.text.split("\n")[0].slice(0, 60))}</b><small>${esc(shortWhen(e.at))} · ${e.reply && e.reply.due <= now6 ? "answered" : "on its way"}</small></span></li>`).join("")}</ul>`;
+    if (u.length) h3 += `<p class="eyebrow" style="margin-top:14px">Pen pals with the universe</p><ul class="hlist">${u.slice().reverse().slice(0, 12).map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${esc(e.text.split("\n")[0].slice(0, 60))}</b><small>${esc(shortWhen(e.at))} · ${e.reply && e.reply.due <= now5 ? "answered" : "on its way"}</small></span></li>`).join("")}</ul>`;
     if (f5.length) h3 += `<p class="eyebrow" style="margin-top:14px">To future me</p><ul class="hlist">${f5.slice().reverse().map((e) => `<li data-lt="open" data-id="${esc(e.id)}" role="button" tabindex="0"><span><b>${e.deliver <= dayKey() ? esc(e.text.split("\n")[0].slice(0, 60)) : "Sealed"}</b><small>written ${esc(shortWhen(e.at))} · ${e.deliver <= dayKey() ? "arrived " : "arrives "}${esc(longDate(e.deliver))}</small></span></li>`).join("")}</ul>`;
     return h3 + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
@@ -33145,7 +33031,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return h3;
   }
   function counterBonbons(F2, pk) {
-    const c = cocoaState(F2), shown = onDisplay2(c), have3 = shown.reduce((a, b) => a + c.trays[b.id], 0);
+    const c = cocoaState(F2), shown = onDisplay2(c), have2 = shown.reduce((a, b) => a + c.trays[b.id], 0);
     if (!c.bonbons.length) return giveSpecials(c);
     if (pk) {
       const n = pickTotal(pk.sel), wine = pk.kind === "pair" && pairShelf(F2).find((b) => b.id === pk.k);
@@ -33157,17 +33043,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       <div class="actions"><button class="btn small primary" data-cc="pkgo" ${n === pk.size ? "" : "disabled"}>Pack it</button>${n < pk.size ? `<button class="btn small alt" data-cc="pkfill">Fill the rest for me</button>` : ""}<button class="btn small alt" data-cc="pkcancel">Cancel</button></div>`;
     }
     return `<p class="eyebrow" style="margin:12px 0 6px">Bonbons</p>${shown.length ? `<div class="gchips">${shown.map((b) => `<button class="gchip" data-cc="eatbb" data-k="${esc(b.id)}">${dot2(KINDS2[b.shell].col)}<span>${esc(b.name)}</span></button>`).join("")}</div>` : `<p class="muted">The display case is empty.</p>`}
-    <div class="actions"><button class="btn small alt" data-cc="pkopen" data-k="box" data-n="4" ${have3 >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="pkopen" data-k="box" data-n="9" ${have3 >= 9 ? "" : "disabled"}>Gift box of 9</button>${ccUp(c, "wrap") ? `<button class="btn small alt" data-cc="pkopen" data-k="grand" data-n="${BOX16}" ${have3 >= BOX16 ? "" : "disabled"}>Grand box of 16</button>` : ""}</div>${pairing(F2, have3)}${giveSpecials(c)}`;
+    <div class="actions"><button class="btn small alt" data-cc="pkopen" data-k="box" data-n="4" ${have2 >= 4 ? "" : "disabled"}>Gift box of 4</button><button class="btn small alt" data-cc="pkopen" data-k="box" data-n="9" ${have2 >= 9 ? "" : "disabled"}>Gift box of 9</button>${ccUp(c, "wrap") ? `<button class="btn small alt" data-cc="pkopen" data-k="grand" data-n="${BOX16}" ${have2 >= BOX16 ? "" : "disabled"}>Grand box of 16</button>` : ""}</div>${pairing(F2, have2)}${giveSpecials(c)}`;
   }
-  function pairing(F2, have3) {
+  function pairing(F2, have2) {
     const wines = pairShelf(F2);
     if (!wines.length) return !F2.vine ? "" : `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">No bottles on the wine shop's shelves to pair. Bottle some at the cellar first.</p>`;
-    return `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">A bottle from the wine shop and 4 bonbons from the case, to give. You can also pack them in the gift shop's wine corner, straight onto the display.</p><div class="actions">${wines.map((b) => `<button class="btn small alt" data-cc="pkopen" data-k="pair:${esc(b.id)}" data-n="4" ${have3 >= 4 ? "" : "disabled"}>With ${esc(b.name)}</button>`).join("")}</div>`;
+    return `<p class="eyebrow" style="margin:12px 0 6px">Wine pairing box</p><p class="muted">A bottle from the wine shop and 4 bonbons from the case, to give. You can also pack them in the gift shop's wine corner, straight onto the display.</p><div class="actions">${wines.map((b) => `<button class="btn small alt" data-cc="pkopen" data-k="pair:${esc(b.id)}" data-n="4" ${have2 >= 4 ? "" : "disabled"}>With ${esc(b.name)}</button>`).join("")}</div>`;
   }
   function giveSpecials(c) {
-    const have3 = Object.values(SPECIALS2).filter((x) => c.specials[x.id] > 0);
-    if (!have3.length) return "";
-    return `<div class="actions">${have3.map((x) => `<button class="btn small alt" data-cc="takesp" data-k="${x.id}">${icon(x.id, 18)} ${esc(x.n)} to give (${c.specials[x.id]})</button>`).join("")}</div>`;
+    const have2 = Object.values(SPECIALS2).filter((x) => c.specials[x.id] > 0);
+    if (!have2.length) return "";
+    return `<div class="actions">${have2.map((x) => `<button class="btn small alt" data-cc="takesp" data-k="${x.id}">${icon(x.id, 18)} ${esc(x.n)} to give (${c.specials[x.id]})</button>`).join("")}</div>`;
   }
   function cocoaNews(c, day, hm12) {
     if (hm12 < CLOSE2 || c.reported === day) return null;
@@ -33313,8 +33199,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   };
   var boxVal = (F2, c) => {
     const v = c && c.pairVals || [];
-    const have3 = (F2.inv || {}).pairbox || 0;
-    if (v.length > have3) v.splice(0, v.length - have3);
+    const have2 = (F2.inv || {}).pairbox || 0;
+    if (v.length > have2) v.splice(0, v.length - have2);
     return v.length ? v.pop() : 18 + 4 * (c && c.prices.bonbon || 4);
   };
   function putOutPairs(F2, c, n = 99) {
@@ -33332,8 +33218,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (!g18.pairs.length) return 0;
     const val = g18.pairs.pop();
     if (c) {
-      const have3 = (F2.inv || {}).pairbox || 0;
-      c.pairVals = [...have3 ? (c.pairVals || []).slice(-have3) : [], val];
+      const have2 = (F2.inv || {}).pairbox || 0;
+      c.pairVals = [...have2 ? (c.pairVals || []).slice(-have2) : [], val];
     }
     F2.inv.pairbox = (F2.inv.pairbox || 0) + 1;
     return 1;
@@ -33449,12 +33335,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     <div class="actions"><button class="btn small primary" data-gs="pgo" ${n === 4 ? "" : "disabled"}>Pack and put out</button>${n < 4 ? `<button class="btn small alt" data-gs="pfill">Fill the rest for me</button>` : ""}<button class="btn small alt" data-gs="pcancel">Cancel</button></div>`;
   }
   function pairsHTML(o) {
-    const g18 = giftState(o.F), have3 = (o.F.inv || {}).pairbox || 0;
+    const g18 = giftState(o.F), have2 = (o.F.inv || {}).pairbox || 0;
     if (o.pk && o.cocoa) return pickerHTML(o);
     const caseN = o.cocoa ? o.onDisplay(o.cocoa).reduce((a, b) => a + (o.cocoa.trays[b.id] || 0), 0) : 0;
-    if (!g18.pairs.length && !have3) return `<p class="eyebrow" style="margin:12px 0 6px">Pairing boxes</p><p class="muted">${!o.cocoa ? "Pairing boxes need bonbons from the Cocoa Room." : caseN < 4 ? "Pairing boxes need 4 bonbons in the Cocoa Room's display case. Make a tray at the bonbon table." : "Tap “Pair it” on a bottle below to pack a box with 4 bonbons, and it goes out on the display."}</p>`;
+    if (!g18.pairs.length && !have2) return `<p class="eyebrow" style="margin:12px 0 6px">Pairing boxes</p><p class="muted">${!o.cocoa ? "Pairing boxes need bonbons from the Cocoa Room." : caseN < 4 ? "Pairing boxes need 4 bonbons in the Cocoa Room's display case. Make a tray at the bonbon table." : "Tap “Pair it” on a bottle below to pack a box with 4 bonbons, and it goes out on the display."}</p>`;
     const lo = Math.min(...g18.pairs), hi = Math.max(...g18.pairs), price = g18.pairs.length ? lo === hi ? `${lo} each` : `${lo} to ${hi} each` : "";
-    return `<p class="eyebrow" style="margin:12px 0 6px">Pairing boxes</p><ul class="hlist wlist"><li><span class="wpic">${icon("pairbox", 30)}</span><span class="wtxt"><b>Wine and chocolate pairing box</b><small>${g18.pairs.length ? `${g18.pairs.length} out · ${price}` : "None out yet"}${have3 ? ` · ${have3} in your backpack` : ""}</small></span><span class="orbtns">` + (have3 ? `<button class="btn small primary" data-gp="put" data-n="1">Put out 1</button>${have3 > 1 ? `<button class="btn small alt" data-gp="put" data-n="99">All</button>` : ""}` : "") + (g18.pairs.length ? `<button class="btn small alt" data-gp="take">Take 1 back</button>` : "") + `</span></li></ul>` + (pairSeason(o.day) ? `<p class="muted">People are buying these for someone special this time of year.</p>` : "");
+    return `<p class="eyebrow" style="margin:12px 0 6px">Pairing boxes</p><ul class="hlist wlist"><li><span class="wpic">${icon("pairbox", 30)}</span><span class="wtxt"><b>Wine and chocolate pairing box</b><small>${g18.pairs.length ? `${g18.pairs.length} out · ${price}` : "None out yet"}${have2 ? ` · ${have2} in your backpack` : ""}</small></span><span class="orbtns">` + (have2 ? `<button class="btn small primary" data-gp="put" data-n="1">Put out 1</button>${have2 > 1 ? `<button class="btn small alt" data-gp="put" data-n="99">All</button>` : ""}` : "") + (g18.pairs.length ? `<button class="btn small alt" data-gp="take">Take 1 back</button>` : "") + `</span></li></ul>` + (pairSeason(o.day) ? `<p class="muted">People are buying these for someone special this time of year.</p>` : "");
   }
   var PANEL = {
     gbasket: (o) => {
@@ -33543,7 +33429,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
   };
   function millPanel(F2) {
-    const m = millState(F2), have3 = olivesHave(F2), can = Math.min(PRESS_MAX, Math.floor(have3 / JARS_PER_BOTTLE)), left7 = pressLeft(m), v = vineState(F2);
+    const m = millState(F2), have2 = olivesHave(F2), can = Math.min(PRESS_MAX, Math.floor(have2 / JARS_PER_BOTTLE)), left7 = pressLeft(m), v = vineState(F2);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The olive press</h2><p class="sub">Three jars of olives make a bottle of olive oil: crushed under the millstone, pressed between the mats. Up to ${PRESS_MAX} bottles a pressing, about an hour.</p>`;
     h3 += `<p class="muted">${icon("olives", 16)} Olives: ${F2.inv && F2.inv.olives || 0} in your backpack${v.oliveCrate ? `, ${v.oliveCrate} in the vineyard crate` : ""}.${m.made ? ` Bottles pressed so far: ${m.made}.` : ""}</p>`;
     if (m.press) h3 += left7 ? `<p>Pressing ${m.press.n} bottle${m.press.n > 1 ? "s" : ""}: ready in ${mins(left7)}.</p><span class="clbar"><i style="width:${Math.round(100 * (1 - left7 / m.press.dur))}%"></i></span>` : `<p><b>The oil's ready!</b></p><div class="actions"><button class="btn primary" data-mill="collect">Bottle it (${m.press.n})</button></div>`;
@@ -33916,8 +33802,8 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       return h3 + `<div class="actions"><button class="btn primary" data-mc="make" ${ready3 ? "" : "disabled"}>${ready3 ? c.recipes.some((r) => r.id === keyOf4(tab, null, pick6, dye)) ? `Make ${esc(craftName(tab, null, pick6, dye))}` : "Try something new" : "Make it"}</button></div>` + shut11;
     }
     h3 += `<p class="sub">${tab === "oil" ? `Two bottles of olive oil and one or two herbs or fruits, steeped for six hours: two bottles of infused oil. You've ${oilHave(F2, c)} bottle${oilHave(F2, c) === 1 ? "" : "s"} of plain oil (backpack and mill).` : tab === "soap" ? `Goat's milk (two) or olive oil (one), and one or two things to go in. A day on the curing rack: six bars.` : `A goat's milk, a bottle of olive oil and one scent. An hour in the little pot: three jars.`}</p>`;
-    const now6 = tab === "oil" ? c.steep : tab === "soap" ? c.cure : c.pot ? [c.pot] : [];
-    if (now6.length) h3 += `<ul class="hlist wlist">${jobs(now6, tab === "oil" ? "steeping" : tab === "soap" ? "curing" : "warming")}</ul>`;
+    const now5 = tab === "oil" ? c.steep : tab === "soap" ? c.cure : c.pot ? [c.pot] : [];
+    if (now5.length) h3 += `<ul class="hlist wlist">${jobs(now5, tab === "oil" ? "steeping" : tab === "soap" ? "curing" : "warming")}</ul>`;
     const known2 = c.recipes.filter((r) => r.kind === tab);
     if (known2.length) h3 += `<p class="eyebrow" style="margin:10px 0 6px">Make one you know</p><ul class="hlist wlist">${known2.map((r) => {
       const can = !busy2 && r.adds.every((a) => got2(F2, c, a));
@@ -34428,13 +34314,17 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     s.chipSold.n++;
     return { ok: true, coins: c, line: `Dot weighs it, nods, and hands over ${c} coin${c === 1 ? "" : "s"}. "Lovely. That'll be in the fryer by teatime."` };
   }
-  function chipsPanel(F2, day) {
-    const s = southState(F2), sold = s.chipSold && s.chipSold.day === day ? s.chipSold.n : 0, have3 = CHIP_BUYS.filter((id) => (F2.inv || {})[id] > 0);
+  var CHIP_HOURS = [11 * 60 + 30, 20 * 60 + 30];
+  var chipsOpen = (hm12) => hm12 >= CHIP_HOURS[0] && hm12 < CHIP_HOURS[1];
+  function chipsPanel(F2, day, hm12) {
+    if (hm12 != null && !chipsOpen(hm12)) return `<span class="tape gingham" aria-hidden="true"></span><h2>Dot's fish and chips</h2><p class="sub">The hatch is down. A note taped inside the glass: "Frying from half eleven till half eight. Dot x"</p>
+    <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+    const s = southState(F2), sold = s.chipSold && s.chipSold.day === day ? s.chipSold.n : 0, have2 = CHIP_BUYS.filter((id) => (F2.inv || {})[id] > 0);
     return `<span class="tape gingham" aria-hidden="true"></span><h2>Dot's fish and chips</h2><p class="sub">Dot leans out of the hatch in her striped apron. "What can I get you, love?"</p>
     <ul class="hlist wlist">${Object.entries(CHIP_MENU).map(([k, m]) => `<li><span class="wtxt"><b>${esc2(m.n)}</b></span><button class="btn small primary" data-chips="${k}"${(F2.coins || 0) < m.price ? " disabled" : ""}>${m.price} coins</button></li>`).join("")}</ul>
     <h3 class="ph3">To take away</h3><ul class="hlist wlist"><li><span class="wpic">${icon("chips_out", 26)}</span><span class="wtxt"><b>Fish and chips, wrapped</b><small>A present for the family, in person or sent round.${(F2.inv || {}).chips_out ? ` You have ${F2.inv.chips_out}.` : ""}</small></span><button class="btn small primary" data-chipsout="1"${(F2.coins || 0) < TAKEAWAY ? " disabled" : ""}>${TAKEAWAY} coins</button></li></ul>
     <h3 class="ph3">Sell her your catch</h3><p class="sub">She buys fresh fish for the fryer, up to ${CHIP_CAP} a day (${sold} so far today).</p>
-    ${have3.length ? `<ul class="hlist wlist">${have3.map((id) => `<li><span class="wpic">${icon(id, 26)}</span><span class="wtxt"><b>${esc2((ITEMS[id] || { n: id }).n)}</b><small>You have ${F2.inv[id]}.</small></span><button class="btn small alt" data-chipsell="${id}"${sold >= CHIP_CAP ? " disabled" : ""}>Sell for ${chipSell(id)}</button></li>`).join("")}</ul>` : `<p class="muted">Nothing in your backpack she can fry. Mackerel off the rocks is her favourite.</p>`}
+    ${have2.length ? `<ul class="hlist wlist">${have2.map((id) => `<li><span class="wpic">${icon(id, 26)}</span><span class="wtxt"><b>${esc2((ITEMS[id] || { n: id }).n)}</b><small>You have ${F2.inv[id]}.</small></span><button class="btn small alt" data-chipsell="${id}"${sold >= CHIP_CAP ? " disabled" : ""}>Sell for ${chipSell(id)}</button></li>`).join("")}</ul>` : `<p class="muted">Nothing in your backpack she can fry. Mackerel off the rocks is her favourite.</p>`}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   var RUIN_STEPS = [
@@ -35293,8 +35183,8 @@ ${m.from}` : ""}`;
     const xo = side > 0 ? 560 : -40, walk2 = Math.min(4200, Math.abs(at9[0] - xo) * 14), stay = 2600, t0 = performance.now();
     let arrived2 = false;
     const face = (d) => g18.firstElementChild.setAttribute("transform", `scale(${d} 1)`);
-    const step6 = (now6) => {
-      const t2 = now6 - t0;
+    const step6 = (now5) => {
+      const t2 = now5 - t0;
       let x;
       if (t2 < walk2) {
         x = xo + (at9[0] - xo) * (t2 / walk2);
@@ -35337,8 +35227,8 @@ ${m.from}` : ""}`;
     host2.appendChild(g18);
     const fade = xr[0] > -20 || xr[1] < 540, x0 = dir > 0 ? xr[0] : xr[1], x1 = dir > 0 ? xr[1] : xr[0], t0 = performance.now();
     g18.firstElementChild.setAttribute("transform", `scale(${dir} 1)`);
-    const step6 = (now6) => {
-      const k = Math.min(1, (now6 - t0) / ms), x = x0 + (x1 - x0) * k, bob4 = Math.sin(k * 40) * 0.6;
+    const step6 = (now5) => {
+      const k = Math.min(1, (now5 - t0) / ms), x = x0 + (x1 - x0) * k, bob4 = Math.sin(k * 40) * 0.6;
       g18.setAttribute("transform", `translate(${x.toFixed(1)} ${(y + bob4).toFixed(1)})`);
       if (fade) g18.style.opacity = Math.min(1, k * 8, (1 - k) * 8).toFixed(2);
       if (k < 1 && g18.isConnected) requestAnimationFrame(step6);
@@ -35611,14 +35501,14 @@ ${m.from}` : ""}`;
   }
   var DAY2 = 864e5;
   function beeTime(t0) {
-    const now6 = clock2(), span = now6 - t0;
+    const now5 = clock2(), span = now5 - t0;
     if (span <= 0) return 0;
     let rain = 0;
-    for (let d = Math.floor(t0 / DAY2); d <= Math.floor(now6 / DAY2); d++) {
+    for (let d = Math.floor(t0 / DAY2); d <= Math.floor(now5 / DAY2); d++) {
       const k = new Date(d * DAY2).toISOString().slice(0, 10);
       if (rainDay(k) === 2) {
         const w = showerAt(k), a = d * DAY2 + (w.from - 8 * 60) * 6e4, b = d * DAY2 + (w.to - 8 * 60) * 6e4;
-        rain += Math.max(0, Math.min(now6, b) - Math.max(t0, a));
+        rain += Math.max(0, Math.min(now5, b) - Math.max(t0, a));
       }
     }
     return span - rain / 2;
@@ -35993,8 +35883,8 @@ ${m.from}` : ""}`;
   }
   var giveName = (id) => NAMES[id] || id;
   var dur2 = (ms) => {
-    const hrs6 = Math.ceil(ms / 36e5);
-    return hrs6 >= 24 ? `${Math.floor(hrs6 / 24)}d ${hrs6 % 24}h` : `${hrs6}h`;
+    const hrs5 = Math.ceil(ms / 36e5);
+    return hrs5 >= 24 ? `${Math.floor(hrs5 / 24)}d ${hrs5 % 24}h` : `${hrs5}h`;
   };
   function extractorPanel(F2) {
     const h3 = hfState(F2), k = honeyNow();
@@ -36818,26 +36708,13 @@ ${m.from}` : ""}`;
     )}
     ${tapeLabel(p + (side < 0 ? 10 : -10), 290, tag3, col, 10)}</g>`;
   }
-  function bakeryArt(open2) {
-    const walls = `<path d="M30 46 L108 18 L186 46z" style="fill:#C9754E"/><rect x="38" y="46" width="140" height="62" style="fill:#F6EBDD"/><rect x="132" y="12" width="12" height="24" style="fill:#BDB3A4"/>
-    <rect x="92" y="68" width="30" height="40" rx="2" style="fill:${open2 ? "#7A9CC6" : "#8A6A4E"}"/>`;
-    const wallsL = `<path d="M30 46 L108 18 L186 46z"/><rect x="38" y="46" width="140" height="62"/><rect x="132" y="12" width="12" height="24"/><rect x="92" y="68" width="30" height="40" rx="2"/>`;
-    const win3 = (x) => open2 ? `<rect class="wglow" x="${x}" y="60" width="34" height="28" rx="2" style="fill:#FFF4DC"/>${[0, 1, 2].map((i) => `<ellipse cx="${x + 7 + i * 10}" cy="82" rx="5" ry="3.4" style="fill:${["#C98A4A", "#E3A857", "#B8743E"][i]}"/>`).join("")}` : `<rect x="${x}" y="60" width="34" height="28" rx="2" style="fill:#A8754F"/>${[0, 1, 2, 3].map((i) => `<rect x="${x + 2}" y="${62 + i * 6.5}" width="30" height="4" style="fill:#8A6A4E"/>`).join("")}`;
-    const awn = open2 ? Array.from({ length: 7 }, (_, i) => `<path d="M${40 + i * 20} 46 h20 v12 q-10 6 -20 0z" style="fill:${i % 2 ? "#FFFDF6" : "#F3C969"}"/>`).join("") : "";
-    const board4 = open2 ? `<path d="M152 116 l8 -22 l8 22" style="fill:#3E4A43"/><text x="160" y="110" text-anchor="middle" font-family="Klee One,serif" font-size="5" fill="#FFFDF6">fresh</text>` : `<rect x="66" y="92" width="28" height="12" rx="1" transform="rotate(-4 80 98)" style="fill:#FFFDF6"/><text x="80" y="100" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="5.5" fill="#B5473A" transform="rotate(-4 80 98)">TO LET</text>`;
-    const sign3 = `<rect x="70" y="36" width="76" height="13" rx="2" style="fill:#FFFDF6"/><text x="108" y="45.5" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="7.5" style="fill:var(--line)">${open2 ? "The Bakehouse" : "Bakery"}</text>`;
-    return `<g data-place="${open2 ? "bakery" : "bakeshut"}" aria-label="${open2 ? "The Honeybrook Bakehouse" : "The old bakery"}"><ellipse class="hov" cx="108" cy="116" rx="70" ry="10" style="fill:var(--butter)"/>
-    ${sk(walls + win3(48) + win3(134) + awn, wallsL + `<rect x="48" y="60" width="34" height="28" rx="2"/><rect x="134" y="60" width="34" height="28" rx="2"/><circle cx="117" cy="88" r="1.4"/>`)}
-    <g pointer-events="none">${sign3}${board4}</g>
-    ${tapeLabel(204, 100, open2 ? "Bakehouse" : "Old bakery", "var(--peach)", 10)}</g>`;
-  }
-  function greenArt(bakery = false) {
+  function greenArt() {
     const ground8 = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="260" cy="340" rx="190" ry="120" style="fill:var(--grass2)"/><ellipse cx="420" cy="600" rx="110" ry="50" style="fill:var(--grass2)"/><ellipse cx="80" cy="90" rx="90" ry="40" style="fill:var(--grass2)"/></g>
     <g filter="url(#wob)" fill="none" style="stroke:var(--path)" stroke-width="20" stroke-linecap="round"><path d="M260 24 C258 120 264 240 260 330 M22 330 C140 324 380 336 498 330 M260 330 C230 420 180 470 150 540 M260 330 C290 420 320 480 340 560 M300 330 C340 310 372 290 380 262 M210 328 C170 310 130 290 120 262"/></g>
     <g filter="url(#wob)"><ellipse cx="260" cy="330" rx="44" ry="22" style="fill:var(--path)"/><ellipse cx="260" cy="330" rx="44" ry="22" fill="none" style="stroke:var(--path2)" stroke-width="1.5" stroke-dasharray="3 7"/></g>
     ${flowers([[40, 260, "#EFA3A6"], [480, 250, "#F3C969"], [470, 400, "#C3CDEE"], [30, 410, "#F3C969"], [240, 470, "#EFA3A6"], [460, 560, "#C3CDEE"], [250, 600, "#F3C969"], [60, 600, "#EFA3A6"], [300, 120, "#C3CDEE"], [210, 90, "#EFA3A6"]])}
-    ${tree(486, 96, 0.95)}${tree(44, 548, 0.8)}${tree(484, 556, 0.8)}${tree(470, 470, 0.75)}`;
+    ${tree(30, 90, 0.9)}${tree(486, 96, 0.95)}${tree(44, 548, 0.8)}${tree(484, 556, 0.8)}${tree(470, 470, 0.75)}`;
     const home2 = `<g data-place="toBaseG" aria-label="Path up home"><ellipse class="hov" cx="260" cy="26" rx="28" ry="16" style="fill:var(--butter)"/>
     ${sk(
       `<rect x="196" y="6" width="44" height="26" rx="12" style="fill:var(--tree2)"/><rect x="280" y="6" width="44" height="26" rx="12" style="fill:var(--tree2)"/><path d="M240 34 V14 Q260 -6 280 14 V34 h-5 V15 Q260 0 245 15 V34z" style="fill:var(--tree)"/><circle cx="247" cy="10" r="2.5" style="fill:#EFA3A6"/><circle cx="268" cy="5" r="2.5" style="fill:#EFA3A6"/><circle cx="278" cy="18" r="2.5" style="fill:#F3C969"/>`,
@@ -36895,7 +36772,7 @@ ${m.from}` : ""}`;
       `<rect x="270" y="404" width="170" height="130" rx="14"/><path d="M398 440 h19 M398 440 v20 M404 440 v20 M410 440 v20 M416 440 v20 M400 439 h6 M408 439 h6"/><path d="M288 478 L338 470 L348 508 L296 516z"/><circle cx="380" cy="470" r="3"/>`
     )}
     ${tapeLabel(340, 582, "Cricket lawn", "var(--peach)", 10)}</g>`;
-    return ground8 + southShore() + home2 + bakeryArt(bakery) + allot + band + pond + lawn + sideGate("toVineG", "Gate to the lower vineyard", 512, "Lower vines", "#E8B4C0", 1) + sideGate("toStablesG", "Gate to the Stables", 6, "The Stables", "var(--butter)", -1) + lamp2(222, 304) + lamp2(300, 304) + bench(470, 210) + bench(470, 380) + bench(52, 390);
+    return ground8 + southShore() + home2 + allot + band + pond + lawn + sideGate("toVineG", "Gate to the lower vineyard", 512, "Lower vines", "#E8B4C0", 1) + sideGate("toStablesG", "Gate to the Stables", 6, "The Stables", "var(--butter)", -1) + lamp2(222, 304) + lamp2(300, 304) + bench(470, 210) + bench(470, 380) + bench(52, 390);
   }
 
   // src/art/stables.js
@@ -37099,7 +36976,22 @@ ${m.from}` : ""}`;
   var gull = ([x, y]) => `<path d="M${x - 7} ${y} q3.5 -4 7 0 q3.5 -4 7 0" fill="none" style="stroke:var(--line)" stroke-width="1.2" stroke-linecap="round"/>`;
   var rock = (x, y, rx, ry, c) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:${c || "#B9B0A4"}"/>`;
   var rockL = (x, y, rx, ry) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}"/>`;
-  function lighthouseArt(night) {
+  function hatchOpen() {
+    return `<g pointer-events="none">${sk(
+      `<rect x="408" y="446" width="44" height="22" style="fill:#F3D9A6"/><rect x="408" y="446" width="44" height="6" style="fill:#E8C48E"/>
+      <rect x="440" y="452" width="10" height="7" rx="1" style="fill:#B9C4CC"/>
+      <path d="M418 468 v-7 q12 -6 24 0 v7z" style="fill:#FFFDF6"/><path d="M423 468 v-8 M428 468 v-9 M433 468 v-9 M438 468 v-8" style="stroke:#7FB8E8" stroke-width="1.6"/>
+      <path style="stroke:#A99D8C;stroke-width:.5" d="M423.2 457 q-2.2 -2 -1 -4.6 q-1.4 -3 1.2 -5 q.4 -3.4 3.6 -3.6 q2.4 -2.4 5.4 -.6 q3.6 -.4 4.4 2.8 q2.8 1.6 1.4 4.6 q1.6 2.6 -.6 4.8 q.6 2.6 -2 3.2 h-10.4 q-2.6 -.6 -2 -3.2z" style="fill:#D9D4CE"/>
+      <circle cx="430" cy="455" r="5.2" style="fill:#F2D3BC;stroke:#8A6A5A;stroke-width:.6"/><path d="M424.8 452.6 q.6 -4.2 3 -4 q1 -1.6 2.4 -.4 q1.6 -1.4 2.8 .4 q2.4 .2 2.2 4 q-1.2 -2.2 -2.6 -1.4 q-1 -1.6 -2.4 -.4 q-1.4 -1.4 -2.6 .2 q-1.6 -.6 -2.8 1.6z" style="fill:#E6E2DC"/><path d="M425.4 449.6 q4.6 -3.4 9.2 0" fill="none" style="stroke:#E88AA0" stroke-width="1.3" stroke-linecap="round"/>
+      <rect x="406" y="443" width="48" height="5" rx="2.5" style="fill:#F6E3A6"/>
+      <path d="M450 466 l4 -9 l4 9z" style="fill:#FFFDF6"/><path d="M451.5 458 l1 -4 M454 457 l.5 -4.5 M456.5 458 l-1 -4" style="stroke:#E3B24A" stroke-width="1.4" stroke-linecap="round"/>`,
+      `<rect x="408" y="446" width="44" height="22"/><rect x="406" y="443" width="48" height="5" rx="2.5"/><path d="M418 468 v-7 q12 -6 24 0 v7"/><path d="M450 466 l4 -9 l4 9z"/>`
+    )}
+    <circle cx="428.1" cy="455.2" r=".65" style="fill:#3B3530"/><circle cx="431.9" cy="455.2" r=".65" style="fill:#3B3530"/>
+    <ellipse cx="426.6" cy="457.2" rx="1.2" ry=".8" style="fill:#F2A6A6" opacity=".7"/><ellipse cx="433.4" cy="457.2" rx="1.2" ry=".8" style="fill:#F2A6A6" opacity=".7"/>
+    <path d="M428.7 457.9 q1.3 1.1 2.6 0" fill="none" style="stroke:#D9707E" stroke-width=".8" stroke-linecap="round"/><circle cx="424.9" cy="457" r=".7" style="fill:#FFFDF6"/><circle cx="435.1" cy="457" r=".7" style="fill:#FFFDF6"/></g>`;
+  }
+  function lighthouseArt(night, chipsOpen2 = false) {
     const ground8 = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="380" cy="370" rx="140" ry="80" style="fill:var(--grass2)"/><ellipse cx="260" cy="120" rx="110" ry="60" style="fill:var(--grass2)"/></g>
     <g filter="url(#wob)"><path d="${SAND}" style="fill:var(--sand)"/><path d="${SEA2}" style="fill:var(--sea)"/>
@@ -37159,11 +37051,12 @@ ${m.from}` : ""}`;
     const awn = Array.from({ length: 7 }, (_, i) => `<path d="M${394 + i * 10} 430 h10 v10 q-5 5 -10 0z" style="fill:${i % 2 ? "#FFFDF6" : "#7FB8E8"}"/>`).join("");
     const chips = `<g data-place="lchips" aria-label="The fish and chip hatch"><ellipse class="hov" cx="430" cy="505" rx="46" ry="10" style="fill:var(--butter)"/>
     ${sk(
-      `<path d="M394 420 L430 400 L466 420z" style="fill:#3E6B8C"/><rect x="398" y="420" width="64" height="70" style="fill:#EAF2F5"/>${awn}<rect class="wglow" x="408" y="446" width="44" height="22" rx="2" style="fill:#F6E3A6"/><rect x="404" y="468" width="52" height="5" style="fill:var(--wood)"/>
+      `<path d="M394 420 L430 400 L466 420z" style="fill:#3E6B8C"/><rect x="398" y="420" width="64" height="70" style="fill:#EAF2F5"/>${awn}${chipsOpen2 ? "" : `<rect x="408" y="446" width="44" height="22" rx="2" style="fill:#C9D6DE"/><path d="M408 451.5 h44 M408 457 h44 M408 462.5 h44" style="stroke:#9AAAB6" stroke-width=".8"/><rect x="424" y="453" width="12" height="8" rx="1" style="fill:#FFFDF6" transform="rotate(-4 430 457)"/>`}<rect x="404" y="468" width="52" height="5" style="fill:var(--wood)"/>
       <rect x="470" y="462" width="20" height="26" rx="2" style="fill:#4A4642"/>`,
       `<path d="M394 420 L430 400 L466 420z"/><rect x="398" y="420" width="64" height="70"/><path d="M394 430 h70"/><rect x="408" y="446" width="44" height="22" rx="2"/><rect x="404" y="468" width="52" height="5"/>
       <rect x="470" y="462" width="20" height="26" rx="2"/><path d="M472 488 l-3 6 M488 488 l3 6"/>`
     )}
+    ${chipsOpen2 ? hatchOpen() : ""}
     <text x="480" y="473" text-anchor="middle" font-family="Klee One,serif" font-size="5.5" fill="#FFFDF6" pointer-events="none">cod</text><text x="480" y="481" text-anchor="middle" font-family="Klee One,serif" font-size="5.5" fill="#FFFDF6" pointer-events="none">chips</text>
     <text x="430" y="416" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="6.5" fill="#FFFDF6" pointer-events="none">fish and chips</text>
     ${tapeLabel(430, 528, "Fish and chips", "var(--peach)", 10)}</g>`;
@@ -37220,180 +37113,6 @@ ${m.from}` : ""}`;
     ${sk(`<rect x="226" y="600" width="68" height="16" rx="2" style="fill:var(--wood)"/>`, `<rect x="226" y="600" width="68" height="16" rx="2"/><path d="M240 600 v16 M254 600 v16 M268 600 v16 M282 600 v16"/>`)}
     ${tapeLabel(260, 590, "The green", "var(--sage)", 10)}</g>`;
     return ground8 + plots + shed2 + crate8 + bench8 + gate13;
-  }
-
-  // src/game/bakery.js
-  var OPEN3 = 7 * 60;
-  var CLOSE3 = 17 * 60;
-  var PROVE = 60;
-  var BAKE = 30;
-  var TRAY2 = 6;
-  var PROOF_SLOTS = 3;
-  var FLOUR = 3;
-  var now3 = () => Date.now() + (globalThis.__mapleOffset || 0);
-  var M2 = 6e4;
-  var RECIPES = {
-    loaf: { n: "Farmhouse loaf", one: "farmhouse loaf", price: 5, needs: { flour: 2, milk: 1 }, col: "#C98A4A", say: "Still warm. The crust crackles when you squeeze it." },
-    croissant: { n: "Butter croissants", one: "butter croissant", price: 6, needs: { flour: 2, butter: 2, egg: 1 }, col: "#E3A857", say: "Flaky, buttery, a hundred layers. Crumbs everywhere." },
-    cinnabun: { n: "Cinnamon buns", one: "cinnamon bun", price: 5, needs: { flour: 2, butter: 1, sp_cinnamon: 1, honey: 1 }, col: "#B8743E", say: "Sticky with honey, swirled with cinnamon. Lick your fingers." },
-    turnover: { n: "Apple turnovers", one: "apple turnover", price: 5, needs: { flour: 1, butter: 1, apple: 3 }, col: "#E8B86A", say: "Golden pastry, hot apple inside. Careful, it's lava." },
-    scone: { n: "Cheese scones", one: "cheese scone", price: 5, needs: { flour: 2, butter: 1, milk: 1, cheese: 1 }, col: "#E6C27A", say: "Crumbly and savoury, with your own cheese melted through." },
-    focaccia: { n: "Sage focaccia", one: "slab of focaccia", price: 6, needs: { flour: 2, oliveoil: 1, herb: 1 }, col: "#D9B060", say: "Dimpled, glossy with your mill's oil, herbs pressed into the top." }
-  };
-  var ANY = { cheese: (id) => id === "cheese" || /^chz_/.test(id), herb: (id) => id === "sage" || id === "rosemary" };
-  var ANY_N = { cheese: "any cheese", herb: "sage or rosemary", flour: "flour", milk: "milk", butter: "butter", egg: "egg", sp_cinnamon: "cinnamon", honey: "honey", apple: "apples", oliveoil: "olive oil" };
-  var itemOf = (r) => "bk_" + r;
-  Object.entries(RECIPES).forEach(([r, x]) => {
-    ITEMS[itemOf(r)] = { n: x.one.charAt(0).toUpperCase() + x.one.slice(1), kind: "gift", to: "family", sell: 2, say: x.say };
-  });
-  ITEMS.butter = { n: "Pat of butter", kind: "ingredient", sell: 2, what: "churned at the bakehouse from two milk: for croissants, buns, turnovers and scones" };
-  var bakeryState = (F2) => {
-    const b = F2.bakery = F2.bakery || {};
-    for (const [k, v] of Object.entries({ stock: {}, proof: [], oven: null, rack: [], tin: 0, sold: 0, lastTick: 0, day: "", today: 0 })) if (b[k] === void 0) b[k] = v;
-    return b;
-  };
-  var have2 = (F2, id) => (F2.inv || {})[id] || 0;
-  var take2 = (F2, id, n) => {
-    F2.inv[id] -= n;
-    if (F2.inv[id] <= 0) delete F2.inv[id];
-  };
-  var pickFor = (F2, k) => ANY[k] ? Object.keys(F2.inv || {}).filter((id) => ANY[k](id) && F2.inv[id] > 0).sort((a, b) => F2.inv[b] - F2.inv[a])[0] || null : k;
-  function missing(F2, r) {
-    const need3 = RECIPES[r].needs, out = [];
-    for (const [k, n] of Object.entries(need3)) {
-      const id = pickFor(F2, k), got3 = id ? have2(F2, id) : 0;
-      if (got3 < n) out.push(`${n - got3} ${ANY_N[k] || (ITEMS[k] ? ITEMS[k].n.toLowerCase() : k)}`);
-    }
-    return out;
-  }
-  function mix2(F2, r, at9 = now3()) {
-    const b = bakeryState(F2), x = RECIPES[r];
-    if (!x) return null;
-    if (b.proof.length >= PROOF_SLOTS) return { line: "The proving shelf's full: three trays rising already. Bake one first." };
-    const miss = missing(F2, r);
-    if (miss.length) return { line: `For ${x.n.toLowerCase()} you still need ${miss.join(", ")}.` };
-    for (const [k, n] of Object.entries(x.needs)) take2(F2, pickFor(F2, k), n);
-    b.proof.push({ r, at: at9 });
-    return { ok: true, line: `A tray of ${x.n.toLowerCase()}, shaped and onto the proving shelf under a cloth. An hour to rise.` };
-  }
-  var proved = (d, at9 = now3()) => at9 - d.at >= PROVE * M2;
-  function bake2(F2, at9 = now3()) {
-    const b = bakeryState(F2);
-    if (b.oven) return { line: "The oven's busy. A little while yet." };
-    const i = b.proof.findIndex((d2) => proved(d2, at9));
-    if (i < 0) return { line: b.proof.length ? "Nothing's risen enough yet. Give it time." : "Nothing on the proving shelf. Mix something first." };
-    const [d] = b.proof.splice(i, 1);
-    b.oven = { r: d.r, at: at9 };
-    return { ok: true, line: `Into the wood oven. ${RECIPES[d.r].n} in half an hour.` };
-  }
-  function carry(F2) {
-    const b = bakeryState(F2);
-    if (!b.rack.length) return { line: "The cooling rack's empty." };
-    const n = b.rack.length;
-    b.rack.forEach((r) => {
-      b.stock[r] = (b.stock[r] || 0) + TRAY2;
-    });
-    b.rack = [];
-    return { ok: true, line: `${n} tray${n > 1 ? "s" : ""} carried through and onto the shelves. The whole shop smells of it.` };
-  }
-  function churn(F2) {
-    if (have2(F2, "milk") < 2) return { line: "The churn needs two milk for a pat of butter." };
-    take2(F2, "milk", 2);
-    F2.inv.butter = (F2.inv.butter || 0) + 1;
-    return { ok: true, line: "Ten minutes of churning, and there it is: a pat of pale gold butter." };
-  }
-  function buyFlour(F2) {
-    if ((F2.coins || 0) < FLOUR) return { line: `A bag of flour is ${FLOUR} coins.` };
-    F2.coins -= FLOUR;
-    F2.inv = F2.inv || {};
-    F2.inv.flour = (F2.inv.flour || 0) + 1;
-    return { ok: true, line: "A bag of flour, off the stack." };
-  }
-  function takeOne(F2, r) {
-    const b = bakeryState(F2);
-    if (!(b.stock[r] > 0)) return null;
-    b.stock[r]--;
-    F2.inv = F2.inv || {};
-    F2.inv[itemOf(r)] = (F2.inv[itemOf(r)] || 0) + 1;
-    return { ok: true, line: `One ${RECIPES[r].one}, wrapped in paper, into your backpack.` };
-  }
-  function collectTin(F2) {
-    const b = bakeryState(F2), c = b.tin;
-    if (!c) return null;
-    b.tin = 0;
-    F2.coins = (F2.coins || 0) + c;
-    return c;
-  }
-  var openNow2 = (hm12) => hm12 >= OPEN3 && hm12 < CLOSE3;
-  var shelfCount = (b) => Object.values(b.stock).reduce((a, n) => a + n, 0);
-  function bakeryTick(F2, opts = {}) {
-    const b = bakeryState(F2), t2 = now3();
-    if (!b.lastTick) b.lastTick = t2;
-    const mins3 = Math.min(1440, Math.floor((t2 - b.lastTick) / M2)), out = { mins: mins3, coins: 0, tin: 0, n: 0, baked: null };
-    if (mins3 < 1) return out;
-    b.lastTick += mins3 * M2;
-    for (let k = mins3; k > 0; k--) {
-      const at9 = t2 - k * M2, d = new Date(at9 + 8 * 36e5), hm12 = d.getUTCHours() * 60 + d.getUTCMinutes(), we = [0, 6].includes(d.getUTCDay()), day = d.toISOString().slice(0, 10);
-      if (b.oven && at9 - b.oven.at >= BAKE * M2) {
-        b.rack.push(b.oven.r);
-        out.baked = b.oven.r;
-        b.oven = null;
-      }
-      if (!openNow2(hm12)) continue;
-      if (b.day !== day) {
-        b.day = day;
-        b.today = 0;
-      }
-      const p = (hm12 < 11 * 60 ? 1 / 6 : 1 / 14) * (we ? 1.5 : 1) * (opts.serving && k === 1 ? 2 : 1);
-      const ids = Object.keys(b.stock).filter((r2) => b.stock[r2] > 0 && RECIPES[r2]);
-      if (!ids.length || Math.random() >= p) continue;
-      const tot = ids.reduce((a, r2) => a + b.stock[r2], 0);
-      let x = Math.random() * tot, r = ids[0];
-      for (const id of ids) {
-        if (x < b.stock[id]) {
-          r = id;
-          break;
-        }
-        x -= b.stock[id];
-      }
-      b.stock[r]--;
-      b.sold++;
-      b.today += RECIPES[r].price;
-      out.n++;
-      if (opts.serving && k === 1) {
-        F2.coins = (F2.coins || 0) + RECIPES[r].price;
-        out.coins += RECIPES[r].price;
-      } else {
-        b.tin += RECIPES[r].price;
-        out.tin += RECIPES[r].price;
-      }
-    }
-    return out;
-  }
-  var close2 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
-  var hrs4 = (ms) => {
-    const m = Math.max(1, Math.ceil(ms / M2));
-    return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60 ? m % 60 + "m" : ""}`.trim() : `${m} min`;
-  };
-  var needLine = (r) => Object.entries(RECIPES[r].needs).map(([k, n]) => `${n} ${ANY_N[k] || (ITEMS[k] ? ITEMS[k].n.toLowerCase() : k)}`).join(", ");
-  function bakeryPanel(F2, view3, opts = {}) {
-    const b = bakeryState(F2), at9 = now3(), hm12 = opts.hm || 0;
-    const head3 = (t2, s) => `<span class="tape gingham" aria-hidden="true"></span><h2>${t2}</h2>${s ? `<p class="sub">${s}</p>` : ""}`;
-    if (view3 === "mix") return head3("The mixing table", `Flour on everything. A tray makes ${TRAY2}. Proving shelf: ${b.proof.length} of ${PROOF_SLOTS}.`) + `<ul class="hlist wlist">${Object.entries(RECIPES).map(([r, x]) => {
-      const miss = missing(F2, r);
-      return `<li><span class="wpic">${icon(itemOf(r), 28)}</span><span class="wtxt"><b>${esc(x.n)}</b><small>${esc(needLine(r))}${miss.length ? ` · still need ${esc(miss.join(", "))}` : ""}</small></span><button class="btn small ${miss.length ? "alt" : "primary"}" data-bk="mix:${r}"${miss.length || b.proof.length >= PROOF_SLOTS ? " disabled" : ""}>Mix</button></li>`;
-    }).join("")}</ul>` + close2;
-    if (view3 === "proof") return head3("The proving shelf", "Trays of dough under cloths, rising for an hour.") + (b.proof.length ? `<ul class="hlist wlist">${b.proof.map((d) => `<li><span class="wtxt"><b>${esc(RECIPES[d.r].n)}</b><small>${proved(d, at9) ? "Risen. Ready for the oven." : `rising: ${hrs4(PROVE * M2 - (at9 - d.at))} to go`}</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty. Mix something at the table.</p>`) + `<div class="actions"><button class="btn primary" data-bk="bake"${b.oven || !b.proof.some((d) => proved(d, at9)) ? " disabled" : ""}>Into the oven</button></div>` + close2;
-    if (view3 === "oven") return head3("The wood oven", b.oven ? `${RECIPES[b.oven.r].n} inside: ${hrs4(BAKE * M2 - (at9 - b.oven.at))} to go. It comes out onto the rack on its own.` : "Hot and waiting.") + `<div class="actions"><button class="btn primary" data-bk="bake"${b.oven || !b.proof.some((d) => proved(d, at9)) ? " disabled" : ""}>Bake the next risen tray</button></div>` + close2;
-    if (view3 === "rack") return head3("The cooling rack", b.rack.length ? b.rack.map((r) => RECIPES[r].n).join(", ") + ", cooling." : "Empty for now.") + `<div class="actions"><button class="btn primary" data-bk="carry"${b.rack.length ? "" : " disabled"}>Carry through to the shop</button></div>` + close2;
-    if (view3 === "churn") return head3("The butter churn", `Two milk make a pat of butter. You have ${have2(F2, "milk")} milk and ${have2(F2, "butter")} butter.`) + `<div class="actions"><button class="btn primary" data-bk="churn"${have2(F2, "milk") < 2 ? " disabled" : ""}>Churn some butter</button></div>` + close2;
-    if (view3 === "flour") return head3("Flour sacks", `${FLOUR} coins a bag, same as Hana's. You have ${have2(F2, "flour")}.`) + `<div class="actions"><button class="btn primary" data-bk="flour"${(F2.coins || 0) < FLOUR ? " disabled" : ""}>Buy a bag of flour (${FLOUR} coins)</button></div>` + close2;
-    if (view3 === "shelves") {
-      const ids = Object.keys(RECIPES).filter((r) => b.stock[r] > 0);
-      return head3("The bread shelves", ids.length ? "Take one to eat, or to give." : "Empty. Bake something and carry it through.") + (ids.length ? `<ul class="hlist wlist">${ids.map((r) => `<li><span class="wpic">${icon(itemOf(r), 28)}</span><span class="wtxt"><b>${esc(RECIPES[r].n)}</b><small>${b.stock[r]} on the shelf · ${RECIPES[r].price} coins each</small></span><button class="btn small alt" data-bk="take:${r}">Take one</button></li>`).join("")}</ul>` : "") + close2;
-    }
-    if (view3 === "counter") return head3(esc(opts.name || "The Honeybrook Bakehouse"), `${openNow2(hm12) ? "Open till 5." : "Closed: open 7am to 5pm."} ${shelfCount(b)} things on the shelves. Customers come most in the mornings and at weekends; while you're behind the counter, twice as often.`) + `<p class="sub">The honesty tin: <b>${b.tin}</b> coins. Today so far: ${b.day === dayKey() ? b.today : 0} coins.</p><div class="actions"><button class="btn primary" data-bk="tin"${b.tin ? "" : " disabled"}>Empty the tin</button></div>` + close2;
-    return "";
   }
 
   // src/art/mill.js
@@ -37682,10 +37401,10 @@ ${m.from}` : ""}`;
     return got3;
   }
   var catchHtml = (F2, mult = 1) => {
-    const have3 = CATCH.filter((x) => (F2.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell);
-    if (!have3.length) return "";
-    const all = have3.reduce((a, x) => a + Math.round(F2.inv[x] * ITEMS[x].sell * mult), 0);
-    return `<h3 class="ph3">Your catch</h3><p class="muted">${mult > 1 ? "Sal's van is just up the beach, and he pays half as much again on a Friday." : "The fishmonger's van takes anything you've caught (or keep it for the kitchen)."}</p><ul class="hlist wlist">${have3.map((x) => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F2.inv[x]}</b><small>${Math.round(ITEMS[x].sell * mult * 10) / 10} coins each</small></span><button class="btn small alt" data-fish="sell" data-k="${x}">Sell one</button></li>`).join("")}</ul>
+    const have2 = CATCH.filter((x) => (F2.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell);
+    if (!have2.length) return "";
+    const all = have2.reduce((a, x) => a + Math.round(F2.inv[x] * ITEMS[x].sell * mult), 0);
+    return `<h3 class="ph3">Your catch</h3><p class="muted">${mult > 1 ? "Sal's van is just up the beach, and he pays half as much again on a Friday." : "The fishmonger's van takes anything you've caught (or keep it for the kitchen)."}</p><ul class="hlist wlist">${have2.map((x) => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F2.inv[x]}</b><small>${Math.round(ITEMS[x].sell * mult * 10) / 10} coins each</small></span><button class="btn small alt" data-fish="sell" data-k="${x}">Sell one</button></li>`).join("")}</ul>
     <div class="actions"><button class="btn primary small" data-fish="sellall">Sell the lot · ${all} ${coin6()}</button></div>`;
   };
   function catchLine(r) {
@@ -37729,10 +37448,10 @@ ${m.from}` : ""}`;
   var shut15 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin7 = () => icon("coin", 13);
   function vanPanel(F2) {
-    const have3 = CATCH.filter((x) => (F2.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell), all = have3.reduce((a, x) => a + Math.round(F2.inv[x] * ITEMS[x].sell * VAN_MULT), 0);
+    const have2 = CATCH.filter((x) => (F2.inv || {})[x] > 0 && ITEMS[x] && ITEMS[x].sell), all = have2.reduce((a, x) => a + Math.round(F2.inv[x] * ITEMS[x].sell * VAN_MULT), 0);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The fishmonger's van</h2><p class="sub">Friday evenings at the bay, five till ten. Ice, a striped awning, and a man called Sal who's been doing this for forty years.</p>`;
     h3 += `<h3 class="ph3">Buy</h3><ul class="hlist wlist">${Object.entries(VAN_GOODS).map(([id, g18]) => `<li><span class="wpic">${icon(id === "worms" ? "rod" : id, 26)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.line)}</small></span><button class="btn small primary" data-salvan="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin7()}</button></li>`).join("")}</ul>`;
-    h3 += `<h3 class="ph3">Sell your catch</h3>` + (have3.length ? `<p class="muted">Sal pays half as much again on a Friday.</p><ul class="hlist wlist">${have3.map((x) => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F2.inv[x]}</b><small>${Math.round(ITEMS[x].sell * VAN_MULT * 10) / 10} coins each</small></span></li>`).join("")}</ul><div class="actions"><button class="btn primary small" data-salvan="sellall">Sell the lot · ${all} ${coin7()}</button></div>` : `<p class="muted">Nothing in your backpack to sell. Catch something and come back: Sal pays well on a Friday.</p>`);
+    h3 += `<h3 class="ph3">Sell your catch</h3>` + (have2.length ? `<p class="muted">Sal pays half as much again on a Friday.</p><ul class="hlist wlist">${have2.map((x) => `<li><span class="wpic">${icon(x, 26)}</span><span class="wtxt"><b>${esc(ITEMS[x].n)} ×${F2.inv[x]}</b><small>${Math.round(ITEMS[x].sell * VAN_MULT * 10) / 10} coins each</small></span></li>`).join("")}</ul><div class="actions"><button class="btn primary small" data-salvan="sellall">Sell the lot · ${all} ${coin7()}</button></div>` : `<p class="muted">Nothing in your backpack to sell. Catch something and come back: Sal pays well on a Friday.</p>`);
     return h3 + shut15;
   }
   function weekQuests(F2, day = dayKey()) {
@@ -43579,8 +43298,8 @@ ${m.from}` : ""}`;
   var coin8 = () => icon("coin", 13);
   var goods2 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop);
   var row3 = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have3 ? ` (${have3} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin8()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin8()}</button></li>`;
   };
   var list2 = (F2, shop, title) => {
     const ids = goods2(shop);
@@ -43722,8 +43441,8 @@ ${m.from}` : ""}`;
   var coin9 = () => icon("coin", 13);
   var goods3 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop && (!TOWN_GOODS[id].months || TOWN_GOODS[id].months.includes(+dayKey().slice(5, 7))));
   var row4 = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have3 ? ` (${have3} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin9()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin9()}</button></li>`;
   };
   var list3 = (F2, shop, title) => {
     const ids = goods3(shop);
@@ -43956,8 +43675,8 @@ ${m.from}` : ""}`;
   var coin10 = () => icon("coin", 13);
   var goods4 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop);
   var row5 = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have3 ? ` (${have3} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin10()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin10()}</button></li>`;
   };
   var list4 = (F2, shop, title) => {
     const ids = goods4(shop);
@@ -44091,8 +43810,8 @@ ${m.from}` : ""}`;
   var coin11 = () => icon("coin", 13);
   var goods5 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop);
   var row6 = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have3 ? ` (${have3} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin11()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin11()}</button></li>`;
   };
   var list5 = (F2, shop, title) => {
     const ids = goods5(shop);
@@ -44232,11 +43951,11 @@ ${m.from}` : ""}`;
     return { first };
   }
   function studioPanel(F2, st6, evan2) {
-    const have3 = glassHave(F2);
+    const have2 = glassHave(F2);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>Ivy's boathouse</h2><p class="sub">Jars of sea glass sorted by colour glow in the window. Ivy looks up from her bench. "Make a suncatcher? Five pieces. Any you've found yourself go in first."</p>`;
     h3 += `<h3 class="ph3">Make a suncatcher · ${SUN.price} ${coin11()}</h3>`;
-    if (!st6) h3 += `<p class="muted">${have3.length ? `Your own finds: ${have3.map((k) => GLASS3[k][0].toLowerCase()).join(", ")}.` : "You haven't found any yet: Ivy lends you some from her jars."} Wired onto a bit of driftwood, to hang in a window.${evan2 ? " Evan chooses the shiniest piece. Obviously." : ""}</p><div class="actions"><button class="btn primary" data-pi="sun" ${F2.coins >= SUN.price ? "" : "disabled"}>Sit at the bench</button></div>`;
-    else if (st6.picks.length < SUN.N) h3 += `<p class="muted">Pick five pieces: ${st6.picks.length}/${SUN.N}${st6.picks.length ? ` (${st6.picks.map((k) => GLASS3[k][0].toLowerCase()).join(", ")})` : ""}.</p><div class="gchips">${Object.entries(GLASS3).map(([k, [n, , col]]) => `<button class="gchip" data-pi="glass:${k}"><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:${col};border:1px solid #3b3530;vertical-align:-2px"></span> <span>${esc(n)}${have3.includes(k) ? " (yours)" : ""}</span></button>`).join("")}</div>`;
+    if (!st6) h3 += `<p class="muted">${have2.length ? `Your own finds: ${have2.map((k) => GLASS3[k][0].toLowerCase()).join(", ")}.` : "You haven't found any yet: Ivy lends you some from her jars."} Wired onto a bit of driftwood, to hang in a window.${evan2 ? " Evan chooses the shiniest piece. Obviously." : ""}</p><div class="actions"><button class="btn primary" data-pi="sun" ${F2.coins >= SUN.price ? "" : "disabled"}>Sit at the bench</button></div>`;
+    else if (st6.picks.length < SUN.N) h3 += `<p class="muted">Pick five pieces: ${st6.picks.length}/${SUN.N}${st6.picks.length ? ` (${st6.picks.map((k) => GLASS3[k][0].toLowerCase()).join(", ")})` : ""}.</p><div class="gchips">${Object.entries(GLASS3).map(([k, [n, , col]]) => `<button class="gchip" data-pi="glass:${k}"><span style="display:inline-block;width:12px;height:12px;border-radius:4px;background:${col};border:1px solid #3b3530;vertical-align:-2px"></span> <span>${esc(n)}${have2.includes(k) ? " (yours)" : ""}</span></button>`).join("")}</div>`;
     else h3 += `<p class="muted">Ivy twists the wire, ties on a loop, and holds it to the window. Coloured light everywhere.</p><div class="actions"><button class="btn primary" data-pi="sundone" ${F2.coins >= SUN.price ? "" : "disabled"}>Take it home · ${SUN.price} ${coin11()}</button></div>`;
     return h3 + list5(F2, "pi_studio", "Ivy's shelf") + shut19;
   }
@@ -44268,8 +43987,8 @@ ${m.from}` : ""}`;
   var coin12 = () => icon("coin", 13);
   var goods6 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop);
   var row7 = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have3 ? ` (${have3} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin12()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin12()}</button></li>`;
   };
   var list6 = (F2, shop, title) => {
     const ids = goods6(shop);
@@ -44426,8 +44145,8 @@ ${m.from}` : ""}`;
   var coin13 = () => icon("coin", 13);
   var goods7 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop);
   var row8 = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have3 ? ` (${have3} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin13()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin13()}</button></li>`;
   };
   var list7 = (F2, shop, title) => {
     const ids = goods7(shop);
@@ -44729,8 +44448,8 @@ ${m.from}` : ""}`;
   var coin15 = () => icon("coin", 13);
   var head = (room4, sub, tape7 = "gingham") => `<span class="tape ${tape7}" aria-hidden="true"></span><h2>${esc(TOWNS[Object.keys(TOWNS).find((t2) => TOWNS[t2].rooms && TOWNS[t2].rooms[room4])].rooms[room4].n)}</h2><p class="sub">${sub}</p>`;
   var row9 = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have3 ? ` (${have3} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : g18.keep ? " · give it, or keep it" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin15()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : g18.keep ? " · give it, or keep it" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin15()}</button></li>`;
   };
   var listOf = (F2, ids, title) => ids.length ? `${title ? `<h3 class="ph3">${esc(title)}</h3>` : ""}<ul class="hlist wlist">${ids.map((id) => row9(F2, id)).join("")}</ul>` : "";
   var shopGoods = (room4) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === room4 && !TOWN_GOODS[id].op);
@@ -45122,11 +44841,11 @@ ${m.from}` : ""}`;
     return { choc, top };
   }
   function dipPanel(F2, st6 = {}, evan2) {
-    const have3 = (F2.inv || {}).strawberry || 0, ok = have3 >= DIP.need && F2.coins >= DIP.price;
-    return tape2("stripe") + `<h2>Dipping with Sophie</h2><p class="sub">Two strawberries on little forks, into the warm chocolate, a twirl, and something on top while it's wet. ${DIP.price} coins for the chocolate (you bring the berries: you've got ${have3}).</p>
+    const have2 = (F2.inv || {}).strawberry || 0, ok = have2 >= DIP.need && F2.coins >= DIP.price;
+    return tape2("stripe") + `<h2>Dipping with Sophie</h2><p class="sub">Two strawberries on little forks, into the warm chocolate, a twirl, and something on top while it's wet. ${DIP.price} coins for the chocolate (you bring the berries: you've got ${have2}).</p>
     <p class="eyebrow" style="margin:10px 0 6px">Chocolate</p><div class="gchips">${Object.entries(DIP.choc).map(([k, n]) => `<button class="gchip${st6.choc === k ? " on" : ""}" data-bba="choc:${k}" aria-pressed="${st6.choc === k}">${esc(n)}</button>`).join("")}</div>
     <p class="eyebrow" style="margin:10px 0 6px">On top</p><div class="gchips">${Object.entries(DIP.tops).map(([k, n]) => `<button class="gchip${st6.top === k ? " on" : ""}" data-bba="top:${k}" aria-pressed="${st6.top === k}">${esc(n)}</button>`).join("")}</div>
-    ${evan2 ? `<p class="muted">Evan gets the spoon to lick after.</p>` : ""}<div class="actions"><button class="btn primary" data-bba="dip" ${ok && st6.choc && st6.top ? "" : "disabled"}>Dip!</button></div>${have3 < DIP.need ? `<p class="muted">You'll need strawberries: pick your own in the rows outside.</p>` : ""}` + shut24;
+    ${evan2 ? `<p class="muted">Evan gets the spoon to lick after.</p>` : ""}<div class="actions"><button class="btn primary" data-bba="dip" ${ok && st6.choc && st6.top ? "" : "disabled"}>Dip!</button></div>${have2 < DIP.need ? `<p class="muted">You'll need strawberries: pick your own in the rows outside.</p>` : ""}` + shut24;
   }
   var JOEY = { STEPS: ["Warm the bottle", "Tuck her into her pouch", "Feed her, slowly", "Back in her basket"], WARM: 3, FEED: 4, RELEASE: 3 };
   var joeyStart = () => ({ step: 0, warm: 0, feed: 0, oops: false });
@@ -46312,26 +46031,26 @@ ${m.from}` : ""}`;
   var GRAPES = ["grape_red", "grape_white", "grape_tempranillo", "grape_pinot", "grape_chardonnay", "grape_priory"];
   var grapesHave = (inv) => GRAPES.reduce((n, k) => n + (inv[k] || 0), 0);
   var cheeseOf = (inv) => ["cheese", ...Object.keys(inv).filter((k) => /^chz_/.test(k))].find((k) => inv[k] > 0);
-  var take3 = (inv, k, n) => {
+  var take2 = (inv, k, n) => {
     inv[k] -= n;
     if (!inv[k]) delete inv[k];
   };
-  var left5 = (b, now6 = Date.now(), days2) => b ? Math.max(0, b.at + days2 * DAY4 - now6) : 0;
-  function missing2(F2, k) {
+  var left5 = (b, now5 = Date.now(), days2) => b ? Math.max(0, b.at + days2 * DAY4 - now5) : 0;
+  function missing(F2, k) {
     const inv = F2.inv || {}, need3 = LOFT[k].need || {}, out = [];
     Object.entries(need3).forEach(([id, n]) => {
-      const have3 = id === "grapes" ? grapesHave(inv) : id === "cheese" ? cheeseOf(inv) ? 1 : 0 : inv[id] || 0;
-      if (have3 < n) out.push(`${n - have3} more ${id === "grapes" ? "bunches of grapes" : id === "pinenuts" ? "bag of pine nuts" : id === "oliveoil" ? "bottle of olive oil" : id}`);
+      const have2 = id === "grapes" ? grapesHave(inv) : id === "cheese" ? cheeseOf(inv) ? 1 : 0 : inv[id] || 0;
+      if (have2 < n) out.push(`${n - have2} more ${id === "grapes" ? "bunches of grapes" : id === "pinenuts" ? "bag of pine nuts" : id === "oliveoil" ? "bottle of olive oil" : id}`);
     });
     return out;
   }
-  function startBatch(F2, k, now6 = Date.now()) {
+  function startBatch(F2, k, now5 = Date.now()) {
     const L3 = loftState(F2), inv = F2.inv = F2.inv || {};
-    if (!loftOpen(F2) || !LOFT[k] || missing2(F2, k).length) return null;
+    if (!loftOpen(F2) || !LOFT[k] || missing(F2, k).length) return null;
     if (k === "rack" && (!canRaisin(F2) || L3.rack || L3.cask)) return null;
     if (k === "pesto") {
       if (!canPesto(F2)) return null;
-      Object.entries(LOFT.pesto.need).forEach(([id, n]) => take3(inv, id === "cheese" ? cheeseOf(inv) : id, n));
+      Object.entries(LOFT.pesto.need).forEach(([id, n]) => take2(inv, id === "cheese" ? cheeseOf(inv) : id, n));
       inv.pesto = (inv.pesto || 0) + 2;
       L3.made.pesto = (L3.made.pesto || 0) + 2;
       return true;
@@ -46343,23 +46062,23 @@ ${m.from}` : ""}`;
       for (const g18 of GRAPES) {
         const t2 = Math.min(n, inv[g18] || 0);
         if (t2) {
-          take3(inv, g18, t2);
+          take2(inv, g18, t2);
           n -= t2;
         }
       }
-      L3[k] = { at: now6, n: LOFT[k].need.grapes };
+      L3[k] = { at: now5, n: LOFT[k].need.grapes };
       return true;
     }
-    Object.entries(LOFT[k].need).forEach(([id, n]) => take3(inv, id, n));
-    L3[k] = { at: now6 };
+    Object.entries(LOFT[k].need).forEach(([id, n]) => take2(inv, id, n));
+    L3[k] = { at: now5 };
     return true;
   }
-  function collect2(F2, k, now6 = Date.now()) {
+  function collect2(F2, k, now5 = Date.now()) {
     const L3 = loftState(F2), b = L3[k];
-    if (!b || left5(b, now6, LOFT[k].days)) return null;
+    if (!b || left5(b, now5, LOFT[k].days)) return null;
     if (k === "rack") {
       L3.rack = null;
-      L3.cask = { at: now6 };
+      L3.cask = { at: now5 };
       return { cask: true };
     }
     const [id, n] = LOFT[k].gives;
@@ -46368,32 +46087,32 @@ ${m.from}` : ""}`;
     L3.made[id] = (L3.made[id] || 0) + n;
     return { id, n };
   }
-  var hrs5 = (ms) => ms >= DAY4 ? `${Math.ceil(ms / DAY4)} day${Math.ceil(ms / DAY4) === 1 ? "" : "s"}` : `${Math.max(1, Math.ceil(ms / H))} hour${Math.ceil(ms / H) === 1 ? "" : "s"}`;
+  var hrs4 = (ms) => ms >= DAY4 ? `${Math.ceil(ms / DAY4)} day${Math.ceil(ms / DAY4) === 1 ? "" : "s"}` : `${Math.max(1, Math.ceil(ms / H))} hour${Math.ceil(ms / H) === 1 ? "" : "s"}`;
   var shut28 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   function row10(F2, k, title, pic3, body2) {
     return `<li><span class="wpic">${icon(pic3, 28)}</span><span class="wtxt"><b>${esc(title)}</b><small>${body2}</small></span>`;
   }
-  function loftPanel(F2, now6 = Date.now()) {
+  function loftPanel(F2, now5 = Date.now()) {
     const L3 = loftState(F2);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>The drying loft</h2><p class="sub">Up the ladder in the barrel shed: warm, dry and smelling of grapes. What you learned in Cinque Terre, made with your own produce. The slower it is, the more it fetches at the market.</p><ul class="hlist wlist">`;
     if (!canRaisin(F2)) h3 += row10(F2, "rack", "Raisin wine", "grape_white", "Help Signor Bruno with the harvest on the monorail in Corniglia, and he'll show you how.") + `</li>`;
     else if (L3.cask) {
-      const t2 = left5(L3.cask, now6, LOFT.cask.days);
-      h3 += row10(F2, "cask", "The little cask: raisin wine", "w_raisin", t2 ? `Ageing: ready in ${hrs5(t2)}.` : "Ready! Three bottles of amber raisin wine.") + `${t2 ? "" : `<button class="btn small primary" data-lf="collect:cask">Bottle it</button>`}</li>`;
+      const t2 = left5(L3.cask, now5, LOFT.cask.days);
+      h3 += row10(F2, "cask", "The little cask: raisin wine", "w_raisin", t2 ? `Ageing: ready in ${hrs4(t2)}.` : "Ready! Three bottles of amber raisin wine.") + `${t2 ? "" : `<button class="btn small primary" data-lf="collect:cask">Bottle it</button>`}</li>`;
     } else if (L3.rack) {
-      const t2 = left5(L3.rack, now6, LOFT.rack.days);
-      h3 += row10(F2, "rack", "The cane racks: drying grapes", "grape_white", t2 ? `Six bunches, slowly turning to raisins: ${hrs5(t2)} to go.` : "Wrinkled and sweet: ready for the cask.") + `${t2 ? "" : `<button class="btn small primary" data-lf="collect:rack">Into the cask</button>`}</li>`;
+      const t2 = left5(L3.rack, now5, LOFT.rack.days);
+      h3 += row10(F2, "rack", "The cane racks: drying grapes", "grape_white", t2 ? `Six bunches, slowly turning to raisins: ${hrs4(t2)} to go.` : "Wrinkled and sweet: ready for the cask.") + `${t2 ? "" : `<button class="btn small primary" data-lf="collect:rack">Into the cask</button>`}</li>`;
     } else {
-      const m = missing2(F2, "rack");
+      const m = missing(F2, "rack");
       h3 += row10(F2, "rack", "Raisin wine: lay grapes on the racks", "grape_white", `Six bunches of your grapes (from the barrel shed's crates). 3 days on the racks, then 4 in the cask: 3 bottles, 36 each.${m.length ? ` You need ${m.join(", ")}.` : ""}`) + `<button class="btn small primary" data-lf="start:rack" ${m.length ? "disabled" : ""}>Lay them out</button></li>`;
     }
     for (const [k, title, pic3, what] of [...canRaisin(F2) ? [["tray", "Raisins on the tray", "raisins", "Two bunches of your grapes, spread on the little tray in the warm for 2 days: 2 bags of raisins, for rum and raisin gelato."]] : [], ["lemon", "Limoncino", "limoncino", "Three lemons from Ma Ma's tree, peeled and steeped for 5 days: 2 bottles, 18 each."], ["salt", "Salted anchovies", "anchovy_salt", "Six fresh anchovies from the sea, packed in salt for 4 days: 2 jars, 15 each."]]) {
-      const b = L3[k], t2 = b ? left5(b, now6, LOFT[k].days) : 0, m = missing2(F2, k);
-      if (b) h3 += row10(F2, k, `${title}: ${t2 ? "on its way" : "ready!"}`, pic3, t2 ? `Ready in ${hrs5(t2)}.` : "Done. Take it down.") + `${t2 ? "" : `<button class="btn small primary" data-lf="collect:${k}">Take it</button>`}</li>`;
+      const b = L3[k], t2 = b ? left5(b, now5, LOFT[k].days) : 0, m = missing(F2, k);
+      if (b) h3 += row10(F2, k, `${title}: ${t2 ? "on its way" : "ready!"}`, pic3, t2 ? `Ready in ${hrs4(t2)}.` : "Done. Take it down.") + `${t2 ? "" : `<button class="btn small primary" data-lf="collect:${k}">Take it</button>`}</li>`;
       else h3 += row10(F2, k, title, pic3, `${what}${m.length ? ` You need ${m.join(", ")}.` : ""}`) + `<button class="btn small primary" data-lf="start:${k}" ${m.length ? "disabled" : ""}>Start</button></li>`;
     }
     {
-      const m = missing2(F2, "pesto");
+      const m = missing(F2, "pesto");
       h3 += row10(F2, "pesto", "Pesto at the mortar", "pesto", canPesto(F2) ? `Basil 2, garlic 1, pine nuts, olive oil and a bit of cheese: 2 jars, right now.${m.length ? ` You need ${m.join(", ")}.` : ""}` : "Make pesto with Nonna Pina in Manarola first, and she'll lend you her secret.") + (canPesto(F2) ? `<button class="btn small primary" data-lf="start:pesto" ${m.length ? "disabled" : ""}>Pound it</button>` : "") + `</li>`;
     }
     return h3 + `</ul>` + shut28;
@@ -47167,12 +46886,12 @@ ${m.from}` : ""}`;
   }
   function streetScreen2() {
     const road = g12(`<rect y="300" width="520" height="70" fill="#A8A498"/><path d="M0 335 H520" stroke="#F3EAD6" stroke-width="2" stroke-dasharray="14 12"/><rect y="282" width="520" height="18" fill="#D9CBB0"/><rect y="370" width="520" height="14" fill="#D9CBB0"/>`);
-    const bake3 = place4("bvtbakery", 110, 248, 46, 10, "The bakehouse", shed(50, 166, 120, 84, { wall: "#E3B8A0", roof: "#8A9098", sign: "BAKEHOUSE", wins: [24, 96], door: "#5A3A2E", veranda: true }) + g12(`<rect x="66" y="120" width="12" height="34" fill="#A8574A"/>`), "Bakehouse", 110, 272, "#FBE0B8");
+    const bake2 = place4("bvtbakery", 110, 248, 46, 10, "The bakehouse", shed(50, 166, 120, 84, { wall: "#E3B8A0", roof: "#8A9098", sign: "BAKEHOUSE", wins: [24, 96], door: "#5A3A2E", veranda: true }) + g12(`<rect x="66" y="120" width="12" height="34" fill="#A8574A"/>`), "Bakehouse", 110, 272, "#FBE0B8");
     const lolly = place4("bvtlolly", 260, 248, 46, 10, "Jarrah's lolly shop", shed(200, 166, 120, 84, { wall: "#F4C7CF", roof: "#8A9098", sign: "LOLLIES", wins: [24, 96], door: "#E8566C" }) + awning3(196, 196, 128, "#E8566C") + g12([210, 222, 298, 310].map((x, i) => `<rect x="${x - 3}" y="${182 - i % 2 * 2}" width="6" height="9" rx="2" fill="${["#F3C969", "#9FD3C2", "#B9A2DC", "#E8566C"][i]}" stroke="${C16.ink}" stroke-width=".5"/>`).join("")), "Lolly shop", 260, 272, "#F6D3DC");
     const books4 = place4("bvtbooks", 410, 248, 46, 10, "The book barn", shed(350, 156, 120, 94, { wall: "#9A5A44", roof: "#7A766A", sign: "BOOK BARN", wins: [24, 96], door: "#3E3A2E", roofH: 28 }), "Book barn", 410, 272, "#FBE0B8");
     const trough = place4("bvttrough", 300, 470, 34, 9, "The old horse trough", g12(sk(`<rect x="270" y="440" width="60" height="22" rx="3" style="fill:#9A9484"/>`, `<rect x="270" y="440" width="60" height="22" rx="3"/>`) + [282, 296, 310, 322].map((x, i) => `<circle cx="${x}" cy="${438 - i % 2 * 3}" r="5" fill="${i % 2 ? "#E8566C" : "#F4A0A0"}"/>`).join("") + `<path d="M276 440 q4 -6 10 -2 M312 440 q6 -6 12 -2" stroke="#5E8A4E" stroke-width="2" fill="none"/>`), "Horse trough", 300, 488, "#F6E3B4");
     const lamps = lantern3(30, 300) + lantern3(186, 300) + lantern3(336, 300) + lantern3(500, 300);
-    return lampDefs + ground6(C16.grass, C16.grass2) + road + bake3 + lolly + books4 + lamps + trough + dog(200, 290) + rfTree(40, 640, 0.9, 0) + rfTree(480, 640, 1, 1) + bush(360, 600) + flowers2([[220, 470, "#F3D34A"], [420, 470, "#FFFDF6"]]) + myVan("bvvan_town", 130, 560) + gate5("bvtToCreek", 504, 400, "The creek", 456, 430, "East to the creek");
+    return lampDefs + ground6(C16.grass, C16.grass2) + road + bake2 + lolly + books4 + lamps + trough + dog(200, 290) + rfTree(40, 640, 0.9, 0) + rfTree(480, 640, 1, 1) + bush(360, 600) + flowers2([[220, 470, "#F3D34A"], [420, 470, "#FFFDF6"]]) + myVan("bvvan_town", 130, 560) + gate5("bvtToCreek", 504, 400, "The creek", 456, 430, "East to the creek");
   }
   function creekScreen() {
     const creek = g12(sk(`<path d="M228 0 Q236 160 230 320 Q226 480 234 640 H292 Q284 480 290 320 Q296 160 288 0z" style="fill:#6E9AA8"/>`, ``) + `<path d="M246 60 q6 20 0 40 M262 220 q-6 20 0 40 M250 500 q6 20 0 40" stroke="#FFFFFF" stroke-width="1.6" fill="none" opacity=".6"/>` + [[240, 120], [276, 260], [244, 560]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="7" ry="3" fill="#5A7A6A"/>`).join(""));
@@ -47275,8 +46994,8 @@ ${m.from}` : ""}`;
   var LINE = 4;
   var SCRAP_CAP = 12;
   var BASE2 = 5;
-  var M3 = 6e4;
-  var now4 = () => Date.now() + (globalThis.__mapleOffset || 0);
+  var M2 = 6e4;
+  var now3 = () => Date.now() + (globalThis.__mapleOffset || 0);
   var sheetId = (col, add2) => `pp_${col}_${add2}`;
   var sheetName = (col, add2) => add2 === "seeds" ? `Seeded ${COLOURS2[col].n.toLowerCase()} paper` : `${COLOURS2[col].n} handmade paper${add2 === "none" ? "" : " " + ADDS2[add2].word}`;
   var sheetPrice = (col, add2) => BASE2 + ADDS2[add2].bonus + (col === "ink" ? 1 : 0);
@@ -47321,7 +47040,7 @@ ${m.from}` : ""}`;
     p.scraps += n;
     return n;
   }
-  function stage2(F2, t2 = now4()) {
+  function stage2(F2, t2 = now3()) {
     const p = paperState(F2);
     return {
       soaking: !!p.soak && p.soak.done > t2,
@@ -47333,14 +47052,14 @@ ${m.from}` : ""}`;
       line: p.line.map((s) => ({ ...s, dry: s.done <= t2 }))
     };
   }
-  function startSoak(F2, t2 = now4()) {
+  function startSoak(F2, t2 = now3()) {
     const p = paperState(F2);
     if (p.soak || p.pulp || p.scraps < SOAK) return false;
     p.scraps -= SOAK;
-    p.soak = { done: t2 + SOAK_MIN * M3 };
+    p.soak = { done: t2 + SOAK_MIN * M2 };
     return true;
   }
-  function beat(F2, col, t2 = now4()) {
+  function beat(F2, col, t2 = now3()) {
     const p = paperState(F2), c = COLOURS2[col];
     if (!c || !p.soak || p.soak.done > t2 || p.pulp || F2.coins < c.cost) return false;
     F2.coins -= c.cost;
@@ -47369,21 +47088,21 @@ ${m.from}` : ""}`;
     p.pulp = null;
     return true;
   }
-  function startPress2(F2, t2 = now4()) {
+  function startPress2(F2, t2 = now3()) {
     const p = paperState(F2);
     if (!p.wet || p.press) return false;
-    p.press = { ...p.wet, done: t2 + PRESS_MIN * M3 };
+    p.press = { ...p.wet, done: t2 + PRESS_MIN * M2 };
     p.wet = null;
     return true;
   }
-  function hang(F2, t2 = now4()) {
+  function hang(F2, t2 = now3()) {
     const p = paperState(F2);
     if (!p.press || p.press.done > t2 || p.line.length >= LINE) return false;
     p.line.push({ col: p.press.col, add: p.press.add, n: p.press.n, done: t2 + DRY_MS });
     p.press = null;
     return true;
   }
-  function takeDown2(F2, t2 = now4()) {
+  function takeDown2(F2, t2 = now3()) {
     const p = paperState(F2), dry = p.line.filter((s) => s.done <= t2);
     if (!dry.length) return 0;
     p.line = p.line.filter((s) => s.done > t2);
@@ -47437,13 +47156,13 @@ ${m.from}` : ""}`;
     }
     return k;
   }
-  function paperTick(F2, here, t2 = now4()) {
+  function paperTick(F2, here, t2 = now3()) {
     const p = paperState(F2), out = { n: 0, coins: 0, wage: 0, cls: 0, down: 0 }, kept = keeperHired(F2);
     if (!p.at || !here && !kept) {
       p.at = t2;
       return out;
     }
-    for (let at9 = Math.max(p.at, t2 - 2 * 864e5) + M3; at9 <= t2; at9 += M3) {
+    for (let at9 = Math.max(p.at, t2 - 2 * 864e5) + M2; at9 <= t2; at9 += M2) {
       const sg = new Date(at9 + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm12 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
       const lise = kept && keeperIn(day, hm12), open2 = here || lise, s = () => p.sold[day] = p.sold[day] || { n: 0, coins: 0 };
       if (lise && p.wageDay !== day) {
@@ -47483,7 +47202,7 @@ ${m.from}` : ""}`;
   CROPS.wildflower = { n: "Wildflowers", ns: "bunches of wildflowers", dur: 48 * 36e5, yield: 3, ico: "wildflower" };
   ITEMS.wildflower = { n: "Wildflowers", kind: "flower", sell: 3, ico: "wildflower", say: "Wildflowers! Cornflowers, poppies, a daisy. From the seed paper?" };
   for (const col of Object.keys(COLOURS2)) Object.assign(ITEMS[sheetId(col, "seeds")], { crop: "wildflower", plantable: true });
-  function bloomFor(F2, id, who3, at9 = now4()) {
+  function bloomFor(F2, id, who3, at9 = now3()) {
     const it = ITEMS[id];
     if (!it || !it.wrapped) return false;
     const w = (paperState(F2).wraps || []).find((r) => r.id === id);
@@ -47501,20 +47220,20 @@ ${m.from}` : ""}`;
     evan: "Dear Mama,\n\nMY FLOWERS CAME UP. Papa helped. They are blue and red and one is yellow.\n\nLove, Evan (Darren held the pencil)",
     darren: "Mel,\n\nThe seed tag from the present came up by the back door. Wildflowers. I didn't kill them. Proud of me?\n\nD"
   };
-  var bloomMail = (F2, t2 = now4()) => (paperState(F2).blooms || []).filter((b) => b.at <= t2).map((b) => ({ id: b.id, from: "postie", at: b.at, title: "The seed tag came up", body: BLOOM[b.who] || BLOOM.mum }));
+  var bloomMail = (F2, t2 = now3()) => (paperState(F2).blooms || []).filter((b) => b.at <= t2).map((b) => ({ id: b.id, from: "postie", at: b.at, title: "The seed tag came up", body: BLOOM[b.who] || BLOOM.mum }));
   var coin20 = () => icon("coin", 13);
   var shut29 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var left6 = (done, t2) => {
-    const m = Math.max(1, Math.ceil((done - t2) / M3));
+    const m = Math.max(1, Math.ceil((done - t2) / M2));
     return m >= 60 ? `${Math.round(m / 60)} hour${Math.round(m / 60) === 1 ? "" : "s"}` : `${m} minute${m === 1 ? "" : "s"}`;
   };
   var btn3 = (a, label2, on = true, k = "", cls = "primary") => `<button class="btn small ${cls}" data-pp="${a}"${k ? ` data-k="${k}"` : ""} ${on ? "" : "disabled"}>${label2}</button>`;
   var STEPS = [["pp_scrap", "Scraps"], ["pp_soak", "Soak"], ["pp_vat", "Pulp"], ["pp_adds", "Add-in"], ["pp_vat", "Pull"], ["pp_press", "Press"], ["pp_line", "Dry"]];
-  function stepNow(F2, t2 = now4()) {
+  function stepNow(F2, t2 = now3()) {
     const st6 = stage2(F2, t2);
     return st6.pressed || st6.pressing ? 5 : st6.wet ? 5 : st6.pulp ? st6.pulp.add === "none" ? 3 : 4 : st6.soaked ? 2 : st6.soaking ? 1 : 0;
   }
-  function batchIcon(F2, t2 = now4()) {
+  function batchIcon(F2, t2 = now3()) {
     const st6 = stage2(F2, t2);
     if (st6.pressing || st6.pressed) return `pppress_${paperState(F2).press.col}_${paperState(F2).press.add}`;
     if (st6.wet) return `ppwet_${st6.wet.col}_${st6.wet.add}`;
@@ -47528,7 +47247,7 @@ ${m.from}` : ""}`;
   }
   var head2 = (title, sub, F2, t2, tape7 = "gingham") => `<span class="tape ${tape7}" aria-hidden="true"></span><h2>${title}</h2><p class="sub">${sub}</p>${strip(F2, t2)}<div class="ppbatch">${icon(batchIcon(F2, t2), 64)}</div>`;
   function paperPanel(F2, spot13, o = {}) {
-    const p = paperState(F2), t2 = o.t || now4(), st6 = stage2(F2, t2);
+    const p = paperState(F2), t2 = o.t || now3(), st6 = stage2(F2, t2);
     if (spot13 === "pp_scrap") {
       return head2("The scrap bin", "Wine labels, chocolate wrappers, receipts and old brown paper: everything gets a second life here.", F2, t2) + `<p class="olabel">${icon("ppscraps", 22)} ${p.scraps} bundle${p.scraps === 1 ? "" : "s"} of scraps</p>${o.came ? `<p class="muted">${o.came} came up in the van today, from ${esc(homeShops(F2).join(", "))}.</p>` : `<p class="muted">Each of your shops puts a bundle aside every day (${homeShops(F2).length} a day now); they ride up in the van when you visit.</p>`}
       <div class="actions">${btn3("tear", `Tear and soak ${SOAK} bundles`, p.scraps >= SOAK && !p.soak && !p.pulp)}${btn3("scraps", `Buy a bundle (${SCRAP_PRICE} ${coin20()})`, F2.coins >= SCRAP_PRICE, "", "alt")}</div>
@@ -47577,7 +47296,7 @@ ${m.from}` : ""}`;
     const F2 = getF();
     return !!(F2 && F2.goals && F2.goals.paperie);
   };
-  var now5 = () => Date.now() + (globalThis.__mapleOffset || 0);
+  var now4 = () => Date.now() + (globalThis.__mapleOffset || 0);
   var O = `stroke="#3a2e28" stroke-width=".6"`;
   var ADDCOL = { lavender: "#8E6CC0", rose: "#E36A86", petals: "#F3C969", tea: "#6E4A2E", gold: "#E0A83A", seeds: "#5A4632" };
   var stoneWall4 = () => g9(`<rect width="520" height="200" fill="#EDE2CC"/>${Array.from({ length: 22 }, (_, i) => `<rect x="${i * 61 % 500}" y="${20 + i * 37 % 160}" width="${20 + i % 3 * 8}" height="9" rx="3" fill="#DDCDAE"/>`).join("")}<rect width="520" height="12" fill="#5E7A4E"/><rect y="196" width="520" height="6" fill="#C9B48E"/>`);
@@ -47589,7 +47308,7 @@ ${m.from}` : ""}`;
   }
   function paperRoomArt() {
     if (!paperOwned()) return emptyRoom();
-    const F2 = getF(), p = F2 && F2.paperie || {}, t2 = now5(), stock2 = Object.entries(p.stock || {}).filter(([, n]) => n > 0);
+    const F2 = getF(), p = F2 && F2.paperie || {}, t2 = now4(), stock2 = Object.entries(p.stock || {}).filter(([, n]) => n > 0);
     const stacks = stock2.slice(0, 12).map(([id, n], i) => {
       const [, col, add2] = id.split("_"), x = 34 + i % 4 * 40, y = 72 + Math.floor(i / 4) * 44, h3 = Math.min(18, 4 + n * 2);
       return `<rect x="${x}" y="${y + 20 - h3}" width="32" height="${h3}" rx="1" fill="${COL[col]}" ${O}/>${flecksIn(add2, x + 3, y + 22 - h3, 26, h3 - 4, 3)}<path d="M${x} ${y + 20 - h3 / 2} h32" stroke="#00000018"/>`;
@@ -48267,7 +47986,7 @@ ${m.from}` : ""}`;
   var placeFor = (id) => !storable(id) ? null : (FRIDGE_KINDS.includes(ITEMS[id].kind) || isIngr(id) || isGood(id)) && !ITEMS[id].mill ? "fridge" : "shelf";
   var storedCount = (F2, where) => Object.values(storeState(F2)[where]).reduce((a, b) => a + b, 0);
   function putAway(F2, where, id, n = 99) {
-    const have3 = (F2.inv || {})[id] || 0, k = Math.min(n, have3);
+    const have2 = (F2.inv || {})[id] || 0, k = Math.min(n, have2);
     if (!k || placeFor(id) !== where) return 0;
     F2.inv[id] -= k;
     if (F2.inv[id] <= 0) delete F2.inv[id];
@@ -48414,16 +48133,16 @@ ${m.from}` : ""}`;
   }
   function pieceRow(F2, c, id) {
     const p = PIECES[id], t2 = tierOf(F2, c, id), nx = nextTier(F2, c, id), o = pending(F2, c, id);
-    const now6 = t2 ? p.tiers[t2 - 1].n : "Not yet";
+    const now5 = t2 ? p.tiers[t2 - 1].n : "Not yet";
     const act2 = o ? `<span class="hbadge">on the train</span>` : nx ? buyBtn2(F2, nx.price, `data-co="order:${id}"`, t2 ? "Upgrade" : "Order") : `<span class="hbadge">the best</span>`;
-    return `<li><span class="wtxt"><b>${esc(p.n)}${p.basic && !t2 ? " (needed to open)" : ""}</b><small>${t2 ? `${"●".repeat(t2)}${"○".repeat(3 - t2)} ${esc(now6)}` : "Not yet"}${o ? `. Coming: ${esc(o.n)}` : nx ? `. ${t2 ? "Next" : "Start with"}: ${esc(nx.n)}` : ""}</small></span>${act2}</li>`;
+    return `<li><span class="wtxt"><b>${esc(p.n)}${p.basic && !t2 ? " (needed to open)" : ""}</b><small>${t2 ? `${"●".repeat(t2)}${"○".repeat(3 - t2)} ${esc(now5)}` : "Not yet"}${o ? `. Coming: ${esc(o.n)}` : nx ? `. ${t2 ? "Next" : "Start with"}: ${esc(nx.n)}` : ""}</small></span>${act2}</li>`;
   }
   function catalogPanel(F2, c, tab = "down") {
     const tabs = `<div class="tabs" role="tablist">${["down", "up", "bath", "garden", "acc"].map((k) => `<button role="tab" data-cotab="${k}" aria-selected="${k === tab}">${ROOMN[k]}</button>`).join("")}</div>`;
     let h3 = `${tape6}<h2>The catalogue</h2>${tabs}<p class="sub">For ${esc(COTTAGES[c].n)}, in ${esc(STYLES3[letState(F2).style[c]].n)}. Order today and it comes on the 9:15 train tomorrow morning. You have ${F2.coins} ${coin22()}.</p>`;
     if (tab === "acc") h3 += `<ul class="hlist wlist">${ACC_IDS.map((k) => {
-      const a = ACCESSORIES2[k], have3 = letState(F2).acc[c][k], o = pending(F2, c, k);
-      return `<li><span class="wtxt"><b>${esc(a.n)}</b><small>${ROOMN[a.room]}</small></span>${have3 ? `<span class="hbadge">there</span>` : o ? `<span class="hbadge">on the train</span>` : buyBtn2(F2, a.price, `data-co="order:${k}"`, "Order")}</li>`;
+      const a = ACCESSORIES2[k], have2 = letState(F2).acc[c][k], o = pending(F2, c, k);
+      return `<li><span class="wtxt"><b>${esc(a.n)}</b><small>${ROOMN[a.room]}</small></span>${have2 ? `<span class="hbadge">there</span>` : o ? `<span class="hbadge">on the train</span>` : buyBtn2(F2, a.price, `data-co="order:${k}"`, "Order")}</li>`;
     }).join("")}</ul>`;
     else h3 += `<ul class="hlist wlist">${PIECE_IDS.filter((k) => PIECES[k].room === tab).map((k) => pieceRow(F2, c, k)).join("")}</ul>`;
     h3 += `<div class="actions"><button class="btn alt small" data-co="view:style">Change the look</button></div>`;
@@ -48575,12 +48294,12 @@ ${m.from}` : ""}`;
     return x - Math.floor(x);
   };
   var hx = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
-  var mix3 = (a, b, t2) => {
+  var mix2 = (a, b, t2) => {
     const A2 = hx(a), B = hx(b);
     return "#" + A2.map((v, i) => Math.round(v + (B[i] - v) * t2).toString(16).padStart(2, "0")).join("").toUpperCase();
   };
-  var dk = (c, t2 = 0.25) => mix3(c, "#2A1E16", t2);
-  var lt = (c, t2 = 0.3) => mix3(c, "#FFFFFF", t2);
+  var dk = (c, t2 = 0.25) => mix2(c, "#2A1E16", t2);
+  var lt = (c, t2 = 0.3) => mix2(c, "#FFFFFF", t2);
   var strip2 = (s) => s.replace(/ style="[^"]*"/g, "").replace(/ (opacity|fill|stroke-width|stroke-dasharray)="[^"]*"/g, "");
   var D5 = (main, det = "") => sk(main + det, strip2(main));
   var txt7 = (x, y, t2, size = 7, fill2 = "#3A2E28", weight = 400) => `<text x="${x}" y="${y}" text-anchor="middle" font-family="Klee One,serif" font-weight="${weight}" font-size="${size}" fill="${fill2}" pointer-events="none">${t2}</text>`;
@@ -48679,7 +48398,7 @@ ${m.from}` : ""}`;
     if (ST.style === "peranakan") {
       for (let r = 0; y0 + r * 34 < 640; r++) for (let k = 0; k < 16; k++) {
         const x = k * 34, y = y0 + r * 34;
-        s += `<rect x="${x}" y="${y}" width="34" height="34" style="fill:${S2.floor};stroke:${mix3(S2.floor, S2.floor2, 0.4)}" stroke-width=".8"/><path d="M${x} ${y - 6} l6 6 l-6 6 l-6 -6z" style="fill:${S2.floor2}" opacity=".7"/><circle cx="${x + 17}" cy="${y + 17}" r="3.4" style="fill:${S2.fabric}" opacity=".6"/>`;
+        s += `<rect x="${x}" y="${y}" width="34" height="34" style="fill:${S2.floor};stroke:${mix2(S2.floor, S2.floor2, 0.4)}" stroke-width=".8"/><path d="M${x} ${y - 6} l6 6 l-6 6 l-6 -6z" style="fill:${S2.floor2}" opacity=".7"/><circle cx="${x + 17}" cy="${y + 17}" r="3.4" style="fill:${S2.fabric}" opacity=".6"/>`;
       }
     } else {
       for (let r = 0; y0 + r * 18 < 640; r++) {
@@ -48774,7 +48493,7 @@ ${m.from}` : ""}`;
   }
   function chimney() {
     const [x] = at8("fireplace");
-    return g14(`<rect x="${x - 38}" y="99" width="76" height="${FL2 - 99}" style="fill:${mix3(S2.wall, S2.wall2, 0.5)}"/>` + sk("", `<path d="M${x - 38} 99 V${FL2} M${x + 38} 99 V${FL2}"/>`) + D5(`<rect x="${x - 40}" y="176" width="80" height="6" rx="1" style="fill:${dk(S2.wood, 0.25)}"/>`, `<path d="M${x - 34} 179 q20 -1 40 0 q14 1 28 -1" fill="none" stroke="${dk(S2.wood, 0.45)}" stroke-width=".6"/>`));
+    return g14(`<rect x="${x - 38}" y="99" width="76" height="${FL2 - 99}" style="fill:${mix2(S2.wall, S2.wall2, 0.5)}"/>` + sk("", `<path d="M${x - 38} 99 V${FL2} M${x + 38} 99 V${FL2}"/>`) + D5(`<rect x="${x - 40}" y="176" width="80" height="6" rx="1" style="fill:${dk(S2.wood, 0.25)}"/>`, `<path d="M${x - 34} 179 q20 -1 40 0 q14 1 28 -1" fill="none" stroke="${dk(S2.wood, 0.45)}" stroke-width=".6"/>`));
   }
   function fireplace(t2, x, y) {
     const fire = (fy, s) => `<path d="M${x - 9 * s} ${fy} l${18 * s} -3 M${x - 8 * s} ${fy - 3} l${16 * s} 3" stroke="#6B4A2E" stroke-width="${3 * s}" stroke-linecap="round"/>` + flame(x - 3 * s, fy - 2, s * 0.7) + flame(x + 3 * s, fy - 2, s * 0.55) + flame(x, fy - 3, s * 0.85);
@@ -48812,7 +48531,7 @@ ${m.from}` : ""}`;
   }
   function kitchen(t2, x, y) {
     const x0 = x - 66, x1 = x + 68, top = `<rect x="${x0 - 2}" y="${y - 38}" width="${x1 - x0 + 4}" height="8" rx="1" style="fill:${t2 === 3 ? dk(S2.wood, 0.1) : lt(S2.wood, 0.25)}"/>`;
-    const cup2 = t2 === 3 ? mix3(S2.accent, "#FFFFFF", 0.35) : t2 === 2 ? mix3(S2.accent, "#FFFFFF", 0.5) : S2.wall2;
+    const cup2 = t2 === 3 ? mix2(S2.accent, "#FFFFFF", 0.35) : t2 === 2 ? mix2(S2.accent, "#FFFFFF", 0.5) : S2.wall2;
     const doors = (a, b) => Array.from({ length: Math.floor((b - a) / 18) }, (_, k) => `<rect x="${a + 2 + k * 18}" y="${y - 27}" width="15" height="24" rx="1" fill="none" stroke="${dk(cup2, 0.2)}" stroke-width=".8"/><circle cx="${a + 14 + k * 18}" cy="${y - 20}" r="1.2" fill="${S2.metal}"/>`).join("");
     const range = (rx, w) => `<rect x="${rx}" y="${y - 36}" width="${w}" height="36" rx="2" style="fill:${S2.accent}"/><rect x="${rx - 1}" y="${y - 40}" width="${w + 2}" height="5" rx="1" style="fill:${dk(S2.accent, 0.2)}"/>`;
     const rangeDet = (rx, w) => `<rect x="${rx + 3}" y="${y - 26}" width="${w / 2 - 4}" height="22" rx="1" fill="${dk(S2.accent, 0.12)}"/><rect x="${rx + w / 2 + 1}" y="${y - 26}" width="${w / 2 - 4}" height="22" rx="1" fill="${dk(S2.accent, 0.12)}"/><path d="M${rx + 2} ${y - 30} h${w - 4}" stroke="#C3C8CC" stroke-width="1.6"/>${[0, 1, 2].map((k) => `<circle cx="${rx + 6 + k * (w - 12) / 2}" cy="${y - 33}" r="1.3" fill="#C3C8CC"/>`).join("")}`;
@@ -48830,12 +48549,12 @@ ${m.from}` : ""}`;
       `<rect x="${x0 - 2}" y="182" width="${x1 - x0 + 4}" height="${y - 38 - 182}" style="fill:${CREAM}"/><rect x="${x0}" y="${y - 30}" width="${x1 - x0}" height="30" style="fill:${cup2}"/>${top}<rect x="${x0}" y="140" width="44" height="34" style="fill:${S2.wall2}"/><rect x="${x0 - 3}" y="136" width="50" height="5" rx="1" style="fill:${dk(S2.wood, 0.1)}"/>${range(x0 + 2, 40)}${sink(x + 2, 24)}<rect x="${x1 - 32}" y="120" width="30" height="3" style="fill:${S2.metal}"/>`,
       Array.from({ length: Math.floor((x1 - x0) / 9) * 3 }, (_, k) => {
         const n = Math.floor((x1 - x0) / 9);
-        return `<rect x="${x0 + k % n * 9}" y="${174 + Math.floor(k / n) * 6.6}" width="9" height="6.6" fill="${k % 4 === 1 ? lt(S2.accent, 0.3) : CREAM}" stroke="${mix3(S2.accent, "#FFFFFF", 0.5)}" stroke-width=".4"/>`;
+        return `<rect x="${x0 + k % n * 9}" y="${174 + Math.floor(k / n) * 6.6}" width="9" height="6.6" fill="${k % 4 === 1 ? lt(S2.accent, 0.3) : CREAM}" stroke="${mix2(S2.accent, "#FFFFFF", 0.5)}" stroke-width=".4"/>`;
       }).join("") + rangeDet(x0 + 2, 40) + doors(x0 + 44, x1) + tap(x + 14) + [x1 - 26, x1 - 12].map((px, k) => `<path d="M${px} 123 v4" stroke="${INK6}" stroke-width=".8"/><circle cx="${px}" cy="${133 + k * 2}" r="${5.4 - k}" fill="#C9824A" stroke="${INK6}" stroke-width=".5"/>`).join("") + [x - 10, x + 2, x + 14].map((px, k) => `<path d="M${px - 3.4} 170 h7 l-1.4 4 h-4z" fill="#C8643B" stroke="${INK6}" stroke-width=".4"/>${[0, 1, 2].map((j) => `<ellipse cx="${px - 2 + j * 2}" cy="${166 - j % 2 * 2}" rx="1.6" ry="3" fill="${k === 1 ? "#88AE6A" : "#6E9A5A"}"/>`).join("")}`).join("")
     );
   }
   function fridge() {
-    const [sx] = SPOTS3.down.fridge, x0 = sx - 16, y = 240, col = mix3(S2.accent, "#FFFFFF", 0.72);
+    const [sx] = SPOTS3.down.fridge, x0 = sx - 16, y = 240, col = mix2(S2.accent, "#FFFFFF", 0.72);
     const note2 = ST.fridge ? `<g transform="rotate(-6 ${sx} 212)"><rect x="${sx - 13}" y="205" width="26" height="14" rx="1" fill="#F4C7CF" stroke="${INK6}" stroke-width=".5"/>${txt7(sx, 214, "Welcome!", 5.4, INK6, 700)}<circle cx="${sx}" cy="205" r="1.8" fill="${S2.accent}"/></g>` : "";
     return otherSpot(
       "fridge",
@@ -48870,7 +48589,7 @@ ${m.from}` : ""}`;
   function rug(t2, x, y) {
     if (t2 === 1) return D5(`<ellipse cx="${x}" cy="${y - 30}" rx="62" ry="30" style="fill:${S2.fabric2}"/>`, [S2.fabric, S2.accent, S2.wall2, S2.fabric, lt(S2.accent, 0.3)].map((c3, k) => `<ellipse cx="${x}" cy="${y - 30}" rx="${56 - k * 10}" ry="${26 - k * 4.6}" fill="none" stroke="${c3}" stroke-width="3.6" stroke-dasharray="${7 + k} 2.4"/>`).join(""));
     if (t2 === 2) return D5(`<rect x="${x - 66}" y="${y - 62}" width="132" height="62" rx="3" style="fill:${S2.fabric2}"/>`, `<rect x="${x - 60}" y="${y - 57}" width="120" height="52" rx="2" fill="none" stroke="${S2.accent}" stroke-width="2.4"/><rect x="${x - 54}" y="${y - 52}" width="108" height="42" fill="none" stroke="${S2.fabric}" stroke-width="1"/>`);
-    const c = mix3(S2.fabric, "#8E3A3A", 0.35);
+    const c = mix2(S2.fabric, "#8E3A3A", 0.35);
     return D5(
       `<rect x="${x - 72}" y="${y - 66}" width="144" height="66" rx="2" style="fill:${c}"/>`,
       `<rect x="${x - 66}" y="${y - 61}" width="132" height="56" fill="none" stroke="${S2.fabric2}" stroke-width="4"/>${Array.from({ length: 16 }, (_, k) => `<path d="M${x - 62 + k * 8} ${y - 61} l2 -2 l2 2" fill="none" stroke="${S2.accent}" stroke-width=".9"/>`).join("")}<path d="M${x} ${y - 53} l30 20 l-30 20 l-30 -20z" fill="${S2.fabric2}" opacity=".9"/><path d="M${x} ${y - 45} l18 12 l-18 12 l-18 -12z" fill="${S2.accent}"/><circle cx="${x}" cy="${y - 33}" r="3.4" fill="${S2.metal}"/>` + Array.from({ length: 9 }, (_, k) => `<path d="M${x - 72} ${y - 63 + k * 7.4} h-4 M${x + 72} ${y - 63 + k * 7.4} h4" stroke="${lt(S2.fabric2, 0.2)}" stroke-width="1.2"/>`).join("")
@@ -48885,7 +48604,7 @@ ${m.from}` : ""}`;
     );
   }
   function sofa(t2, x, y) {
-    const col = t2 === 1 ? mix3(S2.fabric2, "#B8A890", 0.3) : t2 === 2 ? S2.fabric : dk(S2.fabric, 0.12), d = dk(col, 0.18);
+    const col = t2 === 1 ? mix2(S2.fabric2, "#B8A890", 0.3) : t2 === 2 ? S2.fabric : dk(S2.fabric, 0.12), d = dk(col, 0.18);
     const main = `<rect x="${x - 34}" y="${y - 40}" width="68" height="10" rx="4" style="fill:${lt(col, 0.15)}"/><rect x="${x - 38}" y="${y - 34}" width="76" height="30" rx="${t2 === 3 ? 9 : 6}" style="fill:${col}"/><rect x="${x - 44}" y="${y - 31}" width="12" height="27" rx="${t2 === 3 ? 6 : 4}" style="fill:${d}"/><rect x="${x + 32}" y="${y - 31}" width="12" height="27" rx="${t2 === 3 ? 6 : 4}" style="fill:${d}"/><rect x="${x - 40}" y="${y - 7}" width="80" height="4" style="fill:${dk(col, 0.3)}"/>`;
     let det = t2 === 3 ? `<path d="M${x - 38} ${y} v-3 M${x + 38} ${y} v-3 M${x - 10} ${y} v-3 M${x + 10} ${y} v-3" stroke="${S2.metal}" stroke-width="2.6" stroke-linecap="round"/>` : `<path d="M${x - 36} ${y - 3} l-1 3 M${x + 36} ${y - 3} l1 3" stroke="${dk(S2.wood, 0.3)}" stroke-width="2"/>`;
     det += `<path d="M${x} ${y - 39} v8" stroke="${d}" stroke-width=".8"/>`;
@@ -48902,7 +48621,7 @@ ${m.from}` : ""}`;
         `${[0, 1, 2].map((k) => `<path d="M${x - 16} ${y - 24 + k * 6} q14 -2 30 0" fill="none" stroke="${dk(c, 0.25)}" stroke-width=".6"/>`).join("")}<path d="M${x - 14} ${y - 6} l-2 6 M${x + 14} ${y - 6} l2 6" stroke="${dk(c, 0.3)}" stroke-width="2"/>`
       );
     }
-    const col = t2 === 2 ? mix3(S2.accent, S2.fabric2, 0.35) : S2.accent, d = dk(col, 0.2);
+    const col = t2 === 2 ? mix2(S2.accent, S2.fabric2, 0.35) : S2.accent, d = dk(col, 0.2);
     const back = t2 === 3 ? `<path d="M${x - 18} ${y - 6} V${y - 40} q0 -6 6 -6 q4 0 4 6 q6 0 6 8 l-4 4 V${y - 6}z" style="fill:${col}"/>` : `<path d="M${x - 18} ${y - 6} V${y - 32} q0 -5 5 -5 q5 0 5 5 V${y - 6}z" style="fill:${col}"/>`;
     const stool7 = t2 === 3 ? `<rect x="${x + 22}" y="${y - 12}" width="16" height="8" rx="3" style="fill:${col}"/>` : "";
     return D5(
@@ -49048,7 +48767,7 @@ ${m.from}` : ""}`;
   function downDecor() {
     const [ax, ay] = at8("armchair");
     const side = D5(`<ellipse cx="${ax - 24}" cy="${ay - 62}" rx="9" ry="3" style="fill:${lt(S2.wood, 0.1)}"/><path d="M${ax - 30} ${ay - 44} h12 l-1 -3 h-10z" style="fill:${dk(S2.wood, 0.2)}"/>`, `<path d="M${ax - 24} ${ay - 60} v14" stroke="${dk(S2.wood, 0.2)}" stroke-width="1.8"/><path d="M${ax - 28} ${ay - 64} l1 -5 h6 l1 5z" fill="#C8643B"/><ellipse cx="${ax - 26}" cy="${ay - 72}" rx="3" ry="4" fill="#6E9A5A"/><ellipse cx="${ax - 22}" cy="${ay - 73}" rx="2.4" ry="3.4" fill="#88AE6A"/>`);
-    const x0 = 454, x1 = 500, y = 382, c = mix3(S2.accent, "#FFFFFF", 0.55);
+    const x0 = 454, x1 = 500, y = 382, c = mix2(S2.accent, "#FFFFFF", 0.55);
     const dresser = D5(
       `<rect x="${x0}" y="${y - 84}" width="${x1 - x0}" height="50" style="fill:${c}"/><rect x="${x0 - 3}" y="${y - 88}" width="${x1 - x0 + 6}" height="5" rx="1" style="fill:${dk(c, 0.15)}"/><rect x="${x0 - 2}" y="${y - 36}" width="${x1 - x0 + 4}" height="6" rx="1" style="fill:${dk(c, 0.1)}"/><rect x="${x0}" y="${y - 30}" width="${x1 - x0}" height="28" style="fill:${c}"/>`,
       `${[0, 1].map((r) => `<path d="M${x0 + 2} ${y - 60 + r * 22} h${x1 - x0 - 4}" stroke="${dk(c, 0.25)}" stroke-width="1.4"/>${[0, 1, 2, 3].map((k) => `<circle cx="${x0 + 8 + k * 10}" cy="${y - 68 + r * 22}" r="4" fill="${CREAM}" stroke="${S2.accent}" stroke-width=".9"/>`).join("")}`).join("")}<path d="M${(x0 + x1) / 2} ${y - 30} v28" stroke="${dk(c, 0.25)}" stroke-width=".8"/><circle cx="${(x0 + x1) / 2 - 4}" cy="${y - 16}" r="1.2" fill="${S2.metal}"/><circle cx="${(x0 + x1) / 2 + 4}" cy="${y - 16}" r="1.2" fill="${S2.metal}"/><path d="M${x0 + 2} ${y - 2} v2 M${x1 - 2} ${y - 2} v2" stroke="${INK6}" stroke-width="2"/><path d="M${x0 + 6} ${y - 36} q6 -8 12 0z" fill="#C9A26A"/><circle cx="${x0 + 10}" cy="${y - 40}" r="2.4" fill="#D9433A"/><circle cx="${x0 + 15}" cy="${y - 40}" r="2.4" fill="#F2A03A"/>`
@@ -49151,7 +48870,7 @@ ${m.from}` : ""}`;
   function wardrobe(t2, x, y) {
     if (t2 === 1) return D5(`<rect x="${x - 16}" y="${y - 10}" width="32" height="9" rx="1.5" style="fill:#C9A26A"/>`, `<path d="M${x - 20} ${y} V${y - 70} M${x + 20} ${y} V${y - 70} M${x - 22} ${y - 70} h44" stroke="${S2.metal}" stroke-width="2.2"/>${[S2.fabric, S2.accent, CREAM, S2.fabric2, "#7E8FA6"].map((c, k) => `<path d="M${x - 14 + k * 7} ${y - 70} v3" stroke="${INK6}" stroke-width=".6"/><path d="M${x - 18 + k * 7} ${y - 64} l4 -3 l4 3 l1.4 ${22 + k % 2 * 10} h-10.8z" fill="${c}" stroke="${INK6}" stroke-width=".5"/>`).join("")}`);
     if (t2 === 2) {
-      const c = mix3(S2.accent, "#FFFFFF", 0.5);
+      const c = mix2(S2.accent, "#FFFFFF", 0.5);
       return D5(`<rect x="${x - 22}" y="${y - 74}" width="44" height="72" rx="1.5" style="fill:${c}"/><rect x="${x - 25}" y="${y - 78}" width="50" height="5" rx="1.5" style="fill:${dk(c, 0.1)}"/>`, `<path d="M${x} ${y - 72} v68" stroke="${dk(c, 0.3)}" stroke-width="1"/><rect x="${x - 18}" y="${y - 68}" width="15" height="60" fill="none" stroke="${dk(c, 0.2)}" stroke-width=".8"/><rect x="${x + 3}" y="${y - 68}" width="15" height="60" fill="none" stroke="${dk(c, 0.2)}" stroke-width=".8"/><circle cx="${x - 3}" cy="${y - 38}" r="1.3" fill="${S2.metal}"/><circle cx="${x + 3}" cy="${y - 38}" r="1.3" fill="${S2.metal}"/><path d="M${x - 20} ${y - 2} v2 M${x + 20} ${y - 2} v2" stroke="${INK6}" stroke-width="2"/><path d="M${x - 14} ${y - 60} q4 -4 8 0 q-4 4 -8 0 M${x + 6} ${y - 60} q4 -4 8 0 q-4 4 -8 0" fill="${S2.fabric}"/>`);
     }
     return D5(
@@ -49190,7 +48909,7 @@ ${m.from}` : ""}`;
   function upDecor() {
     const [bx, by] = at8("bed");
     let s = tier("bed") ? D5(`<rect x="${bx - 24}" y="${by + 2}" width="48" height="6" rx="2" style="fill:${S2.fabric2}"/><rect x="${bx - 24}" y="${by + 8}" width="48" height="5" style="fill:${S2.wood}"/>`, `<path d="M${bx - 22} ${by + 13} v4 M${bx + 22} ${by + 13} v4" stroke="${dk(S2.wood, 0.3)}" stroke-width="2"/>`) : "";
-    const cx = 424, cy = 470, col = mix3(S2.fabric, S2.accent, 0.3);
+    const cx = 424, cy = 470, col = mix2(S2.fabric, S2.accent, 0.3);
     glow(454, 426, 30);
     s += D5(
       `<rect x="${cx - 15}" y="${cy - 34}" width="30" height="22" rx="7" style="fill:${col}"/><rect x="${cx - 19}" y="${cy - 20}" width="8" height="16" rx="3" style="fill:${dk(col, 0.1)}"/><rect x="${cx + 11}" y="${cy - 20}" width="8" height="16" rx="3" style="fill:${dk(col, 0.1)}"/><rect x="${cx - 12}" y="${cy - 16}" width="24" height="10" rx="3" style="fill:${lt(col, 0.15)}"/>`,
@@ -49203,7 +48922,7 @@ ${m.from}` : ""}`;
   }
   function bathShell() {
     let t2 = `<rect y="${FL2}" width="520" height="${640 - FL2}" style="fill:${CREAM}"/>`;
-    for (let r = 0; FL2 + r * 24 < 640; r++) for (let k = 0; k < 22; k++) t2 += `<rect x="${k * 24 + 2}" y="${FL2 + r * 24}" width="24" height="24" style="fill:${(r + k) % 2 ? CREAM : mix3(S2.wall2, CREAM, 0.15)};stroke:${dk(S2.wall2, 0.12)}" stroke-width=".6"/>`;
+    for (let r = 0; FL2 + r * 24 < 640; r++) for (let k = 0; k < 22; k++) t2 += `<rect x="${k * 24 + 2}" y="${FL2 + r * 24}" width="24" height="24" style="fill:${(r + k) % 2 ? CREAM : mix2(S2.wall2, CREAM, 0.15)};stroke:${dk(S2.wall2, 0.12)}" stroke-width=".6"/>`;
     for (let r = 0; r < 7; r++) for (let k = 0; k < 36; k++) {
       const x = k * 15 - r % 2 * 7.5, c = (k * 7 + r * 3) % 9 === 0 ? lt(S2.accent, 0.35) : (k + r) % 5 === 0 ? lt(S2.fabric2, 0.2) : CREAM;
       t2 += `<rect x="${x}" y="${f111(FL2 - 66 + r * 9.4)}" width="15" height="9.4" style="fill:${c};stroke:${dk(S2.wall2, 0.15)}" stroke-width=".4"/>`;
@@ -49232,7 +48951,7 @@ ${m.from}` : ""}`;
       `<rect x="${x - 12}" y="134" width="24" height="40" rx="12" fill="none" stroke="${S2.wood}" stroke-width="2.4"/><path d="M${x - 6} 152 l9 -11" stroke="#FFFFFF" stroke-width="1.6"/><path d="M${x - 16} ${y - 20} v20 M${x + 16} ${y - 20} v20 M${x - 16} ${y - 8} h32" stroke="${dk(S2.wood, 0.25)}" stroke-width="1.8"/><path d="M${x} ${y - 35} v-5 q0 -2 3 -2" stroke="${S2.metal}" stroke-width="1.4" fill="none"/>`
     );
     return D5(
-      mirror(x - 15, 20, 38) + mirror(x + 15, 20, 38) + `<rect x="${x - 32}" y="${y - 34}" width="64" height="6" rx="1" style="fill:#F2EEE8"/><rect x="${x - 30}" y="${y - 28}" width="60" height="28" style="fill:${mix3(S2.accent, "#FFFFFF", 0.4)}"/>`,
+      mirror(x - 15, 20, 38) + mirror(x + 15, 20, 38) + `<rect x="${x - 32}" y="${y - 34}" width="64" height="6" rx="1" style="fill:#F2EEE8"/><rect x="${x - 30}" y="${y - 28}" width="60" height="28" style="fill:${mix2(S2.accent, "#FFFFFF", 0.4)}"/>`,
       `${[x - 15, x + 15].map((mx) => `<rect x="${mx - 10}" y="134" width="20" height="38" rx="10" fill="none" stroke="${S2.metal}" stroke-width="2"/><path d="M${mx - 5} 150 l7 -9" stroke="#FFFFFF" stroke-width="1.4"/><ellipse cx="${mx}" cy="${y - 32}" rx="8" ry="1.6" fill="#DDEEF2" stroke="${INK6}" stroke-width=".4"/><path d="M${mx} ${y - 34} v-5 q0 -2 3 -2" stroke="${S2.metal}" stroke-width="1.4" fill="none"/>`).join("")}<path d="M${x} ${y - 26} v24" stroke="${dk(S2.accent, 0.2)}" stroke-width=".8"/><circle cx="${x - 4}" cy="${y - 14}" r="1.2" fill="${S2.metal}"/><circle cx="${x + 4}" cy="${y - 14}" r="1.2" fill="${S2.metal}"/>`
     );
   }
@@ -49684,8 +49403,8 @@ ${m.from}` : ""}`;
   var coin23 = () => icon("coin", 13);
   var goods8 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop);
   var row11 = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have3 ? ` (${have3} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : g18.keep ? " · give it, or keep it" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin23()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : g18.keep ? " · give it, or keep it" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin23()}</button></li>`;
   };
   var list8 = (F2, shop, title) => {
     const ids = goods8(shop);
@@ -49941,8 +49660,8 @@ ${m.from}` : ""}`;
   var coin24 = () => icon("coin", 13);
   var goods9 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop);
   var row12 = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have3 ? ` (${have3} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : g18.keep ? " · give it, or keep it" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin24()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : g18.keep ? " · give it, or keep it" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin24()}</button></li>`;
   };
   var list9 = (F2, shop, title) => {
     const ids = goods9(shop);
@@ -49951,15 +49670,15 @@ ${m.from}` : ""}`;
   var daysBetween = (a, b) => Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 864e5);
   var DIVE = { MS: 3200, LO: 0.62, HI: 0.9, N: 3, FINDS: ["a sea urchin", "a turban shell", "an abalone", "a little octopus (you let it go)"] };
   var diveStart = () => ({ n: 0, good: 0, t0: 0, last: null, done: false });
-  var descend = (st6, now6 = Date.now()) => {
+  var descend = (st6, now5 = Date.now()) => {
     if (st6.done || st6.t0) return false;
-    st6.t0 = now6;
+    st6.t0 = now5;
     return true;
   };
-  var depth = (st6, now6 = Date.now()) => st6.t0 ? Math.min(1.2, (now6 - st6.t0) / DIVE.MS) : 0;
-  function surface(st6, now6 = Date.now()) {
+  var depth = (st6, now5 = Date.now()) => st6.t0 ? Math.min(1.2, (now5 - st6.t0) / DIVE.MS) : 0;
+  function surface(st6, now5 = Date.now()) {
     if (!st6.t0 || st6.done) return null;
-    const d = depth(st6, now6), r = d < DIVE.LO ? "soon" : d > DIVE.HI ? "late" : "ok";
+    const d = depth(st6, now5), r = d < DIVE.LO ? "soon" : d > DIVE.HI ? "late" : "ok";
     st6.n++;
     st6.t0 = 0;
     if (r === "ok") st6.good++;
@@ -49992,10 +49711,10 @@ ${m.from}` : ""}`;
     return h3 + list9(F2, "jj_haenyeo", "From the divers") + shut33;
   }
   var SORT = { N: 8, MS: 3e4, SIZES: { small: "Small", medium: "Medium", large: "Large" } };
-  var sortStart = (rng = Math.random, now6 = Date.now()) => ({ t0: now6, sizes: Array.from({ length: SORT.N }, () => ["small", "medium", "large"][Math.floor(rng() * 3)]), i: 0, good: 0, done: false });
-  function sortTap(st6, crate8, now6 = Date.now()) {
+  var sortStart = (rng = Math.random, now5 = Date.now()) => ({ t0: now5, sizes: Array.from({ length: SORT.N }, () => ["small", "medium", "large"][Math.floor(rng() * 3)]), i: 0, good: 0, done: false });
+  function sortTap(st6, crate8, now5 = Date.now()) {
     if (st6.done) return null;
-    if (now6 - st6.t0 > SORT.MS) {
+    if (now5 - st6.t0 > SORT.MS) {
       st6.done = true;
       st6.late = true;
       return "time";
@@ -50218,8 +49937,8 @@ ${m.from}` : ""}`;
   var coin25 = () => icon("coin", 13);
   var goods10 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop);
   var row13 = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have3 ? ` (${have3} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin25()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || g18.line || "")}${have2 ? ` (${have2} in your backpack)` : ""}${g18.kind === "keepsake" ? " · a keepsake for a shelf" : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin25()}</button></li>`;
   };
   var list10 = (F2, shop, title) => {
     const ids = goods10(shop);
@@ -50269,10 +49988,10 @@ ${m.from}` : ""}`;
     return h3 + list10(F2, "ktyukata", "And to take home") + shut34;
   }
   var TEA2 = { price: 10, BEAT: 560, WHISKS: 8, WINDOW: 150, COUNT_IN: 1200 };
-  var whiskStart = (now6 = Date.now()) => ({ t0: now6 + TEA2.COUNT_IN, good: 0, n: 0, done: false, bowed: false });
-  function whisk(st6, now6 = Date.now()) {
-    if (st6.n >= TEA2.WHISKS || now6 < st6.t0 - TEA2.WINDOW) return null;
-    const off = ((now6 - st6.t0) % TEA2.BEAT + TEA2.BEAT) % TEA2.BEAT, d = Math.min(off, TEA2.BEAT - off), ok = d <= TEA2.WINDOW;
+  var whiskStart = (now5 = Date.now()) => ({ t0: now5 + TEA2.COUNT_IN, good: 0, n: 0, done: false, bowed: false });
+  function whisk(st6, now5 = Date.now()) {
+    if (st6.n >= TEA2.WHISKS || now5 < st6.t0 - TEA2.WINDOW) return null;
+    const off = ((now5 - st6.t0) % TEA2.BEAT + TEA2.BEAT) % TEA2.BEAT, d = Math.min(off, TEA2.BEAT - off), ok = d <= TEA2.WINDOW;
     st6.n++;
     if (ok) st6.good++;
     if (st6.n >= TEA2.WHISKS) st6.done = true;
@@ -50292,12 +50011,12 @@ ${m.from}` : ""}`;
     <div class="actions"><button class="btn primary" data-kt="tea" ${F2.coins >= TEA2.price ? "" : "disabled"}>Sit down for tea · ${TEA2.price} ${coin25()}</button></div>` + list10(F2, "kt_tea", "From the tea house") + shut34;
   }
   var BREATH = { HALF: 4e3, BREATHS: 3, COUNT_IN: 1500 };
-  var sitStart = (now6 = Date.now()) => ({ t0: now6 + BREATH.COUNT_IN, taps: [], done: false });
-  var breathPhase = (st6, now6 = Date.now()) => now6 < st6.t0 ? "ready" : Math.floor((now6 - st6.t0) / BREATH.HALF) % 2 ? "out" : "in";
-  function breathe(st6, which, now6 = Date.now()) {
-    const ph = breathPhase(st6, now6);
+  var sitStart = (now5 = Date.now()) => ({ t0: now5 + BREATH.COUNT_IN, taps: [], done: false });
+  var breathPhase = (st6, now5 = Date.now()) => now5 < st6.t0 ? "ready" : Math.floor((now5 - st6.t0) / BREATH.HALF) % 2 ? "out" : "in";
+  function breathe(st6, which, now5 = Date.now()) {
+    const ph = breathPhase(st6, now5);
     if (ph === "ready" || st6.done) return null;
-    const half = Math.floor((now6 - st6.t0) / BREATH.HALF);
+    const half = Math.floor((now5 - st6.t0) / BREATH.HALF);
     if (st6.taps.some((t2) => t2.half === half)) return "again";
     const ok = ph === which;
     st6.taps.push({ half, ok });
@@ -50350,12 +50069,12 @@ ${m.from}` : ""}`;
     return h3 + list10(F2, "kt_sweets", "From the shop") + shut34;
   }
   var CUP = { price: 10, glazes: { indigo: "deep indigo", celadon: "pale celadon green", amber: "warm amber" }, ZONE: { at: 0.5, width: 0.22 } };
-  var cupAt = (t0, now6 = Date.now()) => {
-    const p = (now6 - t0) / 900 % 2;
+  var cupAt = (t0, now5 = Date.now()) => {
+    const p = (now5 - t0) / 900 % 2;
     return p < 1 ? p : 2 - p;
   };
-  var centre = (st6, now6 = Date.now()) => {
-    const ok = Math.abs(cupAt(st6.t0, now6) - CUP.ZONE.at) <= CUP.ZONE.width / 2;
+  var centre = (st6, now5 = Date.now()) => {
+    const ok = Math.abs(cupAt(st6.t0, now5) - CUP.ZONE.at) <= CUP.ZONE.width / 2;
     st6.tries++;
     if (ok) st6.good++;
     return ok;
@@ -50459,8 +50178,8 @@ ${m.from}` : ""}`;
   var shut35 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin26 = () => icon("coin", 13);
   var goodRow = (F2, id) => {
-    const g18 = TOWN_GOODS[id], have3 = (F2.inv || {})[id] || 0;
-    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || "")}${have3 ? ` (${have3} in your backpack)` : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin26()}</button></li>`;
+    const g18 = TOWN_GOODS[id], have2 = (F2.inv || {})[id] || 0;
+    return `<li><span class="wpic">${icon(id, 28)}</span><span class="wtxt"><b>${esc(g18.n)}</b><small>${esc(g18.what || g18.say || "")}${have2 ? ` (${have2} in your backpack)` : ""}</small></span><button class="btn small primary" data-rbuy="${id}" ${F2.coins >= g18.price ? "" : "disabled"}>${g18.price} ${coin26()}</button></li>`;
   };
   var shopGoods2 = (shop) => Object.keys(TOWN_GOODS).filter((id) => TOWN_GOODS[id].shop === shop);
   function marketPanel5(F2) {
@@ -50510,11 +50229,11 @@ ${m.from}` : ""}`;
   var ROUNDS = 2;
   var COUNT_IN = 1500;
   var showOn = (hm12) => SHOWS.some(([a, b]) => hm12 >= a && hm12 < b);
-  var palmasStart = (now6 = Date.now()) => ({ t0: now6 + COUNT_IN, clapped: [], hits: 0, misses: 0, done: false });
+  var palmasStart = (now5 = Date.now()) => ({ t0: now5 + COUNT_IN, clapped: [], hits: 0, misses: 0, done: false });
   var palmasEnd = (st6) => st6.t0 + COMPAS * ROUNDS * BEAT_MS;
-  function clap(st6, now6 = Date.now()) {
-    if (now6 < st6.t0) return "early";
-    const b = Math.floor((now6 - st6.t0) / BEAT_MS);
+  function clap(st6, now5 = Date.now()) {
+    if (now5 < st6.t0) return "early";
+    const b = Math.floor((now5 - st6.t0) / BEAT_MS);
     if (b >= COMPAS * ROUNDS) return null;
     if (st6.clapped.includes(b)) return "dup";
     st6.clapped.push(b);
@@ -50577,12 +50296,12 @@ ${m.from}` : ""}`;
     <div class="fbar"><span class="fzone" style="left:${((TEA_ZONE.at - TEA_ZONE.width / 2) * 100).toFixed(1)}%;width:${(TEA_ZONE.width * 100).toFixed(1)}%"></span><span class="fmark" style="animation-delay:-${(Date.now() - st6.t0) % 1800}ms"></span></div>
     <div class="actions"><button class="btn primary" data-rtea="pour">Pour</button></div>`;
   }
-  var teaAt = (t0, now6 = Date.now()) => {
-    const p = (now6 - t0) / 900 % 2;
+  var teaAt = (t0, now5 = Date.now()) => {
+    const p = (now5 - t0) / 900 % 2;
     return p < 1 ? p : 2 - p;
   };
-  function pour3(st6, now6 = Date.now()) {
-    const ok = Math.abs(teaAt(st6.t0, now6) - TEA_ZONE.at) <= TEA_ZONE.width / 2;
+  function pour3(st6, now5 = Date.now()) {
+    const ok = Math.abs(teaAt(st6.t0, now5) - TEA_ZONE.at) <= TEA_ZONE.width / 2;
     st6.glasses.push(ok);
     return ok;
   }
@@ -51589,8 +51308,6 @@ ${m.from}` : ""}`;
     giftshop: { n: "The gift shop", price: 800, where: "wineshop", line: "A little gift shop through a new door in the wine shop's corner: a case of your bonbons, a shelf of bars, the mill's oils and soaps, a corner of your wines. Posy runs it, and it all sells from the same stock as your other shops." },
     paperie: { n: "The paperie in Montrose", price: 1500, where: "hm_lanes", line: "The empty shop with the green door, up in Montrose's lanes: a paperie of your own. A vat, a press and a drying line in the back, shelves of handmade paper in the front. You make every sheet yourself, from scraps your shops save up for you. It opens while you're in Montrose." },
     paperkeeper: { n: "Lise keeps the paperie", price: 600, where: "bv_hpaper", needs: "paperie", line: "Lise from the lanes keeps your paperie open while you're home: 10 till 5, closed Mondays, 12 coins for each day she opens. She takes the dry sheets off the line and runs the Saturday card class." },
-    bakery: { n: "The Honeybrook Bakehouse", price: 1200, where: "green", line: "The old baker's shop in the corner of Honeybrook Green, empty since he retired to the seaside: bread shelves and a counter at the front, and a bakehouse with a wood oven at the back. Everything on the shelves, you bake." },
-    // round 294
     cellar: { n: "Cellar door", price: 2500, where: "wineshop", line: "A cellar door extension off the wine shop: barrel racks, a tasting bar and a wall of every wine you've made. Visitors love a cellar door, and once a month it hosts the wine club." }
   };
   var owns3 = (F2, k) => !!(F2.goals && F2.goals[k]);
@@ -51617,16 +51334,15 @@ ${m.from}` : ""}`;
       paperie: "The paperie's yours! The À VENDRE board's down and PAPETERIE is up over the green door. Start with the scrap bin.",
       giftshop: "The gift shop's open! Through the new door in the wine shop's corner. Posy's already rearranging the bonbon case.",
       van: "The campervan's yours! Parked at its spot on the lane, keys in your pocket. Hop in and do it up.",
-      bakery: "The Honeybrook Bakehouse is yours! The shutters are up and the oven's warming. Buy some flour at the back, churn some butter, and bake your first tray.",
       cocoa: "The hoarding's down: The Cocoa Room is yours! Buy some beans in the kitchen and make your first bars.",
       millshop: "The Mill Shop is open! Shelves downstairs, a little counter, and Hazel's already rearranging the soap."
     }[k];
   }
   var coin28 = () => icon("coin", 14);
   function goalPanel(F2, k) {
-    const g18 = GOALS[k], have3 = owns3(F2, k), need3 = g18.needs && !owns3(F2, g18.needs);
+    const g18 = GOALS[k], have2 = owns3(F2, k), need3 = g18.needs && !owns3(F2, g18.needs);
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(g18.n)}</h2><p class="sub">${esc(g18.line)}</p>`;
-    if (have3) h3 += `<p class="muted">Yours since ${new Date(F2.goals[k]).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}.</p>`;
+    if (have2) h3 += `<p class="muted">Yours since ${new Date(F2.goals[k]).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}.</p>`;
     else if (need3) h3 += `<p class="muted">You'll need the ${esc(GOALS[g18.needs].n.toLowerCase())} first.</p>`;
     else {
       const pct = Math.min(100, Math.round(100 * F2.coins / g18.price));
@@ -51728,6 +51444,15 @@ ${m.from}` : ""}`;
     if (!Array.isArray(F.upgradeLog)) F.upgradeLog = [];
     if (!F.totalQuests) F.totalQuests = 0;
     if (F.harvestTotal == null) F.harvestTotal = Object.values(F.history || {}).reduce((n, h3) => n + (h3.harvest || 0), 0);
+    if (F.goals && F.goals.bakery) {
+      delete F.goals.bakery;
+      F.coins += 1200;
+    }
+    if (F.bakery) {
+      F.coins += F.bakery.tin || 0;
+      delete F.bakery;
+    }
+    Object.keys(F.inv).filter((k) => /^bk_/.test(k) || k === "butter").forEach((k) => delete F.inv[k]);
     if (!Array.isArray(S3.chats)) S3.chats = [];
     ["halfway", "tread", "npcSaid"].forEach((k) => {
       if (!S3[k]) S3[k] = {};
@@ -51735,7 +51460,7 @@ ${m.from}` : ""}`;
   }
   migrate();
   setPaperArtF(() => F);
-  setArtContext({ bakery: () => bakeryState(F), cocoa: () => cocoaState(F), ohayo: () => ohayoDesk(), F: () => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
+  setArtContext({ cocoa: () => cocoaState(F), ohayo: () => ohayoDesk(), F: () => F, scoop: () => scoopState(F), vine: () => vineState(F), kitchen: () => kitchenState(F), tapas: () => {
     const l = tapasAll(F, dayKey());
     return l.length ? l.map((t2) => TAPAS[t2.id].n).join(" · ") : null;
   }, vineStock: () => shelfStock(vineState(F)), S: () => S3, remaining: () => remaining(), questsIn: (pl) => questsIn(pl), growth: (p) => growth2(p), stats: () => ST2, day: () => dayKey(), postCount: () => postCount(), health: (app) => health(app), goodNews: () => {
@@ -52092,9 +51817,6 @@ ${m.from}` : ""}`;
   var coView = null;
   var hfView = null;
   var hfSt = { kind: "cheddar", name: "", sug: 0 };
-  var bkView = null;
-  var lastBake = 0;
-  var BAKE_IN = ["bakery", "bakehouse"];
   var ccView = null;
   var lastCocoa = 0;
   var ccSt = { shell: "dark", sel: [] };
@@ -52805,7 +52527,6 @@ ${m.from}` : ""}`;
     }
     if (Date.now() - lastScoop > 2e4) scoopNow();
     if (Date.now() - lastCocoa > 2e4) cocoaNow();
-    if (Date.now() - lastBake > 2e4) bakeryNow();
     paperNow();
     if (Date.now() - lastFarm > 2e4) farmNow();
     {
@@ -53208,9 +52929,9 @@ ${m.from}` : ""}`;
     F.totalQuests = (F.totalQuests || 0) + 1;
     F.storyDay = dayKey();
     addBait(F, 1);
-    const now6 = unlocked(F.totalQuests);
-    if (now6.length > before) {
-      const u = now6[now6.length - 1];
+    const now5 = unlocked(F.totalQuests);
+    if (now5.length > before) {
+      const u = now5[now5.length - 1];
       F.upgradeLog.push({ id: u.id, day: dayKey() });
       setTimeout(() => {
         act("cheer");
@@ -53335,8 +53056,8 @@ ${m.from}` : ""}`;
     }
     const n = creditDone(r.tasks);
     if (manual) {
-      const have3 = new Set(allTasks().map((t2) => t2.id));
-      const fresh3 = r.tasks.filter((t2) => !t2.completed && !have3.has(t2.id));
+      const have2 = new Set(allTasks().map((t2) => t2.id));
+      const fresh3 = r.tasks.filter((t2) => !t2.completed && !have2.has(t2.id));
       S3.extra.push(...fresh3);
       sun.added = fresh3.length;
       if (!n) speak(fresh3.length ? `Added ${fresh3.length} new Sunsama task${fresh3.length === 1 ? "" : "s"} to the end of the line.` : "Sunsama and the boards match. All set!", 4e3);
@@ -54961,7 +54682,6 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     healthOpen = false;
     newsOpen = false;
     ccView = null;
-    bkView = null;
     hfView = null;
     railOpen = false;
     fishSpot = null;
@@ -55164,7 +54884,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     else if (woodsView === "tack" && scene === "stables" && southState(F).mine) h3 = tackPanel(F, dayKey());
     else if (woodsView === "boot" && scene === "green") h3 = bootPanel(F, dayKey());
     else if (woodsView === "seacave" && scene === "lighthouse") h3 = seaCavePanel(F);
-    else if (woodsView === "chips" && scene === "lighthouse") h3 = chipsPanel(F, dayKey());
+    else if (woodsView === "chips" && scene === "lighthouse") h3 = chipsPanel(F, dayKey(), sgHM());
     else if (woodsView === "bike" && outside()) h3 = bikePanel(F, F.ride === "car" && owns3(F, "car") ? "car" : owns3(F, "scooter") && F.ride !== "walk" ? "scooter" : "");
     else if (woodsView && STOPS2[woodsView] && STOPS2[woodsView].scene === scene) h3 = taxiPanel(F, woodsView);
     else if (vanView === "crate" && scene === "van") h3 = cratePanel(F, vineState(F));
@@ -55174,7 +54894,6 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     else if (hfView && scene === "barn") h3 = hfView === "extractor" ? extractorPanel(F) : hfView === "crock" ? crockPanel(F) : hfView === "press" ? pressPanel2(F, hfSt) : cavePanel(F);
     else if (hfView && scene === "hfarm") h3 = hfView === "house" ? farmhousePanel(F, isHere("felix")) : hfView === "hives" ? hivesPanel(F, isHere("felix")) : hfView === "stand" ? standPanel(F) : herdPanel(F, hfView, isHere("elena"));
     else if (orView === "pot" && potItem) h3 = potPanel(F, potItem);
-    else if (bkView && BAKE_IN.includes(scene)) h3 = bakeryPanel(F, bkView, { hm: sgHM() });
     else if (ccView && COCOA_IN.includes(scene)) h3 = ccView === "counter" ? counterPanel3(F, { server: isHere("amara"), hand: isHere("mateo"), pk: ccSt.pk }) : ccView === "wall" ? barWallPanel(F) : ccView === "pantry" ? pantryPanel(F, orchState(F)) : ccView === "bonbon" ? bonbonPanel(F, ccSt) : ccView === "case" ? casePanel(F) : ccView === "ups" ? upsPanel(F) : kitchenPanel(F, ccView);
     else if (keepItem && F.inv[keepItem]) h3 = keepPanel(F, keepItem);
     else if (keepSpot) h3 = placedPanel(F, keepSpot);
@@ -55472,27 +55191,6 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     if (scView || fieldView === "mstall8" && scene === "field") wireScoop(c);
     wireCompanions(c);
     if (ccView || fieldView && scene === "field" && fieldKind() === "cocoa") wireCocoa(c);
-    if (bkView) c.querySelectorAll("[data-bk]").forEach((b) => b.onclick = () => {
-      const [a, r] = b.dataset.bk.split(":");
-      const out = a === "mix" ? mix2(F, r) : a === "bake" ? bake2(F) : a === "carry" ? carry(F) : a === "churn" ? churn(F) : a === "flour" ? buyFlour(F) : a === "take" ? takeOne(F, r) : null;
-      if (a === "tin") {
-        const c22 = collectTin(F);
-        if (c22) {
-          sfx("coin");
-          flash(`+${c22} coins from the honesty tin`);
-          speak(`You tip out the honesty tin: ${c22} coins, and a note that says "best buns in Honeybrook".`, 4500);
-        }
-      } else if (out) {
-        speak(out.line, 5e3);
-        if (out.ok) {
-          sfx(a === "flour" ? "chaching" : a === "take" ? "pop" : "chime");
-          if (a === "mix") gainXp(1);
-        }
-      }
-      save2(true);
-      ctx();
-      drawScene();
-    });
     if (hfView && (scene === "hfarm" || scene === "barn")) wireFarm(c);
     if (caveView && scene === "winecave") wireCave(c);
     if (coView && (coOf(scene) || scene === "hlane")) wireLets(c, F, coView, { save: () => save2(true), rerender: () => ctx(), redraw: () => drawScene(), say: (l) => speak(l, 5e3), flash, sfx: (k) => sfx(k, true), today: () => dayKey(), task: (cc, k) => coTask(cc, k) });
@@ -58093,7 +57791,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     }
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
-    $("sceneArt").innerHTML = scene === "winecave" ? caveArt({ laid: laidCount(F), old: Object.values(secretState(F).old).filter(Boolean).length, supper: supperNow(dayKey(), sgHM()), guests: 4 }) : coOf(scene) ? cottageArt(scene, coArt()) : scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : scene === "lowervine" ? lowerVineArt(vineState(F), ruinState(F).step) : scene === "green" ? greenArt(owns3(F, "bakery")) : scene === "allotment" ? allotmentArt() : scene === "bramcot" ? bramCottageArt(isHere("bram")) : scene === "stables" ? stablesArt(!!(F.south && F.south.mine)) : scene === "lighthouse" ? lighthouseArt(sgHM() >= 19 * 60 || sgHM() < 6 * 60) : townRoom(scene) ? townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "porto" ? portoRoomArt(scene) : townOf(scene) === "puffin" ? puffinRoomArt(scene) : townOf(scene) === "bali" ? baliRoomArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoRoomArt(scene) : townOf(scene) === "formentera" ? formenteraRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene) : TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene) : TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "porto" ? portoArt(scene) : townOf(scene) === "puffin" ? puffinArt(scene) : townOf(scene) === "bali" ? baliArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoArt(scene) : townOf(scene) === "formentera" ? formenteraArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), { shop: owns3(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F)) }) : roomArt(scene);
+    $("sceneArt").innerHTML = scene === "winecave" ? caveArt({ laid: laidCount(F), old: Object.values(secretState(F).old).filter(Boolean).length, supper: supperNow(dayKey(), sgHM()), guests: 4 }) : coOf(scene) ? cottageArt(scene, coArt()) : scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : scene === "lowervine" ? lowerVineArt(vineState(F), ruinState(F).step) : scene === "green" ? greenArt() : scene === "allotment" ? allotmentArt() : scene === "bramcot" ? bramCottageArt(isHere("bram")) : scene === "stables" ? stablesArt(!!(F.south && F.south.mine)) : scene === "lighthouse" ? lighthouseArt(sgHM() >= 19 * 60 || sgHM() < 6 * 60, chipsOpen(sgHM())) : townRoom(scene) ? townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "porto" ? portoRoomArt(scene) : townOf(scene) === "puffin" ? puffinRoomArt(scene) : townOf(scene) === "bali" ? baliRoomArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoRoomArt(scene) : townOf(scene) === "formentera" ? formenteraRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene) : TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene) : TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "porto" ? portoArt(scene) : townOf(scene) === "puffin" ? puffinArt(scene) : townOf(scene) === "bali" ? baliArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoArt(scene) : townOf(scene) === "formentera" ? formenteraArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), { shop: owns3(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F)) }) : roomArt(scene);
     if (scene === "cellar" && secretState(F).step) $("sceneArt").insertAdjacentHTML("beforeend", cellarSecretArt(secretState(F).step));
     if (scene === "scoopkitchen" && secretState(F).through) $("sceneArt").insertAdjacentHTML("beforeend", kitchenSecretArt(true));
     $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + coastGulls(scene, sgHM() >= 19 * 60 || sgHM() < 6 * 60) + (scene === "green" && bootNow(dayKey(), sgHM()) ? carBootArt() : "") + beachArt(beachFinds(F, scene, dayKey())) + bottleHere() + fridayLayer(scene) + (scene === "base" ? koiArt(F.fish && F.fish.koi || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns3(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + vanSleeper() + vanCrateArt() + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));
@@ -59779,7 +59477,6 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       keepSpot = null;
       petView = null;
       ccView = null;
-      bkView = null;
       hfView = null;
       railOpen = false;
       fishSpot = null;
@@ -60362,25 +60059,6 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     if (id === "ckdoor") {
       setScene("cocoakitchen", INNER.cocoakitchen.arrive);
       return;
-    }
-    if (id === "bkdoor") {
-      setScene("bakehouse", INNER.bakehouse.arrive);
-      setTimeout(() => speak("Warm in here. Flour sacks, the churn, and the big wood oven ticking as it heats.", 4e3), 900);
-      return;
-    }
-    if (scene === "bakery" && id === "bseat") {
-      speak(pick(["You sit in the window with something warm and watch the green: dog walkers, the ducks, someone's bike with a basket.", "The window seat. The morning sun, the smell of bread, and nobody needing anything for five minutes."]), 5e3);
-      if (evanHere()) setTimeout(() => evanSays(pick(["Can I have the crunchy end?", "I'm a baker too", "mmm, buns"])), 1500);
-      return;
-    }
-    if (BAKE_IN.includes(scene)) {
-      bkView = { bshelves: "shelves", bcounter: "counter", bmix: "mix", bproof: "proof", boven: "oven", brack: "rack", bchurn: "churn", bflour: "flour" }[id] || null;
-      if (bkView) {
-        bakeryNow();
-        sfx("paper", true);
-        render();
-        return;
-      }
     }
     if (scene === "cocoa" && id === "ctables" && workshopGroup(dayKey()).length && sgHM() >= 14 * 60 && sgHM() < 16 * 60) {
       speak("The bonbon workshop's on! Six makers at the tables, piping ganache and arguing about sprinkles. You show them how to temper.", 5500);
@@ -60974,15 +60652,6 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       sitAt(DECK_SEATS);
       return;
     }
-    if (id === "bakeshut") {
-      if (!owns3(F, "bakery")) {
-        goalView = "bakery";
-        sfx("paper", true);
-        speak("The old bakery, shuttered since the baker retired to the seaside. You can still smell bread in the bricks.", 4500);
-      }
-      render();
-      return;
-    }
     if (id === "reno") {
       if (!owns3(F, "cocoa")) {
         goalView = "cocoa";
@@ -61220,22 +60889,22 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     <p class="muted">Make more at the workbench upstairs; the shelves fill as things finish steeping, curing and warming.</p><div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   }
   function crateTick() {
-    const c = craftState(F), t2 = tripOn(F), now6 = Date.now(), here = t2 && t2.by === "van" && townOf(scene) === t2.town && crateCount(vanCrate(F)) > 0 && !evanNight();
+    const c = craftState(F), t2 = tripOn(F), now5 = Date.now(), here = t2 && t2.by === "van" && townOf(scene) === t2.town && crateCount(vanCrate(F)) > 0 && !evanNight();
     if (!here) {
-      c.vanAt = now6;
+      c.vanAt = now5;
       return;
     }
     let coins = 0;
     const what = [];
-    const T2 = TOWNS[t2.town], st6 = T2 && TOWN_PLACES[T2.station], atVan = !!(st6 && st6.scene === scene), live3 = atVan && now6 - (c.vanAt || now6) < 3 * 6e4;
-    for (let at9 = (c.vanAt || now6) + 6e4; at9 <= now6; at9 += 6e4) {
+    const T2 = TOWNS[t2.town], st6 = T2 && TOWN_PLACES[T2.station], atVan = !!(st6 && st6.scene === scene), live3 = atVan && now5 - (c.vanAt || now5) < 3 * 6e4;
+    for (let at9 = (c.vanAt || now5) + 6e4; at9 <= now5; at9 += 6e4) {
       const r = vanSellMinute(F, atVan);
       if (r) {
         coins += r.coins;
         what.push(r.what);
       }
     }
-    c.vanAt = (c.vanAt || now6) + Math.floor((now6 - (c.vanAt || now6)) / 6e4) * 6e4;
+    c.vanAt = (c.vanAt || now5) + Math.floor((now5 - (c.vanAt || now5)) / 6e4) * 6e4;
     if (!coins) return;
     F.coins += coins;
     save2();
@@ -61440,9 +61109,9 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         }
       }
     }
-    const now6 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(c.at || now6, now6 - 864e5);
+    const now5 = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(c.at || now5, now5 - 864e5);
     let coins = 0, n = 0, xcoins = 0, xn = 0, gcoins = 0, gn = 0;
-    for (let at9 = from + 6e4; at9 <= now6; at9 += 6e4) {
+    for (let at9 = from + 6e4; at9 <= now5; at9 += 6e4) {
       const sg = new Date(at9 + 8 * 36e5), day = sg.toISOString().slice(0, 10), hm12 = sg.getUTCHours() * 60 + sg.getUTCMinutes();
       const got3 = craftSellMinute(F, day, hm12, owns3(F, "millshop") ? "shop" : owns3(F, "giftshop") ? null : vineState(F).shelf ? "wineshop" : null);
       if (got3) {
@@ -61455,7 +61124,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         r.skip.forEach((g18) => setTimeout(() => flash(`${g18.who}'s box waits a week: it's ${g18.cost} coins`), 1200));
       }
       if (owns3(F, "giftshop")) {
-        const fr0 = JSON.stringify(galleryState(F).frames.concat([makersState(F).stock])), g18 = giftSellMinute(F, day, hm12, at9 + 6e4 > now6 && scene === "giftshop" && atSpot === "gtill" ? "mel" : keeperOn(day, hm12) ? "keeper" : null, giftOpts());
+        const fr0 = JSON.stringify(galleryState(F).frames.concat([makersState(F).stock])), g18 = giftSellMinute(F, day, hm12, at9 + 6e4 > now5 && scene === "giftshop" && atSpot === "gtill" ? "mel" : keeperOn(day, hm12) ? "keeper" : null, giftOpts());
         if (g18) {
           gcoins += g18;
           gn++;
@@ -61471,7 +61140,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         }
       });
       if (ev && ev.kind === "xmas") {
-        const g18 = stallSellMinute(F, day, at9 + 6e4 > now6 && scene === "field" && /^mstall\d$/.test(atSpot || "") && (stallAt(day, hm12, +atSpot.slice(-1)) || {}).kind === "mine" ? "mel" : owns3(F, "millshop") ? "hazel" : "tin");
+        const g18 = stallSellMinute(F, day, at9 + 6e4 > now5 && scene === "field" && /^mstall\d$/.test(atSpot || "") && (stallAt(day, hm12, +atSpot.slice(-1)) || {}).kind === "mine" ? "mel" : owns3(F, "millshop") ? "hazel" : "tin");
         if (g18) {
           xcoins += g18;
           xn++;
@@ -61498,7 +61167,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         flash(`+${xcoins}: your Christmas stall`);
       } else if (xn > 2) setTimeout(() => speak(`Your stall at the Christmas market sold ${xn} thing${xn > 1 ? "s" : ""} while you were away: ${xcoins} coins.`, 5e3), 3500);
     }
-    c.at = from + Math.floor((now6 - from) / 6e4) * 6e4;
+    c.at = from + Math.floor((now5 - from) / 6e4) * 6e4;
     if (coins) {
       F.coins += coins;
       save2();
@@ -62005,19 +61674,6 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       ctx();
       drawScene();
     });
-  }
-  function bakeryNow() {
-    lastBake = Date.now();
-    if (!owns3(F, "bakery")) return;
-    const out = bakeryTick(F, { serving: scene === "bakery" && atSpot === "bcounter" });
-    if (out.baked && BAKE_IN.includes(scene)) speak(`Ding! ${RECIPES[out.baked].n} out of the oven and onto the cooling rack.`, 4500);
-    if (out.coins) {
-      sfx("coin");
-      flash(`+${out.coins} coins: the bakehouse`);
-    } else if (out.tin && out.mins >= 30) setTimeout(() => speak(`While you were out, the bakehouse sold ${out.n} thing${out.n > 1 ? "s" : ""}: ${out.tin} coins in the honesty tin.`, 5e3), 2500);
-    if (out.n || out.baked || out.mins >= 5) save2();
-    if (bkView) ctx();
-    if (BAKE_IN.includes(scene) && (out.n || out.baked)) drawScene();
   }
   function cocoaNow() {
     if (!owns3(F, "cocoa")) return;
@@ -64314,17 +63970,17 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     cam.snap = true;
   }
   var last = performance.now();
-  function frame3(now6) {
+  function frame3(now5) {
     try {
-      frameNow(now6);
+      frameNow(now5);
     } catch (e) {
       report(e);
     }
     requestAnimationFrame(frame3);
   }
-  function frameNow(now6) {
-    const dt = Math.min(0.05, (now6 - last) / 1e3);
-    last = now6;
+  function frameNow(now5) {
+    const dt = Math.min(0.05, (now5 - last) / 1e3);
+    last = now5;
     if (keys.size) {
       const v = 190 * dt, b = bounds();
       let dx = 0, dy = 0;
@@ -64379,7 +64035,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     }
     if (S3.cruise && (scene !== "shore" || Date.now() > S3.cruise.until)) endCruise();
     {
-      const rd = outside() && !townOf(scene) ? ride(F) : "walk", drive = rd === "car" && mel.moving && !sup, carry2 = (drive || rd === "bike" || rd === "pony") && mel.moving && !sup, withEvan = carry2 && evanHere() && !evanNight();
+      const rd = outside() && !townOf(scene) ? ride(F) : "walk", drive = rd === "car" && mel.moving && !sup, carry = (drive || rd === "bike" || rd === "pony") && mel.moving && !sup, withEvan = carry && evanHere() && !evanNight();
       nodes.mel.classList.toggle("trolley", trolleyOn(F) && outside() && !townOf(scene) && !sup);
       nodes.mel.classList.toggle("scoot", rd === "scooter" && mel.moving && !sup);
       nodes.mel.classList.toggle("biking", rd === "bike" && mel.moving && !sup);
@@ -64390,7 +64046,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
       }
       nodes.mel.classList.toggle("drive", drive);
       nodes.mel.classList.toggle("withEvan", withEvan);
-      if (carry2) {
+      if (carry) {
         mel.carEvan = withEvan;
       } else if (mel.wasDriving) {
         maple3.x = maple3.tx = mel.x - mel.dir * 22;
@@ -64403,7 +64059,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
         }
         mel.carEvan = false;
       }
-      mel.wasDriving = carry2;
+      mel.wasDriving = carry;
     }
     if (sup) {
       if (scene !== "shore" || Date.now() > sup.until) endPaddle(true);
@@ -64457,8 +64113,8 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
     order3.forEach(([n]) => {
       if (g18.lastElementChild !== n) g18.appendChild(n);
     });
-    const close3 = Math.hypot(maple3.x - mel.x, maple3.y - mel.y) < 60;
-    bubbleAt($("speech"), close3 ? maple3.x * 0.35 + mel.x * 0.65 : maple3.x, close3 ? Math.min(maple3.y, mel.y) : maple3.y, close3 ? 76 : sleeping ? 18 : 30);
+    const close2 = Math.hypot(maple3.x - mel.x, maple3.y - mel.y) < 60;
+    bubbleAt($("speech"), close2 ? maple3.x * 0.35 + mel.x * 0.65 : maple3.x, close2 ? Math.min(maple3.y, mel.y) : maple3.y, close2 ? 76 : sleeping ? 18 : 30);
     if (evanHere()) bubbleAt($("evanSay"), evan.x, evan.y, 40);
     else $("evanSay").hidden = true;
     bubbleAt($("melSay"), mel.x, mel.y, 70);
