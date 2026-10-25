@@ -418,6 +418,10 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
   Object.entries(CARBOOT).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   // round 107: Ronda's goods, and the Tempranillo grape and wine
   Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
+  // round 297: the lighthouse's wreck case curios, and Bram's parkin
+  [["cu_greenglass", "disc", "#8FC79A"], ["cu_blueglass", "disc", "#7FB8E8"], ["cu_pipe", "cup", "#F4EEE3"], ["cu_button", "disc", "#C9A24A"], ["cu_nail", "sticks", "#6E625A"], ["cu_penny", "disc", "#B8743E"],
+    ["cu_purse", "wedge", "#3B3530"], ["cu_willow", "plate", "#FFFDF6", "#3E6B8C"], ["cu_float", "ball", "#9CC27E", "#DCEFD8"], ["cu_whelk", "crescent", "#F3E2C4"], ["cu_stopper", "ball", "#DCEAF2", "#7FB8E8"], ["cu_compass", "disc", "#D9B060"], ["lh_parkin", "loaf", "#8A5A3A"]]
+    .forEach(([id, sh, a, b]) => { if (!I[id]) { const fn = S[sh] || S.box; I[id] = b ? fn(a, b) : fn(a); } });
   // round 196: the makers' shelf in the gift shop (game/gallery.js)
   [["mk_cards", "tile", "#FFFDF6", "#F4C7CF"], ["mk_spoon", "disc", "#C9A27E", "#8A5A3A"], ["mk_pettoy", "tile", "#C3CDEE", "#F4C7CF"], ["mk_bird", "bird", "#C9A27E"], ["mk_honeybutter", "jar", "#F3D98A", "#FFFDF6"], ["mk_wraps", "cloth", "#F6E3A1", "#9EBE8C"]].forEach(([id, sh, a, b]) => { if (!I[id]) I[id] = (S[sh] || S.box)(a, b); });
   // round 132: what Mel makes in the loft (game/loft.js)

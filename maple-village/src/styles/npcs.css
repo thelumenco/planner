@@ -531,3 +531,6 @@
 .ch.npc.act-shorepose:not(.walk) .fbrim{animation:brimF 2.8s ease-in-out infinite}.ch.npc.act-shorepose:not(.walk) .hribbon{transform-box:fill-box;transform-origin:100% 0;animation:ribF 1.4s ease-in-out infinite alternate}
 @keyframes brimF{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(3deg)}}@keyframes ribF{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-sandals .armR,.ch.npc.act-sandals .inhand,.ch.npc.act-bikebell .armR,.ch.npc.act-bikebell .bring,.ch.npc.act-figpick .armR,.ch.npc.act-figpick .inhand,.ch.npc.act-flamingos .flip > g,.ch.npc.act-stonestack .armR,.ch.npc.act-stonestack .inhand,.ch.npc .mdrip path,.ch.npc.act-shorepose .fbrim,.ch.npc.act-shorepose .hribbon{animation:none}.ch.npc.act-sandals .armR{transform:rotate(-120deg)}.ch.npc.act-bikebell .armR{transform:rotate(-20deg)}.ch.npc.act-figpick .armR{transform:rotate(-150deg)}.ch.npc.act-stonestack .armR{transform:rotate(-55deg)}}
+/* round 297: the lighthouse beam turning in the lamp room after dark, once every ten seconds */
+.lhspin{transform-box:view-box;transform-origin:260px 330px;animation:lhspin 10s linear infinite}@keyframes lhspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.lhspin{animation:none}}

@@ -5134,6 +5134,42 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // round 297 (Mel: "Need three interior screens for lighthouse"; "Treats only, just be nice to fill, skip the radio")
+  console.log("\nInside the lighthouse (round 297)");
+  const tw = await import(new URL("../src/game/lhtower.js", import.meta.url));
+  { const F = {coins: 5, inv: {}}, d = "2026-10-25";
+    const f1 = tw.poolFind(F, d, .1); check(f1 && F.inv["cu_" + f1.id] === 1 && !tw.poolFind(F, d, .1), "a curio in the rock pools, one day at a time");
+    check(!tw.poolFind(F, "2026-10-26", .9), "and not every day");
+    const pl = tw.placeCurio(F, f1.id); check(pl.ok && !F.inv["cu_" + f1.id] && tw.towerState(F).curios[f1.id] && /Put it in the case|empty space/.test(tw.towerPanel(F, "case")), "into the wreck case, with the empty spaces still to fill");
+    check(tw.signBook(F, d).ok && !tw.signBook(F, d).ok, "the visitor book: sign it once a day");
+    const sights = new Set(); for (let i = 0; i < 40; i++) sights.add(tw.lookOut(F, 14*60, false, 3, i/40).id);
+    check(sights.has("boat") && !sights.has("moon") && !sights.has("lights") && Object.keys(tw.towerState(F).seen).length === sights.size, "the telescope: daytime sights by day, onto the spotting list");
+    check(tw.lookOut(F, 22*60, false, 3, .99).id && !["dolphins", "ferry"].includes(tw.lookOut(F, 22*60, false, 3, .3).id), "and ships' lights and moonlight at night");
+    let treat = null; for (let i = 0; i < 7; i++) { const r = tw.writeLog(F, `2026-11-0${i + 1}`, i % 2 === 0); if (r.treat) treat = i; }
+    check(treat === 6 && F.inv.lh_parkin === 1 && !tw.writeLog(F, "2026-11-07", false).ok, "the weather log: once a day, and a week running brings Bram's parkin");
+    const c0 = F.coins; ["2026-12-01", "2026-12-02", "2026-12-03"].forEach(x => tw.polishLens(F, x, false));
+    check(F.coins === c0 && F.inv.lh_parkin === 2 && !tw.polishLens(F, "2026-12-03", false).ok, "polishing the lens: treats now and then, never coins");
+    check(/beam/.test(tw.galleryView({night: true})) && /car boot/.test(tw.galleryView({boot: true})), "the gallery view, by what's going on"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`lighthouse tower pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=14:00&date=2026-10-22"); await page.waitForTimeout(800);
+  await page.goto(url + "?nosample=1&time=14:00&date=2026-10-22"); await page.waitForTimeout(900);
+  await page.evaluate(() => window.__mapleScene("lighthouse")); await page.waitForTimeout(600);
+  const room = async (re) => page.waitForFunction(r => new RegExp(r).test(document.querySelector("#sceneName").textContent), re, { timeout: 25000 });
+  await page.locator('#world [data-place="llight"]').dispatchEvent("click"); await room("^The lighthouse"); await page.waitForTimeout(400);
+  check(await page.locator('#world [data-lhspot="case"]').count() === 1 && await page.locator('#world [data-lhspot="book"]').count() === 1, "in through the lighthouse door: the wreck case and the visitor book");
+  await page.locator('#world [data-lhspot="up"]').dispatchEvent("click"); await room("watch room"); await page.waitForTimeout(400);
+  check(await page.locator('#world [data-lhspot="scope"]').count() === 1 && await page.locator('#world [data-lhspot="down"]').count() === 1, "up the spiral stair: the watch room, with the telescope");
+  await page.locator('#world [data-lhspot="scope"]').dispatchEvent("click"); await page.waitForFunction(() => Object.keys((JSON.parse(localStorage.getItem("fox.fox")).tower || {}).seen || {}).length === 1, null, { timeout: 20000 });
+  check(true, "a look through the telescope goes on the spotting list");
+  await page.locator('#world [data-lhspot="up"]').dispatchEvent("click"); await room("lamp room"); await page.waitForTimeout(400);
+  check(await page.locator('#world [data-lhspot="lens"]').count() === 1 && await page.locator('#world [data-lhspot="gallery"]').count() === 1, "and up again: the lamp room, the great lens and the gallery door");
+  await page.locator('#world [data-lhspot="down"]').dispatchEvent("click"); await room("watch room"); await page.locator('#world [data-lhspot="down"]').dispatchEvent("click"); await room("^The lighthouse");
+  await page.locator('#world [data-lhspot="out"]').dispatchEvent("click"); await room("Lighthouse Point");
+  check(true, "down both flights and out onto the point");
+  await page.close();
+}
+{
   // round 293 (Mel: "I want to be able to go to the library to read my digests"): her morning digests from Notion on Juniper's shelf
   console.log("\nMorning digests in the library (round 293)");
   const bdg = await import(new URL("../src/game/bookdigests.js", import.meta.url));
