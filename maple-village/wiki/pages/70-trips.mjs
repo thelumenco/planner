@@ -112,7 +112,7 @@ function getThere(id, t){
   const rows = [];
   if (t.by === "train") rows.push([`${ico("xm_train", 22)}<b>Train</b><br><small class="muted">from Honeybrook station</small>`, `${coin(t.fare)} return, each<br><small class="muted">Out ${hm(t.outFrom)} to ${hm(t.outTo)} · last train home ${hm(t.backTo)}</small>`]);
   if (t.ferry) rows.push([`${ico("water", 22)}<b>Ferry</b><br><small class="muted">from the foreshore jetty</small>`, `${coin(t.ferry.fare)} return, each<br><small class="muted">Out ${hm(t.outFrom)} to ${hm(t.outTo)} · last boat home ${hm(t.backTo)}${t.ferry.dry ? " · no crossing on a rainy day" : ""}</small>`]);
-  if (t.boat) rows.push([`${ico("c_boat", 22)}<b>Your own boat</b><br><small class="muted">from the jetty</small>`, `${coin(t.boat.fuel)} of fuel, however many come<br><small class="muted">Set off ${hm(t.outFrom)} to ${hm(t.outTo)} · up to ${t.boat.max} friends aboard · dry days only</small>`]);
+  if (t.boat) rows.push([`${ico("c_boat", 22)}<b>Your own boat</b><br><small class="muted">from the jetty</small>`, `${coin(t.boat.fuel)} of fuel, however many come<br><small class="muted">Set off whenever you like and sail home whenever you're ready · up to ${t.boat.max} friends aboard · dry days only</small>`]);
   if (t.by === "van") { const n = legs("home", id); rows.push([`${ico("b_koala", 22)}<b>Campervan</b><br><small class="muted">from the cottage lane</small>`, `${coin(n*LEG)} of fuel on your own (${n} leg${n === 1 ? "" : "s"} from home), plus ${coin(n)} for each friend<br><small class="muted">Set off ${hm(t.outFrom)} to ${hm(t.outTo)} · home by ${hm(t.backTo)}</small>`]); }
   return table(["How", "Fare and times"], rows);
 }

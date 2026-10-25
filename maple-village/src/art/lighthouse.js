@@ -15,7 +15,21 @@ const gull = ([x, y]) => `<path d="M${x - 7} ${y} q3.5 -4 7 0 q3.5 -4 7 0" fill=
 const rock = (x, y, rx, ry, c) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:${c || "#B9B0A4"}"/>`;
 const rockL = (x, y, rx, ry) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}"/>`;
 
-export function lighthouseArt(night){
+// Dot's hatch open: the shutter rolled up, the warm inside, Dot in her striped apron, and a cone of chips on the ledge
+function hatchOpen(){
+  return `<g pointer-events="none">${sk(`<rect x="408" y="446" width="44" height="22" style="fill:#F3D9A6"/><rect x="408" y="446" width="44" height="6" style="fill:#E8C48E"/>
+      <rect x="440" y="452" width="10" height="7" rx="1" style="fill:#B9C4CC"/>
+      <path d="M418 468 v-7 q12 -6 24 0 v7z" style="fill:#FFFDF6"/><path d="M423 468 v-8 M428 468 v-9 M433 468 v-9 M438 468 v-8" style="stroke:#7FB8E8" stroke-width="1.6"/>
+      <path style="stroke:#A99D8C;stroke-width:.5" d="M423.2 457 q-2.2 -2 -1 -4.6 q-1.4 -3 1.2 -5 q.4 -3.4 3.6 -3.6 q2.4 -2.4 5.4 -.6 q3.6 -.4 4.4 2.8 q2.8 1.6 1.4 4.6 q1.6 2.6 -.6 4.8 q.6 2.6 -2 3.2 h-10.4 q-2.6 -.6 -2 -3.2z" style="fill:#D9D4CE"/>
+      <circle cx="430" cy="455" r="5.2" style="fill:#F2D3BC;stroke:#8A6A5A;stroke-width:.6"/><path d="M424.8 452.6 q.6 -4.2 3 -4 q1 -1.6 2.4 -.4 q1.6 -1.4 2.8 .4 q2.4 .2 2.2 4 q-1.2 -2.2 -2.6 -1.4 q-1 -1.6 -2.4 -.4 q-1.4 -1.4 -2.6 .2 q-1.6 -.6 -2.8 1.6z" style="fill:#E6E2DC"/><path d="M425.4 449.6 q4.6 -3.4 9.2 0" fill="none" style="stroke:#E88AA0" stroke-width="1.3" stroke-linecap="round"/>
+      <rect x="406" y="443" width="48" height="5" rx="2.5" style="fill:#F6E3A6"/>
+      <path d="M450 466 l4 -9 l4 9z" style="fill:#FFFDF6"/><path d="M451.5 458 l1 -4 M454 457 l.5 -4.5 M456.5 458 l-1 -4" style="stroke:#E3B24A" stroke-width="1.4" stroke-linecap="round"/>`,
+    `<rect x="408" y="446" width="44" height="22"/><rect x="406" y="443" width="48" height="5" rx="2.5"/><path d="M418 468 v-7 q12 -6 24 0 v7"/><path d="M450 466 l4 -9 l4 9z"/>`)}
+    <circle cx="428.1" cy="455.2" r=".65" style="fill:#3B3530"/><circle cx="431.9" cy="455.2" r=".65" style="fill:#3B3530"/>
+    <ellipse cx="426.6" cy="457.2" rx="1.2" ry=".8" style="fill:#F2A6A6" opacity=".7"/><ellipse cx="433.4" cy="457.2" rx="1.2" ry=".8" style="fill:#F2A6A6" opacity=".7"/>
+    <path d="M428.7 457.9 q1.3 1.1 2.6 0" fill="none" style="stroke:#D9707E" stroke-width=".8" stroke-linecap="round"/><circle cx="424.9" cy="457" r=".7" style="fill:#FFFDF6"/><circle cx="435.1" cy="457" r=".7" style="fill:#FFFDF6"/></g>`;
+}
+export function lighthouseArt(night, chipsOpen = false){
   const ground = `<rect width="520" height="640" style="fill:var(--grass)"/>
     <g filter="url(#wash)" opacity=".7"><ellipse cx="380" cy="370" rx="140" ry="80" style="fill:var(--grass2)"/><ellipse cx="260" cy="120" rx="110" ry="60" style="fill:var(--grass2)"/></g>
     <g filter="url(#wob)"><path d="${SAND}" style="fill:var(--sand)"/><path d="${SEA}" style="fill:var(--sea)"/>
@@ -78,10 +92,11 @@ export function lighthouseArt(night){
   // the fish and chip hatch: a little kiosk with a striped awning, a hatch and a chalkboard
   const awn = Array.from({length: 7}, (_, i) => `<path d="M${394 + i*10} 430 h10 v10 q-5 5 -10 0z" style="fill:${i % 2 ? "#FFFDF6" : "#7FB8E8"}"/>`).join("");
   const chips = `<g data-place="lchips" aria-label="The fish and chip hatch"><ellipse class="hov" cx="430" cy="505" rx="46" ry="10" style="fill:var(--butter)"/>
-    ${sk(`<path d="M394 420 L430 400 L466 420z" style="fill:#3E6B8C"/><rect x="398" y="420" width="64" height="70" style="fill:#EAF2F5"/>${awn}<rect class="wglow" x="408" y="446" width="44" height="22" rx="2" style="fill:#F6E3A6"/><rect x="404" y="468" width="52" height="5" style="fill:var(--wood)"/>
+    ${sk(`<path d="M394 420 L430 400 L466 420z" style="fill:#3E6B8C"/><rect x="398" y="420" width="64" height="70" style="fill:#EAF2F5"/>${awn}${chipsOpen ? "" : `<rect x="408" y="446" width="44" height="22" rx="2" style="fill:#C9D6DE"/><path d="M408 451.5 h44 M408 457 h44 M408 462.5 h44" style="stroke:#9AAAB6" stroke-width=".8"/><rect x="424" y="453" width="12" height="8" rx="1" style="fill:#FFFDF6" transform="rotate(-4 430 457)"/>`}<rect x="404" y="468" width="52" height="5" style="fill:var(--wood)"/>
       <rect x="470" y="462" width="20" height="26" rx="2" style="fill:#4A4642"/>`,
       `<path d="M394 420 L430 400 L466 420z"/><rect x="398" y="420" width="64" height="70"/><path d="M394 430 h70"/><rect x="408" y="446" width="44" height="22" rx="2"/><rect x="404" y="468" width="52" height="5"/>
       <rect x="470" y="462" width="20" height="26" rx="2"/><path d="M472 488 l-3 6 M488 488 l3 6"/>`)}
+    ${chipsOpen ? hatchOpen() : ""}
     <text x="480" y="473" text-anchor="middle" font-family="Klee One,serif" font-size="5.5" fill="#FFFDF6" pointer-events="none">cod</text><text x="480" y="481" text-anchor="middle" font-family="Klee One,serif" font-size="5.5" fill="#FFFDF6" pointer-events="none">chips</text>
     <text x="430" y="416" text-anchor="middle" font-family="Klee One,serif" font-weight="600" font-size="6.5" fill="#FFFDF6" pointer-events="none">fish and chips</text>
     ${tapeLabel(430, 528, "Fish and chips", "var(--peach)", 10)}</g>`;

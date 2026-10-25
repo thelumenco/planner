@@ -449,6 +449,10 @@ CR_BOUQUETS.forEach(b => { I[b.id] = [`<path d="M7.5 12.5l4.5 9.5 4.5-9.5z" ${f(
     `<ellipse cx="12" cy="12.5" rx="8" ry="4"/><path d="M4 12.5v3c0 2.2 3.6 4 8 4s8-1.8 8-4v-3"/><circle cx="12" cy="12.4" r="2.6"/><path d="M11.2 12.4h1.6" opacity=".6"/>`];
   // round 107: Ronda's goods, and the Tempranillo grape and wine
   // round 271: the car boot sale's curios (game/south.js)
+  // round 297: the lighthouse's wreck case curios, and Bram's parkin
+  [["cu_greenglass", "disc", "#8FC79A"], ["cu_blueglass", "disc", "#7FB8E8"], ["cu_pipe", "cup", "#F4EEE3"], ["cu_button", "disc", "#C9A24A"], ["cu_nail", "sticks", "#6E625A"], ["cu_penny", "disc", "#B8743E"],
+    ["cu_purse", "wedge", "#3B3530"], ["cu_willow", "plate", "#FFFDF6", "#3E6B8C"], ["cu_float", "ball", "#9CC27E", "#DCEFD8"], ["cu_whelk", "crescent", "#F3E2C4"], ["cu_stopper", "ball", "#DCEAF2", "#7FB8E8"], ["cu_compass", "disc", "#D9B060"], ["lh_parkin", "loaf", "#8A5A3A"]]
+    .forEach(([id, sh, a, b]) => { if (!I[id]) { const fn = S[sh] || S.box; I[id] = b ? fn(a, b) : fn(a); } });
   Object.entries(BEACH).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   Object.entries(CARBOOT).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   Object.entries(TOWN_GOODS).forEach(([id, g]) => { if (I[id]) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });

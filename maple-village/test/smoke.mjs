@@ -2598,6 +2598,11 @@ if (want("\nSaltwick Harbour, by ferry")) try {
     check(sw.duskFrom("2026-11-12") === 17*60 && sw.duskFrom("2026-06-12") === 18*60 && /Come back at dusk/.test(sw.lampPanel(F, null, 12*60, "2026-11-12")), "the lamp's lit at dusk (five in the winter months, six in summer)"); }
   { const F = {coins: 100, board: {hearts: {farid: 5, mei: 5, bo: 5}}}, r = tr.buyTrip(F, "saltwick", ["farid", "mei", "bo"], 10*60, "boat");
     check(r && r.cost === 15 && F.coins === 85 && F.trip.by === "ferry" && F.trip.own && F.trip.party.length === 3, "or sail there in your own boat: 15 coins of fuel, friends ride free, and you moor where the ferry does"); }
+  // round 297c (ported): your own boat has no hours; the ferry still does
+  { const G = {coins: 100}, H2 = {coins: 100};
+    check(tr.buyTrip(G, "saltwick", [], 6*60, "boat") && tr.buyTrip(H2, "saltwick", [], 21*60 + 30, "boat") && !tr.buyTrip({coins: 100}, "saltwick", [], 21*60 + 30, "ferry"), "your own boat sets off at six in the morning or half nine at night; the ferry keeps its hours");
+    check(!tr.timeToGo(G, "saltwick", 22*60) && !tr.timeToGo(G, "saltwick", 60) && tr.timeToGo(G, "saltwick", 110), "and sails home whenever you're ready (only called back aboard at a quarter to two)");
+    check(/whenever you like/.test(tr.boatPanel({coins: 100}, [], "saltwick", 23*60)) && !/Too late|Too early/.test(tr.boatPanel({coins: 100}, [], "saltwick", 23*60)), "the boat panel says so"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await closeFriends(page);
   page.on("pageerror", e => errors.push(`saltwick pageerror: ${e.message}`));
@@ -5037,7 +5042,8 @@ if (want("\nRiding your pony and Bram's cottage (round 283)")) try {
   check(/data-sup="lighthouse"/.test(gl.jettyPanel("base", true)) && /data-sup="base"/.test(gl.jettyPanel("lighthouse", true)), "the home jetty paddles down to Lighthouse Point, and back");
   { const F = {coins: 15, inv: {}}, it = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS.chips_out;
     check(so.takeaway(F).ok && F.inv.chips_out === 1 && F.coins === 15 - so.TAKEAWAY && !so.takeaway(F).ok && F.coins === 6, "fish and chips to take away from Dot's, " + so.TAKEAWAY + " coins");
-    check(it && it.kind === "gift" && !it.tab && !it.says && /To take away/.test(so.chipsPanel(F, day)), "a present for a friend (only from Dot's hatch)"); }
+    check(it && it.kind === "gift" && !it.tab && !it.says && /To take away/.test(so.chipsPanel(F, day, 12*60)), "a present for a friend (only from Dot's hatch)");
+    check(so.chipsOpen(12*60) && !so.chipsOpen(21*60) && !so.chipsOpen(11*60) && /hatch is down/.test(so.chipsPanel(F, day, 21*60)) && /To take away/.test(so.chipsPanel(F, day, 12*60)), "Dot's hatch: open half eleven to half eight, shuttered otherwise"); }
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`bramcot pageerror: ${e.message}`));
   await page.goto(url + "?reset=1&seed=1&time=15:30&date=2026-10-24"); await page.waitForTimeout(1000);
@@ -5050,6 +5056,41 @@ if (want("\nRiding your pony and Bram's cottage (round 283)")) try {
   await page.locator('#world [data-exit="lighthouse"]').dispatchEvent("click");
   await page.waitForFunction(() => /Lighthouse Point/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "out the door, back on the point");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nInside the lighthouse (round 297)")) try {
+  // three floors inside the lighthouse: treats only, never coins
+  console.log("\nInside the lighthouse (round 297)");
+  const tw = await import(new URL("../src/game/lhtower.js", import.meta.url));
+  { const F = {coins: 5, inv: {}}, d = "2026-10-25";
+    const f1 = tw.poolFind(F, d, .1); check(f1 && F.inv["cu_" + f1.id] === 1 && !tw.poolFind(F, d, .1), "a curio in the rock pools, one day at a time");
+    check(!tw.poolFind(F, "2026-10-26", .9), "and not every day");
+    const pl = tw.placeCurio(F, f1.id); check(pl.ok && !F.inv["cu_" + f1.id] && tw.towerState(F).curios[f1.id] && /Put it in the case|empty space/.test(tw.towerPanel(F, "case")), "into the wreck case, with the empty spaces still to fill");
+    check(tw.signBook(F, d).ok && !tw.signBook(F, d).ok, "the visitor book: sign it once a day");
+    const sights = new Set(); for (let i = 0; i < 40; i++) sights.add(tw.lookOut(F, 14*60, false, 3, i/40).id);
+    check(sights.has("boat") && !sights.has("moon") && !sights.has("lights") && Object.keys(tw.towerState(F).seen).length === sights.size, "the telescope: daytime sights by day, onto the spotting list");
+    check(tw.lookOut(F, 22*60, false, 3, .99).id && !["dolphins", "ferry"].includes(tw.lookOut(F, 22*60, false, 3, .3).id), "and ships' lights and moonlight at night");
+    let treat = null; for (let i = 0; i < 7; i++) { const r = tw.writeLog(F, `2026-11-0${i + 1}`, i % 2 === 0); if (r.treat) treat = i; }
+    check(treat === 6 && F.inv.lh_parkin === 1 && !tw.writeLog(F, "2026-11-07", false).ok, "the weather log: once a day, and a week running brings Bram's parkin");
+    const c0 = F.coins; ["2026-12-01", "2026-12-02", "2026-12-03"].forEach(x => tw.polishLens(F, x, false));
+    check(F.coins === c0 && F.inv.lh_parkin === 2 && !tw.polishLens(F, "2026-12-03", false).ok, "polishing the lens: treats now and then, never coins");
+    check(/beam/.test(tw.galleryView({night: true})) && /car boot/.test(tw.galleryView({boot: true})) && /Biscuit/.test(tw.galleryView({pet: "Biscuit"})), "the gallery view, by what's going on (and your pet at the railings)"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`lighthouse tower pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=14:00&date=2026-10-22"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("lighthouse")); await page.waitForTimeout(700);
+  const room = async (re) => page.waitForFunction(r => new RegExp(r).test(document.querySelector("#sceneName").textContent), re, { timeout: 25000 });
+  await page.locator('#world [data-place="llight"]').dispatchEvent("click"); await room("^The lighthouse"); await page.waitForTimeout(400);
+  check(await page.locator('#world [data-lhspot="case"]').count() === 1 && await page.locator('#world [data-lhspot="book"]').count() === 1, "in through the lighthouse door: the wreck case and the visitor book");
+  await page.locator('#world [data-lhspot="up"]').dispatchEvent("click"); await room("watch room"); await page.waitForTimeout(400);
+  check(await page.locator('#world [data-lhspot="scope"]').count() === 1 && await page.locator('#world [data-lhspot="down"]').count() === 1, "up the spiral stair: the watch room, with the telescope");
+  await page.locator('#world [data-lhspot="scope"]').dispatchEvent("click"); await page.waitForFunction(() => Object.keys((window.__hbGame.F().tower || {}).seen || {}).length === 1, null, { timeout: 20000 });
+  check(true, "a look through the telescope goes on the spotting list");
+  await page.locator('#world [data-lhspot="up"]').dispatchEvent("click"); await room("lamp room"); await page.waitForTimeout(400);
+  check(await page.locator('#world [data-lhspot="lens"]').count() === 1 && await page.locator('#world [data-lhspot="gallery"]').count() === 1, "and up again: the lamp room, the great lens and the gallery door");
+  await page.locator('#world [data-lhspot="down"]').dispatchEvent("click"); await room("watch room"); await page.locator('#world [data-lhspot="down"]').dispatchEvent("click"); await room("^The lighthouse");
+  await page.locator('#world [data-lhspot="out"]').dispatchEvent("click"); await room("Lighthouse Point");
+  check(true, "down both flights and out onto the point");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {

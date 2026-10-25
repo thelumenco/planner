@@ -83,7 +83,7 @@ function shorePage(){
     + h2("dolphins", "The dolphins", "sparkle")
     + `<p>Sit on the boardwalk bench in the morning (6am to 11am) and the dolphins come by, just past the jetty.</p>`
     + h2("boat", "Your own boat", "kite")
-    + `<p>${esc(g.n)}: ${coin(g.price)}, a big goal. ${esc(g.line)} From its mooring at the end of the jetty, take a dolphin cruise, or a day trip to an island: Saltwick Harbour (15 coins of fuel, up to seven friends free, dry days only) or Puffin Isle (20 coins of fuel). See <a href="/trips">Trips</a>.</p>`
+    + `<p>${esc(g.n)}: ${coin(g.price)}, a big goal. ${esc(g.line)} From its mooring at the end of the jetty, take a dolphin cruise at any hour (after dark it's a moonlit one), or a day trip at whatever time you like to an island: Saltwick Harbour (15 coins of fuel, up to seven friends free, dry days only) or Puffin Isle (20 coins of fuel). See <a href="/trips">Trips</a>.</p>`
     + h2("ferry", "The ferry", "kite")
     + `<p>The ferry stop at the end of the jetty: boats to the islands. See <a href="/trips">Trips</a>.</p>`
     + h2("crabbing", "Crabbing", "fish")

@@ -290,3 +290,6 @@
 @keyframes blswing{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-riceplant .armR,.ch.npc.act-offering .armR,.ch.npc.act-gamelan .armR,.ch.npc.act-coconut .tool,.ch.npc.act-jungleswing .bob{animation:none}}
 .ridePony{display:none}#hero.riding .ridePony{display:inline}/* round 283: riding your own pony */
+/* round 297: the lighthouse beam turning in the lamp room after dark, once every ten seconds */
+.lhspin{transform-box:view-box;transform-origin:260px 330px;animation:lhspin 10s linear infinite}@keyframes lhspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.lhspin{animation:none}}

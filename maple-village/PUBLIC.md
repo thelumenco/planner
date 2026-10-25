@@ -396,4 +396,9 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   Dot's menu, takeaway and buying fish (never above her prices, 6 a day), beachcombing (shells, conches and clams; this
   edition has no mussels), gulls (art/gulls.js), messages in bottles (data/bottles.js, kept in the mailbox), the priory
   ruins (after the mill: sage and lavender), the river taxi's Lighthouse Point stop and weddings' cases of sparkling.
-- Round 4 (Dot's hours, inside the lighthouse, the cruise and own boat at any hour, the green's lamp posts) follows.
+- Round 4: Dot's hatch hours (`chipsOpen`, 11:30 to 20:30, a shutter when shut), inside the lighthouse (game/lhtower.js,
+  art/lhtower.js, scenes lhtower1 to 3, `towerSpot` in core.js; treats only, never coins), the cruise at any hour
+  (moonlit after dark), your own boat to towns at any hour (`timeToGo` in trips.js: by your own boat you're only called
+  back at 1:45am; written for this edition's `boatPanel`, not copied), the green's lamp posts and the wine shop window.
+- Left out of the port: the Notion book digest, the Bakehouse (shelved in the personal edition), Formentera and Porto
+  (not in this edition), mussels, and every Evan and family line (the pet stands in, or the line goes).

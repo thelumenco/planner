@@ -56,15 +56,15 @@ function shedArt(v){
     ${tapeLabel(112, 252, "Barrel shed", "var(--peach)", 11)}</g>`;
 }
 function shopArt(v){
-  const n = Math.min(8, shelfStock(v)), bottles = Array.from({length: n}, (_, i) => `<rect x="${338 + i*5.5}" y="${170 - (i % 2)*2}" width="4" height="12" rx="1.5" style="fill:${i % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>`).join("");
+  const n = Math.min(6, shelfStock(v)), bottles = Array.from({length: n}, (_, i) => `<rect x="${338 + i*5.5}" y="${170 - (i % 2)*2}" width="4" height="12" rx="1.5" style="fill:${i % 3 === 1 ? "#9DBF8A" : "#5B2338"}"/>`).join("");
   return `<g data-place="wineshop" aria-label="${esc(shopName(artCtx().F()))}"><ellipse class="hov" cx="390" cy="218" rx="86" ry="11" style="fill:var(--butter)"/>
     ${sk(`<rect x="318" y="118" width="144" height="96" style="fill:#F1E2C6"/><path d="M306 120 L340 78 H440 L474 120z" style="fill:#C46A4A"/>
-      <path d="M326 150 h50 l-4 12 h-42z M404 150 h50 l-4 12 h-42z" style="fill:#8E2C48"/><rect x="332" y="162" width="46" height="26" style="fill:#DCE8F0"/>${bottles}<rect x="410" y="162" width="38" height="26" style="fill:#DCE8F0"/>
+      <path d="M324 150 h48 l-4 12 h-40z M408 150 h46 l-4 12 h-38z" style="fill:#8E2C48"/><rect x="330" y="162" width="38" height="26" style="fill:#DCE8F0"/>${bottles}<rect x="412" y="162" width="36" height="26" style="fill:#DCE8F0"/>
       <path d="M376 214 v-40 a14 14 0 0 1 28 0 v40z" style="fill:#7B4A36"/><rect x="368" y="92" width="44" height="18" rx="3" style="fill:#FFFDF6"/>
       <circle cx="430" cy="206" r="9" style="fill:#A8754F"/><rect x="420" y="190" width="20" height="5" rx="2" style="fill:#A8754F"/>`,
       `<rect x="318" y="118" width="144" height="96"/><path d="M306 120 L340 78 H440 L474 120z"/><path d="M318 104 h144 M326 92 h128" opacity=".45"/>
-      <path d="M326 150 h50 l-4 12 h-42z M404 150 h50 l-4 12 h-42z"/><path d="M336 150 l-2 12 M348 150 l-1 12 M360 150 v12 M414 150 l-2 12 M426 150 l-1 12 M438 150 v12" style="stroke:#F6E3C6" stroke-width="3"/>
-      <rect x="332" y="162" width="46" height="26"/><rect x="410" y="162" width="38" height="26"/><path d="M429 162 v26" opacity=".6"/>
+      <path d="M324 150 h48 l-4 12 h-40z M408 150 h46 l-4 12 h-38z"/><path d="M334 150 l-2 12 M346 150 l-1 12 M358 150 v12 M418 150 l-2 12 M430 150 l-1 12 M442 150 v12" style="stroke:#F6E3C6" stroke-width="3"/>
+      <rect x="330" y="162" width="38" height="26"/><rect x="412" y="162" width="36" height="26"/><path d="M430 162 v26" opacity=".6"/>
       <path d="M376 214 v-40 a14 14 0 0 1 28 0 v40z"/><circle cx="398" cy="196" r="1.4"/><rect x="368" y="92" width="44" height="18" rx="3"/><circle cx="430" cy="206" r="9"/><path d="M430 195 v2"/>`)}
     <g filter="url(#wob)" style="stroke:var(--line)" stroke-width=".8">${grapes(390, 97, "#6B2A55", .7)}</g><path d="M390 92 q4 -4 8 -2" fill="none" style="stroke:var(--moss2)" stroke-width="1.4"/>
     ${tapeLabel(390, 240, tag(shopName(artCtx().F())), "#E8B4C0", 11.5)}</g>`;

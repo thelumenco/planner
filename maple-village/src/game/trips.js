@@ -25,8 +25,13 @@ export const awayOn = (F, day = dayKey()) => { const t = tripOn(F, day); return 
 export const fareFor = (town, party, by = "train") => { const t = TOWNS[town]; if (by === "boat") return t.boat ? t.boat.fuel : 0; const f = by === "ferry" && t.ferry ? t.ferry.fare : t.fare; return f*(1 + party.filter(id => !t.free.includes(id)).length); };
 export const canLeave = (town, hm = localHM()) => hm >= TOWNS[town].outFrom && hm < TOWNS[town].outTo;
 export const canReturn = (town, hm = localHM()) => hm < TOWNS[town].backTo;
+// round 297c (ported): your own boat sets off whenever you like and sails home whenever you're ready; only in the last
+// quarter of an hour before the day turns over (1:45am) is everyone called back aboard
+export const BOAT_LATE = [105, 120];
+// time everyone went home: the last train or ferry; by your own boat, only just before the day turns over
+export const timeToGo = (F, town, hm = localHM()) => { const t = tripOn(F); return t && t.own ? hm >= BOAT_LATE[0] && hm < BOAT_LATE[1] : hm >= TOWNS[town].backTo; };
 export function buyTrip(F, town, party, hm = localHM(), by = "train"){
-  const t = TOWNS[town]; if (!t || !canLeave(town, hm) || tripOn(F) || (by === "ferry" && !t.ferry) || (by === "boat" && !t.boat)) return null;
+  const t = TOWNS[town]; if (!t || (by !== "boat" && !canLeave(town, hm)) || tripOn(F) || (by === "ferry" && !t.ferry) || (by === "boat" && !t.boat)) return null;
   party = tripFriends(F).filter(id => party.includes(id)); if (by === "boat") party = party.slice(0, t.boat.max); const cost = fareFor(town, party, by); if (F.coins < cost) return null;
   F.coins -= cost; F.trip = {town, day: dayKey(), party, from: hm, by: by === "boat" ? "ferry" : by, ...(by === "boat" ? {own: true} : {})};   // (your own boat lands where the ferry does)
   F.towns = {...(F.towns || {}), [town]: F.towns && F.towns[town] || dayKey()};   // F.towns: where you've been (first visit), round 132
@@ -85,11 +90,11 @@ export function homePanel(F, town, hm = localHM(), by = "train"){
 export function boatPanel(F, pick, town, hm = localHM(), wet = false){
   const isles = Object.entries(TOWNS).filter(([, x]) => x.boat && !x.soon);
   if (!isles.length) return `<span class="tape gingham" aria-hidden="true"></span><h2>Your boat</h2><div class="actions"><button class="btn alt" data-boat="cruise">A dolphin cruise up the coast</button></div>` + shut;
-  const t = TOWNS[town] || TOWNS[isles[0][0]], id = TOWNS[town] ? town : isles[0][0], who = tripFriends(F), party = who.filter(x => pick.includes(x)).slice(0, t.boat.max), on = tripOn(F), open = canLeave(id, hm) && !wet;
+  const t = TOWNS[town] || TOWNS[isles[0][0]], id = TOWNS[town] ? town : isles[0][0], who = tripFriends(F), party = who.filter(x => pick.includes(x)).slice(0, t.boat.max), on = tripOn(F), open = !wet;
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>Your boat</h2><p class="sub">She's tied up at the end of the jetty, rocking gently, with a full tank and a flask of tea in the cabin.</p>
     <div class="actions"><button class="btn alt" data-boat="cruise">A dolphin cruise up the coast</button></div>
     <h3 class="ph3">Or sail somewhere for the day</h3><div class="gchips">${isles.map(([k, x]) => `<button class="gchip${k === id ? " on" : ""}" data-btown="${k}" aria-pressed="${k === id}"><span>${esc(x.n)}</span></button>`).join("")}</div>
-    <p class="muted">${t.boat.fuel} ${coin()} of fuel, however many come. Up to ${t.boat.max} friends aboard. Set off between ${fmt(t.outFrom)} and ${fmt(t.outTo)}, and be home by dark.</p>`;
+    <p class="muted">${t.boat.fuel} ${coin()} of fuel, however many come. Up to ${t.boat.max} friends aboard. Set off whenever you like, and sail home whenever you're ready.</p>`;
   if (on) return h + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut;
   if (wet) return h + `<p><b>Not in this weather. The harbour master would have words.</b></p>` + shut;
   if (!open) return h + `<p><b>${hm < t.outFrom ? `Too early to set off: from ${fmt(t.outFrom)}.` : "Too late to set off today. Tomorrow!"}</b></p>` + shut;
