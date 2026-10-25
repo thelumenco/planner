@@ -21,14 +21,18 @@ export const inParty = (F, id, day = dayKey()) => { const t = tripOn(F, day); re
 export const awayOn = (F, day = dayKey()) => { const t = tripOn(F, day); return t ? t.party.filter(id => id !== "evan") : []; };
 // Mel's own boat (round 205): it sails to any town with a `boat` entry ({fuel, pier, arrive, arriveLine, sight?, sees?}).
 // Fuel only (no tickets), up to 8 aboard including Mel, daylight only: set off 8am to 2pm, home by 7pm. Not on downpour days.
-export const BOAT_SEATS = 8, BOAT_OUT = [8*60, 14*60], BOAT_HOME = 19*60;
+// round 297c (Mel: "Yes lift it, leave any time"): her own boat sets off whenever she likes and sails home whenever
+// she's ready; only in the last quarter of an hour before the day turns over (1:45am) is everyone called back aboard
+export const BOAT_SEATS = 8, BOAT_HOME = 24*60, BOAT_LATE = [105, 120];
 export const boatTowns = () => Object.keys(TOWNS).filter(k => TOWNS[k].boat);
 // by: "train" (every town), "ferry" (towns with a ferry: Jeju, round 127) or "boat" (Mel's own boat, round 205)
 export const fareFor = (town, party, by = "train") => { const t = TOWNS[town]; if (by === "boat" && t.boat) return t.boat.fuel; const f = by === "ferry" && t.ferry ? t.ferry.fare : t.fare; return f*(1 + party.filter(id => !t.free.includes(id)).length); };
-export const canLeave = (town, hm = sgHM(), by = "train") => by === "boat" ? hm >= BOAT_OUT[0] && hm < BOAT_OUT[1] : hm >= TOWNS[town].outFrom && hm < TOWNS[town].outTo;
+export const canLeave = (town, hm = sgHM(), by = "train") => by === "boat" ? true : hm >= TOWNS[town].outFrom && hm < TOWNS[town].outTo;
 // the last time home: the town's last train (or ferry), or dusk for your own boat
 export const backBy = (F, town) => { const t = tripOn(F); return t && t.by === "boat" ? BOAT_HOME : TOWNS[town].backTo; };
 export const canReturn = (town, hm = sgHM()) => hm < TOWNS[town].backTo;
+// time everyone went home: the last train or ferry; by her own boat, only just before the day turns over
+export const timeToGo = (F, town, hm = sgHM()) => { const t = tripOn(F); return t && t.by === "boat" ? hm >= BOAT_LATE[0] && hm < BOAT_LATE[1] : hm >= backBy(F, town); };
 export function buyTrip(F, town, party, hm = sgHM(), by = "train", rough = false){
   const t = TOWNS[town]; if (!t || !canLeave(town, hm, by) || tripOn(F) || (by === "ferry" && !t.ferry)) return null;
   if (by === "boat" && (!t.boat || rough || FAMILY.filter(id => party.includes(id)).length > BOAT_SEATS - 1)) return null;
@@ -81,10 +85,9 @@ export function sailPanel(F, pick, town, hm = sgHM(), {rough = false, month = 1}
     <div class="actions"><button class="btn alt" data-cruise="1">A dolphin cruise up the coast</button></div><h3 class="ph3">Sail to</h3>
     <div class="gchips">${towns.map(k => `<button class="gchip${k === town ? " on" : ""}" data-btown="${k}" aria-pressed="${k === town}"><span>${esc(TOWNS[k].n)}</span></button>`).join("")}</div>
     <p class="sub">${esc(t.boat.blurb || t.blurb || "")}</p>${t.boat.sees ? `<p class="muted"><b>On ${esc(t.n)} this time of year:</b> ${esc(t.boat.sees(month))}</p>` : ""}
-    <p class="muted">Fuel ${t.boat.fuel} ${coin()} there and back, however many come (up to ${BOAT_SEATS} aboard, you included). Set off between ${fmt(BOAT_OUT[0])} and ${fmt(BOAT_OUT[1])}; sail home before dark, by ${fmt(BOAT_HOME)}.</p>`;
+    <p class="muted">Fuel ${t.boat.fuel} ${coin()} there and back, however many come (up to ${BOAT_SEATS} aboard, you included). Set off whenever you like, and sail home whenever you're ready.</p>`;
   if (on) return h + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: sail again tomorrow.</p>` + shut;
   if (rough) return h + `<p><b>Too rough to sail today.</b> Big grey waves out past the jetty. Wait for a calmer day.</p>` + shut;
-  if (!open) return h + `<p><b>${hm < BOAT_OUT[0] ? `Too early to set off: from ${fmt(BOAT_OUT[0])}.` : `Too late to set off today: you'd not be home before dark. Tomorrow!`}</b></p>` + shut;
   h += `<h3 class="ph3">Who's coming?</h3><div class="trippicks">${FAMILY.map(id => `<button class="tpick${party.includes(id) ? " on" : ""}" data-tpick="${id}" aria-pressed="${party.includes(id)}" ${!party.includes(id) && full ? "disabled" : ""}><b>${esc(nameOf(id))}</b><small>${party.includes(id) ? "aboard" : "a seat"}</small></button>`).join("")}</div>`;
   h += `<p class="muted">${party.length ? `You${party.map(id => ", " + esc(nameOf(id))).join("").replace(/, ([^,]*)$/, " and $1")}: ${party.length + 1} aboard.` : "Just you (and Maple, who likes the wind in her ears)."}${full ? " The boat's full." : ""} They'll take the day off from whatever they usually do.</p>`;
   h += `<div class="actions"><button class="btn primary" data-trip="${town}" data-by="boat" ${F.coins >= t.boat.fuel ? "" : "disabled"}>Cast off · ${t.boat.fuel} ${coin()}</button></div>`;
@@ -93,7 +96,7 @@ export function sailPanel(F, pick, town, hm = sgHM(), {rough = false, month = 1}
 // Ronda's station: the train home
 export function homePanel(F, town, hm = sgHM(), by = "train"){
   if (by === "boat") { const on = tripOn(F), t = TOWNS[town];
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>Your boat</h2><p class="sub">Tied up and waiting. Sail home to Honeybrook's jetty whenever you're ready, before dark (${fmt(BOAT_HOME)}).</p>${on && on.party.length ? `<p class="muted">With you today: ${on.party.map(nameOf).join(", ").replace(/, ([^,]*)$/, " and $1")}.</p>` : ""}
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>Your boat</h2><p class="sub">Tied up and waiting. Sail home to Honeybrook's jetty whenever you're ready.</p>${on && on.party.length ? `<p class="muted">With you today: ${on.party.map(nameOf).join(", ").replace(/, ([^,]*)$/, " and $1")}.</p>` : ""}
       <div class="actions"><button class="btn primary" data-triphome="boat">Sail home from ${esc(t.n)}</button></div>` + shut; }
   const t = TOWNS[town], on = tripOn(F), boat = by === "ferry";
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(t.n)} ${boat ? "ferry pier" : "station"}</h2><p class="sub">${boat ? "Ferries home to Honeybrook's foreshore jetty" : "Trains home to Honeybrook"} whenever you're ready, until ${fmt(t.backTo)}.</p>`;

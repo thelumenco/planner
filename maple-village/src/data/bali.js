@@ -36,7 +36,7 @@ const seesMonth = m => m >= 8 && m <= 9 ? "The dry season, and harvest time: the
 
 export const BA_TOWNS = {
   bali: {
-    n: "Bali", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (trips.js BOAT_HOME: by boat, home before dark)
+    n: "Bali", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (by her own boat there are no hours: trips.js canLeave, timeToGo)
     screens: ["ba_beach", "ba_ubud", "ba_terraces", "ba_temple"], arrive: ["ba_beach", [300, 220]], station: "baboat", music: "bali",
     boat: {fuel: 30, pier: "baboat", arrive: ["ba_beach", [300, 220]], sight: "bali",
       blurb: "The longest sail of all, east to the island of the gods: a palm-fringed beach of painted outrigger boats, a volcano in the clouds, rice terraces like green stairs, and a little offering of flowers on every step. Pack a picnic and a sunhat.",
@@ -97,7 +97,7 @@ export const BA_TOWNS = {
       evan: ["the boat is looking at me!", "monkey! a monkey on a man!", "duckies walking walking walking"]
     },
     say: {
-      baboat: "Your boat, pulled up among the jukung at the edge of the reef. Sail home whenever you're ready, before dark.",
+      baboat: "Your boat, pulled up among the jukung at the edge of the reef. Sail home whenever you're ready.",
       bawarung: "Nyoman's warung on the sand: a thatched roof, low wooden tables, a glass cabinet of nasi campur dishes and a pile of green coconuts by the door.",
       bajukung: "The jukung, the fishing outriggers of Sanur: slim painted hulls on bamboo arms, a swordfish snout on the bow and a big painted eye so each boat can see its way home.",
       bakites: "The kites of Sanur: fish and birds and leaves of cloth and bamboo, some so big it takes a whole team with a rope to fly them. Kite season is July to September, when the trade winds blow.",
@@ -125,7 +125,7 @@ export const BA_TOWNS = {
 // Places on the four screens. bridge: a gate to another screen.
 export const BA_PLACES = {
   // the beach: your boat, the jukung, the warung, the kites, the beach shrine
-  baboat: {scene: "ba_beach", name: "Your boat", door: [300, 200], spot: true, mark: [300, 140], line: "Your boat on the reef edge. Sail home before dark."},
+  baboat: {scene: "ba_beach", name: "Your boat", door: [300, 200], spot: true, mark: [300, 140], line: "Your boat on the reef edge. Sail home whenever you're ready."},
   bajukung: {scene: "ba_beach", name: "The jukung", door: [430, 314], spot: true, mark: [440, 230], line: "The jukung outrigger boats."},
   bawarung: {scene: "ba_beach", name: "Nyoman's warung", door: [96, 358], spot: true, mark: [96, 250], line: "Nyoman's warung on the sand."},
   bakites: {scene: "ba_beach", name: "The kites", door: [214, 364], spot: true, mark: [214, 310], line: "The kites of Sanur."},

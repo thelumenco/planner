@@ -13,7 +13,7 @@ import { SW_ROOM_OBST, SW_ROOM_PARTY } from "./saltwick-rooms-layout.js";
 
 export const SW_TOWNS = {
   saltwick: {
-    n: "Saltwick Harbour", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (trips.js BOAT_HOME: by boat, home before dark)
+    n: "Saltwick Harbour", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (by her own boat there are no hours: trips.js canLeave, timeToGo)
     screens: ["sw_quay", "sw_east", "sw_west", "sw_abbey"], arrive: ["sw_quay", [300, 560]], station: "swboat", music: "saltwick",
     boat: {fuel: 10, pier: "swboat", arrive: ["sw_quay", [300, 560]], sight: "saltwick",
       blurb: "Up the coast to an old Yorkshire fishing town: red roofs climbing the cliffs, a swing bridge, a fish market on the quay and the abbey ruins on the headland. The nearest sail.",
@@ -74,7 +74,7 @@ export const SW_TOWNS = {
       evan: ["birdies!", "boats boats boats", "is the bridge going to MOVE?", "chips?"]
     },
     say: {
-      swboat: "Your boat, tied up at the pontoon with the fishing boats either side of her. Sail home whenever you're ready, before dark.",
+      swboat: "Your boat, tied up at the pontoon with the fishing boats either side of her. Sail home whenever you're ready.",
       swmarket: "The fish market: a long open shed on the quay, fish boxes stacked on ice, the morning's catch laid out in rows.",
       swkettle: "The Copper Kettle: a little tearoom with steamed-up windows and a brass kettle hanging over the door.",
       swpots: "Lobster pots stacked against the harbour wall: rope and netting and orange floats, smelling of the sea.",
@@ -99,7 +99,7 @@ export const SW_TOWNS = {
 // Places on the four screens. bridge: a gate to another screen.
 export const SW_PLACES = {
   // the quay: your boat at the pontoon, the fish market shed, the tearoom, the pots, the piers, the swing bridge
-  swboat: {scene: "sw_quay", name: "Your boat", door: [330, 572], spot: true, mark: [400, 520], line: "Your boat at the pontoon. Sail home before dark."},
+  swboat: {scene: "sw_quay", name: "Your boat", door: [330, 572], spot: true, mark: [400, 520], line: "Your boat at the pontoon. Sail home whenever you're ready."},
   swmarket: {scene: "sw_quay", name: "The fish market", door: [120, 352], spot: true, mark: [120, 250], line: "The fish market."},
   swkettle: {scene: "sw_quay", name: "The Copper Kettle", door: [96, 546], spot: true, mark: [96, 440], line: "The Copper Kettle tearoom."},
   swpots: {scene: "sw_quay", name: "Lobster pots", door: [262, 312], spot: true, mark: [262, 250], line: "Lobster pots."},

@@ -4319,7 +4319,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(gs.takeWrapped(F, 0) === id && F.inv[id] === 1 && !gs.giftState(F).wrapped.length, "and it can come back out");
   check(!/Put out:/.test(wr.wrapPanel(F, {}, {where: "giftshop", table: []})), "the wrapping table just points to the basket now");
 }
-// Round 205: your own boat sails to towns (Jeju for now): fuel only, up to 8 aboard, 8am to 2pm out, home by 7pm, not on downpour days
+// Round 205: your own boat sails to towns (Jeju for now): fuel only, up to 8 aboard, any time (round 297c), not on downpour days
 {
   console.log("\nyour own boat sails to towns (round 205)");
   const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
@@ -4331,8 +4331,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector("#ctx [data-cruise]", { timeout: 15000 }); return page.locator("#ctx").innerText(); };
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-01"); await page.waitForTimeout(800);
   check(/Too rough to sail today/.test(await open("10:00", "2026-11-01")) && await page.locator('#ctx [data-trip]').count() === 0, "no sailing on a downpour day");
-  check(/Too early to set off/.test(await open("07:00", "2026-10-14")), "and not before 8am");
-  check(/Too late to set off/.test(await open("15:00", "2026-10-14")), "or after 2pm (you'd not be home before dark)");
+  // round 297c (Mel: "Yes lift it, leave any time"): no hours on her own boat
+  check(!/Too early|Too late/.test(await open("06:00", "2026-10-14")) && await page.locator('#ctx [data-trip]').count() === 1, "set off at six in the morning");
+  check(!/Too early|Too late/.test(await open("21:30", "2026-10-14")) && await page.locator('#ctx [data-trip]').count() === 1 && /whenever you like/.test(await page.locator("#ctx").innerText()), "or half nine at night: whenever you like");
   const txt = await open("09:00", "2026-10-14");
   check(/Jeju/.test(txt) && /Fuel 20/.test(txt) && /up to 8 aboard/.test(txt), "the boat's panel: a dolphin cruise, or sail to Jeju for fuel only, up to 8 aboard");
   for (const id of ["mum", "dad", "mama", "gonggong", "darren", "evan", "marcus", "angelina"]) { const btn = page.locator(`#ctx [data-tpick="${id}"]`); if (await btn.isEnabled()) await btn.click(); await page.waitForTimeout(120); }

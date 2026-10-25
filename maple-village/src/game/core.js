@@ -143,7 +143,7 @@ import { kyotoRoomArt } from "../art/kyoto-rooms.js";
 import { kyotoPanel, kyotoState, stamp as ktStamp, rentYukata, yukataOn, YUKATA, whiskStart, whisk, froth, TEA, sitStart, breathe, calm, drawFortune, makeNerikiri, seasonShape, centre as ktCentre, throwCup, NERI } from "./kyoto.js";
 import { TOWNS, townOf, townRoom, roomBehind, TOWN_BOUNDS, TOWN_PLACES } from "../data/towns.js";
 import { rondaPanel, rondaVisit, buyGood, buyVines, taste, buyTile, picnic as rondaPicnic, tileBench, cafeTreat, showOn, palmasStart, palmasEnd, clap, ole, paintTile, pour, TEA_GLASSES, rondaState } from "./ronda.js";
-import { tripOn, inParty, buyTrip, endTrip, ticketPanel, homePanel, sailPanel, backBy, BOAT_SEATS, initTrips, nameOf as tripName, awayOn } from "./trips.js";
+import { tripOn, inParty, buyTrip, endTrip, ticketPanel, homePanel, sailPanel, backBy, timeToGo, BOAT_SEATS, initTrips, nameOf as tripName, awayOn } from "./trips.js";
 import { bikeArt, taxiBoat, taxiBank, transportArt } from "../art/transport.js";
 import { bikeOn, bikeLeft, hireBike, returnBike, bikeExpired, bikePanel, STOPS as TAXI_STOPS, taxiPanel, takeTaxi } from "./transport.js";
 import { forage, rangerPanel } from "./woods.js";
@@ -2749,7 +2749,7 @@ function startTrip(town, by = "train"){
   ride(own ? `Casting off for ${r.town.n}!` : boat ? `All aboard the ferry for ${r.town.n}!` : `All aboard for ${r.town.n}!`, boat ? false : town, () => { if (town === "ronda") rondaVisit(F); setScene(land[0], land[1]);
     if (town === "jeju" && sgHM() < 8*60) setTimeout(() => speak("And look: the sun's just coming up out of the sea behind Seongsan, turning the crater gold. Worth the early start.", 6000), 8000);   // round 129: the early boat
     if ((own || boat) && town === "hokkaido") hkScroll(scrollSeason(dayKey()), 9500);   // round 225: a mark on the seasons scroll for this season
-    if (own) { setTimeout(() => speak(`${r.town.boat.arriveLine || r.town.arriveLine}${t.party.length ? ` ${partyList(t)} climb${t.party.length > 1 ? "" : "s"} out onto the quay behind you.` : ""} Sail home before dark: 7pm at the latest.`, 6500), 900); }
+    if (own) { setTimeout(() => speak(`${r.town.boat.arriveLine || r.town.arriveLine}${t.party.length ? ` ${partyList(t)} climb${t.party.length > 1 ? "" : "s"} out onto the quay behind you.` : ""} Sail home whenever you're ready.`, 6500), 900); }
     else setTimeout(() => speak(`${(boat && r.town.ferry.arriveLine) || r.town.arriveLine || `${r.town.n}! Whitewashed walls, orange trees and a sky so blue it hums.`}${t.party.length ? ` ${partyList(t)} pile${t.party.length > 1 ? "" : "s"} off the ${boat ? "ferry" : "train"} behind you.` : ""} The last ${boat ? "ferry" : "train"} home is at 10pm.`, 6500), 900);
     if (inParty(F, "evan")) setTimeout(() => evanSays(pick(r.town.evanArrive || ["Mama, it's SO sunny!", "Big birdies in the sky!", "Are we in Spain? Is this Spain?"])), 3200); });
 }
@@ -3087,7 +3087,7 @@ function townTick(){
   const town = townOf(scene); if (!town) return;
   if (evanInVan() && S.vanBed !== dayKey()) { S.vanBed = dayKey(); speak("Evan's yawning his head off. You tuck him into the back of the van under his blanket; he's asleep before you've closed the door.", 6000); drawScene(); }
   if (sgHM() >= TOWNS[town].backTo && TOWNS[town].by === "van" && !document.querySelector(".trainride")) { speak("It's getting late: everyone in the van, time to drive home.", 3500); vanHome(true); return; }
-  if (sgHM() >= backBy(F, town) && !document.querySelector(".trainride")) { const t0 = tripOn(F); speak(t0 && t0.by === "boat" ? "The light's going: everyone back aboard, time to sail home before dark." : `That's the last ${t0 && t0.by === "ferry" ? "ferry" : "train"}! Everyone on, quick.`, 3500); tripHome(true); return; }
+  if (timeToGo(F, town) && !document.querySelector(".trainride")) { const t0 = tripOn(F); speak(t0 && t0.by === "boat" ? "It's very late: everyone back aboard, and home under the stars." : `That's the last ${t0 && t0.by === "ferry" ? "ferry" : "train"}! Everyone on, quick.`, 3500); tripHome(true); return; }
   if (scene === "ct_vernazza" && sgHM() >= 12*60 && sgHM() < 12*60 + 5 && S.ctBells !== dayKey()) { S.ctBells = dayKey(); sfx("chime"); speak("Noon: the church bells ring out over the harbour, and the whole of Vernazza stops for lunch.", 5000); }   // round 134
   const t = tripOn(F); if (!t || !t.party.length || Date.now() - townSaid < 70000 || Math.random() > .25) return;
   const who = t.party.filter(id => id !== "evan" && isHere(id)), id = pick(who.length ? who : [null]); if (!id) return;

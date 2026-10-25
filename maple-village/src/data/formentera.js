@@ -40,7 +40,7 @@ const seesMonth = m => m === 12 || m <= 2 ? "Quiet green winter: the fields gree
 
 export const FM_TOWNS = {
   formentera: {
-    n: "Formentera", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (trips.js BOAT_HOME: by boat, home before dark)
+    n: "Formentera", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (by her own boat there are no hours: trips.js canLeave, timeToGo)
     screens: ["fm_illetes", "fm_village", "fm_salines", "fm_mola"], arrive: ["fm_illetes", [190, 470]], station: "fmboat", music: "formentera",
     boat: {fuel: 28, pier: "fmboat", arrive: ["fm_illetes", [190, 470]], sight: "formentera",
       blurb: "A sail south to Formentera, the quietest of the Balearic islands: the long white spit of Ses Illetes with turquoise water on both sides, salt flats with flamingos, the whitewashed village of Sant Francesc, and La Mola's red cliffs and lighthouse. Everyone goes by bike.",
@@ -102,7 +102,7 @@ export const FM_TOWNS = {
       evan: ["a crab! he runs sideways!", "Mama, the birdies are pink!", "I'm ringing my bell! ding ding!"]
     },
     say: {
-      fmboat: "Your boat, tied up at La Savina's little quay, the water under it so clear the hull seems to float in the air. Sail home whenever you're ready, before dark.",
+      fmboat: "Your boat, tied up at La Savina's little quay, the water under it so clear the hull seems to float in the air. Sail home whenever you're ready.",
       fmchiringuito: "Marina's chiringuito: a little beach bar with a palm-thatch roof, driftwood stools in the sand, lanterns in the rafters and fish on the grill. The sea is about ten steps from the bar.",
       fmsnorkel: "The clear water off the spit: pale sand, then dark meadows of posidonia seagrass waving underneath. The seagrass keeps the water clean, which is why it's this turquoise. Fish everywhere.",
       fmdunes: "The dune boardwalk: a raised wooden path over the dunes, so nobody tramples the sea lilies and the juniper that hold the sand together. It runs north to the salt flats.",
@@ -128,7 +128,7 @@ export const FM_TOWNS = {
 // Places on the four screens. bridge: a gate to another screen.
 export const FM_PLACES = {
   // Ses Illetes and La Savina: your boat at the quay, the harbour light, the spit, the chiringuito, the rock pools, the dunes
-  fmboat: {scene: "fm_illetes", name: "Your boat", door: [130, 500], spot: true, mark: [70, 560], line: "Your boat at La Savina's quay. Sail home before dark."},
+  fmboat: {scene: "fm_illetes", name: "Your boat", door: [130, 500], spot: true, mark: [70, 560], line: "Your boat at La Savina's quay. Sail home whenever you're ready."},
   fmchiringuito: {scene: "fm_illetes", name: "Marina's chiringuito", door: [334, 252], spot: true, mark: [334, 160], line: "Marina's chiringuito."},
   fmsnorkel: {scene: "fm_illetes", name: "The clear water", door: [206, 252], spot: true, mark: [210, 150], line: "The clear water over the seagrass."},
   fmdunes: {scene: "fm_illetes", name: "The dune boardwalk", door: [452, 150], spot: true, mark: [360, 70], line: "The dune boardwalk."},

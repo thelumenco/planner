@@ -39,7 +39,7 @@ const seesMonth = m => m === 12 || m <= 2 ? "Deep winter: powder snow at Niseko,
 
 export const HK_TOWNS = {
   hokkaido: {
-    n: "Hokkaido", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (trips.js BOAT_HOME: by boat, home before dark)
+    n: "Hokkaido", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (by her own boat there are no hours: trips.js canLeave, timeToGo)
     screens: ["hk_market", "hk_onsen", "hk_niseko", "hk_flowers"], arrive: ["hk_market", [180, 470]], station: "hkboat", music: "hokkaido",
     boat: {fuel: 30, pier: "hkboat", arrive: ["hk_market", [180, 470]], sight: "hokkaido",
       blurb: "A long sail north to Hokkaido, Japan's snowy island: a morning market of crab and sea urchin, a canal of stone warehouses and gas lamps, a steaming hot springs valley, the ski slopes under Mount Yotei and a farm of rainbow flowers. Pack a warm jumper whatever the month.",
@@ -100,7 +100,7 @@ export const HK_TOWNS = {
       evan: ["the crab is waving at me!", "Mama, my feet are in the hot puddle!", "the birdies are dancing! I'm dancing too!"]
     },
     say: {
-      hkboat: "Your boat, tied up at the old harbour pier among the fishing boats. Sail home whenever you're ready, before dark.",
+      hkboat: "Your boat, tied up at the old harbour pier among the fishing boats. Sail home whenever you're ready.",
       hkhall: "The morning market hall: a long low building with red lanterns along the eaves, open since before dawn. Inside, tanks of king crab, trays of sea urchin and bowls of salmon roe glowing like jewels.",
       hkglass: "Kenta's glassworks, in an old stone warehouse by the canal: iron shutters, a glowing furnace inside, glass floats in the window and the tinkle of music boxes every time the door opens.",
       hkcanal: "The old canal: a hundred years old, lined with stone warehouses where the ships once unloaded herring, and a row of gas lamps that are lit every evening. In winter the snow sits on every lamp like a hat.",
@@ -128,7 +128,7 @@ export const HK_TOWNS = {
 // Places on the four screens. bridge: a gate to another screen.
 export const HK_PLACES = {
   // the morning market: your boat at the pier, the market hall, the glassworks, the canal, the crab stalls, the gull
-  hkboat: {scene: "hk_market", name: "Your boat", door: [150, 498], spot: true, mark: [96, 540], line: "Your boat at the harbour pier. Sail home before dark."},
+  hkboat: {scene: "hk_market", name: "Your boat", door: [150, 498], spot: true, mark: [96, 540], line: "Your boat at the harbour pier. Sail home whenever you're ready."},
   hkhall: {scene: "hk_market", name: "The market hall", door: [92, 356], spot: true, mark: [92, 270], line: "The morning market hall."},
   hkglass: {scene: "hk_market", name: "Kenta's glassworks", door: [426, 348], spot: true, mark: [426, 262], line: "Kenta's glassworks."},
   hkcanal: {scene: "hk_market", name: "The canal", door: [150, 196], spot: true, mark: [150, 140], line: "The old canal and its gas lamps."},

@@ -47,7 +47,7 @@ export function seasonSay(id, day){
 
 export const PI_TOWNS = {
   puffin: {
-    n: "Puffin Isle", on: true, by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (trips.js BOAT_HOME: by boat, home before dark)
+    n: "Puffin Isle", on: true, by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (by her own boat there are no hours: trips.js canLeave, timeToGo)
     screens: ["pi_haven", "pi_wick", "pi_farm", "pi_point"], arrive: ["pi_haven", [260, 160]], station: "piboat", music: "puffin",
     boat: {fuel: 14, pier: "piboat", arrive: ["pi_haven", [260, 160]], sight: "puffin",
       blurb: "Out past the headland to the little wild island on the edge of the open sea: cliffs, sea pinks, a lighthouse on the far tip, and nobody living there but the keeper, the warden and a great many birds.",
@@ -108,7 +108,7 @@ export const PI_TOWNS = {
       evan: ["puffin! PUFFIN!", "bunny in the hole!", "the lighthouse is so tall"]
     },
     say: {
-      piboat: "Your boat, tied up at the end of the little stone jetty in North Haven. Sail home whenever you're ready, before dark.",
+      piboat: "Your boat, tied up at the end of the little stone jetty in North Haven. Sail home whenever you're ready.",
       piwarden: "The warden's hut: grey stone, a green door, a chalkboard of today's sightings, and a pair of binoculars always on the windowsill.",
       pipath: "The steep path up from the cove: stone steps cut into the bank, a rope to hold, and puffin burrows right beside the path. Mind your feet.",
       pirabbits: "The rabbit warren: little sandy mounds all over the turf, and rabbits everywhere, nibbling, ears up, white tails bobbing when they run.",
@@ -132,7 +132,7 @@ export const PI_TOWNS = {
 // Places on the four screens. bridge: a gate to another screen.
 export const PI_PLACES = {
   // North Haven: your boat at the jetty, the cove path, the warden's hut, the rabbit warren
-  piboat: {scene: "pi_haven", name: "Your boat", door: [262, 132], spot: true, mark: [330, 50], line: "Your boat at the jetty. Sail home before dark."},
+  piboat: {scene: "pi_haven", name: "Your boat", door: [262, 132], spot: true, mark: [330, 50], line: "Your boat at the jetty. Sail home whenever you're ready."},
   pipath: {scene: "pi_haven", name: "The cove path", door: [262, 210], spot: true, mark: [300, 190], line: "The steep path up from the cove."},
   piwarden: {scene: "pi_haven", name: "The warden's hut", door: [104, 326], spot: true, mark: [104, 230], line: "The warden's hut."},
   pirabbits: {scene: "pi_haven", name: "The rabbit warren", door: [404, 482], spot: true, mark: [404, 420], line: "The rabbit warren."},

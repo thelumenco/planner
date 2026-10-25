@@ -13,7 +13,7 @@ import { PV_ROOM_OBST, PV_ROOM_PARTY } from "./porto-rooms-layout.js";
 
 export const PV_TOWNS = {
   porto: {
-    n: "Portovenere", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (trips.js BOAT_HOME: by boat, home before dark)
+    n: "Portovenere", by: "boat", fare: 0, free: ["evan"], outFrom: 8*60, outTo: 14*60, backTo: 19*60,   // (by her own boat there are no hours: trips.js canLeave, timeToGo)
     screens: ["pv_harbour", "pv_borgo", "pv_castle", "pv_point"], arrive: ["pv_harbour", [300, 560]], station: "pvboat", music: "porto",
     boat: {fuel: 24, pier: "pvboat", arrive: ["pv_harbour", [300, 560]], sight: "porto",
       blurb: "The long sail south, past Cinque Terre to the very end of the coast: a wall of tall painted houses along the harbour, a castle on top, and a striped church out on the rocks. Pack a picnic for the crossing.",
@@ -75,7 +75,7 @@ export const PV_TOWNS = {
       evan: ["kitty! another kitty!", "the castle is SO big", "boats with black balls"]
     },
     say: {
-      pvboat: "Your boat, tied up at the quay under the tall painted houses. Sail home whenever you're ready, before dark.",
+      pvboat: "Your boat, tied up at the quay under the tall painted houses. Sail home whenever you're ready.",
       pvwall: "The palazzata: tall narrow tower-houses six storeys high, red and ochre and yellow and salmon, packed shoulder to shoulder along the water like a fortress wall. Green shutters, and washing at the top windows.",
       pvmussels: "The mussel co-op: a blue door, crates stacked outside, and a smell of rope and sea. The mussels come straight off the farm out in the strait.",
       pvbar: "Bar Tonio: a green awning, two little tables on the quay, and the clink of tiny cups. The best seat in town is the one facing the boats.",
@@ -101,7 +101,7 @@ export const PV_TOWNS = {
 // Places on the four screens. bridge: a gate to another screen.
 export const PV_PLACES = {
   // the harbour: your boat, the palazzata, the mussel co-op, the bar, Palmaria, the cats
-  pvboat: {scene: "pv_harbour", name: "Your boat", door: [330, 578], spot: true, mark: [340, 610], line: "Your boat at the quay. Sail home before dark."},
+  pvboat: {scene: "pv_harbour", name: "Your boat", door: [330, 578], spot: true, mark: [340, 610], line: "Your boat at the quay. Sail home whenever you're ready."},
   pvwall: {scene: "pv_harbour", name: "The palazzata", door: [196, 300], spot: true, mark: [196, 110], line: "The wall of tower-houses."},
   pvmussels: {scene: "pv_harbour", name: "The mussel co-op", door: [150, 232], spot: true, mark: [150, 150], line: "The mussel co-op."},
   pvbar: {scene: "pv_harbour", name: "Bar Tonio", door: [276, 232], spot: true, mark: [276, 150], line: "Bar Tonio, on the quay."},
