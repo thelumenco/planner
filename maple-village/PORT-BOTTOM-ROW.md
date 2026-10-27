@@ -165,5 +165,6 @@ Port these smoke-test blocks:
 - "The green, the Stables and Lighthouse Point (rounds 262 to 264)"
 - "The bottom row in the stories (rounds 272 to 275)", only for the threads you ported
 - "Inside the lighthouse (round 297)", plus the changed checks listed in section 12
+- "Seashells, one at a time, and the chocolate steps (round 299)", plus the changed checks HANDOFF.md round 299 lists, for the parts you ported
 
 Adjust their ids to this edition. Then run the full suite and publish only when it's green. Afterwards, tell me what you changed from the source and anything you couldn't port.
