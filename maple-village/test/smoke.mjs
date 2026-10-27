@@ -1365,8 +1365,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#world [data-bed]').count() === 12 && await page.locator('#world [data-bush]').count() === 4, "the flower farm has twelve beds and four bushes");
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="wshelf"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-vyfruit="apple"]', { timeout: 15000 }); await page.click('#ctx [data-vyfruit="apple"]'); await page.waitForTimeout(200);
-  check(await fox().then(f => f.vine.fruit.apple >= 1 && !f.inv.apple), "fruit goes into the wine shop's fruit crate to sell");
+  await page.waitForSelector('#ctx [data-vyfruit="apple"]', { timeout: 15000 }); const apples0 = await fox().then(f => f.inv.apple || 0);
+  await page.click('#ctx [data-vyfruit="apple"][data-n="1"]'); await page.waitForTimeout(200);
+  check(await fox().then(f => f.vine.fruit.apple === 1 && (f.inv.apple || 0) === apples0 - 1), "fruit goes into the wine shop's fruit crate to sell, one at a time (round 299)");
+  if (apples0 > 1) { await page.click('#ctx [data-vyfruit="apple"][data-n="99"]'); await page.waitForTimeout(200); }
+  check(await fox().then(f => f.vine.fruit.apple === apples0 && !f.inv.apple), "or all of it at once");
   await page.goto(url + "?seed=1&time=15:30&date=2026-10-07"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("cottage")); await page.waitForTimeout(900);
   check(await page.locator('#actors [data-npc="mama"]').count() === 1, "Ma Ma's home in her cottage at teatime");
@@ -1841,10 +1844,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await tap("sacks", '#ctx [data-cc="beans"][data-n="3"]'); await page.click('#ctx [data-cc="beans"][data-n="3"]'); await page.waitForTimeout(300);
   await page.click("#ctx [data-close]");
   await tap("roaster", '#ctx [data-cc="roast"]'); await page.click('#ctx [data-cc="roast"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.cocoa.beans === 2 && f.cocoa.roast && f.coins === 925), "three sacks of beans (75 coins), one in the roaster");
+  check(await fox().then(f => f.cocoa.beans === 0 && f.cocoa.roast && f.cocoa.roast.n === 3 && f.coins === 925), "three sacks of beans (75 coins), all three in the roaster at once (round 299)");
+  check(await page.locator("#ctx .ccflow .gchip").count() === 5 && /Roasting/.test(await page.locator("#ctx").innerText()), "the five steps in order across the top, and what's happening now");
   await at("12:15"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
-  await tap("grinder", '#ctx [data-cc="grind"][data-k="dark"]'); await page.click('#ctx [data-cc="grind"][data-k="dark"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.cocoa.roasted === 0 && f.cocoa.grind && f.cocoa.grind.kind === "dark"), "ten minutes later the beans are roasted, and go in the grinder as dark chocolate");
+  await tap("grinder", '#ctx [data-cc="grind"][data-k="dark"]');
+  check(await page.locator('#ctx .ccflow .gchip.on[data-k="grinder"]').count() === 1, "the step strip points at the grinder next");
+  await page.click('#ctx [data-cc="grind"][data-k="dark"]'); await page.waitForTimeout(300);
+  check(await fox().then(f => f.cocoa.roasted === 2 && f.cocoa.grind && f.cocoa.grind.kind === "dark"), "ten minutes later the beans are roasted, and one sack goes in the grinder as dark chocolate");
   await at("13:00"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
   check(await fox().then(f => f.cocoa.grind && !f.cocoa.ground), "an hour on, it's still grinding (two hours)");
   await at("14:20"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
@@ -2590,7 +2596,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-spot="larder"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="syrup"]', { timeout: 15000 });
   await page.click('#ctx [data-k="syrup"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.syrup === 2 && !f.kitchen.larder.tulip), "three garden tulips make two bottles of petal syrup");
-  await page.locator('#ctx [data-k="send"][data-id="syrup"]').click(); await page.waitForTimeout(200);
+  await page.locator('#ctx [data-k="send"][data-id="syrup"][data-n="1"]').click(); await page.waitForTimeout(200);
+  check(await fox().then(f => f.inv.syrup === 1 && f.kitchen.larder.syrup === 1), "into the larder one at a time (round 299)");
+  await page.locator('#ctx [data-k="send"][data-id="syrup"][data-n="1"]').click(); await page.waitForTimeout(200);
   await page.locator('#ctx [data-close]').first().click();
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-dish="posset"]', { timeout: 15000 });
   await page.click('#ctx [data-dish="posset"]'); await page.waitForTimeout(300);
@@ -5138,6 +5146,22 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="vsale"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-lvbuy]", { timeout: 20000 }).catch(() => {});
   check(/Bram/.test(await page.locator("#ctx").innerText()) && await page.locator("#ctx [data-lvbuy]").count() === 1, "on a new game the lower vineyard is Bram's, with his For Sale sign and note");
   await page.close();
+}
+{
+  // round 299 (Mel: seashells to sell and give; adding things one at a time; a clearer chocolate flow, and the roaster
+  // no longer the bottleneck)
+  console.log("\nSeashells, one at a time, and the chocolate steps (round 299)");
+  const itm = await import(new URL("../src/data/items.js", import.meta.url)); await import(new URL("../src/data/carboot.js", import.meta.url));
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), ml = await import(new URL("../src/game/mulled.js", import.meta.url));
+  check(itm.ITEMS.b_shell.sell === 1 && itm.ITEMS.b_shell.to === "family" && itm.ITEMS.b_shell.say && itm.ITEMS.b_conch.sell === 2 && itm.ITEMS.b_conch.to === "family", "seashells sell to Hana for a coin (a conch for 2), and any of the family can be given one");
+  { const F = {coins: 100, inv: {}}; const c = cc.cocoaState(F); cc.buyBeans(F, 3);
+    check(cc.nextStep(c).at === "roaster", "the next step after buying beans: the roaster");
+    check(cc.startRoast(F) === 3 && c.beans === 0 && c.roast.n === 3 && cc.nextStep(c).wait, `the roaster takes all three sacks at once (up to ${cc.ROAST_MAX})`);
+    c.roast.done = 0; cc.kitchenPanel(F, "roaster");
+    check(c.roasted === 3 && cc.nextStep(c).at === "grinder" && /Grind/.test(cc.kitchenPanel(F, "grinder")) && /gchip on[^>]*data-k="grinder"/.test(cc.kitchenPanel(F, "sacks")), "ten minutes on, three sacks roasted, and every station points at the grinder"); }
+  { const F = {coins: 0, inv: {apple: 3, sp_cinnamon: 2}}; vy.vineState(F);
+    check(/1 apple/.test(vy.stockFruit(F, "apple", 1)) && F.inv.apple === 2 && vy.stockFruit(F, "apple") && !F.inv.apple, "the fruit crate: one at a time, or the rest");
+    check(ml.toRack(F, "sp_cinnamon", 1) === 1 && F.inv.sp_cinnamon === 1, "the spice rack takes one at a time too"); }
 }
 {
   // round 297 (Mel: "Need three interior screens for lighthouse"; "Treats only, just be nice to fill, skip the radio")

@@ -139,6 +139,13 @@ Commits (the HANDOFF.md entries for rounds 296 and 297 describe them; leave out 
 - Round 298 (`git log` "The wine shop's windows stop short of the door; the green's lamp posts light up at night"): the green's two lamp posts get `lampGlow` (and `lampDefs`), so they light up after dark; and the wine shop's window panes in `art/vineyard.js` `shopArt` are narrowed (330 to 368, 412 to 448), because the night glow drawn round the left pane spilled over the door. Port the window fix only if this edition's wine shop has the same drawing.
 - Tests: the "Inside the lighthouse (round 297)" block; the extra check for the hatch's hours at the end of the "Riding your pony and Bram's cottage (round 283)" block; and the "your own boat sails to towns (round 205)" block, where the 8am and 2pm checks became "set off at six in the morning" and "half nine at night".
 
+### 13. Seashells, one at a time, and the chocolate steps (round 299)
+`git log` "Seashells sell and can be given; things go in one at a time; the Cocoa Room's step strip and batch roasting" on the branch (HANDOFF.md round 299):
+- Seashells (`BEACH` in `data/carboot.js`): sell for 1 (the conch for 2), and can be given (`to: "family"`, or this edition's equivalent, with a `say`).
+- One at a time: the larder, the wine shop's fruit crate, the mill's basket and the mulled-wine spice rack get "1" and "All" buttons instead of moving everything at once. Port whichever of these this edition has.
+- The Cocoa Room: the roaster takes up to four sacks at once, and every kitchen station shows the five steps with the next one highlighted and a "Go there" button (`STEPS`, `flow`, `nextStep`). Port if this edition has the Cocoa Room.
+- Tests: the "Seashells, one at a time, and the chocolate steps (round 299)" block and the changed checks it lists in HANDOFF.
+
 ### 11. Weddings buy sparkling by the case (round 284, not part of the bottom row)
 If this edition has the terrace weddings (`game/occasions.js`), port this too: commit `4fea497` "Weddings order two to four cases of sparkling, brought up from the cellar on the day".
 - `occasions.js`: `weddingCases(day)` gives each couple an order of two to four cases; the bookings book note reads "N cases of sparkling ordered from your cellar".

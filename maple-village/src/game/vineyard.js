@@ -412,12 +412,12 @@ export function barrelPanel(F){
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
 // Fruit from the orchard goes in a crate by the shelves (all of one kind from the backpack at a time)
-export function stockFruit(F, id){ const v = vineState(F), n = (F.inv || {})[id] || 0; if (!n || !ITEMS[id] || !ITEMS[id].fruit) return null;
-  delete F.inv[id]; v.fruit[id] = (v.fruit[id] || 0) + n; return `${n} ${ITEMS[id].n.toLowerCase()}${n > 1 && !/s$/.test(ITEMS[id].n) ? "s" : ""} into the fruit crate.`; }
+export function stockFruit(F, id, k = 99){ const v = vineState(F), n = Math.min(k, (F.inv || {})[id] || 0); if (!n || !ITEMS[id] || !ITEMS[id].fruit) return null;
+  F.inv[id] -= n; if (F.inv[id] <= 0) delete F.inv[id]; v.fruit[id] = (v.fruit[id] || 0) + n; return `${n} ${ITEMS[id].n.toLowerCase()}${n > 1 && !/s$/.test(ITEMS[id].n) ? "s" : ""} into the fruit crate.`; }
 const fruitCrate = F => { const v = vineState(F), crate = Object.keys(v.fruit).filter(id => v.fruit[id] > 0), bag = Object.keys(F.inv || {}).filter(id => F.inv[id] > 0 && ITEMS[id] && ITEMS[id].fruit);
   if (!crate.length && !bag.length) return "";
   return `<p class="eyebrow">Fruit crate</p>${crate.length ? `<ul class="hlist wlist">${crate.map(id => `<li><span class="wpic">${icon(id, 36)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${v.fruit[id]} in the crate · ${ITEMS[id].sell || 3} coins each</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty. Fruit from Ma Ma's orchard sells here too.</p>`}
-    ${bag.length ? `<div class="vbtns">${bag.map(id => `<button class="btn small alt" data-vyfruit="${id}">${icon(id, 18)} Add ${F.inv[id]} ${esc(ITEMS[id].n.toLowerCase())}</button>`).join("")}</div>` : ""}`; };
+    ${bag.length ? `<div class="vbtns">${bag.map(id => `<button class="btn small alt" data-vyfruit="${id}" data-n="1">${icon(id, 18)} Add 1 ${esc(ITEMS[id].n.toLowerCase())}</button>${F.inv[id] > 1 ? `<button class="btn small alt" data-vyfruit="${id}" data-n="99">All ${F.inv[id]}</button>` : ""}`).join("")}</div>` : ""}`; };
 export function shelfPanel(F){
   const v = vineState(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The wine shelves</h2>
@@ -513,7 +513,7 @@ export function wireVine(root, F, api){
     if (line) api.say(line); api.save(); api.rerender();
   });
   root.querySelectorAll("[data-vybuy]").forEach(b => b.onclick = () => { const line = buy(F, b.dataset.vybuy); if (line) { api.sfx("coin"); api.say(line); api.save(); api.rerender(); } });
-  root.querySelectorAll("[data-vyfruit]").forEach(b => b.onclick = () => { const line = stockFruit(F, b.dataset.vyfruit); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
+  root.querySelectorAll("[data-vyfruit]").forEach(b => b.onclick = () => { const line = stockFruit(F, b.dataset.vyfruit, +b.dataset.n || 99); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyrack]").forEach(b => b.onclick = () => { const c = onRack(F, b.dataset.vyrack); if (c) { api.sfx("chime"); api.say(`${c.name}, neck-down on the riddling rack. A quarter turn a day, like Jono showed you. The longer it stays, the finer it gets.`); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vyhold]").forEach(b => b.onclick = () => { const c = hold(F, b.dataset.vyhold, b.dataset.on === "1"); if (c) { api.sfx("paper"); api.say(c.hold ? `${c.name} stays in the cellar till you say so.` : `Celeste can put ${c.name} out when she's on.`); api.save(); api.rerender(); } });
   root.querySelectorAll("[data-vykitchen]").forEach(b => b.onclick = () => { const line = toKitchen(F, b.dataset.vykitchen); if (line) { api.sfx("paper"); api.say(line); api.save(); api.rerender(); } });
