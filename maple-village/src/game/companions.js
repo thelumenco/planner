@@ -26,7 +26,8 @@ export const KEEP_SPOTS = {
   fridge2: {scene: "home", at: [344, 226], n: "home, on the fridge (lower)", only: "magnet"},   // round 129: room for Jeju's magnet too
   fridge3: {scene: "home", at: [326, 230], n: "home, on the fridge (by the handle)", only: "magnet"},   // round 134: and Cinque Terre's
   fridge4: {scene: "home", at: [344, 204], n: "home, on the fridge (top corner)", only: "magnet"},   // round 142: and Bellbird Valley's
-  fridge5: {scene: "home", at: [312, 214], n: "home, on the fridge (by the freezer door)", only: "magnet"}   // round 149: and the Coast Road's
+  fridge5: {scene: "home", at: [312, 214], n: "home, on the fridge (by the freezer door)", only: "magnet"},   // round 149: and the Coast Road's
+  fridge7: {scene: "home", at: [314, 236], n: "home, on the fridge (bottom left)", only: "magnet"}   // round 233: and Portovenere's
 };
 // what can go where: keepsakes, and souvenirs marked keep (towns.js), on shelves; fridge magnets only on the fridge
 export const canKeep = it => !!it && (it.kind === "keepsake" || !!it.keep);

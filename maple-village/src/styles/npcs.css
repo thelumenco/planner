@@ -293,3 +293,45 @@
 /* round 297: the lighthouse beam turning in the lamp room after dark, once every ten seconds */
 .lhspin{transform-box:view-box;transform-origin:260px 330px;animation:lhspin 10s linear infinite}@keyframes lhspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.lhspin{animation:none}}
+
+/* a day out in Portovenere (never done anywhere before): a friend swims breaststroke off the flat rocks in her cap and
+   goggles, another points out the view from the castle with his red guidebook open, one talks with her hands among the
+   nonnas, one watches the mussel boats come in with his hands clasped behind his back, one jumps off the rocks
+   with a splash, one bobs in his mask, snorkel and flippers at Byron's Grotto, one writes a poem on the poets'
+   bench and looks up for the next line */
+.ch.npc.act-swim:not(.walk) .legL,.ch.npc.act-swim:not(.walk) .legR,.ch.npc.act-swim:not(.walk) .flip > g > ellipse{opacity:0}
+.ch.npc.act-swim:not(.walk) .flip > g{animation:swimB 2.4s ease-in-out infinite alternate}
+.ch.npc.act-swim:not(.walk) .armR{animation:strokeR 2.4s ease-in-out infinite}.ch.npc.act-swim:not(.walk) .armL{animation:strokeL 2.4s ease-in-out infinite}
+.ch.npc .ripple{transform-box:fill-box;transform-origin:50% 50%;animation:rippleO 2.4s ease-out infinite}.ch.npc .ripple2{animation-delay:-1.2s}
+@keyframes swimB{from{transform:translateY(11px)}to{transform:translateY(13px)}}
+@keyframes strokeR{0%,100%{transform:rotate(-168deg)}45%{transform:rotate(-100deg)}70%{transform:rotate(-45deg)}}
+@keyframes strokeL{0%,100%{transform:rotate(168deg)}45%{transform:rotate(100deg)}70%{transform:rotate(45deg)}}
+@keyframes rippleO{from{transform:scale(.85);opacity:.9}to{transform:scale(1.3);opacity:0}}
+.ch.npc.act-rampart:not(.walk) .armL{transform:rotate(50deg)}
+.ch.npc.act-rampart:not(.walk) .armR,.ch.npc.act-rampart:not(.walk) .inhand{animation:pointV 3.6s ease-in-out infinite}
+@keyframes pointV{0%,28%,96%,100%{transform:rotate(-24deg)}40%,52%,64%,86%{transform:rotate(-104deg)}46%,58%{transform:rotate(-96deg)}}
+.ch.npc.act-gossip:not(.walk) .armR{animation:chatA 1.8s ease-in-out infinite}
+.ch.npc .chatter{animation:chatL 1.8s steps(1) infinite}
+@keyframes chatA{0%,100%{transform:rotate(-40deg)}18%{transform:rotate(-82deg)}34%{transform:rotate(-58deg)}52%{transform:rotate(-96deg)}70%{transform:rotate(-64deg)}}
+@keyframes chatL{0%,45%,90%{opacity:1}30%,60%,100%{opacity:0}}
+.ch.npc.act-boatwatch:not(.walk) .armR{transform:rotate(-9deg) scaleY(.7)}.ch.npc.act-boatwatch:not(.walk) .armL{transform:rotate(9deg) scaleY(.7)}
+.ch.npc.act-boatwatch:not(.walk) .flip > g{animation:swayG 4s ease-in-out infinite alternate}
+@keyframes swayG{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+.ch.npc.act-rockjump:not(.walk) .armR{transform:rotate(-166deg)}.ch.npc.act-rockjump:not(.walk) .armL{transform:rotate(166deg)}
+.ch.npc.act-rockjump:not(.walk) .bob{animation:jumpR 1.8s ease-in-out infinite}
+.ch.npc .splash{transform-box:fill-box;transform-origin:50% 100%;animation:splashR 1.8s ease-out infinite}
+@keyframes jumpR{0%,100%{transform:translateY(0)}8%{transform:translateY(2px)}32%{transform:translateY(-15px)}44%{transform:translateY(-17px)}64%{transform:translateY(0)}}
+@keyframes splashR{0%,60%{transform:scale(.3);opacity:0}68%{transform:scale(.8);opacity:1}88%{transform:scale(1.1);opacity:.9}100%{transform:scale(1.25);opacity:0}}
+.ch.npc.act-snorkel:not(.walk) .flip > g{animation:snorB 1.6s ease-in-out infinite alternate}
+.ch.npc.act-snorkel:not(.walk) .armR{transform:rotate(-16deg)}.ch.npc.act-snorkel:not(.walk) .armL{transform:rotate(16deg)}
+.ch.npc .spout{opacity:0;animation:spoutU 2.8s ease-out infinite}
+@keyframes snorB{from{transform:translateY(0)}to{transform:translateY(-2.5px)}}
+@keyframes spoutU{0%,72%{opacity:0;transform:translateY(1px)}78%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-5px)}}
+.ch.npc.act-verse:not(.walk) .armR{transform:rotate(45deg)}.ch.npc.act-verse:not(.walk) .armL{transform:rotate(-40deg)}
+.ch.npc.act-verse:not(.walk) .flip > g{animation:verseB 6s ease-in-out infinite}
+.ch.npc .quill{transform-box:fill-box;transform-origin:50% 50%;animation:verseQ 6s ease-in-out infinite}
+.ch.npc .dream{opacity:0;animation:dreamS 6s ease-in-out infinite}
+@keyframes verseB{0%,50%,100%{transform:rotate(0)}60%,90%{transform:rotate(-3deg)}}
+@keyframes verseQ{0%,50%,100%{transform:translate(0,0)}6%,18%,30%,42%{transform:translate(-1.6px,.4px)}12%,24%,36%{transform:translate(1px,0)}60%,90%{transform:translate(2px,-9px) rotate(-30deg)}}
+@keyframes dreamS{0%,56%,94%,100%{opacity:0;transform:translateY(0)}66%,86%{opacity:1;transform:translateY(-2px)}}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-swim .flip > g,.ch.npc.act-swim .armR,.ch.npc.act-swim .armL,.ch.npc .ripple,.ch.npc.act-rampart .armR,.ch.npc.act-rampart .inhand,.ch.npc.act-gossip .armR,.ch.npc .chatter,.ch.npc.act-boatwatch .flip > g,.ch.npc.act-rockjump .bob,.ch.npc .splash,.ch.npc.act-snorkel .flip > g,.ch.npc .spout,.ch.npc.act-verse .flip > g,.ch.npc .quill,.ch.npc .dream{animation:none}.ch.npc.act-swim .flip > g{transform:translateY(12px)}.ch.npc .splash{opacity:1}}

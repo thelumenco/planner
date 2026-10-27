@@ -16,6 +16,8 @@ import { BB_TOWNS, BB_PLACES, BB_BRIDGES, BB_ARRIVE, BB_BOUNDS, BB_OBST, BB_GOOD
 import { PAINTINGS } from "./terrace-people.js";
 import { SW_TOWN, SW_PLACES, SW_BRIDGES, SW_ARRIVE, SW_BOUNDS, SW_OBST, SW_GOODS, SW_KEEP } from "./saltwick.js";
 import { PI_TOWN, PI_PLACES, PI_BRIDGES, PI_ARRIVE, PI_BOUNDS, PI_OBST, PI_GOODS, PI_KEEP } from "./puffin.js";
+import { PV_TOWNS, PV_PLACES, PV_BRIDGES, PV_ARRIVE, PV_BOUNDS, PV_OBST } from "./porto.js";
+import { PV_GOODS } from "./porto-goods.js";
 import { HK_TOWN, HK_PLACES, HK_BRIDGES, HK_ARRIVE, HK_BOUNDS, HK_OBST, HK_GOODS, HK_KEEP } from "./hokkaido.js";
 import { BL_TOWN, BL_PLACES, BL_BRIDGES, BL_ARRIVE, BL_BOUNDS, BL_OBST, BL_GOODS, BL_KEEP } from "./bali.js";
 export const TOWNS = {
@@ -313,6 +315,7 @@ export const TOWNS = {
 };
 TOWNS.saltwick = SW_TOWN;   // round 215: the first island by ferry (data/saltwick.js)
 TOWNS.puffin = PI_TOWN;   // round 216: Puffin Isle (data/puffin.js)
+Object.assign(TOWNS, PV_TOWNS);   // round 233: Portovenere, by your own boat (data/porto.js, ported)
 TOWNS.hokkaido = HK_TOWN;   // round 217: Hokkaido (data/hokkaido.js)
 TOWNS.bali = BL_TOWN;   // round 218: Bali (data/bali.js)
 Object.assign(TOWNS, BB_TOWNS);   // Bellbird Valley's stops (round 141): campervan "towns" of two screens each
@@ -502,6 +505,7 @@ export const TOWN_OBST = {
 // round 146: the wine shop's terrace isn't a town, but it walks like one of their rooms (bounds, the long table)
 TOWN_BOUNDS.terrace = [52, 226, 470, 612]; TOWN_OBST.terrace = [[236, 300, 284, 580], [400, 280, 472, 340], [424, 520, 472, 592], [62, 330, 92, 372], [196, 320, 226, 578], [294, 320, 324, 578]];
 Object.assign(TOWN_PLACES, BL_PLACES); Object.assign(TOWN_BRIDGES, BL_BRIDGES); Object.assign(TOWN_ARRIVE, BL_ARRIVE); Object.assign(TOWN_BOUNDS, BL_BOUNDS); Object.assign(TOWN_OBST, BL_OBST);   // Bali
+Object.assign(TOWN_PLACES, PV_PLACES); Object.assign(TOWN_BRIDGES, PV_BRIDGES); Object.assign(TOWN_ARRIVE, PV_ARRIVE); Object.assign(TOWN_BOUNDS, PV_BOUNDS); Object.assign(TOWN_OBST, PV_OBST);   // Portovenere
 Object.assign(TOWN_PLACES, HK_PLACES); Object.assign(TOWN_BRIDGES, HK_BRIDGES); Object.assign(TOWN_ARRIVE, HK_ARRIVE); Object.assign(TOWN_BOUNDS, HK_BOUNDS); Object.assign(TOWN_OBST, HK_OBST);   // Hokkaido
 Object.assign(TOWN_PLACES, PI_PLACES); Object.assign(TOWN_BRIDGES, PI_BRIDGES); Object.assign(TOWN_ARRIVE, PI_ARRIVE); Object.assign(TOWN_BOUNDS, PI_BOUNDS); Object.assign(TOWN_OBST, PI_OBST);   // Puffin Isle
 Object.assign(TOWN_PLACES, SW_PLACES); Object.assign(TOWN_BRIDGES, SW_BRIDGES); Object.assign(TOWN_ARRIVE, SW_ARRIVE); Object.assign(TOWN_BOUNDS, SW_BOUNDS); Object.assign(TOWN_OBST, SW_OBST);   // Saltwick Harbour
@@ -649,6 +653,7 @@ Object.assign(TOWN_GOODS, PI_GOODS); Object.assign(KEEP_LINES, PI_KEEP);
 Object.keys(PI_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
 TOWN_GOODS.p_magnet.magnet = true;
 // Hokkaido's goods (round 217: data/hokkaido.js)
+Object.assign(TOWN_GOODS, PV_GOODS);   // Portovenere's goods
 Object.assign(TOWN_GOODS, HK_GOODS); Object.assign(KEEP_LINES, HK_KEEP);
 Object.keys(HK_KEEP).forEach(id => Object.assign(TOWN_GOODS[id], {keep: true, line: KEEP_LINES[id]}));
 TOWN_GOODS.h_magnet.magnet = true;

@@ -24,14 +24,15 @@ import { PEN_SW } from "../../src/data/pen-sw.js";
 import { PEN_PI } from "../../src/data/pen-pi.js";
 import { PEN_HK } from "../../src/data/pen-hk.js";
 import { PEN_BL } from "../../src/data/pen-bl.js";
+import { PEN_PV } from "../../src/data/pen-pv.js";
 import { esc, table, ico, itemIcon, coin, hm, lede, card, link } from "../lib.mjs";
 
-const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_OD, ...PEN_RK, ...PEN_JC, ...PEN_SW, ...PEN_PI, ...PEN_HK, ...PEN_BL};
+const PEN = {...PEN_LV, ...PEN_BB, ...PEN_CR, ...PEN_TL, ...PEN_OD, ...PEN_RK, ...PEN_JC, ...PEN_SW, ...PEN_PV, ...PEN_PI, ...PEN_HK, ...PEN_BL};
 const LIVE = Object.entries(TOWNS).filter(([, t]) => !t.soon);
 const TRAIN = LIVE.filter(([, t]) => t.by === "train"), FERRY = LIVE.filter(([, t]) => t.ferry), VAN = LIVE.filter(([, t]) => t.by === "van");
-const ISLES = LIVE.filter(([, t]) => t.by === "ferry");
+const ISLES = LIVE.filter(([, t]) => t.by === "ferry"), BOATS = LIVE.filter(([, t]) => t.by === "boat");
 // the screens' names, as the game shows them on the map (core.js), and the Bellbird Valley stops' (the region files)
-const SCREEN = {ct_vernazza: "Vernazza", ct_corniglia: "Corniglia", ct_monterosso: "Monterosso", ct_manarola: "Manarola", ba_seminyak: "Seminyak", ba_ubud: "Ubud", ba_tegallalang: "Tegallalang", ba_uluwatu: "Uluwatu",
+const SCREEN = {pv_harbour: "The harbour", pv_borgo: "The Borgo", pv_castle: "Castle Doria", pv_point: "San Pietro Point", ct_vernazza: "Vernazza", ct_corniglia: "Corniglia", ct_monterosso: "Monterosso", ct_manarola: "Manarola", ba_seminyak: "Seminyak", ba_ubud: "Ubud", ba_tegallalang: "Tegallalang", ba_uluwatu: "Uluwatu",
   hk_otaru: "Otaru", hk_sapporo: "Sapporo", hk_niseko: "Niseko", hk_furano: "Furano", pi_landing: "The landing", pi_village: "The village", pi_lighthouse: "The lighthouse", pi_cliffs: "The cliffs",
   sw_harbour: "The harbour", sw_wynds: "The wynds", sw_beach: "The beach", sw_clifftop: "The clifftop", jj_shore: "Seongsan", jj_farms: "The tangerine farms", jj_harbour: "The harbour", jj_village: "The stone village",
   kt_station: "The station", kt_lane: "Higashiyama", kt_temple: "The temple", kt_river: "The river", rd_station: "The station", rd_plaza: "The plaza", rd_bridge: "Puente Nuevo", rd_old: "The old town", ...BB_NAMES, ...CR_NAMES, ...TL_NAMES, ...LV_NAMES};
@@ -49,6 +50,7 @@ export const ACTS = {
   kyoto: ["The tea ceremony with Sachiko: whisk in time with her, then turn the bowl and bow.", "Meditation with Jōshin in the temple hall: breathe with the circle, then he rings the bell.", "Make a nerikiri sweet with Mr Tanaka: pick the season's shape, in four steps.", "Throw a cup at Ishida's wheel in the pottery: centre the clay three times.", "Hire a yukata for the day at the yukata shop.", "The stamp book: eight ink stamps from round the town. A full book puts a stone lantern by the pond at home."],
   jeju: ["The divers' breath song with Halmang Kim: dive, hold, and come up whistling while the depth is in the green. Three dives.", "Sort tangerines with Mr Ko: small, medium or large, against his clock.", "Dye a scarf with green persimmons at Mr Moon's: four steps in order, then it hangs on your own washing line at home and darkens in the sun over three days.", "The café's drinks, and abalone porridge at the divers' house.", "The slow-post box at the market: a postcard to yourself that arrives two weeks later."],
   cinque: ["Pesto with Nonna Pina: the five ingredients in the right order, pounding each one in. Two jars, and after that you can make it at home in the loft.", "The harvest on the monorail with Signor Bruno: ride up the terraces, pick the ripe bunches and leave the green. He shows you how to dry grapes in your drying loft at home (up the ladder in the barrel shed): for raisin wine, or kept as raisins for rum and raisin at the Scoop Shack.", "Paint a fishing boat with the fishermen in Manarola: hull, stripe and a name. A model to keep, and the same boat turns up by the jetty at home.", "Gelato, focaccia and farinata, a tasting at the cantina, and a padlock."],
+  porto: ["Stuffing mussels with Rosa at the mussel co-op: open them, fill them (never with chocolate), tie them shut. The first tray teaches you her recipe for the kitchen at home.", "A line in the Poets' bookshop visitors' book: pick three words and Signora Bianca frames your first line for you.", "Sing the last note with the choir at San Pietro, rehearsing 11 till 12: listen, then join in.", "The poet's notebook: a line from each corner of town (the castle, the swifts, the grotto, the church, the mussel ropes and the strait). All six and it's a keepsake.", "Signora Lia's shell ornaments to take home, and a drink and a bite at the bar on the quay."],
   saltwick: ["Fossil hunting on the scar: three stones a day. Find all six ammonites and they go in a glass case.", "Crabbing off the harbour wall: pull up just after the twitch. Three crabs earns your own line.", "A proper pot of tea with Nell: five steps in order, and a Saltwick mug.", "Light the lighthouse lamp with Alfie at dusk: a page from his ledger.", "Sailor's dark rum at Walter's chandlery (15 coins). With raisins from your drying loft it makes rum and raisin at the Scoop Shack."],
   puffin: ["The count in the bird hide: puffins, or seals and pups out of season. Five right earns a volunteer's badge.", "Read the weather in the lamp room: three right in a row earns Morwenna's storm glass.", "Sea glass in the cove (once a day), and a pendant at the post office's workbench.", "The puffin stamps: one a month in season, five framed."],
   hokkaido: ["Blow a glass float at the glassworks (one a day).", "A music box for each season at the music box hall: all four play together.", "The beer tour and tasting at the beer factory: match three beers.", "A ski lesson, December to March: a first ski pass.", "Carving at the snow festival in February.", "The foot bath."],
@@ -86,9 +88,9 @@ const cap = s => s ? s[0].toUpperCase() + s.slice(1) : "";
 const andList = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
 const slug = id => "trips/" + id;
 const regionN = t => REGION_N[t.region] || "";
-const howN = t => t.by === "van" ? `Bellbird Valley by campervan (${regionN(t)})` : t.by === "ferry" ? "By ferry" : t.ferry ? "By train or ferry" : "By train";
-const sub = (id, t) => t.by === "van" ? regionN(t) : t.by === "ferry" ? `Ferry ${t.ferry.fare} coins` : `Train ${t.fare} coins` + (t.ferry ? `, ferry ${t.ferry.fare}` : "");
-const tIcon = t => t.by === "van" ? "b_koala" : t.by === "ferry" ? "water" : "xm_train";
+const howN = t => t.by === "boat" ? "By your own boat" : t.by === "van" ? `Bellbird Valley by campervan (${regionN(t)})` : t.by === "ferry" ? "By ferry" : t.ferry ? "By train or ferry" : "By train";
+const sub = (id, t) => t.by === "boat" ? `Fuel ${t.boat.fuel} coins` : t.by === "van" ? regionN(t) : t.by === "ferry" ? `Ferry ${t.ferry.fare} coins` : `Train ${t.fare} coins` + (t.ferry ? `, ferry ${t.ferry.fare}` : "");
+const tIcon = t => t.by === "boat" ? "c_boat" : t.by === "van" ? "b_koala" : t.by === "ferry" ? "water" : "xm_train";
 
 // where a town good is sold: [town, shop name]
 function shopOf(g){
@@ -174,6 +176,7 @@ function tripsPage(){
     <h2>${ico("letter", 22)} Pen friends</h2><p>People you meet on your travels (not the day-trippers) can go in your address book. Post them a gift (postage by how far: ${coin(2)} to ${coin(8)}) or a letter (free), and they write back in their own voice, now and then with a little something from home tucked in. Each place's page lists who writes back.</p>
     <h2>${ico("kite", 22)} Where to go</h2><h3>By train</h3><div class="cards">${TRAIN.map(([id, t]) => card(slug(id), t.n, sub(id, t), "xm_train")).join("")}</div>
     <h3>By ferry (the islands)</h3><div class="cards">${ISLES.map(([id, t]) => card(slug(id), t.n, sub(id, t), "water")).join("")}</div>
+    <h3>By your own boat</h3><p>Once you've bought the boat on the foreshore, it sails to the islands with a mooring (above) and somewhere the ferry doesn't go. Set off whenever you like, sail home whenever you're ready.</p><div class="cards">${BOATS.map(([id, t]) => card(slug(id), t.n, sub(id, t), "c_boat")).join("")}</div>
     <h2>${ico("b_koala", 22)} Bellbird Valley stops</h2>${regionCards}`;
   return {slug: "trips", title: "Trips", section: "trips", blurb: "Day trips by train, ferry, your own boat and the campervan: fares, times and who can come", html,
     search: [{t: "Ferry", d: "Trips: by ferry from the foreshore jetty", a: "/trips"}, {t: "Ticket window", d: "Trips: Honeybrook station", a: "/trips"}, {t: "Campervan road trips", d: "Trips: Bellbird Valley", a: "/trips"}, {t: "Bellbird Valley", d: "Trips: by campervan", a: "/trips"}, {t: "Campervan mood board", d: "Do up the van in six styles", a: "/trips"}]};

@@ -2873,8 +2873,8 @@ if (want("\nCinque Terre: the five villages (well, four)")) try {
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
-    check(sp.length === 41 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
-      "the 41 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(sp.length === 44 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 44 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "ornella"), L = np.NPCS.find(n => n.id === "dario");
@@ -4361,7 +4361,7 @@ if (want("\nNobody stands on tables or stalls (round 228)")) try {
   const SEATED = ["sit", "doze", "beanbag", "footbath", "wheel", "sunbathe"];
   // ground, seats and walkways that are drawn as places (decks, rugs, lawns, paths, platforms, pens, a stage for the
   // performers), and shopkeepers standing behind their counters (the counter's front is drawn below their feet)
-  const OPEN = new Set(["deck", "picnic", "exlawn", "glawn", "llight", "fishrocks", "pround", "jardin", "bvhpiste", "bvboardwalk", "ctpadlock", "kttorii", "bandstand", "bvhmeadow", "stairs", "pigoats",
+  const OPEN = new Set(["deck", "picnic", "exlawn", "glawn", "llight", "fishrocks", "pvrocks", "pv_shells:pv_shells", "pround", "jardin", "bvhpiste", "bvboardwalk", "ctpadlock", "kttorii", "bandstand", "bvhmeadow", "stairs", "pigoats",
     "bvtplatypus", "cttrain", "basubak", "run", "bvplayground", "bvbeanbags", "bvrows", "bvbellbirds", "bvballoons", "bvswing", "bvnippers", "bvkoalas", "ctbeach",
     "bvsurf", "swscar", "bvtrock", "bvttrees", "bvtpark", "ctboats", "flamenco", "market:stall", "hk_ramen:hk_ramen",
     "hk_glass:hk_glass", "pi_post:pi_post", "sw_chandlery:sw_chandlery"]);
@@ -4921,12 +4921,13 @@ if (want("\nThe green, the Stables and Lighthouse Point (rounds 262 to 264)")) t
     check(so.feedDucks(F, d, 10*60).fed && !F.inv.pea && F.coins === 20, "peas from the garden for the ducks, free (bread's bad for them)");
     check(so.eatChips(F, "chips").ok && F.coins === 16 && so.sellCatch(F, "mackerel", d).ok && F.coins === 16 + 3, "Dot's hatch: a cone of chips to eat, and she buys your mackerel at the usual price");
     for (let i = 0; i < 5; i++) so.sellCatch(F, "mackerel", d); check(F.inv.mackerel === 1 && !so.sellCatch(F, "mackerel", d).ok, "six fish a day is her fryer full");
+    await import(new URL("../src/game/ronda.js", import.meta.url));   // (the trip goods, mussels among them)
     const it = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS;
     check(so.CHIP_BUYS.every(id => id === "fish" || (it[id] && (it[id].sell || 0) <= so.CHIP_MENU.cod.price)), "Dot never pays more for a fish than her fish and chips cost");
     check(so.plotLine("okada", false) && Object.keys(so.PLOT_LINES).length === 6, "six neighbours' plots at the allotments (Mr Okada's among them), each with something to say"); }
   { const F = {coins: 0, inv: {}}, d = "2026-10-27", f = so.beachFinds(F, "lowervine", d);
     check(f.length === 2 && so.beachFinds(F, "green", d).length === 2 && !so.beachFinds(F, "orchard", d).length, "beachcombing: a couple of finds wash up on each bottom-row beach every day");
-    const r = so.pickBeach(F, "lowervine", f[0].k, d); check(r && F.inv[r.id] === r.n && so.beachFinds(F, "lowervine", d).length === 1 && !so.pickBeach(F, "lowervine", f[0].k, d), "pick one up and it's yours (shells and conches for the shelf, clams for the kitchen); gone till tomorrow"); }
+    const r = so.pickBeach(F, "lowervine", f[0].k, d); check(r && F.inv[r.id] === r.n && so.beachFinds(F, "lowervine", d).length === 1 && !so.pickBeach(F, "lowervine", f[0].k, d), "pick one up and it's yours (shells and conches for the shelf, clams and mussels for the kitchen); gone till tomorrow"); }
   { const fi = await import(new URL("../src/game/fishing.js", import.meta.url)), F = {coins: 1500, inv: {apple: 1}};
     const r = so.buyPony(F, "Clementine", day);
     check(r.ok && F.coins === 300 && so.ponyIds(F).includes("mine") && so.feedPony(F, "mine", day).ok && F.south.ponies.mine.trust === 2 && !so.buyPony(F, "Again", day).ok, "a pony of your own (1,200 coins), named by you, cared for like the others");
@@ -5094,6 +5095,63 @@ if (want("\nInside the lighthouse (round 297)")) try {
   await page.locator('#world [data-lhspot="down"]').dispatchEvent("click"); await room("watch room"); await page.locator('#world [data-lhspot="down"]').dispatchEvent("click"); await room("^The lighthouse");
   await page.locator('#world [data-lhspot="out"]').dispatchEvent("click"); await room("Lighthouse Point");
   check(true, "down both flights and out onto the point");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nPortovenere by boat (round 233)")) try {
+  // ported from the personal edition: the four screens, six rooms (Signora Lia's shells too), stuffing mussels, a line in
+  // the poets' book, the choir, the poet's notebook; your friends in place of the family
+  console.log("\nPortovenere by boat (round 233)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`portovenere pageerror: ${e.message}`));
+  const gf = () => page.evaluate(() => window.__hbGame.F());
+  const go = async sc => { await page.evaluate(s => window.__hbScene(s), sc); await page.waitForTimeout(1500); };
+  const spot = async id => { await page.locator(`#world [data-rdspot="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(2500); };
+  const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(7000); };
+  const name = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
+  await page.goto(url + "?reset=1&seed=1&time=11:15&date=2026-10-17"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.coins = 600; F.goals = {...(F.goals || {}), boat: 1}; F.board = {...(F.board || {}), hearts: {hana: 6, theo: 6, farid: 6, mei: 6, bo: 6, tomi: 6, posy: 6}}; window.__hbGame.save(); });
+  await go("shore"); await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-btown="porto"]', { timeout: 15000 });
+  await page.click('#ctx [data-btown="porto"]'); await page.waitForTimeout(300);
+  check(/24/.test(await page.locator("#ctx").innerText()) && /whenever you like/.test(await page.locator("#ctx").innerText()), "your boat sails to Portovenere (fuel 24), whenever you like");
+  await page.click('#ctx [data-tpick="hana"]'); await page.waitForTimeout(100); await page.click('#ctx [data-trip="porto"]'); await page.waitForTimeout(9000);
+  check(await page.locator('#world [data-place="pvboat"]').count() === 1 && /harbour/i.test(await name()), "you tie up in the harbour under the wall of tall painted houses");
+  check(/Borgo/i.test(await (async () => { await place("pvToBorgo"); return name(); })()) && await page.locator('#world [data-place="pvshells"]').count() === 1, "west to the Borgo: the town gate, the bookshop, the marble bottega, the shell shop");
+  check(/castle/i.test(await (async () => { await place("pvToCastle"); return name(); })()), "up the steps to Castle Doria");
+  check(/point|Pietro/i.test(await (async () => { await place("pvToPointW"); return name(); })()) && await page.locator('#world [data-place="pvchurch"]').count() === 1, "along the walls to San Pietro on its rock");
+  check(/harbour/i.test(await (async () => { await place("pvToHarbourS"); return name(); })()), "and back round the rocks to the harbour");
+  await place("pvcats"); check(((await gf()).porto || {}).cats === 1, "the harbour cats on the warm step");
+  await go("pv_shells"); await spot("pv_shells");
+  check(/Seashell mobile/.test(await page.locator("#ctx").innerText()) && /Shell mirror/.test(await page.locator("#ctx").innerText()), "Signora Lia's shell shop: mobiles, boxes, mirrors, wreaths, boats, frames, garlands");
+  await page.click('#ctx [data-rbuy="pv_shellbox"]'); await page.waitForTimeout(800);
+  check((await gf()).inv.pv_shellbox === 1, "a shell-covered box to take home (a keepsake)");
+  await page.click("#ctx [data-close]"); await page.waitForTimeout(300);
+  await go("pv_mussels"); await spot("pvstuff"); await page.click('#ctx [data-pv="stuff"]'); await page.waitForTimeout(300);
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-pv="open"]'); await page.waitForTimeout(120); }
+  await page.click('#ctx [data-pv="fill:Chocolate"]'); await page.waitForTimeout(200);
+  const oops = /Never/.test(await page.locator("#ctx").innerText());
+  for (const f of ["Bread soaked in milk", "Mortadella", "An egg", "Parsley"]) { await page.click(`#ctx [data-pv="fill:${f}"]`); await page.waitForTimeout(150); }
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-pv="tie"]'); await page.waitForTimeout(120); }
+  await page.click('#ctx [data-pv="stuffdone"]'); await page.waitForTimeout(800);
+  check(oops && (await gf()).porto.muscoli, "stuffing mussels with Rosa: open, fill (never chocolate), tie, and her recipe");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await go("pv_books"); await spot("pvverse");
+  for (const k of ["a:0", "b:0", "c:1"]) { await page.click(`#ctx [data-pv="${k}"]`); await page.waitForTimeout(150); }
+  await page.click('#ctx [data-pv="write"]'); await page.waitForTimeout(800);
+  let f = await gf();
+  check(f.porto.verses.length === 1 && f.inv.pv_verse === 1, "a line in the poets' visitors' book, framed for you to keep");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await go("pv_church"); await page.waitForTimeout(2000); await spot("pvchoir"); await page.click('#ctx [data-pv="choir"]'); await page.waitForTimeout(300);
+  for (let k = 0; k < 3; k++) { await page.click('#ctx [data-pv="listen"]'); await page.waitForTimeout(150); }
+  await page.click('#ctx [data-pv="lastnote"]'); await page.waitForTimeout(800);
+  f = await gf();
+  check(f.porto.choir === 1 && f.porto.lines.church, "the choir at San Pietro: listen, then sing the last note (a line for the notebook)");
+  await go("pv_castle"); await place("pvcastle"); await place("pvfigs"); await go("pv_point"); await place("pvgrotto"); await go("pv_harbour"); await place("pvpalmaria"); await go("pv_mussels"); await spot("pvropes");
+  f = await gf();
+  check(Object.keys(f.porto.lines).length === 6 && f.inv.pv_notebook === 1, "six lines from six corners of town: the poet's notebook");
+  await go("pv_harbour"); await place("pvboat");
+  check(/Sail home/.test(await page.locator("#ctx").innerText()) && !/until/.test(await page.locator("#ctx").innerText()), "your boat at the quay: sail home whenever you're ready");
+  { const T = (await import(new URL("../src/data/towns.js", import.meta.url))).TOWNS.porto, src = (await import("node:fs")).readFileSync(new URL("../src/data/porto.js", import.meta.url), "utf8");
+    check(["hana", "theo", "farid", "mei", "bo", "tomi", "posy"].every(id => T.lines[id] && T.spots[id]) && Object.keys(T.acts).length === 7 && !/\b(evan|mum|dad|mama|gonggong|darren|marcus|angelina)\b/i.test(src), "your friends come along (their own lines and things to do), with no family"); }
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {

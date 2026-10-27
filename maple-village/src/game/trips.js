@@ -80,6 +80,7 @@ export function ticketPanel(F, pick, town = "ronda", hm = localHM(), by = "train
 // Ronda's station: the train home
 export function homePanel(F, town, hm = localHM(), by = "train"){
   const t = TOWNS[town], on = tripOn(F), boat = by === "ferry";
+  if (on && on.own) return `<span class="tape gingham" aria-hidden="true"></span><h2>Your boat</h2><p class="sub">Tied up and waiting. Sail home to Honeybrook's jetty whenever you're ready.</p>${on.party.length ? `<p class="muted">With you today: ${on.party.map(nameOf).join(", ").replace(/, ([^,]*)$/, " and $1")}.</p>` : ""}<div class="actions"><button class="btn primary" data-triphome="ferry">Sail home</button></div>` + shut;   // (by your own boat: no timetable)
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>${esc(t.n)} ${boat ? "ferry pier" : "station"}</h2><p class="sub">${boat ? "Ferries home to Honeybrook's foreshore jetty" : "Trains home to Honeybrook"} whenever you're ready, until ${fmt(t.backTo)}.</p>`;
   if (on && on.party.length) h += `<p class="muted">With you today: ${on.party.map(nameOf).join(", ").replace(/, ([^,]*)$/, " and $1")}.</p>`;
   h += `<div class="actions"><button class="btn primary" data-triphome="${by}">Take the ${boat ? "ferry" : "train"} home</button></div>`;

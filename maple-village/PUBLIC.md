@@ -402,3 +402,15 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   back at 1:45am; written for this edition's `boatPanel`, not copied), the green's lamp posts and the wine shop window.
 - Left out of the port: the Notion book digest, the Bakehouse (shelved in the personal edition), Formentera and Porto
   (not in this edition), mussels, and every Evan and family line (the pet stands in, or the line goes).
+
+## Round 233 (ported): Portovenere by your own boat, and mussels on the beach
+
+- Portovenere from the personal edition: data/porto.js, porto-goods.js, pv-people.js, porto-rooms-layout.js, pen-pv.js,
+  game/porto.js, art/town-porto.js and art/porto-rooms.js. Reached only by your own boat (`town.boat`: fuel, pier,
+  arrival line), with a "Your boat" / "Sail home" panel in place of the station when you're there.
+- Friends' acts there (Hana swims, Theo walks the rampart, Mei gossips, Farid watches the boats, Tomi jumps off the
+  rocks, Bo snorkels, Posy writes verse) are new props in art/people.js and css in npcs.css. Three locals' stories
+  (pvrosa, ilario, bianca), pen pals in contacts.js, and three Specials at the stove (muscoli, castagnaccio, capperi).
+- Mussels now wash up on the bottom-row beaches too (south.js `beachFinds`), and Dot buys them.
+- Tests: "Portovenere by boat (round 233)"; the Specials count is 44; pvrocks and the shell shop's stand point are open
+  ground in "Nobody stands on tables".
