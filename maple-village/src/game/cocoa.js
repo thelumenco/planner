@@ -376,17 +376,35 @@ export function nextStep(c){
   const g = slots(c).find(x => c["grind" + x]); if (g !== undefined) return {at: "grinder", wait: true, line: `Grinding: ready in ${left(c["grind" + g].done)}.${c.beans ? "" : " Meanwhile, buy beans for the next batch."}`};
   return {at: "sacks", line: "Start with a sack of cacao beans."};
 }
+// (Mel: "the current text 'beans roasted' etc is one block of text so it'll be better if it's like clearly illustrated
+// stages and how many are in each stage"): a row of five little drawings, each with its count, the next one lit up
+const PIC = {
+  sacks: () => `<path d="M11 30 q-5 -13 4 -19 l-2 -5 h14 l-2 5 q9 6 4 19z" fill="#C9A27E" stroke="#3A2E28" stroke-width="1.2"/><path d="M14 7 h12" stroke="#8A6A4E" stroke-width="2"/><ellipse cx="17" cy="21" rx="2" ry="1.3" fill="#6B3E2E"/><ellipse cx="23" cy="24" rx="2" ry="1.3" fill="#6B3E2E"/><ellipse cx="22" cy="18" rx="2" ry="1.3" fill="#6B3E2E"/>`,
+  roaster: on => `<rect x="5" y="12" width="30" height="15" rx="7.5" fill="#8A6A5A" stroke="#3A2E28" stroke-width="1.2"/><circle cx="20" cy="19.5" r="4" fill="${on ? "#F2A65A" : "#5A4A40"}"/><path d="M9 27 v4 M31 27 v4" stroke="#3A2E28" stroke-width="1.6"/>${on ? `<path d="M14 9 q-2 -3 0 -6 M20 9 q-2 -3 0 -6 M26 9 q-2 -3 0 -6" fill="none" stroke="#A99D8C" stroke-width="1.4" stroke-linecap="round"/>` : ""}`,
+  grinder: col => `<ellipse cx="20" cy="25" rx="15" ry="5.5" fill="#BDB3A4" stroke="#3A2E28" stroke-width="1.2"/><path d="M5 25 v-6 h30 v6" fill="#BDB3A4" stroke="#3A2E28" stroke-width="1.2"/><ellipse cx="20" cy="19" rx="15" ry="5" fill="${col || "#D9D2C6"}" stroke="#3A2E28" stroke-width="1.2"/><ellipse cx="20" cy="17" rx="6" ry="2.4" fill="#A99D8C" stroke="#3A2E28" stroke-width="1"/>`,
+  slab: col => `<rect x="3" y="19" width="34" height="8" rx="2" fill="#ECE7E0" stroke="#3A2E28" stroke-width="1.2"/>${col ? `<path d="M9 19 q4 -6 11 -5 q9 0 11 5z" fill="${col}" stroke="#3A2E28" stroke-width="1"/>` : `<path d="M8 23 h6 M18 22 h8" stroke="#C9C2B8" stroke-width="1"/>`}`,
+  moulds: () => `<rect x="7" y="9" width="26" height="18" rx="2" fill="#6B3E2E" stroke="#3A2E28" stroke-width="1.2"/><path d="M15.7 9 v18 M24.3 9 v18 M7 18 h26" stroke="#4A2E22" stroke-width="1"/><path d="M9 11 h4" stroke="#A86A50" stroke-width="1.4" stroke-linecap="round"/>`
+};
+const svgPic = inner => `<svg viewBox="0 0 40 32" width="40" height="32" aria-hidden="true">${inner}</svg>`;
 function flow(c, here){
-  const nx = nextStep(c), grinding = slots(c).filter(g => c["grind" + g]).length;
-  const what = {sacks: `${c.beans}`, roaster: c.roast ? `${c.roast.n || 1} roasting` : `${c.roasted} done`, grinder: readyPot(c) !== undefined ? "pot ready" : grinding ? "grinding" : "free",
-    slab: readyPot(c) !== undefined ? "waiting" : "", moulds: `${Object.keys(KINDS).reduce((n, k) => n + c.choc[k], 0)} pieces`};
-  return `<div class="gchips ccflow">${STEPS.map(([k, n], i) => `<button class="gchip${k === nx.at ? " on" : ""}" data-cc="go" data-k="${k}"${k === here ? ' aria-current="step"' : ""}><span>${i + 1}. ${n}${what[k] ? ` · ${what[k]}` : ""}</span></button>`).join("")}</div>
+  const nx = nextStep(c), ks = Object.keys(KINDS), gr = slots(c).map(g => c["grind" + g]).find(Boolean), pot = readyPot(c) === undefined ? null : c["ground" + readyPot(c)];
+  const nm = k => KINDS[k].n.split(" ")[0].toLowerCase(), tot = ks.reduce((n, k) => n + c.choc[k], 0);
+  const kinds = vals => `<span class="cckinds">${ks.filter(k => vals[k] > 0).map(k => `<i style="background:${KINDS[k].col}"></i>${vals[k]} ${nm(k)}`).join("<br>")}</span>`;
+  const card = {
+    sacks: [PIC.sacks(), `<b>${c.beans}</b><small>sack${c.beans === 1 ? "" : "s"} of beans</small>`],
+    roaster: [PIC.roaster(!!c.roast), c.roast ? `<b>${c.roast.n || 1}</b><small>roasting · ${left(c.roast.done)}</small>` : `<b>${c.roasted}</b><small>roasted, ready to grind</small>`],
+    grinder: [PIC.grinder(pot ? KINDS[pot].col : gr ? KINDS[gr.kind].col : ""), pot ? `<b>1</b><small>pot ready!</small>` : gr ? `<b>1</b><small>grinding · ${left(gr.done)}</small>` : `<b>0</b><small>grinding${freeSlot(c) !== undefined ? ": free" : ""}</small>`],
+    slab: [PIC.slab(pot ? KINDS[pot].col : ""), pot ? `<b>1</b><small>pot to temper</small>` : `<b>0</b><small>to temper</small>`],
+    moulds: [PIC.moulds(), `<b>${tot}</b><small>pieces to mould</small>${tot ? kinds(c.choc) : ""}`]
+  };
+  return `<div class="ccpipe">${STEPS.map(([k, n], i) => `<button class="ccstep${k === nx.at ? " on" : ""}" data-cc="go" data-k="${k}"${k === here ? ' aria-current="step"' : ""} aria-label="Step ${i + 1}: ${n}"><span class="ccn">${i + 1}. ${n}</span>${svgPic(card[k][0])}${card[k][1]}</button>`).join("")}</div>
+    <p class="ccres"><b>Bonbon shelf</b> ${ks.filter(k => c.keep[k] || c.res[k]).map(k => `<i style="background:${KINDS[k].col}"></i>${nm(k)} ${c.res[k]}/${c.keep[k]}`).join(", ")}<br><b>Bars on the wall</b> ${ks.map(k => `<i style="background:${KINDS[k].col}"></i>${nm(k)} ${c.bars[k]}`).join(", ")}</p>
     <p class="sub"><b>${nx.wait ? "Waiting" : "Next"}:</b> ${esc(nx.line)}${nx.at !== here && !nx.wait ? ` <button class="btn small alt" data-cc="go" data-k="${nx.at}">Go there</button>` : ""}</p>`;
 }
 export function kitchenPanel(F, which){
   const c = cocoaState(F); finish(c);
-  const short = k => KINDS[k].n.split(" ")[0].toLowerCase(), fl = flow(c, which);
-  const steps = `<p class="muted">Beans ${c.beans} · roasted ${c.roasted} · for bars ${Object.keys(KINDS).map(k => `${short(k)} ${c.choc[k]}`).join(", ")} · bonbon shelf ${Object.keys(KINDS).map(k => `${short(k)} ${c.res[k]}/${c.keep[k]}`).join(", ")}</p>`;
+  const fl = flow(c, which);
+  const steps = "";   // (the counts are drawn in the step row now)
   if (which === "sacks") return `<span class="tape gingham" aria-hidden="true"></span><h2>Bean sacks</h2>${fl}<p class="sub">Cacao beans, ${SACK} ${coin()} a sack. A sack makes a pot of chocolate: 30 pieces.</p>
     <p class="olabel">${c.beans} sack${c.beans === 1 ? "" : "s"} in the kitchen</p><div class="actions"><button class="btn primary" data-cc="beans" data-n="1" ${F.coins < SACK ? "disabled" : ""}>Buy a sack (${SACK} ${coin()})</button><button class="btn alt" data-cc="beans" data-n="3" ${F.coins < SACK*3 ? "disabled" : ""}>Three (${SACK*3} ${coin()})</button></div>${steps}` + shut;
   if (which === "roaster") return `<span class="tape stripe" aria-hidden="true"></span><h2>The roaster</h2>${fl}<p class="sub">${c.roast ? `Roasting ${c.roast.n || 1} sack${(c.roast.n || 1) > 1 ? "s" : ""}: ready in ${left(c.roast.done)}.` : `It holds up to ${ROAST_MAX} sacks: roast them all at once. Ten minutes, and the whole kitchen smells amazing.`}</p>

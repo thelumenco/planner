@@ -1845,10 +1845,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.click("#ctx [data-close]");
   await tap("roaster", '#ctx [data-cc="roast"]'); await page.click('#ctx [data-cc="roast"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.beans === 0 && f.cocoa.roast && f.cocoa.roast.n === 3 && f.coins === 925), "three sacks of beans (75 coins), all three in the roaster at once (round 299)");
-  check(await page.locator("#ctx .ccflow .gchip").count() === 5 && /Roasting/.test(await page.locator("#ctx").innerText()), "the five steps in order across the top, and what's happening now");
+  check(await page.locator("#ctx .ccpipe .ccstep").count() === 5 && /Roasting/.test(await page.locator("#ctx").innerText()), "the five steps in order across the top, and what's happening now");
   await at("12:15"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
   await tap("grinder", '#ctx [data-cc="grind"][data-k="dark"]');
-  check(await page.locator('#ctx .ccflow .gchip.on[data-k="grinder"]').count() === 1, "the step strip points at the grinder next");
+  check(await page.locator('#ctx .ccpipe .ccstep.on[data-k="grinder"]').count() === 1, "the step strip points at the grinder next");
   await page.click('#ctx [data-cc="grind"][data-k="dark"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.cocoa.roasted === 2 && f.cocoa.grind && f.cocoa.grind.kind === "dark"), "ten minutes later the beans are roasted, and one sack goes in the grinder as dark chocolate");
   await at("13:00"); await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(700);
@@ -5158,7 +5158,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(cc.nextStep(c).at === "roaster", "the next step after buying beans: the roaster");
     check(cc.startRoast(F) === 3 && c.beans === 0 && c.roast.n === 3 && cc.nextStep(c).wait, `the roaster takes all three sacks at once (up to ${cc.ROAST_MAX})`);
     c.roast.done = 0; cc.kitchenPanel(F, "roaster");
-    check(c.roasted === 3 && cc.nextStep(c).at === "grinder" && /Grind/.test(cc.kitchenPanel(F, "grinder")) && /gchip on[^>]*data-k="grinder"/.test(cc.kitchenPanel(F, "sacks")), "ten minutes on, three sacks roasted, and every station points at the grinder"); }
+    check(c.roasted === 3 && cc.nextStep(c).at === "grinder" && /Grind/.test(cc.kitchenPanel(F, "grinder")) && /ccstep on[^>]*data-k="grinder"/.test(cc.kitchenPanel(F, "sacks")), "ten minutes on, three sacks roasted, and every station points at the grinder"); }
   { const F = {coins: 0, inv: {apple: 3, sp_cinnamon: 2}}; vy.vineState(F);
     check(/1 apple/.test(vy.stockFruit(F, "apple", 1)) && F.inv.apple === 2 && vy.stockFruit(F, "apple") && !F.inv.apple, "the fruit crate: one at a time, or the rest");
     check(ml.toRack(F, "sp_cinnamon", 1) === 1 && F.inv.sp_cinnamon === 1, "the spice rack takes one at a time too"); }
