@@ -57,6 +57,7 @@ export const INGR = {
   yuzu: ["Yuzu", "Yuzu", "#F3D34A"], hojicha: ["Hōjicha", "Hōjicha", "#A8754F"], mochi: ["Mochi", "Mochi", "#FBEFF2"], sakura: ["Sakura", "Sakura", "#F6C7D6"],   // from Kyoto (round 122)
   hallabong: ["Hallabong", "Hallabong", "#F28C28"], omija: ["Omija berries", "Omija", "#C8324A"],
   chestnutflour: ["Chestnut flour", "Chestnut", "#A8754F"], capers: ["Salted capers", "Caper", "#7A8A4A"], fennelseed: ["Wild fennel seeds", "Fennel", "#A8B86A"],   // from Portovenere
+  flordesal: ["Flor de sal", "Salted Caramel", "#D9A866"], fm_fig: ["Formentera figs", "Fig", "#8A5A7A"],   // from Formentera
   seasalt: ["Saltwick sea salt", "Sea Salt", "#E8EEF0"], seaweed: ["Dulse seaweed", "Seaweed", "#8A3E4A"], buckthorn: ["Sea buckthorn", "Sea Buckthorn", "#F29A2E"], hkmilk: ["Hokkaido milk", "Hokkaido Milk", "#FFFBF2"], hkmelon: ["Furano melon", "Melon", "#F2A65A"], sweetcorn: ["Sweetcorn", "Sweetcorn", "#F3D34A"], cacao_bl: ["Balinese cacao", "Bali Cacao", "#5A3A2A"], salak: ["Snake fruit", "Salak", "#E8D3A0"], lemongrass: ["Lemongrass", "Lemongrass", "#D9E3A8"],   // from Saltwick Harbour (round 215)
   // round 231: a bottle of your own wine (taken from the cellar's wine store), Saltwick's dark rum, and raisins dried in the loft
   wine_red: ["Your red wine", "Red Wine", "#7A1F3D"], wine_rose: ["Your rosé", "Rosé", "#E98AA0"], wine_white: ["Your white wine", "White Wine", "#E8D57A"],

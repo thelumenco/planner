@@ -335,3 +335,26 @@
 @keyframes verseQ{0%,50%,100%{transform:translate(0,0)}6%,18%,30%,42%{transform:translate(-1.6px,.4px)}12%,24%,36%{transform:translate(1px,0)}60%,90%{transform:translate(2px,-9px) rotate(-30deg)}}
 @keyframes dreamS{0%,56%,94%,100%{opacity:0;transform:translateY(0)}66%,86%{opacity:1;transform:translateY(-2px)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-swim .flip > g,.ch.npc.act-swim .armR,.ch.npc.act-swim .armL,.ch.npc .ripple,.ch.npc.act-rampart .armR,.ch.npc.act-rampart .inhand,.ch.npc.act-gossip .armR,.ch.npc .chatter,.ch.npc.act-boatwatch .flip > g,.ch.npc.act-rockjump .bob,.ch.npc .splash,.ch.npc.act-snorkel .flip > g,.ch.npc .spout,.ch.npc.act-verse .flip > g,.ch.npc .quill,.ch.npc .dream{animation:none}.ch.npc.act-swim .flip > g{transform:translateY(12px)}.ch.npc .splash{opacity:1}}
+/* Formentera (round 233): a leather sandal turned this way and that, a palm basket on the other arm; the bell rung on a
+   hire bike; reaching up into the fig tree, a basket on the arm; panning slowly across the flamingos with field glasses;
+   lowering one more flat stone towards the stack; dripping under a pushed-up snorkel mask; a floppy hat held on in the
+   breeze, a hand on the hip, the ribbon fluttering */
+.ch.npc.walk .stonestack{display:none}
+.ch.npc.act-sandals:not(.walk) .armR{animation:sandA 3.4s ease-in-out infinite}.ch.npc.act-sandals:not(.walk) .inhand{animation:sandI 3.4s ease-in-out infinite}
+.ch.npc.act-sandals:not(.walk) .armL,.ch.npc.act-figpick:not(.walk) .armL{transform:rotate(25deg)}
+@keyframes sandA{0%,100%{transform:rotate(-120deg)}45%,60%{transform:rotate(-128deg)}}@keyframes sandI{0%,100%{transform:rotate(0)}45%,60%{transform:rotate(-8deg)}}
+.ch.npc.act-bikebell:not(.walk) .armR{animation:bellA 2.4s ease-in-out infinite}.ch.npc.act-bikebell:not(.walk) .armL{transform:rotate(-16deg)}
+.ch.npc .bring{opacity:0}.ch.npc.act-bikebell:not(.walk) .bring{animation:bellR 2.4s ease-out infinite}
+@keyframes bellA{0%,30%,48%,100%{transform:rotate(-20deg)}36%,54%{transform:rotate(-26deg)}}@keyframes bellR{0%,32%{opacity:0}36%,62%{opacity:1}74%,100%{opacity:0}}
+.ch.npc.act-figpick:not(.walk) .armR{animation:figA 3s ease-in-out infinite}.ch.npc.act-figpick:not(.walk) .inhand{animation:figI 3s ease-in-out infinite}
+@keyframes figA{0%,100%{transform:rotate(-150deg)}40%,55%{transform:rotate(-142deg)}}@keyframes figI{0%,100%{transform:rotate(0)}40%,55%{transform:rotate(8deg)}}
+.ch.npc.act-flamingos:not(.walk) .armR{transform:rotate(-165deg)}.ch.npc.act-flamingos:not(.walk) .armL{transform:rotate(165deg)}
+.ch.npc.act-flamingos:not(.walk) .flip > g{transform-origin:0 0;animation:fgPan 7s ease-in-out infinite}
+@keyframes fgPan{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+.ch.npc.act-stonestack:not(.walk) .armR{animation:stoneA 3.6s ease-in-out infinite}.ch.npc.act-stonestack:not(.walk) .inhand{animation:stoneI 3.6s ease-in-out infinite}
+@keyframes stoneA{0%,100%{transform:rotate(-55deg)}45%,62%{transform:rotate(-50deg)}}@keyframes stoneI{0%,100%{transform:rotate(0)}45%,62%{transform:rotate(5deg)}}
+.ch.npc .mdrip path{animation:sDrip 2.2s ease-in infinite}.ch.npc .mdrip path:nth-child(2){animation-delay:-.8s}.ch.npc .mdrip path:nth-child(3){animation-delay:-1.5s}
+.ch.npc.act-shorepose:not(.walk) .armR{transform:rotate(-165deg)}.ch.npc.act-shorepose:not(.walk) .armL{transform:rotate(28deg)}
+.ch.npc.act-shorepose:not(.walk) .fbrim{animation:brimF 2.8s ease-in-out infinite}.ch.npc.act-shorepose:not(.walk) .hribbon{transform-box:fill-box;transform-origin:100% 0;animation:ribF 1.4s ease-in-out infinite alternate}
+@keyframes brimF{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(3deg)}}@keyframes ribF{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}
+@media (prefers-reduced-motion:reduce){.ch.npc.act-sandals .armR,.ch.npc.act-sandals .inhand,.ch.npc.act-bikebell .armR,.ch.npc.act-bikebell .bring,.ch.npc.act-figpick .armR,.ch.npc.act-figpick .inhand,.ch.npc.act-flamingos .flip > g,.ch.npc.act-stonestack .armR,.ch.npc.act-stonestack .inhand,.ch.npc .mdrip path,.ch.npc.act-shorepose .fbrim,.ch.npc.act-shorepose .hribbon{animation:none}.ch.npc.act-sandals .armR{transform:rotate(-120deg)}.ch.npc.act-bikebell .armR{transform:rotate(-20deg)}.ch.npc.act-figpick .armR{transform:rotate(-150deg)}.ch.npc.act-stonestack .armR{transform:rotate(-55deg)}}

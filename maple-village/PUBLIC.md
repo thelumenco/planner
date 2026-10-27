@@ -414,3 +414,17 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
 - Mussels now wash up on the bottom-row beaches too (south.js `beachFinds`), and Dot buys them.
 - Tests: "Portovenere by boat (round 233)"; the Specials count is 44; pvrocks and the shell shop's stand point are open
   ground in "Nobody stands on tables".
+
+## Round 233 (ported): Formentera by your own boat
+
+- From the personal edition: data/formentera.js, formentera-goods.js, fm-people.js, formentera-rooms-layout.js,
+  pen-fm.js, game/formentera.js, art/town-formentera.js and art/formentera-rooms.js. Own boat only (fuel 28, up to 7
+  friends), like Portovenere; the personal edition's ferry fares and boat "sight" art aren't in this edition.
+- Friends' acts (new props in art/people.js, css in npcs.css): Mei tries sandals at the La Mola market, Tomi rings a hire
+  bike's bell, Farid picks figs, Theo watches the flamingos, Bo builds a stone stack, Hana pushes up her snorkel mask,
+  Posy holds her hat on by the shore. The kid lines are gone; the rock pool crabs get a {pet} line instead.
+- Things to do: raking salt with Toni (July to September), snorkelling the seagrass, bikes to La Mola (3 coins each,
+  you and every friend), three lighthouse stamps for a painted lighthouse, the market (Wednesdays and Sundays, May to
+  October), the chiringuito and the bakery. Stories for Toni, Margalida and Rainbow; pen pals; three Specials
+  (ensalada payesa, flaó, fig bread); flor de sal and figs at the Scoop Shack; a tenth fridge magnet spot.
+- Tests: "Formentera by boat (round 233)"; Specials count 47.

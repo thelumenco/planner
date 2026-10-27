@@ -51,7 +51,7 @@ function eligible(F, id, day){
 export const TELLERS_PER_DAY = 2;
 const order = (day, id) => { let h = 0; for (const c of day + id) h = (h*31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 // Ronda's locals tell theirs on a day trip, quest or no quest (you're on holiday); the two-a-day limit still holds
-const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "ornella", "pvrosa", "ilario", "bianca"];   // Ronda's and Kyoto's, and Ornella in Cinque Terre
+const LOCALS = ["carmen", "rafael", "lucia", "manolo", "sachiko", "joshin", "tanaka", "ornella", "pvrosa", "ilario", "bianca", "fmtoni", "fmmargalida", "fmrainbow"];   // Ronda's and Kyoto's, and Ornella in Cinque Terre
 export function storyReady(F, id, day = dayKey()){
   if (!isLocal(id)) return eligible(F, id, day);   // a villager in Honeybrook: whenever their hearts allow, a chapter a day
   if (id === "ornella") return eligible(F, id, day);   // Ornella (your pen pal) tells hers whenever you visit, a chapter a day, outside the two-a-day limit
@@ -70,6 +70,13 @@ const REWARDS = {
   pvpandolce: (F, addInv) => { addInv("pv_pandolce", 1); return "a pandolce from Rosa's harvest party on the quay"; },
   pvcoaster: (F, addInv) => { addInv("pv_coaster", 1); return "a portoro marble coaster, cut from Ilario's swift (a keepsake)"; },
   pvpoems: (F, addInv) => { addInv("pv_poems", 1); return "a little book of the Gulf's poets, from Signora Bianca"; },
+  // Formentera's locals
+  fmflor: (F, addInv) => { addInv("flordesal", 1); return "a jar of flor de sal from Toni, skimmed off the pans on a still afternoon"; },
+  fmherbsalt: (F, addInv) => { addInv("fm_herbsalt", 1); return "a jar of herb salt from this year's harvest, the rosemary mixed in by Toni's son Biel"; },
+  fmfig: (F, addInv) => { addInv("fm_fig", 2); return "two bags of dried figs from the old tree behind Margalida's bakery"; },
+  fmbiscuits: (F, addInv) => { addInv("fm_biscuits", 1); return "a bag of almond biscuits baked by Margalida's niece Aina"; },
+  fmbracelet: (F, addInv) => { addInv("fm_bracelet", 1); return "a turquoise bead bracelet from Rainbow's blanket at La Mola market"; },
+  fmring: (F, addInv) => { addInv("fm_ring", 1); return "a silver ring Rainbow made for you, with a tiny wave stamped inside (a keepsake)"; },
   priory: F => { addCuttings(F, "priory", 3); return "three cuttings of the monks' own grape, Priory Red, for your trellises"; },
   seacave: F => { storyState(F).flags.seacave = true; return "Bram's directions to the sea door below the lighthouse (low tide only)"; },
   ponypoem: (F, addInv) => { addInv("s_ponypoem", 1); return "a copy of Juniper's poem, 'The Grey Pony' (a keepsake)"; },
@@ -113,7 +120,7 @@ export function tellStory(F, id, addInv, day = dayKey()){
 // the friendship view's "Stories so far": a record to look back on, one card per teller (in the order you first heard
 // them, the latest teller's card open), headed with their name and job (from NPCS; `names` from core.js wins for the
 // name), each chapter numbered and in order, with its bubbles as they were said
-const PLACES = {ronda: "Ronda", kyoto: "Kyoto", cinque: "Cinque Terre", saltwick: "Saltwick Harbour", porto: "Portovenere", puffin: "Puffin Isle", hokkaido: "Hokkaido", bali: "Bali"};
+const PLACES = {ronda: "Ronda", kyoto: "Kyoto", cinque: "Cinque Terre", saltwick: "Saltwick Harbour", porto: "Portovenere", formentera: "Formentera", puffin: "Puffin Isle", hokkaido: "Hokkaido", bali: "Bali"};
 export function storiesHTML(F, names){
   const s = storyState(F), ids = Object.keys(STORIES).filter(id => s.heard[id]);
   if (!ids.length) return `<h3 class="ph3">Stories so far</h3><p class="muted">Everyone in Honeybrook has a story. Help your neighbours and bring them gifts: as their hearts grow, they'll tell you theirs, a little at a time. Look for the "…" over their heads.</p>`;

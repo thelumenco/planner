@@ -2873,8 +2873,8 @@ if (want("\nCinque Terre: the five villages (well, four)")) try {
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
-    check(sp.length === 44 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
-      "the 44 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
+    check(sp.length === 47 && sp.every(id => T[id].price > maxLocal) && Object.keys(kit.SOURCE).length > 50 && Object.keys(T).every(id => Object.keys(T[id].need).every(g => kit.SOURCE[g])),
+      "the 47 dishes from the trips are Specials, every one dearer than any local dish, and every ingredient says where it comes from");
     check(!kit.knows({}, "trofie") && kit.knows({towns: {cinque: "2026-10-12"}}, "trofie") && kit.knows({jeju: {}}, "jeonbok") && !kit.knows({towns: {cinque: 1}}, "salmorejo"), "a town's specials appear once you've been (Ronda's still need tasting)"); }
   check(["trofie", "focaccia", "farinata", "acciughe", "crostini"].every(k => kit.TAPAS[k]) && ["pinenuts", "limoncino", "basil", "lemon"].every(k => sc.INGR[k]), "Cinque Terre's dishes at the kitchen, and basil, lemon, pine nut and limoncino gelato");
   { const np = await import(new URL("../src/data/npcs.js", import.meta.url)), st = await import(new URL("../src/game/stories.js", import.meta.url)), J = np.NPCS.find(n => n.id === "ornella"), L = np.NPCS.find(n => n.id === "dario");
@@ -5152,6 +5152,59 @@ if (want("\nPortovenere by boat (round 233)")) try {
   check(/Sail home/.test(await page.locator("#ctx").innerText()) && !/until/.test(await page.locator("#ctx").innerText()), "your boat at the quay: sail home whenever you're ready");
   { const T = (await import(new URL("../src/data/towns.js", import.meta.url))).TOWNS.porto, src = (await import("node:fs")).readFileSync(new URL("../src/data/porto.js", import.meta.url), "utf8");
     check(["hana", "theo", "farid", "mei", "bo", "tomi", "posy"].every(id => T.lines[id] && T.spots[id]) && Object.keys(T.acts).length === 7 && !/\b(evan|mum|dad|mama|gonggong|darren|marcus|angelina)\b/i.test(src), "your friends come along (their own lines and things to do), with no family"); }
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nFormentera by boat (round 233)")) try {
+  // ported from the personal edition: the four screens, five rooms, raking salt with Toni, the seagrass, bikes to La Mola,
+  // three lighthouse stamps, the bakery; your friends in place of the family
+  console.log("\nFormentera by boat (round 233)");
+  const page = await browser.newPage({ viewport: { width: 520, height: 1100 } });
+  page.on("pageerror", e => errors.push(`formentera pageerror: ${e.message}`));
+  const gf = () => page.evaluate(() => window.__hbGame.F());
+  const go = async sc => { await page.evaluate(s => window.__hbScene(s), sc); await page.waitForTimeout(1500); };
+  const spot = async id => { await page.locator(`#world [data-rdspot="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(2500); };
+  const place = async id => { await page.locator(`#world [data-place="${id}"]`).first().dispatchEvent("click"); await page.waitForTimeout(7000); };
+  const name = () => page.evaluate(() => document.querySelector("#sceneName").innerText.split("\n")[0]);
+  const fm = async k => { await page.click(`#ctx [data-fm="${k}"]`); await page.waitForTimeout(200); };
+  await page.goto(url + "?reset=1&seed=1&time=9:15&date=2026-08-12"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.coins = 600; F.goals = {...(F.goals || {}), boat: 1}; F.board = {...(F.board || {}), hearts: {hana: 6, theo: 6, farid: 6, mei: 6, bo: 6, tomi: 6, posy: 6}}; window.__hbGame.save(); });
+  await go("shore"); await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-btown="formentera"]', { timeout: 15000 });
+  await page.click('#ctx [data-btown="formentera"]'); await page.waitForTimeout(300);
+  check(/28/.test(await page.locator("#ctx").innerText()) && /whenever you like/.test(await page.locator("#ctx").innerText()), "your boat sails to Formentera (fuel 28), whenever you like");
+  await page.click('#ctx [data-tpick="hana"]'); await page.waitForTimeout(100); await page.click('#ctx [data-trip="formentera"]'); await page.waitForTimeout(9000);
+  check(await page.locator('#world [data-place="fmboat"]').count() === 1 && /Illetes/i.test(await name()), "you tie up at La Savina's quay, by the long white spit of Ses Illetes");
+  check(/salt/i.test(await (async () => { await place("fmToSalines"); return name(); })()) && await page.locator('#world [data-place="fmflamingos"]').count() === 1, "north along the dune boardwalk to the salt flats");
+  check(/Mola/i.test(await (async () => { await place("fmToMola"); return name(); })()) && await page.locator('#world [data-place="fmlighthouse"]').count() === 1, "the Green Route east to La Mola and its lighthouse");
+  check(/Francesc/i.test(await (async () => { await place("fmToVillageS"); return name(); })()) && await page.locator('#world [data-place="fmbakery"]').count() === 1, "down the old road to Sant Francesc");
+  check(/Illetes/i.test(await (async () => { await place("fmToIlletesW"); return name(); })()), "and back along the road to La Savina");
+  await place("fmharbourlight"); check(!!(((await gf()).formentera || {}).stamps || {}).harbour, "a stamp from the little harbour light");
+  await go("fm_salines"); await page.waitForTimeout(1500); await place("fmpans"); await fm("rake");
+  for (let k = 0; k < 4; k++) await fm("rakeit");
+  for (let k = 0; k < 2; k++) await fm("skim");
+  await fm("rakedone"); await page.waitForTimeout(600);
+  let f = await gf();
+  check(f.inv.flordesal === 2 && f.inv.fm_myflor === 1, "raking the salt pans with Toni in the harvest: a pyramid, then the flor de sal (and a jar of your own)");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await go("fm_illetes"); await place("fmsnorkel"); await fm("snorkel");
+  for (let k = 0; k < 3; k++) await fm("look");
+  await fm("snorkeldone"); await page.waitForTimeout(600);
+  check(Object.keys((await gf()).formentera.seen).length === 3, "snorkelling over the seagrass: three sea creatures on your fish card");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await go("fm_bakery"); await spot("fm_bakery"); const c0 = (await gf()).coins; await fm("bake:flao"); await page.waitForTimeout(600);
+  check((await gf()).coins === c0 - 3, "a slice of flaó at Margalida's bakery");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await go("fm_bikes"); await spot("fm_bikes"); const c1 = (await gf()).coins; await fm("ride"); await page.waitForTimeout(2500);
+  check((await gf()).coins === c1 - 6 && /Mola/i.test(await name()), "hire bikes at Joan's (you and a friend) and ride the Green Route up to La Mola");
+  await go("fm_light"); await spot("fm_light"); await fm("stamp:mola"); await page.waitForTimeout(400);
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await go("fm_village"); await place("fmbarbaria");
+  f = await gf();
+  check(Object.keys(f.formentera.stamps).length === 3 && f.inv.fm_lighthouse === 1, "three lighthouse stamps (the harbour, La Mola, Cap de Barbaria): a painted lighthouse to keep");
+  await go("fm_illetes"); await place("fmboat");
+  check(/Sail home/.test(await page.locator("#ctx").innerText()) && !/until/.test(await page.locator("#ctx").innerText()), "your boat at the quay: sail home whenever you're ready");
+  { const T = (await import(new URL("../src/data/towns.js", import.meta.url))).TOWNS.formentera, fs = await import("node:fs");
+    const src = ["data/formentera.js", "data/formentera-goods.js", "data/fm-people.js", "data/pen-fm.js", "game/formentera.js"].map(p => fs.readFileSync(new URL("../src/" + p, import.meta.url), "utf8")).join("\n");
+    check(["hana", "theo", "farid", "mei", "bo", "tomi", "posy"].every(id => T.lines[id] && T.spots[id]) && Object.keys(T.acts).length === 7 && !/\b(evan|mum|dad|mama|gonggong|darren|marcus|angelina|mel)\b/i.test(src), "your friends come along (their own lines and things to do), with no family"); }
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {

@@ -94,7 +94,7 @@ const PROPS = {water: "can", repair: "hammer", farm: "hoe", cone: "cone", fish: 
   flask: "thermos", wade: "wadewater", ducks: "ducks", frisbee: "frisbee", lollybag: "lollybag", pail: "milkpail", fence: "fencerail", shake: "branch", crack: "nutstone", pan: "goldpan", guard: "guardflag", sip: "sarsbottle",
   armful: "armful", bee: "beebuzz", baguette: "baguette", accordion: "accordion", sniff: "sniffstrip", spritz: "atomiser", beesuit: "beeveil", sunflower: "bigflower", float: "ring", picnic: "rug", candle: "candlelit", goat: "kid", lantern: "xlantern", carol: "songsheet", shopbag: "shopbag",
   crab: "crabline", fossil: "hammer", sarnie: "sarnie", railpaint: "brush",
-  swim: "swimcap", rampart: "guidebook", gossip: "headscarf", boatwatch: "handsback", rockjump: "splash", snorkel: "snorkelmask", verse: "quillpad",   // Portovenere   // round 215: Saltwick Harbour
+  swim: "swimcap", rampart: "guidebook", gossip: "headscarf", boatwatch: "handsback", rockjump: "splash", snorkel: "snorkelmask", verse: "quillpad", sandals: "sunbasket", bikebell: "bellbike", figpick: "figbasket", flamingos: "fieldglasses", stonestack: "stonepile", maskup: "maskforehead", shorepose: "shorehat",   // Portovenere   // round 215: Saltwick Harbour
   puffinwatch: "binocs", goatfeed: "goatfeed", seaglass: "glassbit",   // round 216: Puffin Isle ("sealwave" is a pose)
   softserve: "softcone", toast: "beerglass", ski: "skipoles",   // round 217: Hokkaido ("footbath" and "flowerlie" are poses)
   riceplant: "seedling", coconut: "coconutstraw", offering: "canang", gamelan: "mallet",

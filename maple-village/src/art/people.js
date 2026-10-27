@@ -188,6 +188,49 @@ function extra(kind, look, k){
     case "songsheet": return `<g class="tool"><rect x="${4*k}" y="${-30*k}" width="${9*k}" height="${7*k}" rx="${.6*k}" ${S("#FFFDF6")}/><path d="M${6*k} ${-27*k} h${5*k} M${6*k} ${-25*k} h${4*k}" style="stroke:#C8432F" stroke-width="${.6*k}"/></g>`;
     case "candlelit": return `<g class="tool"><rect x="${9*k}" y="${-32*k}" width="${3*k}" height="${8*k}" ${S("#FFFDF6")}/><ellipse cx="${10.5*k}" cy="${-34.4*k}" rx="${1.2*k}" ry="${2.2*k}" style="fill:#F3C969" stroke="none"/></g>`;
     case "kid": return `<g class="perch">${`<ellipse cx="${24*k}" cy="${-8*k}" rx="${8*k}" ry="${5*k}" ${S("#F3EAD6")}/><ellipse cx="${32*k}" cy="${-13*k}" rx="${3.6*k}" ry="${3*k}" ${S("#F3EAD6")}/><path d="M${19*k} ${-4*k} v${5*k} M${28*k} ${-4*k} v${5*k}" stroke-width="${1*k}"/>`}</g>`;
+    // a day out in Formentera (round 233, never done anywhere before): a straw sun hat with a palm basket on the arm,
+    // holding up a leather sandal from the market; a turquoise hire bike with its bell rung; reaching up for a fig, the
+    // basket half full; watching the flamingos through field glasses; balancing one more flat stone on the stack; a
+    // snorkel mask pushed up on the forehead, dripping; holding on a big floppy hat in the sea breeze, a hand on the hip.
+    // (on the head) a wide straw hat with a blue band; a palm basket on the left arm; a sandal held up in the right hand
+    // (arm posed at -120deg), turned this way and that
+    case "sunbasket": return `<ellipse cx="0" cy="${y - 5*k}" rx="${17*k}" ry="${4*k}" style="fill:#E6CB8A" stroke-width="${.9*k}"/><path d="M${-8.4*k} ${y - 5.6*k} c0 ${-10*k} ${16.8*k} ${-10*k} ${16.8*k} 0z" style="fill:#E6CB8A" stroke-width="${.9*k}"/>`
+      + `<path d="M${-8.2*k} ${y - 7.4*k} h${16.4*k}" fill="none" stroke-width="${2*k}" style="stroke:#3E9BC7"/><path d="M${-13*k} ${y - 4.6*k} q${13*k} ${3*k} ${26*k} 0" fill="none" stroke-width="${.5*k}" style="stroke:#B8955A"/>`
+      + basket(-15.6, -13, k, "#D9B87A", "") + `<circle cx="${-15.6*k}" cy="${-21.4*k}" r="${2.1*k}" ${S(look.skin)}/>`
+      + `<g class="inhand" style="transform-origin:${9.9*k}px ${-34*k}px"><ellipse cx="${22.8*k}" cy="${-47.4*k}" rx="${2.6*k}" ry="${6.4*k}" transform="rotate(14 ${22.8*k} ${-47.4*k})" style="fill:#A8794E" stroke-width="${.8*k}"/>`
+      + `<path d="M${20.6*k} ${-50.6*k} l${4.8*k} ${1.2*k} M${20*k} ${-47.2*k} l${4.8*k} ${1.4*k} M${21.2*k} ${-51.8*k} l${2.6*k} ${5.6*k}" fill="none" stroke-width="${.9*k}" style="stroke:#6A4428"/><circle cx="${21.6*k}" cy="${-40.8*k}" r="${2.3*k}" ${S(look.skin)}/></g>`;
+    // a bell on the hire bike's handlebar, the right hand on it (arm posed at -20deg) and a ring-ring now and then; a
+    // basket on the front (the bike itself is under him, in personArt)
+    case "bellbike": return `<path d="M${12.2*k} ${-14.4*k} h${8.4*k} l${-1.2*k} ${6*k} h${-6*k}z" style="fill:#D9B87A" stroke-width="${.8*k}"/><path d="M${12.8*k} ${-12*k} h${7.2*k} M${13.4*k} ${-9.8*k} h${6*k}" fill="none" stroke-width="${.5*k}" style="stroke:#A8794E"/>`
+      + `<path d="M${13*k} ${-15.2*k} a${1.9*k} ${1.9*k} 0 0 1 ${3.8*k} 0z" style="fill:#E3C26A" stroke-width="${.7*k}"/><circle cx="${14.9*k}" cy="${-17.4*k}" r="${.6*k}" style="fill:#E3C26A" stroke-width="${.4*k}"/>`
+      + `<g class="inhand" style="transform-origin:${9.9*k}px ${-34*k}px"><circle cx="${14.5*k}" cy="${-20.4*k}" r="${2.2*k}" ${S(look.skin)}/></g>`
+      + `<g class="bring" fill="none" stroke-width="${.7*k}" style="stroke:var(--line)"><path d="M${19*k} ${-19.6*k} q${1.4*k} ${1.6*k} 0 ${3.4*k}"/><path d="M${21.4*k} ${-21*k} q${2.4*k} ${3*k} 0 ${6.2*k}"/></g>`;
+    // a palm basket of figs on the left arm, and the right hand up in the fig tree (arm posed at -150deg) holding a fig
+    case "figbasket": return basket(-15.6, -13, k, "#C9A06A", [-19, -15.6, -12.2].map((x, i) => `<path d="M${x*k} ${(-17.4 - (i === 1 ? 1 : 0))*k} c${-.5*k} ${.8*k} ${-2.2*k} ${1.6*k} ${-2.2*k} ${3.4*k} a${2.2*k} ${2.2*k} 0 0 0 ${4.4*k} 0 c0 ${-1.8*k} ${-1.7*k} ${-2.6*k} ${-2.2*k} ${-3.4*k}z" style="fill:${i === 1 ? "#6A3A5A" : "#8A5A7A"}" stroke-width="${.5*k}"/>`).join("") + `<path d="M${-11*k} ${-16.6*k} q${2.4*k} ${-2.6*k} ${4.6*k} ${-1*k} q${-2*k} ${1.6*k} ${-4.6*k} ${1*k}z" style="fill:#7FA65A" stroke-width="${.5*k}"/>`)
+      + `<circle cx="${-15.6*k}" cy="${-21.4*k}" r="${2.1*k}" ${S(look.skin)}/>`
+      + `<g class="inhand" style="transform-origin:${9.9*k}px ${-34*k}px"><path d="M${17.4*k} ${-52.4*k} c${-.6*k} ${1*k} ${-2.8*k} ${2*k} ${-2.8*k} ${4.2*k} a${2.8*k} ${2.8*k} 0 0 0 ${5.6*k} 0 c0 ${-2.2*k} ${-2.2*k} ${-3.2*k} ${-2.8*k} ${-4.2*k}z" style="fill:#7A4A6A" stroke-width="${.6*k}"/>`
+      + `<path d="M${17.4*k} ${-52.4*k} l${.4*k} ${-1.6*k}" fill="none" stroke-width="${.8*k}" style="stroke:#5E8A3A"/><circle cx="${16.6*k}" cy="${-45.6*k}" r="${2.3*k}" ${S(look.skin)}/></g>`;
+    // (on the head) field glasses up to the eyes in both hands (arms posed at -165deg and 165deg), a glint on the lenses
+    case "fieldglasses": return `<g class="fglass"><rect x="${-11*k}" y="${-48.6*k}" width="${9*k}" height="${7.6*k}" rx="${2*k}" style="fill:#3A4A3A" stroke-width="${.9*k}"/><rect x="${2*k}" y="${-48.6*k}" width="${9*k}" height="${7.6*k}" rx="${2*k}" style="fill:#3A4A3A" stroke-width="${.9*k}"/>`
+      + `<rect x="${-2.4*k}" y="${-47*k}" width="${4.8*k}" height="${3*k}" rx="${.8*k}" style="fill:#2A3A2A" stroke-width="${.7*k}"/>${[-6.5, 6.5].map(x => `<circle cx="${x*k}" cy="${-44.8*k}" r="${2.6*k}" style="fill:#9FC3D9" stroke-width="${.7*k}"/>`).join("")}`
+      + `<g class="glint">${[-6.5, 6.5].map(x => `<path d="M${(x - 1.2)*k} ${-45.8*k} l${1.2*k} ${-1*k}" fill="none" stroke-width="${.7*k}" style="stroke:#FFFDF6"/>`).join("")}</g></g>`
+      + `<circle cx="${-13*k}" cy="${-46*k}" r="${2.3*k}" ${S(look.skin)}/><circle cx="${13*k}" cy="${-46*k}" r="${2.3*k}" ${S(look.skin)}/>`;
+    // one more flat stone in the right hand (arm posed at -55deg), about to go on top of the stack (the stack is on the
+    // sand beside him, in personArt)
+    case "stonepile": return `<g class="inhand" style="transform-origin:${9.9*k}px ${-34*k}px"><ellipse cx="${21.6*k}" cy="${-23.6*k}" rx="${3.2*k}" ry="${1.3*k}" style="fill:#B8B2AA" stroke-width="${.7*k}"/><circle cx="${21*k}" cy="${-26.2*k}" r="${2.2*k}" ${S(look.skin)}/></g>`;
+    // (on the head, instead of a hat) a snorkel mask pushed up on the forehead with its strap round the head, the snorkel
+    // up the side, and drips falling from his hair
+    case "maskforehead": return `<path d="M${-r} ${y - 3.4*k} q${r} ${-3*k} ${2*r} 0" fill="none" stroke-width="${1.8*k}" style="stroke:#2F2B28"/>`
+      + `<path d="M${10*k} ${y - 2*k} q${3.6*k} ${-6*k} ${2.4*k} ${-16*k}" fill="none" stroke-width="${3.4*k}" stroke-linecap="round" style="stroke:var(--line)"/><path d="M${10*k} ${y - 2*k} q${3.6*k} ${-6*k} ${2.4*k} ${-16*k}" fill="none" stroke-width="${2*k}" stroke-linecap="round" style="stroke:#F3C94A"/>`
+      + `<rect x="${-7.6*k}" y="${y - 13*k}" width="${15.2*k}" height="${7.6*k}" rx="${2.6*k}" style="fill:#2F5A7A" stroke-width="${.9*k}"/><rect x="${-6*k}" y="${y - 11.6*k}" width="${12*k}" height="${4.8*k}" rx="${1.8*k}" style="fill:#BFE6F0" stroke-width="${.6*k}"/>`
+      + `<path d="M${-4*k} ${y - 10.6*k} l${2*k} ${2.6*k}" fill="none" stroke-width="${.6*k}" style="stroke:#FFFDF6"/>`
+      + `<g class="mdrip">${[[-9.6, -38], [9.2, -36.4], [-4, -34.6]].map(([x, dy]) => `<path d="M${x*k} ${dy*k} q${-1*k} ${1.6*k} 0 ${2.2*k} q${1*k} ${-.6*k} 0 ${-2.2*k}z" style="fill:#9ED0F0" stroke-width="${.45*k}"/>`).join("")}</g>`;
+    // (on the head, instead of a hat) a big floppy hat with a pink ribbon, held on in the breeze by the right hand (arm
+    // posed at -165deg); the other hand is on her hip
+    case "shorehat": return `<g class="fbrim" style="transform-origin:0px ${(y - 5*k)}px"><path d="M${-21*k} ${y - 4*k} q${4*k} ${-5.4*k} ${21*k} ${-5.4*k} q${17*k} 0 ${21*k} ${5.4*k} q${-3*k} ${3*k} ${-7*k} ${1.6*k} q${-14*k} ${-2*k} ${-28*k} 0 q${-4*k} ${1.4*k} ${-7*k} ${-1.6*k}z" style="fill:#F6E7C8" stroke-width="${.9*k}"/>`
+      + `<path d="M${-8.6*k} ${y - 8*k} c0 ${-10*k} ${17.2*k} ${-10*k} ${17.2*k} 0z" style="fill:#F6E7C8" stroke-width="${.9*k}"/><path d="M${-8.4*k} ${y - 9.6*k} h${16.8*k}" fill="none" stroke-width="${2.2*k}" style="stroke:#E8739A"/></g>`
+      + `<g class="hribbon"><path d="M${-8*k} ${y - 9.6*k} q${-5*k} ${1*k} ${-9*k} ${5*k} M${-8*k} ${y - 9.6*k} q${-4*k} ${3*k} ${-6*k} ${8*k}" fill="none" stroke-width="${1.4*k}" stroke-linecap="round" style="stroke:#E8739A"/></g>`
+      + `<circle cx="${13.6*k}" cy="${-48.4*k}" r="${2.3*k}" ${S(look.skin)}/>`;
     case "lantern": return `<path d="M${12*k} ${-24*k} v${-4*k}" fill="none"/><rect x="${9*k}" y="${-24*k}" width="${7*k}" height="${9*k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5*k}" cy="${-19.5*k}" r="${1.8*k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
   }
   return "";
@@ -208,6 +251,7 @@ function batik(col, k, shirt){   // shirt: just the shirt (a local's print shirt
     ${shirt ? "" : `<path d="M${-5.6*k} ${-12*k} h${3*k} M${-5.6*k} ${-8*k} h${3*k} M${2*k} ${-11*k} h${3*k} M${2*k} ${-6*k} h${3*k}" stroke-width="${1.1*k}" style="stroke:${col}"/>`}</g>`;
 }
 import { bikeArt } from "./transport.js";
+const basket = (cx, ty, k, col, inside) => `<path d="M${(cx - 5)*k} ${ty*k} Q${cx*k} ${(ty - 12)*k} ${(cx + 5)*k} ${ty*k}" fill="none" stroke-width="${1.4*k}" style="stroke:#8A6A42"/>${inside}`
 // Rain gear (everyone outdoors on a rainy day, each their own): an umbrella or a raincoat with a hood and wellies.
 // gear = {kind: "brolly"|"coat", a, b (colours), pat: "solid"|"stripe"|"dots"|"scallop"|"check"|"clear"|"paper"}.
 const BROLLY_COLS = [["#E8566C", "#FFFDF6"], ["#3E6B8C", "#F3C969"], ["#F3C969", "#E8913A"], ["#7FB8A8", "#FFFDF6"], ["#2F2B28", "#E8566C"], ["#9AA9DD", "#FFFDF6"], ["#C2505F", "#F4C7CF"], ["#5E8A5A", "#F3E7C9"], ["#F4C7CF", "#8E2C48"], ["#E3E8EC", "#3E6B8C"]];
@@ -249,14 +293,15 @@ export function personArt(look, kid){
   const legH = 13*k, legY = -15*k, lw = 5*k;
   const rain = look.rain, coat = rain && rain.kind === "coat";
   // (Portovenere: a swimming cap, headscarf or snorkel mask takes the place of a hat; a mask or cap of specs)
-  const capped = ["swimcap", "headscarf", "snorkelmask"].includes(look.extra), masked = look.extra === "snorkelmask" || look.extra === "swimcap";
+  const capped = ["swimcap", "headscarf", "snorkelmask", "sunbasket", "maskforehead", "shorehat"].includes(look.extra), masked = look.extra === "snorkelmask" || look.extra === "swimcap";
+  const stonestack = look.extra === "stonepile" ? `<g class="stonestack" style="stroke:var(--line)" stroke-width="${.8*k}" stroke-linejoin="round">${[[22, -1.6, 6.2, 2.2, "#A8A296"], [22.6, -5.6, 5.2, 2, "#C9C2B6"], [21.8, -9.2, 4.4, 1.8, "#9A948A"], [22.4, -12.6, 3.8, 1.7, "#D6CFC2"], [22, -15.8, 3.2, 1.5, "#B8B2AA"], [22.3, -18.8, 2.6, 1.4, "#E3DDD2"]].map(([x, y, rx, ry, c]) => `<ellipse cx="${x*k}" cy="${y*k}" rx="${rx*k}" ry="${ry*k}" style="fill:${c}"/>`).join("")}</g>` : "";
   const shoe = coat ? rain.b : "var(--sock)", sleeve = x => coat ? `<rect x="${x}" y="${-34*k}" width="${4.2*k}" height="${11*k}" rx="2" ${S(rain.a)}/>` : "";
   return `<g class="flip"><g filter="url(#wob)">
     <ellipse cx="0" cy="0" rx="${11*k}" ry="${3.5*k}" fill="rgba(60,40,30,.18)"/>
     <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
       ${look.board ? board(k) : ""}
       ${look.towel ? towel(k) : ""}
-      ${look.bike ? `<g transform="translate(0 ${7*k})">${bikeArt(look.bike === true ? "#3E6B8C" : look.bike, k)}</g>` : ""}
+      ${look.bike || look.extra === "bellbike" ? `<g transform="translate(0 ${7*k})">${bikeArt(look.extra === "bellbike" ? "#3EB8C0" : look.bike === true ? "#3E6B8C" : look.bike, k)}</g>` : ""}
       <g class="legL"><rect x="${-6.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
       <g class="legR"><rect x="${1.2*k}" y="${legY}" width="${lw}" height="${legH}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${.8*k}" y="${legY}" width="${lw + .8*k}" height="${legH*.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7*k}" cy="${-1.6*k}" rx="${3.6*k}" ry="${2.1*k}" ${S(shoe)}/></g>
       <g class="armL"><rect x="${-12*k}" y="${-34*k}" width="${4.2*k}" height="${13.5*k}" rx="2" ${S(look.skin)}/>${sleeve(-12*k)}${look.sleeves && !coat ? `<rect x="${-12*k - .4*k}" y="${-34.5*k}" width="${5*k}" height="${7*k}" rx="1.5" ${S(look.sleeves)}/>` : ""}</g>
@@ -265,7 +310,7 @@ export function personArt(look, kid){
       <path d="M${-8.6*k} ${-37*k} q${8.6*k} ${-2.4*k} ${17.2*k} 0 l${1.4*k} ${23*k} h${-20*k}z" ${S(look.dress || look.top)}/>
       ${look.batik && !coat ? batik(look.batik, k) : ""}${look.palms && !coat ? palms(k) : ""}
       ${coat ? coatArt(rain, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book", "hanger", "remote", "cuppa", "footy", "wineglass", "juggle", "fan", "flats", "roobag", "shopbag", "tongs", "skim", "cards", "mallow", "bodyboard", "yogamat", "telescope", "easel", "macrocam", "clicker", "chipbox", "prawnbag", "shellpail", "driftwood", "parrot", "quoit", "postcard", "thermos", "wadewater", "ducks", "frisbee", "lollybag", "milkpail", "fencerail", "branch", "nutstone", "goldpan", "guardflag", "sarsbottle", "armful", "beebuzz", "baguette", "accordion", "sniffstrip", "atomiser", "beeveil", "bigflower", "ring", "rug", "candlelit", "kid", "crabline", "sarnie", "goatfeed", "glassbit", "softcone", "beerglass", "skipoles", "seedling", "coconutstraw", "canang", "mallet", "suitcase", "guidebook", "handsback", "splash", "quillpad"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book", "hanger", "remote", "cuppa", "footy", "wineglass", "juggle", "fan", "flats", "roobag", "shopbag", "tongs", "skim", "cards", "mallow", "bodyboard", "yogamat", "telescope", "easel", "macrocam", "clicker", "chipbox", "prawnbag", "shellpail", "driftwood", "parrot", "quoit", "postcard", "thermos", "wadewater", "ducks", "frisbee", "lollybag", "milkpail", "fencerail", "branch", "nutstone", "goldpan", "guardflag", "sarsbottle", "armful", "beebuzz", "baguette", "accordion", "sniffstrip", "atomiser", "beeveil", "bigflower", "ring", "rug", "candlelit", "kid", "crabline", "sarnie", "goatfeed", "glassbit", "softcone", "beerglass", "skipoles", "seedling", "coconutstraw", "canang", "mallet", "suitcase", "guidebook", "handsback", "splash", "quillpad", "bellbike", "figbasket", "stonepile"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? hair(look.hairStyle, look.hair, k) : ""}
       <circle cx="0" cy="${-46*k}" r="${10.6*k}" ${S(look.skin)}/>
       ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46*k, 10.6*k) : hair(look.hairStyle, look.hair, k)}
@@ -275,7 +320,7 @@ export function personArt(look, kid){
       <ellipse cx="${6.4*k}" cy="${-40.6*k}" rx="${2*k}" ry="${1.2*k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
       <path d="M${-1.6*k} ${-40.4*k} q${1.6*k} ${1.4*k} ${3.2*k} 0" fill="none" stroke-width="1"/>
       ${look.hairStyle === "bobfringe" ? fringe(look.hair, -46*k, 10.6*k, k) : ""}
-      ${["glasses", "cap", "sunhat", "helmet", "binocs", "crownw", "swimcap", "headscarf", "snorkelmask"].includes(look.extra) ? extra(look.extra, look, k) : ""}
+      ${["glasses", "cap", "sunhat", "helmet", "binocs", "crownw", "swimcap", "headscarf", "snorkelmask", "sunbasket", "fieldglasses", "maskforehead", "shorehat"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.specs && !masked ? extra("specs", look, k) : ""}
       ${look.hat && !coat && !capped ? extra(look.hat, look, k) : ""}
       ${coat ? hoodArt(rain, k) : ""}
@@ -283,7 +328,7 @@ export function personArt(look, kid){
       ${look.board ? paddle(k) : ""}
       ${rain && rain.kind === "brolly" ? brollyArt(rain, k) : ""}
       ${look.headphones ? `<path d="M${-11*k} ${-46*k} a${11*k} ${12*k} 0 0 1 ${22*k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5*k}" y="${-49*k}" width="${4.5*k}" height="${7*k}" rx="2" style="fill:var(--peri)"/><rect x="${9*k}" y="${-49*k}" width="${4.5*k}" height="${7*k}" rx="2" style="fill:var(--peri)"/>` : ""}
-    </g>
+    </g>${stonestack}
   </g></g>`;
 }
 
