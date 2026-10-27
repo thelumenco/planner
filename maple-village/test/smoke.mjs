@@ -3950,7 +3950,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     // round 199: "I put four bottles of olive oil in the basket and it disappeared": Tomi infused with them. Now he only uses the mill's own pressing
     { const G = {inv: {oliveoil: 2, basil: 1}}, c = mc.craftState(G); c.recipes = [{kind: "oil", adds: ["basil"], name: "Basil oil"}]; mc.toBasket(G, "oliveoil", 2); mc.toBasket(G, "basil");
       const d = mc.inesStep(G, {}, {}); check(!d.infused && c.basket.oliveoil === 2 && c.basket.basil === 1 && !c.steep.length, "Tomi leaves Mel's oil in the basket alone");
-      G.inv.beeswax = 2; check(/data-mc="basket:beeswax"/.test(mc.benchPanel(G, {tab: "basket"})) && mc.toBasket(G, "beeswax") === 2 && c.basket.beeswax === 2 && /Beeswax/.test(mc.benchPanel(G, {tab: "basket"})), "beeswax goes in the basket too (round 201)"); delete c.basket.beeswax;
+      G.inv.beeswax = 2; check(/data-mc="basket:beeswax:1"/.test(mc.benchPanel(G, {tab: "basket"})) && mc.toBasket(G, "beeswax") === 2 && c.basket.beeswax === 2 && /Beeswax/.test(mc.benchPanel(G, {tab: "basket"})), "beeswax goes in the basket too (round 201)"); delete c.basket.beeswax;
       G.inv.oliveoil = 3; const d2 = mc.inesStep(G, {}, {}); check(!d2.infused && c.basket.oliveoil === 2 && G.inv.oliveoil === 3 && !c.steep.length, "and never infuses anything, not from her backpack either (round 200)");
       G.inv.oliveoil = 0; G.inv.basil = 1; const r = mc.craft(G, "oil", null, ["basil"]);
       check(r.recipe && !c.basket.oliveoil && c.steep.length === 1, "and when Mel makes an oil herself, the bench uses her basket oil"); }
