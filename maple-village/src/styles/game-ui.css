@@ -931,10 +931,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .mullsw{display:inline-flex;gap:2px;vertical-align:-1px}.mullsw i{width:9px;height:9px;border-radius:50%;border:1px solid #2F2B28}
 
 /* round 183: the paperie's steps, and the batch's picture */
-.ppstrip{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 4px}
-.ppstep{font-size:.72rem;padding:2px 7px;border-radius:999px;background:#EFE9DF;color:#8A8279}
-.ppstep.done{background:#DCE7D2;color:#4E6A3E}
-.ppstep.now{background:#F3D9A0;color:#5A3E1A;font-weight:600}
 .ppbatch{display:flex;justify-content:center;margin:2px 0 6px}
 .qlist.nbrs .hearts{margin:0;gap:2px}
 .sltext{width:100%;font:inherit;font-size:.85rem;padding:8px;border:1.4px solid #E4DDD2;border-radius:6px;background:#FFFDF7;margin:6px 0 4px}
@@ -1132,3 +1128,18 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 @keyframes gwdown{0%,72%{opacity:1}72.5%,97.5%{opacity:0}98%,100%{opacity:1}}
 @keyframes gwflap{from{transform:scaleY(1)}to{transform:scaleY(.35)}}
 @media (prefers-reduced-motion:reduce){.map .gulloff,.map .gwup,.map .gwdown,.map .gwflap{animation:none}.map .gwup{opacity:0}}
+/* round 299: the Cocoa Room's five steps, drawn, with how many are at each (cocoa.js flow) */
+.ccpipe{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:8px 0 6px}
+.ccstep{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 2px 6px;border-radius:12px;border:1.5px solid rgba(120,104,84,.22);background:#FFFDF6;font:inherit;color:inherit;text-align:center;cursor:pointer}
+.ccstep.on{background:#E3F2EC;border-color:#5E9A86;box-shadow:0 0 0 2px rgba(94,154,134,.18)}
+.ccstep[aria-current="step"]{border-style:dashed}
+.ccstep .ccn{font-size:.62rem;font-weight:700;opacity:.75;white-space:nowrap}
+.ccstep b{font-size:1.15rem;line-height:1.05}
+.ccstep small{font-size:.6rem;line-height:1.15;opacity:.8}
+.ccstep:not(:last-child)::after{content:"›";position:absolute;right:-6px;top:38%;font-weight:700;font-size:.9rem;opacity:.45}
+.cckinds{font-size:.6rem;line-height:1.25;margin-top:2px;white-space:nowrap}.ccres{font-size:.72rem}
+.cckinds i,.ccres i{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 2px 0 3px;vertical-align:middle;border:1px solid rgba(58,46,40,.5)}
+.ccres{opacity:.85;margin:0 0 6px;line-height:1.5}
+/* round 301: the paperie's six stages, the same row as the Cocoa Room's (paperie.js strip) */
+.ccpipe.six{grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.ccpic{display:flex;justify-content:center;height:34px}.ccstep.idle .ccpic{opacity:.4}

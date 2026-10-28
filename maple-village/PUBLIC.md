@@ -428,3 +428,15 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   October), the chiringuito and the bakery. Stories for Toni, Margalida and Rainbow; pen pals; three Specials
   (ensalada payesa, flaó, fig bread); flor de sal and figs at the Scoop Shack; a tenth fridge magnet spot.
 - Tests: "Formentera by boat (round 233)"; Specials count 47.
+
+## Round 299 and 301 (ported): seashells, one at a time, and the steps drawn
+
+- Seashells sell for 1 (the conch for 2) and can be given (`to: "family"`, data/carboot.js BEACH).
+- One at a time: the larder (kitchen.js, `data-n` 1 or 0 for all), the wine shop's fruit crate (`stockFruit(F, id, k)`),
+  the mill's basket (`basket:id:n`) and the spice rack (`rack:id:n`) each have "1" and "All" buttons.
+- The Cocoa Room: the roaster takes up to `ROAST_MAX` (4) sacks at once (`c.roast.n`; Mateo too). Every kitchen station
+  opens with the five steps drawn (`PIC`, `flow`, `nextStep`, css `.ccpipe`/`.ccstep`), with "Next:" and "Go there".
+  This edition's newer grinder panel (round 223) was kept, with the step row added.
+- The paperie: `strip(F, t, here)` draws six stage cards (`PIPE`, `nextPaper`), reusing `.ccpipe` (`.six`, `.ccpic`).
+- The lit-windows fix (round 300) wasn't needed: this edition's `.nightcopy` code never had the slip.
+- Tests: "Seashells, one at a time, and the chocolate steps (round 299)" and the changed checks.

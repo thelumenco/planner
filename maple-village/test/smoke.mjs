@@ -978,8 +978,11 @@ if (want("\nthe orchard")) try {
   check(await page.locator('#actors [data-npc="mei"]').count() === 1, "and Mei is there watering this morning");
   await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="wshelf"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-vyfruit="apple"]', { timeout: 15000 }); await page.click('#ctx [data-vyfruit="apple"]'); await page.waitForTimeout(200);
-  check(await fox().then(f => f.vine.fruit.apple >= 1 && !f.inv.apple), "fruit goes into the wine shop's fruit crate to sell");
+  await page.waitForSelector('#ctx [data-vyfruit="apple"]', { timeout: 15000 }); const apples0 = await fox().then(f => f.inv.apple || 0), crate0 = await fox().then(f => (f.vine.fruit || {}).apple || 0);
+  await page.click('#ctx [data-vyfruit="apple"][data-n="1"]'); await page.waitForTimeout(200);
+  check(await fox().then(f => f.vine.fruit.apple === crate0 + 1 && (f.inv.apple || 0) === apples0 - 1), "fruit goes into the wine shop's fruit crate to sell, one at a time (round 299)");
+  if (apples0 > 1) { await page.click('#ctx [data-vyfruit="apple"][data-n="99"]'); await page.waitForTimeout(200); }
+  check(await fox().then(f => f.vine.fruit.apple === crate0 + apples0 && !f.inv.apple), "or all of it at once");
   await page.goto(url + "?seed=1&time=15:30&date=2026-10-07"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__hbScene("cottage")); await page.waitForTimeout(900);
   check(await page.locator('#actors [data-npc="farid"]').count() === 1 && /Farid and Mei's cottage/.test(await page.locator("#sceneName").textContent()), "Farid's home in the cottage he shares with Mei at teatime");
@@ -1415,10 +1418,11 @@ if (want("\nthe Cocoa Room")) try {
   await tap("sacks", '#ctx [data-cc="beans"][data-n="3"]'); await page.click('#ctx [data-cc="beans"][data-n="3"]'); await page.waitForTimeout(300);
   await page.click("#ctx [data-close]");
   await tap("roaster", '#ctx [data-cc="roast"]'); await page.click('#ctx [data-cc="roast"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.cocoa.beans === 2 && f.cocoa.roast && f.coins === 925), "three sacks of beans (75 coins), one in the roaster");
+  check(await fox().then(f => f.cocoa.beans === 0 && f.cocoa.roast && f.cocoa.roast.n === 3 && f.coins === 925), "three sacks of beans (75 coins), all three in the roaster at once (round 299)");
+  check(await page.locator("#ctx .ccpipe .ccstep").count() === 5 && /Roasting/.test(await page.locator("#ctx").innerText()), "the five steps in order across the top, and what's happening now");
   await at("12:15"); await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
   await tap("grinder", '#ctx [data-cc="grind"][data-k="dark"]'); await page.click('#ctx [data-cc="grind"][data-k="dark"]'); await page.waitForTimeout(300);
-  check(await fox().then(f => f.cocoa.roasted === 0 && f.cocoa.grind && f.cocoa.grind.kind === "dark"), "ten minutes later the beans are roasted, and go in the grinder as dark chocolate");
+  check(await fox().then(f => f.cocoa.roasted === 2 && f.cocoa.grind && f.cocoa.grind.kind === "dark"), "ten minutes later the beans are roasted, and one sack goes in the grinder as dark chocolate");
   await at("13:00"); await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
   check(await fox().then(f => f.cocoa.grind && !f.cocoa.ground), "an hour on, it's still grinding (two hours)");
   await at("14:20"); await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(700);
@@ -2102,7 +2106,9 @@ if (want("\nflowers, eggs and bouquet orders")) try {
   await page.locator('#world [data-spot="larder"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="syrup"]', { timeout: 15000 });
   await page.click('#ctx [data-k="syrup"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.syrup === 2 && !f.kitchen.larder.tulip), "three garden tulips make two bottles of petal syrup");
-  await page.locator('#ctx [data-k="send"][data-id="syrup"]').click(); await page.waitForTimeout(200);
+  await page.locator('#ctx [data-k="send"][data-id="syrup"][data-n="1"]').click(); await page.waitForTimeout(200);
+  check(await fox().then(f => f.inv.syrup === 1 && f.kitchen.larder.syrup === 1), "into the larder one at a time (round 299)");
+  await page.locator('#ctx [data-k="send"][data-id="syrup"][data-n="1"]').click(); await page.waitForTimeout(200);
   await page.locator('#ctx [data-close]').first().click();
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-dish="posset"]', { timeout: 15000 });
   await page.click('#ctx [data-dish="posset"]'); await page.waitForTimeout(300);
@@ -3777,7 +3783,7 @@ if (want("\nStorage at home: the fridge and the garage shelf (round 166)")) try 
     // round 199: "I put four bottles of olive oil in the basket and it disappeared": Tomi infused with them. Now he only uses the mill's own pressing
     { const G = {inv: {oliveoil: 2, basil: 1}}, c = mc.craftState(G); c.recipes = [{kind: "oil", adds: ["basil"], name: "Basil oil"}]; mc.toBasket(G, "oliveoil", 2); mc.toBasket(G, "basil");
       const d = mc.inesStep(G, {}, {}); check(!d.infused && c.basket.oliveoil === 2 && c.basket.basil === 1 && !c.steep.length, "Tomi leaves your oil in the basket alone");
-      G.inv.beeswax = 2; check(/data-mc="basket:beeswax"/.test(mc.benchPanel(G, {tab: "basket"})) && mc.toBasket(G, "beeswax") === 2 && c.basket.beeswax === 2 && /Beeswax/.test(mc.benchPanel(G, {tab: "basket"})), "beeswax goes in the basket too (round 201)"); delete c.basket.beeswax;
+      G.inv.beeswax = 2; check(/data-mc="basket:beeswax:1"/.test(mc.benchPanel(G, {tab: "basket"})) && mc.toBasket(G, "beeswax") === 2 && c.basket.beeswax === 2 && /Beeswax/.test(mc.benchPanel(G, {tab: "basket"})), "beeswax goes in the basket too (round 201)"); delete c.basket.beeswax;
       G.inv.oliveoil = 3; const d2 = mc.inesStep(G, {}, {}); check(!d2.infused && c.basket.oliveoil === 2 && G.inv.oliveoil === 3 && !c.steep.length, "and never infuses anything, not from your backpack either (round 200)");
       G.inv.oliveoil = 0; G.inv.basil = 1; const r = mc.craft(G, "oil", null, ["basil"]);
       check(r.recipe && !c.basket.oliveoil && c.steep.length === 1, "and when you make an oil yourself, the bench uses your basket oil"); }
@@ -3974,7 +3980,7 @@ if (want("\nThe paperie in Montrose (round 183)")) try {
   await page.locator('#world [data-rdspot="pp_scrap"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pp="tear"]', {timeout: 15000});
   await page.click('#ctx [data-pp="tear"]'); await page.waitForTimeout(500);
   const f2 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
-  check(f2.paperie.soak && f2.paperie.scraps === 2 && /2\. Soak/.test(await page.locator("#ctx .ppstep.now").textContent()), "tear two bundles into the tub: the steps along the top move on to Soak");
+  check(f2.paperie.soak && f2.paperie.scraps === 2 && /2\. Soak/.test(await page.locator("#ctx .ccpipe .ccstep.on .ccn").textContent()) && await page.locator("#ctx .ccpipe .ccstep").count() === 6, "tear two bundles into the tub: the steps along the top move on to Soak");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nHampers for Valentine's and Mother's Day (round 184)")) try {
@@ -5061,6 +5067,22 @@ if (want("\nRiding your pony and Bram's cottage (round 283)")) try {
   await page.waitForFunction(() => /Lighthouse Point/.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(true, "out the door, back on the point");
   await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nSeashells, one at a time, and the chocolate steps (round 299)")) try {
+  // ported from the personal edition: seashells to sell and give, adding things one at a time, a clearer chocolate flow
+  // drawn as steps, and the roaster no longer the bottleneck
+  console.log("\nSeashells, one at a time, and the chocolate steps (round 299)");
+  const itm = await import(new URL("../src/data/items.js", import.meta.url)); await import(new URL("../src/data/carboot.js", import.meta.url));
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), vy = await import(new URL("../src/game/vineyard.js", import.meta.url)), ml = await import(new URL("../src/game/mulled.js", import.meta.url));
+  check(itm.ITEMS.b_shell.sell === 1 && itm.ITEMS.b_shell.to === "family" && itm.ITEMS.b_shell.say && itm.ITEMS.b_conch.sell === 2 && itm.ITEMS.b_conch.to === "family", "seashells sell for a coin (a conch for 2), and can be given to anyone");
+  { const F = {coins: 100, inv: {}}; const c = cc.cocoaState(F); cc.buyBeans(F, 3);
+    check(cc.nextStep(c).at === "roaster", "the next step after buying beans: the roaster");
+    check(cc.startRoast(F) === 3 && c.beans === 0 && c.roast.n === 3 && cc.nextStep(c).wait, `the roaster takes all three sacks at once (up to ${cc.ROAST_MAX})`);
+    c.roast.done = 0; cc.kitchenPanel(F, "roaster");
+    check(c.roasted === 3 && cc.nextStep(c).at === "grinder" && /Grind/.test(cc.kitchenPanel(F, "grinder")) && /ccstep on[^>]*data-k="grinder"/.test(cc.kitchenPanel(F, "sacks")), "ten minutes on, three sacks roasted, and every station points at the grinder"); }
+  { const F = {coins: 0, inv: {apple: 3, sp_cinnamon: 2}}; vy.vineState(F);
+    check(/1 apple/.test(vy.stockFruit(F, "apple", 1)) && F.inv.apple === 2 && vy.stockFruit(F, "apple") && !F.inv.apple, "the fruit crate: one at a time, or the rest");
+    check(ml.toRack(F, "sp_cinnamon", 1) === 1 && F.inv.sp_cinnamon === 1, "the spice rack takes one at a time too"); }
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nInside the lighthouse (round 297)")) try {
   // three floors inside the lighthouse: treats only, never coins

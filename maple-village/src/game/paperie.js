@@ -136,9 +136,6 @@ export const bloomMail = (F, t = now()) => (paperState(F).blooms || []).filter(b
 const coin = () => icon("coin", 13), shut = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 const left = (done, t) => { const m = Math.max(1, Math.ceil((done - t)/M)); return m >= 60 ? `${Math.round(m/60)} hour${Math.round(m/60) === 1 ? "" : "s"}` : `${m} minute${m === 1 ? "" : "s"}`; };
 const btn = (a, label, on = true, k = "", cls = "primary") => `<button class="btn small ${cls}" data-pp="${a}"${k ? ` data-k="${k}"` : ""} ${on ? "" : "disabled"}>${label}</button>`;
-const STEPS = [["pp_scrap", "Scraps"], ["pp_soak", "Soak"], ["pp_vat", "Pulp"], ["pp_adds", "Add-in"], ["pp_vat", "Pull"], ["pp_press", "Press"], ["pp_line", "Dry"]];
-// where the batch is up to (0-6), for the strip of steps along the top of every panel
-export function stepNow(F, t = now()){ const st = stage(F, t); return st.pressed || st.pressing ? 5 : st.wet ? 5 : st.pulp ? (st.pulp.add === "none" ? 3 : 4) : st.soaked ? 2 : st.soaking ? 1 : 0; }
 // the batch's own picture, changing at every step
 export function batchIcon(F, t = now()){
   const st = stage(F, t);
@@ -148,45 +145,72 @@ export function batchIcon(F, t = now()){
   if (st.soaking || st.soaked) return "ppsoak";
   return "ppscraps";
 }
-function strip(F, t){
-  const k = stepNow(F, t);
-  return `<div class="ppstrip" aria-label="The steps">${STEPS.map(([, n], i) => `<span class="ppstep${i < k ? " done" : i === k ? " now" : ""}">${i + 1}. ${n}</span>`).join("")}</div>`;
+// round 301 (the paperie's steps weren't clear either, so they're drawn like the Cocoa Room's beans): like its kitchen, every station opens with the six
+// stages drawn in a row, each with how many are there, the next one lit up, and a "Next:" line with a "Go there"
+export const PIPE = [["pp_scrap", "Scraps"], ["pp_soak", "Soak"], ["pp_vat", "Pulp"], ["pp_press", "Press"], ["pp_line", "Dry"], ["pp_shelf", "Shelves"]];
+export function nextPaper(F, t = now()){
+  const p = paperState(F), st = stage(F, t), dry = st.line.filter(s => s.dry).length;
+  if (dry) return {at: "pp_line", line: "Sheets are dry on the line: take them down onto the shelves."};
+  if (st.pressed) return p.line.length < LINE ? {at: "pp_press", line: "Pressed: hang the sheets on the drying line."} : {at: "pp_line", wait: true, line: "The line's full: the dry ones have to come down first."};
+  if (st.wet) return {at: "pp_press", line: "Six wet sheets on their felts: wind them into the press."};
+  if (st.pulp) return {at: "pp_vat", line: st.pulp.add === "none" ? "Pulp in the vat: stir in an add-in if you like (the jars), then pull six sheets." : "Pulp and add-in in the vat: pull six sheets."};
+  if (st.soaked) return {at: "pp_vat", line: "The scraps are soft: beat them into pulp at the vat, in a colour."};
+  if (st.pressing) return {at: "pp_press", wait: true, line: `Pressing: ready in ${left(p.press.done, t)}.`};
+  if (st.soaking) return {at: "pp_soak", wait: true, line: `Soaking: soft in ${left(p.soak.done, t)}.`};
+  if (p.scraps >= SOAK) return {at: "pp_scrap", line: `Tear ${SOAK} bundles of scraps into the soaking tub.`};
+  if (st.line.length) return {at: "pp_line", wait: true, line: `Drying on the line: ready in ${left(Math.min(...st.line.map(s => s.done)), t)}. Meanwhile, more scraps for the next batch.`};
+  return {at: "pp_scrap", line: `You need ${SOAK} bundles of scraps: your shops put them aside, or buy one here.`};
 }
-const head = (title, sub, F, t, tape = "gingham") => `<span class="tape ${tape}" aria-hidden="true"></span><h2>${title}</h2><p class="sub">${sub}</p>${strip(F, t)}<div class="ppbatch">${icon(batchIcon(F, t), 64)}</div>`;
+function strip(F, t, here){
+  const p = paperState(F), st = stage(F, t), nx = nextPaper(F, t), pr = p.press || st.wet, onLine = st.line.reduce((a, s) => a + s.n, 0), dryN = st.line.filter(s => s.dry).reduce((a, s) => a + s.n, 0);
+  const shelf = Object.values(p.stock).reduce((a, n) => a + n, 0), firstSheet = Object.keys(p.stock).find(id => p.stock[id] > 0);
+  const card = {
+    pp_scrap: [icon("ppscraps", 34), p.scraps, `bundle${p.scraps === 1 ? "" : "s"} of scraps`, p.scraps > 0],
+    pp_soak: [icon("ppsoak", 34), st.soaking || st.soaked ? 1 : 0, st.soaking ? `soaking · ${left(p.soak.done, t)}` : st.soaked ? "soft, ready to beat" : "in the tub", st.soaking || st.soaked],
+    pp_vat: [icon(st.pulp ? `ppulp_${st.pulp.col}_${st.pulp.add}` : "ppulp_natural_none", 34), st.pulp ? 1 : 0, st.pulp ? `${COLOURS[st.pulp.col].n.toLowerCase()} pulp${st.pulp.add === "none" ? "" : ` + ${ADDS[st.pulp.add].n.toLowerCase()}`}` : "pulp in the vat", !!st.pulp],
+    pp_press: [icon(st.wet ? `ppwet_${st.wet.col}_${st.wet.add}` : p.press ? `pppress_${p.press.col}_${p.press.add}` : "pppress_natural_none", 34), pr ? pr.n || BATCH : 0, st.wet ? "wet sheets to press" : st.pressing ? `pressing · ${left(p.press.done, t)}` : st.pressed ? "pressed, to hang" : "sheets in the press", !!pr],
+    pp_line: [icon(st.line.length ? (dryN ? sheetId(st.line[0].col, st.line[0].add) : `pppress_${st.line[0].col}_${st.line[0].add}`) : "pppress_natural_none", 34), onLine, onLine ? (dryN === onLine ? "dry!" : dryN ? `${dryN} dry, ${onLine - dryN} drying` : "drying, by tomorrow") : "sheets on the line", onLine > 0],
+    pp_shelf: [icon(firstSheet || "pp_natural_none", 34), shelf, "sheets on the shelves", shelf > 0]
+  };
+  return `<div class="ccpipe six" aria-label="The steps">${PIPE.map(([k, n], i) => { const [pic, num, what, busy] = card[k];
+      return `<button class="ccstep${k === nx.at ? " on" : ""}${busy ? "" : " idle"}" data-pp="go" data-k="${k}"${k === here ? ' aria-current="step"' : ""}><span class="ccn">${i + 1}. ${n}</span><span class="ccpic">${pic}</span><b>${num}</b><small>${esc(what)}</small></button>`; }).join("")}</div>
+    <p class="sub"><b>${nx.wait ? "Waiting" : "Next"}:</b> ${esc(nx.line)}${nx.at !== here && !nx.wait ? ` ${btn("go", "Go there", true, nx.at, "alt")}` : ""}</p>`;
+}
+const head = (title, sub, F, t, tape = "gingham", here = "") => `<span class="tape ${tape}" aria-hidden="true"></span><h2>${title}</h2>${strip(F, t, here)}<p class="sub">${sub}</p>`;
 
 export function paperPanel(F, spot, o = {}){
   const p = paperState(F), t = o.t || now(), st = stage(F, t);
   if (spot === "pp_scrap") {
-    return head("The scrap bin", "Wine labels, chocolate wrappers, receipts and old brown paper: everything gets a second life here.", F, t)
+    return head("The scrap bin", "Wine labels, chocolate wrappers, receipts and old brown paper: everything gets a second life here.", F, t, "gingham", spot)
       + `<p class="olabel">${icon("ppscraps", 22)} ${p.scraps} bundle${p.scraps === 1 ? "" : "s"} of scraps</p>${o.came ? `<p class="muted">${o.came} came up in the van today, from ${esc(homeShops(F).join(", "))}.</p>` : `<p class="muted">Each of your shops puts a bundle aside every day (${homeShops(F).length} a day now); they ride up in the van when you visit.</p>`}
       <div class="actions">${btn("tear", `Tear and soak ${SOAK} bundles`, p.scraps >= SOAK && !p.soak && !p.pulp)}${btn("scraps", `Buy a bundle (${SCRAP_PRICE} ${coin()})`, F.coins >= SCRAP_PRICE, "", "alt")}</div>
       ${p.soak || p.pulp ? `<p class="muted">The tub's busy: one batch at a time.</p>` : ""}` + shut;
   }
   if (spot === "pp_soak") {
-    return head("The soaking tub", st.soaking ? `Torn scraps going soft in the water: ready in ${left(p.soak.done, t)}. Swish them about if you like.` : st.soaked ? "Soft and floppy, falling apart in your fingers: ready to beat into pulp at the vat." : "Empty. Tear some scraps in at the scrap bin.", F, t)
+    return head("The soaking tub", st.soaking ? `Torn scraps going soft in the water: ready in ${left(p.soak.done, t)}. Swish them about if you like.` : st.soaked ? "Soft and floppy, falling apart in your fingers: ready to beat into pulp at the vat." : "Empty. Tear some scraps in at the scrap bin.", F, t, "gingham", spot)
       + (st.soaked ? `<div class="actions">${btn("go", "Over to the vat", true, "pp_vat")}</div>` : "") + shut;
   }
   if (spot === "pp_vat") {
-    if (st.soaked && !st.pulp) return head("The vat", "Beat the soaked scraps into a slurry. Pick a colour: a pinch of pigment in the beater.", F, t)
+    if (st.soaked && !st.pulp) return head("The vat", "Beat the soaked scraps into a slurry. Pick a colour: a pinch of pigment in the beater.", F, t, "gingham", spot)
       + `<ul class="hlist wlist">${Object.entries(COLOURS).map(([k, c]) => `<li><span class="wpic">${icon(`ppulp_${k}_none`, 30)}</span><span class="wtxt"><b>${c.n}</b><small>${c.cost ? `${c.cost} ${coin()} of pigment` : "As it comes: oatmeal, with flecks of old print"}</small></span><span class="orbtns">${btn("beat", "Beat it", F.coins >= c.cost, k)}</span></li>`).join("")}</ul>` + shut;
-    if (st.pulp) return head("The vat", `${COLOURS[st.pulp.col].n} pulp${st.pulp.add === "none" ? "" : `, with ${ADDS[st.pulp.add].n.toLowerCase()} stirred through`}. ${st.pulp.add === "none" ? "Stir in an add-in from the jars, or pull it plain." : "Ready to pull."}`, F, t)
+    if (st.pulp) return head("The vat", `${COLOURS[st.pulp.col].n} pulp${st.pulp.add === "none" ? "" : `, with ${ADDS[st.pulp.add].n.toLowerCase()} stirred through`}. ${st.pulp.add === "none" ? "Stir in an add-in from the jars, or pull it plain." : "Ready to pull."}`, F, t, "gingham", spot)
       + `<div class="actions">${st.pulp.add === "none" ? btn("go", "The add-in jars", true, "pp_adds", "alt") : ""}${btn("pull", `Pull ${BATCH} sheets`, !st.wet)}</div>${st.wet ? `<p class="muted">The last sheets are still on the felts: press them first.</p>` : ""}` + shut;
-    return head("The vat", st.wet ? "Six wet sheets lie on their felts, shining. Over to the press." : st.soaking ? "Waiting for the scraps to soften in the tub." : "Empty. Start with scraps in the tub.", F, t)
+    return head("The vat", st.wet ? "Six wet sheets lie on their felts, shining. Over to the press." : st.soaking ? "Waiting for the scraps to soften in the tub." : "Empty. Start with scraps in the tub.", F, t, "gingham", spot)
       + (st.wet ? `<div class="actions">${btn("go", "To the press", true, "pp_press")}</div>` : "") + shut;
   }
   if (spot === "pp_adds") {
     const can = st.pulp && st.pulp.add === "none";
-    return head("The add-in jars", can ? "One add-in for this batch, stirred through the vat. Lavender and roses can come from your backpack." : "Jars of lavender, petals, tea, gold leaf and seeds. They go in when there's plain pulp in the vat.", F, t)
+    return head("The add-in jars", can ? "One add-in for this batch, stirred through the vat. Lavender and roses can come from your backpack." : "Jars of lavender, petals, tea, gold leaf and seeds. They go in when there's plain pulp in the vat.", F, t, "gingham", spot)
       + `<ul class="hlist wlist">${Object.entries(ADDS).filter(([k]) => k !== "none").map(([k, a]) => { const bag = a.inv && (F.inv || {})[a.inv] > 0;
         return `<li><span class="wpic">${icon(`pp_natural_${k}`, 30)}</span><span class="wtxt"><b>${a.n}</b><small>${bag ? "One from your backpack" : `${a.cost} ${coin()}`} · sheets sell for ${a.bonus} more${k === "seeds" ? " · plant it and wildflowers grow" : ""}</small></span><span class="orbtns">${btn("add", "Stir in", can && (bag || F.coins >= a.cost), k)}</span></li>`; }).join("")}</ul>` + shut;
   }
   if (spot === "pp_press") {
-    return head("The screw press", st.pressing ? `Squeezing the water out: ${left(p.press.done, t)}.` : st.pressed ? "Pressed: firm, damp sheets, ready for the line." : st.wet ? "Six wet sheets on their felts. Into the press, and wind it down." : "Empty, the big iron screw wound right up.", F, t)
+    return head("The screw press", st.pressing ? `Squeezing the water out: ${left(p.press.done, t)}.` : st.pressed ? "Pressed: firm, damp sheets, ready for the line." : st.wet ? "Six wet sheets on their felts. Into the press, and wind it down." : "Empty, the big iron screw wound right up.", F, t, "gingham", spot)
       + `<div class="actions">${st.wet ? btn("press", "Wind it down") : ""}${st.pressed ? btn("hang", "Hang them on the line", p.line.length < LINE) : ""}</div>${st.pressed && p.line.length >= LINE ? `<p class="muted">The line's full: take the dry ones down first.</p>` : ""}` + shut;
   }
   if (spot === "pp_line") {
     const dry = st.line.filter(s => s.dry).reduce((a, s) => a + s.n, 0);
-    return head("The drying line", st.line.length ? "Sheets pegged up across the back room, the deckled edges curling a little as they dry." : "An empty line and a row of pegs.", F, t, "stripe")
+    return head("The drying line", st.line.length ? "Sheets pegged up across the back room, the deckled edges curling a little as they dry." : "An empty line and a row of pegs.", F, t, "stripe", spot)
       + (st.line.length ? `<ul class="hlist wlist">${st.line.map(s => `<li><span class="wpic">${icon(s.dry ? sheetId(s.col, s.add) : `pppress_${s.col}_${s.add}`, 30)}</span><span class="wtxt"><b>${esc(sheetName(s.col, s.add))}</b><small>${s.n} sheets · ${s.dry ? "dry!" : `dry in ${left(s.done, t)}`}</small></span></li>`).join("")}</ul>` : "")
       + `<div class="actions">${btn("down", `Take down the dry ones${dry ? ` (${dry})` : ""}`, dry > 0)}</div>` + shut;
   }

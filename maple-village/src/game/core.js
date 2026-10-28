@@ -1555,13 +1555,13 @@ function ctxBody(){
       const r = millCraft(F, kind, kind === "soap" ? base : null, adds, "bag", r0 ? r0.dye || null : mcSt.dye || null); speak(r.msg, 5000); if (r.recipe) { sfx("chime"); gainXp(r.fresh ? 2 : 1); if (r.fresh) flash(`New: ${r.recipe.name}`); mcSt = {tab: kind}; save(); drawScene(); } }
     else if (a === "takeit") { if (takeFromStore(F, v, 1)) { sfx("tap"); save(); } }
     else if (a === "unbasket") { const [id, n] = v.split(":"), k = fromBasket(F, id, +n || 99); if (k) { sfx("paper", true); flash(`${k} back into your backpack`); save(); } }
-    else if (a === "basket") { const k = toBasket(F, v); if (k) { sfx("paper", true); speak(`${k} into the mill's basket, ready for the bench.`, 3500); save(); } }
+    else if (a === "basket") { const [hv, hn] = v.split(":"), k = toBasket(F, hv, +hn || 99); if (k) { sfx("paper", true); speak(`${k} into the mill's basket, ready for the bench.`, 3500); save(); } }
     ctx(); });
   // round 153: the mulling pot (mulled.js)
   c.querySelectorAll("[data-mull]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.mull.split(":"), st = mullSt;
     if (a === "base") { st.base = v; sfx("tap"); }
     else if (a === "unrack") { const k = fromRack(F, v, +b.dataset.mull.split(":")[2] || 99); if (k) { sfx("paper", true); flash(`${k} back into your backpack`); save(); } }
-    else if (a === "rack") { const k = toRack(F, v); if (k) { sfx("paper", true); flash(`${k} ${MULL_ADDS[v].n.toLowerCase()}, onto the spice rack`); save(); } }
+    else if (a === "rack") { const k = toRack(F, v, +b.dataset.mull.split(":")[2] || 99); if (k) { sfx("paper", true); flash(`${k} ${MULL_ADDS[v].n.toLowerCase()}, onto the spice rack`); save(); } }
     else if (a === "add") { st.adds = st.adds || []; if (st.adds.includes(v)) st.adds = st.adds.filter(x => x !== v); else if (st.adds.length < MULL.max) st.adds.push(v); sfx("tap"); }
     else if (a === "go" || a === "again") { const vs = vineState(F), adds = a === "again" ? (mullState(F).recipes.find(r => r.id === v) || {adds: []}).adds : st.adds || [], base = a === "again" ? (vs.shelf.find(x => x.n > 0 && MULL.base.includes(x.type)) || {}).id : st.base;
       const r = mullStart(F, vs, base, adds, dayKey()); speak(r.msg, 5000); if (r.recipe) { sfx("chime"); gainXp(r.fresh ? 2 : 1); if (r.fresh) flash(`New mulled wine: ${r.recipe.name}`); mullSt = {}; if (isHere("pilar")) setTimeout(() => npcSay("pilar", pick(["Mmm, the whole kitchen smells like Christmas.", "Low heat! Never let it boil.", "Save me a cup, eh?"])), 1800); save(); } }
@@ -1928,7 +1928,7 @@ function bagBody(){
   const order = ["gift","food","ingredient","feed","flower","use","tool","seed"];
   ids.sort((a, b) => order.indexOf((ITEMS[a] || {}).kind) - order.indexOf((ITEMS[b] || {}).kind));
   $("bag").innerHTML = ids.map(id => { try { const it = ITEMS[id];
-    const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" ? "put on a shelf" : it.kind === "curio" ? "for the wreck case" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? "give to someone" : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed your pet" : it.kind === "ingredient" ? (it.scoop ? "for ice cream or bonbons" : "send to the kitchen") : it.kind === "flower" ? "give" : "use";
+    const lbl = it.kind === "bouquet" ? "give or send to someone" : it.kind === "pot" ? "place it" : it.kind === "keepsake" && it.to ? `give to ${giftNames(it.to)}` : it.kind === "keepsake" ? "put on a shelf" : it.kind === "curio" ? "for the wreck case" : it.kind === "pet" ? "find it a home" : it.kind === "seed" ? "plant in garden" : it.kind === "gift" ? "give to someone" : it.kind === "tool" ? "use" : it.kind === "feed" ? "for the run" : it.kind === "food" ? "feed your pet" : it.kind === "ingredient" ? (it.scoop ? "for ice cream or bonbons" : "send to the kitchen") : it.kind === "flower" ? "give" : "use";
     // kitchen ingredients can go to the wine shop's larder instead (food can still be fed to the pet)
     // (not on flowers: a friend's picked tulips kept "vanishing" from the backpack, sent off to the kitchen larder by one
     // tap on this little chip. Flowers still go to the kitchen from the larder itself, or by the delivery bike.)
@@ -3184,7 +3184,8 @@ function wireCocoa(c){
   c.querySelectorAll("[data-cc]").forEach(b => b.onclick = () => { const k = b.dataset.k, n = +b.dataset.n, a = b.dataset.cc;
     if (a === "vendbox") { const got = emptyVending(F); if (got) { sfx("coin"); flash(`+${got} coins from the vending machine`); if (Math.random() < .3) speak("Someone's left a sticky note on the glass: \"The dark one's the best. Please never run out.\"", 4500); } }
     else if (a === "beans") { if (buyBeans(F, n)) { sfx("coin"); flash(`${n} sack${n > 1 ? "s" : ""} of cacao beans`); } }
-    else if (a === "roast") { if (startRoast(F)) { sfx("paper", true); speak("Beans in the roaster. Ten minutes, and the whole kitchen will smell of chocolate.", 4000); } }
+    else if (a === "go") { ccView = k; sfx("tap"); }   // round 299: the step row
+    else if (a === "roast") { const got = startRoast(F, n || undefined); if (got) { sfx("paper", true); speak(`${got > 1 ? `${got} sacks of beans` : "Beans"} in the roaster. Ten minutes, and the whole kitchen will smell of chocolate.`, 4000); } }
     else if (a === "grind") { if (startGrind(F, k)) { sfx("paper", true); speak(`${CC_KINDS[k].n} in the stone grinder. It'll be ready in two hours.`, 4000); } }
     else if (a === "temper") { const kk = ccTemper(F); if (kk) { sfx("chime"); act("cheer"); gainXp(1); speak(`Spread, scrape, fold... it shines! 30 pieces of ${CC_KINDS[kk].n.toLowerCase()}.`, 4500); } }
     else if (a === "mould") { if (ccMould(F, k)) { sfx("chime"); flash(`10 ${CC_KINDS[k].n.toLowerCase()} bars on the wall`); gainXp(1); } }

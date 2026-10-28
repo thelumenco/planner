@@ -298,7 +298,7 @@ const needList = (k, need) => Object.entries(need).map(([id, n]) => `<span class
 export function larderPanel(F){
   const k = kitchenState(F), bag = backpackGoods(F);
   return `<span class="tape gingham" aria-hidden="true"></span><h2>The larder</h2>${larderGrid(k)}
-    <h3 class="ph3">In your backpack</h3>${bag.length ? `<div class="kgoods">${bag.map(id => `<button class="kgood kbtn" data-k="send" data-id="${id}">${pic(id)}<b>${F.inv[id]}</b><small>${esc(nm(id, F.inv[id]))}</small><em>Bring in</em></button>`).join("")}</div>
+    <h3 class="ph3">In your backpack</h3>${bag.length ? `<div class="kgoods">${bag.map(id => `<div class="kgoodw"><button class="kgood kbtn" data-k="send" data-id="${id}" data-n="1">${pic(id)}<b>${F.inv[id]}</b><small>${esc(nm(id, F.inv[id]))}</small><em>Bring in one</em></button>${F.inv[id] > 1 ? `<span class="kkeep"><button class="btn small alt" data-k="send" data-id="${id}" data-n="0">All ${F.inv[id]}</button></span>` : ""}</div>`).join("")}</div>
     <div class="actions"><button class="btn primary small" data-k="sendall">Bring everything in</button></div>` : `<p class="muted">Nothing for the kitchen in your backpack right now. Crops from the garden, eggs and milk from the animal run, olives from the olive tree, and Hana's deli shelf all help.</p>`}
     <h3 class="ph3">Petal syrup</h3><p class="muted">${SYRUP_PETALS} garden flowers (tulips or sunflowers) make two bottles: for gelato, a bonbon filling, or the lemon and petal posset. Flowers in the larder: ${larderCount(k, "petals")}.</p>
     <div class="actions"><button class="btn small ${larderCount(k, "petals") >= SYRUP_PETALS ? "primary" : "alt"}" data-k="syrup" ${larderCount(k, "petals") >= SYRUP_PETALS ? "" : "disabled"}>Make petal syrup</button></div>
@@ -347,7 +347,7 @@ export function wireKitchen(root, F, api){
   root.querySelectorAll("details[data-kp]").forEach(d => d.ontoggle = () => { KP[d.dataset.kp] = d.open; });
   root.querySelectorAll("[data-k]").forEach(b => b.onclick = () => {
     const k = b.dataset.k, id = b.dataset.dish || b.dataset.id; let line = null;   // (dish buttons avoid data-id: the market claims .item[data-id])
-    if (k === "send") { const n = sendToKitchen(F, id); if (n) line = `${n} ${nm(id, n)} into the larder.`; }
+    if (k === "send") { const n = sendToKitchen(F, id, +b.dataset.n || 0); if (n) line = `${n} ${nm(id, n)} into the larder.`; }
     else if (k === "syrup") line = makeSyrup(F);
     else if (k === "take") { const kk = kitchenState(F); if ((kk.larder[id] || 0) > 0) { kk.larder[id]--; if (kk.larder[id] <= 0) delete kk.larder[id]; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; kk.out = kk.out || {}; kk.out[id] = (kk.out[id] || 0) + 1; line = `One ${nm(id, 1)} back in your backpack.`; } }
     else if (k === "sendall") { const moved = backpackGoods(F).map(x => [x, sendToKitchen(F, x)]).filter(([, n]) => n); if (moved.length) line = `Brought in ${moved.map(([x, n]) => `${n} ${nm(x, n)}`).join(", ")}.`; }
