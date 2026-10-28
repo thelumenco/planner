@@ -66,7 +66,7 @@ const HOURS = {
 };
 // a few places want a word more than their one line in the game
 const EXTRA = {
-  market: "Hana's shop, with tabs for seeds, treats, the deli, pet care, gifts, animals, things for your home, things for you and your room, and selling what you've grown and made.",
+  market: "Hana's shop, with tabs for seeds, treats, the deli, pet care, gifts, animals, things for your home, things for you and your room, scratch cards, and selling what you've grown and made. Scratch cards are 4 coins, two a day: rub the silver ink off with your finger, and three the same wins 5, 20 or 50 coins, or a present off Hana's shelves. About one card in three wins something.",
   haberdash: "Ada sells fabric by the piece and buttons by the card, and buys unused fabric back at half price. She always has every fabric and button in stock.",
   tailor: "Idris makes clothes to your design from your fabric: ready the next morning from 9.",
   treehouse: "Up the ladder in the swing tree: a window seat at a round window (the view follows the time of day and the weather), a shelf with your letters, the daydream jar, and floor cushions for you and your pet. See <a href=\"/home#treehouse\">Home</a>.",

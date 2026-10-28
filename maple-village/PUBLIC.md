@@ -440,3 +440,14 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
 - The paperie: `strip(F, t, here)` draws six stage cards (`PIPE`, `nextPaper`), reusing `.ccpipe` (`.six`, `.ccpic`).
 - The lit-windows fix (round 300) wasn't needed: this edition's `.nightcopy` code never had the slip.
 - Tests: "Seashells, one at a time, and the chocolate steps (round 299)" and the changed checks.
+
+## Round 303: scratch cards at Hana's market
+
+- game/scratch.js: a "Scratch cards" tab in the market (core.js). 4 coins a card, 2 a day (`CARD`, `PER_DAY`). Six
+  squares under silver ink on a canvas; rub with a finger or the mouse (pointer events, `touch-action:none`) and the
+  ink comes off where you rub; once 60% of the card's cells are rubbed the rest fades and `claimCard` pays out. A
+  "Scratch it all off" button does the same. Three the same wins.
+- Odds (`ODDS`, agreed with the team): 70% nothing, 18% 5 coins, 6% a free item off Hana's treats, deli or gifts
+  shelves (12 coins or less), 4% 20 coins, 2% 50 coins. Pays back about 3 of the 4 coins over many cards.
+- No undo bar for buying a card (it would let a losing card be bought again): the buy handler bumps `undoMark`.
+- Test: "Scratch cards at Hana's market (round 303)", with real rubbing in the browser.

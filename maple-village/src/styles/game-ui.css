@@ -1143,3 +1143,10 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 /* round 301: the paperie's six stages, the same row as the Cocoa Room's (paperie.js strip) */
 .ccpipe.six{grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
 .ccpic{display:flex;justify-content:center;height:34px}.ccstep.idle .ccpic{opacity:.4}
+/* round 303: scratch cards at Hana's market (scratch.js): six squares under silver ink you rub away */
+.scwrap{display:flex;flex-direction:column;gap:6px}
+.sccard{position:relative;width:min(300px,100%);aspect-ratio:3/2;margin:4px auto;border-radius:14px;background:#FFF6DE;border:2px solid #D9B87A;box-shadow:0 2px 0 rgba(120,104,84,.2);overflow:hidden}
+.scgrid{position:absolute;inset:8px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:6px}
+.scsym{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;background:#FFFDF6;border:1px dashed rgba(120,104,84,.3)}
+.scsym b{font-size:.78rem;line-height:1.1}
+.scink{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;border-radius:12px}

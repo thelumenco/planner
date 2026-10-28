@@ -100,6 +100,7 @@ import { puffinRoomArt } from "../art/puffin-rooms.js";
 import { PV_NAMES } from "../data/porto.js";
 import { portoArt } from "../art/town-porto.js";
 import { portoRoomArt } from "../art/porto-rooms.js";
+import { scratchHTML, wireScratch, buyCard, claimCard } from "./scratch.js";
 import { FM_NAMES, FM_ARRIVE, flamingosOn } from "../data/formentera.js";
 import { formenteraArt } from "../art/town-formentera.js";
 import { formenteraRoomArt } from "../art/formentera-rooms.js";
@@ -1356,13 +1357,15 @@ function ctxBody(){
   else if (fieldView === "hampers" && scene === "post") h = hamperPanel(F, vineState(F), {day: dayKey(), pick: xmPick, season: hamperSeason(dayKey()) || "xmas"});   // round 173
   else if (newsOpen && scene === "village") h = goodNewsHTML(myWins(), villageCalendar(), newsTab);
   else if (scene === "market" && !shopClosed) {
-    const tabs = [["seeds","Seeds"],["treats","Treats"],["deli","Deli"],["care","Care"],["family","Gifts"],["animals","Animals"],["home","Home"],["me","Me & my room"],["sell","Sell"]];
+    const tabs = [["seeds","Seeds"],["treats","Treats"],["deli","Deli"],["care","Care"],["family","Gifts"],["animals","Animals"],["home","Home"],["me","Me & my room"],["scratch","Scratch cards"],["sell","Sell"]];
     h = `<span class="tape gingham" aria-hidden="true"></span><h2>The market</h2><p class="sub">You have ${icon("coin", 16)} ${F.coins}. Seeds and treats go straight into your backpack.</p>
       <div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button role="tab" data-shop="${k}" aria-selected="${shopTab === k}">${n}</button>`).join("")}</div><div class="items shop">`;
     if (shopTab === "home" || shopTab === "me") {
       h += Object.keys(DECOR).filter(id => (DECOR[id].tab || "home") === shopTab).map(id => { const d = DECOR[id], own = F.decorOwned[id], on = own && F.decor[d.slot] === d.val;
         return `<button class="item" data-decor="${id}" ${!own && F.coins < d.price ? "disabled" : ""}><span class="e">${icon(d.ico, 34)}</span><span class="n">${esc(d.n)}</span><span class="c">${on ? (d.where === "me" ? "wearing it" : d.where === "room" ? "in your room" : "in your home") : own ? "tap to use" : `<b>${d.price}</b> ${icon("coin", 13)}`}</span></button>`; }).join("")
         + `<p class="muted" style="grid-column:1/-1">Bought once, kept forever. ${shopTab === "me" ? "Room things appear in your room; the rest you wear around the village." : "They appear inside your house."} Tap something you own to swap it in or put it away.</p>`;
+    } else if (shopTab === "scratch") {
+      h += `<div style="grid-column:1/-1">${scratchHTML(F, dayKey())}</div>`;   // round 303: scratch cards (scratch.js)
     } else if (shopTab === "sell") {
       const sellable = Object.keys(F.inv).filter(id => ITEMS[id] && ITEMS[id].sell);
       h += sellable.length ? sellable.map(id => itemBtn(id, `sell <b>+${ITEMS[id].sell}</b> ${icon("coin", 13)}`, false, `<span class="cnt">×${F.inv[id]}</span>`)).join("") : `<p class="muted" style="grid-column:1/-1">Nothing to sell yet. Grow something in the garden!</p>`;
@@ -1851,6 +1854,12 @@ function ctxBody(){
   if (trophyView && scene === "trophy") { wireTrophies(c, F, {save: () => save(true), undoable, rerender: () => { ctx(); drawScene(); }, close: () => { trophyView = null; selfView = null; vyView = null; kView = null; orView = null; fieldView = null; goalView = null; ctx(); drawScene(); }}); }
   showPanel(!!h, (homeView === "shoplist" || homeView === "stored") && scene === "home" ? "fridge" : scene === "market" ? "shop" : boardOpen ? "cork" : "paper");
   c.querySelectorAll("[data-shop]").forEach(b => b.onclick = () => { shopTab = b.dataset.shop; ctx(); });
+  // round 303: scratch cards at Hana's market; rub the ink off (scratch.js), then the prize is paid
+  const scratchDone = () => { const r = claimCard(F, addInv); if (!r) return; if (r.prize) { sfx("chime"); gainXp(1); flash(r.prize.coins ? `+${r.prize.coins} coins` : `Won: ${ITEMS[r.prize.item].n}`); } speak(r.line, 5500); save(); ctx(); };
+  c.querySelectorAll("[data-scratch]").forEach(b => b.onclick = () => { const a = b.dataset.scratch;
+    if (a === "buy") { const r = buyCard(F, dayKey()); if (!r.ok) { speak(r.line, 4000); return; } undoMark++; sfx("coin"); save(); ctx(); }   // (no undo: it would let a losing card be bought again)
+    else if (a === "all") scratchDone(); });
+  if (scene === "market" && shopTab === "scratch") wireScratch(c, {done: scratchDone, sfx: () => sfx("paper", true)});
   c.querySelectorAll("[data-decor]").forEach(b => b.onclick = () => decorClick(b.dataset.decor));
   c.querySelectorAll(".item[data-id]").forEach(b => b.onclick = () => {
     const id = b.dataset.id;

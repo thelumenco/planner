@@ -5229,6 +5229,40 @@ if (want("\nFormentera by boat (round 233)")) try {
     check(["hana", "theo", "farid", "mei", "bo", "tomi", "posy"].every(id => T.lines[id] && T.spots[id]) && Object.keys(T.acts).length === 7 && !/\b(evan|mum|dad|mama|gonggong|darren|marcus|angelina|mel)\b/i.test(src), "your friends come along (their own lines and things to do), with no family"); }
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nScratch cards at Hana's market (round 303)")) try {
+  // two a day, 4 coins; rub the silver ink away with a finger; three the same wins; the odds pay back under the price
+  console.log("\nScratch cards at Hana's market (round 303)");
+  const sc = await import(new URL("../src/game/scratch.js", import.meta.url)); await import(new URL("../src/data/stall-goods.js", import.meta.url)).catch(() => {});
+  let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
+  { let paid = 0, wins = 0, items = 0, fifty = 0; const N = 20000;
+    for (let i = 0; i < N; i++) { const p = sc.rollPrize(rnd(), rnd()); if (p) { wins++; if (p.coins) paid += p.coins; else { items++; paid += 6; } if (p.coins === 50) fifty++; } }
+    check(Math.abs(wins/N - .30) < .02 && Math.abs(fifty/N - .02) < .006 && paid/N < sc.CARD, `about one card in three wins (${Math.round(wins/N*100)}%), 50 coins about 1 in 50, and the cards pay back under their price (${(paid/N).toFixed(2)} of ${sc.CARD})`);
+    { const IT = (await import(new URL("../src/data/items.js", import.meta.url))).ITEMS; check(sc.prizeItems().length > 5 && sc.prizeItems().every(id => ["treats", "deli", "family"].includes(IT[id].tab) && IT[id].price <= 12), "the free items come off Hana's own shelves (treats, deli and gifts, 12 coins or less)"); } }
+  { let ok = true; for (let i = 0; i < 400; i++) { const p = sc.rollPrize(rnd(), rnd()), syms = sc.layout(p, rnd), w = sc.winner(syms);
+      if (syms.length !== 6 || (p ? w !== (p.item ? "gift" : "c" + p.coins) : w !== null)) ok = false; }
+    check(ok, "a winning card shows three of its prize, and a losing card never has three the same"); }
+  { const F = {coins: 20, inv: {}}, d = "2026-10-28";
+    const a = sc.buyCard(F, d, rnd); check(a.ok && F.coins === 16 && !sc.buyCard(F, d, rnd).ok, "a card is 4 coins, and you finish one before buying the next");
+    sc.claimCard(F, (id, n) => F.inv[id] = (F.inv[id] || 0) + n); const b = sc.buyCard(F, d, rnd); sc.claimCard(F, (id, n) => F.inv[id] = (F.inv[id] || 0) + n);
+    check(b.ok && !sc.buyCard(F, d, rnd).ok && sc.buyCard(F, "2026-10-29", rnd).ok, "two a day, and two more tomorrow"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  page.on("pageerror", e => errors.push(`scratch pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=10:15&date=2026-10-28"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.coins = 50; window.__hbGame.save(); window.__hbScene("market"); }); await page.waitForTimeout(1500);
+  await page.locator('#world [data-place="market"]').first().dispatchEvent("click").catch(() => {});
+  await page.waitForSelector('#ctx [data-shop="scratch"]', { timeout: 20000 }); await page.click('#ctx [data-shop="scratch"]'); await page.waitForTimeout(300);
+  await page.click('#ctx [data-scratch="buy"]'); await page.waitForTimeout(400);
+  check(await page.locator("#ctx canvas.scink").count() === 1 && (await page.evaluate(() => window.__hbGame.F().coins)) === 46, "buy a card at the Scratch cards tab: the six squares under silver ink");
+  check(await page.locator("#undoBar").isHidden(), "no undo for a card (it would let a losing one be bought again)");
+  const box = await page.locator("#ctx canvas.scink").boundingBox(); await page.mouse.move(box.x + 5, box.y + 5); await page.mouse.down();
+  for (let row = 0; row < 8; row++) for (let k = 0; k <= 10; k++) await page.mouse.move(box.x + 6 + (row % 2 ? 10 - k : k)*(box.width - 12)/10, box.y + 8 + row*(box.height - 16)/7, { steps: 2 });
+  await page.mouse.up(); await page.waitForTimeout(1200);
+  const s = await page.evaluate(() => window.__hbGame.F().scratch);
+  check(s.card.paid && await page.locator("#ctx canvas.scink").count() === 0 && /Not this time|You won/.test(await page.locator("#ctx").innerText()), "rub the ink away with a finger: the rest clears by itself and the card pays out");
+  await page.click('#ctx [data-scratch="buy"]'); await page.waitForTimeout(400); await page.click('#ctx [data-scratch="all"]'); await page.waitForTimeout(800);
+  check(await page.locator('#ctx [data-scratch="buy"]').isDisabled() && (await page.evaluate(() => window.__hbGame.F().scratch.bought)) === 2, "the second card, then that's your two for today");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");
   const tw = await import(new URL("../src/data/towns.js", import.meta.url)), tp = await import(new URL("../wiki/pages/70-trips.mjs", import.meta.url));
