@@ -16,6 +16,7 @@
 import { esc, dayKey, hash } from "../util.js";
 import { SEATS } from "./lunch.js";
 import { WEDDINGS } from "../data/terrace-people.js";
+import { QUIZ_ROUNDS } from "../data/trivia.js";
 
 const dowOf = day => new Date(day + "T00:00:00Z").getUTCDay();
 const md = day => day.slice(5);
@@ -83,41 +84,16 @@ export const dancingNow = (day, hm) => { const oc = occasionNow(day, hm); return
 
 /* ---------- trivia ---------- */
 // five rounds of four; the night's twenty are picked from each round's pool by the date. [question, [answers], right index]
-export const QUIZ = {entry: 10, house: 10, rounds: [
-  ["General knowledge", [
-    ["How many sides does a hexagon have?", ["Five", "Six", "Eight"], 1], ["What colour do you get mixing blue and yellow?", ["Green", "Purple", "Orange"], 0],
-    ["How many days are there in a leap year?", ["365", "366", "364"], 1], ["Which is the largest planet in our solar system?", ["Saturn", "Jupiter", "Neptune"], 1],
-    ["How many strings does a standard violin have?", ["Four", "Five", "Six"], 0], ["What's the freezing point of water in Celsius?", ["0 degrees", "10 degrees", "32 degrees"], 0],
-    ["How many minutes in a day?", ["1,240", "1,440", "1,640"], 1], ["Which shape has three sides?", ["Square", "Triangle", "Pentagon"], 1],
-    ["What do bees make?", ["Honey", "Silk", "Wax only"], 0], ["How many colours are in a rainbow?", ["Six", "Seven", "Eight"], 1]]],
-  ["Food and wine", [
-    ["Which grape makes Champagne's classic white blend alongside Pinot Noir?", ["Chardonnay", "Shiraz", "Riesling"], 0], ["What's the main ingredient in guacamole?", ["Avocado", "Pea", "Cucumber"], 0],
-    ["Which country does Tempranillo come from?", ["Spain", "France", "Germany"], 0], ["What are dried grapes called?", ["Raisins", "Prunes", "Dates"], 0],
-    ["Pesto is traditionally made with which herb?", ["Basil", "Mint", "Coriander"], 0], ["What's the yellow part of an egg called?", ["The white", "The yolk", "The shell"], 1],
-    ["Which nut is marzipan made from?", ["Almond", "Walnut", "Peanut"], 0], ["What does a pavlova have on the outside?", ["Meringue", "Pastry", "Sponge"], 0],
-    ["Where does gelato come from?", ["Italy", "Greece", "Portugal"], 0], ["Which spice is the most expensive by weight?", ["Saffron", "Cinnamon", "Pepper"], 0]]],
-  ["Around the world", [
-    ["What's the capital of Japan?", ["Kyoto", "Tokyo", "Osaka"], 1], ["Which country is shaped like a boot?", ["Italy", "Spain", "Greece"], 0],
-    ["What's the capital of Australia?", ["Sydney", "Canberra", "Melbourne"], 1], ["Which ocean is the largest?", ["Atlantic", "Indian", "Pacific"], 2],
-    ["Jeju Island belongs to which country?", ["South Korea", "Japan", "China"], 0], ["The Cinque Terre is a string of villages in which country?", ["Italy", "France", "Croatia"], 0],
-    ["Ronda, with its deep gorge and bridge, is in which country?", ["Spain", "Portugal", "Morocco"], 0], ["What's the longest river in Africa?", ["The Nile", "The Congo", "The Niger"], 0],
-    ["Which city has the Eiffel Tower?", ["Paris", "Lyon", "Brussels"], 0], ["Singapore's famous lion-headed statue is called the...", ["Merlion", "Lionfish", "Sealion"], 0]]],
-  ["Animals", [
-    ["What's a baby kangaroo called?", ["A kit", "A joey", "A cub"], 1], ["How many legs does a spider have?", ["Six", "Eight", "Ten"], 1],
-    ["What do koalas mostly eat?", ["Bamboo", "Eucalyptus leaves", "Grass"], 1], ["Which bird is famous for copying sounds, including chainsaws?", ["The lyrebird", "The magpie", "The kookaburra"], 0],
-    ["What's the world's smallest penguin, the one that parades home at dusk?", ["The little penguin", "The emperor penguin", "The rockhopper"], 0], ["What's a group of crows called?", ["A murder", "A gaggle", "A pride"], 0],
-    ["Which mammal can truly fly?", ["The bat", "The flying squirrel", "The sugar glider"], 0], ["What's a baby fox called?", ["A kit", "A foal", "A calf"], 0],
-    ["Humpback whales are famous for their...", ["Songs", "Stripes", "Tusks"], 0], ["Which is the fastest land animal?", ["The cheetah", "The lion", "The horse"], 0]]],
-  ["Honeybrook", [
-    ["Who pedals the Scoop Shack's mint delivery bike?", ["Tomo", "Mateo", "Felix"], 0], ["Who helps out part-time at the Cocoa Room?", ["Mateo", "Marco", "Theo"], 0],
-    ["Which nights is the night market on the field?", ["Tuesday and Thursday", "Monday and Friday", "Saturday only"], 0], ["What's the name of the dog at the Cellar Door in Bellbird Valley?", ["Pinot", "Shiraz", "Merlot"], 0],
-    ["Who teaches surfing at Breakwater?", ["Jet", "Mags", "Ari"], 0], ["What does Gus fly over Bellbird Valley?", ["A hot air balloon", "A glider", "A seaplane"], 0],
-    ["What's the joey at the wildlife hospital called?", ["Pip", "Clover", "Skippy"], 0], ["Who takes you out to the cray pots at Fisher's Harbour?", ["Mags", "Davo", "Ned"], 0],
-    ["How many bunches of grapes go into one barrel?", ["Three", "Six", "Ten"], 0], ["When's the Sunday long lunch on the terrace?", ["12 to 3", "6 to 9", "9 to 11"], 0]]]
-]};
+// round 302 (Mel: "Can I have more variety of trivia questions?"): the bank lives in data/trivia.js, eleven rounds of
+// twenty; each night plays four of them, picked by the date, and Honeybrook to finish
+export const QUIZ = {entry: 10, house: 10, rounds: QUIZ_ROUNDS};
 // (the answers come in a different order each night, so the right one isn't always first)
-const shuffleQ = (q, key) => { const order = [0, 1, 2].map(i => [hash(key + ":" + i), i]).sort((a, b) => a[0] - b[0]).map(([, i]) => i); return [q[0], order.map(i => q[1][i]), order.indexOf(q[2])]; };
-export function quizFor(day){ return QUIZ.rounds.map(([n, pool], r) => ({n, qs: pool.map((q, i) => [hash(day + ":" + r + ":" + i), q, i]).sort((a, b) => a[0] - b[0]).slice(0, 4).map(([, q, i]) => shuffleQ(q, day + r + ":" + i))})); }
+// (the shared string hash barely changes from one date to the next, so the picks go through a mixer first)
+const mix = s => { let h = hash(s); h = Math.imul(h ^ (h >>> 16), 0x45d9f3b); h = Math.imul(h ^ (h >>> 16), 0x45d9f3b); return (h ^ (h >>> 16)) >>> 0; };
+const shuffleQ = (q, key) => { const order = [0, 1, 2].map(i => [mix(key + ":" + i), i]).sort((a, b) => a[0] - b[0]).map(([, i]) => i); return [q[0], order.map(i => q[1][i]), order.indexOf(q[2])]; };
+export function nightRounds(day){ const home = QUIZ.rounds.length - 1;
+  return [...QUIZ.rounds.slice(0, home).map((x, r) => [mix(day + ":round" + r), x, r]).sort((a, b) => a[0] - b[0]).slice(0, 4).map(([, x, r]) => [x, r]), [QUIZ.rounds[home], home]]; }
+export function quizFor(day){ return nightRounds(day).map(([[n, pool], r]) => ({n, qs: pool.map((q, i) => [mix(day + ":" + r + ":" + i), q, i]).sort((a, b) => a[0] - b[0]).slice(0, 4).map(([, q, i]) => shuffleQ(q, day + r + ":" + i))})); }
 // the other teams' scores out of twenty, set by the night
 export const rivalScores = day => TRIVIA.teams.map((t, i) => ({n: t.n, score: 10 + hash(day + ":team" + i) % 8}));
 export const triviaStart = (day, team) => ({day, team, r: 0, q: 0, score: 0, picked: null, done: false, rounds: quizFor(day)});

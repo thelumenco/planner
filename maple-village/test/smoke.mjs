@@ -3884,6 +3884,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const cu = oc.comingUp("2026-10-12"); check(cu.some(e => /wedding of/.test(e.n)) && cu.some(e => e.n === "Trivia night") && cu.every(e => e.day >= "2026-10-12"), "the bookings book: what's coming up");
   // trivia: twenty questions, all with three answers; a perfect score wins the pot
   const qz = oc.quizFor("2026-10-14"); check(qz.length === 5 && qz.every(r => r.qs.length === 4 && r.qs.every(q => q[1].length === 3 && q[2] >= 0 && q[2] < 3)), "trivia: five rounds of four, three answers each");
+  // round 302 (Mel: "Can I have more variety of trivia questions?"): eleven rounds of twenty, four a night plus Honeybrook
+  { const T = oc.QUIZ.rounds, q4 = d => oc.quizFor(d).map(r => r.n).join("|"), seen = new Set();
+    for (let k = 0; k < 52; k++) oc.quizFor(new Date(Date.UTC(2026, 0, 7) + k*7*864e5).toISOString().slice(0, 10)).forEach(r => r.qs.forEach(q => seen.add(q[0])));
+    check(T.length === 11 && T.every(([, p]) => p.length >= 20) && T[T.length - 1][0] === "Honeybrook" && oc.quizFor("2026-10-28")[4].n === "Honeybrook" && q4("2026-10-28") !== q4("2026-11-04") && seen.size >= 200,
+      `trivia: ${T.reduce((a, r) => a + r[1].length, 0)} questions in ${T.length} rounds; a different mix each week, ${seen.size} different questions over a year of Wednesdays`); }
   const st = oc.triviaStart("2026-10-14", "Mel's Marvels"); while (!st.done) { oc.triviaAnswer(st, st.rounds[st.r].qs[st.q][2]); oc.triviaNext(st); }
   const F = {coins: 0, inv: {}}; const r = oc.finishTrivia(F, st); check(st.score === 20 && r.win && F.coins === r.pot && r.pot === oc.QUIZ.entry*4 + oc.QUIZ.house, "twenty out of twenty: the winners take the pot");
   // sip and paint: three layers, and the painting to keep
