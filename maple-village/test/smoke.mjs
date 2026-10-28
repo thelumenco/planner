@@ -4140,7 +4140,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-rdspot="pp_scrap"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-pp="tear"]', {timeout: 15000});
   await page.click('#ctx [data-pp="tear"]'); await page.waitForTimeout(500);
   const f2 = await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
-  check(f2.paperie.soak && f2.paperie.scraps === 2 && /2\. Soak/.test(await page.locator("#ctx .ppstep.now").textContent()), "tear two bundles into the tub: the steps along the top move on to Soak");
+  check(f2.paperie.soak && f2.paperie.scraps === 2 && /2\. Soak/.test(await page.locator("#ctx .ccpipe .ccstep.on .ccn").textContent()) && await page.locator("#ctx .ccpipe .ccstep").count() === 6, "tear two bundles into the tub: the steps along the top move on to Soak");
   await page.close();
 }
 {

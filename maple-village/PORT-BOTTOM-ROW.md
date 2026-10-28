@@ -153,6 +153,9 @@ Commits `a4fcaa1` "Seashells sell and can be given; things go in one at a time; 
 - Round 300, the lit windows at night: in `core.js`, where each `.wglow` pane's lit copy is made for `.nightcopy`, check that `k.setAttribute("stroke", "none"); k.setAttribute("transform", mtx(w));` is real code and not the tail of the comment after `k.setAttribute("style", ...)`. In the personal edition it had slipped into the comment, so on any building drawn inside a translated group (Chord, Chico) the warm panes floated beside the windows. If this edition has the same line, fix it the same way.
 - Tests: the "Seashells, one at a time, and the chocolate steps (round 299)" block and the changed checks it lists in HANDOFF.
 
+### 14. The paperie's steps drawn (round 301)
+Commit "The paperie's steps drawn, like the Cocoa Room's" on the branch (HANDOFF.md round 301). In `game/paperie.js`, the text strip of steps (`STEPS`, `stepNow`, `.ppstrip`/`.ppstep`) and the batch picture under it become `strip(F, t, here)`: six stages drawn as cards (Scraps, Soak, Pulp, Press, Dry, Shelves), each with its picture (the batch icons) and how many are at it, the next one lit up by `nextPaper(F, t)`, a "Next:" line and a "Go there" button, and tapping a card goes to that station. It reuses the Cocoa Room's card CSS from section 13 (`.ccpipe`, `.ccstep`), plus `.ccpipe.six` and `.ccpic`, so port section 13's CSS first. Test: the changed check in "The paperie in Montrose (round 183)".
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.
@@ -167,5 +170,6 @@ Port these smoke-test blocks:
 - "The bottom row in the stories (rounds 272 to 275)", only for the threads you ported
 - "Inside the lighthouse (round 297)", plus the changed checks listed in section 12
 - "Seashells, one at a time, and the chocolate steps (round 299)", plus the changed checks HANDOFF.md round 299 lists, for the parts you ported
+- the changed check in "The paperie in Montrose (round 183)" (section 14)
 
 Adjust their ids to this edition. Then run the full suite and publish only when it's green. Afterwards, tell me what you changed from the source and anything you couldn't port.
