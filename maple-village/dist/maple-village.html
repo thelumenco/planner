@@ -1971,10 +1971,6 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .mullsw{display:inline-flex;gap:2px;vertical-align:-1px}.mullsw i{width:9px;height:9px;border-radius:50%;border:1px solid #2F2B28}
 
 /* round 183: the paperie's steps, and the batch's picture */
-.ppstrip{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 4px}
-.ppstep{font-size:.72rem;padding:2px 7px;border-radius:999px;background:#EFE9DF;color:#8A8279}
-.ppstep.done{background:#DCE7D2;color:#4E6A3E}
-.ppstep.now{background:#F3D9A0;color:#5A3E1A;font-weight:600}
 .ppbatch{display:flex;justify-content:center;margin:2px 0 6px}
 
 /* round 287: seagulls gliding over Lighthouse Point, slow and calm */
@@ -2015,6 +2011,9 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
 .cckinds{font-size:.6rem;line-height:1.25;margin-top:2px;white-space:nowrap}.ccres{font-size:.72rem}
 .cckinds i,.ccres i{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 2px 0 3px;vertical-align:middle;border:1px solid rgba(58,46,40,.5)}
 .ccres{opacity:.85;margin:0 0 6px;line-height:1.5}
+/* round 301: the paperie's six stages, the same row as the Cocoa Room's (paperie.js strip) */
+.ccpipe.six{grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.ccpic{display:flex;justify-content:center;height:34px}.ccstep.idle .ccpic{opacity:.4}
 </style>
 </head>
 <body>
@@ -47571,52 +47570,66 @@ ${m.from}` : ""}`;
     return m >= 60 ? `${Math.round(m / 60)} hour${Math.round(m / 60) === 1 ? "" : "s"}` : `${m} minute${m === 1 ? "" : "s"}`;
   };
   var btn3 = (a, label2, on = true, k = "", cls = "primary") => `<button class="btn small ${cls}" data-pp="${a}"${k ? ` data-k="${k}"` : ""} ${on ? "" : "disabled"}>${label2}</button>`;
-  var STEPS2 = [["pp_scrap", "Scraps"], ["pp_soak", "Soak"], ["pp_vat", "Pulp"], ["pp_adds", "Add-in"], ["pp_vat", "Pull"], ["pp_press", "Press"], ["pp_line", "Dry"]];
-  function stepNow(F2, t2 = now3()) {
-    const st6 = stage2(F2, t2);
-    return st6.pressed || st6.pressing ? 5 : st6.wet ? 5 : st6.pulp ? st6.pulp.add === "none" ? 3 : 4 : st6.soaked ? 2 : st6.soaking ? 1 : 0;
+  var PIPE = [["pp_scrap", "Scraps"], ["pp_soak", "Soak"], ["pp_vat", "Pulp"], ["pp_press", "Press"], ["pp_line", "Dry"], ["pp_shelf", "Shelves"]];
+  function nextPaper(F2, t2 = now3()) {
+    const p = paperState(F2), st6 = stage2(F2, t2), dry = st6.line.filter((s) => s.dry).length;
+    if (dry) return { at: "pp_line", line: "Sheets are dry on the line: take them down onto the shelves." };
+    if (st6.pressed) return p.line.length < LINE ? { at: "pp_press", line: "Pressed: hang the sheets on the drying line." } : { at: "pp_line", wait: true, line: "The line's full: the dry ones have to come down first." };
+    if (st6.wet) return { at: "pp_press", line: "Six wet sheets on their felts: wind them into the press." };
+    if (st6.pulp) return { at: "pp_vat", line: st6.pulp.add === "none" ? "Pulp in the vat: stir in an add-in if you like (the jars), then pull six sheets." : "Pulp and add-in in the vat: pull six sheets." };
+    if (st6.soaked) return { at: "pp_vat", line: "The scraps are soft: beat them into pulp at the vat, in a colour." };
+    if (st6.pressing) return { at: "pp_press", wait: true, line: `Pressing: ready in ${left6(p.press.done, t2)}.` };
+    if (st6.soaking) return { at: "pp_soak", wait: true, line: `Soaking: soft in ${left6(p.soak.done, t2)}.` };
+    if (p.scraps >= SOAK) return { at: "pp_scrap", line: `Tear ${SOAK} bundles of scraps into the soaking tub.` };
+    if (st6.line.length) return { at: "pp_line", wait: true, line: `Drying on the line: ready in ${left6(Math.min(...st6.line.map((s) => s.done)), t2)}. Meanwhile, more scraps for the next batch.` };
+    return { at: "pp_scrap", line: `You need ${SOAK} bundles of scraps: your shops put them aside, or buy one here.` };
   }
-  function batchIcon(F2, t2 = now3()) {
-    const st6 = stage2(F2, t2);
-    if (st6.pressing || st6.pressed) return `pppress_${paperState(F2).press.col}_${paperState(F2).press.add}`;
-    if (st6.wet) return `ppwet_${st6.wet.col}_${st6.wet.add}`;
-    if (st6.pulp) return `ppulp_${st6.pulp.col}_${st6.pulp.add}`;
-    if (st6.soaking || st6.soaked) return "ppsoak";
-    return "ppscraps";
+  function strip(F2, t2, here) {
+    const p = paperState(F2), st6 = stage2(F2, t2), nx = nextPaper(F2, t2), pr = p.press || st6.wet, onLine = st6.line.reduce((a, s) => a + s.n, 0), dryN = st6.line.filter((s) => s.dry).reduce((a, s) => a + s.n, 0);
+    const shelf6 = Object.values(p.stock).reduce((a, n) => a + n, 0), firstSheet = Object.keys(p.stock).find((id) => p.stock[id] > 0);
+    const card5 = {
+      pp_scrap: [icon("ppscraps", 34), p.scraps, `bundle${p.scraps === 1 ? "" : "s"} of scraps`, p.scraps > 0],
+      pp_soak: [icon("ppsoak", 34), st6.soaking || st6.soaked ? 1 : 0, st6.soaking ? `soaking · ${left6(p.soak.done, t2)}` : st6.soaked ? "soft, ready to beat" : "in the tub", st6.soaking || st6.soaked],
+      pp_vat: [icon(st6.pulp ? `ppulp_${st6.pulp.col}_${st6.pulp.add}` : "ppulp_natural_none", 34), st6.pulp ? 1 : 0, st6.pulp ? `${COLOURS2[st6.pulp.col].n.toLowerCase()} pulp${st6.pulp.add === "none" ? "" : ` + ${ADDS2[st6.pulp.add].n.toLowerCase()}`}` : "pulp in the vat", !!st6.pulp],
+      pp_press: [icon(st6.wet ? `ppwet_${st6.wet.col}_${st6.wet.add}` : p.press ? `pppress_${p.press.col}_${p.press.add}` : "pppress_natural_none", 34), pr ? pr.n || BATCH : 0, st6.wet ? "wet sheets to press" : st6.pressing ? `pressing · ${left6(p.press.done, t2)}` : st6.pressed ? "pressed, to hang" : "sheets in the press", !!pr],
+      pp_line: [icon(st6.line.length ? dryN ? sheetId(st6.line[0].col, st6.line[0].add) : `pppress_${st6.line[0].col}_${st6.line[0].add}` : "pppress_natural_none", 34), onLine, onLine ? dryN === onLine ? "dry!" : dryN ? `${dryN} dry, ${onLine - dryN} drying` : "drying, by tomorrow" : "sheets on the line", onLine > 0],
+      pp_shelf: [icon(firstSheet || "pp_natural_none", 34), shelf6, "sheets on the shelves", shelf6 > 0]
+    };
+    return `<div class="ccpipe six" aria-label="The steps">${PIPE.map(([k, n], i) => {
+      const [pic3, num, what, busy2] = card5[k];
+      return `<button class="ccstep${k === nx.at ? " on" : ""}${busy2 ? "" : " idle"}" data-pp="go" data-k="${k}"${k === here ? ' aria-current="step"' : ""}><span class="ccn">${i + 1}. ${n}</span><span class="ccpic">${pic3}</span><b>${num}</b><small>${esc(what)}</small></button>`;
+    }).join("")}</div>
+    <p class="sub"><b>${nx.wait ? "Waiting" : "Next"}:</b> ${esc(nx.line)}${nx.at !== here && !nx.wait ? ` ${btn3("go", "Go there", true, nx.at, "alt")}` : ""}</p>`;
   }
-  function strip(F2, t2) {
-    const k = stepNow(F2, t2);
-    return `<div class="ppstrip" aria-label="The steps">${STEPS2.map(([, n], i) => `<span class="ppstep${i < k ? " done" : i === k ? " now" : ""}">${i + 1}. ${n}</span>`).join("")}</div>`;
-  }
-  var head2 = (title, sub, F2, t2, tape7 = "gingham") => `<span class="tape ${tape7}" aria-hidden="true"></span><h2>${title}</h2><p class="sub">${sub}</p>${strip(F2, t2)}<div class="ppbatch">${icon(batchIcon(F2, t2), 64)}</div>`;
+  var head2 = (title, sub, F2, t2, tape7 = "gingham", here = "") => `<span class="tape ${tape7}" aria-hidden="true"></span><h2>${title}</h2>${strip(F2, t2, here)}<p class="sub">${sub}</p>`;
   function paperPanel(F2, spot14, o = {}) {
     const p = paperState(F2), t2 = o.t || now3(), st6 = stage2(F2, t2);
     if (spot14 === "pp_scrap") {
-      return head2("The scrap bin", "Wine labels, chocolate wrappers, receipts and old brown paper: everything gets a second life here.", F2, t2) + `<p class="olabel">${icon("ppscraps", 22)} ${p.scraps} bundle${p.scraps === 1 ? "" : "s"} of scraps</p>${o.came ? `<p class="muted">${o.came} came up in the van today, from ${esc(homeShops(F2).join(", "))}.</p>` : `<p class="muted">Each of your shops puts a bundle aside every day (${homeShops(F2).length} a day now); they ride up in the van when you visit.</p>`}
+      return head2("The scrap bin", "Wine labels, chocolate wrappers, receipts and old brown paper: everything gets a second life here.", F2, t2, "gingham", spot14) + `<p class="olabel">${icon("ppscraps", 22)} ${p.scraps} bundle${p.scraps === 1 ? "" : "s"} of scraps</p>${o.came ? `<p class="muted">${o.came} came up in the van today, from ${esc(homeShops(F2).join(", "))}.</p>` : `<p class="muted">Each of your shops puts a bundle aside every day (${homeShops(F2).length} a day now); they ride up in the van when you visit.</p>`}
       <div class="actions">${btn3("tear", `Tear and soak ${SOAK} bundles`, p.scraps >= SOAK && !p.soak && !p.pulp)}${btn3("scraps", `Buy a bundle (${SCRAP_PRICE} ${coin20()})`, F2.coins >= SCRAP_PRICE, "", "alt")}</div>
       ${p.soak || p.pulp ? `<p class="muted">The tub's busy: one batch at a time.</p>` : ""}` + shut30;
     }
     if (spot14 === "pp_soak") {
-      return head2("The soaking tub", st6.soaking ? `Torn scraps going soft in the water: ready in ${left6(p.soak.done, t2)}. Swish them about if you like.` : st6.soaked ? "Soft and floppy, falling apart in your fingers: ready to beat into pulp at the vat." : "Empty. Tear some scraps in at the scrap bin.", F2, t2) + (st6.soaked ? `<div class="actions">${btn3("go", "Over to the vat", true, "pp_vat")}</div>` : "") + shut30;
+      return head2("The soaking tub", st6.soaking ? `Torn scraps going soft in the water: ready in ${left6(p.soak.done, t2)}. Swish them about if you like.` : st6.soaked ? "Soft and floppy, falling apart in your fingers: ready to beat into pulp at the vat." : "Empty. Tear some scraps in at the scrap bin.", F2, t2, "gingham", spot14) + (st6.soaked ? `<div class="actions">${btn3("go", "Over to the vat", true, "pp_vat")}</div>` : "") + shut30;
     }
     if (spot14 === "pp_vat") {
-      if (st6.soaked && !st6.pulp) return head2("The vat", "Beat the soaked scraps into a slurry. Pick a colour: a pinch of pigment in the beater.", F2, t2) + `<ul class="hlist wlist">${Object.entries(COLOURS2).map(([k, c]) => `<li><span class="wpic">${icon(`ppulp_${k}_none`, 30)}</span><span class="wtxt"><b>${c.n}</b><small>${c.cost ? `${c.cost} ${coin20()} of pigment` : "As it comes: oatmeal, with flecks of old print"}</small></span><span class="orbtns">${btn3("beat", "Beat it", F2.coins >= c.cost, k)}</span></li>`).join("")}</ul>` + shut30;
-      if (st6.pulp) return head2("The vat", `${COLOURS2[st6.pulp.col].n} pulp${st6.pulp.add === "none" ? "" : `, with ${ADDS2[st6.pulp.add].n.toLowerCase()} stirred through`}. ${st6.pulp.add === "none" ? "Stir in an add-in from the jars, or pull it plain." : "Ready to pull."}`, F2, t2) + `<div class="actions">${st6.pulp.add === "none" ? btn3("go", "The add-in jars", true, "pp_adds", "alt") : ""}${btn3("pull", `Pull ${BATCH} sheets`, !st6.wet)}</div>${st6.wet ? `<p class="muted">The last sheets are still on the felts: press them first.</p>` : ""}` + shut30;
-      return head2("The vat", st6.wet ? "Six wet sheets lie on their felts, shining. Over to the press." : st6.soaking ? "Waiting for the scraps to soften in the tub." : "Empty. Start with scraps in the tub.", F2, t2) + (st6.wet ? `<div class="actions">${btn3("go", "To the press", true, "pp_press")}</div>` : "") + shut30;
+      if (st6.soaked && !st6.pulp) return head2("The vat", "Beat the soaked scraps into a slurry. Pick a colour: a pinch of pigment in the beater.", F2, t2, "gingham", spot14) + `<ul class="hlist wlist">${Object.entries(COLOURS2).map(([k, c]) => `<li><span class="wpic">${icon(`ppulp_${k}_none`, 30)}</span><span class="wtxt"><b>${c.n}</b><small>${c.cost ? `${c.cost} ${coin20()} of pigment` : "As it comes: oatmeal, with flecks of old print"}</small></span><span class="orbtns">${btn3("beat", "Beat it", F2.coins >= c.cost, k)}</span></li>`).join("")}</ul>` + shut30;
+      if (st6.pulp) return head2("The vat", `${COLOURS2[st6.pulp.col].n} pulp${st6.pulp.add === "none" ? "" : `, with ${ADDS2[st6.pulp.add].n.toLowerCase()} stirred through`}. ${st6.pulp.add === "none" ? "Stir in an add-in from the jars, or pull it plain." : "Ready to pull."}`, F2, t2, "gingham", spot14) + `<div class="actions">${st6.pulp.add === "none" ? btn3("go", "The add-in jars", true, "pp_adds", "alt") : ""}${btn3("pull", `Pull ${BATCH} sheets`, !st6.wet)}</div>${st6.wet ? `<p class="muted">The last sheets are still on the felts: press them first.</p>` : ""}` + shut30;
+      return head2("The vat", st6.wet ? "Six wet sheets lie on their felts, shining. Over to the press." : st6.soaking ? "Waiting for the scraps to soften in the tub." : "Empty. Start with scraps in the tub.", F2, t2, "gingham", spot14) + (st6.wet ? `<div class="actions">${btn3("go", "To the press", true, "pp_press")}</div>` : "") + shut30;
     }
     if (spot14 === "pp_adds") {
       const can = st6.pulp && st6.pulp.add === "none";
-      return head2("The add-in jars", can ? "One add-in for this batch, stirred through the vat. Lavender and roses can come from your backpack." : "Jars of lavender, petals, tea, gold leaf and seeds. They go in when there's plain pulp in the vat.", F2, t2) + `<ul class="hlist wlist">${Object.entries(ADDS2).filter(([k]) => k !== "none").map(([k, a]) => {
+      return head2("The add-in jars", can ? "One add-in for this batch, stirred through the vat. Lavender and roses can come from your backpack." : "Jars of lavender, petals, tea, gold leaf and seeds. They go in when there's plain pulp in the vat.", F2, t2, "gingham", spot14) + `<ul class="hlist wlist">${Object.entries(ADDS2).filter(([k]) => k !== "none").map(([k, a]) => {
         const bag2 = a.inv && (F2.inv || {})[a.inv] > 0;
         return `<li><span class="wpic">${icon(`pp_natural_${k}`, 30)}</span><span class="wtxt"><b>${a.n}</b><small>${bag2 ? "One from your backpack" : `${a.cost} ${coin20()}`} · sheets sell for ${a.bonus} more${k === "seeds" ? " · plant it and wildflowers grow" : ""}</small></span><span class="orbtns">${btn3("add", "Stir in", can && (bag2 || F2.coins >= a.cost), k)}</span></li>`;
       }).join("")}</ul>` + shut30;
     }
     if (spot14 === "pp_press") {
-      return head2("The screw press", st6.pressing ? `Squeezing the water out: ${left6(p.press.done, t2)}.` : st6.pressed ? "Pressed: firm, damp sheets, ready for the line." : st6.wet ? "Six wet sheets on their felts. Into the press, and wind it down." : "Empty, the big iron screw wound right up.", F2, t2) + `<div class="actions">${st6.wet ? btn3("press", "Wind it down") : ""}${st6.pressed ? btn3("hang", "Hang them on the line", p.line.length < LINE) : ""}</div>${st6.pressed && p.line.length >= LINE ? `<p class="muted">The line's full: take the dry ones down first.</p>` : ""}` + shut30;
+      return head2("The screw press", st6.pressing ? `Squeezing the water out: ${left6(p.press.done, t2)}.` : st6.pressed ? "Pressed: firm, damp sheets, ready for the line." : st6.wet ? "Six wet sheets on their felts. Into the press, and wind it down." : "Empty, the big iron screw wound right up.", F2, t2, "gingham", spot14) + `<div class="actions">${st6.wet ? btn3("press", "Wind it down") : ""}${st6.pressed ? btn3("hang", "Hang them on the line", p.line.length < LINE) : ""}</div>${st6.pressed && p.line.length >= LINE ? `<p class="muted">The line's full: take the dry ones down first.</p>` : ""}` + shut30;
     }
     if (spot14 === "pp_line") {
       const dry = st6.line.filter((s) => s.dry).reduce((a, s) => a + s.n, 0);
-      return head2("The drying line", st6.line.length ? "Sheets pegged up across the back room, the deckled edges curling a little as they dry." : "An empty line and a row of pegs.", F2, t2, "stripe") + (st6.line.length ? `<ul class="hlist wlist">${st6.line.map((s) => `<li><span class="wpic">${icon(s.dry ? sheetId(s.col, s.add) : `pppress_${s.col}_${s.add}`, 30)}</span><span class="wtxt"><b>${esc(sheetName(s.col, s.add))}</b><small>${s.n} sheets · ${s.dry ? "dry!" : `dry in ${left6(s.done, t2)}`}</small></span></li>`).join("")}</ul>` : "") + `<div class="actions">${btn3("down", `Take down the dry ones${dry ? ` (${dry})` : ""}`, dry > 0)}</div>` + shut30;
+      return head2("The drying line", st6.line.length ? "Sheets pegged up across the back room, the deckled edges curling a little as they dry." : "An empty line and a row of pegs.", F2, t2, "stripe", spot14) + (st6.line.length ? `<ul class="hlist wlist">${st6.line.map((s) => `<li><span class="wpic">${icon(s.dry ? sheetId(s.col, s.add) : `pppress_${s.col}_${s.add}`, 30)}</span><span class="wtxt"><b>${esc(sheetName(s.col, s.add))}</b><small>${s.n} sheets · ${s.dry ? "dry!" : `dry in ${left6(s.done, t2)}`}</small></span></li>`).join("")}</ul>` : "") + `<div class="actions">${btn3("down", `Take down the dry ones${dry ? ` (${dry})` : ""}`, dry > 0)}</div>` + shut30;
     }
     if (spot14 === "pp_shelf") {
       const ids = Object.keys(p.stock).filter((id) => p.stock[id] > 0), bag2 = Object.keys(F2.inv || {}).filter((id) => F2.inv[id] > 0 && ITEMS[id] && ITEMS[id].paper);
