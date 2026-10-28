@@ -154,7 +154,7 @@ Commits `a4fcaa1` "Seashells sell and can be given; things go in one at a time; 
 - Tests: the "Seashells, one at a time, and the chocolate steps (round 299)" block and the changed checks it lists in HANDOFF.
 
 ### 14. The paperie's steps drawn (round 301)
-Commit "The paperie's steps drawn, like the Cocoa Room's" on the branch (HANDOFF.md round 301). In `game/paperie.js`, the text strip of steps (`STEPS`, `stepNow`, `.ppstrip`/`.ppstep`) and the batch picture under it become `strip(F, t, here)`: six stages drawn as cards (Scraps, Soak, Pulp, Press, Dry, Shelves), each with its picture (the batch icons) and how many are at it, the next one lit up by `nextPaper(F, t)`, a "Next:" line and a "Go there" button, and tapping a card goes to that station. It reuses the Cocoa Room's card CSS from section 13 (`.ccpipe`, `.ccstep`), plus `.ccpipe.six` and `.ccpic`, so port section 13's CSS first. Test: the changed check in "The paperie in Montrose (round 183)".
+Commit `45b9e10` "The paperie's steps drawn, like the Cocoa Room's" on the branch (HANDOFF.md round 301). In `game/paperie.js`, the text strip of steps (`STEPS`, `stepNow`, `.ppstrip`/`.ppstep`) and the batch picture under it become `strip(F, t, here)`: six stages drawn as cards (Scraps, Soak, Pulp, Press, Dry, Shelves), each with its picture (the batch icons) and how many are at it, the next one lit up by `nextPaper(F, t)`, a "Next:" line and a "Go there" button, and tapping a card goes to that station. It reuses the Cocoa Room's card CSS from section 13 (`.ccpipe`, `.ccstep`), plus `.ccpipe.six` and `.ccpic`, so port section 13's CSS first. Test: the changed check in "The paperie in Montrose (round 183)".
 
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
