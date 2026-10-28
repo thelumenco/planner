@@ -451,3 +451,11 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   shelves (12 coins or less), 4% 20 coins, 2% 50 coins. Pays back about 3 of the 4 coins over many cards.
 - No undo bar for buying a card (it would let a losing card be bought again): the buy handler bumps `undoMark`.
 - Test: "Scratch cards at Hana's market (round 303)", with real rubbing in the browser.
+
+## Round 302 (ported): more trivia
+
+- The questions live in data/trivia.js (`QUIZ_ROUNDS`: eleven rounds of twenty, 220). `quizFor` plays four rounds
+  picked by the date (`nightRounds`, through a `mix` of the hash so neighbouring weeks differ) plus Honeybrook to finish.
+- The personal edition's three Singapore questions were swapped (the Little Mermaid, a Bramley, thyme); every
+  Honeybrook answer was checked against this edition (Tomo, Mateo, Bram's Monday lamp, Pebble, Dot, Pilar, Amara...).
+- Test: the new check in "The terrace's week".
