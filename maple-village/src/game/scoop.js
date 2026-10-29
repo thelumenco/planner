@@ -17,6 +17,7 @@
 import { esc, dayKey, sgHM, hash } from "../util.js";
 import { icon } from "../art/icons.js";
 import { ITEMS } from "../data/items.js";
+import { boost } from "./happen.js";
 import { TREES, FLOWERS } from "../data/orchard.js";
 
 export const OPEN = 10*60, CLOSE = 20*60, TUB = 20;
@@ -253,7 +254,7 @@ function saleMinute(s, day, hm, opts){
     s.box += coins; const t = s.sold[day] = s.sold[day] || {n: 0, coins: 0}; t.n++; t.coins += coins; return {coins, box: true, fmt: "cup", r};
   }
   const price = s.prices.cup + s.prices.cone + s.prices.float + s.prices.waffle, pf = Math.pow(DEFAULT/Math.max(4, price), 1.3);
-  const p = .07*(we ? 1.5 : 1)*(night ? 1.4 : 1)*(hm >= 14*60 && hm < 17*60 ? 1.25 : 1)*pf*(opts.serving ? 1.5 : 1)*glow*(waiterOn(hm) ? 1.2 : 1);
+  const p = .07*(we ? 1.5 : 1)*(night ? 1.4 : 1)*(hm >= 14*60 && hm < 17*60 ? 1.25 : 1)*pf*(opts.serving ? 1.5 : 1)*glow*(waiterOn(hm) ? 1.2 : 1)*(opts.boost ? opts.boost(day, hm) : 1);   // round 303: a review, a coach party, a torn awning
   if (Math.random() >= p) return null;
   let x = Math.random(), fmt = "cone"; for (const [f, w] of FMT_W) { if ((x -= w) < 0) { fmt = f; break; } }
   const r = stocked[Math.floor(Math.random()*stocked.length)];
@@ -268,6 +269,7 @@ function saleMinute(s, day, hm, opts){
 }
 // catch up minute by minute since the last tick (at most two days): the kitchen, then the counter
 export function scoopTick(F, opts = {}){
+  opts = {...opts, boost: (d, h) => boost(F, "scoop", d, h)};
   const s = scoopState(F), now = Date.now() + (globalThis.__mapleOffset || 0), from = Math.max(s.at || now, now - 864e5);
   if (s.batch) { s.tubs[s.batch.id] = (s.tubs[s.batch.id] || 0) + TUB; s.batch = null; }   // a batch Tomo had on the go (from when he still cooked)
   const out = {coins: 0, n: 0, mins: 0, box: 0, churned: finishChurn(s, now)};

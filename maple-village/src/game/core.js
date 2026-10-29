@@ -8,7 +8,9 @@ import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLev
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, orchardArt, flowerFarmArt, setArtContext } from "../art/scenes.js";
 import { vineSpot, vineScene } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, tapasAll, TAPAS, cookTick, cookLine } from "./kitchen.js";
-import { questBoost, lowerSalePanel, buyLower } from "./vineyard.js";
+import { questBoost, lowerSalePanel, buyLower, birdsTake, shelfStock as vShelfStock } from "./vineyard.js";
+import * as HP from "./happen.js";
+import { caseCount } from "./cocoa.js";
 import { wineNews, vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, cellarPanel, counterPanel, boxPanel, cafePanel, olivePanel, grovePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
@@ -676,6 +678,7 @@ setInterval(() => {
   if (Date.now() - lastFarm > 20000) farmNow();
   { const l = bikeExpired(F); if (l) { speak(l, 4500); save(); } }
   townTick(); letsTick();
+  if (Date.now() - lastHap > 15000) hapNow();   // round 303: happenings
   { const k = scene === "base" ? `${bonfireNow(dayKey(), sgHM())}` : scene === "bay" ? `${vanNow(dayKey(), sgHM())}${spotOpen("bay")}` : scene === "field" ? `${!!(S.kite && S.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : ""; if (k !== lastFri) { lastFri = k; if (k) drawScene(); } }
   if (scene === "mill") { const m = millState(F), k = m.press ? (pressLeft(m) ? "on" : "ready") : ""; if (k !== lastMill) { lastMill = k; drawScene(); if (millOpen) ctx(); } }
   if ((outside() || scene === "terrace") && skyKey() !== lastSky) { lastSky = skyKey(); drawScene(); }
@@ -1202,7 +1205,7 @@ const WEEKDAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday
 let localCache = {key: "", items: []};
 const dayKeyAt = ms => new Date(ms + 6*H).toISOString().slice(0, 10);   // same 2am reset as dayKey()
 function localMail(){
-  const day = dayKey(), hm = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm/10)}:${S.doneIds.length}:${S.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}:${slowMail(F).length}:${PP.bloomMail(F).length}:${BK.bookMail(F).length}:${GAL.galleryMail(F, Date.now()).length}:${LT.letsMail(F, Date.now() + (globalThis.__mapleOffset || 0)).length}:${SO.bottleMail(F).length}`;
+  const day = dayKey(), hm = sgHM(), mi = MAIL.items || [], key = `${day}:${Math.floor(hm/10)}:${HP.hapMail(F).length}:${S.doneIds.length}:${S.cleanDone}:${mi.length}:${mi.length ? mi[mi.length - 1].id : ""}:${thanksMail().length}:${slowMail(F).length}:${PP.bloomMail(F).length}:${BK.bookMail(F).length}:${GAL.galleryMail(F, Date.now()).length}:${LT.letsMail(F, Date.now() + (globalThis.__mapleOffset || 0)).length}:${SO.bottleMail(F).length}`;
   if (key === localCache.key) return localCache.items;
   const out = [], wd = new Date(day + "T00:00:00Z").getUTCDay();
   if ((wd === 5 && hm >= 900) || wd === 6 || wd === 0) out.push(weeklyPaper(wd === 5 ? day : wd === 6 ? prevDay(day) : prevDay(prevDay(day))));
@@ -1210,7 +1213,7 @@ function localMail(){
   const routineWind = (MAIL.items || []).some(m => m && m.from === "winddown" && m.at && dayKeyAt(m.at) === day);
   if (hm >= 1080 && !routineWind && (S.cleanDone || S.doneIds.length)) out.push({id: "wind-" + day, from: "winddown", at: sgAt(day, 18), pond: true,
     title: "Time to close the day", body: "Meet me at the pond. Each of today's wins gets a lantern on the water.\nThen tell chat \"wind down\" whenever you're ready."});
-  out.push(...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...PP.bloomMail(F), ...BK.bookMail(F), ...GAL.galleryMail(F, Date.now()), ...LT.letsMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...SO.bottleMail(F));   // round 129: Jeju's slow-post postcards, two weeks on
+  out.push(...thanksMail(), ...slowMail(F), ...hamperMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...PP.bloomMail(F), ...BK.bookMail(F), ...GAL.galleryMail(F, Date.now()), ...LT.letsMail(F, Date.now() + (globalThis.__mapleOffset || 0)), ...SO.bottleMail(F), ...HP.hapMail(F));   // round 129: Jeju's slow-post postcards, two weeks on
   return (localCache = {key, items: out}).items;
 }
 const allMail = () => [...(MAIL.items || []), ...localMail()];
@@ -2591,6 +2594,7 @@ function drawScene(){
   if (scene === "scoopkitchen" && SC.secretState(F).through) $("sceneArt").insertAdjacentHTML("beforeend", kitchenSecretArt(true));
   $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + coastGulls(scene, sgHM() >= 19*60 || sgHM() < 6*60) + (scene === "green" && SO.bootNow(dayKey(), sgHM()) ? carBootArt() : "") + beachArt(SO.beachFinds(F, scene, dayKey())) + bottleHere() + fridayLayer(scene) + (scene === "base" ? koiArt((F.fish && F.fish.koi) || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + vanSleeper() + vanCrateArt() + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));   // shelves with keepsakes, and pets at home here
   if ((outside() || scene === "terrace" || scene === "allotment") && scene !== "base" && scene !== "field") $("sceneArt").insertAdjacentHTML("beforeend", skyWash(sgHM()));   // (round 153: the terrace too, Mel)   // the same evening light everywhere outdoors
+  $("sceneArt").insertAdjacentHTML("beforeend", hapMarks());   // round 303: storm damage, tap to mend
   if ((outside() || scene === "terrace" || scene === "allotment") && isDusk()) nightLights();
   const names = {winecave: "The wine cave", allotment: "The allotments", bramcot: "Bram's cottage", lhtower1: "The lighthouse", lhtower2: "The watch room", lhtower3: "The lamp room", lowervine: "The lower vineyard", green: "Honeybrook Green", stables: "The Stables", lighthouse: "Lighthouse Point", figtree_down: "Fig Tree", figtree_up: "Fig Tree: upstairs", figtree_bath: "Fig Tree: the bathroom", bluebell_bath: "Bluebell: the bathroom", figtree_garden: "Fig Tree: the garden", bluebell_down: "Bluebell", bluebell_up: "Bluebell: upstairs", bluebell_garden: "Bluebell: the garden", village:"Town square", base:"Home base", lane:"Makers' Lane", vineyard:vineyardName(F), farm:"The garden", wineshop:shopName(F), terrace:"The terrace", millup:"The old mill: upstairs", orchard:"Ma Ma's orchard", flowers:"Ma Ma's flower farm", field:"The field", shore:"The foreshore", bay:"The bay", hfarm:"Wildflower Farm", hlane:"Honeybrook station", hwoods:"Honeybrook Woods", greenhouse:"The greenhouse", mill:"The old mill", scoopshop: scoopState(F).name, ct_vernazza:"Cinque Terre: Vernazza", ct_corniglia:"Cinque Terre: Corniglia", ct_monterosso:"Cinque Terre: Monterosso", ct_manarola:"Cinque Terre: Manarola", ...SW_NAMES, ...PV_NAMES, ...PI_NAMES, ...BA_NAMES, ...HK_NAMES, ...FM_NAMES, ...Object.fromEntries(Object.entries(BB_NAMES).map(([k, v]) => [k, "Bellbird Valley: " + v])), jj_shore:"Jeju: Seongsan", jj_farms:"Jeju: the tangerine farms", jj_harbour:"Jeju: the harbour", jj_village:"Jeju: the stone village", kt_station:"Kyoto: the station", kt_lane:"Kyoto: Higashiyama", kt_temple:"Kyoto: the temple", kt_river:"Kyoto: the river", rd_station:"Ronda: the station", rd_plaza:"Ronda: the plaza", rd_bridge:"Ronda: Puente Nuevo", rd_old:"Ronda: the old town"};
   $("sceneName").innerHTML = `<span>${esc(names[scene] || (townRoom(scene) ? `${TOWNS[townOf(scene)].n}: ${townRoom(scene).n.replace(/^The /, "the ")}` : ROOMS[scene].name))}</span>${!outside() ? `<span style="font-family:Mulish,sans-serif;font-size:.85rem">tap Exit to leave</span>` : ""}`;
@@ -2743,6 +2747,7 @@ function boatRide(text, home, then, town){
   setTimeout(() => { o.remove(); then(); }, 6000);
 }
 function startTrip(town, by = "train"){
+  if (by === "boat" && HP.broken(F, "boat")) { speak("The boat's storm-damaged: the rail's cracked. Mend it first (tap the storm damage label at the jetty).", 5000); return; }   // round 303
   const own = by === "boat", r = buyTrip(F, town, tripPick, sgHM(), by, own && rainDay(dayKey()) === 2);   // round 239: a downpour day keeps the sea rough all day, even after the shower if (!r) return;
   const t = tripOn(F), boat = by === "ferry", land = own ? r.town.boat.arrive : boat ? r.town.ferry.arrive : r.town.arrive; railOpen = false; tripPick = []; ctx(); sfx("chaching"); flash(own ? "Fuel for the boat" : `Tickets to ${r.town.n}`); save(true);
   const ride = own ? (tx, h, then) => boatRide(tx, false, then, town) : boat ? ferryRide : trainRide;
@@ -3678,6 +3683,20 @@ function coTask(c, k){
   speak(r.done ? `${CO_DONE[k]} That's ${COTTAGES[c].n} turned round, fresh for the next guests.` : CO_DONE[k] + (r.used ? ` (${r.used.map(i => ITEMS[i] ? ITEMS[i].n.toLowerCase() : i).join(", ")})` : ""), 5000);
   save(true); drawScene(); if (coView) ctx();
 }
+// round 303: the morning's happening, the critic's visit, and the storm damage labels
+let lastHap = 0;
+const hapStock = shop => shop === "scoop" ? Object.values(scoopState(F).tubs || {}).reduce((a, n) => a + n, 0) : shop === "cocoa" ? (() => { const c = cocoaState(F); return Object.values(c.bars).reduce((a, n) => a + n, 0) + caseCount(c); })() : F.vine ? vShelfStock(vineState(F)) : 0;
+function hapNow(){
+  lastHap = Date.now(); const day = dayKey(), hm = sgHM(), prev = prevDay(day);
+  const own = {scoop: !!F.scoop, cocoa: owns(F, "cocoa"), wine: !!F.vine, boat: owns(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning)};
+  const got = HP.hapDaily(F, day, own, {stormy: [3, 9, 15, 21].some(h => stormyOn(prev, h*60)), away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: rnd => birdsTake(F, rnd)});
+  const j = HP.judge(F, day, hm, hapStock);
+  if (got.length || j) { save(); sfx("paper", true); flash(got.includes("storm") ? "Storm damage in the night: see your mailbox" : j ? (j.good ? "A good review in the Gazette!" : "A review in the Gazette") : "Something's happening today: see your mailbox"); drawScene(); }
+}
+function hapMarks(){
+  return HP.hapState(F).repairs.map(r => { const a = HP.repairAt(F, r.id); if (!a || a.scene !== scene) return "";
+    return `<g data-mend="${r.id}" aria-label="Storm damage: tap to mend"><ellipse class="hov" cx="${a.at[0]}" cy="${a.at[1] + 4}" rx="44" ry="10" style="fill:var(--butter)"/>${tapeLabel(a.at[0], a.at[1], "Storm damage: mend", "#F2B8B0", 10)}</g>`; }).join("");
+}
 function letsTick(){
   const L = LT.letState(F), had = L.offered, ev = LT.step(F, dayKey(), sgHM());
   if (!ev.length) { if (!had) save(); return; }
@@ -4179,6 +4198,7 @@ function paddleTo(dest){
 const cruisingNow = () => !!(S.cruise && Date.now() < S.cruise.until && scene === "shore");
 function startCruise(){
   if (S.cruise && Date.now() < S.cruise.until) return;
+  if (HP.broken(F, "boat")) { speak("The boat's storm-damaged: the rail's cracked. Mend it first (tap the storm damage label at the jetty).", 5000); render(); return; }   // round 303
   // round 297 (Mel: "Should be no restriction on time of setting off. That's the whole point of having my own boat"): any hour; after dark, a moonlit one
   const m = sgHM(), dark = m >= 19*60 || m < 6*60;
   S.cruise = {until: Date.now() + 45000}; route = []; mel.path = []; atSpot = null;
@@ -4494,6 +4514,8 @@ svg.addEventListener("click", ev => {
   // round 277: the allotments, each neighbour's plot and the swap crate; the gate back to the green
   // round 283: Bram's cottage: the fire, the kettle (tea with Bram), the ship in a bottle, the window and the logbook
   // round 297: inside the lighthouse: three floors up the spiral stair
+  const mnd = ev.target.closest("[data-mend]");   // round 303: mend storm damage
+  if (mnd) { const id = mnd.dataset.mend, at = (HP.repairAt(F, id) || {}).at || [mel.x, mel.y]; go(scene, at[0], Math.min(600, at[1] + 40), () => { const r = HP.mend(F, id); if (!r) return; speak(r.line, 6000); if (r.ok) { sfx("chime"); gainXp(2); act("cheer"); } save(true); drawScene(); }); return; }
   const lsp = /^lhtower[123]$/.test(scene) && ev.target.closest("[data-lhspot]");
   if (lsp) { towerSpot(lsp.dataset.lhspot); return; }
   if (scene === "bramcot" && ev.target.closest("[data-exit]")) { go(scene, 260, 600, () => setScene("lighthouse", [436, 158])); return; }
