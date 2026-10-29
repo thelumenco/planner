@@ -5215,7 +5215,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(!hp.judge(G, "2026-06-03", 0, () => 0).good && !G.hap.boosts.length && /lukewarm/.test(G.hap.log[0].body), "bare shelves: a lukewarm write-up, no harm done"); }
   { const F = {coins: 0}; hp.hapDaily(F, "2026-06-01", {});
     check(hp.hapDaily(F, "2026-06-02", {scoop: 1, cocoa: 1, wine: 1}, {rnd: seq([.9, .05, .2, .2])}).includes("coach") && hp.boost(F, "scoop", "2026-06-02", 11*60 + 30) === 3 && hp.boost(F, "cocoa", "2026-06-02", 12*60) === 3 && hp.boost(F, "scoop", "2026-06-02", 13*60) === 1 && hp.boost(F, "wine", "2026-06-02", 12*60) === 1, "a coach party at the bay at 11: the Scoop Shack and Cocoa Room three times as busy for two hours");
-    check(!hp.hapDaily(F, "2026-06-03", {scoop: 1}, {rnd: seq([.9, 0])}).length, "and not another coach for a few days"); }
+    check(!hp.hapDaily(F, "2026-06-03", {scoop: 1}, {rnd: seq([.9, 0])}).includes("coach"), "and not another coach for a few days"); }
   { const F = {coins: 0, scoop: {}, hap: {repairs: [{id: "awning-x", kind: "awning"}], boosts: [], log: []}};
     check(hp.boost(F, "scoop", "2026-06-02", 600) === .85, "a torn awning: the deck's a bit quieter until it's mended"); }
   // the wine: the vinegar barrel, the starlings and the netting
