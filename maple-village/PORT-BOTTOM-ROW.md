@@ -159,6 +159,19 @@ Commit `45b9e10` "The paperie's steps drawn, like the Cocoa Room's" on the branc
 ### 15. More trivia (round 302)
 Commit `9058fc3` "Trivia: 220 questions in eleven rounds, a different mix each week" on the branch (HANDOFF.md round 302). If this edition has trivia night on the terrace (`game/occasions.js` `QUIZ`): the questions move to a new file `src/data/trivia.js` (`QUIZ_ROUNDS`, eleven rounds of twenty), and `quizFor` plays four rounds picked by the date (`nightRounds`) plus the Honeybrook round to finish, with a `mix` step on the hash so neighbouring weeks differ. The Honeybrook round names personal-edition villagers and places (Tomo, Mateo, Bram, Dot, Pilar, Amara, Pebble, Bellbird Valley's people): keep the ones this edition has and swap or drop the rest. Test: the new check in "The terrace's week".
 
+### 16. Happenings: setbacks and surprises (rounds 303 and 304)
+Commits `c7da0a9` "Happenings, part one" and `00d2241` "Happenings, part two" (HANDOFF.md rounds 303 and 304). Once a player has bought everything, nothing much happens, so now and then something does. Take the new file `src/game/happen.js` as it stands at the branch tip and wire it by hand:
+- **The morning roll** (`hapDaily`, state `F.hap`): never on the first morning or while away on a trip. Each happening leaves a note in the mailbox (`hapMail`, merged into core's mail list; add `HP.hapMail(F).length` to the mail cache key). In `core.js`, `hapNow()` runs every 15 seconds from the tick, builds who owns what, reads last night's weather, then calls `judge()` (the critic) and `lapse()` (a missed order).
+- **Storm night** (60% after a stormy night): breaks the boat's rail (no boat trips or cruises until mended), a vineyard trellis (that row can't be picked), the Scoop Shack awning (sales ×0.85), or the bandstand bunting. A tappable "Storm damage: mend" tape label (`hapMarks`, `data-mend`); Mel walks over and pays (`mend`).
+- **The wine** (`vineyard.js`): every twelfth bottling turns to vinegar (six bottles of `vinegar`, sells for 2); in harvest week, without the new **bird netting** (vineyard shop, 80), starlings strip a few ripe vines (`birdsTake`).
+- **The food critic** (1 in 20, a fortnight apart): a hint names the shop and the hour; well stocked (`WELL`) means a good review and ×1.3 sales for a week, otherwise a lukewarm write-up and no harm.
+- **Coach party** (1 in 10): the bay's shops or the wine shop sell ×3 for two hours from 11 or 2.
+- **Big orders** (1 in 8, at least 6 days apart): 20 to 30 scoops, 12 to 18 bars or 10 to 16 bottles, due in 2 or 3 days at 5pm, paid at the shop price plus a tenth. "Order: deliver" label on the shop (`data-order`, `orderStock`, `orderTake` in core). Missed: a note, nothing lost.
+- **Upkeep**: per shop, after 21 days, 1 in 14 a morning, a bill (80, 100 or 60) and an "Upkeep: pay" label; that shop sells ×0.8 until it's paid.
+- `boost(F, shop, day, hm)` multiplies sales in `scoop.js` (`saleMinute`), `cocoa.js` (`busy`) and the wine shop's factor.
+- Port only the parts whose shops and places this edition has, and map the village names in the notes (the cricket club, Hana, Bram, the Honeybrook Gazette) to this edition's. Keep the amounts: money must not come easily.
+- Tests: "Happenings: storms, the wine, the critic and coach parties (round 303)" and "Happenings: big orders and upkeep (round 304)".
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.
@@ -174,5 +187,6 @@ Port these smoke-test blocks:
 - "Inside the lighthouse (round 297)", plus the changed checks listed in section 12
 - "Seashells, one at a time, and the chocolate steps (round 299)", plus the changed checks HANDOFF.md round 299 lists, for the parts you ported
 - the changed check in "The paperie in Montrose (round 183)" (section 14)
+- "Happenings: storms, the wine, the critic and coach parties (round 303)" and "Happenings: big orders and upkeep (round 304)" (section 16)
 
 Adjust their ids to this edition. Then run the full suite and publish only when it's green. Afterwards, tell me what you changed from the source and anything you couldn't port.
