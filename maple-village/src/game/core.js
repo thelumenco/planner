@@ -3690,12 +3690,24 @@ function hapNow(){
   lastHap = Date.now(); const day = dayKey(), hm = sgHM(), prev = prevDay(day);
   const own = {scoop: !!F.scoop, cocoa: owns(F, "cocoa"), wine: !!F.vine, boat: owns(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning)};
   const got = HP.hapDaily(F, day, own, {stormy: [3, 9, 15, 21].some(h => stormyOn(prev, h*60)), away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: rnd => birdsTake(F, rnd)});
-  const j = HP.judge(F, day, hm, hapStock);
-  if (got.length || j) { save(); sfx("paper", true); flash(got.includes("storm") ? "Storm damage in the night: see your mailbox" : j ? (j.good ? "A good review in the Gazette!" : "A review in the Gazette") : "Something's happening today: see your mailbox"); drawScene(); }
+  const j = HP.judge(F, day, hm, hapStock), lp = HP.lapse(F, day, hm);
+  if (lp && !got.length && !j) { save(); flash(`The order for ${lp.who} wasn't ready in time: see your mailbox`); }
+  if (got.length || j) { save(); sfx("paper", true); flash(got.includes("storm") ? "Storm damage in the night: see your mailbox" : got.includes("order") && !j ? "A big order's come in: see your mailbox" : j ? (j.good ? "A good review in the Gazette!" : "A review in the Gazette") : "Something's happening today: see your mailbox"); drawScene(); }
+}
+// round 304: what an order takes, and from where (scoops from the tubs, bars off the wall, bottles off the shop shelves)
+const orderStock = shop => shop === "scoop" ? Object.values(scoopState(F).tubs || {}).reduce((a, n) => a + n, 0) : shop === "cocoa" ? Object.values(cocoaState(F).bars).reduce((a, n) => a + n, 0) : F.vine ? vShelfStock(vineState(F)) : 0;
+function orderTake(shop, n){
+  const take = (o, k) => { const t = Math.min(n, o[k]); o[k] -= t; n -= t; };
+  if (shop === "scoop") { const t = scoopState(F).tubs; Object.keys(t).sort((a, b) => t[b] - t[a]).forEach(k => n > 0 && take(t, k)); }
+  else if (shop === "cocoa") { const b = cocoaState(F).bars; Object.keys(b).sort((x, y) => b[y] - b[x]).forEach(k => n > 0 && take(b, k)); }
+  else { const v = vineState(F); v.shelf.forEach(x => n > 0 && take(x, "n")); v.shelf = v.shelf.filter(x => x.n > 0); }
 }
 function hapMarks(){
-  return HP.hapState(F).repairs.map(r => { const a = HP.repairAt(F, r.id); if (!a || a.scene !== scene) return "";
-    return `<g data-mend="${r.id}" aria-label="Storm damage: tap to mend"><ellipse class="hov" cx="${a.at[0]}" cy="${a.at[1] + 4}" rx="44" ry="10" style="fill:var(--butter)"/>${tapeLabel(a.at[0], a.at[1], "Storm damage: mend", "#F2B8B0", 10)}</g>`; }).join("");
+  const lab = (attr, id, at, text, col, aria) => `<g ${attr}="${id}" aria-label="${aria}"><ellipse class="hov" cx="${at[0]}" cy="${at[1] + 4}" rx="44" ry="10" style="fill:var(--butter)"/>${tapeLabel(at[0], at[1], text, col, 10)}</g>`;
+  const o = HP.orderAt(F), out = HP.hapState(F).repairs.map(r => { const a = HP.repairAt(F, r.id); if (!a || a.scene !== scene) return "";
+    return HP.isUpkeep(r.kind) ? lab("data-mend", r.id, a.at, "Upkeep: pay", "#F3D9A4", "Upkeep due: tap to pay") : lab("data-mend", r.id, a.at, "Storm damage: mend", "#F2B8B0", "Storm damage: tap to mend"); });
+  if (o && o.scene === scene) out.push(lab("data-order", "1", o.at, "Order: deliver", "#C9E4D2", "A big order: tap to deliver"));
+  return out.join("");
 }
 function letsTick(){
   const L = LT.letState(F), had = L.offered, ev = LT.step(F, dayKey(), sgHM());
@@ -4514,6 +4526,8 @@ svg.addEventListener("click", ev => {
   // round 277: the allotments, each neighbour's plot and the swap crate; the gate back to the green
   // round 283: Bram's cottage: the fire, the kettle (tea with Bram), the ship in a bottle, the window and the logbook
   // round 297: inside the lighthouse: three floors up the spiral stair
+  const ord = ev.target.closest("[data-order]");   // round 304: deliver a big order
+  if (ord) { const at = (HP.orderAt(F) || {}).at || [mel.x, mel.y]; go(scene, at[0], Math.min(600, at[1] + 40), () => { const r = HP.deliver(F, dayKey(), sgHM(), orderStock, orderTake); if (!r) return; speak(r.line, 6000); if (r.ok) { sfx("coin"); S.earned += r.paid; gainXp(3); act("cheer"); } save(true); drawScene(); }); return; }
   const mnd = ev.target.closest("[data-mend]");   // round 303: mend storm damage
   if (mnd) { const id = mnd.dataset.mend, at = (HP.repairAt(F, id) || {}).at || [mel.x, mel.y]; go(scene, at[0], Math.min(600, at[1] + 40), () => { const r = HP.mend(F, id); if (!r) return; speak(r.line, 6000); if (r.ok) { sfx("chime"); gainXp(2); act("cheer"); } save(true); drawScene(); }); return; }
   const lsp = /^lhtower[123]$/.test(scene) && ev.target.closest("[data-lhspot]");

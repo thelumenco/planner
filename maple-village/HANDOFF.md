@@ -2905,3 +2905,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - `boost(F, shop, day, hm)` is applied in scoop.js `saleMinute`, cocoa.js `busy`, and the wine shop's factor.
 - Tests: the "Happenings: storms, the wine, the critic and coach parties (round 303)" block (20 checks).
 - Part two still to come: big orders with deadlines, and upkeep.
+
+## Round 304: happenings, part two (big orders with deadlines, and upkeep)
+- **Big orders** (happen.js `ORDER`, `order`, `deliver`, `lapse`, `orderAt`, `ORDER_AT`): 1 in 8 a morning, one at a time, at least 6 days apart. Someone in the village (the cricket club, the school, the golf club...) wants 20 to 30 scoops, 12 to 18 bars or 10 to 16 bottles, due in 2 or 3 days at 5pm. Paid at the shop's own price (4 a scoop, 6 a bar, 15 a bottle) plus a tenth as a thank-you. An "Order: deliver" tape label (`data-order`) sits on the shop (Scoop Shack and Cocoa Room on the bay, the wine shop on the vineyard); tapping it walks Mel over and delivers from the shop (core `orderStock`, `orderTake`: the tubs, the bar wall, the shop shelves), or says how many are short. Missed: a note ("went elsewhere"), nothing lost, and no order for about a fortnight.
+- **Upkeep** (`REPAIR.up_scoop` 80, `up_cocoa` 100, `up_wine` 60; `upkeep`, `isUpkeep`): for each shop she owns, the clock starts the first morning; after 21 days, 1 in 14 a morning, a bill comes in (a mail note and an "Upkeep: pay" label). Until it's paid that shop sells ×0.8 (`boost`). Paying uses the same `data-mend`/`mend` path and restarts the clock.
+- Tests: "Happenings: big orders and upkeep (round 304)" (17 checks).

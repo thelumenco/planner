@@ -5153,6 +5153,43 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.close();
 }
 {
+  // round 304: happenings, part two (big orders with deadlines, and upkeep)
+  console.log("\nHappenings: big orders and upkeep (round 304)");
+  const hp = await import(new URL("../src/game/happen.js", import.meta.url));
+  const seq = a => { let i = 0; return () => a[i++ % a.length]; };
+  { const F = {coins: 0}; hp.hapDaily(F, "2026-06-01", {scoop: 1});
+    check(hp.hapDaily(F, "2026-06-02", {scoop: 1}, {rnd: seq([.9, .9, .05, 0, .3, .5, .9, .9])}).includes("order") && F.hap.order.n === 25 && F.hap.order.due === "2026-06-05" && F.hap.order.pay === 100 && F.hap.order.tip === 10 && /by Friday at 5pm/.test(F.hap.log[0].body), "a big order: 25 scoops for sports day, by Friday at 5pm, 100 coins and 10 as thanks");
+    check(hp.orderAt(F).scene === "bay" && /15 in the Scoop Shack/.test(hp.deliver(F, "2026-06-03", 600, () => 15, () => 0).line) && F.hap.order, "not enough in the freezer: it waits");
+    let took = 0; const r = hp.deliver(F, "2026-06-03", 600, () => 30, (s, n) => took = n);
+    check(r.ok && took === 25 && F.coins === 110 && r.paid === 110 && !F.hap.order && /Thank you/.test(F.hap.log[0].title), "delivered: the scoops come out of the tubs, 110 coins and a thank-you note");
+    check(!hp.hapDaily(F, "2026-06-04", {scoop: 1}, {rnd: () => .01}).includes("order"), "not another order straight away"); }
+  { const F = {coins: 0}; hp.hapDaily(F, "2026-06-01", {wine: 1}); hp.hapDaily(F, "2026-06-02", {wine: 1}, {rnd: seq([.9, .9, .05, 0, 0, 0, 0, .9])});
+    check(F.hap.order && F.hap.order.shop === "wine" && hp.lapse(F, "2026-06-04", 16*60) === null, "an order for the wine shop, not late yet");
+    check(hp.lapse(F, "2026-06-04", 17*60) && !F.hap.order && /went elsewhere/.test(F.hap.log[0].title) && F.coins === 0, "past the deadline: they went elsewhere, nothing lost");
+    check(!hp.hapDaily(F, "2026-06-10", {wine: 1}, {rnd: () => .01}).includes("order"), "and no orders for a while after"); }
+  { const F = {coins: 50}; hp.hapDaily(F, "2026-06-01", {cocoa: 1}); hp.hapDaily(F, "2026-06-02", {cocoa: 1}, {rnd: () => .99});
+    check(hp.hapState(F).upkeep.cocoa === "2026-06-02" && !hp.hapState(F).repairs.length, "upkeep's clock starts the first morning she owns the shop");
+    check(!hp.hapDaily(F, "2026-06-20", {cocoa: 1}, {rnd: seq([.99, .99, .99, .01])}).length, "nothing due in the first three weeks");
+    check(hp.hapDaily(F, "2026-06-24", {cocoa: 1}, {rnd: seq([.99, .99, .99, .01])}).includes("upkeep") && hp.broken(F, "up_cocoa") && hp.boost(F, "cocoa", "2026-06-24", 600) === .8 && hp.repairAt(F, "up_cocoa-2026-06-24").scene === "bay", "the grinding stones need re-dressing: the Cocoa Room sells a fifth less until it's paid");
+    check(/bill is 100/.test(hp.mend(F, "up_cocoa-2026-06-24").line), "100 coins: not enough yet");
+    F.coins = 120; check(hp.mend(F, "up_cocoa-2026-06-24").ok && F.coins === 20 && hp.boost(F, "cocoa", "2026-06-25", 600) === 1 && hp.hapState(F).upkeep.cocoa === "2026-06-24", "paid: back to normal, and the clock starts again"); }
+  // in the browser: an order outside the Scoop Shack
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`orders pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/ho=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; f.coins = 0;
+    f.scoop = Object.assign(f.scoop || {}, {tubs: {vanilla: 14, strawberry: 12}});
+    f.hap = {day: "2026-10-14", repairs: [], boosts: [], log: [], critic: null, lastCritic: "", lastCoach: "", lastOrder: "2026-10-14", upkeep: {}, order: {id: "order-2026-10-14", shop: "scoop", n: 20, who: "the church", what: "the summer fete", day: "2026-10-14", due: "2026-10-16", hm: 1020, pay: 80, tip: 8}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-14"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-14&ho=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("bay")); await page.waitForTimeout(1000);
+  check(await page.locator('#world [data-order]').count() === 1, "the bay: an \"Order: deliver\" label on the Scoop Shack");
+  await page.locator('#world [data-order]').dispatchEvent("click"); await page.waitForFunction(() => !document.querySelector('#world [data-order]'), null, { timeout: 20000 }).catch(() => {});
+  check(await fox().then(f => !f.hap.order && f.coins === 88 && f.scoop.tubs.vanilla + f.scoop.tubs.strawberry === 6), "tap it: twenty scoops out of the tubs, 88 coins");
+  await page.close();
+}
+{
   // round 303 (Mel: "I need more random events and setbacks in the game. Now have bought everything and am bored"; she
   // picked storm night, the wine, a food critic, a coach party, big orders with deadlines and upkeep: part one)
   console.log("\nHappenings: storms, the wine, the critic and coach parties (round 303)");
