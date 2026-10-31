@@ -15,6 +15,7 @@ import * as GS from "../../src/game/giftshop.js";
 import * as WR from "../../src/game/wrap.js";
 import * as GA from "../../src/game/gallery.js";
 import * as PP from "../../src/game/paperie.js";
+import * as HP from "../../src/game/happen.js";
 import * as SW from "../../src/data/sewing.js";
 import { sellBack } from "../../src/game/tailor.js";
 import { BOX as TRAVEL_BOX, TRADE } from "../../src/game/contacts.js";
@@ -337,4 +338,22 @@ function tailorPage(){
   return {slug: "tailor-and-haberdashery", title: "Tailor and haberdashery", navTitle: "Tailor and haberdashery", section: "making", blurb: "Ada's fabric and buttons, and clothes made to your design by Idris", html, search};
 }
 
-export const pages = () => [vineyardPage(), millPage(), kitchenPage(), scoopPage(), cocoaPage(), giftPage(), paperiePage(), tailorPage()];
+// round 303 (ported): happenings, the setbacks and surprises that come now and then (game/happen.js)
+function happenPage(){
+  const R = HP.REPAIR, up = k => R["up_" + k];
+  const html = lede(`Once the village is built up, now and then something happens. Each one leaves a note in your mailbox. Setbacks cost a little time and a few coins, never what you've built, and nothing happens while you're away on a trip.`)
+    + h2("storms", "Storm damage") + `<p>After a stormy night there's a good chance something's broken. A pink "Storm damage: mend" label goes on it: walk over and tap it to mend it.</p>`
+    + T(["What breaks", "Until it's mended", "To mend"], [["Your boat's rail", "No boat trips or cruises", coin(R.boat.cost)], ["A vineyard trellis", "That row can't be picked", coin(R.trellis.cost)],
+      ["The Scoop Shack's awning", "The deck's a bit quieter", coin(R.awning.cost)], ["The bandstand bunting", "It just looks sorry for itself", coin(R.bunting.cost)]])
+    + h2("the-wine", "The wine") + `<p>Now and then a barrel turns to vinegar when you bottle it (about one in twelve). It isn't wasted: six bottles of wine vinegar, which Hana buys. In harvest week, starlings come for the ripe grapes and strip a few vines, unless you've put up <b>bird netting</b> (${coin(VY.SHOP.netting.price)} at the vineyard stall).</p>`
+    + h2("the-critic", "The food critic") + `<p>Every so often there's word in the village that a critic will try one of your shops that day, and roughly when. If it's well stocked when they call (${HP.WELL.scoop} scoops in the Scoop Shack, ${HP.WELL.cocoa} chocolates in the Cocoa Room, or ${HP.WELL.wine} bottles on the wine shop's shelves), the Honeybrook Gazette gives it a good review and it's busier for a week. If not, a lukewarm write-up, and no harm done.</p>`
+    + h2("coach-party", "Coach parties") + `<p>Some mornings a coach is booked in at the bay or the vineyard, at 11am or 2pm. For two hours the shops there are three times as busy: stock up beforehand.</p>`
+    + h2("big-orders", "Big orders") + `<p>Now and then someone in the village wants a lot at once, by a set day at 5pm. Have them in the shop, then tap the green "Order: deliver" label outside it. They pay the shop price and a tenth more as thanks. Miss the deadline and they buy elsewhere: nothing's lost.</p>`
+    + T(["Shop", "How many", "Paid each"], Object.entries(HP.ORDER).map(([k, o]) => [esc(HP.SHOP_N[k].replace(/^the /, "").replace(/^./, c => c.toUpperCase())), `${o.n[0]} to ${o.n[1]} ${o.unit}`, coin(o.price)]))
+    + h2("upkeep", "Upkeep") + `<p>After a shop's first three weeks, every so often it needs some upkeep: a bill, and a yellow "Upkeep: pay" label outside it. Until it's paid, that shop sells a fifth less.</p>`
+    + T(["Shop", "What wears out", "Bill"], [["Scoop Shack", "The big freezer's yearly service", coin(up("scoop").cost)], ["Cocoa Room", "The grinding stones, re-dressed", coin(up("cocoa").cost)], ["Wine shop", "The pump and hoses", coin(up("wine").cost)]]);
+  const search = [{t: "Storm damage", d: "Happenings: mending what a storm broke", a: "/happenings#storms"}, {t: "Bird netting", d: "Keeps the starlings off the grapes in harvest week", a: "/happenings#the-wine"},
+    {t: "Food critic", d: "Happenings: a review in the Gazette", a: "/happenings#the-critic"}, {t: "Big orders", d: "Happenings: a lot at once, by a deadline", a: "/happenings#big-orders"}, {t: "Upkeep", d: "Happenings: bills for the shops", a: "/happenings#upkeep"}];
+  return {slug: "happenings", title: "Happenings", section: "making", blurb: "Storms, the vinegar barrel, starlings, the food critic, coach parties, big orders and upkeep", html, search};
+}
+export const pages = () => [vineyardPage(), millPage(), kitchenPage(), scoopPage(), cocoaPage(), giftPage(), paperiePage(), tailorPage(), happenPage()];

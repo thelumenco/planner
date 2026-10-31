@@ -459,3 +459,19 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
 - The personal edition's three Singapore questions were swapped (the Little Mermaid, a Bramley, thyme); every
   Honeybrook answer was checked against this edition (Tomo, Mateo, Bram's Monday lamp, Pebble, Dot, Pilar, Amara...).
 - Test: the new check in "The terrace's week".
+
+## Rounds 303 and 304 (ported): happenings, setbacks and surprises
+
+- game/happen.js (from the personal edition's tip): a morning roll (`hapDaily`, `F.hap`), never on the first morning or
+  while away. Storm damage after a stormy night (the boat's rail, a trellis, the awning, the bunting), the critic
+  (`judge`, `WELL`), coach parties, big orders (`order`, `deliver`, `lapse`), upkeep bills per shop after 21 days.
+  `boost(F, shop, day, hm)` in scoop.js `saleMinute`, cocoa.js `busy` and the wine shop's factor. Notes go to the
+  mailbox (`hapMail`, in core's `localMail` and its cache key).
+- vineyard.js: one bottling in twelve turns to `vinegar` (6 bottles, sells for 2); `birdsTake` in harvest week unless
+  the vineyard stall's bird netting (80) is up; a downed trellis row can't be picked, by you or the workers.
+- core.js: `hapNow` every 15 seconds, `hapStock`, `orderStock`/`orderTake`, `hapMarks` (tape labels: "Storm damage:
+  mend", "Upkeep: pay", "Order: deliver"; `data-mend`, `data-order`), and no boat trips or cruises while the rail's broken.
+- Changed from the source: no pub or inn here, so the critic asks Nell at the holiday cottages, and Nell orders the
+  chocolates; "she" in notes and comments became "you". Wiki: a new Happenings page (wiki/pages/50-making.mjs).
+- Tests: "Happenings: storms, the wine, the critic and coach parties (round 303)" and "Happenings: big orders and upkeep
+  (round 304)", with the personal edition's later fix to the coach check.

@@ -33,6 +33,7 @@
 // often while the player's serving too). Takings go straight to the player. The player can have a bar or take one to give.
 import { esc, dayKey, localHM, hash, LOC } from "../util.js";
 import { icon } from "../art/icons.js";
+import { boost } from "./happen.js";
 import { ITEMS } from "../data/items.js";
 import { mouldPath, shellRibs } from "../art/moulds.js";
 import { INGR, farmShelf, scoopState, hasUp, takeBack, bikeOwned, DELIVERY, deliveryHours } from "./scoop.js";
@@ -332,7 +333,7 @@ export function cocoaTick(F, opts = {}){
       const s = c.sold[day] = c.sold[day] || {n: 0, coins: 0, bonbons: 0}; c.specials[sp.id]--; s.specials = (s.specials || 0) + 1; s.coins += sp.price; out.coins += sp.price; out.specials = (out.specials || 0) + 1; }
     const stocked = Object.keys(KINDS).filter(k => c.bars[k] > 0), shown = onDisplay(c); if (!stocked.length && !shown.length) continue;
     const d = sg.getUTCDay(), we = d === 0 || d === 6, pf = Math.pow(6/Math.max(2, c.prices.bar), 1.3);
-    const busy = (ccUp(c, "window") ? 1.2 : 1)*(ccUp(c, "assistant") ? 1.1 : 1);
+    const busy = (ccUp(c, "window") ? 1.2 : 1)*(ccUp(c, "assistant") ? 1.1 : 1)*boost(F, "cocoa", day, hm);   // round 303: a review, a coach party, upkeep
     if (Math.random() >= .03*(we ? 1.4 : 1)*(hm >= 15*60 && hm < 18*60 ? 1.2 : 1)*(opts.serving ? 1.5 : 1)*pf*busy) continue;
     const got = sellTo(c, day, out, {box: ccUp(c, "wrap")});
     if (got && ccUp(c, "fountain") && Math.random() < .25) { c.sold[day].coins++; c.sold[day].tips = (c.sold[day].tips || 0) + 1; out.coins++; }   // lingering by the fountain
