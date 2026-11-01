@@ -2598,6 +2598,8 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     sp_log: G("Chocolate yule log", "family", 18, "cocoa", "A chocolate log! It's Christmas now, officially.", null, { evan: "A CHOCOLATE TREE! I mean log! Can I eat the holly?", marcus: "Dark choc log, no dairy. Merry Christmas, Zeh." }),
     sp_coins: G("Box of gold chocolate coins", NOM, 12, "cocoa", "Gold coins! Huat ah! So much luck in one box.", ["box", "#F3C969", "#D9433A"], { evan: "I'm RICH! Chocolate rich!", mama: "Gold coins for Ma Ma? Huat ah!" }),
     sp_spiced: G("Spiced chocolate box", "family", 12, "cocoa", "Cardamom and chocolate? Oh, that's lovely. Happy Deepavali!", ["box", "#4A2E22", "#F6A23A"], { marcus: "Dark and spiced, dairy-free. Happy Deepavali, Zeh." }),
+    sp_hearts: G("Box of chocolate hearts", "family", 12, "cocoa", "Chocolate hearts! You're a sweetheart. Happy Valentine's!", null, { evan: "Hearts! One for me and one for Maple!", marcus: "Dark chocolate, so no dairy. Thanks, Zeh!", mama: "Hearts for Ma Ma? Aiyo, so sweet.", gonggong: "Valentine's chocolate! I share with your Ma Ma. Maybe." }),
+    sp_roses: G("Posy of chocolate roses", NOM, 12, "cocoa", "Chocolate roses! They're far too pretty to eat. Well, nearly.", null, { mum: "Roses I can eat! Happy Mother's Day to me. Thank you, darling.", mama: "Chocolate flowers for Ma Ma! Wah, so clever. Happy Mother's Day!", evan: "For Mummy! Can I have one rose?" }),
     sp_mooncake: G("Chocolate mooncake", NOM, 10, "cocoa", "A chocolate mooncake! Let's have it under the lanterns.", null, { mama: "Chocolate mooncake? Ma Ma never try before. So modern!" }),
     box16: G("Grand box of 16 bonbons", NOM, 50, "cocoa", "Sixteen bonbons, in a ribbon box! I'm going to make these last. I'm not.", ["box", "#C2505F", "#F3C969"]),
     box16d: G("Grand box of 16 dark bonbons", "family", 50, "cocoa", "Sixteen dark bonbons, all dairy-free! This is a treasure chest.", ["box", "#4A2E22", "#C2505F"], { marcus: "Sixteen, dairy-free. You spoil me, Zeh." }),
@@ -8474,6 +8476,22 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     I.housechoc = S4.bar("#3F2519");
     I.sp_log = I.logcake;
     I.sp_mooncake = I.mooncake;
+    I.sp_spiced = [
+      `<rect x="3" y="10" width="18" height="10" rx="1.5" ${f3("#F6A23A")}/><path d="M4 10l2-5h12l2 5z" ${f3("#4A2E22")}/>${[6.5, 12, 17.5].map((x) => `<path d="M${x - 3} 13.5q3 4.5 6 0z" ${f3("#4A2E22")}/><path d="M${x} 13.2q-1.4-1.6 0-3.4q1.4 1.8 0 3.4z" ${f3("#F3C969")}/>`).join("")}<circle cx="7" cy="17.5" r=".9" ${f3("#D9433A")}/><circle cx="12" cy="17.5" r=".9" ${f3("#7A3E8A")}/><circle cx="17" cy="17.5" r=".9" ${f3("#2E8B7A")}/>`,
+      `<rect x="3" y="10" width="18" height="10" rx="1.5"/><path d="M4 10l2-5h12l2 5"/>${[6.5, 12, 17.5].map((x) => `<path d="M${x - 3} 13.5q3 4.5 6 0z"/>`).join("")}`
+    ];
+    I.sp_hearts = [
+      `<path d="M12 21c-7-4-9-8-7-11c1.6-2.4 5-2 7 .6c2-2.6 5.4-3 7-.6c2 3 0 7-7 11z" ${f3("#C2253F")}/><path d="M9 12.5c-1.6-1-1.2-2.6 0-2.4c.6 .1 1 .5 1 .9c0-.4.4-.8 1-.9c1.2-.2 1.6 1.4 0 2.4l-1 .8z" ${f3("#4A2E22")}/><path d="M14 16c-1.6-1-1.2-2.6 0-2.4c.6 .1 1 .5 1 .9c0-.4.4-.8 1-.9c1.2-.2 1.6 1.4 0 2.4l-1 .8z" ${f3("#4A2E22")}/>`,
+      `<path d="M12 21c-7-4-9-8-7-11c1.6-2.4 5-2 7 .6c2-2.6 5.4-3 7-.6c2 3 0 7-7 11z"/>`
+    ];
+    I.sp_roses = [
+      `<path d="M12 21V12M12 16l-4-3M12 15l4-3" style="stroke:#7FA35A;stroke-width:1.6;fill:none"/><circle cx="8" cy="9" r="3.4" ${f3("#FBF1E4")}/><circle cx="16" cy="9" r="3.4" ${f3("#FBF1E4")}/><circle cx="12" cy="6.5" r="3.6" ${f3("#F6C9CF")}/><path d="M10 19h4l-.6 3h-2.8z" ${f3("#F2B8C6")}/>`,
+      `<circle cx="8" cy="9" r="3.4"/><circle cx="16" cy="9" r="3.4"/><circle cx="12" cy="6.5" r="3.6"/><path d="M11 6.5q1-1.6 2 0" opacity=".6"/>`
+    ];
+    I.sp_coins = [
+      `<rect x="3" y="11" width="18" height="9" rx="1.5" ${f3("#D9433A")}/><circle cx="8" cy="12" r="4" ${f3("#F3C969")}/><circle cx="15.5" cy="11" r="4" ${f3("#E8B84A")}/><circle cx="12" cy="15.5" r="4" ${f3("#F3C969")}/>`,
+      `<rect x="3" y="11" width="18" height="9" rx="1.5"/><circle cx="8" cy="12" r="4"/><circle cx="15.5" cy="11" r="4"/><circle cx="12" cy="15.5" r="4"/><circle cx="12" cy="15.5" r="2.4" opacity=".5"/><circle cx="8" cy="12" r="2.4" opacity=".5"/>`
+    ];
     [["red", "#7A1F3D"], ["rose", "#E98AA0"], ["white", "#E8D57A"], ["sparkling", "#F3E7B0"]].forEach(([k, c]) => {
       I["wine_" + k] = S4.bottle(c);
     });
@@ -16849,12 +16867,18 @@ ${p.sign}` };
     }
     return null;
   }
+  var mixr = (h3) => {
+    h3 = Math.imul(h3 ^ h3 >>> 16, 73244475);
+    h3 = Math.imul(h3 ^ h3 >>> 16, 73244475);
+    return (h3 ^ h3 >>> 16) >>> 0;
+  };
   function rainDay(day) {
-    const h3 = hash(day + "rain") % 100;
-    return [11, 12, 1].includes(+day.slice(5, 7)) ? h3 < 34 ? 2 : h3 < 44 ? 1 : 0 : h3 < 14 ? 1 : 0;
+    const d = Math.round(dayNum(day)), w = Math.floor(d / 5), at9 = d - w * 5, second = 2 + mixr(w * 7 + 3) % 2;
+    if (at9 !== 0 && at9 !== second) return 0;
+    return mixr(hash(day + "rain")) % 100 < ([11, 12, 1].includes(+day.slice(5, 7)) ? 50 : 25) ? 2 : 1;
   }
   function showerAt(day) {
-    const from = 9 * 60 + hash(day + "when") % (10 * 60), len = rainDay(day) === 2 ? 45 + hash(day + "len") % 16 : 20 + hash(day + "len") % 21;
+    const len = 60 + mixr(hash(day + "len")) % 121, from = 7 * 60 + mixr(hash(day + "when")) % (12 * 60 + 1);
     return { from, to: from + len };
   }
   function rainLevel(day, hm12 = sgHM()) {
@@ -16865,6 +16889,11 @@ ${p.sign}` };
   }
   var rainyOn = (day, hm12) => rainLevel(day, hm12) > 0;
   var stormyOn = (day, hm12) => rainLevel(day, hm12) === 2;
+  var roughSea = (day, hm12 = sgHM()) => {
+    if (rainDay(day) !== 2) return false;
+    const w = showerAt(day);
+    return hm12 >= w.from - 30 && hm12 < w.to + 120;
+  };
   function festivalArt(f5) {
     if (!f5) return "";
     const lanternRow = (x1, x2, y, cols) => {
@@ -20205,7 +20234,7 @@ ${r.n}`;
     h3.boosts = h3.boosts.filter((b) => b.to >= day);
     if (first || o.away) return [];
     const rnd17 = o.rnd || Math.random, out = [];
-    if (o.stormy && rnd17() < 0.6) {
+    if (o.stormy && rnd17() < 0.4) {
       const r = storm(F2, day, own, rnd17);
       if (r) out.push("storm");
     }
@@ -25029,7 +25058,8 @@ ${r.n}`;
     }
     if (id === "cocoa") {
       const s2 = stationsOf("cocoa").find((t2) => t2.kind === "ccounter"), x2 = s2.x, y2 = s2.y;
-      return sk(
+      const cs = (G2.cocoa ? G2.cocoa() : null) || {}, spx = ["sp_spiced", "sp_coins", "sp_log", "sp_mooncake", "sp_hearts", "sp_roses"].filter((k) => (cs.specials || {})[k] > 0);
+      return spx.map((k, i) => `<g pointer-events="none">${iconAt(k, x2 - 88 + i * 22, y2 - 64, 22)}</g>`).join("") + sk(
         `<rect x="${x2 - 96}" y="${y2 - 46}" width="192" height="46" rx="4" style="fill:#8A5A3A"/><rect x="${x2 - 100}" y="${y2 - 52}" width="200" height="8" rx="2" style="fill:#F6EEE4"/><path d="M${x2 - 96} ${y2 - 24} h192" style="stroke:#F3E7C9" stroke-width="4"/>
       ${[-70, -40, -10, 20].map((dx, i) => `<rect x="${x2 + dx}" y="${y2 - 64}" width="22" height="12" rx="2" style="fill:#FFFDF6"/>${[0, 1, 2].map((k) => `<circle cx="${x2 + dx + 5 + k * 6}" cy="${y2 - 58}" r="2.4" style="fill:${["#4A2E22", "#8A5A3A", "#C2505F", "#F3E7C9"][(i + k) % 4]}"/>`).join("")}`).join("")}<rect x="${x2 + 56}" y="${y2 - 66}" width="26" height="14" rx="2" style="fill:#F3C969"/>`,
         `<rect x="${x2 - 96}" y="${y2 - 46}" width="192" height="46" rx="4"/><rect x="${x2 - 100}" y="${y2 - 52}" width="200" height="8" rx="2"/>${[-70, -40, -10, 20].map((dx) => `<rect x="${x2 + dx}" y="${y2 - 64}" width="22" height="12" rx="2"/>`).join("")}<rect x="${x2 + 56}" y="${y2 - 66}" width="26" height="14" rx="2"/>`
@@ -26108,16 +26138,31 @@ ${r.n}`;
     return TO_FRIDGE;
   }
   var SPECIALS2 = {
-    christmas: { id: "sp_log", n: "Chocolate yule log", kind: "dark", use: 12, make: 4, price: 18, line: "A dark chocolate log with a sprig of holly." },
-    cny: { id: "sp_coins", n: "Box of gold chocolate coins", kind: "milk", use: 12, make: 6, price: 12, line: "Milk chocolate coins in gold foil, for luck." },
-    deepavali: { id: "sp_spiced", n: "Spiced chocolate box", kind: "dark", use: 12, make: 6, price: 12, line: "Dark chocolate with cardamom, cinnamon and a little chilli." },
-    midautumn: { id: "sp_mooncake", n: "Chocolate mooncake", kind: "white", use: 12, make: 6, price: 10, line: "A white chocolate snowskin mooncake with a ganache middle." }
+    // round 305: the line says what it is; the only thing it needs is the chocolate (the spices, foil and so on are in the kitchen)
+    christmas: { id: "sp_log", n: "Chocolate yule log", kind: "dark", use: 12, make: 4, price: 18, line: "A dark chocolate log, rolled and bark-marked with a fork, with a sprig of marzipan holly." },
+    cny: { id: "sp_coins", n: "Box of gold chocolate coins", kind: "milk", use: 12, make: 6, price: 12, line: "Milk chocolate coins wrapped in gold foil, in a red box, for luck." },
+    deepavali: { id: "sp_spiced", n: "Spiced chocolate box", kind: "dark", use: 12, make: 6, price: 12, line: "Little dark chocolate diyas, warm with cardamom and cinnamon, each with a gold flame, in a marigold box." },
+    midautumn: { id: "sp_mooncake", n: "Chocolate mooncake", kind: "white", use: 12, make: 6, price: 10, line: "A white chocolate snowskin mooncake with a ganache middle." },
+    // round 307 (Mel: "And a mother's day and valentines'?"): the week before each
+    valentine: { id: "sp_hearts", n: "Box of chocolate hearts", kind: "dark", use: 12, make: 6, price: 12, line: "Six dark chocolate hearts swirled with pink, in a red heart-shaped box with a ribbon." },
+    mothersday: { id: "sp_roses", n: "Posy of chocolate roses", kind: "white", use: 12, make: 6, price: 12, line: "White chocolate roses blushed pink at the edges, on green stems, tied with a ribbon." }
   };
   var SPECIAL_IDS = Object.values(SPECIALS2).map((x) => x.id);
-  var specialOn = (day) => {
+  var secondSunMay = (y) => {
+    const d = new Date(Date.UTC(y, 4, 1)), first = 1 + (7 - d.getUTCDay()) % 7;
+    return `${y}-05-${String(first + 7).padStart(2, "0")}`;
+  };
+  var weekBefore = (day, to) => {
+    const n = (Date.parse(to + "T00:00:00Z") - Date.parse(day + "T00:00:00Z")) / 864e5;
+    return n >= 0 && n <= 7;
+  };
+  function specialOn(day) {
+    const y = +day.slice(0, 4);
+    if (weekBefore(day, `${y}-02-14`)) return { ...SPECIALS2.valentine, fest: "Valentine's Day" };
+    if (weekBefore(day, secondSunMay(y))) return { ...SPECIALS2.mothersday, fest: "Mother's Day" };
     const f5 = festivalOn(day);
     return f5 && SPECIALS2[f5.id] ? { ...SPECIALS2[f5.id], fest: f5.name } : null;
-  };
+  }
   function makeSpecial(F2) {
     const c = cocoaState(F2), sp = specialOn(dayKey());
     if (!sp || shellChoc(c, sp.kind) < sp.use) return null;
@@ -26476,11 +26521,55 @@ ${r.n}`;
     if (c.bonbons.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map((b) => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS2[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span>${canMakeBonbon(c, b.shell, b.fills) ? `<button class="btn small alt" data-cc="again" data-k="${esc(b.id)}">Another tray</button>` : `<button class="btn small alt" disabled>${esc(shortBy(c, b.shell, b.fills))}</button>`}</li>`).join("")}</ul>`;
     return h3;
   }
+  function specialPic(id, w = 150) {
+    const sk2 = (fill2, line) => `${fill2}<g fill="none" stroke="#3A2E28" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${line}</g>`;
+    let b = "";
+    if (id === "sp_spiced") {
+      const diya = (x, y) => `<path d="M${x - 11} ${y} q11 13 22 0z" style="fill:#4A2E22"/><path d="M${x - 8} ${y + 3} q8 5 16 0" style="fill:none;stroke:#C98A4A;stroke-width:1.2"/><path d="M${x} ${y - 1} q-5 -6 0 -13 q5 7 0 13z" style="fill:#F3C969"/><path d="M${x} ${y - 3} q-2 -3 0 -6 q2 3 0 6z" style="fill:#F6A23A"/>`;
+      b = sk2(
+        `<rect x="10" y="22" width="130" height="64" rx="5" style="fill:#F6A23A"/><rect x="18" y="30" width="114" height="48" rx="3" style="fill:#FBE3B8"/>${[[42, 46], [75, 46], [108, 46], [42, 68], [75, 68], [108, 68]].map(([x, y]) => diya(x, y)).join("")}${[18, 40, 62, 88, 110, 132].map((x, i) => `<circle cx="${x}" cy="90" r="2.6" style="fill:${["#D9433A", "#7A3E8A", "#2E8B7A"][i % 3]}"/>`).join("")}`,
+        `<rect x="10" y="22" width="130" height="64" rx="5"/><rect x="18" y="30" width="114" height="48" rx="3"/>${[[42, 46], [75, 46], [108, 46], [42, 68], [75, 68], [108, 68]].map(([x, y]) => `<path d="M${x - 11} ${y} q11 13 22 0z"/>`).join("")}`
+      );
+    } else if (id === "sp_coins") {
+      b = sk2(
+        `<rect x="10" y="26" width="130" height="62" rx="5" style="fill:#D9433A"/><rect x="18" y="34" width="114" height="46" rx="3" style="fill:#F2B8B0"/>${[[40, 46], [75, 46], [110, 46], [40, 69], [75, 69], [110, 69]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="10.5" style="fill:${i % 2 ? "#E8B84A" : "#F3C969"}"/><rect x="${x - 3.5}" y="${y - 3.5}" width="7" height="7" style="fill:#D9433A"/>`).join("")}`,
+        `<rect x="10" y="26" width="130" height="62" rx="5"/>${[[40, 46], [75, 46], [110, 46], [40, 69], [75, 69], [110, 69]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10.5"/><circle cx="${x}" cy="${y}" r="7" opacity=".45"/>`).join("")}`
+      );
+    } else if (id === "sp_log") {
+      b = sk2(
+        `<rect x="8" y="78" width="134" height="10" rx="3" style="fill:#C9A27E"/><rect x="18" y="38" width="112" height="40" rx="20" style="fill:#5A3624"/><ellipse cx="126" cy="58" rx="12" ry="20" style="fill:#E3C8A0"/><path d="M126 42 q-8 8 0 16 q8 8 0 16" style="fill:none;stroke:#5A3624;stroke-width:3"/><path d="M58 38 l6 -10 l6 10z" style="fill:#7FA35A"/><circle cx="64" cy="27" r="3" style="fill:#D9433A"/><circle cx="70" cy="30" r="3" style="fill:#D9433A"/>`,
+        `<rect x="18" y="38" width="112" height="40" rx="20"/><ellipse cx="126" cy="58" rx="12" ry="20"/><path d="M28 50 h80 M34 60 h70 M30 70 h76" opacity=".5"/>`
+      );
+    } else if (id === "sp_mooncake") {
+      b = sk2(
+        `<circle cx="50" cy="58" r="30" style="fill:#F6EBD2"/><circle cx="50" cy="58" r="20" style="fill:#FBF5E6"/><path d="M98 58 a30 30 0 0 1 30 -30 v60 a30 30 0 0 1 -30 -30z" style="fill:#F6EBD2"/><path d="M106 58 a22 22 0 0 1 22 -20 v40 a22 22 0 0 1 -22 -20z" style="fill:#6B4430"/>`,
+        `<circle cx="50" cy="58" r="30"/><circle cx="50" cy="58" r="20"/><path d="M50 42 v32 M34 58 h32 M39 47 l22 22 M61 47 l-22 22" opacity=".45"/><path d="M98 58 a30 30 0 0 1 30 -30 v60 a30 30 0 0 1 -30 -30z"/>`
+      );
+    } else if (id === "sp_hearts") {
+      const H3 = "M12 21c-7-4-9-8-7-11c1.6-2.4 5-2 7 .6c2-2.6 5.4-3 7-.6c2 3 0 7-7 11z", at9 = (x, y, k) => `transform="translate(${x - 12 * k} ${y - 14.3 * k}) scale(${k})"`;
+      const spots = [[58, 46], [75, 50], [92, 46], [64, 64], [86, 64], [75, 79]];
+      b = sk2(
+        `<path d="${H3}" ${at9(75, 54, 5)} style="fill:#C2253F"/><path d="${H3}" ${at9(75, 55, 4.1)} style="fill:#F2B8C6"/>${spots.map(([x, y]) => `<path d="${H3}" ${at9(x, y, 1.05)} style="fill:#4A2E22"/><path d="M${x - 4} ${y - 2} q4 3 8 -1" style="fill:none;stroke:#F2A0B8;stroke-width:1.4"/>`).join("")}<path d="M75 36 q-13 -11 -15 -2 q2 7 15 2z M75 36 q13 -11 15 -2 q-2 7 -15 2z" style="fill:#F3C969"/><circle cx="75" cy="36" r="3" style="fill:#E8B84A"/>`,
+        `<path d="${H3}" ${at9(75, 54, 5)} vector-effect="non-scaling-stroke"/>${spots.map(([x, y]) => `<path d="${H3}" ${at9(x, y, 1.05)} vector-effect="non-scaling-stroke"/>`).join("")}<path d="M75 36 q-13 -11 -15 -2 q2 7 15 2z M75 36 q13 -11 15 -2 q-2 7 -15 2z"/>`
+      );
+    } else if (id === "sp_roses") {
+      const rose = (x, y) => `<circle cx="${x}" cy="${y}" r="10" style="fill:#FBF1E4"/><path d="M${x - 10} ${y} a10 10 0 0 0 20 0" style="fill:#F6C9CF"/><path d="M${x - 4} ${y - 2} q4 -5 8 0 q-4 4 -8 0z" style="fill:#F2A0B8"/>`;
+      const heads = [[50, 30], [75, 22], [100, 30], [60, 48], [90, 48], [75, 40]];
+      b = sk2(
+        `${heads.map(([x, y]) => `<path d="M${x} ${y + 8} L75 80" style="fill:none;stroke:#7FA35A;stroke-width:3"/>`).join("")}<path d="M62 70 q-12 -4 -14 -12 q10 0 14 12z M88 66 q12 -4 14 -12 q-10 0 -14 12z" style="fill:#9BBF6A"/><path d="M64 76 h22 l-3 14 h-16z" style="fill:#F2B8C6"/><path d="M62 78 q13 6 26 0" style="fill:none;stroke:#C2505F;stroke-width:2.4"/>${heads.map(([x, y]) => rose(x, y)).join("")}`,
+        `${heads.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10"/><path d="M${x - 5} ${y + 1} q5 -8 10 0 q-5 5 -10 0" opacity=".55"/>`).join("")}<path d="M64 76 h22 l-3 14 h-16z"/>`
+      );
+    }
+    return `<svg class="sppic" viewBox="0 0 150 100" width="${w}" height="${Math.round(w * 2 / 3)}" role="img" aria-hidden="true">${b}</svg>`;
+  }
   function specialCard(c) {
     const sp = specialOn(dayKey());
-    if (!sp) return `<p class="muted" style="margin-top:12px">Festival specials appear here around Deepavali, Christmas, Chinese New Year and Mid-Autumn.</p>`;
-    return `<p class="eyebrow" style="margin:12px 0 6px">${esc(sp.fest)} special</p><div class="gresult">${icon(sp.id, 34)}<span><b>${esc(sp.n)}</b><small>${esc(sp.line)} ${sp.use} pieces of ${KINDS2[sp.kind].n.toLowerCase()} make ${sp.make}, at ${sp.price} coins each. ${c.specials[sp.id] || 0} ready.</small></span></div>
-    <div class="actions"><button class="btn small primary" data-cc="special" ${shellChoc(c, sp.kind) >= sp.use ? "" : "disabled"}>Make ${sp.make}</button></div>`;
+    if (!sp) return `<p class="muted" style="margin-top:12px">Festival specials appear here around Deepavali, Christmas, Chinese New Year, Valentine's Day, Mother's Day and Mid-Autumn.</p>`;
+    const n = c.specials[sp.id] || 0, have2 = shellChoc(c, sp.kind);
+    return `<p class="eyebrow" style="margin:12px 0 6px">${esc(sp.fest)} special</p><div style="text-align:center">${specialPic(sp.id, 180)}</div><p><b>${esc(sp.n)}</b><br><small>${esc(sp.line)}</small></p>
+    <p class="muted">All it needs is ${sp.use} pieces of ${KINDS2[sp.kind].n.toLowerCase()} (you have ${have2}): everything else is in the kitchen. ${sp.use} pieces make ${sp.make}. They sell beside the display case at ${sp.price} coins, or take one to give.</p>
+    <p class="muted">${n ? `${n} made and waiting.` : "None made yet."}</p>
+    <div class="actions"><button class="btn small primary" data-cc="special" ${have2 >= sp.use ? "" : "disabled"}>${have2 >= sp.use ? `Make ${sp.make}` : `Needs ${sp.use - have2} more ${KINDS2[sp.kind].n.toLowerCase().split(" ")[0]}`}</button>${n ? `<button class="btn small alt" data-cc="takesp" data-k="${sp.id}">Take one to give</button>` : ""}</div>`;
   }
   function casePanel(F2) {
     const c = cocoaState(F2), ids = displayIds2(c), shown = ids.map((id) => recipeOf2(c, id)), rest = c.bonbons.filter((b) => !ids.includes(b.id) && c.trays[b.id] > 0);
@@ -35159,7 +35248,7 @@ ${m.from}` : ""}`;
     <p class="sub">${esc(t2.boat.blurb || t2.blurb || "")}</p>${t2.boat.sees ? `<p class="muted"><b>On ${esc(t2.n)} this time of year:</b> ${esc(t2.boat.sees(month2))}</p>` : ""}
     <p class="muted">Fuel ${t2.boat.fuel} ${coin4()} there and back, however many come (up to ${BOAT_SEATS} aboard, you included). Set off whenever you like, and sail home whenever you're ready.</p>`;
     if (on) return h3 + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: sail again tomorrow.</p>` + shut12;
-    if (rough) return h3 + `<p><b>Too rough to sail today.</b> Big grey waves out past the jetty. Wait for a calmer day.</p>` + shut12;
+    if (rough) return h3 + `<p><b>Too rough to sail just now.</b> A downpour and big grey waves out past the jetty. It settles a couple of hours after the rain stops.</p>` + shut12;
     h3 += `<h3 class="ph3">Who's coming?</h3><div class="trippicks">${FAMILY.map((id) => `<button class="tpick${party.includes(id) ? " on" : ""}" data-tpick="${id}" aria-pressed="${party.includes(id)}" ${!party.includes(id) && full ? "disabled" : ""}><b>${esc(nameOf2(id))}</b><small>${party.includes(id) ? "aboard" : "a seat"}</small></button>`).join("")}</div>`;
     h3 += `<p class="muted">${party.length ? `You${party.map((id) => ", " + esc(nameOf2(id))).join("").replace(/, ([^,]*)$/, " and $1")}: ${party.length + 1} aboard.` : "Just you (and Maple, who likes the wind in her ears)."}${full ? " The boat's full." : ""} They'll take the day off from whatever they usually do.</p>`;
     h3 += `<div class="actions"><button class="btn primary" data-trip="${town}" data-by="boat" ${F2.coins >= t2.boat.fuel ? "" : "disabled"}>Cast off · ${t2.boat.fuel} ${coin4()}</button></div>`;
@@ -55640,7 +55729,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       h3 = bbRoom === "balloon" ? balloonPanel(F, bbSt.flight, { hm: sgHM(), party: tp }) : bbRoom === "riddle" ? riddlePanel(F, bbSt.riddle) : bbRoom === "berries" ? berriesPanel(F, bbSt.berries, evanOn) : bbRoom === "dip" ? dipPanel(F, bbSt.dip, evanOn) : bbRoom === "joey" ? joeyPanel(F, bbSt.joey, evanOn) : bbRoom === "canoe" ? canoePanel(F, bbSt.canoe, evanOn, bbSt.paid) : bbRoom === "fire" ? firePanel(F, bbSt.bag, { hm: sgHM(), folk: FIRE_FOLK.some(isHere) }) : bbRoom === "surf" ? surfPanel(F, bbSt.surf, evanOn, bbSt.paid) : bbRoom === "whales" ? whalePanel(F, bbSt.whale, evanOn) : bbRoom === "glow" ? glowPanel(F, bbSt.glow, { hm: sgHM(), evan: evanOn }) : bbRoom === "pots" ? potsPanel(F, bbSt.pots, { hm: sgHM(), evan: evanOn }) : bbRoom === "penguins" ? pengPanel(F, bbSt.peng, { hm: sgHM(), evan: evanOn }) : bbRoom === "nippers" ? nipPanel(F, bbSt.nip, { hm: sgHM(), evan: evanOn }) : TL_KINDS.includes(bbRoom) ? tlPanel(F, bbRoom, bbSt, { hm: sgHM(), evan: evanOn }) : LV_KINDS.includes(bbRoom) ? lvPanel(F, bbRoom, bbSt, { hm: sgHM(), evan: evanOn }) : bbRoomPanel(F, bbRoom, { evan: evanOn, party: !!tp.length });
     } else if (bvView) h3 = bvView === "passport" ? passportPanel(F) : mapPanel(F, { pick: tripPick, ownsVan: owns3(F, "van"), region: bvRegion });
     else if (railOpen === "tickets" && scene === "hlane") h3 = ticketPanel(F, tripPick, tripTown);
-    else if (railOpen === "boat" && scene === "shore") h3 = sailPanel(F, tripPick, boatTown, sgHM(), { rough: rainDay(dayKey()) === 2, month: +dayKey().slice(5, 7) });
+    else if (railOpen === "boat" && scene === "shore") h3 = sailPanel(F, tripPick, boatTown, sgHM(), { rough: roughSea(dayKey(), sgHM()), month: +dayKey().slice(5, 7) });
     else if (railOpen === "ferry" && scene === "shore") h3 = ticketPanel(F, tripPick, ferryTown, sgHM(), "ferry");
     else if (railOpen && scene === "hlane") h3 = timetablePanel(dayKey(), sgHM(), true);
     else if (railOpen && townOf(scene)) h3 = homePanel(F, townOf(scene), sgHM(), railOpen === "ferry" || railOpen === "boat" ? railOpen : "train");
@@ -58894,7 +58983,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       speak("The boat's storm-damaged: the rail's cracked. Mend it first (tap the storm damage label at the jetty).", 5e3);
       return;
     }
-    const own = by === "boat", r = buyTrip(F, town, tripPick, sgHM(), by, own && rainDay(dayKey()) === 2);
+    const own = by === "boat", r = buyTrip(F, town, tripPick, sgHM(), by, own && roughSea(dayKey(), sgHM()));
     const t2 = tripOn(F), boat2 = by === "ferry", land2 = own ? r.town.boat.arrive : boat2 ? r.town.ferry.arrive : r.town.arrive;
     railOpen = false;
     tripPick = [];
@@ -61977,7 +62066,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     lastHap = Date.now();
     const day = dayKey(), hm12 = sgHM(), prev = prevDay(day);
     const own = { scoop: !!F.scoop, cocoa: owns3(F, "cocoa"), wine: !!F.vine, boat: owns3(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning) };
-    const got3 = hapDaily(F, day, own, { stormy: [3, 9, 15, 21].some((h3) => stormyOn(prev, h3 * 60)), away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: (rnd17) => birdsTake(F, rnd17) });
+    const got3 = hapDaily(F, day, own, { stormy: rainDay(prev) === 2, away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: (rnd17) => birdsTake(F, rnd17) });
     const j = judge(F, day, hm12, hapStock), lp = lapse(F, day, hm12);
     if (lp && !got3.length && !j) {
       save2();
@@ -62866,7 +62955,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         act("cheer");
         gainXp(2);
         [0, 250].forEach((t2, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 20 : -20), mel.y - 60, 1500), t2));
-        speak(`${sp.make} ${sp.n.toLowerCase()}${sp.make > 1 && !/s$/.test(sp.n) ? "s" : ""} for ${sp.fest}! They'll sell beside the display case.`, 5e3);
+        speak(`${sp.make} ${sp.n.toLowerCase().replace(/^box of/, "boxes of").replace(/box$/, "boxes").replace(/(log|mooncake)$/, "$1s")} for ${sp.fest}! Take one to give, and the rest sell beside the display case.`, 5e3);
       } else if (a === "takesp") {
         if (!takeSpecial(F, k)) return;
         sfx("chime");
