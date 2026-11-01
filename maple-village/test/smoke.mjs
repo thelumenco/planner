@@ -5298,6 +5298,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // the wine: the vinegar barrel, the starlings and the netting
   { const F = {coins: 200, inv: {}}, v = vy.vineState(F); let vin = 0;
     for (let k = 0; k < 12; k++) { v.barrels[0] = {style: "red", start: 0, dur: 0}; const out = vy.bottle(F, 0, "Test " + k); if (/vinegar/.test(out || "")) vin++; }
+    { const kt = await import(new URL("../src/game/kitchen.js", import.meta.url)), ic = await import(new URL("../src/art/icons.js", import.meta.url));   // round 309 (Mel: "What can I do with wine vinegar? And why doesn't it have a drawing")
+      check(kt.isGood("vinegar") && kt.DISHES.insalata.need.vinegar === 1 && kt.TAPAS.encurtidos.need.vinegar === 1 && /C9785A/.test(ic.icon("vinegar", 24)), "wine vinegar has its own bottle drawing, goes in the larder, and makes a tomato salad or pickled vegetables"); }
     check(vin === 1 && F.inv.vinegar === 6, `one barrel in twelve turns to vinegar (${vin}), and it isn't wasted: ${F.inv.vinegar} bottles of wine vinegar`);
     v.rows = [{trellis: true, vines: [{v: "red", wateredAt: Date.now() - 864e5*30}, {v: "red", wateredAt: Date.now() - 864e5*30}]}];
     check(vy.birdsTake(F, () => .99) === 2 && v.rows[0].vines.every(vn => !vn.wateredAt), "harvest week without netting: the starlings strip the ripe vines");

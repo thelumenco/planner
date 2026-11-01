@@ -2939,3 +2939,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - Tests: "The barrel shed and the drying loft as rooms (round 308)"; the vineyard, round 132 loft and Cinque Terre checks now walk into the shed first (and out again); the raisin wine check is 2 days and 6 bottles.
 
 - Round 308b (Mel: "Shed cat is ok, no need for the old list also"; "What if I buy extra barrels in the cellar?"): the loft's "List view" tape is gone (the room does everything; the round 132 check now taps the rack and reads "You need ... more bunches"). The cellar's barrel racks (scenes.js `barrelrack`) now draw the barrels bought for the cellar (the 7th to 18th): twelve barrel ends, each stamped in its wine's colour, dark gaps for ones not bought, a green dot on a ready one, and a "N ready" tag over the racks; tapping the racks still opens the barrels list. Check in the round 308 block.
+
+## Round 309: wine vinegar, drawn and useful (Mel: "What can I do with wine vinegar? And why doesn't it have a drawing")
+- icons.js `I.vinegar`: a tall rosy-amber bottle with a cork and a label (it had no art, so it showed blank).
+- kitchen.js: `vinegar` is a kitchen good (the larder takes it); a small plate `insalata` (tomato salad with your own vinegar: 2 tomatoes, 1 vinegar, 4 plates at 6) and an all-year tapa `encurtidos` (pickled vegetables: a carrot, a pepper, a vinegar, at 8); the ingredient hint says where it comes from. Hana still buys it at 2. The barrel's "turned to vinegar" line and the item's `what` say so.
+- Test: a check in the round 303 block.

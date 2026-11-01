@@ -30,7 +30,7 @@ export const GOODS = {
   garlic: ["bulb of garlic", "bulbs of garlic"], basil: ["bunch of basil", "bunches of basil"], mint: ["bunch of mint", "bunches of mint"], rosemary: ["sprig of rosemary", "sprigs of rosemary"],
   clams: ["clam", "clams"], chives: ["bunch of chives", "bunches of chives"], thyme: ["bunch of thyme", "bunches of thyme"], shrimp: ["shrimp", "shrimp"],
   // round 107: from Ronda's market
-  almond: ["bag of almonds", "bags of almonds"], sevilla: ["Seville orange", "Seville oranges"], oliveoil: ["bottle of olive oil", "bottles of olive oil"], jamon: ["piece of jamón", "pieces of jamón"],
+  almond: ["bag of almonds", "bags of almonds"], sevilla: ["Seville orange", "Seville oranges"], oliveoil: ["bottle of olive oil", "bottles of olive oil"], vinegar: ["bottle of wine vinegar", "bottles of wine vinegar"], jamon: ["piece of jamón", "pieces of jamón"],
   payoyo: ["payoyo cheese", "payoyo cheeses"], membrillo: ["block of membrillo", "blocks of membrillo"],
   // round 122: from Kyoto
   yuzu: ["yuzu", "yuzu"], miso: ["tub of white miso", "tubs of white miso"], tofu: ["block of tofu", "blocks of tofu"], mochi: ["mochi", "mochi"], matcha: ["tin of matcha", "tins of matcha"],
@@ -77,7 +77,9 @@ export const DISHES = {
   crumble: {n: "Blackberry crumble", need: {blackberry: 3, flour: 1}, plates: 4, price: 6},
   // round 107: with Ronda's almonds and olive oil
   almendras: {n: "Salted almonds", need: {almond: 1}, plates: 4, price: 5},
-  panaceite: {n: "Bread with olive oil", need: {loaf: 1, oliveoil: 1}, plates: 4, price: 5}};
+  panaceite: {n: "Bread with olive oil", need: {loaf: 1, oliveoil: 1}, plates: 4, price: 5},
+  // round 309 (Mel: "What can I do with wine vinegar?"): the barrel that turned, in a salad
+  insalata: {n: "Tomato salad with your own vinegar", need: {tomato: 2, vinegar: 1}, plates: 4, price: 6}};
 // the tapas of the day: garden dishes, one chosen each day, 6 plates a batch
 export const TAPAS = {
   patatas: {n: "Patatas bravas", need: {potato: 2, tomato: 1}, price: 8, seasons: ["autumn"]},
@@ -94,6 +96,7 @@ export const TAPAS = {
   calabaza: {n: "Roast pumpkin with olives", need: {pumpkin: 1, olives: 1}, price: 8, seasons: ["autumn", "winter"]},
   puerros: {n: "Leek and potato soup cups", need: {leek: 2, potato: 1}, price: 8, seasons: ["autumn", "winter"]},
   // from the fishing spots, all year round
+  encurtidos: {n: "Pickled vegetables", need: {carrot: 1, pepper: 1, vinegar: 1}, price: 8},   // round 309: all year, in your own wine vinegar
   sardinas: {n: "Grilled sardines", need: {sardine: 3}, price: 8},
   escabeche: {n: "Mackerel escabeche", need: {mackerel: 2, pepper: 1}, price: 10},
   calamares: {n: "Fried calamari", need: {squid: 2, flour: 1}, price: 11},
@@ -389,7 +392,7 @@ export const SOURCE = {
   sardine: "the sea or bay", mackerel: "the sea or bay, daytime", squid: "the sea, at night", octopus: "the sea, on rainy days", seabream: "the sea or bay",
   trout: "the river, daytime", crayfish: "the lake", shrimp: "the sea, at dawn", anchovy: "the sea or bay", clams: "the Friday fish van at the bay, or the beach along the bottom of the village",
   wildgarlic: "the woods in spring", mushroom: "the woods in autumn", chestnut: "the woods in winter",
-  oliveoil: "your olive mill (or Ronda)", anchovy_salt: "your drying loft", pesto: "your drying loft (or Cinque Terre)", pinenuts: "the market, once you've been to Cinque Terre",
+  oliveoil: "your olive mill (or Ronda)", vinegar: "a wine barrel that turned (the barrel shed)", anchovy_salt: "your drying loft", pesto: "your drying loft (or Cinque Terre)", pinenuts: "the market, once you've been to Cinque Terre",
   almond: "Ronda's market", sevilla: "Ronda's market", jamon: "Ronda's market", payoyo: "Ronda's market", membrillo: "Ronda's market",
   yuzu: "Kyoto's market", miso: "Kyoto's market", tofu: "Kyoto's market", mochi: "Kyoto's market",
   tangerine: "Jeju (or your own tangerine tree)", hallabong: "Jeju's market", omija: "Jeju's market", blackpork: "Jeju's market", abalone: "Jeju's divers' house",
