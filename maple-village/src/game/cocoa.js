@@ -240,10 +240,21 @@ export const SPECIALS = {
   christmas: {id: "sp_log", n: "Chocolate yule log", kind: "dark", use: 12, make: 4, price: 18, line: "A dark chocolate log, rolled and bark-marked with a fork, with a sprig of marzipan holly."},
   cny: {id: "sp_coins", n: "Box of gold chocolate coins", kind: "milk", use: 12, make: 6, price: 12, line: "Milk chocolate coins wrapped in gold foil, in a red box, for luck."},
   deepavali: {id: "sp_spiced", n: "Spiced chocolate box", kind: "dark", use: 12, make: 6, price: 12, line: "Little dark chocolate diyas, warm with cardamom and cinnamon, each with a gold flame, in a marigold box."},
-  midautumn: {id: "sp_mooncake", n: "Chocolate mooncake", kind: "white", use: 12, make: 6, price: 10, line: "A white chocolate snowskin mooncake with a ganache middle."}
+  midautumn: {id: "sp_mooncake", n: "Chocolate mooncake", kind: "white", use: 12, make: 6, price: 10, line: "A white chocolate snowskin mooncake with a ganache middle."},
+  // round 307 (Mel: "And a mother's day and valentines'?"): the week before each
+  valentine: {id: "sp_hearts", n: "Box of chocolate hearts", kind: "dark", use: 12, make: 6, price: 12, line: "Six dark chocolate hearts swirled with pink, in a red heart-shaped box with a ribbon."},
+  mothersday: {id: "sp_roses", n: "Posy of chocolate roses", kind: "white", use: 12, make: 6, price: 12, line: "White chocolate roses blushed pink at the edges, on green stems, tied with a ribbon."}
 };
 export const SPECIAL_IDS = Object.values(SPECIALS).map(x => x.id);
-export const specialOn = day => { const f = festivalOn(day); return f && SPECIALS[f.id] ? {...SPECIALS[f.id], fest: f.name} : null; };
+// Valentine's and Mother's Day aren't village festivals (no decorations), so their chocolates have their own weeks
+const secondSunMay = y => { const d = new Date(Date.UTC(y, 4, 1)), first = 1 + (7 - d.getUTCDay()) % 7; return `${y}-05-${String(first + 7).padStart(2, "0")}`; };
+const weekBefore = (day, to) => { const n = (Date.parse(to + "T00:00:00Z") - Date.parse(day + "T00:00:00Z"))/864e5; return n >= 0 && n <= 7; };
+export function specialOn(day){
+  const y = +day.slice(0, 4);   // (Valentine's week comes first: Chinese New Year often runs across it)
+  if (weekBefore(day, `${y}-02-14`)) return {...SPECIALS.valentine, fest: "Valentine's Day"};
+  if (weekBefore(day, secondSunMay(y))) return {...SPECIALS.mothersday, fest: "Mother's Day"};
+  const f = festivalOn(day); return f && SPECIALS[f.id] ? {...SPECIALS[f.id], fest: f.name} : null;
+}
 export function makeSpecial(F){
   const c = cocoaState(F), sp = specialOn(dayKey()); if (!sp || shellChoc(c, sp.kind) < sp.use) return null;
   takeChoc(c, sp.kind, sp.use); c.specials[sp.id] = (c.specials[sp.id] || 0) + sp.make; return sp;
@@ -481,11 +492,22 @@ export function specialPic(id, w = 150){
     b = sk(`<circle cx="50" cy="58" r="30" style="fill:#F6EBD2"/><circle cx="50" cy="58" r="20" style="fill:#FBF5E6"/><path d="M98 58 a30 30 0 0 1 30 -30 v60 a30 30 0 0 1 -30 -30z" style="fill:#F6EBD2"/><path d="M106 58 a22 22 0 0 1 22 -20 v40 a22 22 0 0 1 -22 -20z" style="fill:#6B4430"/>`,
       `<circle cx="50" cy="58" r="30"/><circle cx="50" cy="58" r="20"/><path d="M50 42 v32 M34 58 h32 M39 47 l22 22 M61 47 l-22 22" opacity=".45"/><path d="M98 58 a30 30 0 0 1 30 -30 v60 a30 30 0 0 1 -30 -30z"/>`);
   }
+  else if (id === "sp_hearts") {
+    const H = "M12 21c-7-4-9-8-7-11c1.6-2.4 5-2 7 .6c2-2.6 5.4-3 7-.6c2 3 0 7-7 11z", at = (x, y, k) => `transform="translate(${x - 12*k} ${y - 14.3*k}) scale(${k})"`;
+    const spots = [[58, 46], [75, 50], [92, 46], [64, 64], [86, 64], [75, 79]];
+    b = sk(`<path d="${H}" ${at(75, 54, 5)} style="fill:#C2253F"/><path d="${H}" ${at(75, 55, 4.1)} style="fill:#F2B8C6"/>${spots.map(([x, y]) => `<path d="${H}" ${at(x, y, 1.05)} style="fill:#4A2E22"/><path d="M${x - 4} ${y - 2} q4 3 8 -1" style="fill:none;stroke:#F2A0B8;stroke-width:1.4"/>`).join("")}<path d="M75 36 q-13 -11 -15 -2 q2 7 15 2z M75 36 q13 -11 15 -2 q-2 7 -15 2z" style="fill:#F3C969"/><circle cx="75" cy="36" r="3" style="fill:#E8B84A"/>`,
+      `<path d="${H}" ${at(75, 54, 5)} vector-effect="non-scaling-stroke"/>${spots.map(([x, y]) => `<path d="${H}" ${at(x, y, 1.05)} vector-effect="non-scaling-stroke"/>`).join("")}<path d="M75 36 q-13 -11 -15 -2 q2 7 15 2z M75 36 q13 -11 15 -2 q-2 7 -15 2z"/>`);
+  } else if (id === "sp_roses") {
+    const rose = (x, y) => `<circle cx="${x}" cy="${y}" r="10" style="fill:#FBF1E4"/><path d="M${x - 10} ${y} a10 10 0 0 0 20 0" style="fill:#F6C9CF"/><path d="M${x - 4} ${y - 2} q4 -5 8 0 q-4 4 -8 0z" style="fill:#F2A0B8"/>`;
+    const heads = [[50, 30], [75, 22], [100, 30], [60, 48], [90, 48], [75, 40]];
+    b = sk(`${heads.map(([x, y]) => `<path d="M${x} ${y + 8} L75 80" style="fill:none;stroke:#7FA35A;stroke-width:3"/>`).join("")}<path d="M62 70 q-12 -4 -14 -12 q10 0 14 12z M88 66 q12 -4 14 -12 q-10 0 -14 12z" style="fill:#9BBF6A"/><path d="M64 76 h22 l-3 14 h-16z" style="fill:#F2B8C6"/><path d="M62 78 q13 6 26 0" style="fill:none;stroke:#C2505F;stroke-width:2.4"/>${heads.map(([x, y]) => rose(x, y)).join("")}`,
+      `${heads.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10"/><path d="M${x - 5} ${y + 1} q5 -8 10 0 q-5 5 -10 0" opacity=".55"/>`).join("")}<path d="M64 76 h22 l-3 14 h-16z"/>`);
+  }
   return `<svg class="sppic" viewBox="0 0 150 100" width="${w}" height="${Math.round(w*2/3)}" role="img" aria-hidden="true">${b}</svg>`;
 }
 function specialCard(c){
   const sp = specialOn(dayKey());
-  if (!sp) return `<p class="muted" style="margin-top:12px">Festival specials appear here around Deepavali, Christmas, Chinese New Year and Mid-Autumn.</p>`;
+  if (!sp) return `<p class="muted" style="margin-top:12px">Festival specials appear here around Deepavali, Christmas, Chinese New Year, Valentine's Day, Mother's Day and Mid-Autumn.</p>`;
   const n = c.specials[sp.id] || 0, have = shellChoc(c, sp.kind);
   return `<p class="eyebrow" style="margin:12px 0 6px">${esc(sp.fest)} special</p><div style="text-align:center">${specialPic(sp.id, 180)}</div><p><b>${esc(sp.n)}</b><br><small>${esc(sp.line)}</small></p>
     <p class="muted">All it needs is ${sp.use} pieces of ${KINDS[sp.kind].n.toLowerCase()} (you have ${have}): everything else is in the kitchen. ${sp.use} pieces make ${sp.make}. They sell beside the display case at ${sp.price} coins, or take one to give.</p>

@@ -5161,6 +5161,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), itm = await import(new URL("../src/data/items.js", import.meta.url));
   check(Object.values(cc.SPECIALS).every(sp => /<svg class="sppic"/.test(cc.specialPic(sp.id)) && cc.specialPic(sp.id).length > 400) && (cc.specialPic("sp_spiced").match(/q-5 -6 0 -13/g) || []).length === 6, "each festival special has its own picture (the Deepavali box: six little chocolate diyas with gold flames)");
   check(!/chilli/.test(cc.SPECIALS.deepavali.line) && itm.ITEMS.sp_spiced.to === "family", "no chilli to hunt for, and the box can go to the family or any friend");
+  // round 307 (Mel: "And a mother's day and valentines'?"): the week before each
+  check(cc.specialOn("2027-02-07").id === "sp_hearts" && cc.specialOn("2027-02-14").id === "sp_hearts" && cc.specialOn("2027-02-15").id === "sp_coins" && cc.specialOn("2027-02-06").id === "sp_coins", "Valentine's week: a box of chocolate hearts (it takes over from Chinese New Year's coins for that week)");
+  check(cc.specialOn("2027-05-02").id === "sp_roses" && cc.specialOn("2027-05-09").id === "sp_roses" && !cc.specialOn("2027-05-10") && !cc.specialOn("2027-05-01") && itm.ITEMS.sp_hearts.to === "family" && itm.ITEMS.sp_roses.says.mum, "Mother's Day week: a posy of chocolate roses, for Mum and Ma Ma");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`festival chocolates pageerror: ${e.message}`));
   const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
