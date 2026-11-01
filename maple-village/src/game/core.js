@@ -4,7 +4,7 @@ import { icon, progressBar, progressBarV } from "../art/icons.js";
 import { VILLAGE, WORK, ROOMS, MAPLE_BED, OUTDOOR, BRIDGES, ARRIVE, INNER, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask, SOUTH } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco, seasonOf, SEASONS } from "../data/items.js";
 import { brollyArt, hoodArt } from "../art/people.js";
-import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLevel, rainDay, FESTIVALS } from "../art/village-extras.js";
+import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLevel, rainDay, roughSea, FESTIVALS } from "../art/village-extras.js";
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, orchardArt, flowerFarmArt, setArtContext } from "../art/scenes.js";
 import { vineSpot, vineScene } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, tapasAll, TAPAS, cookTick, cookLine } from "./kitchen.js";
@@ -1795,7 +1795,7 @@ function ctx(){
       : bbRoom === "pots" ? CRA.potsPanel(F, bbSt.pots, {hm: sgHM(), evan: evanOn}) : bbRoom === "penguins" ? CRA.pengPanel(F, bbSt.peng, {hm: sgHM(), evan: evanOn}) : bbRoom === "nippers" ? CRA.nipPanel(F, bbSt.nip, {hm: sgHM(), evan: evanOn}) : TLA.TL_KINDS.includes(bbRoom) ? TLA.tlPanel(F, bbRoom, bbSt, {hm: sgHM(), evan: evanOn}) : LVA.LV_KINDS.includes(bbRoom) ? LVA.lvPanel(F, bbRoom, bbSt, {hm: sgHM(), evan: evanOn}) : bbRoomPanel(F, bbRoom, {evan: evanOn, party: !!tp.length}); }
   else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van"), region: bvRegion});
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
-  else if (railOpen === "boat" && scene === "shore") h = sailPanel(F, tripPick, boatTown, sgHM(), {rough: rainDay(dayKey()) === 2, month: +dayKey().slice(5, 7)});   // round 205: your own boat
+  else if (railOpen === "boat" && scene === "shore") h = sailPanel(F, tripPick, boatTown, sgHM(), {rough: roughSea(dayKey(), sgHM()), month: +dayKey().slice(5, 7)});   // round 205: your own boat
   else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, ferryTown, sgHM(), "ferry");   // round 127: the Jeju ferry from the jetty (round 226: and the boat towns)
   else if (railOpen && scene === "hlane") h = timetablePanel(dayKey(), sgHM(), true);
   else if (railOpen && townOf(scene)) h = homePanel(F, townOf(scene), sgHM(), railOpen === "ferry" || railOpen === "boat" ? railOpen : "train");
@@ -2748,7 +2748,7 @@ function boatRide(text, home, then, town){
 }
 function startTrip(town, by = "train"){
   if (by === "boat" && HP.broken(F, "boat")) { speak("The boat's storm-damaged: the rail's cracked. Mend it first (tap the storm damage label at the jetty).", 5000); return; }   // round 303
-  const own = by === "boat", r = buyTrip(F, town, tripPick, sgHM(), by, own && rainDay(dayKey()) === 2);   // round 239: a downpour day keeps the sea rough all day, even after the shower if (!r) return;
+  const own = by === "boat", r = buyTrip(F, town, tripPick, sgHM(), by, own && roughSea(dayKey(), sgHM()));   // round 239: a downpour day keeps the sea rough all day, even after the shower if (!r) return;
   const t = tripOn(F), boat = by === "ferry", land = own ? r.town.boat.arrive : boat ? r.town.ferry.arrive : r.town.arrive; railOpen = false; tripPick = []; ctx(); sfx("chaching"); flash(own ? "Fuel for the boat" : `Tickets to ${r.town.n}`); save(true);
   const ride = own ? (tx, h, then) => boatRide(tx, false, then, town) : boat ? ferryRide : trainRide;
   ride(own ? `Casting off for ${r.town.n}!` : boat ? `All aboard the ferry for ${r.town.n}!` : `All aboard for ${r.town.n}!`, boat ? false : town, () => { if (town === "ronda") rondaVisit(F); setScene(land[0], land[1]);

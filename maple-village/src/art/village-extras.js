@@ -95,6 +95,9 @@ export function showerAt(day){ const len = 60 + mixr(hash(day + "len")) % 121, f
 export function rainLevel(day, hm = sgHM()){ const l = rainDay(day); if (!l) return 0; const w = showerAt(day); return hm >= w.from && hm < w.to ? l : 0; }
 export const rainyOn = (day, hm) => rainLevel(day, hm) > 0;
 export const stormyOn = (day, hm) => rainLevel(day, hm) === 2;
+// round 306: with downpours so much commoner, the sea's only too rough to sail from half an hour before one until two
+// hours after it (it used to be the whole day)
+export const roughSea = (day, hm = sgHM()) => { if (rainDay(day) !== 2) return false; const w = showerAt(day); return hm >= w.from - 30 && hm < w.to + 120; };
 
 export function festivalArt(f){
   if (!f) return "";

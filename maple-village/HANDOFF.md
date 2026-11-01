@@ -2923,6 +2923,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - village-extras.js `rainDay`: the days go in fives (from the epoch), with a shower on the first and on the third or fourth (`mixr` picks), so there's always rain two or three days after the last: 146 days a year. Half are downpours in the wet season (Nov to Jan), a quarter otherwise. `showerAt`: 60 to 180 minutes, starting 7am to 7pm.
 - happen.js storm night now follows a downpour day (`rainDay(prev) === 2`, in core's `hapNow`), at 40% (was 60%, since downpours are commoner).
 - Test: the "rainy days" block's first check (gaps of two or three days, 1 to 3 hours), now on 2026-10-09.
+- Rough seas: `roughSea(day, hm)` in village-extras.js, from half an hour before a downpour until two hours after it (it was the whole of a downpour day, which would now lose a sailing day most weeks). Used by core's boat panel and `buyTrip`; trips.js says "Too rough to sail just now". The round 205 boat test checks 6:30pm on 2026-10-16.
 
 ## Round 307: Valentine's and Mother's Day chocolates (Mel: "And a mother's day and valentines'?")
 - cocoa.js `SPECIALS.valentine` (`sp_hearts`, a box of six dark chocolate hearts, dark so Marcus can have one) and `SPECIALS.mothersday` (`sp_roses`, a posy of white chocolate roses), 12 pieces make 6, 12 coins each. They aren't village festivals, so `specialOn(day)` gives them the week before the day (7 to 14 February; the 7 days up to the second Sunday in May), checked before the festivals because Chinese New Year often runs across Valentine's week.

@@ -4349,7 +4349,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const open = async (t, d) => { await page.goto(url + `?seed=1&time=${t}&date=${d}&boatpatch=1`); await page.waitForTimeout(1500); await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1500);
     await page.locator('#world [data-place="boat"]').first().dispatchEvent("click"); await page.waitForSelector("#ctx [data-cruise]", { timeout: 15000 }); return page.locator("#ctx").innerText(); };
   await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-11-01"); await page.waitForTimeout(800);
-  check(/Too rough to sail today/.test(await open("10:00", "2026-11-01")) && await page.locator('#ctx [data-trip]').count() === 0, "no sailing on a downpour day");
+  check(/Too rough to sail just now/.test(await open("18:30", "2026-10-16")) && await page.locator('#ctx [data-trip]').count() === 0, "no sailing in a downpour (or for a couple of hours after)");
   // round 297c (Mel: "Yes lift it, leave any time"): no hours on her own boat
   check(!/Too early|Too late/.test(await open("06:00", "2026-10-14")) && await page.locator('#ctx [data-trip]').count() === 1, "set off at six in the morning");
   check(!/Too early|Too late/.test(await open("21:30", "2026-10-14")) && await page.locator('#ctx [data-trip]').count() === 1 && /whenever you like/.test(await page.locator("#ctx").innerText()), "or half nine at night: whenever you like");

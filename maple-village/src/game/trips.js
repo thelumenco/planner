@@ -87,7 +87,7 @@ export function sailPanel(F, pick, town, hm = sgHM(), {rough = false, month = 1}
     <p class="sub">${esc(t.boat.blurb || t.blurb || "")}</p>${t.boat.sees ? `<p class="muted"><b>On ${esc(t.n)} this time of year:</b> ${esc(t.boat.sees(month))}</p>` : ""}
     <p class="muted">Fuel ${t.boat.fuel} ${coin()} there and back, however many come (up to ${BOAT_SEATS} aboard, you included). Set off whenever you like, and sail home whenever you're ready.</p>`;
   if (on) return h + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: sail again tomorrow.</p>` + shut;
-  if (rough) return h + `<p><b>Too rough to sail today.</b> Big grey waves out past the jetty. Wait for a calmer day.</p>` + shut;
+  if (rough) return h + `<p><b>Too rough to sail just now.</b> A downpour and big grey waves out past the jetty. It settles a couple of hours after the rain stops.</p>` + shut;
   h += `<h3 class="ph3">Who's coming?</h3><div class="trippicks">${FAMILY.map(id => `<button class="tpick${party.includes(id) ? " on" : ""}" data-tpick="${id}" aria-pressed="${party.includes(id)}" ${!party.includes(id) && full ? "disabled" : ""}><b>${esc(nameOf(id))}</b><small>${party.includes(id) ? "aboard" : "a seat"}</small></button>`).join("")}</div>`;
   h += `<p class="muted">${party.length ? `You${party.map(id => ", " + esc(nameOf(id))).join("").replace(/, ([^,]*)$/, " and $1")}: ${party.length + 1} aboard.` : "Just you (and Maple, who likes the wind in her ears)."}${full ? " The boat's full." : ""} They'll take the day off from whatever they usually do.</p>`;
   h += `<div class="actions"><button class="btn primary" data-trip="${town}" data-by="boat" ${F.coins >= t.boat.fuel ? "" : "disabled"}>Cast off · ${t.boat.fuel} ${coin()}</button></div>`;
