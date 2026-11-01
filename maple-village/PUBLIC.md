@@ -475,3 +475,5 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   chocolates; "she" in notes and comments became "you". Wiki: a new Happenings page (wiki/pages/50-making.mjs).
 - Tests: "Happenings: storms, the wine, the critic and coach parties (round 303)" and "Happenings: big orders and upkeep
   (round 304)", with the personal edition's later fix to the coach check.
+- Public edition only: upkeep bills wait until a player first has `UPKEEP_FROM` (1,000) coins (`h.richSince`); the
+  three-week clock starts then, so beginners never get a bill. Storms, the critic, coach parties and orders unchanged.

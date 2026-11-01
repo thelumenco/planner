@@ -116,8 +116,11 @@ export function lapse(F, day, hm){
   return o;
 }
 export const orderAt = F => { const o = F.hap && F.hap.order; return o ? {scene: ORDER_AT[o.shop][0], at: ORDER_AT[o.shop][1]} : null; };
+// upkeep waits until a player first has UPKEEP_FROM coins (public edition: no bills for beginners); the clock starts then
+export const UPKEEP_FROM = 1000;
 function upkeep(F, day, own, rnd){
   const h = hapState(F), out = [];
+  if (!h.richSince) { if ((F.coins || 0) < UPKEEP_FROM) return out; h.richSince = day; }
   for (const shop of ["scoop", "cocoa", "wine"]) { if (!own[shop]) continue; const k = "up_" + shop;
     if (!h.upkeep[shop]) { h.upkeep[shop] = day; continue; }   // the clock starts the first morning you own it
     if (broken(F, k) || daysBetween(h.upkeep[shop], day) < 21 || rnd() >= 1/14) continue;

@@ -5334,8 +5334,11 @@ if (want("\nHappenings: big orders and upkeep (round 304)")) try {
     check(F.hap.order && F.hap.order.shop === "wine" && hp.lapse(F, "2026-06-04", 16*60) === null, "an order for the wine shop, not late yet");
     check(hp.lapse(F, "2026-06-04", 17*60) && !F.hap.order && /went elsewhere/.test(F.hap.log[0].title) && F.coins === 0, "past the deadline: they went elsewhere, nothing lost");
     check(!hp.hapDaily(F, "2026-06-10", {wine: 1}, {rnd: () => .01}).includes("order"), "and no orders for a while after"); }
-  { const F = {coins: 50}; hp.hapDaily(F, "2026-06-01", {cocoa: 1}); hp.hapDaily(F, "2026-06-02", {cocoa: 1}, {rnd: () => .99});
-    check(hp.hapState(F).upkeep.cocoa === "2026-06-02" && !hp.hapState(F).repairs.length, "upkeep's clock starts the first morning you own the shop");
+  { const B = {coins: 900}; hp.hapDaily(B, "2026-05-01", {scoop: 1, wine: 1});
+    for (let d = 2; d <= 60; d++) hp.hapDaily(B, new Date(Date.UTC(2026, 4, d)).toISOString().slice(0, 10), {scoop: 1, wine: 1}, {rnd: () => .01});
+    check(!hp.hapState(B).repairs.some(r => hp.isUpkeep(r.kind)) && !hp.hapState(B).upkeep.scoop, `no upkeep bills for a beginner: none until you've had ${hp.UPKEEP_FROM} coins (public edition)`); }
+  { const F = {coins: hp.UPKEEP_FROM}; hp.hapDaily(F, "2026-06-01", {cocoa: 1}); hp.hapDaily(F, "2026-06-02", {cocoa: 1}, {rnd: () => .99}); F.coins = 50;
+    check(hp.hapState(F).upkeep.cocoa === "2026-06-02" && !hp.hapState(F).repairs.length, "upkeep's clock starts the first morning you own the shop with enough coins");
     check(!hp.hapDaily(F, "2026-06-20", {cocoa: 1}, {rnd: seq([.99, .99, .99, .01])}).length, "nothing due in the first three weeks");
     check(hp.hapDaily(F, "2026-06-24", {cocoa: 1}, {rnd: seq([.99, .99, .99, .01])}).includes("upkeep") && hp.broken(F, "up_cocoa") && hp.boost(F, "cocoa", "2026-06-24", 600) === .8 && hp.repairAt(F, "up_cocoa-2026-06-24").scene === "bay", "the grinding stones need re-dressing: the Cocoa Room sells a fifth less until it's paid");
     check(/bill is 100/.test(hp.mend(F, "up_cocoa-2026-06-24").line), "100 coins: not enough yet");
