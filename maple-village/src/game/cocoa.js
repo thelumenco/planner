@@ -249,13 +249,25 @@ export function sendScoop(F, to){
 
 /* ---------- festival specials ---------- */
 export const SPECIALS = {
-  christmas: {id: "sp_log", n: "Chocolate yule log", kind: "dark", use: 12, make: 4, price: 18, line: "A dark chocolate log with a sprig of holly."},
-  cny: {id: "sp_coins", n: "Box of gold chocolate coins", kind: "milk", use: 12, make: 6, price: 12, line: "Milk chocolate coins in gold foil, for luck."},
-  deepavali: {id: "sp_spiced", n: "Spiced chocolate box", kind: "dark", use: 12, make: 6, price: 12, line: "Dark chocolate with cardamom, cinnamon and a little chilli."},
-  midautumn: {id: "sp_mooncake", n: "Chocolate mooncake", kind: "white", use: 12, make: 6, price: 10, line: "A white chocolate snowskin mooncake with a ganache middle."}
+  // round 305: the line says what it is; the only thing it needs is the chocolate (the spices, foil and so on are in the kitchen)
+  christmas: {id: "sp_log", n: "Chocolate yule log", kind: "dark", use: 12, make: 4, price: 18, line: "A dark chocolate log, rolled and bark-marked with a fork, with a sprig of marzipan holly."},
+  cny: {id: "sp_coins", n: "Box of gold chocolate coins", kind: "milk", use: 12, make: 6, price: 12, line: "Milk chocolate coins wrapped in gold foil, in a red box, for luck."},
+  deepavali: {id: "sp_spiced", n: "Spiced chocolate box", kind: "dark", use: 12, make: 6, price: 12, line: "Little dark chocolate diyas, warm with cardamom and cinnamon, each with a gold flame, in a marigold box."},
+  midautumn: {id: "sp_mooncake", n: "Chocolate mooncake", kind: "white", use: 12, make: 6, price: 10, line: "A white chocolate snowskin mooncake with a ganache middle."},
+  // round 307: Valentine's and Mother's Day, the week before each
+  valentine: {id: "sp_hearts", n: "Box of chocolate hearts", kind: "dark", use: 12, make: 6, price: 12, line: "Six dark chocolate hearts swirled with pink, in a red heart-shaped box with a ribbon."},
+  mothersday: {id: "sp_roses", n: "Posy of chocolate roses", kind: "white", use: 12, make: 6, price: 12, line: "White chocolate roses blushed pink at the edges, on green stems, tied with a ribbon."}
 };
 export const SPECIAL_IDS = Object.values(SPECIALS).map(x => x.id);
-export const specialOn = day => { const f = festivalOn(day); return f && SPECIALS[f.id] ? {...SPECIALS[f.id], fest: f.name} : null; };
+// Valentine's and Mother's Day aren't village festivals (no decorations), so their chocolates have their own weeks
+const secondSunMay = y => { const d = new Date(Date.UTC(y, 4, 1)), first = 1 + (7 - d.getUTCDay()) % 7; return `${y}-05-${String(first + 7).padStart(2, "0")}`; };
+const weekBefore = (day, to) => { const n = (Date.parse(to + "T00:00:00Z") - Date.parse(day + "T00:00:00Z"))/864e5; return n >= 0 && n <= 7; };
+export function specialOn(day){
+  const y = +day.slice(0, 4);   // (Valentine's week comes first: Chinese New Year often runs across it)
+  if (weekBefore(day, `${y}-02-14`)) return {...SPECIALS.valentine, fest: "Valentine's Day"};
+  if (weekBefore(day, secondSunMay(y))) return {...SPECIALS.mothersday, fest: "Mother's Day"};
+  const f = festivalOn(day); return f && SPECIALS[f.id] ? {...SPECIALS[f.id], fest: f.name} : null;
+}
 export function makeSpecial(F){
   const c = cocoaState(F), sp = specialOn(dayKey()); if (!sp || shellChoc(c, sp.kind) < sp.use) return null;
   takeChoc(c, sp.kind, sp.use); c.specials[sp.id] = (c.specials[sp.id] || 0) + sp.make; return sp;
@@ -488,11 +500,45 @@ export function bonbonPanel(F, st){
   if (c.bonbons.length) h += `<p class="eyebrow" style="margin:12px 0 6px">Your bonbons</p><ul class="hlist wlist">${c.bonbons.map(b => `<li><span class="wpic">${bonbonMini(b)}</span><span class="wtxt"><b>${esc(b.name)}</b><small>${c.trays[b.id] || 0} made · ${KINDS[b.shell].n.split(" ")[0].toLowerCase()} shell, ${esc(b.fills.map(fillName).join(" and ").toLowerCase())}</small></span><button class="btn small alt" data-cc="again" data-k="${esc(b.id)}" ${canMakeBonbon(c, b.shell, b.fills) ? "" : "disabled"}>Another tray</button></li>`).join("")}</ul>`;
   return h;
 }
+// round 305 (the festival chocolates were only words): a proper picture of each festival special
+export function specialPic(id, w = 150){
+  const sk = (fill, line) => `${fill}<g fill="none" stroke="#3A2E28" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${line}</g>`;
+  let b = "";
+  if (id === "sp_spiced") {
+    const diya = (x, y) => `<path d="M${x - 11} ${y} q11 13 22 0z" style="fill:#4A2E22"/><path d="M${x - 8} ${y + 3} q8 5 16 0" style="fill:none;stroke:#C98A4A;stroke-width:1.2"/><path d="M${x} ${y - 1} q-5 -6 0 -13 q5 7 0 13z" style="fill:#F3C969"/><path d="M${x} ${y - 3} q-2 -3 0 -6 q2 3 0 6z" style="fill:#F6A23A"/>`;
+    b = sk(`<rect x="10" y="22" width="130" height="64" rx="5" style="fill:#F6A23A"/><rect x="18" y="30" width="114" height="48" rx="3" style="fill:#FBE3B8"/>${[[42, 46], [75, 46], [108, 46], [42, 68], [75, 68], [108, 68]].map(([x, y]) => diya(x, y)).join("")}${[18, 40, 62, 88, 110, 132].map((x, i) => `<circle cx="${x}" cy="90" r="2.6" style="fill:${["#D9433A", "#7A3E8A", "#2E8B7A"][i % 3]}"/>`).join("")}`,
+      `<rect x="10" y="22" width="130" height="64" rx="5"/><rect x="18" y="30" width="114" height="48" rx="3"/>${[[42, 46], [75, 46], [108, 46], [42, 68], [75, 68], [108, 68]].map(([x, y]) => `<path d="M${x - 11} ${y} q11 13 22 0z"/>`).join("")}`);
+  } else if (id === "sp_coins") {
+    b = sk(`<rect x="10" y="26" width="130" height="62" rx="5" style="fill:#D9433A"/><rect x="18" y="34" width="114" height="46" rx="3" style="fill:#F2B8B0"/>${[[40, 46], [75, 46], [110, 46], [40, 69], [75, 69], [110, 69]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="10.5" style="fill:${i % 2 ? "#E8B84A" : "#F3C969"}"/><rect x="${x - 3.5}" y="${y - 3.5}" width="7" height="7" style="fill:#D9433A"/>`).join("")}`,
+      `<rect x="10" y="26" width="130" height="62" rx="5"/>${[[40, 46], [75, 46], [110, 46], [40, 69], [75, 69], [110, 69]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10.5"/><circle cx="${x}" cy="${y}" r="7" opacity=".45"/>`).join("")}`);
+  } else if (id === "sp_log") {
+    b = sk(`<rect x="8" y="78" width="134" height="10" rx="3" style="fill:#C9A27E"/><rect x="18" y="38" width="112" height="40" rx="20" style="fill:#5A3624"/><ellipse cx="126" cy="58" rx="12" ry="20" style="fill:#E3C8A0"/><path d="M126 42 q-8 8 0 16 q8 8 0 16" style="fill:none;stroke:#5A3624;stroke-width:3"/><path d="M58 38 l6 -10 l6 10z" style="fill:#7FA35A"/><circle cx="64" cy="27" r="3" style="fill:#D9433A"/><circle cx="70" cy="30" r="3" style="fill:#D9433A"/>`,
+      `<rect x="18" y="38" width="112" height="40" rx="20"/><ellipse cx="126" cy="58" rx="12" ry="20"/><path d="M28 50 h80 M34 60 h70 M30 70 h76" opacity=".5"/>`);
+  } else if (id === "sp_mooncake") {
+    b = sk(`<circle cx="50" cy="58" r="30" style="fill:#F6EBD2"/><circle cx="50" cy="58" r="20" style="fill:#FBF5E6"/><path d="M98 58 a30 30 0 0 1 30 -30 v60 a30 30 0 0 1 -30 -30z" style="fill:#F6EBD2"/><path d="M106 58 a22 22 0 0 1 22 -20 v40 a22 22 0 0 1 -22 -20z" style="fill:#6B4430"/>`,
+      `<circle cx="50" cy="58" r="30"/><circle cx="50" cy="58" r="20"/><path d="M50 42 v32 M34 58 h32 M39 47 l22 22 M61 47 l-22 22" opacity=".45"/><path d="M98 58 a30 30 0 0 1 30 -30 v60 a30 30 0 0 1 -30 -30z"/>`);
+  }
+  else if (id === "sp_hearts") {
+    const H = "M12 21c-7-4-9-8-7-11c1.6-2.4 5-2 7 .6c2-2.6 5.4-3 7-.6c2 3 0 7-7 11z", at = (x, y, k) => `transform="translate(${x - 12*k} ${y - 14.3*k}) scale(${k})"`;
+    const spots = [[58, 46], [75, 50], [92, 46], [64, 64], [86, 64], [75, 79]];
+    b = sk(`<path d="${H}" ${at(75, 54, 5)} style="fill:#C2253F"/><path d="${H}" ${at(75, 55, 4.1)} style="fill:#F2B8C6"/>${spots.map(([x, y]) => `<path d="${H}" ${at(x, y, 1.05)} style="fill:#4A2E22"/><path d="M${x - 4} ${y - 2} q4 3 8 -1" style="fill:none;stroke:#F2A0B8;stroke-width:1.4"/>`).join("")}<path d="M75 36 q-13 -11 -15 -2 q2 7 15 2z M75 36 q13 -11 15 -2 q-2 7 -15 2z" style="fill:#F3C969"/><circle cx="75" cy="36" r="3" style="fill:#E8B84A"/>`,
+      `<path d="${H}" ${at(75, 54, 5)} vector-effect="non-scaling-stroke"/>${spots.map(([x, y]) => `<path d="${H}" ${at(x, y, 1.05)} vector-effect="non-scaling-stroke"/>`).join("")}<path d="M75 36 q-13 -11 -15 -2 q2 7 15 2z M75 36 q13 -11 15 -2 q-2 7 -15 2z"/>`);
+  } else if (id === "sp_roses") {
+    const rose = (x, y) => `<circle cx="${x}" cy="${y}" r="10" style="fill:#FBF1E4"/><path d="M${x - 10} ${y} a10 10 0 0 0 20 0" style="fill:#F6C9CF"/><path d="M${x - 4} ${y - 2} q4 -5 8 0 q-4 4 -8 0z" style="fill:#F2A0B8"/>`;
+    const heads = [[50, 30], [75, 22], [100, 30], [60, 48], [90, 48], [75, 40]];
+    b = sk(`${heads.map(([x, y]) => `<path d="M${x} ${y + 8} L75 80" style="fill:none;stroke:#7FA35A;stroke-width:3"/>`).join("")}<path d="M62 70 q-12 -4 -14 -12 q10 0 14 12z M88 66 q12 -4 14 -12 q-10 0 -14 12z" style="fill:#9BBF6A"/><path d="M64 76 h22 l-3 14 h-16z" style="fill:#F2B8C6"/><path d="M62 78 q13 6 26 0" style="fill:none;stroke:#C2505F;stroke-width:2.4"/>${heads.map(([x, y]) => rose(x, y)).join("")}`,
+      `${heads.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10"/><path d="M${x - 5} ${y + 1} q5 -8 10 0 q-5 5 -10 0" opacity=".55"/>`).join("")}<path d="M64 76 h22 l-3 14 h-16z"/>`);
+  }
+  return `<svg class="sppic" viewBox="0 0 150 100" width="${w}" height="${Math.round(w*2/3)}" role="img" aria-hidden="true">${b}</svg>`;
+}
 function specialCard(c){
   const sp = specialOn(dayKey());
-  if (!sp) return `<p class="muted" style="margin-top:12px">Festival specials appear here around Deepavali, Christmas, Chinese New Year and Mid-Autumn.</p>`;
-  return `<p class="eyebrow" style="margin:12px 0 6px">${esc(sp.fest)} special</p><div class="gresult">${icon(sp.id, 34)}<span><b>${esc(sp.n)}</b><small>${esc(sp.line)} ${sp.use} pieces of ${KINDS[sp.kind].n.toLowerCase()} make ${sp.make}, at ${sp.price} coins each. ${c.specials[sp.id] || 0} ready.</small></span></div>
-    <div class="actions"><button class="btn small primary" data-cc="special" ${shellChoc(c, sp.kind) >= sp.use ? "" : "disabled"}>Make ${sp.make}</button></div>`;
+  if (!sp) return `<p class="muted" style="margin-top:12px">Festival specials appear here around Deepavali, Christmas, Chinese New Year, Valentine's Day, Mother's Day and Mid-Autumn.</p>`;
+  const n = c.specials[sp.id] || 0, have = shellChoc(c, sp.kind);
+  return `<p class="eyebrow" style="margin:12px 0 6px">${esc(sp.fest)} special</p><div style="text-align:center">${specialPic(sp.id, 180)}</div><p><b>${esc(sp.n)}</b><br><small>${esc(sp.line)}</small></p>
+    <p class="muted">All it needs is ${sp.use} pieces of ${KINDS[sp.kind].n.toLowerCase()} (you have ${have}): everything else is in the kitchen. ${sp.use} pieces make ${sp.make}. They sell beside the display case at ${sp.price} coins, or take one to give.</p>
+    <p class="muted">${n ? `${n} made and waiting.` : "None made yet."}</p>
+    <div class="actions"><button class="btn small primary" data-cc="special" ${have >= sp.use ? "" : "disabled"}>${have >= sp.use ? `Make ${sp.make}` : `Needs ${sp.use - have} more ${KINDS[sp.kind].n.toLowerCase().split(" ")[0]}`}</button>${n ? `<button class="btn small alt" data-cc="takesp" data-k="${sp.id}">Take one to give</button>` : ""}</div>`;
 }
 export function casePanel(F){
   const c = cocoaState(F), ids = displayIds(c), shown = ids.map(id => recipeOf(c, id)), rest = c.bonbons.filter(b => !ids.includes(b.id) && c.trays[b.id] > 0);

@@ -97,7 +97,7 @@ export function boatPanel(F, pick, town, hm = localHM(), wet = false){
     <h3 class="ph3">Or sail somewhere for the day</h3><div class="gchips">${isles.map(([k, x]) => `<button class="gchip${k === id ? " on" : ""}" data-btown="${k}" aria-pressed="${k === id}"><span>${esc(x.n)}</span></button>`).join("")}</div>
     <p class="muted">${t.boat.fuel} ${coin()} of fuel, however many come. Up to ${t.boat.max} friends aboard. Set off whenever you like, and sail home whenever you're ready.</p>`;
   if (on) return h + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut;
-  if (wet) return h + `<p><b>Not in this weather. The harbour master would have words.</b></p>` + shut;
+  if (wet) return h + `<p><b>Too rough to sail just now.</b> A downpour and big grey waves out past the jetty. It settles a couple of hours after the rain stops.</p>` + shut;
   if (!open) return h + `<p><b>${hm < t.outFrom ? `Too early to set off: from ${fmt(t.outFrom)}.` : "Too late to set off today. Tomorrow!"}</b></p>` + shut;
   h += `<h3 class="ph3">Who's coming?</h3>${who.length ? "" : `<p class="muted">${NOBODY}</p>`}<div class="trippicks">${who.map(x => `<button class="tpick${party.includes(x) ? " on" : ""}" data-tpick="${x}" aria-pressed="${party.includes(x)}"><b>${esc(nameOf(x))}</b><small>free</small></button>`).join("")}</div>`;
   return h + `<div class="actions"><button class="btn primary" data-trip="${id}" data-by="boat" ${F.coins >= t.boat.fuel ? "" : "disabled"}>Cast off · ${t.boat.fuel} ${coin()}</button></div>` + shut;

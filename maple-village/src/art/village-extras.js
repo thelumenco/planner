@@ -78,17 +78,24 @@ export function festivalOn(day){
   for (const f of FESTIVALS) for (const k of f.dates) { const x = dayNum(k); if (d >= x - f.before && d <= x + f.after) return f; }
   return null;
 }
-// The rainy months (November to January): roughly one day in three is a proper downpour, and another one in ten a
-// light shower. The rest of the year a shower blows through about one day in seven: brollies up, nothing called off.
-// rainLevel: 0 dry, 1 a light shower, 2 a downpour (paddling's off).
-// Mel: "rain shouldn't be for the whole day. One hour at most": a wet day has one spell of rain, 30 to 60 minutes,
-// some time between 8am and 8pm (rainSpell). Given a time (minutes since midnight), rainLevel/rainyOn/stormyOn say
-// whether it's raining right then; without one, whether it rains at all that day.
-const dayRain = day => { const h = hash(day + "rain") % 100; return [11, 12, 1].includes(+day.slice(5, 7)) ? (h < 34 ? 2 : h < 44 ? 1 : 0) : (h < 14 ? 1 : 0); };
-export function rainSpell(day){ if (!dayRain(day)) return null; const h = hash(day + "spell"), from = 8*60 + (h % 144)*5; return {from, to: from + 30 + (Math.floor(h/144) % 7)*5}; }
+// round 306 (ported: rain more often, for shorter spells): the days go in fives, with a shower on the first and on the
+// third or fourth, so there's always one two or three days after the last. Each lasts 1 to 3 hours, starting between
+// 7am and 7pm. In the rainy months (November to January) half are downpours; the rest of the year about one in four.
+// rainLevel: 0 dry, 1 a light shower, 2 a downpour (paddling's off). Given a time (minutes since midnight),
+// rainLevel/rainyOn/stormyOn say whether it's raining right then; without one, whether it rains at all that day.
+const mixr = h => { h = Math.imul(h ^ (h >>> 16), 0x45d9f3b); h = Math.imul(h ^ (h >>> 16), 0x45d9f3b); return (h ^ (h >>> 16)) >>> 0; };
+const dayN = day => Math.round(Date.parse(day.slice(0, 10) + "T00:00:00Z")/864e5);
+const dayRain = day => { const d = dayN(day), w = Math.floor(d/5), at = d - w*5, second = 2 + mixr(w*7 + 3) % 2;
+  if (at !== 0 && at !== second) return 0;
+  return mixr(hash(day + "rain")) % 100 < ([11, 12, 1].includes(+day.slice(5, 7)) ? 50 : 25) ? 2 : 1; };
+export const rainDay = dayRain;
+export function rainSpell(day){ if (!dayRain(day)) return null; const from = 7*60 + mixr(hash(day + "when")) % (12*60 + 1); return {from, to: from + 60 + mixr(hash(day + "len")) % 121}; }
 export function rainLevel(day, hm){ const l = dayRain(day); if (!l || hm == null) return l; const s = rainSpell(day); return hm >= s.from && hm < s.to ? l : 0; }
 export const rainyOn = (day, hm) => rainLevel(day, hm) > 0;
 export const stormyOn = (day, hm) => rainLevel(day, hm) === 2;
+// round 306: with downpours so much commoner, the sea's only too rough to sail from half an hour before one until two
+// hours after it
+export const roughSea = (day, hm) => { if (dayRain(day) !== 2) return false; const w = rainSpell(day); return hm >= w.from - 30 && hm < w.to + 120; };
 
 export function festivalArt(f){
   if (!f) return "";

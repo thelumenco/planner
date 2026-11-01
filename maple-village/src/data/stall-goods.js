@@ -109,6 +109,8 @@ Object.assign(GOODS, {
   sp_log: G("Chocolate yule log", "family", 18, "cocoa", "A chocolate log! It's Christmas now, officially.", null, {tomi: "Dark choc log, no dairy. Merry Christmas!"}),
   sp_coins: G("Box of gold chocolate coins", NOM, 12, "cocoa", "Gold coins! So much luck in one box.", ["box", "#F3C969", "#D9433A"], {farid: "Gold coins! I'll hang a few in the trees for luck."}),
   sp_spiced: G("Spiced chocolate box", "family", 12, "cocoa", "Cardamom and chocolate? Oh, that's lovely. Happy Deepavali!", ["box", "#4A2E22", "#F6A23A"], {tomi: "Dark and spiced, dairy-free. Happy Deepavali!"}),
+  sp_hearts: G("Box of chocolate hearts", "family", 12, "cocoa", "Chocolate hearts! You're a sweetheart. Happy Valentine's!", null, {tomi: "Dark chocolate, so no dairy. Thank you!", posy: "Hearts! I'm going to write a very soppy poem about these."}),
+  sp_roses: G("Posy of chocolate roses", NOM, 12, "cocoa", "Chocolate roses! They're far too pretty to eat. Well, nearly.", null, {mei: "Roses I can eat! I'll keep one on the windowsill for a day first.", farid: "Chocolate flowers! I'll take them to my mother. Most of them."}),
   sp_mooncake: G("Chocolate mooncake", NOM, 10, "cocoa", "A chocolate mooncake! Let's have it under the lanterns.", null, {farid: "A chocolate mooncake? I've never tried one. How modern!"}),
   box16: G("Grand box of 16 bonbons", NOM, 50, "cocoa", "Sixteen bonbons, in a ribbon box! I'm going to make these last. I'm not.", ["box", "#C2505F", "#F3C969"]),
   box16d: G("Grand box of 16 dark bonbons", "family", 50, "cocoa", "Sixteen dark bonbons, all dairy-free! This is a treasure chest.", ["box", "#4A2E22", "#C2505F"], {tomi: "Sixteen, dairy-free. You spoil me."}),

@@ -242,7 +242,7 @@ function cocoaPage(){
     + h3("boxes", "Gift boxes") + `<p>Pack a box of 4 or 9 from the case (a grand box of 16 with the gift wrapping station), choosing the bonbons or letting the game fill it. All dark shells makes it dairy-free. A <b>pairing box</b> is a bottle of your wine and 4 bonbons, ribboned together, for the <a href="/gift-shop#pairing">gift shop</a>.</p>`
     + T(["Box", "Price"], boxes)
     + h3("specials", "Festival specials and little extras")
-    + `<p>Around Christmas, Chinese New Year, Deepavali and the Mid-Autumn Festival, the bonbon table makes that festival's special, sold beside the case while the festival's on (or to give).</p>`
+    + `<p>Around Christmas, Chinese New Year, Deepavali and the Mid-Autumn Festival, and in the week before Valentine's Day and Mother's Day, the bonbon table makes a special: a yule log, gold coins, a box of chocolate diyas, mooncakes, chocolate hearts or a posy of chocolate roses. All it needs is 12 pieces of the right chocolate; everything else is in the kitchen. The specials stand on the shop counter and sell beside the case, or take one to give.</p>`
     + T(["Special", "Makes", "Price", ""], specials)
     + `<p>All year, ${CC.COIN_TINS.use} pieces of milk chocolate make ${CC.COIN_TINS.make} ${named("coin_tin", 20, "little tins of gold chocolate coins")}, to give.</p>`
     + h2("scoop-shack", "With the Scoop Shack", "ic_cone")

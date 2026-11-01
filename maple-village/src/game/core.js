@@ -5,7 +5,7 @@ import { roomShell } from "../art/interiors.js";   // round 231: the fallback wh
 import { VILLAGE, ROOMS, PET_BED, OUTDOOR, BRIDGES, ARRIVE, INNER, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, SOUTH } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, YAY, itemIco, seasonOf, SEASONS } from "../data/items.js";
 import { brollyArt, hoodArt } from "../art/people.js";
-import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLevel, FESTIVALS } from "../art/village-extras.js";
+import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLevel, roughSea, rainDay, FESTIVALS } from "../art/village-extras.js";
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, orchardArt, flowerFarmArt, setArtContext } from "../art/scenes.js";
 import { vineSpot, vineScene } from "../art/vineyard.js";
 import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel, stovePanel, wireKitchen, staffDinner, staffLine, tapasToday, tapasAll, TAPAS, cookTick, cookLine } from "./kitchen.js";
@@ -1305,7 +1305,7 @@ function ctxBody(){
       : bbRoom === "pots" ? CRA.potsPanel(F, bbSt.pots, {hm: localHM()}) : bbRoom === "penguins" ? CRA.pengPanel(F, bbSt.peng, {hm: localHM()}) : bbRoom === "nippers" ? CRA.nipPanel(F, bbSt.nip, {hm: localHM()}) : TLA.TL_KINDS.includes(bbRoom) ? TLA.tlPanel(F, bbRoom, bbSt, {hm: localHM()}) : LVA.LV_KINDS.includes(bbRoom) ? LVA.lvPanel(F, bbRoom, bbSt, {hm: localHM()}) : bbRoomPanel(F, bbRoom, {party: !!tp.length}); }
   else if (bvView) h = bvView === "passport" ? bbPassport(F) : bbMapPanel(F, {pick: tripPick, ownsVan: owns(F, "van"), region: bvRegion});
   else if (railOpen === "tickets" && scene === "hlane") h = ticketPanel(F, tripPick, tripTown);
-  else if (railOpen === "boat" && scene === "shore") h = boatPanel(F, tripPick, boatTown, localHM(), rainyOn(dayKey(), localHM()));   // round 215: your own boat: the cruise, or an island
+  else if (railOpen === "boat" && scene === "shore") h = boatPanel(F, tripPick, boatTown, localHM(), roughSea(dayKey(), localHM()));   // round 215: your own boat: the cruise, or an island (round 306: kept in only around a downpour)
   else if (railOpen === "ferry" && scene === "shore") h = ticketPanel(F, tripPick, TOWNS[ferryTown] && !TOWNS[ferryTown].soon ? ferryTown : "jeju", localHM(), "ferry", rainyOn(dayKey(), localHM()));   // round 127: the Jeju ferry from the jetty (round 215: and the islands)
   else if (railOpen && scene === "hlane") h = timetablePanel(dayKey(), localHM(), true);
   else if (railOpen && townOf(scene)) h = homePanel(F, townOf(scene), localHM(), railOpen === "ferry" ? "ferry" : "train");
@@ -2148,7 +2148,7 @@ const hapStock = shop => shop === "scoop" ? Object.values(scoopState(F).tubs || 
 function hapNow(){
   lastHap = Date.now(); const day = dayKey(), hm = localHM(), prev = prevDay(day);
   const own = {scoop: !!F.scoop, cocoa: owns(F, "cocoa"), wine: !!F.vine, boat: owns(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning)};
-  const got = HP.hapDaily(F, day, own, {stormy: [3, 9, 15, 21].some(h => stormyOn(prev, h*60)), away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: rnd => birdsTake(F, rnd)});
+  const got = HP.hapDaily(F, day, own, {stormy: rainDay(prev) === 2, away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: rnd => birdsTake(F, rnd)});
   const j = HP.judge(F, day, hm, hapStock), lp = HP.lapse(F, day, hm);
   if (lp && !got.length && !j) { save(); flash(`The order for ${lp.who} wasn't ready in time: see your mailbox`); }
   if (got.length || j) { save(); sfx("paper", true); flash(got.includes("storm") ? "Storm damage in the night: see your mailbox" : got.includes("order") && !j ? "A big order's come in: see your mailbox" : j ? (j.good ? "A good review in the Gazette!" : "A review in the Gazette") : "Something's happening today: see your mailbox"); drawScene(); }
@@ -2826,17 +2826,17 @@ function towerSpot(k){
     if (k === "chart") { woodsView = "twlist"; sfx("paper", true); render(); return; }
     if (k === "book") { const r = TW.signBook(F, day); say(r, 7000); if (r.ok) { sfx("paper", true); gainXp(1); } }
     else if (k === "tide") speak(`The tide board, in Bram's chalk: low water 6 to 11 in the morning and 5 to 8 in the evening. ${SO.tideAt(hm) === "low" ? "It's out now: good for the rock pools." : "It's in now. The rock pools are under the sea."}`, 6000);
-    else if (k === "pegs") speak(rainyOn(day) ? "You borrow a yellow oilskin from the peg. It's enormous, and smells of the sea, and you stay perfectly dry all the way round the point." : "Oilskins and sou'westers on the pegs, ready for the next wet day. You try a hat on. It comes down over your eyes.", 5500);
+    else if (k === "pegs") speak(rainyOn(day, hm) ? "You borrow a yellow oilskin from the peg. It's enormous, and smells of the sea, and you stay perfectly dry all the way round the point." : "Oilskins and sou'westers on the pegs, ready for the next wet day. You try a hat on. It comes down over your eyes.", 5500);
     else if (k === "bell") { sfx("chime"); speak("You give the old fog bell one gentle ring. It hums for ages, and somewhere outside a gull answers.", 5000); }
-    else if (k === "scope") { const r = TW.lookOut(F, hm, rainyOn(day), new Date(day + "T00:00:00Z").getUTCDay()); say(r, 6500); if (r.first) { sfx("chime"); gainXp(1); } }
-    else if (k === "log") { const r = TW.writeLog(F, day, rainyOn(day)); say(r, 7500); if (r.ok) { sfx("paper", true); gainXp(1); } if (r.treat) flash("+ a slab of Bram's parkin"); }
+    else if (k === "scope") { const r = TW.lookOut(F, hm, rainyOn(day, hm), new Date(day + "T00:00:00Z").getUTCDay()); say(r, 6500); if (r.first) { sfx("chime"); gainXp(1); } }
+    else if (k === "log") { const r = TW.writeLog(F, day, rainyOn(day, hm)); say(r, 7500); if (r.ok) { sfx("paper", true); gainXp(1); } if (r.treat) flash("+ a slab of Bram's parkin"); }
     else if (k === "chair") { const tale = isHere("bram") && SO.keeperTale(F, day);
       if (tale) { speak("You sit by the stove while Bram settles into his armchair and fills his pipe, which he never lights.", 4000); setTimeout(() => npcSay("bram", tale), 4200); }
       else speak(isHere("bram") ? "Bram's dozing in his armchair, cap over his eyes. He's told you his story for today." : "Bram's armchair, the cushion squashed into exactly his shape. He's up here most afternoons, half four till half five.", 5500); }
     else if (k === "lens" && SO.lampNow(day, hm)) { const r = SO.lampLighting(F, day, hm); say(r, 7000); if (r.first) { gainXp(1); sfx("chime"); } }
     else if (k === "lens") { const r = TW.polishLens(F, day, night); say(r, 7000); if (r.ok) { sfx("chime"); gainXp(1); } if (r.treat) flash(r.treat === "mackerel" ? "+ a mackerel" : "+ a slab of Bram's parkin"); }
     else if (k === "gallery") { const r = SO.climb(F, day, hm); if (r.first) gainXp(1);
-      speak(TW.galleryView({night, rain: rainyOn(day), boot: SO.bootNow(day, hm), cricket: SO.cricketNow(day, hm), band: SO.bandNow(day, hm), pet: "{pet}"}), 8000); }
+      speak(TW.galleryView({night, rain: rainyOn(day, hm), boot: SO.bootNow(day, hm), cricket: SO.cricketNow(day, hm), band: SO.bandNow(day, hm), pet: "{pet}"}), 8000); }
     save(true); render(); });
 }
 function allotSpot(id){
@@ -3264,7 +3264,7 @@ function wireCocoa(c){
       speak(k === "dip" ? `${got} dips of house-made dark, off to the Scoop Shack's dip station. Cones dipped in it sell for more.` : `${got} bars of Cocoa Room chocolate, into the Scoop Shack's gelato fridge. Try it at the mixing bench!`, 5000); }
     else if (a === "wine") { const got = wineToPantry(F, k); if (!got) return; sfx("tap"); flash(`${got.wine}: 4 fillings on the shelf`); }
     else if (a === "pair") { const w = packPairing(F, k); if (!w) return; sfx("paper", true); flash(`Pairing box with ${w}, in your backpack`); speak("A bottle and four bonbons, ribboned together. Tap it in your backpack to choose who it's for.", 4500); }
-    else if (a === "special") { const sp = makeSpecial(F); if (!sp) return; sfx("chime"); act("cheer"); gainXp(2); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", hero.x + (i ? 20 : -20), hero.y - 60, 1500), t)); speak(`${sp.make} ${sp.n.toLowerCase()}${sp.make > 1 && !/s$/.test(sp.n) ? "s" : ""} for ${sp.fest}! They'll sell beside the display case.`, 5000); }
+    else if (a === "special") { const sp = makeSpecial(F); if (!sp) return; sfx("chime"); act("cheer"); gainXp(2); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", hero.x + (i ? 20 : -20), hero.y - 60, 1500), t)); speak(`${sp.make} ${sp.n.toLowerCase().replace(/^box of/, "boxes of").replace(/^posy of/, "posies of").replace(/box$/, "boxes").replace(/(log|mooncake)$/, "$1s")} for ${sp.fest}! Take one to give, and the rest sell beside the display case.`, 5000); }
     else if (a === "takesp") { if (!takeSpecial(F, k)) return; sfx("chime"); flash(`${ITEMS[k].n} in your backpack`); }
     else if (a === "cointin") { const m = makeCoinTins(F); if (!m) return; sfx("chime"); flash(`${m} little tins of gold coins in your backpack`); speak("Gold foil, a red tin, a click of the lid. For luck.", 3500); }   // the loves round: all year
     else if (a === "praline") { const m = makePralines(F, storyGiven(F, "henri")); if (!m) return; sfx("chime"); gainXp(1); flash(`${m} boxes of Henri's hazelnut pralines in your backpack`); speak("Henri's pralines, from his own page in the book. The kitchen smells of toasted hazelnuts.", 4500); }
@@ -3432,7 +3432,7 @@ const SUP_BOARD = k => `<g class="supboard"><ellipse cx="0" cy="${-1*k}" rx="${2
 function familyPaddle(){
   if (sup) return;
   const m = localHM(); if (m >= 19*60 || m < 6*60) { speak("Too dark for paddling now. The boards will be here in the morning.", 3500); render(); return; }
-  if (stormyOn(dayKey())) { speak("Choppy and rainy out there. Better on a sunny day.", 3500); render(); return; }
+  if (stormyOn(dayKey(), localHM())) { speak("Choppy and rainy out there. Better once the downpour's passed.", 3500); render(); return; }   // round 306: only while it's pouring
   sup = {from: m, until: Date.now() + 60000, out: false};
   route = []; atSpot = null; hero.path = []; hero.tx = 104; hero.ty = 372; hero.sitting = false; nodes.hero.classList.remove("sit"); nodes.hero.classList.add("sup"); sfx("paper", true);
   const fam = ["hana", "theo", "tomi", "posy"].filter(isHere);

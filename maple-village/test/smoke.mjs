@@ -2010,16 +2010,18 @@ if (want("\nrainy days")) try {
   page.on("pageerror", e => errors.push(`rain pageerror: ${e.message}`));
   // round 228 (Mel: "rain shouldn't be for the whole day. One hour at most"): one spell of 30 to 60 minutes on a wet day
   { const vx = await import(new URL("../src/art/village-extras.js", import.meta.url)); const days = Array.from({length: 730}, (_, i) => new Date(Date.UTC(2026, 0, 1) + i*864e5).toISOString().slice(0, 10)), spells = days.map(vx.rainSpell).filter(Boolean);
-    check(spells.length > 50 && spells.every(x => x.to - x.from >= 30 && x.to - x.from <= 60 && x.from >= 8*60 && x.from <= 20*60), "rain comes in one spell of 30 minutes to an hour, never all day (" + spells.length + " wet days in two years)");
-    const sp = vx.rainSpell("2026-10-12"); check(vx.rainyOn("2026-10-12") && vx.rainyOn("2026-10-12", sp.from + 5) && !vx.rainyOn("2026-10-12", sp.from - 5) && !vx.rainyOn("2026-10-12", sp.to), "dry before the shower and after it"); }
-  await page.goto(url + "?reset=1&seed=1&time=13:10&date=2026-10-12"); await page.waitForTimeout(900);
+    // round 306 (ported): a shower every two or three days, one to three hours long, starting between 7am and 7pm
+    const wet = days.map((k, i) => vx.rainDay(k) ? i : -1).filter(i => i >= 0), gaps = wet.slice(1).map((d, i) => d - wet[i]);
+    check(spells.length > 200 && spells.every(x => x.to - x.from >= 60 && x.to - x.from <= 180 && x.from >= 7*60 && x.from <= 19*60) && gaps.every(g => g >= 2 && g <= 3), "a shower every two or three days, one to three hours long, never all day (" + spells.length + " wet days in two years)");
+    const sp = vx.rainSpell("2026-10-09"); check(vx.rainDay("2026-10-09") === 1 && vx.rainyOn("2026-10-09", sp.from + 5) && !vx.rainyOn("2026-10-09", sp.from - 5) && !vx.rainyOn("2026-10-09", sp.to), "dry before the shower and after it"); }
+  await page.goto(url + "?reset=1&seed=1&time=13:10&date=2026-10-09"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__hbScene("base")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => { const r = document.getElementById("rain"); return !r.hidden && r.classList.contains("light"); }), "a light shower in October (not just the wet season)");
   check(await page.locator("#melRain .brolly").count() === 1, "you're under your brolly");
   await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(2500);
   const gear = await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].map(n => n.querySelector(".brolly") ? "b:" + n.querySelector(".brolly > path:nth-of-type(3)").getAttribute("style") : n.querySelector(".rcoat") ? "c:" + n.querySelector(".rcoat").getAttribute("style") : ""));
   check(gear.length > 0 && gear.every(Boolean) && new Set(gear).size > 1, "everyone in town has a brolly or a raincoat, not all the same");
-  await page.goto(url + "?seed=1&time=11:00&date=2026-10-12"); await page.waitForTimeout(900);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-10-09"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => document.getElementById("rain").hidden), "the same day, before the shower, it's dry");
   await page.goto(url + "?seed=1&time=11:00&date=2026-10-07"); await page.waitForTimeout(900);
@@ -2685,8 +2687,8 @@ if (want("\nPuffin Isle, by the island boat")) try {
   const ids = () => page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc));
   await page.addInitScript(() => { if (!/picoins/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     f.coins = 300; const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
-  await page.goto(url + "?reset=1&seed=1&time=10:00&date=2026-05-14"); await page.waitForTimeout(800);
-  await page.goto(url + "?seed=1&time=10:00&date=2026-05-14&picoins=1"); await page.waitForTimeout(900);
+  await page.goto(url + "?reset=1&seed=1&time=16:30&date=2026-05-14"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=16:30&date=2026-05-14&picoins=1"); await page.waitForTimeout(900);
   await page.evaluate(() => window.__hbScene("shore")); await page.waitForTimeout(900);
   await page.locator('#world [data-place="ferry"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-ftown="puffin"]', { timeout: 15000 });
   await page.click('#ctx [data-ftown="puffin"]'); await page.waitForTimeout(300);
@@ -5357,6 +5359,37 @@ if (want("\nHappenings: big orders and upkeep (round 304)")) try {
   check(await page.locator('#world [data-order]').count() === 1, "the bay: an \"Order: deliver\" label on the Scoop Shack");
   await page.locator('#world [data-order]').dispatchEvent("click"); await page.waitForFunction(() => !document.querySelector('#world [data-order]'), null, { timeout: 20000 }).catch(() => {});
   check(await fox().then(f => !f.hap.order && f.coins === 88 && f.scoop.tubs.vanilla + f.scoop.tubs.strawberry === 6), "tap it: twenty scoops out of the tubs, 88 coins");
+  await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nFestival chocolates you can see and give (round 305)")) try {
+  // ported (rounds 305 to 307): the festival chocolates drawn, nothing to hunt for, easy to give; Valentine's and
+  // Mother's Day chocolates; and rain every two or three days, with your boat kept in only around a downpour
+  console.log("\nFestival chocolates you can see and give (round 305)");
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), itm = await import(new URL("../src/data/items.js", import.meta.url));
+  check(Object.values(cc.SPECIALS).every(sp => /<svg class="sppic"/.test(cc.specialPic(sp.id)) && cc.specialPic(sp.id).length > 400) && (cc.specialPic("sp_spiced").match(/q-5 -6 0 -13/g) || []).length === 6, "each festival special has its own picture (the Deepavali box: six little chocolate diyas with gold flames)");
+  check(!/chilli/.test(cc.SPECIALS.deepavali.line) && itm.ITEMS.sp_spiced.to === "family", "no chilli to hunt for, and the box can go to any friend");
+  check(cc.specialOn("2027-02-07").id === "sp_hearts" && cc.specialOn("2027-02-14").id === "sp_hearts" && cc.specialOn("2027-02-15").id === "sp_coins" && cc.specialOn("2027-02-06").id === "sp_coins", "Valentine's week: a box of chocolate hearts (it takes over from Chinese New Year's coins for that week)");
+  check(cc.specialOn("2027-05-02").id === "sp_roses" && cc.specialOn("2027-05-09").id === "sp_roses" && !cc.specialOn("2027-05-10") && !cc.specialOn("2027-05-01") && itm.ITEMS.sp_hearts.to === "family" && itm.ITEMS.sp_roses.says.mei, "Mother's Day week: a posy of chocolate roses");
+  { const VX = await import(new URL("../src/art/village-extras.js", import.meta.url)), TR = await import(new URL("../src/game/trips.js", import.meta.url)), sp = VX.rainSpell("2026-10-16");
+    check(VX.rainDay("2026-10-16") === 2 && VX.roughSea("2026-10-16", sp.from - 20) && VX.roughSea("2026-10-16", sp.to + 100) && !VX.roughSea("2026-10-16", sp.from - 40) && !VX.roughSea("2026-10-16", sp.to + 130) && !VX.roughSea("2026-10-09", VX.rainSpell("2026-10-09").from + 5),
+      "your boat's kept in from half an hour before a downpour till two hours after it (a light shower doesn't stop it)");
+    check(/Too rough to sail just now/.test(TR.boatPanel({coins: 100, goals: {boat: 1}}, [], null, 18*60 + 30, true)), "the boat panel says it's too rough just now"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`festival chocolates pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/fc=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.goals = Object.assign(f.goals || {}, {cocoa: "2026-10-01"}); f.cocoa = {name: "The Cocoa Room", res: {milk: 0, dark: 18, white: 0}, choc: {milk: 0, dark: 0, white: 0}, bars: {milk: 0, dark: 0, white: 0}, specials: {}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-11-03"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-11-03&fc=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__hbScene("cocoakitchen")); await page.waitForTimeout(1000);
+  await page.locator('#world [data-spot="bonbon"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-cc="special"]', { timeout: 20000 });
+  check(await page.locator("#ctx svg.sppic").count() === 1 && /All it needs is 12 pieces of dark chocolate/.test(await page.locator("#ctx").innerText()), "the bonbon table: the Deepavali box drawn, and all it needs is 12 pieces of dark chocolate");
+  await page.click('#ctx [data-cc="special"]'); await page.waitForSelector('#ctx [data-cc="takesp"]', { timeout: 10000 });
+  await page.click('#ctx [data-cc="takesp"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.inv.sp_spiced === 1 && f.cocoa.specials.sp_spiced === 5), "make six, take one to give: it's in the backpack, five left to sell");
+  await page.evaluate(() => window.__hbScene("cocoa")); await page.waitForTimeout(1000);
+  check(await page.evaluate(() => /q-1.4-1.6 0-3.4/.test(document.getElementById("world").innerHTML)), "and the boxes stand on the shop counter");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {

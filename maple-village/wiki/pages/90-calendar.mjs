@@ -38,7 +38,7 @@ function seasonsHTML(){
   + Object.entries(SEASONS).map(([s, S]) => h3(s, `${S.n}: ${SEASON_MONTHS[s]}`) + `<p class="muted">${esc(S.line)}.</p>`
     + table(["", "In season"], [["<b>Seeds at the market</b>", icoList(seeds(s)) + (seeds(s).some(id => ITEMS[id].visited) ? `<br><small class="muted">${seeds(s).filter(id => ITEMS[id].visited).map(id => `${esc(ITEMS[id].n)} once you've visited ${esc(VISITED[ITEMS[id].visited] || ITEMS[id].visited)}`).join("; ")}.</small>` : "")], ["<b>Orchard fruit</b>", icoList(trees(s))], ["<b>Flower farm</b>", icoList(flowers(s)).replace(/Bouquet of (\w)/g, (m, c) => c.toUpperCase())], ["<b>Foraging in the woods</b>", icoList([FORAGE[s].id])]])).join("")
   + h3("weather", "The weather")
-  + `<p>The rainy months are November to January: roughly one day in three is a proper downpour (paddling's off), and another one in ten a light shower. The rest of the year a shower blows through about one day in seven: brollies up, nothing called off. Rain never lasts all day: a wet day has one spell of rain, half an hour to an hour, some time between 8am and 8pm.</p>`
+  + `<p>A shower comes every two or three days, lasting one to three hours, some time between 7am and 7pm. Rain never lasts all day. In the rainy months, November to January, half of them are proper downpours (paddling's off, and your boat stays in); the rest of the year about one in four. The rest are light showers: brollies up, nothing called off.</p>`
   + h3("travel-seasons", "Seasons away from home")
   + table(["Where", "When", "What"], [
     ["<a href=\"/trips/puffin\">Puffin Isle</a>", months(PUFFIN_MONTHS), "Puffins, and a puffin stamp each month."],

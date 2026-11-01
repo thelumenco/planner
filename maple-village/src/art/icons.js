@@ -438,6 +438,16 @@ CR_BOUQUETS.forEach(b => { I[b.id] = [`<path d="M7.5 12.5l4.5 9.5 4.5-9.5z" ${f(
   };
   // the Cocoa Room's (cocoa.js): house chocolate for the gelato fridge, wine fillings, festival specials
   I.housechoc = S.bar("#3F2519"); I.sp_log = I.logcake; I.sp_mooncake = I.mooncake;
+  // round 305: the Deepavali box shows its little chocolate diyas, the Chinese New Year box its gold coins; round 307:
+  // Valentine's hearts and Mother's Day roses
+  I.sp_spiced = [`<rect x="3" y="10" width="18" height="10" rx="1.5" ${f("#F6A23A")}/><path d="M4 10l2-5h12l2 5z" ${f("#4A2E22")}/>${[6.5, 12, 17.5].map(x => `<path d="M${x - 3} 13.5q3 4.5 6 0z" ${f("#4A2E22")}/><path d="M${x} 13.2q-1.4-1.6 0-3.4q1.4 1.8 0 3.4z" ${f("#F3C969")}/>`).join("")}<circle cx="7" cy="17.5" r=".9" ${f("#D9433A")}/><circle cx="12" cy="17.5" r=".9" ${f("#7A3E8A")}/><circle cx="17" cy="17.5" r=".9" ${f("#2E8B7A")}/>`,
+    `<rect x="3" y="10" width="18" height="10" rx="1.5"/><path d="M4 10l2-5h12l2 5"/>${[6.5, 12, 17.5].map(x => `<path d="M${x - 3} 13.5q3 4.5 6 0z"/>`).join("")}`];
+  I.sp_hearts = [`<path d="M12 21c-7-4-9-8-7-11c1.6-2.4 5-2 7 .6c2-2.6 5.4-3 7-.6c2 3 0 7-7 11z" ${f("#C2253F")}/><path d="M9 12.5c-1.6-1-1.2-2.6 0-2.4c.6 .1 1 .5 1 .9c0-.4.4-.8 1-.9c1.2-.2 1.6 1.4 0 2.4l-1 .8z" ${f("#4A2E22")}/><path d="M14 16c-1.6-1-1.2-2.6 0-2.4c.6 .1 1 .5 1 .9c0-.4.4-.8 1-.9c1.2-.2 1.6 1.4 0 2.4l-1 .8z" ${f("#4A2E22")}/>`,
+    `<path d="M12 21c-7-4-9-8-7-11c1.6-2.4 5-2 7 .6c2-2.6 5.4-3 7-.6c2 3 0 7-7 11z"/>`];
+  I.sp_roses = [`<path d="M12 21V12M12 16l-4-3M12 15l4-3" style="stroke:#7FA35A;stroke-width:1.6;fill:none"/><circle cx="8" cy="9" r="3.4" ${f("#FBF1E4")}/><circle cx="16" cy="9" r="3.4" ${f("#FBF1E4")}/><circle cx="12" cy="6.5" r="3.6" ${f("#F6C9CF")}/><path d="M10 19h4l-.6 3h-2.8z" ${f("#F2B8C6")}/>`,
+    `<circle cx="8" cy="9" r="3.4"/><circle cx="16" cy="9" r="3.4"/><circle cx="12" cy="6.5" r="3.6"/><path d="M11 6.5q1-1.6 2 0" opacity=".6"/>`];
+  I.sp_coins = [`<rect x="3" y="11" width="18" height="9" rx="1.5" ${f("#D9433A")}/><circle cx="8" cy="12" r="4" ${f("#F3C969")}/><circle cx="15.5" cy="11" r="4" ${f("#E8B84A")}/><circle cx="12" cy="15.5" r="4" ${f("#F3C969")}/>`,
+    `<rect x="3" y="11" width="18" height="9" rx="1.5"/><circle cx="8" cy="12" r="4"/><circle cx="15.5" cy="11" r="4"/><circle cx="12" cy="15.5" r="4"/><circle cx="12" cy="15.5" r="2.4" opacity=".5"/><circle cx="8" cy="12" r="2.4" opacity=".5"/>`];
   [["red", "#7A1F3D"], ["rose", "#E98AA0"], ["white", "#E8D57A"], ["sparkling", "#F3E7B0"]].forEach(([k, c]) => { I["wine_" + k] = S.bottle(c); });
   Object.entries(GOODS).forEach(([id, g]) => { if (I[id] || !g.art) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   // the loves round (stall-goods.js): a card of buttons, a rubber stamp, a little tin of gold coins

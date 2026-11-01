@@ -477,3 +477,18 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   (round 304)", with the personal edition's later fix to the coach check.
 - Public edition only: upkeep bills wait until a player first has `UPKEEP_FROM` (1,000) coins (`h.richSince`); the
   three-week clock starts then, so beginners never get a bill. Storms, the critic, coach parties and orders unchanged.
+
+## Rounds 305 to 307 (ported): festival chocolates you can see and give, and more rain
+
+- cocoa.js: `SPECIALS` lines say what each is (no chilli to hunt for); `specialPic(id)` draws each special; the card on
+  the bonbon table says "All it needs is 12 pieces of ...", shows how many are made and a "Take one to give" button.
+  Valentine's (`sp_hearts`) and Mother's Day (`sp_roses`) chocolates the week before each (`specialOn`, checked before
+  the festivals). Icons in art/icons.js; specials in stock stand on the Cocoa Room counter (art/scenes.js).
+  Gift lines (data/stall-goods.js) for this edition's friends: Tomi, Posy, Mei, Farid.
+- Rain (art/village-extras.js): this edition keeps `dayRain`/`rainSpell` (`rainDay` exported too): a shower every two
+  or three days, 1 to 3 hours from 7am to 7pm, half downpours in November to January, a quarter otherwise.
+  `roughSea(day, hm)`: your boat stays in from half an hour before a downpour to two hours after (it used to stay in
+  for any rain); storm night follows a downpour day (`rainDay(prev) === 2`, 40%).
+- Also: paddleboarding and the lighthouse lines now go by whether it's raining right now, not all day.
+- Tests: "Festival chocolates you can see and give (round 305)" (with the rough-sea checks), "rainy days" on
+  2026-10-09, and the Puffin Isle rainy-day check moved to 4:30pm on 2026-05-14.
