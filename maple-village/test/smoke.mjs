@@ -3188,8 +3188,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1000);
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-loft]', { timeout: 20000 });
   await page.click('#ctx [data-loft]'); await page.waitForFunction(() => /drying loft/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400);
-  await page.locator('#world [data-vsspot="list"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-lf="start:rack"]', { timeout: 20000 });
-  check(/drying loft/i.test(await page.locator("#ctx h2").textContent()) && await page.locator('#ctx [data-lf="start:rack"]').isDisabled(), "up the ladder in the barrel shed: the drying loft (three bunches isn't enough for the racks yet)");
+  await page.locator('#world [data-vsspot="rack"]').dispatchEvent("click"); await page.waitForFunction(() => /You need \d+ more bunches/.test(document.body.textContent), null, { timeout: 20000 }).catch(() => {});
+  check(/drying loft/i.test(await page.locator("#sceneName").textContent()) && /You need \d+ more bunches/.test(await page.locator("body").textContent()) && await fox().then(f => !(f.loft || {}).rack), "up the ladder in the barrel shed: the drying loft (three bunches isn't enough for the racks yet)");
   await page.close();
 }
 {
@@ -5190,6 +5190,14 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-vsspot="down"]').dispatchEvent("click"); await page.waitForFunction(() => /barrel shed/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(500); await page.locator('#world [data-vsspot="out"]').dispatchEvent("click"); await page.waitForFunction(() => !/barrel shed/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(/vineyard|vines/i.test(await page.locator("#sceneName").textContent()), "down the ladder and out to the vines");
+  // round 308b (Mel: "What if I buy extra barrels in the cellar?"): they show on the cellar's racks
+  await page.addInitScript(() => { if (!/cb=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; const t = Date.now(), H = 36e5;
+    f.goals = Object.assign(f.goals || {}, {cellar: "2026-10-01"}); f.vine = Object.assign(f.vine || {}, {grapes: {red: 0, white: 0}});
+    f.vine.barrels = [null, null, null, null, null, null, {style: "white", start: t - 20*H, dur: 8*H, stage: 1}, {style: "red", start: t - H, dur: 10*H, stage: 1}, null];
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?seed=1&time=16:45&date=2026-11-02&cb=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("cellar")); await page.waitForTimeout(1000);
+  check(await page.evaluate(() => { const w = document.getElementById("world").innerHTML; return /1 ready/.test(w) && w.includes("#E8D57A") && w.includes("#7A1F3D"); }), "barrels bought for the cellar sit on its racks, stamped in their wine's colour, with how many are ready");
   await page.close();
 }
 {

@@ -5,7 +5,7 @@
 //          and the ladder up to the loft in the back corner
 //   vloft  the drying loft: sloping beams and a round window, two cane racks of bunches that shrivel to raisins as they
 //          dry, a little cask beside each, three raisin trays on a trestle, the steeping shelf of limoncino, the salting
-//          crock, the mortar table, a sleepy cat on a sack, and the hatch back down
+//          crock, the mortar table, a sleepy cat on a sack, and the hatch back down (round 308b, Mel: "no need for the old list")
 // Tapping a spot (data-vsspot) walks Mel there; core.js (vsSpot) does the rest.
 import { sk, tapeLabel } from "./scenes.js";
 
@@ -85,7 +85,6 @@ export function loftArt(o){
     ${sk(`<path d="M0 0 H520 V190 H0z" style="fill:#E8D9BE"/><path d="M0 190 L0 120 L260 6 L520 120 L520 190" style="fill:#F3E7D2"/><path d="M0 120 L260 6 L520 120" style="fill:none;stroke:#8A5A3A;stroke-width:12"/>`, `<path d="M0 120 L260 6 L520 120 M0 190 H520"/><path d="M130 63 V190 M390 63 V190" style="stroke-width:5"/>`)}
     ${sk(`<circle cx="260" cy="96" r="30" style="fill:${night ? "#2E3A5C" : "#CFE0EE"}"/>`, `<circle cx="260" cy="96" r="30"/><path d="M260 66 v60 M230 96 h60"/>`)}
     ${lantern(180, night)}${lantern(340, night)}`;
-  h += spot("list", "List view", 70, 160, 30, "", 70, 150, "var(--card)", 8);
   // the racks and their casks
   [[95, 300], [95, 470]].forEach(([x, y], i) => { const r = o.racks[i], c = o.casks[i];
     h += spot(i ? "rack2" : "rack", i ? "Cane rack 2" : "Cane rack", x, y + 6, 56, rack(x, y, r), x, y + 20, "var(--peach)", 8.5);

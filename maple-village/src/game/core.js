@@ -3482,14 +3482,13 @@ function loftNow(){
   return {racks: ["rack", "rack2"].map(st), casks: ["cask", "cask2"].map(st), trays: ["tray", "tray2", "tray3"].map(st), lemon: job("lemon"), salt: job("salt"), pesto: {locked: !canPesto(F)}, night: hm >= 19*60 || hm < 6*60};
 }
 const VS_AT = {vshed: {up: [470, 280], bench: [392, 290], b0: [84, 300], b1: [184, 300], b2: [284, 300], b3: [84, 446], b4: [184, 446], b5: [284, 446], bottle: [420, 446], crates: [150, 580], out: [260, 600]},
-  vloft: {list: [70, 322], rack: [180, 330], rack2: [180, 500], cask: [222, 330], cask2: [222, 500], lemon: [400, 236], salt: [442, 350], pesto: [432, 490], tray: [90, 590], tray2: [175, 590], tray3: [260, 590], down: [446, 530]}};
+  vloft: {rack: [180, 330], rack2: [180, 500], cask: [222, 330], cask2: [222, 500], lemon: [400, 236], salt: [442, 350], pesto: [432, 490], tray: [90, 590], tray2: [175, 590], tray3: [260, 590], down: [446, 530]}};
 function vsSpot(k){
   const at = (VS_AT[scene] || {})[k]; if (!at) return;
   go(scene, at[0], at[1], () => {
     if (k === "out") { setScene("vineyard", [112, 268]); return; }
     if (k === "up") { setScene("vloft", [446, 530]); return; }
     if (k === "down") { setScene("vshed", [470, 280]); return; }
-    if (k === "list") { loftView = true; sfx("paper", true); render(); return; }
     if (scene === "vshed") {
       const m = /^b(\d)$/.exec(k), v = vineState(F), b = m && v.barrels[+m[1]];
       if (b && vBarrelLeft(b)) { speak(`${V_STYLES[b.style].n} in barrel ${+m[1] + 1}: ready in about ${VS_HRS(vBarrelLeft(b)).replace("h", " hours").replace("d", " days")}. It doesn't need you.`, 4500); return; }

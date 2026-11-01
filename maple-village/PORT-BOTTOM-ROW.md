@@ -181,6 +181,8 @@ HANDOFF.md rounds 305 and 306.
 ### 18. The barrel shed and the drying loft as rooms (round 308)
 HANDOFF.md round 308. Port the barrel shed room if this edition has the vineyard's barrel shed; the drying loft only if it has the loft (it comes with Cinque Terre).
 - New `src/art/vshed.js` (`shedArt`, `loftArt`, `SHED_SLOTS`): scenes `vshed` and `vloft`, custom-drawn front-view rooms with `data-vsspot` spots, wired like the lighthouse floors: in `core.js` the scene art and names, `shedNow()`, `loftNow()`, `VS_AT`, `vsSpot(k)`, `loftAct(a, k)` (shared with the loft's list), the click handler for `data-vsspot`, the vineyard's barrel shed place walking you in (`setScene("vshed", ...)`), and `vshed` added where the barrels panel renders and `wireVine` runs. Walls in `game/paths.js`; Marco's 4:30 to 6 bench slot in `data/npcs.js` (map to this edition's vineyard hand, if any).
+- No "list view" in the loft: everything is done by tapping things in the room (the loft's list panel stays only as code the old ladder button could reach).
+- The cellar (if this edition has it): `art/scenes.js` `barrelrack` draws the barrels bought for the cellar (the 7th to 18th) as twelve barrel ends stamped in their wine's colours, gaps for ones not bought, a green dot on ready ones, and an "N ready" tag.
 - `game/loft.js`: two racks each with their own cask (`rack`/`rack2`, `cask`/`cask2`), racks dry in 2 days, a cask gives 6 bottles, three raisin trays (`tray`/`tray2`/`tray3`).
 - Tests: "The barrel shed and the drying loft as rooms (round 308)", and wherever an old test tapped the barrel shed and expected the list, walk into the shed and tap the crates (`[data-vsspot="crates"]`) first, and out (`[data-vsspot="out"]`) after.
 
