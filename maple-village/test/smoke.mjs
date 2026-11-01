@@ -1192,20 +1192,21 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.waitForSelector('#ctx [data-vy="harvest"]', { timeout: 15000 }); await page.click('#ctx [data-vy="harvest"]');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.grapes.red >= 3), "ripe grapes are picked: three bunches (four in harvest week)");
   await page.click('#ctx [data-close]');
-  await page.locator('#world [data-place="barrels"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-vy="fill"][data-k="rose"]:not([disabled])', { timeout: 15000 }); await page.click('#ctx [data-vy="fill"][data-k="rose"]');
+  await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click");   // round 308: into the barrel shed, then the crates
+  await page.waitForSelector('#ctx [data-vy="fill"][data-k="rose"]:not([disabled])', { timeout: 20000 }); await page.click('#ctx [data-vy="fill"][data-k="rose"]');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.barrels[0].style === "rose"), "and go into a barrel to ferment as a rosé");
   await page.goto(url + "?seed=1&time=17:20&ripen=1"); await page.waitForTimeout(800);
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
-  await page.locator('#world [data-place="barrels"]').dispatchEvent("click");
-  await page.waitForSelector('#vyName0', { timeout: 15000 });
+  await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click");
+  await page.waitForSelector('#vyName0', { timeout: 20000 });
   const ph = await page.locator('#vyName0').getAttribute("placeholder"); await page.click('#ctx [data-vy="suggest"]'); await page.waitForTimeout(300);
   const sug = await page.locator('#vyName0').inputValue();
   check(ph && sug && ph !== "Name it" && sug !== ph && sug.length > 3, `a ready barrel suggests names (${ph}; ${sug})`);
   await page.fill('#vyName0', "Evan's Blush"); await page.click('#ctx [data-vy="bottle"]');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.cellar.some(c => c.name === "Evan's Blush" && c.n === 6)), "a ready barrel is named and bottled: six bottles in the cellar");
   await page.click('#ctx [data-close]');
+  await page.locator('#world [data-vsspot="out"]').dispatchEvent("click"); await page.waitForFunction(() => !/barrel shed/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(600);   // round 308: back out of the shed
   await page.locator('#world [data-place="wineshop"]').dispatchEvent("click");
   await page.waitForFunction(() => /wine shop/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.waitForTimeout(500);
@@ -2336,7 +2337,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#ctx .item[data-id="chocolate"]').count() === 1 && await page.locator('#ctx .item[data-id="pandan"]').count() === 1 && await page.locator('#ctx .item[data-id="milk"]').count() === 1,
     "Hana's deli stocks gelato staples: chocolate, vanilla, pistachios, pandan, milk and more");
   await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(800);
-  await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vy="takegr"]', { timeout: 15000 });
+  await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vy="takegr"]', { timeout: 20000 });
   await page.click('#ctx [data-vy="takegr"][data-k="red"][data-n="1"]'); await page.waitForTimeout(300);
   check(await fox().then(f => f.inv.grape_red === 1 && f.vine.grapes.red === 2), "grapes wait in the vineyard's crates; take a bunch for the ice cream shop");
   await page.click('#ctx [data-vy="putgr"][data-k="red"]'); await page.waitForTimeout(300);
@@ -3101,7 +3102,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(!lf.startBatch(F, "rack", now) && !lf.startBatch(F, "pesto", now), "raisin wine and pesto wait for their lessons (the harvest with Bruno, the mortar with Nonna Pina)");
     F.cinque = {raisin: true, pestoLesson: true};
     check(lf.startBatch(F, "rack", now) && !F.inv.grape_white && !F.inv.grape_red && lf.startBatch(F, "lemon", now) && lf.startBatch(F, "salt", now) && lf.startBatch(F, "pesto", now) && F.inv.pesto === 2 && !F.inv.chz_cheddar, "six bunches on the racks, lemons steeping, anchovies in salt, and pesto straight away from your own basil, garlic, oil and cheese");
-    check(!lf.collect(F, "rack", now + 2*D) && lf.collect(F, "rack", now + 3*D).cask && !lf.collect(F, "cask", now + 6*D) && lf.collect(F, "cask", now + 7*D).n === 3 && F.inv.w_raisin === 3, "three days on the racks, four in the cask: three bottles of raisin wine");
+    check(!lf.collect(F, "rack", now + 1*D) && lf.collect(F, "rack", now + 2*D).cask && !lf.collect(F, "cask", now + 5*D) && lf.collect(F, "cask", now + 6*D).n === 6 && F.inv.w_raisin === 6, "two days on the rack, four in the cask: six bottles of raisin wine (round 308)");
     check(lf.collect(F, "lemon", now + 5*D).n === 2 && F.inv.limoncino === 2 && lf.collect(F, "salt", now + 4*D).n === 2 && F.inv.anchovy_salt === 2, "five days for two limoncino, four for two jars of salted anchovies"); }
   check(items.CROPS.chickpea && items.ITEMS.chickpea_seed && items.ITEMS.pinenuts.visited === "cinque" && fishing.FISH.anchovy, "chickpeas to grow, pine nuts at the market once you've been, and anchovies in the sea");
   { const T = kit.TAPAS, local = Object.keys(T).filter(id => !T[id].special), sp = Object.keys(T).filter(id => T[id].special), maxLocal = Math.max(...local.map(id => T[id].price));
@@ -3185,8 +3186,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("shore")); await page.waitForTimeout(1200);
   check(await page.locator("#sceneArt").evaluate(e => e.innerHTML.includes("#2E7A5A")), "the painted boat (green, like the one in Manarola) is pulled up on the foreshore sand");
   await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1000);
-  await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-loft]', { timeout: 15000 });
-  await page.click('#ctx [data-loft]'); await page.waitForSelector('#ctx [data-lf="start:rack"]', { timeout: 15000 });
+  await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-loft]', { timeout: 20000 });
+  await page.click('#ctx [data-loft]'); await page.waitForFunction(() => /drying loft/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(400);
+  await page.locator('#world [data-vsspot="list"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-lf="start:rack"]', { timeout: 20000 });
   check(/drying loft/i.test(await page.locator("#ctx h2").textContent()) && await page.locator('#ctx [data-lf="start:rack"]').isDisabled(), "up the ladder in the barrel shed: the drying loft (three bunches isn't enough for the racks yet)");
   await page.close();
 }
@@ -5151,6 +5153,43 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("lowervine")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="vsale"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-lvbuy]", { timeout: 20000 }).catch(() => {});
   check(/Bram/.test(await page.locator("#ctx").innerText()) && await page.locator("#ctx [data-lvbuy]").count() === 1, "on a new game the lower vineyard is Bram's, with his For Sale sign and note");
+  await page.close();
+}
+{
+  // round 308 (Mel: "I'm thinking of building a proper room view for the barrel shed and the drying loft. Right now it's
+  // just a list"; "I need more trays for raisins too ... relook at the raisin wine ... I need to be able to make more")
+  console.log("\nThe barrel shed and the drying loft as rooms (round 308)");
+  const lf = await import(new URL("../src/game/loft.js", import.meta.url)), D = 864e5, now = Date.parse("2026-11-03T02:00:00Z");
+  { const F = {towns: {cinque: 1}, cinque: {raisin: true}, inv: {grape_red: 20}};
+    check(lf.startBatch(F, "rack", now) && lf.startBatch(F, "rack2", now) && F.inv.grape_red === 8, "two cane racks, six bunches each");
+    check(lf.startBatch(F, "tray", now) && lf.startBatch(F, "tray2", now) && lf.startBatch(F, "tray3", now) && F.inv.grape_red === 2 && !lf.startBatch(F, "tray", now), "and three raisin trays, two bunches each");
+    check(lf.collect(F, "rack", now + 2*D).cask && lf.collect(F, "rack2", now + 2*D).cask && F.loft.cask && F.loft.cask2 && !lf.startBatch(Object.assign(F, {inv: {grape_red: 6}}), "rack", now + 2*D), "each rack fills its own cask, and can't start again till that cask's bottled");
+    check(lf.collect(F, "cask", now + 6*D).n === 6 && lf.collect(F, "cask2", now + 6*D).n === 6 && F.inv.w_raisin === 12 && ["tray", "tray2", "tray3"].every(k => lf.collect(F, k, now + 2*D).n === 2) && F.inv.raisins === 6, "twelve bottles of raisin wine from the two casks, and six bags of raisins off the trays"); }
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`barrel shed pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/vs=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return; const t = Date.now(), H = 36e5;
+    f.towns = Object.assign(f.towns || {}, {cinque: 1}); f.cinque = Object.assign(f.cinque || {}, {raisin: true});
+    f.vine = Object.assign(f.vine || {}, {grapes: {red: 5, white: 2}}); f.vine.barrels = [{style: "red", start: t - 2*H, dur: 10*H, stage: 1}, {style: "rose", start: t - 20*H, dur: 6*H, stage: 1}, null];
+    f.loft = {made: {}, rack: {at: t - 26*H, n: 6}, tray: {at: t - 50*H, n: 2}}; f.inv = Object.assign(f.inv || {}, {grape_red: 4});
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=16:45&date=2026-11-02"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=16:45&date=2026-11-02&vs=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(800);
+  await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForFunction(() => /barrel shed/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1200);
+  check(await page.locator('#world [data-vsspot="b0"], #world [data-vsspot="b1"], #world [data-vsspot="b2"]').count() === 3 && await page.locator('#world [data-vsspot="b3"]').count() === 0 && await page.locator('#world [data-vsspot="bottle"]').count() === 1 && /Ready!/.test(await page.locator("#sceneArt").textContent()) && await page.locator('#world [data-vsspot="up"]').count() === 1, "tap the barrel shed: you walk in, three barrels on their cradles (one ready), the bottling table and the ladder up");
+  check((await page.locator("#actors .npc").evaluateAll(n => n.map(x => x.dataset.npc))).includes("marco"), "Marco at his bench in the late afternoon");
+  await page.locator('#world [data-vsspot="b1"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-vy="bottle"]', { timeout: 20000 });
+  check(true, "tap the ready barrel: name it and bottle it");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.locator('#world [data-vsspot="up"]').dispatchEvent("click"); await page.waitForFunction(() => /drying loft/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1000);
+  check(await page.locator('#world [data-vsspot^="tray"]').count() === 3 && await page.locator('#world [data-vsspot^="rack"]').count() === 2 && await page.locator('#world [data-vsspot^="cask"]').count() === 2, "up the ladder: two cane racks with their casks, and three raisin trays");
+  await page.locator('#world [data-vsspot="tray"]').dispatchEvent("click"); await page.waitForFunction(() => JSON.parse(localStorage.getItem("fox.fox")).inv.raisins === 2, null, { timeout: 20000 }).catch(() => {});
+  await page.waitForTimeout(500); await page.locator('#world [data-vsspot="tray2"]').dispatchEvent("click"); await page.waitForFunction(() => !!JSON.parse(localStorage.getItem("fox.fox")).loft.tray2, null, { timeout: 20000 }).catch(() => {});
+  check(await fox().then(f => f.inv.raisins === 2 && f.loft.tray2 && f.inv.grape_red === 2 && !f.loft.tray), "tap the finished tray to take the raisins, and an empty one to spread out two more bunches");
+  await page.locator('#world [data-vsspot="down"]').dispatchEvent("click"); await page.waitForFunction(() => /barrel shed/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  await page.waitForTimeout(500); await page.locator('#world [data-vsspot="out"]').dispatchEvent("click"); await page.waitForFunction(() => !/barrel shed/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  check(/vineyard|vines/i.test(await page.locator("#sceneName").textContent()), "down the ladder and out to the vines");
   await page.close();
 }
 {

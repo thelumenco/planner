@@ -19,9 +19,14 @@ Object.assign(ITEMS, {
   raisins: {n: "Bag of raisins", kind: "ingredient", price: 6, sell: 4, crafted: true, art: ["bag", "#6B3A2A", "#C9A27E"], what: "dried on the loft's raisin tray: rum and raisin gelato at the Scoop Shack"},   // round 251
   anchovy_salt: {n: "Jar of salted anchovies", kind: "ingredient", price: 15, sell: 15, crafted: true, what: "packed in salt in the loft: anchovy and lemon toasts at the kitchen"}
 });
+// round 308 (Mel: "I need more trays for raisins too and you need to relook at the raisin wine because it also dries
+// raisins but seems to take longer. I need to be able to make more raisin wine as well"): two racks, each with its own
+// cask; the racks dry in 2 days like the trays; a cask gives 6 bottles (was 3); three raisin trays (was 1).
 export const LOFT = {
-  rack: {n: "The cane drying racks", need: {grapes: 6}, days: 3, then: "cask"}, cask: {n: "The little cask", days: 4, gives: ["w_raisin", 3]},
+  rack: {n: "The cane drying racks", need: {grapes: 6}, days: 2, then: "cask"}, cask: {n: "The little cask", days: 4, gives: ["w_raisin", 6]},
+  rack2: {n: "The second cane rack", need: {grapes: 6}, days: 2, then: "cask2"}, cask2: {n: "The second cask", days: 4, gives: ["w_raisin", 6]},
   tray: {n: "The raisin tray", need: {grapes: 2}, days: 2, gives: ["raisins", 2]},   // round 251 (Mel: "where do I get raisin"): a quicker, smaller drying than the raisin wine's racks
+  tray2: {n: "The second raisin tray", need: {grapes: 2}, days: 2, gives: ["raisins", 2]}, tray3: {n: "The third raisin tray", need: {grapes: 2}, days: 2, gives: ["raisins", 2]},
   lemon: {n: "The steeping shelf", need: {lemon: 3}, days: 5, gives: ["limoncino", 2]},
   salt: {n: "The salting barrel", need: {anchovy: 6}, days: 4, gives: ["anchovy_salt", 2]},
   pesto: {n: "The mortar", need: {basil: 2, garlic: 1, pinenuts: 1, oliveoil: 1, cheese: 1}, gives: ["pesto", 2]}
@@ -44,17 +49,18 @@ export function missing(F, k){
 // start a batch -> true, or null
 export function startBatch(F, k, now = Date.now()){
   const L = loftState(F), inv = F.inv = F.inv || {}; if (!loftOpen(F) || !LOFT[k] || missing(F, k).length) return null;
-  if (k === "rack" && (!canRaisin(F) || L.rack || L.cask)) return null;
+  const isRack = /^rack/.test(k), isTray = /^tray/.test(k);
+  if (isRack && (!canRaisin(F) || L[k] || L[LOFT[k].then])) return null;
   if (k === "pesto") { if (!canPesto(F)) return null; Object.entries(LOFT.pesto.need).forEach(([id, n]) => take(inv, id === "cheese" ? cheeseOf(inv) : id, n)); inv.pesto = (inv.pesto || 0) + 2; L.made.pesto = (L.made.pesto || 0) + 2; return true; }
   if (L[k]) return null;
-  if (k === "tray" && !canRaisin(F)) return null;
-  if (k === "rack" || k === "tray") { let n = LOFT[k].need.grapes; for (const g of GRAPES) { const t = Math.min(n, inv[g] || 0); if (t) { take(inv, g, t); n -= t; } } L[k] = {at: now, n: LOFT[k].need.grapes}; return true; }
+  if (isTray && !canRaisin(F)) return null;
+  if (isRack || isTray) { let n = LOFT[k].need.grapes; for (const g of GRAPES) { const t = Math.min(n, inv[g] || 0); if (t) { take(inv, g, t); n -= t; } } L[k] = {at: now, n: LOFT[k].need.grapes}; return true; }
   Object.entries(LOFT[k].need).forEach(([id, n]) => take(inv, id, n)); L[k] = {at: now}; return true;
 }
 // collect a finished batch -> {id, n} (or, for the rack, "cask": the raisins go into the cask), or null
 export function collect(F, k, now = Date.now()){
   const L = loftState(F), b = L[k]; if (!b || left(b, now, LOFT[k].days)) return null;
-  if (k === "rack") { L.rack = null; L.cask = {at: now}; return {cask: true}; }
+  if (/^rack/.test(k)) { L[k] = null; L[LOFT[k].then] = {at: now}; return {cask: true}; }
   const [id, n] = LOFT[k].gives; L[k] = null; F.inv[id] = (F.inv[id] || 0) + n; L.made[id] = (L.made[id] || 0) + n; return {id, n};
 }
 const hrs = ms => ms >= DAY ? `${Math.ceil(ms/DAY)} day${Math.ceil(ms/DAY) === 1 ? "" : "s"}` : `${Math.max(1, Math.ceil(ms/H))} hour${Math.ceil(ms/H) === 1 ? "" : "s"}`;
@@ -63,13 +69,15 @@ function row(F, k, title, pic, body){ return `<li><span class="wpic">${icon(pic,
 export function loftPanel(F, now = Date.now()){
   const L = loftState(F);
   let h = `<span class="tape gingham" aria-hidden="true"></span><h2>The drying loft</h2><p class="sub">Up the ladder in the barrel shed: warm, dry and smelling of grapes. What you learned in Cinque Terre, made with your own produce. The slower it is, the more it fetches at the market.</p><ul class="hlist wlist">`;
-  // the racks and the cask (raisin wine)
+  // the racks and their casks (raisin wine): two of each since round 308
   if (!canRaisin(F)) h += row(F, "rack", "Raisin wine", "grape_white", "Help Signor Bruno with the harvest on the monorail in Corniglia, and he'll show you how.") + `</li>`;
-  else if (L.cask) { const t = left(L.cask, now, LOFT.cask.days); h += row(F, "cask", "The little cask: raisin wine", "w_raisin", t ? `Ageing: ready in ${hrs(t)}.` : "Ready! Three bottles of amber raisin wine.") + `${t ? "" : `<button class="btn small primary" data-lf="collect:cask">Bottle it</button>`}</li>`; }
-  else if (L.rack) { const t = left(L.rack, now, LOFT.rack.days); h += row(F, "rack", "The cane racks: drying grapes", "grape_white", t ? `Six bunches, slowly turning to raisins: ${hrs(t)} to go.` : "Wrinkled and sweet: ready for the cask.") + `${t ? "" : `<button class="btn small primary" data-lf="collect:rack">Into the cask</button>`}</li>`; }
-  else { const m = missing(F, "rack"); h += row(F, "rack", "Raisin wine: lay grapes on the racks", "grape_white", `Six bunches of your grapes (from the barrel shed's crates). 3 days on the racks, then 4 in the cask: 3 bottles, 36 each.${m.length ? ` You need ${m.join(", ")}.` : ""}`) + `<button class="btn small primary" data-lf="start:rack" ${m.length ? "disabled" : ""}>Lay them out</button></li>`; }
+  else for (const [r, c, nth] of [["rack", "cask", ""], ["rack2", "cask2", " (the second)"]]) {
+    if (L[c]) { const t = left(L[c], now, LOFT[c].days); h += row(F, c, `The little cask${nth}: raisin wine`, "w_raisin", t ? `Ageing: ready in ${hrs(t)}.` : `Ready! ${LOFT[c].gives[1]} bottles of amber raisin wine.`) + `${t ? "" : `<button class="btn small primary" data-lf="collect:${c}">Bottle it</button>`}</li>`; }
+    else if (L[r]) { const t = left(L[r], now, LOFT[r].days); h += row(F, r, `The cane rack${nth}: drying grapes`, "grape_white", t ? `Six bunches, slowly turning to raisins: ${hrs(t)} to go.` : "Wrinkled and sweet: ready for the cask.") + `${t ? "" : `<button class="btn small primary" data-lf="collect:${r}">Into the cask</button>`}</li>`; }
+    else { const m = missing(F, r); h += row(F, r, `Raisin wine${nth}: lay grapes on the rack`, "grape_white", `Six bunches of your grapes (from the barrel shed's crates). ${LOFT[r].days} days on the rack, then ${LOFT[c].days} in the cask: ${LOFT[c].gives[1]} bottles, 36 each.${m.length ? ` You need ${m.join(", ")}.` : ""}`) + `<button class="btn small primary" data-lf="start:${r}" ${m.length ? "disabled" : ""}>Lay them out</button></li>`; }
+  }
   // the steeping shelf (limoncino), the salting barrel (anchovies) and the raisin tray (round 251)
-  for (const [k, title, pic, what] of [...(canRaisin(F) ? [["tray", "Raisins on the tray", "raisins", "Two bunches of your grapes, spread on the little tray in the warm for 2 days: 2 bags of raisins, for rum and raisin gelato."]] : []), ["lemon", "Limoncino", "limoncino", "Three lemons from Ma Ma's tree, peeled and steeped for 5 days: 2 bottles, 18 each."], ["salt", "Salted anchovies", "anchovy_salt", "Six fresh anchovies from the sea, packed in salt for 4 days: 2 jars, 15 each."]]) {
+  for (const [k, title, pic, what] of [...(canRaisin(F) ? ["tray", "tray2", "tray3"].map((k, i) => [k, `Raisins on tray ${i + 1}`, "raisins", "Two bunches of your grapes, spread on the tray in the warm for 2 days: 2 bags of raisins, for rum and raisin gelato."]) : []), ["lemon", "Limoncino", "limoncino", "Three lemons from Ma Ma's tree, peeled and steeped for 5 days: 2 bottles, 18 each."], ["salt", "Salted anchovies", "anchovy_salt", "Six fresh anchovies from the sea, packed in salt for 4 days: 2 jars, 15 each."]]) {
     const b = L[k], t = b ? left(b, now, LOFT[k].days) : 0, m = missing(F, k);
     if (b) h += row(F, k, `${title}: ${t ? "on its way" : "ready!"}`, pic, t ? `Ready in ${hrs(t)}.` : "Done. Take it down.") + `${t ? "" : `<button class="btn small primary" data-lf="collect:${k}">Take it</button>`}</li>`;
     else h += row(F, k, title, pic, `${what}${m.length ? ` You need ${m.join(", ")}.` : ""}`) + `<button class="btn small primary" data-lf="start:${k}" ${m.length ? "disabled" : ""}>Start</button></li>`;

@@ -178,6 +178,12 @@ HANDOFF.md rounds 305 and 306.
 - **Valentine's and Mother's Day chocolates** (round 307): two more specials, `sp_hearts` (a box of six dark chocolate hearts) and `sp_roses` (a posy of white chocolate roses), with pictures, icons and gift items. `specialOn(day)` gives them the week before 14 February and the week before the second Sunday in May, checked before the festivals (Chinese New Year often overlaps Valentine's week). Map the gift lines to this edition's family.
 - **More rain, shorter showers**: `art/village-extras.js` `rainDay` and `showerAt`: a shower every two or three days (the days go in fives, rain on the first and on the third or fourth), each 1 to 3 hours, starting 7am to 7pm; half downpours in the wet season, a quarter otherwise. If this edition has section 16's storm night, it now follows a downpour day (`rainDay(prev) === 2`) at 40%. Your own boat is only kept in by rough seas from half an hour before a downpour until two hours after (`roughSea(day, hm)`, used where the boat panel and `buyTrip` checked for a downpour day; "Too rough to sail just now"). Test: the "rainy days" block's first check. Expect other tests that assumed a dry day to need a dry date or time.
 
+### 18. The barrel shed and the drying loft as rooms (round 308)
+HANDOFF.md round 308. Port the barrel shed room if this edition has the vineyard's barrel shed; the drying loft only if it has the loft (it comes with Cinque Terre).
+- New `src/art/vshed.js` (`shedArt`, `loftArt`, `SHED_SLOTS`): scenes `vshed` and `vloft`, custom-drawn front-view rooms with `data-vsspot` spots, wired like the lighthouse floors: in `core.js` the scene art and names, `shedNow()`, `loftNow()`, `VS_AT`, `vsSpot(k)`, `loftAct(a, k)` (shared with the loft's list), the click handler for `data-vsspot`, the vineyard's barrel shed place walking you in (`setScene("vshed", ...)`), and `vshed` added where the barrels panel renders and `wireVine` runs. Walls in `game/paths.js`; Marco's 4:30 to 6 bench slot in `data/npcs.js` (map to this edition's vineyard hand, if any).
+- `game/loft.js`: two racks each with their own cask (`rack`/`rack2`, `cask`/`cask2`), racks dry in 2 days, a cask gives 6 bottles, three raisin trays (`tray`/`tray2`/`tray3`).
+- Tests: "The barrel shed and the drying loft as rooms (round 308)", and wherever an old test tapped the barrel shed and expected the list, walk into the shed and tap the crates (`[data-vsspot="crates"]`) first, and out (`[data-vsspot="out"]`) after.
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.
@@ -195,5 +201,6 @@ Port these smoke-test blocks:
 - the changed check in "The paperie in Montrose (round 183)" (section 14)
 - "Happenings: storms, the wine, the critic and coach parties (round 303)" and "Happenings: big orders and upkeep (round 304)" (section 16)
 - "Festival chocolates you can see and give (round 305)" and the changed "rainy days" check (section 17)
+- "The barrel shed and the drying loft as rooms (round 308)" (section 18)
 
 Adjust their ids to this edition. Then run the full suite and publish only when it's green. Afterwards, tell me what you changed from the source and anything you couldn't port.
