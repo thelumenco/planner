@@ -2501,18 +2501,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   console.log("\nrainy days");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", e => errors.push(`rain pageerror: ${e.message}`));
-  // round 239 (Mel: "rain should be an hour at most"): a wet day is one shower of up to an hour
-  const VX = await import(new URL("../src/art/village-extras.js", import.meta.url)), sh = VX.showerAt("2026-10-12"), hhmm = m => `${String(Math.floor(m/60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
-  { let ok = true; for (let i = 0; i < 730; i++) { const k = new Date(Date.parse("2026-01-01") + i*864e5).toISOString().slice(0, 10); if (VX.rainDay(k)) { const w = VX.showerAt(k); if (w.to - w.from > 60 || w.from < 9*60 || w.to > 20*60) ok = false; } }
-    check(ok && VX.rainDay("2026-10-12") === 1 && !VX.rainyOn("2026-10-12", sh.from - 1) && VX.rainyOn("2026-10-12", sh.from + 5) && !VX.rainyOn("2026-10-12", sh.to), "every shower lasts an hour at most (between 9am and 8pm), and it's dry either side"); }
-  await page.goto(url + `?reset=1&seed=1&time=${hhmm(sh.from + 5)}&date=2026-10-12`); await page.waitForTimeout(900);
+  // round 239 (Mel: "rain should be an hour at most"): a wet day is one shower; round 306 (Mel: "rain more often and for
+  // shorter periods, so maybe 3 hours at the most, 1 hour at the minimum ... once every 2 to 3 days")
+  const VX = await import(new URL("../src/art/village-extras.js", import.meta.url)), sh = VX.showerAt("2026-10-09"), hhmm = m => `${String(Math.floor(m/60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+  { let ok = true, last = -1; for (let i = 0; i < 730; i++) { const k = new Date(Date.parse("2026-01-01") + i*864e5).toISOString().slice(0, 10); if (VX.rainDay(k)) { const w = VX.showerAt(k); if (w.to - w.from > 180 || w.to - w.from < 60 || w.from < 7*60 || w.to > 22*60) ok = false; if (last >= 0 && (i - last < 2 || i - last > 3)) ok = false; last = i; } }
+    check(ok && VX.rainDay("2026-10-09") === 1 && !VX.rainyOn("2026-10-09", sh.from - 1) && VX.rainyOn("2026-10-09", sh.from + 5) && !VX.rainyOn("2026-10-09", sh.to), "a shower every two or three days, one to three hours long (between 7am and 10pm), and it's dry either side"); }
+  await page.goto(url + `?reset=1&seed=1&time=${hhmm(sh.from + 5)}&date=2026-10-09`); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("base")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => { const r = document.getElementById("rain"); return !r.hidden && r.classList.contains("light"); }), "a light shower in October (not just the wet season)");
   check(await page.locator("#melRain .brolly").count() === 1 && await page.evaluate(() => document.getElementById("evan").classList.contains("raincoat")), "Mel under her brolly, Evan in his raincoat and wellies");
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(2500);
   const gear = await page.evaluate(() => [...document.querySelectorAll("#actors .npc")].map(n => n.querySelector(".brolly") ? "b:" + n.querySelector(".brolly > path:nth-of-type(3)").getAttribute("style") : n.querySelector(".rcoat") ? "c:" + n.querySelector(".rcoat").getAttribute("style") : ""));
   check(gear.length > 0 && gear.every(Boolean) && new Set(gear).size > 1, "everyone in town has a brolly or a raincoat, not all the same");
-  await page.goto(url + `?seed=1&time=${hhmm(sh.to + 20)}&date=2026-10-12`); await page.waitForTimeout(900);
+  await page.goto(url + `?seed=1&time=${hhmm(sh.to + 20)}&date=2026-10-09`); await page.waitForTimeout(900);
   await page.evaluate(() => window.__mapleScene("village")); await page.waitForTimeout(1500);
   check(await page.evaluate(() => document.getElementById("rain").hidden) && await page.locator("#melRain .brolly, #actors .brolly").count() === 0, "and once the shower's passed the brollies are put away");
   await page.close();
@@ -5150,6 +5151,32 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("lowervine")); await page.waitForTimeout(600);
   await page.locator('#world [data-place="vsale"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-lvbuy]", { timeout: 20000 }).catch(() => {});
   check(/Bram/.test(await page.locator("#ctx").innerText()) && await page.locator("#ctx [data-lvbuy]").count() === 1, "on a new game the lower vineyard is Bram's, with his For Sale sign and note");
+  await page.close();
+}
+{
+  // round 305 (Mel: the Deepavali chocolates "seem to be very underwhelming ... it says it needs cardamom ... Cinnamon and a
+  // bit of chili, but I didn't know where to get the chili ... it was only words. I didn't get to see the bonbon. I didn't
+  // get to take the bonbon and give it to friends")
+  console.log("\nFestival chocolates you can see and give (round 305)");
+  const cc = await import(new URL("../src/game/cocoa.js", import.meta.url)), itm = await import(new URL("../src/data/items.js", import.meta.url));
+  check(Object.values(cc.SPECIALS).every(sp => /<svg class="sppic"/.test(cc.specialPic(sp.id)) && cc.specialPic(sp.id).length > 400) && (cc.specialPic("sp_spiced").match(/q-5 -6 0 -13/g) || []).length === 6, "each festival special has its own picture (the Deepavali box: six little chocolate diyas with gold flames)");
+  check(!/chilli/.test(cc.SPECIALS.deepavali.line) && itm.ITEMS.sp_spiced.to === "family", "no chilli to hunt for, and the box can go to the family or any friend");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`festival chocolates pageerror: ${e.message}`));
+  const fox = () => page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")));
+  await page.addInitScript(() => { if (!/fc=1/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.goals = Object.assign(f.goals || {}, {cocoa: "2026-10-01"}); f.cocoa = {name: "The Cocoa Room", res: {milk: 0, dark: 18, white: 0}, choc: {milk: 0, dark: 0, white: 0}, bars: {milk: 0, dark: 0, white: 0}, specials: {}};
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-11-03"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=11:00&date=2026-11-03&fc=1"); await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__mapleScene("cocoakitchen")); await page.waitForTimeout(1000);
+  await page.locator('#world [data-spot="bonbon"]').first().dispatchEvent("click"); await page.waitForSelector('#ctx [data-cc="special"]', { timeout: 20000 });
+  check(await page.locator("#ctx svg.sppic").count() === 1 && /All it needs is 12 pieces of dark chocolate/.test(await page.locator("#ctx").innerText()), "the bonbon table: the Deepavali box drawn, and all it needs is 12 pieces of dark chocolate");
+  await page.click('#ctx [data-cc="special"]'); await page.waitForSelector('#ctx [data-cc="takesp"]', { timeout: 10000 });
+  await page.click('#ctx [data-cc="takesp"]'); await page.waitForTimeout(400);
+  check(await fox().then(f => f.inv.sp_spiced === 1 && f.cocoa.specials.sp_spiced === 5), "make six, take one to give: it's in the backpack, five left to sell");
+  await page.evaluate(() => window.__mapleScene("cocoa")); await page.waitForTimeout(1000);
+  check(await page.evaluate(() => /q-1.4-1.6 0-3.4/.test(document.getElementById("world").innerHTML)), "and the boxes stand on the shop counter");
   await page.close();
 }
 {

@@ -3689,7 +3689,7 @@ const hapStock = shop => shop === "scoop" ? Object.values(scoopState(F).tubs || 
 function hapNow(){
   lastHap = Date.now(); const day = dayKey(), hm = sgHM(), prev = prevDay(day);
   const own = {scoop: !!F.scoop, cocoa: owns(F, "cocoa"), wine: !!F.vine, boat: owns(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning)};
-  const got = HP.hapDaily(F, day, own, {stormy: [3, 9, 15, 21].some(h => stormyOn(prev, h*60)), away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: rnd => birdsTake(F, rnd)});
+  const got = HP.hapDaily(F, day, own, {stormy: rainDay(prev) === 2, away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: rnd => birdsTake(F, rnd)});
   const j = HP.judge(F, day, hm, hapStock), lp = HP.lapse(F, day, hm);
   if (lp && !got.length && !j) { save(); flash(`The order for ${lp.who} wasn't ready in time: see your mailbox`); }
   if (got.length || j) { save(); sfx("paper", true); flash(got.includes("storm") ? "Storm damage in the night: see your mailbox" : got.includes("order") && !j ? "A big order's come in: see your mailbox" : j ? (j.good ? "A good review in the Gazette!" : "A review in the Gazette") : "Something's happening today: see your mailbox"); drawScene(); }
@@ -4014,7 +4014,7 @@ function wireCocoa(c){
       speak(k === "dip" ? `${got} dips of house-made dark, off to the Scoop Shack's dip station. Cones dipped in it sell for more.` : `${got} bars of Cocoa Room chocolate, into the Scoop Shack's gelato fridge. Try it at the mixing bench!`, 5000); }
     else if (a === "wine") { const got = wineToPantry(F, k); if (!got) return; sfx("tap"); flash(`${got.wine}: 4 fillings on the shelf`); }
     else if (a === "pair") { const w = packPairing(F, k); if (!w) return; sfx("paper", true); flash(`Pairing box with ${w}, in your backpack`); speak("A bottle and four bonbons, ribboned together. Tap it in your backpack to choose who it's for.", 4500); }
-    else if (a === "special") { const sp = makeSpecial(F); if (!sp) return; sfx("chime"); act("cheer"); gainXp(2); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 20 : -20), mel.y - 60, 1500), t)); speak(`${sp.make} ${sp.n.toLowerCase()}${sp.make > 1 && !/s$/.test(sp.n) ? "s" : ""} for ${sp.fest}! They'll sell beside the display case.`, 5000); }
+    else if (a === "special") { const sp = makeSpecial(F); if (!sp) return; sfx("chime"); act("cheer"); gainXp(2); [0, 250].forEach((t, i) => setTimeout(() => mprop("sparkle", mel.x + (i ? 20 : -20), mel.y - 60, 1500), t)); speak(`${sp.make} ${sp.n.toLowerCase().replace(/^box of/, "boxes of").replace(/box$/, "boxes").replace(/(log|mooncake)$/, "$1s")} for ${sp.fest}! Take one to give, and the rest sell beside the display case.`, 5000); }
     else if (a === "takesp") { if (!takeSpecial(F, k)) return; sfx("chime"); flash(`${ITEMS[k].n} in your backpack`); }
     else if (a === "eatbb") { const bb = eatBonbon(F, k); if (!bb) return; sfx("chime"); mprop("heart", mel.x, mel.y - 60, 1600); speak(`${bb.name}. Oh, that's good.`, 3500); if (evanHere() && eatBonbon(F, k)) setTimeout(() => evanSays(pick(["chocolate!!", "another one!", "mmm!"])), 900); }
     // round 184: choose the bonbons for a box or a pairing box

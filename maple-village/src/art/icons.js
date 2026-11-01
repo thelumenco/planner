@@ -411,6 +411,12 @@ I.logcake = [`<rect x="4" y="9" width="16" height="9" rx="4.5" ${f("#6E4430")}/>
   };
   // the Cocoa Room's (cocoa.js): house chocolate for the gelato fridge, wine fillings, festival specials
   I.housechoc = S.bar("#3F2519"); I.sp_log = I.logcake; I.sp_mooncake = I.mooncake;
+  // round 305 (Mel: the festival chocolates were "only words"): the Deepavali box shows its little chocolate diyas, the
+  // Chinese New Year box its gold coins
+  I.sp_spiced = [`<rect x="3" y="10" width="18" height="10" rx="1.5" ${f("#F6A23A")}/><path d="M4 10l2-5h12l2 5z" ${f("#4A2E22")}/>${[6.5, 12, 17.5].map(x => `<path d="M${x - 3} 13.5q3 4.5 6 0z" ${f("#4A2E22")}/><path d="M${x} 13.2q-1.4-1.6 0-3.4q1.4 1.8 0 3.4z" ${f("#F3C969")}/>`).join("")}<circle cx="7" cy="17.5" r=".9" ${f("#D9433A")}/><circle cx="12" cy="17.5" r=".9" ${f("#7A3E8A")}/><circle cx="17" cy="17.5" r=".9" ${f("#2E8B7A")}/>`,
+    `<rect x="3" y="10" width="18" height="10" rx="1.5"/><path d="M4 10l2-5h12l2 5"/>${[6.5, 12, 17.5].map(x => `<path d="M${x - 3} 13.5q3 4.5 6 0z"/>`).join("")}`];
+  I.sp_coins = [`<rect x="3" y="11" width="18" height="9" rx="1.5" ${f("#D9433A")}/><circle cx="8" cy="12" r="4" ${f("#F3C969")}/><circle cx="15.5" cy="11" r="4" ${f("#E8B84A")}/><circle cx="12" cy="15.5" r="4" ${f("#F3C969")}/>`,
+    `<rect x="3" y="11" width="18" height="9" rx="1.5"/><circle cx="8" cy="12" r="4"/><circle cx="15.5" cy="11" r="4"/><circle cx="12" cy="15.5" r="4"/><circle cx="12" cy="15.5" r="2.4" opacity=".5"/><circle cx="8" cy="12" r="2.4" opacity=".5"/>`];
   [["red", "#7A1F3D"], ["rose", "#E98AA0"], ["white", "#E8D57A"], ["sparkling", "#F3E7B0"]].forEach(([k, c]) => { I["wine_" + k] = S.bottle(c); });
   Object.entries(GOODS).forEach(([id, g]) => { if (I[id] || !g.art) return; const fn = S[g.art[0]] || S.box; I[id] = fn(g.art[1], g.art[2]); });
   // round 271: the car boot sale's curios (game/south.js)

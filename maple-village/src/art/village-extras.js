@@ -79,14 +79,19 @@ export function festivalOn(day){
   for (const f of FESTIVALS) for (const k of f.dates) { const x = dayNum(k); if (d >= x - f.before && d <= x + f.after) return f; }
   return null;
 }
-// Wet season (Nov to Jan): roughly one day in three is a proper downpour, and another one in ten a light shower. The
-// rest of the year a shower blows through about one day in seven: brollies up, nothing called off.
-// rainLevel: 0 dry, 1 a light shower, 2 a downpour (paddling's off).
-// round 239 (Mel: "rain should be an hour at most"): a wet day is one shower, not all day. rainDay says what kind of
-// day it is; showerAt when the shower comes (between 9am and 7pm: 45 to 60 minutes for a downpour, 20 to 40 for a light
-// one); rainLevel / rainyOn / stormyOn are only true while it's actually raining.
-export function rainDay(day){ const h = hash(day + "rain") % 100; return [11, 12, 1].includes(+day.slice(5, 7)) ? (h < 34 ? 2 : h < 44 ? 1 : 0) : (h < 14 ? 1 : 0); }
-export function showerAt(day){ const from = 9*60 + hash(day + "when") % (10*60), len = rainDay(day) === 2 ? 45 + hash(day + "len") % 16 : 20 + hash(day + "len") % 21; return {from, to: from + len}; }
+// round 306 (Mel: "it's not raining often enough. I would like it to rain more often and for shorter periods, so maybe
+// 3 hours at the most, 1 hour at the minimum, and ... once every 2 to 3 days"): the days go in fives, with a shower on
+// the first and on the third or fourth, so there's always one two or three days after the last. Each lasts 1 to 3 hours,
+// starting between 7am and 7pm. In the wet season (Nov to Jan) half are downpours; the rest of the year about one in four.
+// rainLevel: 0 dry, 1 a light shower, 2 a downpour (paddling's off). rainDay says what kind of day it is; showerAt when
+// the shower comes; rainLevel / rainyOn / stormyOn are only true while it's actually raining.
+const mixr = h => { h = Math.imul(h ^ (h >>> 16), 0x45d9f3b); h = Math.imul(h ^ (h >>> 16), 0x45d9f3b); return (h ^ (h >>> 16)) >>> 0; };
+export function rainDay(day){
+  const d = Math.round(dayNum(day)), w = Math.floor(d/5), at = d - w*5, second = 2 + mixr(w*7 + 3) % 2;
+  if (at !== 0 && at !== second) return 0;
+  return mixr(hash(day + "rain")) % 100 < ([11, 12, 1].includes(+day.slice(5, 7)) ? 50 : 25) ? 2 : 1;
+}
+export function showerAt(day){ const len = 60 + mixr(hash(day + "len")) % 121, from = 7*60 + mixr(hash(day + "when")) % (12*60 + 1); return {from, to: from + len}; }
 export function rainLevel(day, hm = sgHM()){ const l = rainDay(day); if (!l) return 0; const w = showerAt(day); return hm >= w.from && hm < w.to ? l : 0; }
 export const rainyOn = (day, hm) => rainLevel(day, hm) > 0;
 export const stormyOn = (day, hm) => rainLevel(day, hm) === 2;

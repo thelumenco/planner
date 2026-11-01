@@ -133,7 +133,7 @@ export function hapDaily(F, day, own, o = {}){
   h.boosts = h.boosts.filter(b => b.to >= day);
   if (first || o.away) return [];
   const rnd = o.rnd || Math.random, out = [];
-  if (o.stormy && rnd() < .6) { const r = storm(F, day, own, rnd); if (r) out.push("storm"); }
+  if (o.stormy && rnd() < .4) { const r = storm(F, day, own, rnd); if (r) out.push("storm"); }
   // harvest weeks: the starlings, unless the vines are netted
   if (o.harvest && o.birds && rnd() < .5) { const n = o.birds(rnd); if (n) { out.push("birds");
     note(h, day, "Starlings in the vineyard", `A cloud of starlings came down on the ripe grapes at first light: ${n} vine${n > 1 ? "s" : ""} picked clean before anyone could shoo them off. Water ${n > 1 ? "them" : "it"} again and ${n > 1 ? "they'll" : "it'll"} fruit again. Bird netting from the vineyard shop keeps them off for good.`); } }

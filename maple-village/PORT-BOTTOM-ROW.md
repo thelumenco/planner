@@ -172,6 +172,11 @@ Commits `c7da0a9` "Happenings, part one" and `00d2241` "Happenings, part two" (H
 - Port only the parts whose shops and places this edition has, and map the village names in the notes (the cricket club, Hana, Bram, the Honeybrook Gazette) to this edition's. Keep the amounts: money must not come easily.
 - Tests: "Happenings: storms, the wine, the critic and coach parties (round 303)" and "Happenings: big orders and upkeep (round 304)".
 
+### 17. Festival chocolates you can see and give, and more rain (rounds 305 and 306)
+HANDOFF.md rounds 305 and 306.
+- **Festival chocolates** (port if this edition has the Cocoa Room's festival specials): in `game/cocoa.js`, the `SPECIALS` lines stop sounding like a list of ingredients (no chilli to hunt for), the festival card on the bonbon table says "All it needs is 12 pieces of ... chocolate (you have N): everything else is in the kitchen", and shows a big drawn picture of the special (`specialPic`: six chocolate diyas with gold flames in a marigold box for Deepavali, gold coins for Chinese New Year, the yule log, mooncakes), how many are made, and a "Take one to give" button (`data-cc="takesp"`). New icons `sp_spiced` and `sp_coins` in `art/icons.js`; specials in stock stand on the Cocoa Room counter (`art/scenes.js`, the cocoa counter). The Deepavali box goes to family or friends. In `core.js` the "made" line's plural is fixed ("boxes"). Test: "Festival chocolates you can see and give (round 305)".
+- **More rain, shorter showers**: `art/village-extras.js` `rainDay` and `showerAt`: a shower every two or three days (the days go in fives, rain on the first and on the third or fourth), each 1 to 3 hours, starting 7am to 7pm; half downpours in the wet season, a quarter otherwise. If this edition has section 16's storm night, it now follows a downpour day (`rainDay(prev) === 2`) at 40%. Test: the "rainy days" block's first check. Expect other tests that assumed a dry day to need a dry date or time.
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.
@@ -188,5 +193,6 @@ Port these smoke-test blocks:
 - "Seashells, one at a time, and the chocolate steps (round 299)", plus the changed checks HANDOFF.md round 299 lists, for the parts you ported
 - the changed check in "The paperie in Montrose (round 183)" (section 14)
 - "Happenings: storms, the wine, the critic and coach parties (round 303)" and "Happenings: big orders and upkeep (round 304)" (section 16)
+- "Festival chocolates you can see and give (round 305)" and the changed "rainy days" check (section 17)
 
 Adjust their ids to this edition. Then run the full suite and publish only when it's green. Afterwards, tell me what you changed from the source and anything you couldn't port.
