@@ -65390,7 +65390,7 @@ Return JSON only: {"affirmations": ["...", "..."]}`, { modelTier: "quick", cache
             if (v.spot) arriveVillageSpot(n);
             else go(n, 260, 560, null);
           } else arriveSpot(n);
-        } else if (!outside() && scene !== "farm" && !INNER[scene] && !coOf(scene) && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
+        } else if (!outside() && scene !== "farm" && !INNER[scene] && !coOf(scene) && VILLAGE[scene] && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
         else if (INNER[scene] && scene !== "kidroom" && (Math.abs(mel.x - INNER[scene].exit[0]) < 12 && Math.abs(mel.y - INNER[scene].exit[1]) < 56 || mel.y > 592 && Math.abs(mel.x - 260) < 60)) {
           const I3 = INNER[scene];
           go(I3.parent, I3.door[0] + 30, I3.door[1] + 20, null);
