@@ -3596,6 +3596,7 @@ setTimeout(vineTick, 3000);
 // dev builds only (the stub sets the flag): test scripts jump straight to a scene
 if (window.__hbDevStub) window.__hbIntro = i => introAt(i, {replay: true, trainArt: () => trainRideArt(false), sfx});
 if (window.__hbDevStub) window.__hbScene = (id, at) => setScene(id, at || (OUTDOOR.includes(id) ? [260, 330] : INNER[id] ? INNER[id].arrive : [260, 596]));
+if (window.__hbDevStub) window.__hbGo = (id, x, y) => go(id, x, y, null);   // tests: walk somewhere, room by room (round 310)
 if (window.__hbDevStub) window.__hbOrder = (shop = "The Scoop Shack") => { S.orderAt = 0; scoopState(F).bikeOut = Date.now() + (globalThis.__hbOffset || 0); orderNote([{shop: "scoop", coins: 6, what: "a cone of mango"}], shop, false); };   // tests: an order note, and Tomo riding past
 // dev builds only: test scripts read and nudge the save (the quest board tests give the backpack what a request needs)
 if (window.__hbDevStub) window.__hbGame = {F: () => F, S: () => S, near: () => { const n = nearestVillager(); return n ? n.def.id + ":" + Math.round(Math.hypot(n.x - hero.x, n.y - hero.y)) : npcActors().map(([, e]) => e.def.id + "@" + Math.round(e.x) + "," + Math.round(e.y) + " hero " + Math.round(hero.x) + "," + Math.round(hero.y)).join(";"); }, give: (id, n) => { addInv(id, n); save(true); }, save: () => { resetNpcs(); save(true); }, render: () => render(true), handOver: who => offerHandOver(who), mail: () => ({paper: paperWaiting(), unread: unreadMail().map(m => m.id), atSpot}), items: () => ITEMS,
@@ -3948,7 +3949,7 @@ function frameBody(now){
     else if (!route.length) {
       const n = nearSpot();
       if (n) { if (outside()) { const v = VILLAGE[n]; if (v.spot) arriveVillageSpot(n); else go(n, 260, 560, null); } else arriveSpot(n); }
-      else if (!outside() && scene !== "farm" && !INNER[scene] && hero.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
+      else if (!outside() && scene !== "farm" && !INNER[scene] && VILLAGE[scene] && hero.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);   // (round 310: rooms with no village door, like the barrel shed and the loft, have their own way out)
       else if (INNER[scene] && ((Math.abs(hero.x - INNER[scene].exit[0]) < 12 && Math.abs(hero.y - INNER[scene].exit[1]) < 56) || (hero.y > 592 && Math.abs(hero.x - 260) < 60))) { const I = INNER[scene]; go(I.parent, I.door[0] + 30, I.door[1] + 20, null); }
       else if (scene === "farm" && hero.y > 592 && Math.abs(hero.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
     }

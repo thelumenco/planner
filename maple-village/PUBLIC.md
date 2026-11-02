@@ -505,3 +505,7 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
 - Wine vinegar: `I.vinegar` icon, a kitchen good, the small plate `insalata` and the tapa `encurtidos`; 33 autumn tapas.
 - Tests: "The barrel shed and the drying loft as rooms (round 308)", the barrel shed taps in older tests (crates, then
   out), the loft check (tap the rack), raisin wine 2 days and 6 bottles, the vinegar check in the round 303 block.
+- Round 310 (ported): the "walked past the bottom of a room" rule in core.js now checks `VILLAGE[scene]`, so rooms with
+  no village door (the barrel shed and the loft) never try to leave by one. Here the walking bounds already kept you
+  above that line, so it didn't crash, but the guard matches the source. A dev-only `__hbGo(id, x, y)` test hook, and
+  two checks in the round 308 block (walk to the bottom of each room: no crash, still inside).
