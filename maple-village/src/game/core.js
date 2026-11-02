@@ -4797,7 +4797,7 @@ function frameNow(now){
     else if (!route.length) {
       const n = nearSpot();
       if (n) { if (outside()) { const v = VILLAGE[n]; if (v.spot) arriveVillageSpot(n); else go(n, 260, 560, null); } else arriveSpot(n); }
-      else if (!outside() && scene !== "farm" && !INNER[scene] && !coOf(scene) && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);
+      else if (!outside() && scene !== "farm" && !INNER[scene] && !coOf(scene) && VILLAGE[scene] && mel.y > 592) go(outdoorOf(scene), VILLAGE[scene].door[0], VILLAGE[scene].door[1] + 10, null);   // (round 310: rooms with no village door, like the barrel shed and the loft, have their own way out)
       else if (INNER[scene] && scene !== "kidroom" && ((Math.abs(mel.x - INNER[scene].exit[0]) < 12 && Math.abs(mel.y - INNER[scene].exit[1]) < 56) || (mel.y > 592 && Math.abs(mel.x - 260) < 60))) { const I = INNER[scene]; go(I.parent, I.door[0] + 30, I.door[1] + 20, null); }
       else if (scene === "farm" && mel.y > 592 && Math.abs(mel.x - 260) < 50) go("base", VILLAGE.farm.door[0], VILLAGE.farm.door[1] + 10, null);
     }

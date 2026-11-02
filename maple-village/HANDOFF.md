@@ -2944,3 +2944,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - icons.js `I.vinegar`: a tall rosy-amber bottle with a cork and a label (it had no art, so it showed blank).
 - kitchen.js: `vinegar` is a kitchen good (the larder takes it); a small plate `insalata` (tomato salad with your own vinegar: 2 tomatoes, 1 vinegar, 4 plates at 6) and an all-year tapa `encurtidos` (pickled vegetables: a carrot, a pepper, a vinegar, at 8); the ingredient hint says where it comes from. Hana still buys it at 2. The barrel's "turned to vinegar" line and the item's `what` say so.
 - Test: a check in the round 303 block.
+
+## Round 310: no crash at the bottom of the shed or loft (Mel's screenshot: "Cannot read properties of undefined (reading 'door') at frameNow")
+- In core.js `frameNow`, walking past y 592 in a room with no INNER entry sent Mel out by `VILLAGE[scene].door`; the barrel shed and the drying loft have no village door (they leave by their own "Out to the vines" and "Down the ladder" spots), so it threw. The rule now also needs `VILLAGE[scene]`. Two checks in the round 308 block walk to the bottom of each room.

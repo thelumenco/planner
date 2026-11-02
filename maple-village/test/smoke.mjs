@@ -5183,11 +5183,21 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(true, "tap the ready barrel: name it and bottle it");
   await page.click("#ctx [data-close]").catch(() => {});
   await page.locator('#world [data-vsspot="up"]').dispatchEvent("click"); await page.waitForFunction(() => /drying loft/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 }); await page.waitForTimeout(1000);
+  // round 310 (Mel's screenshot: "Cannot read properties of undefined (reading 'door')"): walking to the bottom edge
+  // of the loft used to try to leave by a village door it doesn't have
+  { let bad = 0; const onErr = () => bad++; page.on("pageerror", onErr);
+    await page.evaluate(() => window.__mapleGo("vloft", 200, 606)); await page.waitForTimeout(3500);
+    check(!bad && /drying loft/i.test(await page.locator("#sceneName").textContent()), "walk right down to the bottom of the loft: no crash, still in the loft");
+    page.off("pageerror", onErr); }
   check(await page.locator('#world [data-vsspot^="tray"]').count() === 3 && await page.locator('#world [data-vsspot^="rack"]').count() === 2 && await page.locator('#world [data-vsspot^="cask"]').count() === 2, "up the ladder: two cane racks with their casks, and three raisin trays");
   await page.locator('#world [data-vsspot="tray"]').dispatchEvent("click"); await page.waitForFunction(() => JSON.parse(localStorage.getItem("fox.fox")).inv.raisins === 2, null, { timeout: 20000 }).catch(() => {});
   await page.waitForTimeout(500); await page.locator('#world [data-vsspot="tray2"]').dispatchEvent("click"); await page.waitForFunction(() => !!JSON.parse(localStorage.getItem("fox.fox")).loft.tray2, null, { timeout: 20000 }).catch(() => {});
   check(await fox().then(f => f.inv.raisins === 2 && f.loft.tray2 && f.inv.grape_red === 2 && !f.loft.tray), "tap the finished tray to take the raisins, and an empty one to spread out two more bunches");
   await page.locator('#world [data-vsspot="down"]').dispatchEvent("click"); await page.waitForFunction(() => /barrel shed/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
+  { let bad = 0; const onErr = () => bad++; page.on("pageerror", onErr);
+    await page.evaluate(() => window.__mapleGo("vshed", 140, 606)); await page.waitForTimeout(3500);
+    check(!bad && /barrel shed/i.test(await page.locator("#sceneName").textContent()), "and the same at the bottom of the barrel shed");
+    page.off("pageerror", onErr); }
   await page.waitForTimeout(500); await page.locator('#world [data-vsspot="out"]').dispatchEvent("click"); await page.waitForFunction(() => !/barrel shed/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   check(/vineyard|vines/i.test(await page.locator("#sceneName").textContent()), "down the ladder and out to the vines");
   // round 308b (Mel: "What if I buy extra barrels in the cellar?"): they show on the cellar's racks
