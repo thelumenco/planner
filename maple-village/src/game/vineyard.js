@@ -16,7 +16,7 @@ import { mulledSeason, sellCup, mullState } from "./mulled.js";
 import { vineCloseup, barrelPic, stageStrip, bottleArt, glassArt, stallIcon, dishArt, oliveArt } from "../art/wine.js";
 import { boost } from "./happen.js";
 // round 303: a barrel that's turned (see bottle); Hana buys it for dressings
-ITEMS.vinegar = {n: "Wine vinegar", kind: "food", sell: 2, say: "Wine vinegar! Lovely on a salad, with good oil."};
+ITEMS.vinegar = {n: "Wine vinegar", kind: "food", sell: 2, say: "Wine vinegar! Lovely on a salad, with good oil.", what: "from a barrel that turned: into the kitchen larder for a tomato salad or pickled vegetables, or Hana buys it"};
 
 export const GROW = 8*H;                                     // a watered vine ripens in 8 hours
 // Fermenting is a once-a-day rhythm: fill a barrel one evening, bottle it the next day (finishing quests speeds it up).
@@ -185,7 +185,7 @@ export function bottle(F, slot, name){
   // round 303 (setbacks: the wine): about one barrel in twelve turns to vinegar; it isn't wasted, Hana buys it
   v.bottledN = (v.bottledN || 0) + 1;
   if (v.bottledN % 12 === 8) { v.barrels[slot] = null; F.inv = F.inv || {}; F.inv.vinegar = (F.inv.vinegar || 0) + BOTTLES;
-    return `Oh no. You draw a glass to taste and it's sharp as a lemon: this barrel's turned to vinegar. Still, it's good wine vinegar: ${BOTTLES} bottles into your backpack, and Hana buys it for dressings.`; }
+    return `Oh no. You draw a glass to taste and it's sharp as a lemon: this barrel's turned to vinegar. Still, it's good wine vinegar: ${BOTTLES} bottles into your backpack: the kitchen can make a tomato salad or pickled vegetables with it, or Hana buys it.`; }
   v.cellar.push({id: "w" + Date.now().toString(36), name: nm, type: b.style, n: BOTTLES}); v.barrels[slot] = null;
   return `${BOTTLES} bottles of ${nm}, into the cellar. Stock them on the shop shelves.`;
 }

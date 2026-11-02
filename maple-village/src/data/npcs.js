@@ -124,7 +124,8 @@ export const NPCS = [
     look: {skin: "#C99470", hair: "#4A4038", hairStyle: "short", top: "#9DB88A", bottom: "#6B5444"},
     routine: [slot("8:00", "12:00", "vineyard", [[262, 390], [340, 440], [418, 490], [300, 392], [380, 442]], {act: "water"}),
       slot("12:00", "13:00", "wineshop", [227, 518], {act: "sit"}),
-      slot("13:00", "18:00", "vineyard", [[262, 390], [340, 440], [418, 490], [230, 470], [450, 400]], {act: "farm"})],
+      slot("13:00", "16:30", "vineyard", [[262, 390], [340, 440], [418, 490], [230, 470], [450, 400]], {act: "farm"}),
+      slot("16:30", "18:00", "vshed", [392, 296], {act: "farm"})],   // round 308: an hour and a half at his bench in the barrel shed
     lines: ["Talk to them nicely. Vines listen.", "Water in the morning, pick in the afternoon.", "The red ones are show-offs. The white ones are shy.", "A good barrel takes its time. So do I."],
     actLines: {water: ["Watering the thirsty ones.", "A drink for every vine.", "Ripe ones go straight to the barrels."], farm: ["Tying up the shoots.", "Checking every bunch. Looking good."]},
     away: "Marco's gone home. The vines can wait till morning.",

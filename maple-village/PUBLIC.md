@@ -492,3 +492,16 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
 - Also: paddleboarding and the lighthouse lines now go by whether it's raining right now, not all day.
 - Tests: "Festival chocolates you can see and give (round 305)" (with the rough-sea checks), "rainy days" on
   2026-10-09, and the Puffin Isle rainy-day check moved to 4:30pm on 2026-05-14.
+
+## Rounds 308 and 309 (ported): the barrel shed and the drying loft as rooms, and wine vinegar made useful
+
+- art/vshed.js (`shedArt`, `loftArt`): scenes `vshed` and `vloft`, front-view rooms with `data-vsspot` spots, wired like
+  the lighthouse floors (core.js `shedNow`, `loftNow`, `VS_AT`, `vsSpot`, `loftAct`). The vineyard's barrel shed walks
+  you in; the shed's spots open the barrels list; the loft's start or collect a batch directly (no list). Walls in
+  paths.js; Marco at his bench 4:30 to 6 (data/npcs.js). The cellar's barrel rack draws barrels 7 to 18 (art/scenes.js).
+- game/loft.js: two racks with their own casks (`rack`/`rack2`, `cask`/`cask2`), 2 days on a rack, 6 bottles a cask,
+  and three raisin trays (`tray`/`tray2`/`tray3`, new here: this edition had no tray). "Keep them as raisins" off a
+  finished rack still works (`takeRaisins(F, now, k)`).
+- Wine vinegar: `I.vinegar` icon, a kitchen good, the small plate `insalata` and the tapa `encurtidos`; 33 autumn tapas.
+- Tests: "The barrel shed and the drying loft as rooms (round 308)", the barrel shed taps in older tests (crates, then
+  out), the loft check (tap the rack), raisin wine 2 days and 6 bottles, the vinegar check in the round 303 block.

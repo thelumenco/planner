@@ -437,6 +437,9 @@ CR_BOUQUETS.forEach(b => { I[b.id] = [`<path d="M7.5 12.5l4.5 9.5 4.5-9.5z" ${f(
     coconut: (a) => [`<circle cx="12" cy="14" r="7" ${f(a)}/><ellipse cx="12" cy="9" rx="4" ry="1.5" ${f("#FFFDF6")}/>`, `<circle cx="12" cy="14" r="7"/><ellipse cx="12" cy="9" rx="4" ry="1.5"/><path d="M14 9l3-7"/>`]
   };
   // the Cocoa Room's (cocoa.js): house chocolate for the gelato fridge, wine fillings, festival specials
+  // round 309: wine vinegar, from a barrel that turned: a tall bottle, rosy amber, with a cork and a little label
+  I.vinegar = [`<path d="M10 2h4v5c2 1 3 2.5 3 4.5V20.5a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V11.5c0-2 1-3.5 3-4.5z" ${f("#C9785A")}/><rect x="10" y="1" width="4" height="3" rx=".8" ${f("#C9A27E")}/><rect x="8.5" y="13" width="7" height="5" rx=".6" ${f("#FFFDF6")}/><path d="M10 15.5h4" style="stroke:#7A1F3D;stroke-width:1"/>`,
+    `<path d="M10 2h4v5c2 1 3 2.5 3 4.5V20.5a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V11.5c0-2 1-3.5 3-4.5z"/><rect x="10" y="1" width="4" height="3" rx=".8"/><rect x="8.5" y="13" width="7" height="5" rx=".6"/>`];
   I.housechoc = S.bar("#3F2519"); I.sp_log = I.logcake; I.sp_mooncake = I.mooncake;
   // round 305: the Deepavali box shows its little chocolate diyas, the Chinese New Year box its gold coins; round 307:
   // Valentine's hearts and Mother's Day roses
