@@ -1185,18 +1185,19 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const e = document.querySelector("#ctx .sub"); return !!e && getComputedStyle(e).display === "block" && e.getBoundingClientRect().height < 80; }), "panel text flows normally (the notebook's checklist styles stay in the notebook)");
   await page.waitForSelector('#ctx [data-vy="water"]', { timeout: 5000 }); await page.click('#ctx [data-vy="water"]');
   check(await page.evaluate(() => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.rows[0].vines[0] && v.rows[0].vines[0].v === "red" && !!v.rows[0].vines[0].wateredAt; }), "a red vine is planted on the trellis and watered");
-  await page.goto(url + "?seed=1&time=17:10&ripen=1"); await page.waitForTimeout(800);
-  await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
+  await page.waitForTimeout(1200); await page.goto(url + "?seed=1&time=17:10&ripen=1"); await page.waitForTimeout(800);
+  if (!/vineyard/i.test(await page.locator("#sceneName").textContent())) await page.locator('#world [data-place="toVine"]').dispatchEvent("click");   // round 312: the reload may already have Mel in the vineyard
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-vine="0-0"]').dispatchEvent("click");
-  await page.waitForSelector('#ctx [data-vy="harvest"]', { timeout: 15000 }); await page.click('#ctx [data-vy="harvest"]');
+  for (let i = 0; i < 3 && !(await page.waitForSelector('#ctx [data-vy="harvest"]', { timeout: 6000 }).catch(() => null)); i++) await page.locator('#world [data-vine="0-0"]').dispatchEvent("click");
+  await page.waitForSelector('#ctx [data-vy="harvest"]', { timeout: 5000 }); await page.click('#ctx [data-vy="harvest"]');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.grapes.red >= 3), "ripe grapes are picked: three bunches (four in harvest week)");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click");   // round 308: into the barrel shed, then the crates
   await page.waitForSelector('#ctx [data-vy="fill"][data-k="rose"]:not([disabled])', { timeout: 20000 }); await page.click('#ctx [data-vy="fill"][data-k="rose"]');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.barrels[0].style === "rose"), "and go into a barrel to ferment as a rosé");
-  await page.goto(url + "?seed=1&time=17:20&ripen=1"); await page.waitForTimeout(800);
-  await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
+  await page.waitForTimeout(1200); await page.goto(url + "?seed=1&time=17:20&ripen=1"); await page.waitForTimeout(800);
+  if (!/vineyard/i.test(await page.locator("#sceneName").textContent())) await page.locator('#world [data-place="toVine"]').dispatchEvent("click");   // round 312: the reload may already have Mel in the vineyard
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click");
   for (let i = 0; i < 3 && !(await page.waitForSelector('#vyName0', { timeout: 8000 }).catch(() => null)); i++) await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click");   // round 312: tap the crates again if Mel was still walking in
@@ -1221,7 +1222,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(/Today's menu/.test(await page.locator("#ctx h2").textContent()) && /Evan's Blush/.test(await page.locator("#ctx").textContent()), "the chalkboard opens today's menu: what's available, with prices");
   await page.click('#ctx [data-close]');
   // customers while Mel's away: back-date the last tick, sales land in the honesty box
-  await page.goto(url + "?seed=1&time=21:00&sold=1"); await page.waitForTimeout(4200);
+  await page.waitForTimeout(1200); await page.goto(url + "?seed=1&time=21:00&sold=1"); await page.waitForTimeout(4200);
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.box > 0), "villagers buy wine while Mel's away and pay into the honesty box");
   await page.screenshot({ path: join(shots, "vineyard.png") });
   await page.close();
