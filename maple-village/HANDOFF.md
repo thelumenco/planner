@@ -2960,3 +2960,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Build v243 (rounds 311 and 312) published without a fully green run, at Mel's say-so
 - This session's container was about five times slower than usual, and the older timing-based checks (breathing cues, vineyard, wine club, goats, the kitchen's leftover tapas) failed at random. The v242 build failed the same way on that container. Mel chose to publish with the round 311 block passing. Next session on a normal machine: run the full suite once to confirm green.
 - `TEST_SLOW` in test/smoke.mjs (off by default) stretches pauses and timeouts, but it breaks checks that time something (a breath cue every half minute), so it isn't a fix. Every reload now waits 700 ms for the save to reach the stub cloud copy.
+
+## Round 313: raisins dry while the casks age, the loft redraws at once, and the shed's panel split in two
+- Mel: "I should be able to dry some while some are in the cask"; "Things don't appear immediately eg grapes on the racks or raisins in the tray"; "The current list of wines and grapes and up the ladder to drying loft is too confusing. It should be one modal for grapes. One modal for the wines."
+- loft.js: racks start while casks age; a dry rack fills its own cask, else the other free one, else waits (`{wait: true}`). core.js: loft taps `render(true)`, `[data-lf]` buttons `drawScene()`. vineyard.js: `grapePanel` (crates, `vyView "grapes"`) and `barrelPanel` ("The wines"), no ladder button. Port doc section 18 has the details.

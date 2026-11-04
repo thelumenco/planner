@@ -50,7 +50,7 @@ export function missing(F, k){
 export function startBatch(F, k, now = Date.now()){
   const L = loftState(F), inv = F.inv = F.inv || {}; if (!loftOpen(F) || !LOFT[k] || missing(F, k).length) return null;
   const isRack = /^rack/.test(k), isTray = /^tray/.test(k);
-  if (isRack && (!canRaisin(F) || L[k] || L[LOFT[k].then])) return null;
+  if (isRack && (!canRaisin(F) || L[k])) return null;   // round 313: a rack can dry while the casks are ageing
   if (k === "pesto") { if (!canPesto(F)) return null; Object.entries(LOFT.pesto.need).forEach(([id, n]) => take(inv, id === "cheese" ? cheeseOf(inv) : id, n)); inv.pesto = (inv.pesto || 0) + 2; L.made.pesto = (L.made.pesto || 0) + 2; return true; }
   if (L[k]) return null;
   if (isTray && !canRaisin(F)) return null;
@@ -60,7 +60,10 @@ export function startBatch(F, k, now = Date.now()){
 // collect a finished batch -> {id, n} (or, for the rack, "cask": the raisins go into the cask), or null
 export function collect(F, k, now = Date.now()){
   const L = loftState(F), b = L[k]; if (!b || left(b, now, LOFT[k].days)) return null;
-  if (/^rack/.test(k)) { L[k] = null; L[LOFT[k].then] = {at: now}; return {cask: true}; }
+  // round 313 (Mel: "I should be able to dry some while some are in the cask"): dry raisins go into this rack's own
+  // cask, or the other one if that's free; if both are ageing, they wait on the rack
+  if (/^rack/.test(k)) { const own = LOFT[k].then, c = !L[own] ? own : ["cask", "cask2"].find(x => !L[x]); if (!c) return {wait: true};
+    L[k] = null; L[c] = {at: now}; return {cask: c}; }
   const [id, n] = LOFT[k].gives; L[k] = null; F.inv[id] = (F.inv[id] || 0) + n; L.made[id] = (L.made[id] || 0) + n; return {id, n};
 }
 const hrs = ms => ms >= DAY ? `${Math.ceil(ms/DAY)} day${Math.ceil(ms/DAY) === 1 ? "" : "s"}` : `${Math.max(1, Math.ceil(ms/H))} hour${Math.ceil(ms/H) === 1 ? "" : "s"}`;

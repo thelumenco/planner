@@ -11,7 +11,7 @@ import { kitchenState, sendToKitchen, isGood, larderPanel, ovenPanel, pressPanel
 import { questBoost, lowerSalePanel, buyLower, birdsTake, shelfStock as vShelfStock } from "./vineyard.js";
 import * as HP from "./happen.js";
 import { caseCount } from "./cocoa.js";
-import { wineNews, vineState, sellTick, vinePanel, stallPanel, barrelPanel, shelfPanel, cellarPanel, counterPanel, boxPanel, cafePanel, olivePanel, grovePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
+import { wineNews, vineState, sellTick, vinePanel, stallPanel, barrelPanel, grapePanel, shelfPanel, cellarPanel, counterPanel, boxPanel, cafePanel, olivePanel, grovePanel, wireVine, shelfStock, vineyardName, shopName, serveGuest, menuPanel, stallMarketPanel } from "./vineyard.js";
 import { AGENTS, NPCS } from "../data/npcs.js";
 import { initNotebook, openTask, openMail, openDigest, openTracker, closeNotebook, refreshNotebook, notebookOpen } from "../ui/notebook.js";
 import { bd, loadMyDigests, openMyDigest } from "./bookdigests.js";
@@ -1842,7 +1842,7 @@ function ctx(){
   else if (kView === "mull" && scene === "kitchen") h = mullPanel(F, vineState(F), mullSt);   // round 153: mulled wine
   else if (kView && scene === "kitchen") h = kView === "oven" ? ovenPanel(F) : kView === "press" ? pressPanel(F) : kView === "stove" ? stovePanel(F, dayKey()) : larderPanel(F);
   else if (loftView && (scene === "vineyard" || scene === "vshed" || scene === "vloft")) h = loftPanel(F);
-  else if (vyView && (scene === "vineyard" || scene === "vshed" || scene === "lowervine" || scene === "wineshop" || scene === "cellar")) h = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F)
+  else if (vyView && (scene === "vineyard" || scene === "vshed" || scene === "lowervine" || scene === "wineshop" || scene === "cellar")) h = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "grapes" ? grapePanel(F) : vyView === "barrels" ? barrelPanel(F)
     : vyView === "mcrate" ? wineCratePanel(F, dayKey()) : vyView === "shelf" ? shelfPanel(F) : vyView === "cellar" ? cellarPanel(F) : vyView === "menu" ? menuPanel(F, dayKey()) : vyView === "counter" ? counterPanel(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter(n => n.id !== "celeste" && isHere(n.id)).map(n => n.name), dayKey());
   else if (kudosOpen && scene === "trophy") h = kudosPanel();
   else if (trophyView && scene === "trophy") h = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
@@ -2314,7 +2314,7 @@ function ctx(){
     ctx(); });
   // the drying loft (round 132): up the ladder from the barrels; start a batch, collect a finished one
   c.querySelectorAll("[data-loft]").forEach(b => b.onclick = () => { vyView = null; if (scene === "vshed") { setScene("vloft", [446, 530]); return; } loftView = true; sfx("paper", true); render(); });
-  c.querySelectorAll("[data-lf]").forEach(b => b.onclick = () => { const [a, k] = b.dataset.lf.split(":"); loftAct(a, k); ctx(); });
+  c.querySelectorAll("[data-lf]").forEach(b => b.onclick = () => { const [a, k] = b.dataset.lf.split(":"); loftAct(a, k); ctx(); drawScene(); });
   // Jeju (rounds 128–129): the breath song, the sorting, the café, the porridge, the slow post, the dye
   c.querySelectorAll("[data-jj]").forEach(b => b.onclick = () => { const [a, v] = b.dataset.jj.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => { if (evanOn) setTimeout(() => evanSays(pick(l)), d); };
     if (a === "dive" || a === "again") { jjSt = {dive: diveStart()}; sfx("paper", true); }
@@ -2819,8 +2819,9 @@ function loftAct(a, k){
   const base = k.replace(/\d$/, "");
   if (a === "start") { if (!startBatch(F, k)) return false; sfx(k === "pesto" ? "tap" : "paper", true); gainXp(1);
     speak({rack: "Six bunches hung on the cane rack in the warm air. In two days they'll be raisins.", tray: "Two bunches spread out on the tray. Two days in the warm and they'll be raisins.", lemon: "Lemon peel into the bottle. Five days, and it'll be limoncino.", salt: "Layer of salt, layer of anchovies, layer of salt. Lid on. Four days.", pesto: "Pound, pound, pound: garlic, pine nuts, basil, cheese, a stream of your own olive oil. Two jars of bright green pesto."}[base], 5000); save(); return true; }
-  if (a === "collect") { const r = loftCollect(F, k); if (!r) return false; sfx("chime"); gainXp(2); act("cheer");
-    if (r.cask) speak("The grapes have shrivelled into sweet little raisins. Pressed, and into the cask for four days.", 5000); else { flash(`${r.n} × ${ITEMS[r.id].n.toLowerCase()}`); speak(r.id === "w_raisin" ? `${r.n} bottles of amber raisin wine, sticky and sweet. Six days of waiting, and worth every one.` : `${ITEMS[r.id].n}, ready. Into the backpack.`, 5000); } save(); return true; }
+  if (a === "collect") { const r = loftCollect(F, k); if (r && r.wait) { speak("Raisins, ready, but both casks are still full of raisin wine. They'll keep on the rack until a cask's free.", 5000); return false; }
+    if (!r) return false; sfx("chime"); gainXp(2); act("cheer");
+    if (r.cask) speak(`The grapes have shrivelled into sweet little raisins. Pressed, and into ${r.cask === "cask2" ? "the second cask" : "the cask"} for four days.`, 5000); else { flash(`${r.n} × ${ITEMS[r.id].n.toLowerCase()}`); speak(r.id === "w_raisin" ? `${r.n} bottles of amber raisin wine, sticky and sweet. Six days of waiting, and worth every one.` : `${ITEMS[r.id].n}, ready. Into the backpack.`, 5000); } save(); return true; }
   return false;
 }
 let loftView = false;   // round 132: the drying loft over the barrel shed (loft.js)
@@ -3493,17 +3494,16 @@ function vsSpot(k){
       const m = /^b(\d)$/.exec(k), v = vineState(F), b = m && v.barrels[+m[1]];
       if (b && vBarrelLeft(b)) { speak(`${V_STYLES[b.style].n} in barrel ${+m[1] + 1}: ready in about ${VS_HRS(vBarrelLeft(b)).replace("h", " hours").replace("d", " days")}. It doesn't need you.`, 4500); return; }
       if (k === "bench" && isHere("marco")) npcSay("marco", pick(["Tell me how many bunches to keep back for you, and I'll fill the rest.", "Every barrel gets a name. Your job, not mine.", "Smell that? That's next year's wine."]));
-      vyView = "barrels"; sfx("paper", true); render(); return; }
+      vyView = k === "crates" ? "grapes" : "barrels"; sfx("paper", true); render(); return; }
     // the loft: start an empty job, collect a finished one, or say how it's going
     const L = loftState(F), ki = k;
     if (/^(rack|cask|tray)/.test(ki) && !canRaisin(F)) { speak("Help Signor Bruno with the harvest on the monorail in Corniglia, and he'll show you how to dry grapes.", 5000); return; }
     if (ki === "pesto" && !canPesto(F)) { speak("Make pesto with Nonna Pina in Manarola first, and she'll lend you her secret.", 4500); return; }
     if (/^cask/.test(ki) && !L[ki]) { speak(`The cask's empty. Dry six bunches on ${ki === "cask2" ? "the second rack" : "the rack"} beside it first.`, 4500); render(); return; }
-    if (L[ki]) { const t = loftLeft(L[ki], Date.now(), LOFT[ki].days); if (!t) { loftAct("collect", ki); render(); return; }
+    if (L[ki]) { const t = loftLeft(L[ki], Date.now(), LOFT[ki].days); if (!t) { loftAct("collect", ki); render(true); return; }
       speak(`${/^cask/.test(ki) ? "Raisin wine, ageing in the cask" : /^rack/.test(ki) ? "Six bunches, slowly turning to raisins" : /^tray/.test(ki) ? "Raisins drying on the tray" : ki === "lemon" ? "The limoncino, steeping" : "Anchovies in their salt"}: ready in ${VS_HRS(t).replace("h", " hours").replace("d", " days")}.`, 4500); return; }
-    if (/^rack/.test(ki) && L[LOFT[ki].then]) { speak("This rack's cask is still full: bottle the raisin wine first.", 4000); return; }
     const miss = loftMissing(F, ki); if (miss.length) { speak(`You need ${miss.join(", ")}.`, 4500); return; }
-    loftAct("start", ki); render(); });
+    loftAct("start", ki); render(true); });
 }
 const TOWER_AT = {lhtower1: {case: [150, 372], book: [294, 548], tide: [260, 252], pegs: [134, 262], bell: [380, 412], up: [372, 312], out: [260, 566]},
   lhtower2: {scope: [262, 300], log: [128, 396], chart: [134, 262], chair: [340, 470], up: [372, 290], down: [214, 470]},
