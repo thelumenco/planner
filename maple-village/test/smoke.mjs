@@ -1199,7 +1199,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click");
-  await page.waitForSelector('#vyName0', { timeout: 20000 });
+  for (let i = 0; i < 3 && !(await page.waitForSelector('#vyName0', { timeout: 8000 }).catch(() => null)); i++) await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click");   // round 312: tap the crates again if Mel was still walking in
+  await page.waitForSelector('#vyName0', { timeout: 5000 });
   const ph = await page.locator('#vyName0').getAttribute("placeholder"); await page.click('#ctx [data-vy="suggest"]'); await page.waitForTimeout(300);
   const sug = await page.locator('#vyName0').inputValue();
   check(ph && sug && ph !== "Name it" && sug !== ph && sug.length > 3, `a ready barrel suggests names (${ph}; ${sug})`);
