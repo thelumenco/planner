@@ -18,6 +18,10 @@ execSync("node build.mjs --dev --once", { cwd: root, stdio: "inherit" });
 const shots = join(root, "test/shots"); mkdirSync(shots, { recursive: true });
 const url = pathToFileURL(join(root, "dist/dev.html")).href;
 const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || undefined });
+// round 312: the game pushes its save to the (stub) cloud copy half a second after each change; a reload sooner than
+// that can load the older copy. Every reload of a page that has the game open waits for the push first.
+{ const p0 = await browser.newPage(), P = Object.getPrototypeOf(p0), go0 = P.goto; await p0.close();
+  P.goto = async function(u, o){ if (/^file:/.test(this.url())) await this.waitForTimeout(700); return go0.call(this, u, o); }; }
 // Most checks expect a reload to start at home base: pages opt out of "pick up where Mel left off" (core.js F.where)
 // unless they ask for it with newPage({resume: true}).
 { const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); if (!resume) await pg.addInitScript(() => { window.__mapleNoResume = true; }); return pg; }; }
