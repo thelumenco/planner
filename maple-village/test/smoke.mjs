@@ -4205,6 +4205,30 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(pp.bloomFor(G, id, "mum", t0) && !pp.bloomMail(G, t0 + 864e5).length && pp.bloomMail(G, t0 + 2*864e5 + 1).length === 1 && /front step/.test(pp.bloomMail(G, t0 + 3*864e5)[0].body), "a gift with a seeded tag: two days later Mum writes about the flowers by her front step");
 }
 {
+  console.log("\nLise makes paper too: every stage, her own colours and add-ins (round 311)");
+  const pp = await import(new URL("../src/game/paperie.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
+  const F = {coins: 500, goals: {paperie: 1, paperkeeper: 1}, inv: {bq_lavender: 3}}, p = pp.paperState(F), wed = Date.parse("2026-10-14T02:00:00Z");   // Wednesday 10am
+  p.scraps = 4; p.at = wed; let rnd = Math.random; Math.random = () => .99;
+  let out = pp.paperTick(F, false, wed + 3*3600e3); Math.random = rnd;   // till 1pm, Mel at home
+  const kinds = p.line.map(s => s.col + "/" + s.add);
+  check(p.line.length === 2 && p.scraps === 0 && p.line.every(s => s.n === pp.BATCH) && out.lise.filter(l => /^hung/.test(l)).length === 2, `with Mel at home, Lise soaks, beats, adds, pulls, presses and hangs: two batches from four bundles (${kinds.join(", ")})`);
+  check(kinds[0] !== kinds[1] && F.inv.bq_lavender === 3, "she varies it (never the same sheet twice running) and leaves Mel's backpack alone");
+  check(F.coins < 500 - pp.WAGE || kinds.every(k => k === "natural/none"), "pigment and jars come out of the till, like Mel's own (money doesn't come easily)");
+  check(p.liseDid && p.liseDid.batches.length === 2 && /Lise has been at the vat today: 2 batches/.test(pp.liseToday(F, "2026-10-14")) && it.ITEMS[p.liseDid.batches[0]], "the till says what she's made today");
+  // she gives Mel first go: a fresh step waits five minutes
+  const G = {coins: 100, goals: {paperie: 1, paperkeeper: 1}, inv: {}}, q = pp.paperState(G); q.scraps = 2; pp.startSoak(G, wed);
+  q.soak.done = wed; check(pp.liseStep(G, wed + 2*60e3, "2026-10-14") === null && G.paperie.soak, "she leaves a step Mel's just done for five minutes");
+  check(/^beat the pulp/.test(pp.liseStep(G, wed + 6*60e3, "2026-10-14") || "") && q.pulp && !q.soak, "then she picks it up: beats the soft scraps in a colour of her choosing");
+  // short of coins: natural and plain
+  const H = {coins: 0, goals: {paperie: 1, paperkeeper: 1}, inv: {}}, h = pp.paperState(H); h.scraps = 2; h.at = wed; pp.paperTick(H, false, wed + 2*3600e3);
+  check(h.line.length === 1 && h.line[0].col === "natural" && h.line[0].add === "none", "with nothing in the till she makes plain natural sheets");
+  // the season leans her choices, and the line still holds four batches
+  let blush = 0; Math.random = () => .2; for (let i = 0; i < 5; i++) if (pp.liseColour({coins: 50, paperie: {}}, "2026-02-10") === "blush") blush++; Math.random = rnd;
+  check(blush === 5 && pp.LINE === 4 && pp.LINE*pp.BATCH === 24, "blush for Valentine's; the drying line holds four batches, 24 sheets");
+  const J = {coins: 500, goals: {paperie: 1, paperkeeper: 1}, inv: {}}, j = pp.paperState(J); j.scraps = 12; j.at = wed; pp.paperTick(J, false, wed + 7*3600e3);
+  check(j.line.length === pp.LINE && j.press && j.scraps < 12, "a full day: she fills the line (four batches), the fifth waits pressed until the line has room");
+}
+{
   console.log("\nLip balms and lip oils, dyed with Mel's flowers (round 187)");
   const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)), tw = await import(new URL("../src/data/towns.js", import.meta.url)), li = await import(new URL("../src/art/lip-icons.js", import.meta.url));
   const F = {coins: 50, goals: {mill: 1}, inv: {honeycomb: 1, oliveoil: 3, honey: 2, mint: 1, tulip: 1}, orch: {stock: {"stem:dahlia": 2}}};

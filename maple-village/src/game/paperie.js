@@ -63,20 +63,20 @@ export function stage(F, t = now()){
   return {soaking: !!p.soak && p.soak.done > t, soaked: !!p.soak && p.soak.done <= t, pulp: p.pulp || null, wet: p.wet || null,
     pressing: !!p.press && p.press.done > t, pressed: !!p.press && p.press.done <= t, line: p.line.map(s => ({...s, dry: s.done <= t}))};
 }
-export function startSoak(F, t = now()){ const p = paperState(F); if (p.soak || p.pulp || p.scraps < SOAK) return false; p.scraps -= SOAK; p.soak = {done: t + SOAK_MIN*M}; return true; }
+export function startSoak(F, t = now()){ const p = paperState(F); if (p.soak || p.pulp || p.scraps < SOAK) return false; p.scraps -= SOAK; p.soak = {done: t + SOAK_MIN*M}; p.touched = t; return true; }
 export function beat(F, col, t = now()){
-  const p = paperState(F), c = COLOURS[col]; if (!c || !p.soak || p.soak.done > t || p.pulp || F.coins < c.cost) return false;
-  F.coins -= c.cost; p.soak = null; p.pulp = {col, add: "none"}; return true;
+  const p = paperState(F), c = COLOURS[col]; if (!c || !p.soak || p.soak.done > t || p.pulp || (c.cost && F.coins < c.cost)) return false;
+  F.coins -= c.cost; p.soak = null; p.pulp = {col, add: "none"}; p.touched = t; return true;
 }
 // one add-in stirred into the vat: from the backpack if she has it (lavender, roses), else bought from the jars
-export function addIn(F, add){
+export function addIn(F, add, t = now()){
   const p = paperState(F), a = ADDS[add]; if (!a || add === "none" || !p.pulp || p.pulp.add !== "none") return null;
-  if (a.inv && (F.inv || {})[a.inv] > 0) { F.inv[a.inv]--; if (F.inv[a.inv] <= 0) delete F.inv[a.inv]; p.pulp.add = add; return "bag"; }
-  if (F.coins < a.cost) return null; F.coins -= a.cost; p.pulp.add = add; return "jar";
+  if (a.inv && (F.inv || {})[a.inv] > 0) { F.inv[a.inv]--; if (F.inv[a.inv] <= 0) delete F.inv[a.inv]; p.pulp.add = add; p.touched = t; return "bag"; }
+  if (F.coins < a.cost) return null; F.coins -= a.cost; p.pulp.add = add; p.touched = t; return "jar";
 }
-export function pull(F){ const p = paperState(F); if (!p.pulp || p.wet) return false; p.wet = {...p.pulp, n: BATCH}; p.pulp = null; return true; }
-export function startPress(F, t = now()){ const p = paperState(F); if (!p.wet || p.press) return false; p.press = {...p.wet, done: t + PRESS_MIN*M}; p.wet = null; return true; }
-export function hang(F, t = now()){ const p = paperState(F); if (!p.press || p.press.done > t || p.line.length >= LINE) return false; p.line.push({col: p.press.col, add: p.press.add, n: p.press.n, done: t + DRY_MS}); p.press = null; return true; }
+export function pull(F, t = now()){ const p = paperState(F); if (!p.pulp || p.wet) return false; const {col, add} = p.pulp; p.wet = {col, add, n: BATCH}; p.pulp = null; p.touched = t; return true; }
+export function startPress(F, t = now()){ const p = paperState(F); if (!p.wet || p.press) return false; p.press = {...p.wet, done: t + PRESS_MIN*M}; p.wet = null; p.touched = t; return true; }
+export function hang(F, t = now()){ const p = paperState(F); if (!p.press || p.press.done > t || p.line.length >= LINE) return false; p.line.push({col: p.press.col, add: p.press.add, n: p.press.n, done: t + DRY_MS}); p.press = null; p.touched = t; return true; }
 // take the dry sheets down: onto the shop's shelves -> how many
 export function takeDown(F, t = now()){
   const p = paperState(F), dry = p.line.filter(s => s.done <= t); if (!dry.length) return 0;
@@ -99,15 +99,54 @@ export const classOn = (day, hm) => dowOf(day) === CLASS.dow && hm >= CLASS.from
 const sheetsIn = p => Object.values(p.stock).reduce((a, n) => a + n, 0);
 function takeSheets(p, n){ let k = 0; while (k < n) { const ids = Object.keys(p.stock).filter(id => p.stock[id] > 0); if (!ids.length) break; const id = ids[k % ids.length]; p.stock[id]--; if (!p.stock[id]) delete p.stock[id]; k++; } return k; }
 
+// round 311 (Mel: "Liz in the paper shop doesn't help me with the process... she should be helping me to make paper as
+// well, at every stage. She can choose the add-ins and the colours, and she can vary it up"): while she's in (10 to 5,
+// not Mondays), Lise works the back room too, one step a minute: tears scraps into the tub, beats the pulp in a colour
+// she picks, stirs in an add-in she picks (or leaves it plain), pulls, presses and hangs. She never uses the backpack,
+// buys no scraps, and pays for pigment and jars from the till like Mel would (plain natural if the coins are short).
+// She gives Mel first go: a step waits LISE_WAIT minutes after anyone last touched the batch. She mixes it up: never
+// the same sheet twice running, and she leans to the season (blush and roses for Valentine's, petals in May, gold and
+// ink blue in December, seeds in spring).
+export const LISE_WAIT = 5;
+const pick = list => { const tot = list.reduce((a, [, w]) => a + w, 0); let r = Math.random()*tot; for (const [k, w] of list) { if ((r -= w) < 0) return k; } return list[list.length - 1][0]; };
+function liseLean(day){
+  const md = (day || "").slice(5);
+  if (md >= "02-01" && md <= "02-14") return {col: {blush: 4}, add: {rose: 4, petals: 2}};
+  if (md >= "05-01" && md <= "05-14") return {col: {blush: 3, sage: 2}, add: {petals: 4, seeds: 2}};
+  if (md >= "12-01" && md <= "12-24") return {col: {ink: 3, natural: 2}, add: {gold: 4, none: 1}};
+  if (md >= "03-01" && md <= "04-30") return {col: {sage: 3}, add: {seeds: 4, petals: 2}};
+  return {col: {}, add: {}};
+}
+export function liseColour(F, day){ const p = paperState(F), lean = liseLean(day).col, last = p.liseLast || {};
+  const ok = Object.keys(COLOURS).filter(k => COLOURS[k].cost <= F.coins);
+  const list = ok.map(k => [k, (lean[k] || 1)*(k === last.col ? .3 : 1)]); return list.length ? pick(list) : "natural"; }
+export function liseAdd(F, day, col){ const p = paperState(F), lean = liseLean(day).add, last = p.liseLast || {};
+  const ok = Object.keys(ADDS).filter(k => ADDS[k].cost <= F.coins);
+  const list = ok.map(k => [k, (lean[k] || (k === "none" ? 2 : 1))*(col === last.col && k === last.add ? 0 : 1)]).filter(([, w]) => w > 0); return list.length ? pick(list) : "none"; }
+// one step, if there's one to do -> a line for the notes, or null
+export function liseStep(F, t = now(), day = ""){
+  const p = paperState(F), st = stage(F, t); if (t - (p.touched || 0) < LISE_WAIT*M) return null;
+  const did = line => { p.touched = t; const d = p.liseDid = p.liseDid && p.liseDid.day === day ? p.liseDid : {day, steps: 0, batches: []}; d.steps++; return line; };
+  if (st.pressed && p.line.length < LINE) { const {col, add} = p.press; hang(F, t); const d = did(`hung six sheets of ${sheetName(col, add).toLowerCase()} on the line`); p.liseDid.batches.push(sheetId(col, add)); return d; }
+  if (st.wet) { startPress(F, t); return did("wound the wet sheets into the press"); }
+  if (st.pulp && !p.pulp.mulled && p.pulp.add === "none") { const add = liseAdd(F, day, p.pulp.col); p.pulp.mulled = 1;
+    if (add !== "none" && F.coins >= ADDS[add].cost) { F.coins -= ADDS[add].cost; p.pulp.add = add; p.liseLast = {col: p.pulp.col, add}; return did(`stirred ${add === "seeds" ? "wildflower seeds" : ADDS[add].n.toLowerCase()} into the vat`); }
+    p.liseLast = {col: p.pulp.col, add: "none"}; return did("decided this batch looks best plain"); }
+  if (st.pulp && !st.wet) { pull(F, t); return did("pulled six sheets from the vat"); }
+  if (st.soaked && !st.pulp) { const col = liseColour(F, day); if (beat(F, col, t)) { p.pulp.mulled = 0; return did(`beat the pulp ${COLOURS[col].n.toLowerCase()}`); } return null; }
+  if (!p.soak && !p.pulp && p.scraps >= SOAK) { startSoak(F, t); return did("tore scraps into the soaking tub"); }
+  return null;
+}
+
 // minute by minute since the last look (at most two days): here = Mel's in Montrose
 export function paperTick(F, here, t = now()){
-  const p = paperState(F), out = {n: 0, coins: 0, wage: 0, cls: 0, down: 0}, kept = keeperHired(F);
+  const p = paperState(F), out = {n: 0, coins: 0, wage: 0, cls: 0, down: 0, lise: []}, kept = keeperHired(F);
   if (!p.at || (!here && !kept)) { p.at = t; return out; }
   for (let at = Math.max(p.at, t - 2*864e5) + M; at <= t; at += M) {
     const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     const lise = kept && keeperIn(day, hm), open = here || lise, s = () => (p.sold[day] = p.sold[day] || {n: 0, coins: 0});
     if (lise && p.wageDay !== day) { p.wageDay = day; F.coins -= WAGE; s().wage = WAGE; out.wage += WAGE; }
-    if (lise) { const d = takeDown(F, at); if (d) out.down += d; }
+    if (lise) { const d = takeDown(F, at); if (d) out.down += d; const w = liseStep(F, at, day); if (w) out.lise.push(w); }
     if (open && dowOf(day) === CLASS.dow && hm === CLASS.to - 1 && p.classDay !== day && sheetsIn(p) >= CLASS.size) {   // the class finishes: four cards made, four fees
       p.classDay = day; takeSheets(p, CLASS.size); const fee = CLASS.size*CLASS.fee; s().cls = fee; s().coins += fee; out.coins += fee; out.cls += fee; }
     if (!open) continue;
@@ -179,6 +218,9 @@ function strip(F, t, here){
 }
 const head = (title, sub, F, t, tape = "gingham", here = "") => `<span class="tape ${tape}" aria-hidden="true"></span><h2>${title}</h2>${strip(F, t, here)}<p class="sub">${sub}</p>`;
 
+// what Lise has made today, for the till
+export function liseToday(F, day){ const d = paperState(F).liseDid; if (!d || d.day !== day || !d.steps) return `<p class="muted">Lise works the back room while she's in: if a step sits for ${LISE_WAIT} minutes, she takes it on.</p>`;
+  const b = d.batches; return `<p class="muted">Lise has been at the vat today${b.length ? `: ${b.length} batch${b.length === 1 ? "" : "es"} on the line (${b.map(id => esc(ITEMS[id].n.toLowerCase())).join("; ")})` : ", and a batch is on its way"}.</p>`; }
 export function paperPanel(F, spot, o = {}){
   const p = paperState(F), t = o.t || now(), st = stage(F, t);
   if (spot === "pp_scrap") {
@@ -223,7 +265,8 @@ export function paperPanel(F, spot, o = {}){
   }
   // the till
   const d = o.day && p.sold[o.day], kept = keeperHired(F);
-  return `<span class="tape gingham" aria-hidden="true"></span><h2>The paperie</h2><p class="sub">${o.lise ? "Lise's at the till, folding a stack of tissue into little fans." : kept ? "Lise keeps the shop 10 till 5 (closed Mondays) and takes the dry sheets off the line." : "The sign on the door says <i>ouvert</i> while you're in Montrose. Browsers come in off the lane and take a sheet or two."}</p>
+  return `<span class="tape gingham" aria-hidden="true"></span><h2>The paperie</h2><p class="sub">${o.lise ? "Lise's at the till, folding a stack of tissue into little fans." : kept ? "Lise keeps the shop 10 till 5 (closed Mondays). She makes paper in the back room too, choosing the colours and add-ins herself, and takes the dry sheets off the line." : "The sign on the door says <i>ouvert</i> while you're in Montrose. Browsers come in off the lane and take a sheet or two."}</p>
+    ${kept ? liseToday(F, o.day) : ""}
     <p class="muted">${d ? `Today: ${d.n} sheet${d.n === 1 ? "" : "s"} sold${d.cls ? `, the card class (${d.cls} coins)` : ""}, ${d.coins} coins${d.wage ? `; Lise's wage ${d.wage}` : ""}.` : "Nothing sold yet today."} ${p.made ? `${p.made} sheets made so far.` : ""}</p>
     ${paperSeason(o.day || "") ? `<p class="muted">It's a gift season: people are buying paper for cards and wrapping, twice as many as usual.</p>` : ""}
     <p class="eyebrow" style="margin:12px 0 6px">Saturday card class</p><p class="muted">Saturdays 2 to 4: four people make cards at the big table, ${CLASS.fee} ${coin()} each, with four of your sheets. It runs if ${kept ? "Lise" : "you"}${kept ? " (or you)" : ""} ${kept ? "is" : "are"} here and there are four sheets on the shelves.</p>

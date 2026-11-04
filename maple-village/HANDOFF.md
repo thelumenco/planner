@@ -2947,3 +2947,9 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 310: no crash at the bottom of the shed or loft (Mel's screenshot: "Cannot read properties of undefined (reading 'door') at frameNow")
 - In core.js `frameNow`, walking past y 592 in a room with no INNER entry sent Mel out by `VILLAGE[scene].door`; the barrel shed and the drying loft have no village door (they leave by their own "Out to the vines" and "Down the ladder" spots), so it threw. The rule now also needs `VILLAGE[scene]`. Two checks in the round 308 block walk to the bottom of each room.
+
+## Round 311: Lise makes paper too (Mel: "Liz in the paper shop doesn't help me with the process... she should be helping me to make paper as well, at every stage. She can choose the add-ins and the colours, and she can vary it up")
+- paperie.js: `liseStep` runs inside `paperTick` while Lise is in (10 to 5, not Mondays): hang, press, choose an add-in or plain, pull, beat in a colour, tear scraps, one step a minute, each waiting 5 minutes (`LISE_WAIT`) after the batch was last touched (`p.touched`, stamped by every step) so Mel gets first go. `liseColour`/`liseAdd` pick with seasonal leanings, only what the till can afford, never her last combination. She pays from Mel's coins, never uses the backpack or buys scraps. `liseToday` on the till panel; `out.lise` lines flash in core's `paperNow`, and her away note counts new sheets.
+- `beat` lets natural (free) through even when coins are below zero (Lise's wage can take the till negative).
+- Mel asked how many sheets the line holds: still 4 batches of 6, 24 sheets.
+- Test: "Lise makes paper too: every stage, her own colours and add-ins (round 311)". Port doc section 19.
