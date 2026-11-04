@@ -34,7 +34,7 @@ export const ADDS = {
   gold: {n: "Gold flecks", cost: 5, bonus: 3, word: "with gold flecks"},
   seeds: {n: "Wildflower seeds", cost: 4, bonus: 2, word: "seeded"}
 };
-export const BATCH = 6, SOAK = 2, SCRAP_PRICE = 3, SOAK_MIN = 15, PRESS_MIN = 5, DRY_MS = 864e5, LINE = 4, SCRAP_CAP = 12, BASE = 5;
+export const BATCH = 6, SOAK = 2, SCRAP_PRICE = 3, SOAK_MIN = 15, PRESS_MIN = 5, DRY_MS = 864e5, LINE = 8, SCRAP_CAP = 12, BASE = 5;
 const M = 60000;
 const now = () => Date.now() + (globalThis.__mapleOffset || 0);
 
@@ -137,6 +137,8 @@ export function liseStep(F, t = now(), day = ""){
   if (!p.soak && !p.pulp && p.scraps >= SOAK) { startSoak(F, t); return did("tore scraps into the soaking tub"); }
   return null;
 }
+
+// round 312 (Mel: "need maybe 8 batches"): the drying line holds eight batches (48 sheets), on two strings
 
 // minute by minute since the last look (at most two days): here = Mel's in Montrose
 export function paperTick(F, here, t = now()){

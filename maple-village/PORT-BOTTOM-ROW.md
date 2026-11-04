@@ -187,13 +187,13 @@ HANDOFF.md round 308. Port the barrel shed room if this edition has the vineyard
 - `game/loft.js`: two racks each with their own cask (`rack`/`rack2`, `cask`/`cask2`), racks dry in 2 days, a cask gives 6 bottles, three raisin trays (`tray`/`tray2`/`tray3`).
 - Tests: "The barrel shed and the drying loft as rooms (round 308)", and wherever an old test tapped the barrel shed and expected the list, walk into the shed and tap the crates (`[data-vsspot="crates"]`) first, and out (`[data-vsspot="out"]`) after.
 
-### 19. The paper shop keeper makes paper too (round 311)
-HANDOFF.md round 311. Port this if this edition has the paperie and its keeper (here Lise, the `paperkeeper` goal; use this edition's keeper name). In `game/paperie.js`:
+### 19. The paper shop keeper makes paper too, and a longer drying line (rounds 311 and 312)
+HANDOFF.md rounds 311 and 312. Port this if this edition has the paperie and its keeper (here Lise, the `paperkeeper` goal; use this edition's keeper name). In `game/paperie.js`:
 - `liseStep(F, t, day)`: while the keeper is in (`keeperIn`), `paperTick` runs one back-room step a minute after taking dry sheets down: hang pressed sheets if the line has room, press wet sheets, choose an add-in (or plain) for pulp that hasn't had one, pull, beat soaked scraps in a colour, or tear 2 bundles into the tub. Each step waits `LISE_WAIT` (5) minutes after anyone last touched the batch (`p.touched`, now stamped by Mel's own steps too), so the player gets first go.
 - `liseColour`, `liseAdd`, `liseLean(day)`: weighted random picks, only what the till can pay for, never the same colour and add-in as her last batch, and leaning to the season (blush and roses before Valentine's, petals and seeds in early May, gold and ink blue in December, sage and seeds in spring).
 - Money must not come easily: she pays pigment and jars from the player's coins, never uses the backpack, never buys scraps. With an empty till she makes plain natural sheets (`beat` now lets a free colour through when coins are below zero).
 - `paperTick` returns `out.lise` (lines like "hung six sheets of ... on the line"); `liseToday(F, day)` puts what she's made today on the till panel. In `core.js` `paperNow` flashes "Lise ..." when the player is in the shop, saves on her steps, and her away note adds how many new sheets she hung.
-- The drying line still holds `LINE` = 4 batches of 6 (24 sheets): with the keeper working, the line and the scraps are the limits.
+- Round 312: the drying line holds `LINE` = 8 batches of 6 (48 sheets), drawn as two strings of four in `art/paperie-room.js` (the second string 50 down). With the keeper working, the line and the scraps are the limits.
 - Test: "Lise makes paper too: every stage, her own colours and add-ins (round 311)".
 
 ## Make it fit this edition

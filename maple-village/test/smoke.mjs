@@ -4222,11 +4222,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // short of coins: natural and plain
   const H = {coins: 0, goals: {paperie: 1, paperkeeper: 1}, inv: {}}, h = pp.paperState(H); h.scraps = 2; h.at = wed; pp.paperTick(H, false, wed + 2*3600e3);
   check(h.line.length === 1 && h.line[0].col === "natural" && h.line[0].add === "none", "with nothing in the till she makes plain natural sheets");
-  // the season leans her choices, and the line still holds four batches
+  // the season leans her choices, and the line holds eight batches
   let blush = 0; Math.random = () => .2; for (let i = 0; i < 5; i++) if (pp.liseColour({coins: 50, paperie: {}}, "2026-02-10") === "blush") blush++; Math.random = rnd;
-  check(blush === 5 && pp.LINE === 4 && pp.LINE*pp.BATCH === 24, "blush for Valentine's; the drying line holds four batches, 24 sheets");
-  const J = {coins: 500, goals: {paperie: 1, paperkeeper: 1}, inv: {}}, j = pp.paperState(J); j.scraps = 12; j.at = wed; pp.paperTick(J, false, wed + 7*3600e3);
-  check(j.line.length === pp.LINE && j.press && j.scraps < 12, "a full day: she fills the line (four batches), the fifth waits pressed until the line has room");
+  check(blush === 5 && pp.LINE === 8 && pp.LINE*pp.BATCH === 48, "blush for Valentine's; the drying line holds eight batches, 48 sheets (round 312)");
+  const J = {coins: 500, goals: {paperie: 1, paperkeeper: 1}, inv: {}}, j = pp.paperState(J); j.scraps = 20; j.line = Array.from({length: 6}, () => ({col: "natural", add: "none", n: 6, done: wed + 864e5})); j.at = wed; pp.paperTick(J, false, wed + 7*3600e3);
+  check(j.line.length === pp.LINE && j.press && j.scraps < 20, "a full day: she fills the line (eight batches), the next waits pressed until the line has room");
 }
 {
   console.log("\nLip balms and lip oils, dyed with Mel's flowers (round 187)");

@@ -2953,3 +2953,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - `beat` lets natural (free) through even when coins are below zero (Lise's wage can take the till negative).
 - Mel asked how many sheets the line holds: still 4 batches of 6, 24 sheets.
 - Test: "Lise makes paper too: every stage, her own colours and add-ins (round 311)". Port doc section 19.
+
+## Round 312: a drying line for eight batches (Mel: "yeah need maybe 8 batches")
+- paperie.js `LINE` 4 to 8 (48 sheets). art/paperie-room.js draws two strings, four batches each, the second 50 lower. The round 311 test checks LINE 8 and a full line with the next batch waiting pressed.
