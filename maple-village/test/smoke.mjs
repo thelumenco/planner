@@ -22,6 +22,16 @@ const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM 
 // that can load the older copy. Every reload of a page that has the game open waits for the push first.
 { const p0 = await browser.newPage(), P = Object.getPrototypeOf(p0), go0 = P.goto; await p0.close();
   P.goto = async function(u, o){ if (/^file:/.test(this.url())) await this.waitForTimeout(700); return go0.call(this, u, o); }; }
+// round 312: on a slow machine (a cloud container with a slow CPU) set TEST_SLOW=3 and every fixed pause and timeout in
+// the tests stretches to match; at the default (1) nothing changes
+const SLOW = +(process.env.TEST_SLOW || 1);
+if (SLOW !== 1) { const p0 = await browser.newPage(), P = Object.getPrototypeOf(p0), w0 = P.waitForTimeout, ws = P.waitForSelector, wf = P.waitForFunction; await p0.close();
+  const st = o => o && o.timeout ? {...o, timeout: o.timeout*SLOW} : o;
+  P.waitForTimeout = function(ms){ return w0.call(this, ms*SLOW); };
+  P.waitForSelector = function(sel, o){ return ws.call(this, sel, st(o)); };
+  P.waitForFunction = function(fn, arg, o){ return wf.call(this, fn, arg, st(o)); };
+  const B = Object.getPrototypeOf(browser), bnp = B.newPage;
+  B.newPage = async function(...a){ const pg = await bnp.apply(this, a); pg.setDefaultTimeout(30000*SLOW); return pg; }; }
 // Most checks expect a reload to start at home base: pages opt out of "pick up where Mel left off" (core.js F.where)
 // unless they ask for it with newPage({resume: true}).
 { const np = browser.newPage.bind(browser); browser.newPage = async (o = {}) => { const { resume, ...rest } = o; const pg = await np(rest); if (!resume) await pg.addInitScript(() => { window.__mapleNoResume = true; }); return pg; }; }
