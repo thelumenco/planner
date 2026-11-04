@@ -2956,3 +2956,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 312: a drying line for eight batches (Mel: "yeah need maybe 8 batches")
 - paperie.js `LINE` 4 to 8 (48 sheets). art/paperie-room.js draws two strings, four batches each, the second 50 lower. The round 311 test checks LINE 8 and a full line with the next batch waiting pressed.
+
+## Build v243 (rounds 311 and 312) published without a fully green run, at Mel's say-so
+- This session's container was about five times slower than usual, and the older timing-based checks (breathing cues, vineyard, wine club, goats, the kitchen's leftover tapas) failed at random. The v242 build failed the same way on that container. Mel chose to publish with the round 311 block passing. Next session on a normal machine: run the full suite once to confirm green.
+- `TEST_SLOW` in test/smoke.mjs (off by default) stretches pauses and timeouts, but it breaks checks that time something (a breath cue every half minute), so it isn't a fix. Every reload now waits 700 ms for the save to reach the stub cloud copy.

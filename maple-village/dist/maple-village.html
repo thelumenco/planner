@@ -15800,9 +15800,9 @@ ${offerLine(e.to, e.offer)}` : ""}`;
       g18.frames = g18.frames.map((f5) => {
         if (f5 || !queue.length || room4 <= 0) return f5;
         room4--;
-        const by = queue.shift(), done = new Set(g18.sold.filter((s) => s.by === by).map((s) => s.t)), w = PAINTERS[by].works, pick5 = w.find((x) => !done.has(x[0])) || w[hashS(day + by) % w.length];
+        const by = queue.shift(), done = new Set(g18.sold.filter((s) => s.by === by).map((s) => s.t)), w = PAINTERS[by].works, pick6 = w.find((x) => !done.has(x[0])) || w[hashS(day + by) % w.length];
         n++;
-        return { by, t: pick5[0], price: pick5[1], c1: pick5[2], c2: pick5[3], m: pick5[4] };
+        return { by, t: pick6[0], price: pick6[1], c1: pick6[2], c2: pick6[3], m: pick6[4] };
       });
     }
     if (!m.filled || dow(day) === 1 && m.filled !== day) {
@@ -17384,14 +17384,14 @@ ${p.sign}` };
     return null;
   }
   function visitsOn(day) {
-    const d = dow2(day), busy2 = toursOn(day).flatMap((t4) => [t4.guide, ...t4.group]), pick5 = (seed2) => groupFor(day + seed2, 1, busy2)[0];
+    const d = dow2(day), busy2 = toursOn(day).flatMap((t4) => [t4.guide, ...t4.group]), pick6 = (seed2) => groupFor(day + seed2, 1, busy2)[0];
     const tbusy = toursOn(day).flatMap((t4) => t4.group), [t1, t2, t3] = groupFor(day + "tv", 3, tbusy, TOURISTS);
     const tourists = [
       { id: t1, scene: "orchard", from: 10 * 60 + 30, to: 11 * 60 + 30, wander: SHOPSIDE },
       { id: t2, scene: "orchard", from: 10 * 60 + 45, to: 11 * 60 + 45, wander: SHOPSIDE },
       { id: t3, scene: "flowers", from: 14 * 60 + 30, to: 15 * 60 + 30 }
     ];
-    return (d === 0 || d === 6 ? [{ id: pick5("v1"), scene: "flowers", from: 12 * 60 + 30, to: 13 * 60 + 30 }] : [{ id: pick5("v1"), scene: "orchard", from: 12 * 60 + 15, to: 13 * 60 }, { id: pick5("v2"), scene: "flowers", from: 17 * 60 + 15, to: 18 * 60 }]).concat(tourists);
+    return (d === 0 || d === 6 ? [{ id: pick6("v1"), scene: "flowers", from: 12 * 60 + 30, to: 13 * 60 + 30 }] : [{ id: pick6("v1"), scene: "orchard", from: 12 * 60 + 15, to: 13 * 60 }, { id: pick6("v2"), scene: "flowers", from: 17 * 60 + 15, to: 18 * 60 }]).concat(tourists);
   }
   var SHOPSIDE = [[390, 290], [430, 296], [460, 300], [400, 318]];
   var WANDER = { orchard: [[160, 330], [260, 420], [360, 330], [310, 510], [210, 500]], flowers: [[160, 300], [260, 380], [360, 470], [310, 300], [210, 470]] };
@@ -18682,15 +18682,15 @@ ${r.n}`;
     return pay;
   }
   function postHTML(F2, o) {
-    const mine = (xmasState(F2).hampers || []).filter((hp) => (F2.inv || {})[hp.id] > 0), pick5 = o.pick && mine.find((hp) => hp.id === o.pick), orders = ordersOn(F2, o.day || "");
+    const mine = (xmasState(F2).hampers || []).filter((hp) => (F2.inv || {})[hp.id] > 0), pick6 = o.pick && mine.find((hp) => hp.id === o.pick), orders = ordersOn(F2, o.day || "");
     let h3 = "";
     if (orders.length) h3 += `<p class="eyebrow" style="margin:12px 0 6px">Orders pinned up by the table</p><ul class="hlist wlist">${orders.map((od) => {
       const fit = mine.find((hp) => fits(hp, od));
       return `<li><span class="wtxt"><b>${esc(orderText(od))}</b><small>${fit ? `Your ${esc(fit.name.replace(/^The /, ""))} hamper would do` : "Nothing packed that fits yet"}</small></span>${fit ? `<button class="btn small primary" data-xh="fill:${od.id}|${fit.id}">Fill it</button>` : ""}</li>`;
     }).join("")}</ul>`;
     if (!mine.length) return h3;
-    h3 += `<p class="eyebrow" style="margin:12px 0 6px">Post a hamper</p><div class="actions">${mine.map((hp) => `<button class="btn small ${pick5 && pick5.id === hp.id ? "primary" : "alt"}" data-xh="pick:${hp.id}">${icon(hamperIco2(hp), 16)} ${esc(hp.name)}</button>`).join("")}</div>`;
-    if (pick5) h3 += `<p class="muted">Where to? Penny weighs it and sticks on the stamps.</p><div class="actions">${recipsFor(F2).map((r) => `<button class="btn small alt" data-xh="send:${r.id}">${esc(r.n)}</button>`).join("")}</div>`;
+    h3 += `<p class="eyebrow" style="margin:12px 0 6px">Post a hamper</p><div class="actions">${mine.map((hp) => `<button class="btn small ${pick6 && pick6.id === hp.id ? "primary" : "alt"}" data-xh="pick:${hp.id}">${icon(hamperIco2(hp), 16)} ${esc(hp.name)}</button>`).join("")}</div>`;
+    if (pick6) h3 += `<p class="muted">Where to? Penny weighs it and sticks on the stamps.</p><div class="actions">${recipsFor(F2).map((r) => `<button class="btn small alt" data-xh="send:${r.id}">${esc(r.n)}</button>`).join("")}</div>`;
     return h3;
   }
 
@@ -20901,9 +20901,9 @@ ${r.n}`;
     if (st6.cart && !tubs2.length) return h3 + `<p class="muted">Nothing to scoop: the shop's display is empty tonight.</p>` + shut4;
     if (!tubs2.length && scoopsLeft(s)) return h3 + `<p class="muted">Nothing in the display, but there are tubs in the freezer.</p><div class="actions"><button class="btn small primary" data-gview="freezer">Put some out</button></div>` + upBtn + shut4;
     if (!tubs2.length) return h3 + `<p class="muted">The display's empty. Discover a flavour at the mixing bench in the kitchen (through the door on the west wall), then make more tubs from the recipe book there.</p>` + upBtn + shut4;
-    const pick5 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
-    if (pick5) return h3 + `<div class="gpick"><p class="olabel">${dot(pick5.col)} ${esc(pick5.name)}${pick5.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick5.ings.map((i) => INGR[i][0]).join(", "))} · ${s.tubs[pick5.id]} scoops left</p>
-    <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick5.id)}">Have one now${st6.evan ? ", and one for Evan" : ""}</button></div>
+    const pick6 = st6.pick && s.tubs[st6.pick] > 0 ? recipeOf(s, st6.pick) : null;
+    if (pick6) return h3 + `<div class="gpick"><p class="olabel">${dot(pick6.col)} ${esc(pick6.name)}${pick6.dairy ? "" : ' <span class="hbadge">dairy-free</span>'}</p><p class="muted">${esc(pick6.ings.map((i) => INGR[i][0]).join(", "))} · ${s.tubs[pick6.id]} scoops left</p>
+    <p class="eyebrow" style="margin:10px 0 6px">For you (free)</p><div class="actions"><button class="btn primary" data-geat="${esc(pick6.id)}">Have one now${st6.evan ? ", and one for Evan" : ""}</button></div>
     <p class="eyebrow" style="margin:12px 0 6px">To give someone</p><div class="actions">${Object.keys(FORMATS).map((f5) => `<button class="btn small alt" data-gtake="${f5}">${FORMATS[f5].n}</button>`).join("")}</div>
     <div class="actions"><button class="btn alt small" data-gback="1">Back</button><button class="btn alt small" data-close="1">Close</button></div></div>`;
     h3 += `<ul class="hlist wlist">${tubs2.map((r) => `<li><span class="wpic">${dot(r.col)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${s.tubs[r.id]} scoops${r.dairy ? "" : " · dairy-free"}${r.special ? " · special" : ""}</small></span><button class="btn small primary" data-gpick="${esc(r.id)}">Choose</button></li>`).join("")}</ul>`;
@@ -21022,10 +21022,10 @@ ${r.n}`;
   function loadTrolley(F2, ids, t2 = clock()) {
     const s = scoopState(F2);
     if (s.trolley) return null;
-    const pick5 = [...new Set(ids)].filter((id) => recipeOf(s, id) && s.tubs[id] > 0).slice(0, TROLLEY.flavours);
-    if (!pick5.length) return null;
+    const pick6 = [...new Set(ids)].filter((id) => recipeOf(s, id) && s.tubs[id] > 0).slice(0, TROLLEY.flavours);
+    if (!pick6.length) return null;
     const tubs2 = {};
-    pick5.forEach((id) => {
+    pick6.forEach((id) => {
       const n = Math.min(TROLLEY.scoops, s.tubs[id]);
       tubs2[id] = n;
       s.tubs[id] -= n;
@@ -21723,7 +21723,7 @@ ${r.n}`;
       const r = m.recipes.find((x) => x.id === m.cupId) || { name: "Mulled wine", adds: [] };
       return h3 + `<p class="sub">${m.cups} cups of ${esc(r.name)} left in the pot, ${m.price} coins a cup. Celeste ladles it out at the counter, and out on the terrace.</p>` + shut6;
     }
-    const reds = v.shelf.filter(isBase), have2 = Object.keys(ADDS).filter((a) => got(F2, m, a) > 0), pick5 = st6.adds || [];
+    const reds = v.shelf.filter(isBase), have2 = Object.keys(ADDS).filter((a) => got(F2, m, a) > 0), pick6 = st6.adds || [];
     h3 += `<p class="sub">A bottle of your red, and two or three things to mull it with. Half an hour on a low heat, then ten cups.</p>`;
     if (m.recipes.length) h3 += `<p class="eyebrow" style="margin:10px 0 6px">Make one you know</p><ul class="hlist wlist">${m.recipes.map((r) => {
       const ok = r.adds.every((a) => got(F2, m, a) > 0) && reds.length;
@@ -21731,10 +21731,10 @@ ${r.n}`;
     }).join("")}</ul>`;
     if (!reds.length) return h3 + `<p class="muted">You'll need a bottle of red on the shelves for the base: Merlot-ish house red, Tempranillo or Pinot.</p>` + shut6;
     h3 += `<p class="eyebrow" style="margin:10px 0 6px">The wine</p><div class="gchips">${reds.map((s) => `<button class="gchip${st6.base === s.id ? " on" : ""}" data-mull="base:${s.id}" aria-pressed="${st6.base === s.id}">${esc(s.name)} (${s.n})</button>`).join("")}</div>`;
-    h3 += `<p class="eyebrow" style="margin:10px 0 6px">Mull it with (two or three)</p>${have2.length ? `<div class="gchips">${have2.map((a) => `<button class="gchip${pick5.includes(a) ? " on" : ""}" data-mull="add:${a}" aria-pressed="${pick5.includes(a)}"><i class="mulldot" style="background:${ADDS[a].col}"></i>${esc(ADDS[a].n)} (${got(F2, m, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing to mull with yet: spices from Hana's market; oranges, lemons and apples from Ma Ma's orchard; raspberries; honey from the farm.</p>`}`;
+    h3 += `<p class="eyebrow" style="margin:10px 0 6px">Mull it with (two or three)</p>${have2.length ? `<div class="gchips">${have2.map((a) => `<button class="gchip${pick6.includes(a) ? " on" : ""}" data-mull="add:${a}" aria-pressed="${pick6.includes(a)}"><i class="mulldot" style="background:${ADDS[a].col}"></i>${esc(ADDS[a].n)} (${got(F2, m, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing to mull with yet: spices from Hana's market; oranges, lemons and apples from Ma Ma's orchard; raspberries; honey from the farm.</p>`}`;
     h3 += rackHTML(F2, m);
-    const ready2 = st6.base && pick5.length >= MULL.min && pick5.length <= MULL.max, known2 = ready2 && m.recipes.some((r) => r.id === keyOf2(pick5));
-    return h3 + `<div class="actions"><button class="btn primary" data-mull="go" ${ready2 ? "" : "disabled"}>${ready2 ? known2 ? `Mull ${esc(mullName(pick5))} again` : "Into the pot: something new" : "Into the pot"}</button></div>` + shut6;
+    const ready2 = st6.base && pick6.length >= MULL.min && pick6.length <= MULL.max, known2 = ready2 && m.recipes.some((r) => r.id === keyOf2(pick6));
+    return h3 + `<div class="actions"><button class="btn primary" data-mull="go" ${ready2 ? "" : "disabled"}>${ready2 ? known2 ? `Mull ${esc(mullName(pick6))} again` : "Into the pot: something new" : "Into the pot"}</button></div>` + shut6;
   }
 
   // src/game/secret.js
@@ -31542,13 +31542,13 @@ Quests finished today: ${S4.doneIds.length}`;
     else h3 += `<p class="sub">Your stylist hasn't been by yet today. The morning briefing hangs three outfits in here.</p>`;
     const all = outfitsToday(F2), w = F2.wear && F2.wear.day === dayKey() ? F2.wear : null;
     if (w) h3 += `<p class="muted">Wearing today: <b>${esc(w.label || "your outfit")}</b>. <button class="btn small alt" data-wearoff="1">Back to my usual clothes</button></p>`;
-    const pick5 = st6.pick != null ? all[st6.pick] : null;
-    if (pick5) {
-      const fs = FIELDS.filter(([k]) => pick5[k]);
-      h3 += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean3(pick5.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick5[k])}</span><span><small>${n}</small>${esc(clean3(pick5[k]))}</span></label></li>`).join("")}</ul>
+    const pick6 = st6.pick != null ? all[st6.pick] : null;
+    if (pick6) {
+      const fs = FIELDS.filter(([k]) => pick6[k]);
+      h3 += `<div class="outfit wearpick"><p class="olabel">Put on ${esc(clean3(pick6.label, 50) || "this outfit")}</p><p class="muted">Untick anything you're skipping.</p><ul>${fs.map(([k, n]) => `<li><label><input type="checkbox" data-wearf="${k}" checked> <span class="gpic">${garment(k === "layer" ? "layer" : k, pick6[k])}</span><span><small>${n}</small>${esc(clean3(pick6[k]))}</span></label></li>`).join("")}</ul>
       <div class="actions"><button class="btn primary" data-wearok="${st6.pick}">Put it on</button><button class="btn alt small" data-wearback="1">Back</button></div></div>`;
     } else if (all.length) h3 += `<div class="outfits">${all.map(card2).join("")}</div>`;
-    if (!pick5) h3 += accessories(F2);
+    if (!pick6) h3 += accessories(F2);
     h3 += `<p class="eyebrow" style="margin:14px 0 6px">Want something different?</p>`;
     if (!inv) h3 += `<p class="muted">New outfits need your wardrobe list, which comes with the morning drop-off.</p>`;
     else if (!st6.sample) h3 += `<p class="muted">New outfits need Claude, which isn't reachable from this view just now.</p>`;
@@ -34419,7 +34419,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
       <p class="eyebrow" style="margin:10px 0 6px">From your backpack</p>
       ${inBag2.length ? `<div class="actions">${inBag2.map((a) => `<button class="btn small alt" data-mc="basket:${a}:1">${HERB[a] ? dots2([a]) : ""} Put in 1 ${esc(bn(a).toLowerCase())}</button>${have(F2, a) > 1 ? `<button class="btn small alt" data-mc="basket:${a}:99">All ${have(F2, a)}</button>` : ""}`).join("")}</div>` : `<p class="muted">Nothing for the basket in your backpack. Herbs come from the greenhouse, fruit from Ma Ma's orchard and the garden, flowers from her flower farm, honey from your hives and goat's milk from Wildflower Farm.</p>`}` + shut11;
     }
-    const ok = HERB_OF(tab), base = st6.base || "goatmilk", pick5 = st6.adds || [];
+    const ok = HERB_OF(tab), base = st6.base || "goatmilk", pick6 = st6.adds || [];
     const lip = tab === "balm" || tab === "lipoil", rollers = c.lipoil || [];
     const busy2 = tab === "oil" ? c.steep.length >= CRAFT.jars : tab === "soap" ? c.cure.length >= CRAFT.rack : tab === "balm" ? !!c.balm : tab === "lipoil" ? rollers.length >= CRAFT.rollers : !!c.pot;
     if (lip) {
@@ -34433,12 +34433,12 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
         return `<li><span class="wpic">${icon(`${tab}_${r.dye || "none"}`, 28)}</span><span class="wtxt"><b>${esc(r.name)}</b><small>${dots2(r.adds)} ${ITEMS[itemId2(r)] ? ITEMS[itemId2(r)].price : ""} coins each</small></span><button class="btn small ${can ? "primary" : "alt"}" data-mc="again:${r.id}" ${can ? "" : "disabled"}>Make</button></li>`;
       }).join("")}</ul>`;
       if (busy2) return h3 + `<p class="muted">${tab === "balm" ? "A tray of balm's setting." : "Both roller trays are steeping."}</p>` + shut11;
-      const pick6 = st6.adds || [], dye = st6.dye || null, flav = HERB_OF(tab).filter((a) => got2(F2, c, a)), dyes = Object.keys(FLOWERS).filter((d) => dyeHave(F2, d) > 0);
+      const pick7 = st6.adds || [], dye = st6.dye || null, flav = HERB_OF(tab).filter((a) => got2(F2, c, a)), dyes = Object.keys(FLOWERS).filter((d) => dyeHave(F2, d) > 0);
       h3 += `<div class="ppbatch">${icon(`${tab}_${dye || "none"}`, 64)}</div>`;
-      h3 += `<p class="eyebrow" style="margin:10px 0 6px">The flavour (one)</p>${flav.length ? `<div class="gchips">${flav.map((a) => `<button class="gchip${pick6.includes(a) ? " on" : ""}" data-mc="add:${a}" aria-pressed="${pick6.includes(a)}"><i class="mulldot" style="background:${HERB[a].col}"></i><span>${esc(nm4(a))}</span></button>`).join("")}</div>` : `<p class="muted">No flavours with you: honey, mint, orange, lemon, lavender, rose, strawberries...</p>`}`;
+      h3 += `<p class="eyebrow" style="margin:10px 0 6px">The flavour (one)</p>${flav.length ? `<div class="gchips">${flav.map((a) => `<button class="gchip${pick7.includes(a) ? " on" : ""}" data-mc="add:${a}" aria-pressed="${pick7.includes(a)}"><i class="mulldot" style="background:${HERB[a].col}"></i><span>${esc(nm4(a))}</span></button>`).join("")}</div>` : `<p class="muted">No flavours with you: honey, mint, orange, lemon, lavender, rose, strawberries...</p>`}`;
       h3 += `<p class="eyebrow" style="margin:10px 0 6px">The colour (a flower, if you like)</p><div class="gchips"><button class="gchip${!dye ? " on" : ""}" data-mc="dye:" aria-pressed="${!dye}"><span>None</span></button>${dyes.map((d) => `<button class="gchip${dye === d ? " on" : ""}" data-mc="dye:${d}" aria-pressed="${dye === d}"><i class="mulldot" style="background:${FLOWERS[d].col}"></i><span>${esc(capW(FLOWERS[d].one))} (${dyeHave(F2, d)})</span></button>`).join("")}</div>${dyes.length ? "" : `<p class="muted">Stems from Ma Ma's flower farm (in its shed) or tulips and sunflowers from your garden make the colours.</p>`}`;
-      const ready3 = pick6.length === 1;
-      return h3 + `<div class="actions"><button class="btn primary" data-mc="make" ${ready3 ? "" : "disabled"}>${ready3 ? c.recipes.some((r) => r.id === keyOf4(tab, null, pick6, dye)) ? `Make ${esc(craftName(tab, null, pick6, dye))}` : "Try something new" : "Make it"}</button></div>` + shut11;
+      const ready3 = pick7.length === 1;
+      return h3 + `<div class="actions"><button class="btn primary" data-mc="make" ${ready3 ? "" : "disabled"}>${ready3 ? c.recipes.some((r) => r.id === keyOf4(tab, null, pick7, dye)) ? `Make ${esc(craftName(tab, null, pick7, dye))}` : "Try something new" : "Make it"}</button></div>` + shut11;
     }
     h3 += `<p class="sub">${tab === "oil" ? `Two bottles of olive oil and one or two herbs or fruits, steeped for six hours: two bottles of infused oil. You've ${oilHave(F2, c)} bottle${oilHave(F2, c) === 1 ? "" : "s"} of plain oil (backpack and mill).` : tab === "soap" ? `Goat's milk (two) or olive oil (one), and one or two things to go in. A day on the curing rack: six bars.` : `A goat's milk, a bottle of olive oil and one scent. An hour in the little pot: three jars.`}</p>`;
     const now5 = tab === "oil" ? c.steep : tab === "soap" ? c.cure : c.pot ? [c.pot] : [];
@@ -34451,9 +34451,9 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
     if (busy2) return h3 + `<p class="muted">${tab === "oil" ? "All three jars are steeping." : tab === "soap" ? "The rack's full of curing soap." : "The lotion pot's on."}</p>` + shut11;
     if (tab === "soap") h3 += `<p class="eyebrow" style="margin:10px 0 6px">The base</p><div class="gchips">${[["goatmilk", `Goat's milk (${got2(F2, c, "goatmilk")})`], ["oliveoil", `Olive oil (${oilHave(F2, c)})`]].map(([k, n]) => `<button class="gchip${base === k ? " on" : ""}" data-mc="base:${k}" aria-pressed="${base === k}">${esc(n)}</button>`).join("")}</div>`;
     const inBag = ok.filter((a) => got2(F2, c, a));
-    h3 += `<p class="eyebrow" style="margin:10px 0 6px">${tab === "lotion" ? "The scent (one)" : "What goes in (one or two)"}</p>${inBag.length ? `<div class="gchips">${inBag.map((a) => `<button class="gchip${pick5.includes(a) ? " on" : ""}" data-mc="add:${a}" aria-pressed="${pick5.includes(a)}"><i class="mulldot" style="background:${HERB[a].col}"></i>${esc(nm4(a))} (${got2(F2, c, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing for these in your backpack or the basket yet: ${ok.map((a) => nm4(a).toLowerCase()).join(", ")}.</p>`}`;
-    const ready2 = pick5.length >= 1 && pick5.length <= K4.max;
-    return h3 + `<div class="actions"><button class="btn primary" data-mc="make" ${ready2 ? "" : "disabled"}>${ready2 ? c.recipes.some((r) => r.id === keyOf4(tab, tab === "soap" ? base : null, pick5)) ? `Make ${esc(craftName(tab, base, pick5))}` : "Try something new" : "Make it"}</button></div>` + shut11;
+    h3 += `<p class="eyebrow" style="margin:10px 0 6px">${tab === "lotion" ? "The scent (one)" : "What goes in (one or two)"}</p>${inBag.length ? `<div class="gchips">${inBag.map((a) => `<button class="gchip${pick6.includes(a) ? " on" : ""}" data-mc="add:${a}" aria-pressed="${pick6.includes(a)}"><i class="mulldot" style="background:${HERB[a].col}"></i>${esc(nm4(a))} (${got2(F2, c, a)})</button>`).join("")}</div>` : `<p class="muted">Nothing for these in your backpack or the basket yet: ${ok.map((a) => nm4(a).toLowerCase()).join(", ")}.</p>`}`;
+    const ready2 = pick6.length >= 1 && pick6.length <= K4.max;
+    return h3 + `<div class="actions"><button class="btn primary" data-mc="make" ${ready2 ? "" : "disabled"}>${ready2 ? c.recipes.some((r) => r.id === keyOf4(tab, tab === "soap" ? base : null, pick6)) ? `Make ${esc(craftName(tab, base, pick6))}` : "Try something new" : "Make it"}</button></div>` + shut11;
   }
   var HERB_OF = (kind) => Object.keys(HERB).filter((a) => HERB[a][kind]);
   var TASTE = { at: [11 * 60], weekend: [16 * 60 + 15], dur: 45, size: 4, boost: 60 };
@@ -35259,9 +35259,9 @@ ${m.from}` : ""}`;
   var shut12 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
   var coin4 = () => icon("coin", 13);
   var ferryTowns = () => Object.keys(TOWNS).filter((k) => TOWNS[k].ferry);
-  function ticketPanel(F2, pick5, town = "ronda", hm12 = sgHM(), by = "train") {
+  function ticketPanel(F2, pick6, town = "ronda", hm12 = sgHM(), by = "train") {
     if (by === "ferry" && !(TOWNS[town] || {}).ferry) town = ferryTowns()[0];
-    const t2 = TOWNS[town], party = FAMILY.filter((id) => pick5.includes(id)), cost = fareFor(town, party, by), open2 = canLeave(town, hm12), on = tripOn(F2), boat2 = by === "ferry", fare = boat2 ? t2.ferry.fare : t2.fare, ride2 = boat2 ? "ferry" : "train";
+    const t2 = TOWNS[town], party = FAMILY.filter((id) => pick6.includes(id)), cost = fareFor(town, party, by), open2 = canLeave(town, hm12), on = tripOn(F2), boat2 = by === "ferry", fare = boat2 ? t2.ferry.fare : t2.fare, ride2 = boat2 ? "ferry" : "train";
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>${boat2 ? "The ferry" : "Tickets"} to ${esc(t2.n)}</h2>${boat2 ? `<div class="gchips">${ferryTowns().map((k) => `<button class="gchip${k === town ? " on" : ""}" data-ftown="${k}" aria-pressed="${k === town}"><span>${esc(TOWNS[k].n)}</span></button>`).join("")}</div>` : `<div class="gchips">${Object.entries(TOWNS).filter(([, x]) => x.by === "train").map(([k, x]) => `<button class="gchip${k === town ? " on" : ""}" data-ttown="${k}" aria-pressed="${k === town}"><span>${esc(x.n)}</span></button>`).join("")}</div>`}<p class="sub">${esc(boat2 ? town === "jeju" ? "Across the sea to Jeju: a slower crossing than the train over the sea bridge, but there are dolphins. Come home by ferry or by train, whichever you like." : t2.ferry.blurb || t2.blurb : t2.blurb)}</p>${boat2 && t2.ferry.sees ? `<p class="muted"><b>On ${esc(t2.n)} this time of year:</b> ${esc(t2.ferry.sees(+dayKey().slice(5, 7)))}</p>` : ""}
     <p class="muted">${fare} ${coin4()} return a person (Evan ${boat2 ? "sails" : "rides"} free). ${boat2 ? "Ferries" : "Trains"} out ${fmt4(t2.outFrom)} to ${fmt4(t2.outTo)}; the last ${ride2} home leaves ${esc(t2.n)} at ${fmt4(t2.backTo)}. A day trip: you'll be home tonight.</p>`;
     if (on) return h3 + `<p><b>You've been to ${esc(TOWNS[on.town].n)} today.</b> One trip a day: go again tomorrow.</p>` + shut12;
@@ -35271,10 +35271,10 @@ ${m.from}` : ""}`;
     h3 += `<div class="actions"><button class="btn primary" data-trip="${town}" data-by="${by}" ${F2.coins >= cost ? "" : "disabled"}>Buy tickets and go · ${cost} ${coin4()}</button></div>`;
     return h3 + shut12;
   }
-  function sailPanel(F2, pick5, town, hm12 = sgHM(), { rough = false, month: month2 = 1 } = {}) {
+  function sailPanel(F2, pick6, town, hm12 = sgHM(), { rough = false, month: month2 = 1 } = {}) {
     const towns = boatTowns();
     town = towns.includes(town) ? town : towns[0];
-    const t2 = TOWNS[town], party = FAMILY.filter((id) => pick5.includes(id)), full = party.length >= BOAT_SEATS - 1, on = tripOn(F2), open2 = canLeave(town, hm12, "boat");
+    const t2 = TOWNS[town], party = FAMILY.filter((id) => pick6.includes(id)), full = party.length >= BOAT_SEATS - 1, on = tripOn(F2), open2 = canLeave(town, hm12, "boat");
     let h3 = `<span class="tape gingham" aria-hidden="true"></span><h2>Your boat</h2><p class="sub">Moored at the end of the jetty, fuelled up and ready. Out for the dolphins, or off along the coast for the day?</p>
     <div class="actions"><button class="btn alt" data-cruise="1">A dolphin cruise up the coast</button></div><h3 class="ph3">Sail to</h3>
     <div class="gchips">${towns.map((k) => `<button class="gchip${k === town ? " on" : ""}" data-btown="${k}" aria-pressed="${k === town}"><span>${esc(TOWNS[k].n)}</span></button>`).join("")}</div>
@@ -44377,12 +44377,12 @@ ${m.from}` : ""}`;
   var SEA5 = { starfish: "a red starfish", octopus: "an octopus tucked in a crack", wrasse: "a rainbow wrasse", pinna: "a giant fan mussel standing up in the seagrass", turtle: "a loggerhead turtle, slowly", bream: "a shoal of silver bream", seahorse: "a tiny seahorse", ray: "an eagle ray, flying" };
   var SNORKEL_LOOKS = 3;
   var snorkelStart = (F2, day) => {
-    const ks = Object.keys(SEA5), h3 = [...day].reduce((a, ch) => a * 31 + ch.charCodeAt(0) >>> 0, 7), pick5 = [];
-    for (let i = 0; pick5.length < SNORKEL_LOOKS; i++) {
+    const ks = Object.keys(SEA5), h3 = [...day].reduce((a, ch) => a * 31 + ch.charCodeAt(0) >>> 0, 7), pick6 = [];
+    for (let i = 0; pick6.length < SNORKEL_LOOKS; i++) {
       const k = ks[(h3 + i * 5) % ks.length];
-      if (!pick5.includes(k)) pick5.push(k);
+      if (!pick6.includes(k)) pick6.push(k);
     }
-    return { pick: pick5, i: 0 };
+    return { pick: pick6, i: 0 };
   };
   function snorkelLook(F2, st6) {
     if (st6.i >= st6.pick.length) return null;
@@ -45091,10 +45091,10 @@ ${m.from}` : ""}`;
     return { verse: v, first };
   }
   function versePanel(F2, st6 = {}, evan2) {
-    const c = pvState(F2), pick5 = (k, opts) => `<div class="gchips">${opts.map((o, i) => `<button class="gchip${st6[k] === i ? " on" : ""}" data-pv="${k}:${i}" aria-pressed="${st6[k] === i}"><span>${esc(o)}</span></button>`).join("")}</div>`;
+    const c = pvState(F2), pick6 = (k, opts) => `<div class="gchips">${opts.map((o, i) => `<button class="gchip${st6[k] === i ? " on" : ""}" data-pv="${k}:${i}" aria-pressed="${st6[k] === i}"><span>${esc(o)}</span></button>`).join("")}</div>`;
     return `<span class="tape gingham" aria-hidden="true"></span><h2>The visitors' book</h2><p class="sub">A huge old book on a stand, its pages soft as cloth. Signora Bianca's grandmother started it in 1922. "One line," says Signora Bianca. "Everyone who comes writes one line. Make it a good one. No pressure."</p>
     ${c.verses.length ? `<p class="muted">Your lines so far: ${c.verses.map((v) => `"${esc(v)}"`).join(" ")}</p>` : ""}
-    <p class="eyebrow">Begin</p>${pick5("a", VERSE.a)}<p class="eyebrow">Then</p>${pick5("b", VERSE.b)}<p class="eyebrow">And end</p>${pick5("c", VERSE.c)}
+    <p class="eyebrow">Begin</p>${pick6("a", VERSE.a)}<p class="eyebrow">Then</p>${pick6("b", VERSE.b)}<p class="eyebrow">And end</p>${pick6("c", VERSE.c)}
     ${verseOf(st6) ? `<p style="font-family:'Klee One',serif;font-size:1.1rem;text-align:center;margin:12px 0">"${esc(verseOf(st6))}"</p>` : ""}${evan2 ? `<p class="muted">Evan adds a drawing of a cat underneath. It's very good. It has nine legs.</p>` : ""}
     <div class="actions"><button class="btn primary" data-pv="write" ${verseOf(st6) ? "" : "disabled"}>Write it in the book</button></div>` + shut21;
   }
@@ -45424,11 +45424,11 @@ ${m.from}` : ""}`;
     if (!at9) {
       if (t2) return h3 + `<p class="muted">You're already out on a day trip today.</p>` + shut23;
       if (!o.ownsVan) return h3 + shut23;
-      const pick5 = (o.pick || []).filter((id) => FAMILY.includes(id)).slice(0, VAN_SEATS - 1);
-      h3 += `<p class="eyebrow" style="margin:10px 0 6px">Who's coming? (${pick5.length + 1} of ${VAN_SEATS} seats, you included)</p><div class="gchips">${FAMILY.map((id) => `<button class="gchip${pick5.includes(id) ? " on" : ""}" data-bvpick="${id}" aria-pressed="${pick5.includes(id)}" ${!pick5.includes(id) && pick5.length >= VAN_SEATS - 1 ? "disabled" : ""}>${esc(nameOf2(id))}</button>`).join("")}</div>`;
+      const pick6 = (o.pick || []).filter((id) => FAMILY.includes(id)).slice(0, VAN_SEATS - 1);
+      h3 += `<p class="eyebrow" style="margin:10px 0 6px">Who's coming? (${pick6.length + 1} of ${VAN_SEATS} seats, you included)</p><div class="gchips">${FAMILY.map((id) => `<button class="gchip${pick6.includes(id) ? " on" : ""}" data-bvpick="${id}" aria-pressed="${pick6.includes(id)}" ${!pick6.includes(id) && pick6.length >= VAN_SEATS - 1 ? "disabled" : ""}>${esc(nameOf2(id))}</button>`).join("")}</div>`;
       if (!canSet(hm12)) return h3 + `<p class="muted">Too ${hm12 < 7 * 60 ? "early" : "late"} to set off: day trips leave between 7am and 6pm (and you're home by 10).</p>` + shut23;
       h3 += `<p class="eyebrow" style="margin:12px 0 6px">Where to?</p><div class="actions bbgo">${known(F2).filter(inR).map((s) => {
-        const c = fuelFor("home", s, pick5);
+        const c = fuelFor("home", s, pick6);
         return `<button class="btn small ${F2.coins >= c ? "primary" : "alt"}" data-bvgo="${s}" ${F2.coins >= c ? "" : "disabled"}>${esc(TOWNS[s].n)} · ${c} ${coin14()}</button>`;
       }).join("")}</div><p class="muted">Fuel: ${LEG} coins a leg, plus 1 for each grown-up passenger. Home by ${fmt5(TOWNS.bv_gate.backTo)}.</p>`;
       return h3 + shut23;
@@ -48003,7 +48003,7 @@ ${m.from}` : ""}`;
   var SOAK_MIN = 15;
   var PRESS_MIN = 5;
   var DRY_MS = 864e5;
-  var LINE = 4;
+  var LINE = 8;
   var SCRAP_CAP = 12;
   var BASE2 = 5;
   var M2 = 6e4;
@@ -48069,35 +48069,41 @@ ${m.from}` : ""}`;
     if (p.soak || p.pulp || p.scraps < SOAK) return false;
     p.scraps -= SOAK;
     p.soak = { done: t2 + SOAK_MIN * M2 };
+    p.touched = t2;
     return true;
   }
   function beat(F2, col, t2 = now3()) {
     const p = paperState(F2), c = COLOURS2[col];
-    if (!c || !p.soak || p.soak.done > t2 || p.pulp || F2.coins < c.cost) return false;
+    if (!c || !p.soak || p.soak.done > t2 || p.pulp || c.cost && F2.coins < c.cost) return false;
     F2.coins -= c.cost;
     p.soak = null;
     p.pulp = { col, add: "none" };
+    p.touched = t2;
     return true;
   }
-  function addIn(F2, add2) {
+  function addIn(F2, add2, t2 = now3()) {
     const p = paperState(F2), a = ADDS2[add2];
     if (!a || add2 === "none" || !p.pulp || p.pulp.add !== "none") return null;
     if (a.inv && (F2.inv || {})[a.inv] > 0) {
       F2.inv[a.inv]--;
       if (F2.inv[a.inv] <= 0) delete F2.inv[a.inv];
       p.pulp.add = add2;
+      p.touched = t2;
       return "bag";
     }
     if (F2.coins < a.cost) return null;
     F2.coins -= a.cost;
     p.pulp.add = add2;
+    p.touched = t2;
     return "jar";
   }
-  function pull(F2) {
+  function pull(F2, t2 = now3()) {
     const p = paperState(F2);
     if (!p.pulp || p.wet) return false;
-    p.wet = { ...p.pulp, n: BATCH };
+    const { col, add: add2 } = p.pulp;
+    p.wet = { col, add: add2, n: BATCH };
     p.pulp = null;
+    p.touched = t2;
     return true;
   }
   function startPress2(F2, t2 = now3()) {
@@ -48105,6 +48111,7 @@ ${m.from}` : ""}`;
     if (!p.wet || p.press) return false;
     p.press = { ...p.wet, done: t2 + PRESS_MIN * M2 };
     p.wet = null;
+    p.touched = t2;
     return true;
   }
   function hang(F2, t2 = now3()) {
@@ -48112,6 +48119,7 @@ ${m.from}` : ""}`;
     if (!p.press || p.press.done > t2 || p.line.length >= LINE) return false;
     p.line.push({ col: p.press.col, add: p.press.add, n: p.press.n, done: t2 + DRY_MS });
     p.press = null;
+    p.touched = t2;
     return true;
   }
   function takeDown2(F2, t2 = now3()) {
@@ -48168,8 +48176,87 @@ ${m.from}` : ""}`;
     }
     return k;
   }
+  var LISE_WAIT = 5;
+  var pick4 = (list11) => {
+    const tot = list11.reduce((a, [, w]) => a + w, 0);
+    let r = Math.random() * tot;
+    for (const [k, w] of list11) {
+      if ((r -= w) < 0) return k;
+    }
+    return list11[list11.length - 1][0];
+  };
+  function liseLean(day) {
+    const md3 = (day || "").slice(5);
+    if (md3 >= "02-01" && md3 <= "02-14") return { col: { blush: 4 }, add: { rose: 4, petals: 2 } };
+    if (md3 >= "05-01" && md3 <= "05-14") return { col: { blush: 3, sage: 2 }, add: { petals: 4, seeds: 2 } };
+    if (md3 >= "12-01" && md3 <= "12-24") return { col: { ink: 3, natural: 2 }, add: { gold: 4, none: 1 } };
+    if (md3 >= "03-01" && md3 <= "04-30") return { col: { sage: 3 }, add: { seeds: 4, petals: 2 } };
+    return { col: {}, add: {} };
+  }
+  function liseColour(F2, day) {
+    const p = paperState(F2), lean = liseLean(day).col, last2 = p.liseLast || {};
+    const ok = Object.keys(COLOURS2).filter((k) => COLOURS2[k].cost <= F2.coins);
+    const list11 = ok.map((k) => [k, (lean[k] || 1) * (k === last2.col ? 0.3 : 1)]);
+    return list11.length ? pick4(list11) : "natural";
+  }
+  function liseAdd(F2, day, col) {
+    const p = paperState(F2), lean = liseLean(day).add, last2 = p.liseLast || {};
+    const ok = Object.keys(ADDS2).filter((k) => ADDS2[k].cost <= F2.coins);
+    const list11 = ok.map((k) => [k, (lean[k] || (k === "none" ? 2 : 1)) * (col === last2.col && k === last2.add ? 0 : 1)]).filter(([, w]) => w > 0);
+    return list11.length ? pick4(list11) : "none";
+  }
+  function liseStep(F2, t2 = now3(), day = "") {
+    const p = paperState(F2), st6 = stage2(F2, t2);
+    if (t2 - (p.touched || 0) < LISE_WAIT * M2) return null;
+    const did = (line) => {
+      p.touched = t2;
+      const d = p.liseDid = p.liseDid && p.liseDid.day === day ? p.liseDid : { day, steps: 0, batches: [] };
+      d.steps++;
+      return line;
+    };
+    if (st6.pressed && p.line.length < LINE) {
+      const { col, add: add2 } = p.press;
+      hang(F2, t2);
+      const d = did(`hung six sheets of ${sheetName(col, add2).toLowerCase()} on the line`);
+      p.liseDid.batches.push(sheetId(col, add2));
+      return d;
+    }
+    if (st6.wet) {
+      startPress2(F2, t2);
+      return did("wound the wet sheets into the press");
+    }
+    if (st6.pulp && !p.pulp.mulled && p.pulp.add === "none") {
+      const add2 = liseAdd(F2, day, p.pulp.col);
+      p.pulp.mulled = 1;
+      if (add2 !== "none" && F2.coins >= ADDS2[add2].cost) {
+        F2.coins -= ADDS2[add2].cost;
+        p.pulp.add = add2;
+        p.liseLast = { col: p.pulp.col, add: add2 };
+        return did(`stirred ${add2 === "seeds" ? "wildflower seeds" : ADDS2[add2].n.toLowerCase()} into the vat`);
+      }
+      p.liseLast = { col: p.pulp.col, add: "none" };
+      return did("decided this batch looks best plain");
+    }
+    if (st6.pulp && !st6.wet) {
+      pull(F2, t2);
+      return did("pulled six sheets from the vat");
+    }
+    if (st6.soaked && !st6.pulp) {
+      const col = liseColour(F2, day);
+      if (beat(F2, col, t2)) {
+        p.pulp.mulled = 0;
+        return did(`beat the pulp ${COLOURS2[col].n.toLowerCase()}`);
+      }
+      return null;
+    }
+    if (!p.soak && !p.pulp && p.scraps >= SOAK) {
+      startSoak(F2, t2);
+      return did("tore scraps into the soaking tub");
+    }
+    return null;
+  }
   function paperTick(F2, here, t2 = now3()) {
-    const p = paperState(F2), out = { n: 0, coins: 0, wage: 0, cls: 0, down: 0 }, kept = keeperHired(F2);
+    const p = paperState(F2), out = { n: 0, coins: 0, wage: 0, cls: 0, down: 0, lise: [] }, kept = keeperHired(F2);
     if (!p.at || !here && !kept) {
       p.at = t2;
       return out;
@@ -48186,6 +48273,8 @@ ${m.from}` : ""}`;
       if (lise) {
         const d = takeDown2(F2, at9);
         if (d) out.down += d;
+        const w = liseStep(F2, at9, day);
+        if (w) out.lise.push(w);
       }
       if (open2 && dowOf4(day) === CLASS.dow && hm12 === CLASS.to - 1 && p.classDay !== day && sheetsIn(p) >= CLASS.size) {
         p.classDay = day;
@@ -48272,6 +48361,12 @@ ${m.from}` : ""}`;
     <p class="sub"><b>${nx.wait ? "Waiting" : "Next"}:</b> ${esc(nx.line)}${nx.at !== here && !nx.wait ? ` ${btn3("go", "Go there", true, nx.at, "alt")}` : ""}</p>`;
   }
   var head2 = (title, sub, F2, t2, tape7 = "gingham", here = "") => `<span class="tape ${tape7}" aria-hidden="true"></span><h2>${title}</h2>${strip(F2, t2, here)}<p class="sub">${sub}</p>`;
+  function liseToday(F2, day) {
+    const d = paperState(F2).liseDid;
+    if (!d || d.day !== day || !d.steps) return `<p class="muted">Lise works the back room while she's in: if a step sits for ${LISE_WAIT} minutes, she takes it on.</p>`;
+    const b = d.batches;
+    return `<p class="muted">Lise has been at the vat today${b.length ? `: ${b.length} batch${b.length === 1 ? "" : "es"} on the line (${b.map((id) => esc(ITEMS[id].n.toLowerCase())).join("; ")})` : ", and a batch is on its way"}.</p>`;
+  }
   function paperPanel(F2, spot15, o = {}) {
     const p = paperState(F2), t2 = o.t || now3(), st6 = stage2(F2, t2);
     if (spot15 === "pp_scrap") {
@@ -48306,7 +48401,8 @@ ${m.from}` : ""}`;
       return `<span class="tape gingham" aria-hidden="true"></span><h2>The paper shelves</h2><p class="sub">Your sheets, stacked by colour, a little card under each with its price.</p>` + (ids.length ? `<ul class="hlist wlist">${ids.map((id) => `<li><span class="wpic">${icon(id, 30)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${p.stock[id]} on the shelf · ${ITEMS[id].price} ${coin20()} a sheet</small></span><span class="orbtns">${btn3("bag", "Take 1", true, id, "alt")}</span></li>`).join("")}</ul>` : `<p class="muted">Bare shelves. Sheets come off the drying line the day after you make them.</p>`) + (bag2.length ? `<p class="eyebrow" style="margin:12px 0 6px">In your backpack</p><ul class="hlist wlist">${bag2.map((id) => `<li><span class="wpic">${icon(id, 30)}</span><span class="wtxt"><b>${esc(ITEMS[id].n)}</b><small>${F2.inv[id]} with you</small></span><span class="orbtns">${btn3("shelf", "Put back", true, id, "alt")}</span></li>`).join("")}</ul>` : "") + shut30;
     }
     const d = o.day && p.sold[o.day], kept = keeperHired(F2);
-    return `<span class="tape gingham" aria-hidden="true"></span><h2>The paperie</h2><p class="sub">${o.lise ? "Lise's at the till, folding a stack of tissue into little fans." : kept ? "Lise keeps the shop 10 till 5 (closed Mondays) and takes the dry sheets off the line." : "The sign on the door says <i>ouvert</i> while you're in Montrose. Browsers come in off the lane and take a sheet or two."}</p>
+    return `<span class="tape gingham" aria-hidden="true"></span><h2>The paperie</h2><p class="sub">${o.lise ? "Lise's at the till, folding a stack of tissue into little fans." : kept ? "Lise keeps the shop 10 till 5 (closed Mondays). She makes paper in the back room too, choosing the colours and add-ins herself, and takes the dry sheets off the line." : "The sign on the door says <i>ouvert</i> while you're in Montrose. Browsers come in off the lane and take a sheet or two."}</p>
+    ${kept ? liseToday(F2, o.day) : ""}
     <p class="muted">${d ? `Today: ${d.n} sheet${d.n === 1 ? "" : "s"} sold${d.cls ? `, the card class (${d.cls} coins)` : ""}, ${d.coins} coins${d.wage ? `; Lise's wage ${d.wage}` : ""}.` : "Nothing sold yet today."} ${p.made ? `${p.made} sheets made so far.` : ""}</p>
     ${paperSeason(o.day || "") ? `<p class="muted">It's a gift season: people are buying paper for cards and wrapping, twice as many as usual.</p>` : ""}
     <p class="eyebrow" style="margin:12px 0 6px">Saturday card class</p><p class="muted">Saturdays 2 to 4: four people make cards at the big table, ${CLASS.fee} ${coin20()} each, with four of your sheets. It runs if ${kept ? "Lise" : "you"}${kept ? " (or you)" : ""} ${kept ? "is" : "are"} here and there are four sheets on the shelves.</p>
@@ -48340,11 +48436,12 @@ ${m.from}` : ""}`;
       return `<rect x="${x}" y="${y + 20 - h3}" width="32" height="${h3}" rx="1" fill="${COL[col]}" ${O}/>${flecksIn(add2, x + 3, y + 22 - h3, 26, h3 - 4, 3)}<path d="M${x} ${y + 20 - h3 / 2} h32" stroke="#00000018"/>`;
     }).join("");
     const shelf6 = spot11("pp_shelf", 110, 270, "The paper shelves", hovE9(110, 205, 90, 10), sk(`<rect x="24" y="40" width="172" height="152" rx="3" style="fill:#8A6A52"/>${[0, 1, 2].map((r) => `<rect x="28" y="${92 + r * 44}" width="164" height="5" style="fill:#6B5444"/>`).join("")}`, `<rect x="24" y="40" width="172" height="152" rx="3"/>`) + g9(stacks || "") + lab20(110, 220, stock2.length ? "Paper shelves" : "Empty shelves", "#F6E3B4"));
-    const sheets = (p.line || []).slice(0, 4).flatMap((s, b) => [0, 1, 2].map((k) => {
-      const x = 222 + b * 70 + k * 20, dry = s.done <= t2;
-      return dry ? iconAt(`pp_${s.col}_${s.add}`, x + 8, 92, 26) : `<rect x="${x}" y="80" width="17" height="24" fill="${WET[s.col]}" ${O}/>${flecksIn(s.add, x + 2, 82, 13, 20, 3)}`;
+    const sheets = (p.line || []).slice(0, 8).flatMap((s, i) => [0, 1, 2].map((k) => {
+      const b = i % 4, dy = i < 4 ? 0 : 50, x = 222 + b * 70 + k * 20, dry = s.done <= t2;
+      return dry ? iconAt(`pp_${s.col}_${s.add}`, x + 8, 92 + dy, 26) : `<rect x="${x}" y="${80 + dy}" width="17" height="24" fill="${WET[s.col]}" ${O}/>${flecksIn(s.add, x + 2, 82 + dy, 13, 20, 3)}`;
     })).join("");
-    const line = spot11("pp_line", 380, 268, "The drying line", hovE9(360, 205, 130, 10), g9(`<path d="M214 70 Q360 84 506 70" fill="none" stroke="#5A4636" stroke-width="1.2"/>${Array.from({ length: 12 }, (_, i) => `<rect x="${224 + i * 23}" y="72" width="3" height="7" fill="#C9A27E"/>`).join("")}`) + g9(sheets) + lab20(360, 220, "Drying line", "#E6DCF3"));
+    const strings = [0, 50].map((dy) => `<path d="M214 ${70 + dy} Q360 ${84 + dy} 506 ${70 + dy}" fill="none" stroke="#5A4636" stroke-width="1.2"/>${Array.from({ length: 12 }, (_, i) => `<rect x="${224 + i * 23}" y="${72 + dy}" width="3" height="7" fill="#C9A27E"/>`).join("")}`).join("");
+    const line = spot11("pp_line", 380, 268, "The drying line", hovE9(360, 205, 130, 10), g9(strings) + g9(sheets) + lab20(360, 220, "Drying line", "#E6DCF3"));
     const pulp = p.pulp ? COL[p.pulp.col] : p.wet ? "#D9E6EA" : "#C9DEE6", padd = p.pulp ? p.pulp.add : null;
     const vat = spot11("pp_vat", 260, 312, "The vat", hovE9(260, 300, 70, 12), sk(`<path d="M200 236 h120 l-8 56 h-104z" style="fill:#9A7A5A"/><ellipse cx="260" cy="236" rx="60" ry="12" style="fill:${pulp}"/>`, `<path d="M200 236 h120 l-8 56 h-104z"/><ellipse cx="260" cy="236" rx="60" ry="12"/><path d="M204 258 h112 M206 276 h108" opacity=".5"/>`) + g9(flecksIn(padd, 214, 230, 92, 10, 10) + `<rect x="168" y="214" width="30" height="40" rx="2" transform="rotate(-12 183 234)" fill="none" stroke="#6B5444" stroke-width="3"/><path d="M172 222 h22 M172 230 h22 M172 238 h22 M172 246 h22" transform="rotate(-12 183 234)" stroke="#B9AE9A" stroke-width=".6"/>`) + lab20(260, 330, p.pulp ? "Pulp in the vat" : "The vat", "#F6E3B4"));
     const bits = Array.from({ length: Math.min(7, p.scraps || 0) }, (_, i) => `<path d="M${46 + i * 8} ${300 - i % 3 * 4} l7 -10 l5 4 l-4 10z" fill="${["#FFFDF6", "#7A1F3D", "#D9B98C", "#C2505F", "#F3C969"][i % 5]}" ${O}/>`).join("");
@@ -50491,7 +50588,7 @@ ${m.from}` : ""}`;
     if (!ripe.some(Boolean)) ripe[0] = true;
     return { ripe, picked: [], oops: 0, riding: true };
   };
-  function pick4(st6, i) {
+  function pick5(st6, i) {
     if (st6.riding || st6.picked.includes(i)) return null;
     if (!st6.ripe[i]) {
       st6.oops++;
@@ -57178,7 +57275,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         if (ctSt.harvest) ctSt.harvest.riding = false;
         sfx("tap");
       } else if (a === "pick") {
-        const r = pick4(ctSt.harvest, +v);
+        const r = pick5(ctSt.harvest, +v);
         if (!r) return;
         sfx(r === "ok" ? "tap" : "paper", true);
       } else if (a === "harvestdone") {
@@ -62849,7 +62946,11 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     if (!owns3(F, "paperie")) return;
     const here = townOf(scene) === "bv_hilltown", out = paperTick(F, here);
     if (out.cls && here) setTimeout(() => speak(`The card class is done: four little cards drying on the big table, and ${out.cls} coins in the tin.`, 5e3), 800);
-    if (out.coins || out.wage || out.down) {
+    if (out.lise.length && scene === "bv_hpaper") {
+      const w = out.lise[out.lise.length - 1];
+      flash(`Lise ${w}`);
+    }
+    if (out.coins || out.wage || out.down || out.lise.length) {
       save2();
       if (scene === "bv_hpaper") {
         if (out.coins) {
@@ -62860,7 +62961,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         drawScene();
       } else if (!here && out.coins > 20 && Date.now() - (S3.paperSaid || 0) > 36e5) {
         S3.paperSaid = Date.now();
-        setTimeout(() => speak(`A note from Lise: the paperie took ${out.coins} coins${out.wage ? ` (her wage, ${out.wage}, already out)` : ""}.`, 5e3), 2500);
+        setTimeout(() => speak(`A note from Lise: the paperie took ${out.coins} coins${out.wage ? ` (her wage, ${out.wage}, already out)` : ""}${out.lise.some((l) => /^hung/.test(l)) ? `, and she's hung ${out.lise.filter((l) => /^hung/.test(l)).length * 6} new sheets on the line` : ""}.`, 5e3), 2500);
       }
     }
   }
