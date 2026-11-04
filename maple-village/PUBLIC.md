@@ -509,3 +509,15 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   no village door (the barrel shed and the loft) never try to leave by one. Here the walking bounds already kept you
   above that line, so it didn't crash, but the guard matches the source. A dev-only `__hbGo(id, x, y)` test hook, and
   two checks in the round 308 block (walk to the bottom of each room: no crash, still inside).
+
+## Rounds 311 and 312 (ported): Lise makes paper too, a longer drying line, and steadier tests
+
+- game/paperie.js: `liseStep` runs inside `paperTick` while Lise is in, one back-room step a minute (hang, press, add-in
+  or plain, pull, beat in a colour, tear scraps), each waiting `LISE_WAIT` (5) minutes after the batch was last touched
+  (`p.touched`). `liseColour`/`liseAdd` pick by weight with seasonal leanings, only what the till can pay for, never the
+  last combination; pigment and jars come from your coins, never the backpack, and she buys no scraps (`beat` lets the
+  free colour through when coins are negative). `liseToday` on the till; `out.lise` lines flash in core's `paperNow`.
+- `LINE` is 8 batches (48 sheets), drawn as two strings in art/paperie-room.js.
+- test/smoke.mjs: every reload of a game page waits 700 ms for the stub cloud save first; `TEST_SLOW=3` stretches waits
+  on a slow machine; the vineyard and wine club tests let the save settle and tap again if a panel didn't open.
+- Test: "Lise makes paper too: every stage, her own colours and add-ins (round 311)", on the player's own clock.

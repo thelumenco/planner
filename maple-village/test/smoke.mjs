@@ -23,6 +23,20 @@ execSync("node build.mjs --dev --once", { cwd: root, stdio: "inherit" });
 const shots = join(root, "test/shots"); mkdirSync(shots, { recursive: true });
 const url = pathToFileURL(join(root, "dist/dev.html")).href;
 const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || undefined });
+// round 312 (ported): the game pushes its save to the (stub) cloud copy half a second after each change; a reload sooner
+// than that can load the older copy. Every reload of a page that has the game open waits for the push first.
+{ const p0 = await browser.newPage(), P = Object.getPrototypeOf(p0), go0 = P.goto; await p0.close();
+  P.goto = async function(u, o){ if (/^file:/.test(this.url())) await this.waitForTimeout(700); return go0.call(this, u, o); }; }
+// round 312: on a slow machine set TEST_SLOW=3 and every fixed pause and timeout in the tests stretches to match; at the
+// default (1) nothing changes
+const SLOW = +(process.env.TEST_SLOW || 1);
+if (SLOW !== 1) { const p0 = await browser.newPage(), P = Object.getPrototypeOf(p0), w0 = P.waitForTimeout, ws = P.waitForSelector, wf = P.waitForFunction; await p0.close();
+  const st = o => o && o.timeout ? {...o, timeout: o.timeout*SLOW} : o;
+  P.waitForTimeout = function(ms){ return w0.call(this, ms*SLOW); };
+  P.waitForSelector = function(sel, o){ return ws.call(this, sel, st(o)); };
+  P.waitForFunction = function(fn, arg, o){ return wf.call(this, fn, arg, st(o)); };
+  const B = Object.getPrototypeOf(browser), bnp = B.newPage;
+  B.newPage = async function(...a){ const pg = await bnp.apply(this, a); pg.setDefaultTimeout(30000*SLOW); return pg; }; }
 // Most checks expect a reload to start at home base: pages opt out of "pick up where you left off" (core.js F.where)
 // unless they ask for it with newPage({resume: true}).
 // Pages are tracked so a section that throws before its page.close() doesn't leave its page open for the rest of the
@@ -810,11 +824,12 @@ if (want("\nthe vineyard")) try {
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click");   // round 308: into the barrel shed, then the crates
   await page.waitForSelector('#ctx [data-vy="fill"][data-k="rose"]:not([disabled])', { timeout: 20000 }); await page.click('#ctx [data-vy="fill"][data-k="rose"]');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.barrels[0].style === "rose"), "and go into a barrel to ferment as a rosé");
-  await page.goto(url + "?seed=1&time=17:20&ripen=1"); await page.waitForTimeout(800);
-  await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
+  await page.waitForTimeout(1200); await page.goto(url + "?seed=1&time=17:20&ripen=1"); await page.waitForTimeout(800);
+  if (!/vineyard/i.test(await page.locator("#sceneName").textContent())) await page.locator('#world [data-place="toVine"]').dispatchEvent("click");   // round 312: the reload may already be in the vineyard
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click");
-  await page.waitForSelector('#vyName0', { timeout: 20000 });
+  for (let i = 0; i < 3 && !(await page.waitForSelector('#vyName0', { timeout: 8000 }).catch(() => null)); i++) await page.locator('#world [data-vsspot="crates"]').dispatchEvent("click");   // round 312: tap the crates again if still walking in
+  await page.waitForSelector('#vyName0', { timeout: 5000 });
   const ph = await page.locator('#vyName0').getAttribute("placeholder"); await page.click('#ctx [data-vy="suggest"]'); await page.waitForTimeout(300);
   const sug = await page.locator('#vyName0').inputValue();
   check(ph && sug && ph !== "Name it" && sug !== ph && sug.length > 3, `a ready barrel suggests names (${ph}; ${sug})`);
@@ -1257,8 +1272,8 @@ if (want("\nbig goals")) try {
   await page.addInitScript(() => { if (!/clubpatch/.test(location.search)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     f.vine = f.vine || {}; f.vine.shelf = [{id: "c1", name: "Club Red", type: "red", n: 40, price: 18, open: 0}]; f.vine.lastTick = Date.now() - 100*60e3; f.vine.box = 0;
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
-  await page.goto(url + "?seed=1&time=19:40&date=2026-11-06&clubpatch=1"); await page.waitForTimeout(2500);
-  check(await gf().then(f => f.vine.shelf[0].n < 40 && f.vine.box > 0), "the wine club buys bottles and glasses off the shop's shelves");
+  await page.waitForTimeout(1200); await page.goto(url + "?seed=1&time=19:40&date=2026-11-06&clubpatch=1"); await page.waitForTimeout(2500);   // round 312: let the save settle first
+  check(await gf().then(f => (f.vine.shelf[0] ? f.vine.shelf[0].n : 0) < 40 && f.vine.box > 0), "the wine club buys bottles and glasses off the shop's shelves");
   await page.evaluate(() => window.__hbScene("cellar")); await page.waitForTimeout(1500);
   check(await page.locator("#actors .npc").count() >= 6, "the wine club gathers in the cellar door");
   await page.locator('#world [data-spot="flight"]').dispatchEvent("click"); await page.waitForTimeout(2500);
@@ -5450,6 +5465,30 @@ if (want("\nThe barrel shed and the drying loft as rooms (round 308)")) try {
   await page.evaluate(() => window.__hbScene("cellar")); await page.waitForTimeout(1000);
   check(await page.evaluate(() => { const w = document.getElementById("world").innerHTML; return /1 ready/.test(w) && w.includes("#E8D57A") && w.includes("#7A1F3D"); }), "barrels bought for the cellar sit on its racks, stamped in their wine's colour, with how many are ready");
   await page.close();
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nLise makes paper too: every stage, her own colours and add-ins (round 311)")) try {
+  console.log("\nLise makes paper too: every stage, her own colours and add-ins (round 311)");
+  const pp = await import(new URL("../src/game/paperie.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url));
+  const F = {coins: 500, goals: {paperie: 1, paperkeeper: 1}, inv: {bq_lavender: 3}}, p = pp.paperState(F), wed = Date.parse("2026-10-14T10:00:00Z") - (await import(new URL("../src/util.js", import.meta.url))).LOC();   // Wednesday 10am, the player's own clock
+  p.scraps = 4; p.at = wed; let rnd = Math.random; Math.random = () => .99;
+  let out = pp.paperTick(F, false, wed + 3*3600e3); Math.random = rnd;   // till 1pm, you at home
+  const kinds = p.line.map(s => s.col + "/" + s.add);
+  check(p.line.length === 2 && p.scraps === 0 && p.line.every(s => s.n === pp.BATCH) && out.lise.filter(l => /^hung/.test(l)).length === 2, `with you at home, Lise soaks, beats, adds, pulls, presses and hangs: two batches from four bundles (${kinds.join(", ")})`);
+  check(kinds[0] !== kinds[1] && F.inv.bq_lavender === 3, "she varies it (never the same sheet twice running) and leaves your backpack alone");
+  check(F.coins < 500 - pp.WAGE || kinds.every(k => k === "natural/none"), "pigment and jars come out of the till, like your own (money doesn't come easily)");
+  check(p.liseDid && p.liseDid.batches.length === 2 && /Lise has been at the vat today: 2 batches/.test(pp.liseToday(F, "2026-10-14")) && it.ITEMS[p.liseDid.batches[0]], "the till says what she's made today");
+  // she gives you first go: a fresh step waits five minutes
+  const G = {coins: 100, goals: {paperie: 1, paperkeeper: 1}, inv: {}}, q = pp.paperState(G); q.scraps = 2; pp.startSoak(G, wed);
+  q.soak.done = wed; check(pp.liseStep(G, wed + 2*60e3, "2026-10-14") === null && G.paperie.soak, "she leaves a step you've just done for five minutes");
+  check(/^beat the pulp/.test(pp.liseStep(G, wed + 6*60e3, "2026-10-14") || "") && q.pulp && !q.soak, "then she picks it up: beats the soft scraps in a colour of her choosing");
+  // short of coins: natural and plain
+  const H = {coins: 0, goals: {paperie: 1, paperkeeper: 1}, inv: {}}, h = pp.paperState(H); h.scraps = 2; h.at = wed; pp.paperTick(H, false, wed + 2*3600e3);
+  check(h.line.length === 1 && h.line[0].col === "natural" && h.line[0].add === "none", "with nothing in the till she makes plain natural sheets");
+  // the season leans her choices, and the line holds eight batches
+  let blush = 0; Math.random = () => .2; for (let i = 0; i < 5; i++) if (pp.liseColour({coins: 50, paperie: {}}, "2026-02-10") === "blush") blush++; Math.random = rnd;
+  check(blush === 5 && pp.LINE === 8 && pp.LINE*pp.BATCH === 48, "blush for Valentine's; the drying line holds eight batches, 48 sheets (round 312)");
+  const J = {coins: 500, goals: {paperie: 1, paperkeeper: 1}, inv: {}}, j = pp.paperState(J); j.scraps = 20; j.line = Array.from({length: 6}, () => ({col: "natural", add: "none", n: 6, done: wed + 864e5})); j.at = wed; pp.paperTick(J, false, wed + 7*3600e3);
+  check(j.line.length === pp.LINE && j.press && j.scraps < 20, "a full day: she fills the line (eight batches), the next waits pressed until the line has room");
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");

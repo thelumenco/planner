@@ -3218,8 +3218,9 @@ function deliver(w){
 function paperNow(){
   if (!owns(F, "paperie")) return; const here = townOf(scene) === "bv_hilltown", out = PP.paperTick(F, here);
   if (out.cls && here) setTimeout(() => speak(`The card class is done: four little cards drying on the big table, and ${out.cls} coins in the tin.`, 5000), 800);
-  if (out.coins || out.wage || out.down) { save(); if (scene === "bv_hpaper") { if (out.coins) { sfx("coin"); flash(`+${out.coins}: ${out.n ? `${out.n} sheet${out.n === 1 ? "" : "s"} of paper` : "the paperie"}`); } if (ppView) ctx(); drawScene(); }
-    else if (!here && out.coins > 20 && Date.now() - (S.paperSaid || 0) > 3600e3) { S.paperSaid = Date.now(); setTimeout(() => speak(`A note from Lise: the paperie took ${out.coins} coins${out.wage ? ` (her wage, ${out.wage}, already out)` : ""}.`, 5000), 2500); } }
+  if (out.lise.length && scene === "bv_hpaper") { const w = out.lise[out.lise.length - 1]; flash(`Lise ${w}`); }
+  if (out.coins || out.wage || out.down || out.lise.length) { save(); if (scene === "bv_hpaper") { if (out.coins) { sfx("coin"); flash(`+${out.coins}: ${out.n ? `${out.n} sheet${out.n === 1 ? "" : "s"} of paper` : "the paperie"}`); } if (ppView) ctx(); drawScene(); }
+    else if (!here && out.coins > 20 && Date.now() - (S.paperSaid || 0) > 3600e3) { S.paperSaid = Date.now(); setTimeout(() => speak(`A note from Lise: the paperie took ${out.coins} coins${out.wage ? ` (her wage, ${out.wage}, already out)` : ""}${out.lise.some(l => /^hung/.test(l)) ? `, and she's hung ${out.lise.filter(l => /^hung/.test(l)).length*6} new sheets on the line` : ""}.`, 5000), 2500); } }
 }
 // round 185: wrapping (the paperie's ribbon rack, the gift shop's wrapping table)
 function wireWrap(c){

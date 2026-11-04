@@ -36,9 +36,11 @@ export function paperRoomArt(){
   const shelf = spot("pp_shelf", 110, 270, "The paper shelves", hovE(110, 205, 90, 10), sk(`<rect x="24" y="40" width="172" height="152" rx="3" style="fill:#8A6A52"/>${[0, 1, 2].map(r => `<rect x="28" y="${92 + r*44}" width="164" height="5" style="fill:#6B5444"/>`).join("")}`, `<rect x="24" y="40" width="172" height="152" rx="3"/>`)
     + g(stacks || "") + lab(110, 220, stock.length ? "Paper shelves" : "Empty shelves", "#F6E3B4"));
   // the drying line, back wall right: each batch's sheets pegged up, darker while damp
-  const sheets = (p.line || []).slice(0, 4).flatMap((s, b) => [0, 1, 2].map(k => { const x = 222 + b*70 + k*20, dry = s.done <= t;
-    return dry ? iconAt(`pp_${s.col}_${s.add}`, x + 8, 92, 26) : `<rect x="${x}" y="80" width="17" height="24" fill="${WET[s.col]}" ${O}/>${flecksIn(s.add, x + 2, 82, 13, 20, 3)}`; })).join("");
-  const line = spot("pp_line", 380, 268, "The drying line", hovE(360, 205, 130, 10), g(`<path d="M214 70 Q360 84 506 70" fill="none" stroke="#5A4636" stroke-width="1.2"/>${Array.from({length: 12}, (_, i) => `<rect x="${224 + i*23}" y="72" width="3" height="7" fill="#C9A27E"/>`).join("")}`) + g(sheets)
+  // round 312: two strings now, four batches on each (eight in all)
+  const sheets = (p.line || []).slice(0, 8).flatMap((s, i) => [0, 1, 2].map(k => { const b = i % 4, dy = i < 4 ? 0 : 50, x = 222 + b*70 + k*20, dry = s.done <= t;
+    return dry ? iconAt(`pp_${s.col}_${s.add}`, x + 8, 92 + dy, 26) : `<rect x="${x}" y="${80 + dy}" width="17" height="24" fill="${WET[s.col]}" ${O}/>${flecksIn(s.add, x + 2, 82 + dy, 13, 20, 3)}`; })).join("");
+  const strings = [0, 50].map(dy => `<path d="M214 ${70 + dy} Q360 ${84 + dy} 506 ${70 + dy}" fill="none" stroke="#5A4636" stroke-width="1.2"/>${Array.from({length: 12}, (_, i) => `<rect x="${224 + i*23}" y="${72 + dy}" width="3" height="7" fill="#C9A27E"/>`).join("")}`).join("");
+  const line = spot("pp_line", 380, 268, "The drying line", hovE(360, 205, 130, 10), g(strings) + g(sheets)
     + lab(360, 220, "Drying line", "#E6DCF3"));
   // the vat, back middle: water, or the pulp in its colour with the add-in through it, and the mould and deckle
   const pulp = p.pulp ? COL[p.pulp.col] : p.wet ? "#D9E6EA" : "#C9DEE6", padd = p.pulp ? p.pulp.add : null;
