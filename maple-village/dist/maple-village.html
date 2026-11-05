@@ -22746,17 +22746,21 @@ ${r.n}`;
   var vy = { name: {} };
   var GRAPE_COL = { priory: "#3A1428", red: "#7A2E5A", white: "#C9D98A", tempranillo: "#3A2050", pinot: "#4A2A4E", chardonnay: "#D9D27A" };
   var grapePic = (c) => `<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">${[[9, 8], [15, 8], [12, 12], [6, 12], [18, 12], [9, 16], [15, 16], [12, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="${GRAPE_COL[c] || "#C9D98A"}" stroke="#3A2E28" stroke-width="1"/>`).join("")}<path d="M12 5 V2" stroke="#3A2E28" stroke-width="1.2"/></svg>`;
-  function barrelPanel(F2) {
+  function grapePanel(F2) {
     const v = vineState(F2);
-    let h3 = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles.</p>`;
-    if (F2.towns && F2.towns.cinque) h3 += `<div class="actions"><button class="btn alt small" data-loft="1">Up the ladder to the drying loft</button></div>`;
-    h3 += `<p class="eyebrow">The grape crates</p><ul class="hlist wlist orflowers grcrates">${grapeKinds(v).map((c) => {
+    let h3 = `<span class="tape stripe" aria-hidden="true"></span><h2>The grape crates</h2><p class="sub">Picked grapes wait here. Take some for the Scoop Shack or the drying loft, or leave them for the barrels.</p>`;
+    h3 += `<ul class="hlist wlist orflowers grcrates">${grapeKinds(v).map((c) => {
       const back = (F2.inv || {})["grape_" + c] || 0;
       return `<li><span class="wpic">${grapePic(c)}</span><span class="wtxt"><b>${v.grapes[c]} ${c} bunch${v.grapes[c] === 1 ? "" : "es"}</b><small>${v.help.barrels ? `Marco keeps ${v.keep[c] || 0} back for you` : "picked and waiting"}</small></span>
       <span class="orbtns"><button class="btn small primary" data-vy="takegr" data-k="${c}" data-n="1" ${v.grapes[c] ? "" : "disabled"}>Take 1</button><button class="btn small alt" data-vy="takegr" data-k="${c}" data-n="99" ${v.grapes[c] ? "" : "disabled"}>All</button>${back ? `<button class="btn small alt" data-vy="putgr" data-k="${c}">Put back ${back}</button>` : ""}</span>
       ${v.help.barrels ? `<span class="grkeep"><span>Keep back from the barrels</span><span class="gstep"><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="-1" aria-label="Keep fewer back">−</button><b>${v.keep[c] || 0}</b><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="1" aria-label="Keep more back">+</button></span></span>` : ""}</li>`;
     }).join("")}</ul>
-    <p class="muted">Grapes you take go in your backpack (for gelato at the Scoop Shack).${v.help.barrels ? " Marco fills empty barrels only from bunches beyond what you keep back." : ""}</p><div class="vbarrels">`;
+    <p class="muted">Grapes you take go in your backpack (for gelato at the Scoop Shack).${v.help.barrels ? " Marco fills empty barrels only from bunches beyond what you keep back." : ""}</p>`;
+    return h3 + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
+  function barrelPanel(F2) {
+    const v = vineState(F2);
+    let h3 = `<span class="tape stripe" aria-hidden="true"></span><h2>The wines</h2><p class="sub">Three bunches from the crates make a barrel; a barrel makes ${BOTTLES} bottles.</p><div class="vbarrels">`;
     v.barrels.forEach((b, i) => {
       const ph = !b ? "empty" : barrelLeft(b) ? b.style === "sparkling" && b.stage === 2 ? "bubbles" : "ferment" : b.style === "sparkling" && b.stage === 1 ? "await2" : "ready";
       if (i === BARRELS.shed) h3 += `</div><p class="eyebrow">On the racks in the cellar</p><div class="vbarrels">`;
@@ -47057,7 +47061,7 @@ ${m.from}` : ""}`;
     const L3 = loftState(F2), inv = F2.inv = F2.inv || {};
     if (!loftOpen(F2) || !LOFT[k] || missing(F2, k).length) return null;
     const isRack = /^rack/.test(k), isTray = /^tray/.test(k);
-    if (isRack && (!canRaisin(F2) || L3[k] || L3[LOFT[k].then])) return null;
+    if (isRack && (!canRaisin(F2) || L3[k])) return null;
     if (k === "pesto") {
       if (!canPesto(F2)) return null;
       Object.entries(LOFT.pesto.need).forEach(([id, n]) => take2(inv, id === "cheese" ? cheeseOf(inv) : id, n));
@@ -47087,9 +47091,11 @@ ${m.from}` : ""}`;
     const L3 = loftState(F2), b = L3[k];
     if (!b || left5(b, now5, LOFT[k].days)) return null;
     if (/^rack/.test(k)) {
+      const own = LOFT[k].then, c = !L3[own] ? own : ["cask", "cask2"].find((x) => !L3[x]);
+      if (!c) return { wait: true };
       L3[k] = null;
-      L3[LOFT[k].then] = { at: now5 };
-      return { cask: true };
+      L3[c] = { at: now5 };
+      return { cask: c };
     }
     const [id, n] = LOFT[k].gives;
     L3[k] = null;
@@ -56035,7 +56041,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     else if (kView === "mull" && scene === "kitchen") h3 = mullPanel(F, vineState(F), mullSt);
     else if (kView && scene === "kitchen") h3 = kView === "oven" ? ovenPanel(F) : kView === "press" ? pressPanel(F) : kView === "stove" ? stovePanel(F, dayKey()) : larderPanel(F);
     else if (loftView && (scene === "vineyard" || scene === "vshed" || scene === "vloft")) h3 = loftPanel(F);
-    else if (vyView && (scene === "vineyard" || scene === "vshed" || scene === "lowervine" || scene === "wineshop" || scene === "cellar")) h3 = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "mcrate" ? wineCratePanel(F, dayKey()) : vyView === "shelf" ? shelfPanel(F) : vyView === "cellar" ? cellarPanel(F) : vyView === "menu" ? menuPanel2(F, dayKey()) : vyView === "counter" ? counterPanel2(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter((n) => n.id !== "celeste" && isHere(n.id)).map((n) => n.name), dayKey());
+    else if (vyView && (scene === "vineyard" || scene === "vshed" || scene === "lowervine" || scene === "wineshop" || scene === "cellar")) h3 = vyView === "olive" ? olivePanel(F) : vyView === "grove" ? grovePanel(F) : vyView === "vine" ? vinePanel(F, vyAt.r, vyAt.i) : vyView === "stall" ? stallPanel(F) : vyView === "grapes" ? grapePanel(F) : vyView === "barrels" ? barrelPanel(F) : vyView === "mcrate" ? wineCratePanel(F, dayKey()) : vyView === "shelf" ? shelfPanel(F) : vyView === "cellar" ? cellarPanel(F) : vyView === "menu" ? menuPanel2(F, dayKey()) : vyView === "counter" ? counterPanel2(F, serving(), whereIs("celeste") === "wineshop") : vyView === "box" ? boxPanel(F) : cafePanel(F, NPCS.filter((n) => n.id !== "celeste" && isHere(n.id)).map((n) => n.name), dayKey());
     else if (kudosOpen && scene === "trophy") h3 = kudosPanel();
     else if (trophyView && scene === "trophy") h3 = trophyView === "book" ? bookPanel(F, onPedestals(F).length < PEDESTALS) : trophyView === "affirm" ? affirmPanel(F.affirm, affirmBusy, !!sampleCap) : trophyView === "fountain" ? fountainPanel(!!sampleCap) : pedestalPanel(onPedestals(F)[+trophyView.slice(3)], nextUp(trophyCtx()), true);
     else if (routOpen && scene === "room") h3 = routinesPanel();
@@ -57831,6 +57837,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       const [a, k] = b.dataset.lf.split(":");
       loftAct(a, k);
       ctx();
+      drawScene();
     });
     c.querySelectorAll("[data-jj]").forEach((b) => b.onclick = () => {
       const [a, v] = b.dataset.jj.split(":"), evanOn = inParty(F, "evan") && !evanNight(), ev = (l, d = 1600) => {
@@ -59365,11 +59372,15 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     }
     if (a === "collect") {
       const r = collect2(F, k);
+      if (r && r.wait) {
+        speak("Raisins, ready, but both casks are still full of raisin wine. They'll keep on the rack until a cask's free.", 5e3);
+        return false;
+      }
       if (!r) return false;
       sfx("chime");
       gainXp(2);
       act("cheer");
-      if (r.cask) speak("The grapes have shrivelled into sweet little raisins. Pressed, and into the cask for four days.", 5e3);
+      if (r.cask) speak(`The grapes have shrivelled into sweet little raisins. Pressed, and into ${r.cask === "cask2" ? "the second cask" : "the cask"} for four days.`, 5e3);
       else {
         flash(`${r.n} × ${ITEMS[r.id].n.toLowerCase()}`);
         speak(r.id === "w_raisin" ? `${r.n} bottles of amber raisin wine, sticky and sweet. Six days of waiting, and worth every one.` : `${ITEMS[r.id].n}, ready. Into the backpack.`, 5e3);
@@ -61566,7 +61577,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
           return;
         }
         if (k === "bench" && isHere("marco")) npcSay("marco", pick(["Tell me how many bunches to keep back for you, and I'll fill the rest.", "Every barrel gets a name. Your job, not mine.", "Smell that? That's next year's wine."]));
-        vyView = "barrels";
+        vyView = k === "crates" ? "grapes" : "barrels";
         sfx("paper", true);
         render();
         return;
@@ -61589,14 +61600,10 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         const t2 = left5(L3[ki], Date.now(), LOFT[ki].days);
         if (!t2) {
           loftAct("collect", ki);
-          render();
+          render(true);
           return;
         }
         speak(`${/^cask/.test(ki) ? "Raisin wine, ageing in the cask" : /^rack/.test(ki) ? "Six bunches, slowly turning to raisins" : /^tray/.test(ki) ? "Raisins drying on the tray" : ki === "lemon" ? "The limoncino, steeping" : "Anchovies in their salt"}: ready in ${VS_HRS(t2).replace("h", " hours").replace("d", " days")}.`, 4500);
-        return;
-      }
-      if (/^rack/.test(ki) && L3[LOFT[ki].then]) {
-        speak("This rack's cask is still full: bottle the raisin wine first.", 4e3);
         return;
       }
       const miss = missing(F, ki);
@@ -61605,7 +61612,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         return;
       }
       loftAct("start", ki);
-      render();
+      render(true);
     });
   }
   var TOWER_AT = {

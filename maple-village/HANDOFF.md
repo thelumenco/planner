@@ -2964,3 +2964,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Round 313: raisins dry while the casks age, the loft redraws at once, and the shed's panel split in two
 - Mel: "I should be able to dry some while some are in the cask"; "Things don't appear immediately eg grapes on the racks or raisins in the tray"; "The current list of wines and grapes and up the ladder to drying loft is too confusing. It should be one modal for grapes. One modal for the wines."
 - loft.js: racks start while casks age; a dry rack fills its own cask, else the other free one, else waits (`{wait: true}`). core.js: loft taps `render(true)`, `[data-lf]` buttons `drawScene()`. vineyard.js: `grapePanel` (crates, `vyView "grapes"`) and `barrelPanel` ("The wines"), no ladder button. Port doc section 18 has the details.
+
+## Build v244 (round 313) published at Mel's say-so without a fully green run
+- Run 259 on the slow container: all the round 313 checks passed; it failed on the wine club (also red in run 254, before round 313) and the Kyoto ticket button (disabled once; the Cinque Terre block hit the same and passed twice on rerun). Still to do on a normal-speed machine: one full green run.
