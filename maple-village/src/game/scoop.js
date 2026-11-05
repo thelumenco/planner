@@ -25,7 +25,12 @@ export const OPEN = 10*60, CLOSE = 20*60, TUB = 20;
 // an hour in all; it holds two batches at once (s.churn: [{id, done, isNew}])
 export const CHURN_MIN = 60, CHURNS = 2;
 const clock = () => Date.now() + (globalThis.__mapleOffset || 0);
-export const churnFull = s => s.churn.length >= CHURNS;
+// round 314 (Mel: "Can I get a bigger churner/mixer for ice cream as an upgrade. Can churn more at once"): the big
+// churner upgrade holds four batches at once instead of two
+export const BIG_CHURNS = 4;
+export const churnCap = s => s.up && s.up.bigchurn ? BIG_CHURNS : CHURNS;
+const capWord = s => ["", "one", "two", "three", "four"][churnCap(s)] || String(churnCap(s));
+export const churnFull = s => s.churn.length >= churnCap(s);
 export const churnLeft = b => { const m = Math.max(0, Math.ceil((b.done - clock())/60000)); return m >= 60 ? `${Math.floor(m/60)}h ${m % 60}m` : `${m} min`; };
 // batches whose time is up go into the freezer (and the display, if it's arranged and has room) -> the recipes done
 export function finishChurn(s, t = clock()){
@@ -116,6 +121,7 @@ export const UPGRADES = {
   awning: {n: "Striped awning and fairy lights", price: 250, line: "A pink striped awning over the deck, strung with fairy lights that glow in the evenings. Customers linger, and leave tips."},
   neon: {n: "Neon cone sign", price: 350, line: "A pink neon cone by the door. It glows from 5pm, so more people find you in the evenings."},
   bike: {n: "Delivery bike", price: 800, line: "A mint delivery bike with a cool box, for all three shops. From 10am to 10pm Tomo pedals villagers' orders round: ice creams from here, chocolates from the Cocoa Room, tapas, small plates and bottles from the winery (late-night suppers too). And you can send something to the family from anywhere."},
+  bigchurn: {n: "A bigger churner", price: 900, line: "A big stainless churner with four bowls, so four tubs can blend and freeze at once instead of two. Each one still takes an hour."},
   dip: {n: "Chocolate dip station", price: 500, line: "A little room off the shop: warm pots of chocolate and a shelf of toppings. Cones and waffles can be dipped and topped (customers pay a bit extra), and you can make your own. Comes with milk chocolate and rainbow sprinkles; more dips and toppings to buy."}
 };
 export const DIPS = {
@@ -147,6 +153,7 @@ export function buyUpgrade(F, k){
     awning: "The striped awning's up over the deck, fairy lights and all. Wait till you see it at dusk.",
     neon: "The neon cone's on the wall by the door. It switches on at 5pm.",
     bike: "A mint delivery bike, parked by the shop. Villagers order from the Scoop Shack, the Cocoa Room and the winery, 10am to 10pm (late-night suppers from the winery), and Tomo pedals it round.",
+    bigchurn: "The big churner's in, humming away behind the counter: four bowls, four tubs at a time.",
     dip: "The chocolate dip station's open! Through the new door on the shop's east wall."}[k];
 }
 export function buyDip(F, k){ const s = scoopState(F), d = DIPS[k]; if (!d || d.house || s.dips[k] || F.coins < d.price) return false; F.coins -= d.price; s.dips[k] = 1; return true; }
@@ -200,7 +207,7 @@ export function discover(F, ings){
   if (!ings.length) return {msg: "Pick something from the fridge to mix."};
   const known = knownRecipe(s, ings); if (known) return {known, msg: `You already know this one: ${known.name}. Make another tub of it instead.`};
   if (!hasAll(s, ings)) return {msg: "The fridge is missing some of that."};
-  if (churnFull(s)) return {msg: `The churner's full: two batches are blending and freezing. The next one's ready in ${churnLeft(s.churn[0])}.`};
+  if (churnFull(s)) return {msg: `The churner's full: ${capWord(s)} batches are blending and freezing. The next one's ready in ${churnLeft(s.churn[0])}.`};
   useAll(s, ings);
   const r = {id: keyOf(ings), ings: [...ings].sort(), name: nameFor([...ings].sort()), col: blend(ings), dairy: isDairy(ings), special: ings.some(i => ADULT.includes(i)), found: Date.now()};   // grown-up flavours sell for the special's extra
   s.recipes.push(r); toChurn(s, r.id, true); registerItems(F);
@@ -474,8 +481,8 @@ export function benchPanel(F, st){
 // what's in the churner, and when it'll be ready
 export function churnLine(s){
   finishChurn(s);
-  if (!s.churn.length) return `<p class="muted">The churner's free: a tub takes an hour to blend and freeze, two at a time.</p>`;
-  return `<p class="eyebrow" style="margin:10px 0 6px">In the churner (${s.churn.length} of ${CHURNS})</p><ul class="hlist">${s.churn.map(b => { const r = recipeOf(s, b.id); return r ? `<li>${dot(r.col)} <b>${esc(r.name)}</b> <small class="muted">${b.isNew ? "new! " : ""}ready in ${churnLeft(b)}</small></li>` : ""; }).join("")}</ul>`;
+  if (!s.churn.length) return `<p class="muted">The churner's free: a tub takes an hour to blend and freeze, ${capWord(s)} at a time.</p>`;
+  return `<p class="eyebrow" style="margin:10px 0 6px">In the churner (${s.churn.length} of ${churnCap(s)})</p><ul class="hlist">${s.churn.map(b => { const r = recipeOf(s, b.id); return r ? `<li>${dot(r.col)} <b>${esc(r.name)}</b> <small class="muted">${b.isNew ? "new! " : ""}ready in ${churnLeft(b)}</small></li>` : ""; }).join("")}</ul>`;
 }
 // the recipe book on the kitchen wall: every flavour Mel knows, how much is left, and another tub at a tap
 export function recipePanel(F){

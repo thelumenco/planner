@@ -2275,6 +2275,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
+  { // round 314: a bigger churner, four tubs at once
+    const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), F = {coins: 1000}, s = sc.scoopState(F), t = Date.now() + 3600e3;
+    s.churn = [{id: "a", done: t}, {id: "b", done: t}];
+    check(sc.churnFull(s) && sc.churnCap(s) === 2 && /2 of 2/.test(sc.churnLine(s)), "the churner holds two tubs at once");
+    const said = sc.buyUpgrade(F, "bigchurn");
+    check(said && F.coins === 1000 - sc.UPGRADES.bigchurn.price && sc.UPGRADES.bigchurn.price >= 900 && !sc.churnFull(s) && sc.churnCap(s) === 4 && /2 of 4/.test(sc.churnLine(s)) && !sc.buyUpgrade(F, "bigchurn"), "the bigger churner (an upgrade, 900 coins) holds four");
+    s.churn.push({id: "c", done: t}, {id: "d", done: t}); check(sc.churnFull(s), "and is full at four"); }
   { const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), s = sc.scoopState({}), d = "2026-10-10";
     s.recipes = [{id: "m", ings: ["mango"], name: "Mango Sorbet", col: "#F8D59A"}]; s.tubs = {m: 4};
     const low = sc.scoopNews(s, d, 12*60), again = sc.scoopNews(s, d, 12*60 + 5); s.tubs = {}; const out = sc.scoopNews(s, d, 13*60);
@@ -2295,7 +2302,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.locator('#world [data-place="hfreezer"]').count() === 0 && await page.locator('#world [data-place="dbike"]').count() === 0, "before any upgrades, no honesty freezer or bike on the bay");
   await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="gupgrades"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gbuy]", { timeout: 15000 });
-  check(await page.locator("#ctx [data-gbuy]").count() === 5, "the catalogue in the shop lists five upgrades");
+  check(await page.locator("#ctx [data-gbuy]").count() === 6, "the catalogue in the shop lists six upgrades (the bigger churner since round 314)");
   for (const k of ["honesty", "awning", "neon", "bike", "dip"]) { await page.evaluate(() => { document.querySelector("#ctx [data-close]")?.click(); });
     await page.locator('#world [data-spot="gupgrades"]').dispatchEvent("click"); await page.waitForSelector(`#ctx [data-gbuy="${k}"]`, { timeout: 15000 }); await page.click(`#ctx [data-gbuy="${k}"]`); await page.waitForTimeout(300); }
   const f1 = await fox();

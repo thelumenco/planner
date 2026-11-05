@@ -202,6 +202,11 @@ HANDOFF.md rounds 311 and 312. Port this if this edition has the paperie and its
 - Round 312: the drying line holds `LINE` = 8 batches of 6 (48 sheets), drawn as two strings of four in `art/paperie-room.js` (the second string 50 down). With the keeper working, the line and the scraps are the limits.
 - Test: "Lise makes paper too: every stage, her own colours and add-ins (round 311)".
 
+### 20. A bigger churner for the Scoop Shack (round 314)
+HANDOFF.md round 314. Port it if this edition has the Scoop Shack and its upgrades catalogue.
+- `game/scoop.js`: a sixth upgrade, `bigchurn` ("A bigger churner", 900 coins, with a line in `buyUpgrade`). `churnCap(s)` is `BIG_CHURNS` (4) with it, else `CHURNS` (2); `churnFull` uses it, and the "churner's full" message and `churnLine` say the right number ("four at a time", "In the churner (2 of 4)"). Each tub still takes an hour.
+- Tests: the Scoop Shack upgrades block counts six upgrades; a unit check "the bigger churner (an upgrade, 900 coins) holds four".
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.
@@ -217,6 +222,7 @@ Port these smoke-test blocks:
 - "Inside the lighthouse (round 297)", plus the changed checks listed in section 12
 - "Seashells, one at a time, and the chocolate steps (round 299)", plus the changed checks HANDOFF.md round 299 lists, for the parts you ported
 - the changed check in "The paperie in Montrose (round 183)" (section 14)
+- the round 314 checks in "Scoop Shack upgrades" and the bigger churner unit checks (section 20)
 - "Lise makes paper too: every stage, her own colours and add-ins (round 311)" (section 19)
 - "Happenings: storms, the wine, the critic and coach parties (round 303)" and "Happenings: big orders and upkeep (round 304)" (section 16)
 - "Festival chocolates you can see and give (round 305)" and the changed "rainy days" check (section 17)

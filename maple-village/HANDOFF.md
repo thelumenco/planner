@@ -2967,3 +2967,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Build v244 (round 313) published at Mel's say-so without a fully green run
 - Run 259 on the slow container: all the round 313 checks passed; it failed on the wine club (also red in run 254, before round 313) and the Kyoto ticket button (disabled once; the Cinque Terre block hit the same and passed twice on rerun). Still to do on a normal-speed machine: one full green run.
+
+## Round 314: a bigger churner (Mel: "Can I get a bigger churner/mixer for ice cream as an upgrade. Can churn more at once")
+- scoop.js: upgrade `bigchurn` (900 coins): `churnCap(s)` 4 instead of 2; messages and `churnLine` use the cap. Tests: six upgrades in "Scoop Shack upgrades", and unit checks before the round 2278 scoop block. Port doc section 20.
