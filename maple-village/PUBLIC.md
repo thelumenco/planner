@@ -521,3 +521,15 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
 - test/smoke.mjs: every reload of a game page waits 700 ms for the stub cloud save first; `TEST_SLOW=3` stretches waits
   on a slow machine; the vineyard and wine club tests let the save settle and tap again if a panel didn't open.
 - Test: "Lise makes paper too: every stage, her own colours and add-ins (round 311)", on the player's own clock.
+
+## Round 313 (ported): one panel for grapes, one for wines, and raisins dry while the casks age
+
+- game/vineyard.js: `barrelPanel` split in two. `grapePanel` ("The grape crates": take, put back, keep back) opens from
+  the crates in the barrel shed; `barrelPanel` ("The wines": barrels, riddling, cellar) opens from any barrel. The
+  "Up the ladder" button is gone from the panel: the ladder in the room is the way up.
+- game/loft.js: a cane rack can start a new lot while its cask is still ageing. Finished raisins go into the rack's own
+  cask, or the other cask if that one's free; if both are full they wait on the rack (`{wait: true}`).
+- game/core.js: `vyView = "grapes"` for the crates; the "both casks are full" line; "into the second cask" wording;
+  the loft redraws straight away after a start or collect (`render(true)`, `drawScene()` after `[data-lf]`).
+- test/smoke.mjs: tests that fill or bottle tap barrel 1 (`b0`) instead of the crates; the loft test climbs the ladder
+  in the room; new checks for the two panels, racks drying while casks age, and the tray redrawing at once.

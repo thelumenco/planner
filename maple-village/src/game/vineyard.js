@@ -395,18 +395,21 @@ export function storePanel(F){
   if (up.length) h += `<p class="eyebrow">On the shelves upstairs</p><ul class="hlist wlist">${up.map(s => `<li><span class="wpic">${bottleSVG(s.type)}</span><span class="wtxt"><b>${esc(s.name)}</b><small>${s.n} bottle${s.n === 1 ? "" : "s"} at ${s.price} each</small><button class="scoopchip" data-vy="scoopws" data-k="${esc(s.id)}">Take a bottle</button></span><button class="btn small alt" data-vy="unstock" data-k="${esc(s.id)}">Bring them down</button></li>`).join("")}</ul>`;
   return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
 }
-export function barrelPanel(F){
+// round 313: one panel for the grapes (the crates), one for the wines (the barrels). The ladder to the drying loft
+// is in the room itself, so no ladder button here.
+export function grapePanel(F){
   const v = vineState(F);
-  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The barrels</h2><p class="sub">Three bunches make a barrel; a barrel makes ${BOTTLES} bottles.</p>`;
-  // round 132: the ladder up to the drying loft, once the player's been to Cinque Terre (game/loft.js)
-  if (F.towns && F.towns.cinque) h += `<div class="actions"><button class="btn alt small" data-loft="1">Up the ladder to the drying loft</button></div>`;
-  // the grape crates: picked grapes wait here. Take some for the Scoop Shack (or put them back); Marco only fills
-  // barrels from what's left over the amount the player keeps back
-  h += `<p class="eyebrow">The grape crates</p><ul class="hlist wlist orflowers grcrates">${grapeKinds(v).map(c => { const back = (F.inv || {})["grape_" + c] || 0;
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The grape crates</h2><p class="sub">Picked grapes wait here. Take some for the Scoop Shack or the drying loft, or leave them for the barrels.</p>`;
+  h += `<ul class="hlist wlist orflowers grcrates">${grapeKinds(v).map(c => { const back = (F.inv || {})["grape_" + c] || 0;
     return `<li><span class="wpic">${grapePic(c)}</span><span class="wtxt"><b>${v.grapes[c]} ${c} bunch${v.grapes[c] === 1 ? "" : "es"}</b><small>${v.help.barrels ? `Marco keeps ${v.keep[c] || 0} back for you` : "picked and waiting"}</small></span>
       <span class="orbtns"><button class="btn small primary" data-vy="takegr" data-k="${c}" data-n="1" ${v.grapes[c] ? "" : "disabled"}>Take 1</button><button class="btn small alt" data-vy="takegr" data-k="${c}" data-n="99" ${v.grapes[c] ? "" : "disabled"}>All</button>${back ? `<button class="btn small alt" data-vy="putgr" data-k="${c}">Put back ${back}</button>` : ""}</span>
       ${v.help.barrels ? `<span class="grkeep"><span>Keep back from the barrels</span><span class="gstep"><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="-1" aria-label="Keep fewer back">−</button><b>${v.keep[c] || 0}</b><button class="btn small alt" data-vy="keep" data-k="${c}" data-n="1" aria-label="Keep more back">+</button></span></span>` : ""}</li>`; }).join("")}</ul>
-    <p class="muted">Grapes you take go in your backpack (for gelato at the Scoop Shack).${v.help.barrels ? " Marco fills empty barrels only from bunches beyond what you keep back." : ""}</p><div class="vbarrels">`;
+    <p class="muted">Grapes you take go in your backpack (for gelato at the Scoop Shack).${v.help.barrels ? " Marco fills empty barrels only from bunches beyond what you keep back." : ""}</p>`;
+  return h + `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
+}
+export function barrelPanel(F){
+  const v = vineState(F);
+  let h = `<span class="tape stripe" aria-hidden="true"></span><h2>The wines</h2><p class="sub">Three bunches from the crates make a barrel; a barrel makes ${BOTTLES} bottles.</p><div class="vbarrels">`;
   v.barrels.forEach((b, i) => {
     const ph = !b ? "empty" : barrelLeft(b) ? (b.style === "sparkling" && b.stage === 2 ? "bubbles" : "ferment") : b.style === "sparkling" && b.stage === 1 ? "await2" : "ready";
     if (i === BARRELS.shed) h += `</div><p class="eyebrow">On the racks in the cellar</p><div class="vbarrels">`;
