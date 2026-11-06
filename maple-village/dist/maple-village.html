@@ -19262,7 +19262,9 @@ ${r.n}`;
     wattlescone: ["#C9A06A", "#8A5A3A"],
     crayroll: ["#E8D3A8", "#C8432F"],
     scalloppie: ["#E3B47A", "#F3E7C8"],
-    spsquid: ["#F3E7B0", "#9DAA78"]
+    spsquid: ["#F3E7B0", "#9DAA78"],
+    encurtidos: ["#F6E9C8", "#F08A3C"],
+    salmonetes: ["#F6E3A1", "#E8574C"]
   };
   function dishArt(id, s = 44, off) {
     if (String(id).startsWith("tapas:")) {
@@ -19289,6 +19291,9 @@ ${r.n}`;
       dumplings: plate2 + [[15, 27], [24, 24], [33, 27]].map(([x, y]) => `<path d="M${x - 6} ${y + 2} q6 -9 12 0 q-6 3 -12 0z" fill="#F4EEE3" ${INK4}/><path d="M${x - 3} ${y - 1} l1 2 M${x} ${y - 2} v2 M${x + 3} ${y - 1} l-1 2" stroke="#8A8279" stroke-width=".9"/>`).join(""),
       honeytoast: plate2 + [[14, 21], [22, 19], [30, 21]].map(([x, y]) => `<rect x="${x}" y="${y}" width="6" height="12" rx="1.5" fill="#D9A066" ${INK4} stroke-width="1"/><rect x="${x + 1}" y="${y + 1}" width="4" height="4" rx="1" fill="#F3C969"/>`).join("") + `<path d="M36 22 q4 1 3 6" fill="none" stroke="#E3A33A" stroke-width="2"/>`,
       fish: plate2 + `<path d="M11 27 q9 -9 20 0 q-11 9 -20 0z" fill="#B9C6CF" ${INK4}/><path d="M31 27 l6 -5 v10z" fill="#B9C6CF" ${INK4}/><circle cx="15" cy="26" r="1" fill="#3b3530"/><path d="M19 23 l3 8 M24 23 l3 8" stroke="#6B5E52" stroke-width="1.1"/><path d="M35 33 q3 -2 5 0" fill="none" stroke="#7FA35A" stroke-width="1.4"/>`,
+      // round 316 (Mel: "the tomato salad with vinegar is just an empty plate"): tomato slices, a splash of the
+      // wine vinegar, torn basil and a little cruet
+      insalata: plate2 + [[15, 28], [22, 25], [29, 28], [23, 31], [32, 24]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4.6" fill="#E8574C" ${INK4} stroke-width="1"/><circle cx="${x}" cy="${y}" r="2.2" fill="#F4A08A"/><circle cx="${x - 1}" cy="${y - 0.6}" r=".6" fill="#F6E3A1"/><circle cx="${x + 1}" cy="${y + 0.6}" r=".6" fill="#F6E3A1"/>`).join("") + `<path d="M13 24 q8 6 19 1" fill="none" stroke="#C9785A" stroke-width="1.4" opacity=".8"/>` + [[18, 23, -30], [27, 30, 20], [33, 29, -10]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="2.6" ry="1.4" transform="rotate(${r} ${x} ${y})" fill="#6FA35A" stroke="#3b3530" stroke-width=".7"/>`).join("") + `<path d="M38 15 h4 v3 l1.5 2 v9 h-7 v-9 l1.5 -2z" fill="#C9785A" ${INK4} stroke-width="1"/><rect x="38.5" y="13" width="3" height="2.4" rx=".6" fill="#8B5E3C" ${INK4} stroke-width=".8"/>`,
       apples: plate2 + [[15, 27, "#D9485F"], [22, 25, "#9CC27E"], [29, 27, "#D9485F"], [35, 26, "#9CC27E"]].map(([x, y, c]) => `<path d="M${x - 4} ${y} q4 -7 8 0 q-4 3 -8 0z" fill="#FFF3DD" stroke="${c}" stroke-width="2"/>`).join("")
     };
     return `<svg class="vybottle" viewBox="0 0 48 44" width="${s}" height="${Math.round(s * 44 / 48)}" aria-hidden="true"><g${off ? ' opacity=".4"' : ""}>${F2[id] || plate2}</g></svg>`;
