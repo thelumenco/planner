@@ -207,6 +207,12 @@ HANDOFF.md round 314. Port it if this edition has the Scoop Shack and its upgrad
 - `game/scoop.js`: a sixth upgrade, `bigchurn` ("A bigger churner", 900 coins, with a line in `buyUpgrade`). `churnCap(s)` is `BIG_CHURNS` (4) with it, else `CHURNS` (2); `churnFull` uses it, and the "churner's full" message and `churnLine` say the right number ("four at a time", "In the churner (2 of 4)"). Each tub still takes an hour.
 - Tests: the Scoop Shack upgrades block counts six upgrades; a unit check "the bigger churner (an upgrade, 900 coins) holds four".
 
+### 21. A dish for red mullet (round 315)
+HANDOFF.md round 315. Port it if this edition has the kitchen's tapas and the bay's Friday sunset fishing.
+- `game/kitchen.js`: `mullet` in `GOODS` and `SOURCE` ("the bay, Friday evenings 5 to 8"), and an all-year tapa `salmonetes` ("Fried red mullet with lemon": 1 red mullet, 1 lemon, 12 coins).
+- `game/fishing.js`: the red mullet's backpack line names the kitchen, the Friday bonfire and Sal.
+- Tests: the stove's Local tab count goes up by one; a unit check "red mullet goes to the kitchen".
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.

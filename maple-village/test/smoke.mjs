@@ -1133,7 +1133,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   check(await page.evaluate(() => { const k = JSON.parse(localStorage.getItem("fox.fox")).kitchen; return !!k.oven && !k.larder.flour; }), "flour goes in the oven to bake");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 33 && await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().getAttribute("aria-selected") === "true", "the stove's Local tab offers this season's local tapas (33 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams, your own vinegar)");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 34 && await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().getAttribute("aria-selected") === "true", "the stove's Local tab offers this season's local tapas (34 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams, your own vinegar, red mullet)");
   check(/from the market deli|from the farm gate|from the garden/.test(await page.locator("#ctx").innerText()), "each missing ingredient says where to get it");
   await page.locator('#ctx [data-k="ktab"][data-id="specials"]').first().click(); await page.waitForTimeout(200);
   check(await page.locator('#ctx [data-k="tapas"]').count() === 0 && /travel to Ronda, Kyoto, Jeju or Cinque Terre/.test(await page.locator("#ctx").innerText()), "the Specials tab is empty until you've travelled: specials come from the trips");
@@ -2275,6 +2275,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
+  { // round 315: red mullet has a dish at the kitchen
+    const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)); await import(new URL("../src/game/fishing.js", import.meta.url));
+    const t = kit.TAPAS.salmonetes;
+    check(t && t.need.mullet === 1 && t.need.lemon === 1 && !t.seasons && !t.special && kit.GOODS.mullet && kit.SOURCE.mullet && /kitchen/.test(it.ITEMS.mullet.what) && t.price >= it.ITEMS.mullet.sell + 4, "red mullet goes to the kitchen: fried with lemon, all year, and the backpack says so (round 315)"); }
   { // round 314: a bigger churner, four tubs at once
     const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), F = {coins: 1000}, s = sc.scoopState(F), t = Date.now() + 3600e3;
     s.churn = [{id: "a", done: t}, {id: "b", done: t}];

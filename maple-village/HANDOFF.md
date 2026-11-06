@@ -2973,3 +2973,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Build v245 (round 314) published at Mel's say-so without a fully green run
 - Run 260 on the slow container stopped in "the Scoop Shack" block at a reload; the block passed twice on its own and failed once at a different early step. A full green run on a normal-speed machine is still owed.
+
+## Round 315: a dish for red mullet (Mel: "red mullet seems to have no use")
+- It had uses (the Friday bonfire grill, the chip shop in the south, selling to Sal) but no kitchen dish. kitchen.js: `salmonetes` (red mullet and a lemon, 12 coins, all year), `mullet` in GOODS and SOURCE; fishing.js: its backpack line lists all its uses. Local tapas count 33 to 34. Port doc section 21.

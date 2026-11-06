@@ -20,7 +20,7 @@ export const GOODS = {
   apple: ["apple", "apples"], dumpling: ["dumpling", "dumplings"], fish: ["fish", "fish"], toast: ["honey toast", "honey toasts"],
   pea: ["handful of peas", "handfuls of peas"], pumpkin: ["pumpkin", "pumpkins"], leek: ["leek", "leeks"],
   trout: ["rainbow trout", "rainbow trout"], crayfish: ["crayfish", "crayfish"], sardine: ["sardine", "sardines"], mackerel: ["mackerel", "mackerel"],
-  seabream: ["sea bream", "sea bream"], squid: ["squid", "squid"], octopus: ["octopus", "octopuses"],
+  seabream: ["sea bream", "sea bream"], mullet: ["red mullet", "red mullet"], squid: ["squid", "squid"], octopus: ["octopus", "octopuses"],
   goatmilk: ["goat's milk", "goat's milk"], yoghurt: ["pot of yoghurt", "pots of yoghurt"], pear: ["pear", "pears"], fig: ["fig", "figs"],
   honeycomb: ["piece of honeycomb", "pieces of honeycomb"], lemon: ["lemon", "lemons"], wildgarlic: ["bunch of wild garlic", "bunches of wild garlic"], blackberry: ["blackberry", "blackberries"], mushroom: ["wild mushroom", "wild mushrooms"], chestnut: ["chestnut", "chestnuts"], syrup: ["bottle of petal syrup", "bottles of petal syrup"],
   // groups (round 101): anything that fits, see ALT
@@ -102,6 +102,7 @@ export const TAPAS = {
   calamares: {n: "Fried calamari", need: {squid: 2, flour: 1}, price: 11},
   pulpo: {n: "Pulpo a la gallega", need: {octopus: 1, potato: 2}, price: 12},
   dorada: {n: "Sea bream with olives", need: {seabream: 1, olives: 1}, price: 11},
+  salmonetes: {n: "Fried red mullet with lemon", need: {mullet: 1, lemon: 1}, price: 12},   // round 315 (Mel: "red mullet seems to have no use")
   trucha: {n: "Trout with brown butter", need: {trout: 2, milk: 1}, price: 10},
   cangrejos: {n: "Garlic crayfish on toast", need: {crayfish: 4, loaf: 1}, price: 10},
   // round 101: more ways to use eggs, tomatoes, yoghurt, honey, the farm's cheeses, pears and leeks
@@ -389,7 +390,7 @@ export const SOURCE = {
   cheese: "the market deli", flour: "the market deli", olives: "the market deli", loaf: "the oven (1 flour makes 2)",
   farmcheese: "your farm's cheese", halloumi: "your farm's cheese", bluecheese: "your farm's cheese", cheddar: "your farm's cheese",
   apple: "the orchard", pear: "the orchard", lemon: "Ma Ma's lemon tree or the Friday fish van", fish: "the market or fishing",
-  sardine: "the sea or bay", mackerel: "the sea or bay, daytime", squid: "the sea, at night", octopus: "the sea, on rainy days", seabream: "the sea or bay",
+  sardine: "the sea or bay", mackerel: "the sea or bay, daytime", squid: "the sea, at night", octopus: "the sea, on rainy days", seabream: "the sea or bay", mullet: "the bay, Friday evenings 5 to 8",
   trout: "the river, daytime", crayfish: "the lake", shrimp: "the sea, at dawn", anchovy: "the sea or bay", clams: "the Friday fish van at the bay, or the beach along the bottom of the village",
   wildgarlic: "the woods in spring", mushroom: "the woods in autumn", chestnut: "the woods in winter",
   oliveoil: "your olive mill (or Ronda)", vinegar: "a wine barrel that turned (the barrel shed)", anchovy_salt: "your drying loft", pesto: "your drying loft (or Cinque Terre)", pinenuts: "the market, once you've been to Cinque Terre",
