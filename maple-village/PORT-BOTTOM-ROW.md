@@ -213,6 +213,11 @@ HANDOFF.md round 315. Port it if this edition has the kitchen's tapas and the ba
 - `game/fishing.js`: the red mullet's backpack line names the kitchen, the Friday bonfire and Sal.
 - Tests: the stove's Local tab count goes up by one; a unit check "red mullet goes to the kitchen".
 
+### 22. The tomato salad's picture (round 316)
+HANDOFF.md round 316. Port it with the vinegar dishes (section 16's note) and section 21.
+- `art/wine.js` `dishArt`: an `insalata` drawing (tomato slices, basil, a splash of vinegar and a small cruet); without it the small plate showed an empty plate. `TAPAS_COL` gets colours for `patatas`, `encurtidos` and `salmonetes`.
+- Test: "every small plate is drawn, not an empty plate" (a unit check).
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.

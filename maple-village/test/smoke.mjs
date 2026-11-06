@@ -2275,6 +2275,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
+  { // round 316: every small plate has its own drawing (the tomato salad was an empty plate)
+    const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), wa = await import(new URL("../src/art/wine.js", import.meta.url)), bare = wa.dishArt("no_such_dish");
+    const none = Object.keys(kit.DISHES).filter(id => wa.dishArt(id) === bare);
+    check(!none.length && ["patatas", "encurtidos", "salmonetes"].every(id => wa.dishArt("tapas:" + id) !== wa.dishArt("tapas:no_such_dish")), `every small plate is drawn, not an empty plate${none.length ? ` (missing: ${none.join(", ")})` : ""}; the newest local tapas have their own colours (round 316)`); }
   { // round 315: red mullet has a dish at the kitchen
     const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)); await import(new URL("../src/game/fishing.js", import.meta.url));
     const t = kit.TAPAS.salmonetes;
