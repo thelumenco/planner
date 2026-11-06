@@ -2976,3 +2976,5 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 315: a dish for red mullet (Mel: "red mullet seems to have no use")
 - It had uses (the Friday bonfire grill, the chip shop in the south, selling to Sal) but no kitchen dish. kitchen.js: `salmonetes` (red mullet and a lemon, 12 coins, all year), `mullet` in GOODS and SOURCE; fishing.js: its backpack line lists all its uses. Local tapas count 33 to 34. Port doc section 21.
+
+## Build v246 (round 315) published at Mel's say-so without a full run (slow container); the round 315 checks and the kitchen block passed.

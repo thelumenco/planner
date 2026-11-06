@@ -19321,6 +19321,7 @@ ${r.n}`;
     sardine: ["sardine", "sardines"],
     mackerel: ["mackerel", "mackerel"],
     seabream: ["sea bream", "sea bream"],
+    mullet: ["red mullet", "red mullet"],
     squid: ["squid", "squid"],
     octopus: ["octopus", "octopuses"],
     goatmilk: ["goat's milk", "goat's milk"],
@@ -19461,6 +19462,8 @@ ${r.n}`;
     calamares: { n: "Fried calamari", need: { squid: 2, flour: 1 }, price: 11 },
     pulpo: { n: "Pulpo a la gallega", need: { octopus: 1, potato: 2 }, price: 12 },
     dorada: { n: "Sea bream with olives", need: { seabream: 1, olives: 1 }, price: 11 },
+    salmonetes: { n: "Fried red mullet with lemon", need: { mullet: 1, lemon: 1 }, price: 12 },
+    // round 315 (Mel: "red mullet seems to have no use")
     trucha: { n: "Trout with brown butter", need: { trout: 2, milk: 1 }, price: 10 },
     cangrejos: { n: "Garlic crayfish on toast", need: { crayfish: 4, loaf: 1 }, price: 10 },
     // round 101: more ways to use eggs, tomatoes, yoghurt, honey, the farm's cheeses, pears and leeks
@@ -20020,6 +20023,7 @@ ${r.n}`;
     squid: "the sea, at night",
     octopus: "the sea, on rainy days",
     seabream: "the sea or bay",
+    mullet: "the bay, Friday evenings 5 to 8",
     trout: "the river, daytime",
     crayfish: "the lake",
     shrimp: "the sea, at dawn",
@@ -38288,7 +38292,7 @@ ${m.from}` : ""}`;
     octopus: ["Octopus", 6, "pulpo a la gallega, at the kitchen"],
     shrimp: ["Shrimp", 2, "gambas al ajillo with garlic and olive oil, at the kitchen"],
     anchovy: ["Anchovy", 1, "fried and stuffed at the kitchen, or salted in the loft for weeks of flavour"],
-    mullet: ["Red mullet", 6, "grill it on the bonfire at home, or Sal pays well for it"],
+    mullet: ["Red mullet", 6, "fried with lemon at the kitchen, grilled on the Friday bonfire at home, or sold to Sal"],
     tuna: ["Bluefin tuna", 30, "an enormous fish: Sal will pay a fortune"]
   };
   Object.entries(ING).forEach(([id, [n, sell2, what]]) => {
