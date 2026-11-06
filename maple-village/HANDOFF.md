@@ -2980,4 +2980,4 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Build v246 (round 315) published at Mel's say-so without a full run (slow container); the round 315 checks and the kitchen block passed.
 
 ## Round 316: the tomato salad was an empty plate (Mel: "bug. the tomato salad with vinegar is just an empty plate")
-- wine.js `dishArt` had no `insalata` drawing, so it fell back to the bare plate. Drawn now; patatas, encurtidos and salmonetes get cazuela colours. A unit check makes sure every DISHES entry has its own drawing. Many trip specials still use the default cazuela colours (drawn, not empty). Port doc section 22. Picture: screens-bottom-row/round316-dishes.png.
+- wine.js `dishArt` had no `insalata` drawing, so it fell back to the bare plate. Drawn now; encurtidos and salmonetes get cazuela colours. A unit check makes sure every DISHES entry has its own drawing. Many trip specials still use the default cazuela colours (drawn, not empty). Port doc section 22. Picture: screens-bottom-row/round316-dishes.png.
