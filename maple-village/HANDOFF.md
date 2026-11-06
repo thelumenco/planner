@@ -2970,3 +2970,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 314: a bigger churner (Mel: "Can I get a bigger churner/mixer for ice cream as an upgrade. Can churn more at once")
 - scoop.js: upgrade `bigchurn` (900 coins): `churnCap(s)` 4 instead of 2; messages and `churnLine` use the cap. Tests: six upgrades in "Scoop Shack upgrades", and unit checks before the round 2278 scoop block. Port doc section 20.
+
+## Build v245 (round 314) published at Mel's say-so without a fully green run
+- Run 260 on the slow container stopped in "the Scoop Shack" block at a reload; the block passed twice on its own and failed once at a different early step. A full green run on a normal-speed machine is still owed.
