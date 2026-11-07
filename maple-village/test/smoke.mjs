@@ -2281,6 +2281,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     const full = cc.crowdSplit("vineyard", 1, {terrace: true}), half = cc.crowdSplit("vineyard", .4, {terrace: true}), none = cc.crowdSplit("vineyard", 1, {terrace: false});
     check(full.wineshop === 12 && full.terrace === 12 && half.wineshop === 10 && !half.terrace && none.wineshop === 12 && none.vineyard === 6 && !none.terrace, "the wine shop fills first, then the rest sit out on the terrace (or wait by the door with no terrace)");
     const bay = cc.crowdSplit("bay", 1, {cocoa: false});
+    const g = cc.crowdSplit("vineyard", 1, {terrace: true, gift: true});
+    check(g.wineshop === 12 && g.giftshop === 10 && g.terrace === 12 && Object.keys(cc.CHAT).every(r => cc.CROWD_AT[r] && cc.CHAT[r].length >= 4 && cc.CHAT[r].every(l => !/[\u2013\u2014]/.test(l))), "the gift shop fills after the wine shop (round 318), and every room has its chatter");
     check(bay.scoopshop === 13 && bay.bay === 10 && !bay.cocoa && cc.crowdSplit("bay", 1, {cocoa: true}).cocoa === 12, "at the bay: a full Scoop Shack, a queue out of the door and onto the deck, and the Cocoa Room too once it's yours");
     const F = {hap: {boosts: [{shop: "wine", from: "2026-10-14", to: "2026-10-14", hm: [660, 780], x: 3, why: "coach"}], repairs: [], log: []}};
     F.hap.boosts.push({shop: "scoop", from: "2026-10-14", to: "2026-10-14", hm: [660, 780], x: 2.5, why: "coach"});
@@ -5293,7 +5295,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   page.on("pageerror", e => errors.push(`coach crowd pageerror: ${e.message}`));
   await page.addInitScript(() => { const q = location.search; if (!/coachpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     f.vine = f.vine || {}; if (!/noterrace/.test(q)) f.vine.terrace = Date.now(); else delete f.vine.terrace;
-    f.hap = Object.assign(f.hap || {}, {day: "2026-10-14", repairs: [], log: [], boosts: (/allshops/.test(q) ? ["wine", "scoop"] : ["wine"]).map(shop => ({shop, from: "2026-10-14", to: "2026-10-14", hm: [11*60, 13*60], x: 2.5, why: "coach"}))});
+    if (/allshops/.test(q)) f.goals = Object.assign(f.goals || {}, {giftshop: 1});
+    f.hap = Object.assign(f.hap || {}, {day: "2026-10-14", repairs: [], log: [], boosts: (/allshops/.test(q) ? ["wine", "scoop", "gift"] : ["wine"]).map(shop => ({shop, from: "2026-10-14", to: "2026-10-14", hm: [11*60, 13*60], x: 2.5, why: "coach"}))});
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-14"); await page.waitForTimeout(1200);
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-14&coachpatch=1"); await page.waitForTimeout(1500);
@@ -5310,7 +5313,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(1200);
   const inScoop = await page.locator("#sceneArt .crowd").count();
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
-  check(inScoop === 13 && await page.locator("#sceneArt .crowd").count() === 12, `one coach, every shop at once: the Scoop Shack (${inScoop}) and the wine shop full at the same time (round 318)`);
+  const inWine = await page.locator("#sceneArt .crowd").count(); await page.evaluate(() => window.__mapleScene("giftshop")); await page.waitForTimeout(1200); const inGift = await page.locator("#sceneArt .crowd").count(); await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
+  check(inScoop === 13 && inWine === 12 && inGift === 10, `one coach, every shop at once: the Scoop Shack (${inScoop}), the wine shop (${inWine}) and the gift shop (${inGift}) full at the same time (round 318)`);
+  await page.waitForFunction(() => document.querySelector("#sceneArt .crowdsay"), null, { timeout: 20000 }).catch(() => {});
+  check(await page.locator("#sceneArt .crowdsay").count() === 1 && await page.locator("#sceneArt .crowd.stroll").count() >= 2 && await page.locator("#sceneArt .crowd:not(.walk) .armR").first().evaluate(n => getComputedStyle(n).animationName) !== "none", "and they're lively: chatting in little bubbles, waving and sipping, a few strolling about");
   await page.goto(url + "?seed=1&time=14:00&date=2026-10-14&coachpatch=1"); await page.waitForTimeout(1500);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
   check(await page.locator("#sceneArt .crowd").count() === 0, "and once the two hours are up, they've all gone");

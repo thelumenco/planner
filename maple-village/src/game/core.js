@@ -112,7 +112,7 @@ import { loftPanel, startBatch, collect as loftCollect, loftState, LOFT, left as
 import { cinqueRoomArt } from "../art/cinque-rooms.js";
 import { bellbirdRoomArt } from "../art/bellbird-rooms.js";
 import { terraceArt } from "../art/terrace.js";
-import { crowdArt, crowdLevel, crowdSplit, coachArt } from "../art/coachcrowd.js";
+import { crowdArt, crowdLevel, crowdSplit, coachArt, CHAT, chatBubble } from "../art/coachcrowd.js";
 import { coastArt } from "../art/coast.js";
 import { coastRoomArt } from "../art/coast-rooms.js";
 import { tablelandsArt } from "../art/tablelands.js";
@@ -682,6 +682,7 @@ setInterval(() => {
   { const l = bikeExpired(F); if (l) { speak(l, 4500); save(); } }
   townTick(); letsTick();
   if (Date.now() - lastHap > 15000) hapNow();   // round 303: happenings
+  if (Date.now() - crowdSaidAt > 3000 && crowdKey) crowdChatter();   // round 318: the coach party chatting
   { const k = scene === "base" ? `${bonfireNow(dayKey(), sgHM())}` : scene === "bay" ? `${vanNow(dayKey(), sgHM())}${spotOpen("bay")}` : scene === "field" ? `${!!(S.kite && S.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : ""; if (k !== lastFri) { lastFri = k; if (k) drawScene(); } }
   if (scene === "mill") { const m = millState(F), k = m.press ? (pressLeft(m) ? "on" : "ready") : ""; if (k !== lastMill) { lastMill = k; drawScene(); if (millOpen) ctx(); } }
   if ((outside() || scene === "terrace") && skyKey() !== lastSky) { lastSky = skyKey(); drawScene(); }
@@ -3736,17 +3737,25 @@ function coTask(c, k){
 // round 317: who's here from today's coach, room by room (null if there's no coach in its two hours)
 function coachCrowdNow(){
   const c = HP.coachToday(F, dayKey()); if (!c) return null; const hm = sgHM(), lv = crowdLevel(c.hm, hm); if (!lv) return null;
-  const o = {terrace: !!vineState(F).terrace, cocoa: owns(F, "cocoa")};
+  const o = {terrace: !!vineState(F).terrace, cocoa: owns(F, "cocoa"), gift: owns(F, "giftshop")};
   return {place: c.place, places: c.places, rooms: Object.assign({}, ...c.places.map(p => crowdSplit(p, lv, o))), seed: +dayKey().replace(/-/g, "") % 997};
 }
-let crowdKey = "";
+let crowdKey = "", crowdSaidAt = 0;
+function crowdChatter(){
+  crowdSaidAt = Date.now(); const lines = CHAT[scene]; if (!lines) return;
+  const ppl = [...document.querySelectorAll("#sceneArt .crowd:not(.stroll)")]; if (!ppl.length) return;
+  document.querySelectorAll("#sceneArt .crowdsay").forEach(n => n.remove());
+  const p = ppl[Math.floor(Math.random()*ppl.length)], m = /translate\(([-\d.]+) ([-\d.]+)\)/.exec(p.getAttribute("transform") || ""); if (!m) return;
+  $("sceneArt").insertAdjacentHTML("beforeend", chatBubble(+m[1], +m[2] + (p.classList.contains("act-sit") ? 7 : 0), lines[Math.floor(Math.random()*lines.length)]));
+  setTimeout(() => document.querySelectorAll("#sceneArt .crowdsay").forEach(n => { if (Date.now() - crowdSaidAt >= 2700) n.remove(); }), 2800);
+}
 // round 303: the morning's happening, the critic's visit, and the storm damage labels
 let lastHap = 0;
 const hapStock = shop => shop === "scoop" ? Object.values(scoopState(F).tubs || {}).reduce((a, n) => a + n, 0) : shop === "cocoa" ? (() => { const c = cocoaState(F); return Object.values(c.bars).reduce((a, n) => a + n, 0) + caseCount(c); })() : F.vine ? vShelfStock(vineState(F)) : 0;
 function hapNow(){
   lastHap = Date.now(); const day = dayKey(), hm = sgHM(), prev = prevDay(day);
   { const cw = coachCrowdNow(), k = cw ? JSON.stringify(cw.rooms) : ""; if (k !== crowdKey) { crowdKey = k; if (cw ? (cw.rooms[scene] != null || (scene === "vineyard" && cw.places.includes("vineyard"))) : true) drawScene(); } }   // round 317
-  const own = {scoop: !!F.scoop, cocoa: owns(F, "cocoa"), wine: !!F.vine, boat: owns(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning)};
+  const own = {scoop: !!F.scoop, cocoa: owns(F, "cocoa"), wine: !!F.vine, gift: owns(F, "giftshop"), boat: owns(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning)};
   const got = HP.hapDaily(F, day, own, {stormy: rainDay(prev) === 2, away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: rnd => birdsTake(F, rnd)});
   const j = HP.judge(F, day, hm, hapStock), lp = HP.lapse(F, day, hm);
   if (lp && !got.length && !j) { save(); flash(`The order for ${lp.who} wasn't ready in time: see your mailbox`); }
@@ -3788,7 +3797,7 @@ function millTick(){
   for (let at = from + 60000; at <= now; at += 60000) { const sg = new Date(at + 8*3600e3), day = sg.toISOString().slice(0, 10), hm = sg.getUTCHours()*60 + sg.getUTCMinutes();
     const got = craftSellMinute(F, day, hm, owns(F, "millshop") ? "shop" : owns(F, "giftshop") ? null : vineState(F).shelf ? "wineshop" : null); if (got) { coins += got; n++; }
     if (owns(F, "giftshop") && hm % 60 === 0) { const r = BK.travelTick(F, at); r.got.forEach(g => setTimeout(() => flash(`A box from ${g.who}: ${BK.BOX} ${ITEMS[g.item].n.toLowerCase()} for the gift shop (${g.cost} coins)`), 1200)); r.skip.forEach(g => setTimeout(() => flash(`${g.who}'s box waits a week: it's ${g.cost} coins`), 1200)); }   // round 198
-    if (owns(F, "giftshop")) { const fr0 = JSON.stringify(GAL.galleryState(F).frames.concat([GAL.makersState(F).stock])), g = giftSellMinute(F, day, hm, at + 60000 > now && scene === "giftshop" && atSpot === "gtill" ? "mel" : giftKeeperOn(day, hm) ? "keeper" : null, giftOpts()); if (g) { gcoins += g; gn++; }
+    if (owns(F, "giftshop")) { const fr0 = JSON.stringify(GAL.galleryState(F).frames.concat([GAL.makersState(F).stock])), g = giftSellMinute(F, day, hm, at + 60000 > now && scene === "giftshop" && atSpot === "gtill" ? "mel" : giftKeeperOn(day, hm) ? "keeper" : null, Object.assign(giftOpts(), {boost: HP.boost(F, "gift", day, hm)})); if (g) { gcoins += g; gn++; }
       if (scene === "giftshop" && JSON.stringify(GAL.galleryState(F).frames.concat([GAL.makersState(F).stock])) !== fr0) galleryRedraw = true; }
     const ev = eventNow(day, hm); if (ev && ev.kind === "market") ["market", "grace"].forEach(w => { const g = craftSellMinute(F, day, hm, w); if (g) { coins += g; n++; } });
     if (ev && ev.kind === "xmas") { const g = stallSellMinute(F, day, at + 60000 > now && scene === "field" && /^mstall\d$/.test(atSpot || "") && (stallAt(day, hm, +atSpot.slice(-1)) || {}).kind === "mine" ? "mel" : owns(F, "millshop") ? "hazel" : "tin"); if (g) { xcoins += g; xn++; } } }

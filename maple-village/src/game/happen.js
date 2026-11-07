@@ -73,7 +73,8 @@ export function judge(F, day, hm, stockOf){
   else note(h, c.day, `A review in the Honeybrook Gazette: ${SHOP_N[c.shop]}`, `"Charming, but the shelves were looking a little bare when I called in. One to watch." A lukewarm write-up: no harm done, but a chance missed. A fuller shop next time.`);
   h.critic = null; return {good, shop: c.shop};
 }
-const COACH = {bay: {shops: ["scoop", "cocoa"], n: "the bay"}, vineyard: {shops: ["wine"], n: "the vineyard"}};
+const COACH = {bay: {shops: ["scoop", "cocoa"], n: "the bay"}, vineyard: {shops: ["wine", "gift"], n: "the vineyard"}};   // round 318: the gift shop too
+const COACH_N = Object.assign({gift: "the gift shop"}, SHOP_N);
 // round 318 (Mel: "I thought it would be for all at once"): one coach, every shop you own, the same two hours. The forty
 // are split between the bay and the vineyard, so each shop is two and a half times as busy rather than three
 export const COACH_X = 2.5;
@@ -83,7 +84,7 @@ function coach(F, day, own, rnd){
   const from = rnd() < .5 ? 11*60 : 14*60, shops = places.flatMap(p => COACH[p].shops.filter(s => own[s]));
   shops.forEach(s => h.boosts.push({shop: s, from: day, to: day, hm: [from, from + 120], x: COACH_X, why: "coach"}));
   h.lastCoach = day;
-  const names = shops.map(s => SHOP_N[s]), list = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0];
+  const names = shops.map(s => COACH_N[s]), list = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0];
   note(h, day, "A coach party today", `A coach is booked in at ${from === 11*60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours, and they'll be everywhere at once.${places.length > 1 ? " It drops half at the bay and takes the rest up to the vineyard." : ""} ${list.replace(/^./, x => x.toUpperCase())} will be rushed off ${shops.length > 1 ? "their" : "its"} feet: stock up beforehand.${places.includes("vineyard") ? " When the wine shop's full, the rest will take their glasses out onto the terrace." : ""}${places.includes("bay") ? " Expect a queue out of the Scoop Shack's door and every seat on the deck taken." : ""}`);
   return places.join("+");
 }
@@ -91,7 +92,7 @@ function coach(F, day, own, rnd){
 // round 317: today's coach, if there is one: where it is ("bay" or "vineyard") and its two hours
 export function coachToday(F, day){
   const bs = hapState(F).boosts.filter(x => x.why === "coach" && x.from === day && x.hm); if (!bs.length) return null;
-  const places = [...new Set(bs.map(b => b.shop === "wine" ? "vineyard" : "bay"))];
+  const places = [...new Set(bs.map(b => b.shop === "wine" || b.shop === "gift" ? "vineyard" : "bay"))];
   return {places, place: places[0], hm: bs[0].hm};   // round 318: every place it stops at
 }
 

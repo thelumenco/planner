@@ -225,6 +225,10 @@ HANDOFF.md round 317. Port the coach crowd with section 16 (happenings); Tomo's 
 - `core.js`: `coachCrowdNow()`; `drawScene` adds the crowd to the scene art (and the coach in the vineyard); `hapNow` redraws when the numbers change. Check the positions against this edition's rooms.
 - Tomo's bike: `npcs.css` keeps a `.rideby` rider's arms still and forward on the handlebars (no walk swing); `setScene` removes any `.rideby` so his ride never carries on indoors.
 - Round 318 (Mel: "I thought it would be for all at once"): `coach()` in `happen.js` now boosts every shop the player owns, at the bay and the vineyard together, for the same two hours, at `COACH_X` = 2.5 each (was 3 for one place, so the money stays in check). `coachToday` returns `places`; `coachCrowdNow` merges `crowdSplit` for each. The note says it splits between the bay and the vineyard.
+- Round 318, lively crowds (Mel: "how come they don't talk or do stuff ... Tourists are usually excited"; "Gift shop also gets more tourists"):
+  - `crowdArt` wraps each visitor: standing ones in `.cb` (a gentle bob; `.hop` now and then), a few `.stroll` (walking back and forth), seated ones sip. Each has its own `--d` timing. The CSS is at the end of `styles/npcs.css` (`crowdBob`, `crowdHop`, `crowdTalk`, `crowdSip`, `crowdWave`, `crowdStroll`, `crowdSay`), off under reduced motion.
+  - `CHAT` (lines per room) and `chatBubble()`; `core.js` `crowdChatter()` puts one bubble over a random visitor every 3 seconds.
+  - The gift shop joins the vineyard's coach: `COACH.vineyard.shops` gets "gift" (`own.gift`), `CROWD_AT.giftshop` (10 browsing), `CROWD_ORDER.vineyard` wine shop, gift shop, then terrace; `giftSellMinute` multiplies its chance by `o.boost` (core passes `HP.boost(F, "gift", ...)`).
 - Not built yet: a cruise ship (Mel: "don't build the cruise part yet").
 - Tests: "The coach party you can see, and Tomo's bike (round 317)" and the round 317 unit checks.
 
