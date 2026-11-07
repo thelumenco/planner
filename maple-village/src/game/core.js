@@ -3756,7 +3756,7 @@ function hapNow(){
   lastHap = Date.now(); const day = dayKey(), hm = sgHM(), prev = prevDay(day);
   { const cw = coachCrowdNow(), k = cw ? JSON.stringify(cw.rooms) : ""; if (k !== crowdKey) { crowdKey = k; if (cw ? (cw.rooms[scene] != null || (scene === "vineyard" && cw.places.includes("vineyard"))) : true) drawScene(); } }   // round 317
   const own = {scoop: !!F.scoop, cocoa: owns(F, "cocoa"), wine: !!F.vine, gift: owns(F, "giftshop"), boat: owns(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning)};
-  const got = HP.hapDaily(F, day, own, {stormy: rainDay(prev) === 2, away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: rnd => birdsTake(F, rnd)});
+  const got = HP.hapDaily(F, day, own, {stormy: rainDay(prev) === 2, away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: rnd => birdsTake(F, rnd), noCoach: HP.noCoachOn(day)});
   const j = HP.judge(F, day, hm, hapStock), lp = HP.lapse(F, day, hm);
   if (lp && !got.length && !j) { save(); flash(`The order for ${lp.who} wasn't ready in time: see your mailbox`); }
   if (got.length || j) { save(); sfx("paper", true); flash(got.includes("storm") ? "Storm damage in the night: see your mailbox" : got.includes("order") && !j ? "A big order's come in: see your mailbox" : j ? (j.good ? "A good review in the Gazette!" : "A review in the Gazette") : "Something's happening today: see your mailbox"); drawScene(); }

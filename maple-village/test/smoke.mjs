@@ -2286,7 +2286,12 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(bay.scoopshop === 13 && bay.bay === 10 && !bay.cocoa && cc.crowdSplit("bay", 1, {cocoa: true}).cocoa === 12, "at the bay: a full Scoop Shack, a queue out of the door and onto the deck, and the Cocoa Room too once it's yours");
     const F = {hap: {boosts: [{shop: "wine", from: "2026-10-14", to: "2026-10-14", hm: [660, 780], x: 3, why: "coach"}], repairs: [], log: []}};
     F.hap.boosts.push({shop: "scoop", from: "2026-10-14", to: "2026-10-14", hm: [660, 780], x: 2.5, why: "coach"});
-    check(hp.coachToday(F, "2026-10-14").places.join() === "vineyard,bay" && !hp.coachToday(F, "2026-10-15") && (cc.crowdArt("terrace", 3).match(/class="ch npc crowd act-sit"/g) || []).length === 3 && /HOLIDAY TOURS/.test(cc.coachArt()), "today's coach, seated figures on the terrace, and the coach itself"); }
+    // round 320: no visitor on a villager's spot (Pilar at the tasting tables, Marco by the door, the deck's regulars)
+    const npcSrc = (await import("node:fs")).readFileSync(new URL("../src/data/npcs.js", import.meta.url), "utf8"), clash = [];
+    for (const room of Object.keys(cc.CROWD_AT)) { const spots = [...npcSrc.matchAll(new RegExp(`"${room}", *\\[(\\d+), *(\\d+)\\]`, "g"))].map(m => [+m[1], +m[2]]);
+      cc.CROWD_AT[room].forEach(([x, y]) => spots.forEach(([a, b]) => { if (Math.abs(x - a) < 30 && Math.abs(y - b) < 30) clash.push(`${room} ${x},${y} by ${a},${b}`); })); }
+    check(!clash.length, `no coach visitor stands or sits on a villager's spot${clash.length ? `: ${clash.join("; ")}` : ""} (round 320)`);
+    check(hp.coachToday(F, "2026-10-14").places.join() === "vineyard,bay" && !hp.coachToday(F, "2026-10-15") && (cc.crowdArt("terrace", 3).match(/class="ch npc crowd act-sit/g) || []).length === 3 && /HOLIDAY TOURS/.test(cc.coachArt()), "today's coach, seated figures on the terrace, and the coach itself"); }
   { // round 316: every small plate has its own drawing (the tomato salad was an empty plate)
     const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), wa = await import(new URL("../src/art/wine.js", import.meta.url)), bare = wa.dishArt("no_such_dish");
     const none = Object.keys(kit.DISHES).filter(id => wa.dishArt(id) === bare);
@@ -5423,7 +5428,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(!hp.judge(G, "2026-06-03", 0, () => 0).good && !G.hap.boosts.length && /lukewarm/.test(G.hap.log[0].body), "bare shelves: a lukewarm write-up, no harm done"); }
   { const F = {coins: 0}; hp.hapDaily(F, "2026-06-01", {});
     check(hp.hapDaily(F, "2026-06-02", {scoop: 1, cocoa: 1, wine: 1}, {rnd: seq([.9, .05, .2, .2])}).includes("coach") && hp.boost(F, "scoop", "2026-06-02", 11*60 + 30) === hp.COACH_X && hp.boost(F, "cocoa", "2026-06-02", 12*60) === hp.COACH_X && hp.boost(F, "scoop", "2026-06-02", 13*60) === 1 && hp.boost(F, "wine", "2026-06-02", 12*60) === hp.COACH_X && hp.COACH_X === 2.5, "a coach party at 11: every shop at once (round 318), each two and a half times as busy for two hours");
-    check(!hp.hapDaily(F, "2026-06-03", {scoop: 1}, {rnd: seq([.9, 0])}).includes("coach"), "and not another coach for a few days"); }
+    check(!hp.hapDaily(F, "2026-06-03", {scoop: 1}, {rnd: seq([.9, 0])}).includes("coach"), "and not another coach for a few days");
+    const G = {hap: {day: "2026-06-06", boosts: [], repairs: [], log: [], upkeep: {}}}, ev = (day, noCoach) => hp.hapDaily(G, day, {scoop: 1, wine: 1}, {rnd: () => .05, noCoach});
+    check(!ev("2026-06-07", true).includes("coach") && ev("2026-06-08", false).includes("coach"), "never on a Sunday or a wedding day: no clash with the long lunch or a wedding (round 320)");
+    const oc = await import(new URL("../src/game/occasions.js", import.meta.url)); let wd = null; for (let d = Date.parse("2026-01-01"); d < Date.parse("2027-01-01") && !wd; d += 864e5) { const k = new Date(d).toISOString().slice(0, 10); if (oc.weddingOn(k)) wd = k; }
+    check(!!wd && hp.noCoachOn(wd) && hp.noCoachOn("2026-06-07") && !hp.noCoachOn("2026-06-08"), `and the game counts Sundays and wedding days (${wd}) as no-coach days`); }
   { const F = {coins: 0, scoop: {}, hap: {repairs: [{id: "awning-x", kind: "awning"}], boosts: [], log: []}};
     check(hp.boost(F, "scoop", "2026-06-02", 600) === .85, "a torn awning: the deck's a bit quieter until it's mended"); }
   // the wine: the vinegar barrel, the starlings and the netting

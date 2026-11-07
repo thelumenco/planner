@@ -1,3 +1,4 @@
+import { weddingOn } from "./occasions.js";   // round 320
 // Happenings (round 303, Mel: "I need more random events and setbacks in the game. Now have bought everything and am
 // bored"; she picked storm night, the wine, a food critic, a coach party, big orders with deadlines and upkeep).
 // Part one: storms, the critic, coach parties (and, in vineyard.js, the vinegar barrel and the birds at harvest).
@@ -90,6 +91,8 @@ function coach(F, day, own, rnd){
 }
 
 // round 317: today's coach, if there is one: where it is ("bay" or "vineyard") and its two hours
+// round 320: the days a coach can't come: Sundays (the long lunch) and wedding days
+export const noCoachOn = day => new Date(day + "T00:00:00Z").getUTCDay() === 0 || !!weddingOn(day);
 export function coachToday(F, day){
   const bs = hapState(F).boosts.filter(x => x.why === "coach" && x.from === day && x.hm); if (!bs.length) return null;
   const places = [...new Set(bs.map(b => b.shop === "wine" || b.shop === "gift" ? "vineyard" : "bay"))];
@@ -151,7 +154,8 @@ export function hapDaily(F, day, own, o = {}){
   if (o.harvest && o.birds && rnd() < .5) { const n = o.birds(rnd); if (n) { out.push("birds");
     note(h, day, "Starlings in the vineyard", `A cloud of starlings came down on the ripe grapes at first light: ${n} vine${n > 1 ? "s" : ""} picked clean before anyone could shoo them off. Water ${n > 1 ? "them" : "it"} again and ${n > 1 ? "they'll" : "it'll"} fruit again. Bird netting from the vineyard shop keeps them off for good.`); } }
   if (!h.critic && (!h.lastCritic || daysBetween(h.lastCritic, day) >= 14) && rnd() < 1/20) { if (critic(F, day, own, rnd)) out.push("critic"); }
-  else if ((!h.lastCoach || daysBetween(h.lastCoach, day) >= 5) && rnd() < 1/10) { if (coach(F, day, own, rnd)) out.push("coach"); }
+  // round 320 (Mel: "Tours must never clash with a wedding or a Sunday lunch"): no coach on a Sunday or a wedding day (o.noCoach)
+  else if (!o.noCoach && (!h.lastCoach || daysBetween(h.lastCoach, day) >= 5) && rnd() < 1/10) { if (coach(F, day, own, rnd)) out.push("coach"); }
   if (!h.order && (!h.lastOrder || daysBetween(h.lastOrder, day) >= 6) && rnd() < 1/8) { if (order(F, day, own, rnd)) out.push("order"); }
   if (upkeep(F, day, own, rnd).length) out.push("upkeep");
   return out;

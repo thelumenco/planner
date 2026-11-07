@@ -20,16 +20,17 @@ function look(seed, extra){
   if (r(11) < .2) l.hat = "sunhat";
   return l;
 }
-// where they go, in scene units: [x, y, sit?, faces (1 right, -1 left)]; the shop queues start a step back from the
+// where they go, in scene units: [x, y, sit?, faces (1 right, -1 left)]; round 320 (Mel: "Pilar is sitting on someone"):
+// never where a villager stands or sits (the tasting-room tables, the deck's bench, Marco by the wine shop door); the shop queues start a step back from the
 // counter (Mel: "Some people are under the counter in the shop")
 export const CROWD_AT = {
-  wineshop: [[70, 432], [120, 448], [178, 430], [228, 456], [302, 448], [352, 432], [406, 452], [456, 434], [92, 548], [190, 540], [338, 540], [450, 548]].map(([x, y], i) => [x, y, false, i % 2 ? -1 : 1]),
+  wineshop: [[70, 432], [120, 448], [178, 430], [228, 456], [302, 448], [352, 432], [406, 452], [456, 434], [110, 604], [176, 612], [350, 612], [420, 604]].map(([x, y], i) => [x, y, false, i % 2 ? -1 : 1]),
   terrace: [...[329, 373, 417, 461, 505, 549].map(y => [214, y + 12, true, 1]), ...[329, 373, 417, 461, 505, 549].map(y => [306, y + 12, true, -1])],
-  vineyard: [[350, 262, false, 1], [392, 270, false, -1], [434, 258, false, -1], [312, 280, false, 1], [462, 284, false, -1], [372, 296, false, 1]],   // waiting by the wine shop's door (no terrace yet)
+  vineyard: [[350, 262, false, 1], [420, 302, false, -1], [434, 258, false, -1], [312, 280, false, 1], [462, 284, false, -1], [372, 296, false, 1]],   // waiting by the wine shop's door (no terrace yet)
   scoopshop: [[232, 404, false, 1], [272, 408, false, -1], [312, 404, false, 1], [352, 408, false, -1], [204, 454, false, 1], [254, 458, false, 1], [306, 454, false, -1], [362, 458, false, -1], [412, 454, false, -1], [92, 506, true, 1], [150, 506, true, -1], [386, 506, true, 1], [444, 506, true, -1]],
   cocoa: [[238, 404, false, 1], [278, 408, false, -1], [318, 404, false, 1], [358, 408, false, -1], [214, 454, false, 1], [266, 458, false, 1], [318, 454, false, -1], [372, 458, false, -1], [92, 506, true, 1], [150, 506, true, -1], [386, 506, true, 1], [444, 506, true, -1]],
   giftshop: [[96, 322, false, 1], [150, 336, false, -1], [214, 320, false, 1], [268, 334, false, -1], [330, 322, false, 1], [408, 336, false, -1], [196, 404, false, 1], [228, 520, false, 1], [300, 532, false, -1], [440, 488, false, -1]],   // round 318: browsing the cases and the shelves
-  bay: [[382, 290, false, -1], [362, 302, false, -1], [342, 314, false, -1], [322, 326, false, -1], [302, 338, false, -1], [284, 352, false, -1], [138, 338, true, 1], [226, 360, true, -1], [186, 414, true, 1], [148, 400, true, 1]]
+  bay: [[382, 290, false, -1], [362, 302, false, -1], [342, 314, false, -1], [322, 326, false, -1], [302, 338, false, -1], [284, 352, false, -1], [138, 338, true, 1], [210, 404, true, -1], [186, 414, true, 1], [148, 400, true, 1]]
 };
 // which rooms fill, in order, for each place the coach goes
 export const CROWD_ORDER = {vineyard: ["wineshop", "giftshop", "terrace"], bay: ["scoopshop", "cocoa", "bay"]};

@@ -3000,3 +3000,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 319: calmer strollers, glasses stay in hand (Mel: "some are walking too much ... swinging their arms while there's a glass of wine floating next to them. I don't mind if they just occasionally move a few steps")
 - coachcrowd.js: `.holds` on visitors with a wineglass or cone (the prop isn't inside the arm, so moving that arm left it floating); fewer strollers, no `.walk`. npcs.css: holders talk with the left hand; strollers take a few steps twice in a 16-second cycle, legs only. Test: the "lively" check in the round 317 block. Picture: screens-bottom-row/round319-glasses.png.
+
+## Round 320: no coach on Sundays or wedding days, and no tourist on a villager (Mel: "Tours must never clash with a wedding or a Sunday lunch"; "Pilar is sitting on someone")
+- happen.js `noCoachOn(day)` (Sunday or a wedding day; imports `weddingOn` from occasions.js); core passes `noCoach` to `hapDaily`. coachcrowd.js: the wine shop's second row moves from the tasting tables to the bottom of the room; the deck seat and the spot by the wine shop door move off the regulars and Marco. A unit check compares every crowd spot with the villagers' spots in data/npcs.js. Picture: screens-bottom-row/round320-tables-clear.png.
