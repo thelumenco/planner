@@ -6,6 +6,7 @@
 // cost time and a few coins, never what you've built up: a storm breaks one thing until it's mended (a "Storm damage"
 // label on it, tap to mend); a critic tries one of your shops and, if it's well stocked, writes it up (a busier week);
 // a coach party fills one place for two hours. Nothing rolls while you're away on a trip. State: F.hap.
+import { weddingOn } from "./occasions.js";   // round 320
 export const hapState = F => { const h = F.hap = F.hap || {}; for (const [k, v] of Object.entries({day: "", repairs: [], boosts: [], log: [], critic: null, lastCritic: "", lastCoach: "", order: null, lastOrder: "", upkeep: {}})) if (h[k] === undefined) h[k] = v; return h; };
 
 const addDays = (day, n) => new Date(Date.parse(day + "T00:00:00Z") + n*864e5).toISOString().slice(0, 10);
@@ -73,14 +74,20 @@ export function judge(F, day, hm, stockOf){
   else note(h, c.day, `A review in the Honeybrook Gazette: ${SHOP_N[c.shop]}`, `"Charming, but the shelves were looking a little bare when I called in. One to watch." A lukewarm write-up: no harm done, but a chance missed. A fuller shop next time.`);
   h.critic = null; return {good, shop: c.shop};
 }
-const COACH = {bay: {shops: ["scoop", "cocoa"], n: "the bay"}, vineyard: {shops: ["wine"], n: "the vineyard"}};
+const COACH = {bay: {shops: ["scoop", "cocoa"], n: "the bay"}, vineyard: {shops: ["wine", "gift"], n: "the vineyard"}};   // round 318: the gift shop too
+const COACH_N = Object.assign({gift: "the gift shop"}, SHOP_N);
+// round 318: one coach, every shop you own, the same two hours. The forty
+// are split between the bay and the vineyard, so each shop is two and a half times as busy rather than three
+export const COACH_X = 2.5;
 function coach(F, day, own, rnd){
   const h = hapState(F), places = Object.keys(COACH).filter(p => COACH[p].shops.some(s => own[s])); if (!places.length) return null;
-  const p = places[Math.floor(rnd()*places.length)], from = rnd() < .5 ? 11*60 : 14*60;
-  COACH[p].shops.filter(s => own[s]).forEach(s => h.boosts.push({shop: s, from: day, to: day, hm: [from, from + 120], x: 3, why: "coach"}));
+  rnd();   // (was: which place; the coach now stops at every one)
+  const from = rnd() < .5 ? 11*60 : 14*60, shops = places.flatMap(p => COACH[p].shops.filter(s => own[s]));
+  shops.forEach(s => h.boosts.push({shop: s, from: day, to: day, hm: [from, from + 120], x: COACH_X, why: "coach"}));
   h.lastCoach = day;
-  note(h, day, "A coach party today", `A coach is booked in at ${COACH[p].n} at ${from === 11*60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours. ${COACH[p].shops.filter(s => own[s]).map(s => SHOP_N[s]).join(" and ").replace(/^./, x => x.toUpperCase())} will be rushed off ${COACH[p].shops.filter(s => own[s]).length > 1 ? "their" : "its"} feet: stock up beforehand.`);
-  return p;
+  const names = shops.map(s => COACH_N[s]), list = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0];
+  note(h, day, "A coach party today", `A coach is booked in at ${from === 11*60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours, and they'll be everywhere at once.${places.length > 1 ? " It drops half at the bay and takes the rest up to the vineyard." : ""} ${list.replace(/^./, x => x.toUpperCase())} will be rushed off ${shops.length > 1 ? "their" : "its"} feet: stock up beforehand.${places.includes("vineyard") ? " When the wine shop's full, the rest will take their glasses out onto the terrace." : ""}${places.includes("bay") ? " Expect a queue out of the Scoop Shack's door and every seat on the deck taken." : ""}`);
+  return places.join("+");
 }
 
 /* ---------- big orders with a deadline (round 304) ---------- */
@@ -141,7 +148,8 @@ export function hapDaily(F, day, own, o = {}){
   if (o.harvest && o.birds && rnd() < .5) { const n = o.birds(rnd); if (n) { out.push("birds");
     note(h, day, "Starlings in the vineyard", `A cloud of starlings came down on the ripe grapes at first light: ${n} vine${n > 1 ? "s" : ""} picked clean before anyone could shoo them off. Water ${n > 1 ? "them" : "it"} again and ${n > 1 ? "they'll" : "it'll"} fruit again. Bird netting from the vineyard shop keeps them off for good.`); } }
   if (!h.critic && (!h.lastCritic || daysBetween(h.lastCritic, day) >= 14) && rnd() < 1/20) { if (critic(F, day, own, rnd)) out.push("critic"); }
-  else if ((!h.lastCoach || daysBetween(h.lastCoach, day) >= 5) && rnd() < 1/10) { if (coach(F, day, own, rnd)) out.push("coach"); }
+  // round 320: no coach on a Sunday (the long lunch) or a wedding day (o.noCoach)
+  else if (!o.noCoach && (!h.lastCoach || daysBetween(h.lastCoach, day) >= 5) && rnd() < 1/10) { if (coach(F, day, own, rnd)) out.push("coach"); }
   if (!h.order && (!h.lastOrder || daysBetween(h.lastOrder, day) >= 6) && rnd() < 1/8) { if (order(F, day, own, rnd)) out.push("order"); }
   if (upkeep(F, day, own, rnd).length) out.push("upkeep");
   return out;
@@ -156,8 +164,11 @@ export function boost(F, shop, day, hm){
 }
 export const hapMail = F => ((F.hap && F.hap.log) || []).map(n => ({id: n.id, from: "postie", at: n.at, title: n.title, body: n.body}));
 
+// round 320: the days a coach can't come: Sundays (the long lunch) and wedding days
+export const noCoachOn = day => new Date(day + "T00:00:00Z").getUTCDay() === 0 || !!weddingOn(day);
 // round 317: today's coach, if there is one: where it is ("bay" or "vineyard") and its two hours
 export function coachToday(F, day){
-  const b = hapState(F).boosts.find(x => x.why === "coach" && x.from === day && x.hm); if (!b) return null;
-  return {place: b.shop === "wine" ? "vineyard" : "bay", hm: b.hm};
+  const bs = hapState(F).boosts.filter(x => x.why === "coach" && x.from === day && x.hm); if (!bs.length) return null;
+  const places = [...new Set(bs.map(b => b.shop === "wine" || b.shop === "gift" ? "vineyard" : "bay"))];
+  return {places, place: places[0], hm: bs[0].hm};   // round 318: every place it stops at
 }

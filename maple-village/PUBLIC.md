@@ -568,3 +568,18 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   the ride never shows indoors.
 - Checked the spots against this edition's rooms (screenshots); they match the source's rooms.
 - Test: unit checks in "Scoop Shack upgrades", and "The coach party you can see, and Tomo's bike (round 317)".
+
+## Rounds 318 to 320 (ported): one coach for every shop, lively crowds, the gift shop, and no clashes
+
+- game/happen.js: one coach stops at every shop you own (bay and vineyard together), each `COACH_X` (2.5) times as
+  busy for the same two hours; the gift shop is part of the vineyard stop. `coachToday` returns `places`.
+  `noCoachOn(day)` (a Sunday, or `weddingOn` from occasions.js) is passed to `hapDaily` as `noCoach`.
+- art/coachcrowd.js: `CROWD_AT.giftshop` (10 browsing), the order wine shop, gift shop, terrace; visitors bob, talk
+  with the free hand, hop and sip, each on its own `--d`; a hand holding a glass or cone (`.holds`) stays still; a few
+  strollers (no `.walk`) stand most of a 16 second cycle and take a few steps. `CHAT` lines and `chatBubble()`; the
+  spots keep clear of every villager's spot. One chat line changed from the source ("Perfect for my nan!").
+- game/core.js: `coachCrowdNow` merges the places; `crowdChatter()` shows one bubble every 3 seconds; the gift shop's
+  sales take the coach boost (`giftSellMinute` multiplies by `o.boost`). CSS at the end of npcs.css, off under
+  reduced motion.
+- Tests: the round 317 unit block and page section cover all of it, including a check that no visitor is within 30
+  of a villager's spot in data/npcs.js.

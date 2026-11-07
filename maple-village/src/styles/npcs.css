@@ -360,3 +360,27 @@
 .ch.npc.act-shorepose:not(.walk) .fbrim{animation:brimF 2.8s ease-in-out infinite}.ch.npc.act-shorepose:not(.walk) .hribbon{transform-box:fill-box;transform-origin:100% 0;animation:ribF 1.4s ease-in-out infinite alternate}
 @keyframes brimF{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(3deg)}}@keyframes ribF{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}
 @media (prefers-reduced-motion:reduce){.ch.npc.act-sandals .armR,.ch.npc.act-sandals .inhand,.ch.npc.act-bikebell .armR,.ch.npc.act-bikebell .bring,.ch.npc.act-figpick .armR,.ch.npc.act-figpick .inhand,.ch.npc.act-flamingos .flip > g,.ch.npc.act-stonestack .armR,.ch.npc.act-stonestack .inhand,.ch.npc .mdrip path,.ch.npc.act-shorepose .fbrim,.ch.npc.act-shorepose .hribbon{animation:none}.ch.npc.act-sandals .armR{transform:rotate(-120deg)}.ch.npc.act-bikebell .armR{transform:rotate(-20deg)}.ch.npc.act-figpick .armR{transform:rotate(-150deg)}.ch.npc.act-stonestack .armR{transform:rotate(-55deg)}}
+
+/* round 318: the coach party's visitors are lively (art/coachcrowd.js). Round 319: a hand holding a
+   glass or a cone (.holds) stays still, so they talk with the other hand; a stroller stands most of the time and
+   now and then takes a few steps, with only the legs moving */
+.ch.crowd:not(.act-sit):not(.stroll) > .cb{animation:crowdBob 2.2s ease-in-out infinite;animation-delay:var(--d,0s)}
+.ch.crowd.hop > .cb{animation:crowdHop 3.4s ease-out infinite;animation-delay:var(--d,0s)}
+.ch.crowd:not(.holds):not(.stroll) .armR{animation:crowdTalk 1.5s ease-in-out infinite alternate;animation-delay:var(--d,0s)}
+.ch.crowd.act-sit:not(.holds) .armR{animation:crowdSip 2.6s ease-in-out infinite alternate;animation-delay:var(--d,0s)}
+.ch.crowd.holds:not(.stroll) .armL{animation:crowdTalkL 1.6s ease-in-out infinite alternate;animation-delay:var(--d,0s)}
+.ch.crowd:not(.holds):not(.stroll):nth-child(3n) .armL{animation:crowdWave 1.2s ease-in-out infinite alternate;animation-delay:var(--d,0s)}
+.ch.crowd.stroll > .strollw{animation:crowdStroll 16s ease-in-out infinite;animation-delay:var(--d,0s)}
+.ch.crowd.stroll .legL{animation:crowdStepA 16s linear infinite;animation-delay:var(--d,0s)}
+.ch.crowd.stroll .legR{animation:crowdStepB 16s linear infinite;animation-delay:var(--d,0s)}
+@keyframes crowdBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6px)}}
+@keyframes crowdHop{0%,72%,100%{transform:translateY(0)}80%{transform:translateY(-7px)}88%{transform:translateY(0)}93%{transform:translateY(-3px)}}
+@keyframes crowdTalk{from{transform:rotate(-12deg)}to{transform:rotate(-62deg)}}
+@keyframes crowdTalkL{from{transform:rotate(8deg)}to{transform:rotate(48deg)}}
+@keyframes crowdSip{0%,55%{transform:rotate(-15deg)}100%{transform:rotate(-80deg)}}
+@keyframes crowdWave{from{transform:rotate(10deg)}to{transform:rotate(55deg)}}
+@keyframes crowdStroll{0%,34%{transform:translateX(0) scaleX(1)}42%,72%{transform:translateX(14px) scaleX(1)}72.5%{transform:translateX(14px) scaleX(-1)}80.5%,99.5%{transform:translateX(0) scaleX(-1)}100%{transform:translateX(0) scaleX(1)}}
+@keyframes crowdStepA{0%,34%,42%,72.5%,80.5%,100%{transform:rotate(0)}36%,40%,74.5%,78.5%{transform:rotate(18deg)}38%,76.5%{transform:rotate(-18deg)}}
+@keyframes crowdStepB{0%,34%,42%,72.5%,80.5%,100%{transform:rotate(0)}36%,40%,74.5%,78.5%{transform:rotate(-18deg)}38%,76.5%{transform:rotate(18deg)}}
+.crowdsay{animation:crowdSay 2.8s ease-out forwards}@keyframes crowdSay{0%{opacity:0}10%,82%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.ch.crowd > .cb,.ch.crowd .armR,.ch.crowd .armL,.ch.crowd.stroll > .strollw,.ch.crowd.stroll .legL,.ch.crowd.stroll .legR{animation:none !important}}
