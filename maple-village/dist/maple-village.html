@@ -566,6 +566,8 @@ button.subname[aria-expanded="true"]::after{content:"▴"}
 .bikeWheel{transform-box:fill-box;transform-origin:50% 50%}#mel.biking .bikeWheel,.npc.walk .bikeWheel{animation:bspin .5s linear infinite}@keyframes bspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){#mel.biking .bikeWheel,.npc.walk .bikeWheel{animation:none}}
 #mel.scoot .rideScoot,#mel.drive .rideCar{display:inline}
+/* round 317 (Mel: "Tomo cycles with his hands swinging"): on the delivery bike his hands stay on the handlebars; his legs pedal */
+.ch.rideby .armL,.ch.rideby .armR{animation:none !important;transform:rotate(-58deg)}
 #mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
 #mel.drive .legL,#mel.drive .legR{visibility:hidden}
 .ridePony{display:none}#mel.riding .ridePony{display:inline}#mel .ponyEvan{display:none}#mel.riding.withEvan .ponyEvan{display:inline}/* round 283 */
@@ -6880,12 +6882,12 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var h = (s) => [...s].reduce((a, c) => a * 31 + c.charCodeAt(0) >>> 0, 7);
   var person = (id, name, job, role, hairStyle, kid2) => {
     const k = h(id), skin = SKIN[k % SKIN.length], hair2 = role === "grand" ? "#D6D0C6" : HAIR[(k >> 3) % 6], col = DRESSY[(k >> 5) % DRESSY.length];
-    const look = role === "bride" ? { skin, hair: hair2, hairStyle, top: "#FFFDF6", bottom: "#FFFDF6", dress: "#FFFDF6" } : role === "groom" ? { skin, hair: hair2, hairStyle, top: "#2F3A4A", bottom: "#2F3A4A", extra: "tie" } : role === "suit" || role === "grand" && /^m/.test(hairStyle) ? { skin, hair: hair2, hairStyle: hairStyle.replace(/^m/, "") || "short", top: col === "#C8432F" ? "#4A5568" : "#3E4A5A", bottom: "#3E4A5A", extra: "tie" } : { skin, hair: hair2, hairStyle, top: col, bottom: col, dress: col };
+    const look2 = role === "bride" ? { skin, hair: hair2, hairStyle, top: "#FFFDF6", bottom: "#FFFDF6", dress: "#FFFDF6" } : role === "groom" ? { skin, hair: hair2, hairStyle, top: "#2F3A4A", bottom: "#2F3A4A", extra: "tie" } : role === "suit" || role === "grand" && /^m/.test(hairStyle) ? { skin, hair: hair2, hairStyle: hairStyle.replace(/^m/, "") || "short", top: col === "#C8432F" ? "#4A5568" : "#3E4A5A", bottom: "#3E4A5A", extra: "tie" } : { skin, hair: hair2, hairStyle, top: col, bottom: col, dress: col };
     return {
       id,
       name,
       job,
-      look,
+      look: look2,
       local: "wedding",
       tourist: true,
       kid: !!kid2,
@@ -9190,7 +9192,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
   var slot = (from, to, scene2, where, opts) => Object.assign({ from: hm(from), to: hm(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
   var FIRE = [[224, 458], [336, 458], [250, 496], [310, 496], [280, 418]];
   var at = (i, d) => ({ dir: d || (FIRE[i][0] < 280 ? 1 : -1) });
-  var P5 = (id, name, job, look, routine, lines2, intro, away, more) => ({ id, local: "bellbird", pitch: 0.8 + id.charCodeAt(2) % 6 * 0.06, name, job, look, routine, lines: lines2, intro, away, ...more || {} });
+  var P5 = (id, name, job, look2, routine, lines2, intro, away, more) => ({ id, local: "bellbird", pitch: 0.8 + id.charCodeAt(2) % 6 * 0.06, name, job, look: look2, routine, lines: lines2, intro, away, ...more || {} });
   var BB_PEOPLE = [
     /* ---------- Valley Gate ---------- */
     P5(
@@ -9669,7 +9671,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return h3 * 60 + (m || 0);
   };
   var slot2 = (from, to, scene2, where, opts) => Object.assign({ from: hm2(from), to: hm2(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
-  var P6 = (id, name, job, look, routine, lines2, intro, away, more) => ({ id, local: "bellbird", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look, routine, lines: lines2, intro, away, ...more || {} });
+  var P6 = (id, name, job, look2, routine, lines2, intro, away, more) => ({ id, local: "bellbird", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look: look2, routine, lines: lines2, intro, away, ...more || {} });
   var DESK = [404, 292];
   var CR_PEOPLE = [
     /* ---------- Breakwater ---------- */
@@ -10010,7 +10012,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return h3 * 60 + (m || 0);
   };
   var slot3 = (from, to, scene2, where, opts) => Object.assign({ from: hm3(from), to: hm3(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
-  var P7 = (id, name, job, look, routine, lines2, intro, away, more) => ({ id, local: "saltwick", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look, routine, lines: lines2, intro, away, ...more || {} });
+  var P7 = (id, name, job, look2, routine, lines2, intro, away, more) => ({ id, local: "saltwick", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look: look2, routine, lines: lines2, intro, away, ...more || {} });
   var at2 = (room4) => SW_ROOM_STAND[room4];
   var SW_PEOPLE = [
     P7(
@@ -10124,7 +10126,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return h3 * 60 + (m || 0);
   };
   var slot4 = (from, to, scene2, where, opts) => Object.assign({ from: hm4(from), to: hm4(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
-  var P8 = (id, name, job, look, routine, lines2, intro, away, more) => ({ id, local: "porto", pitch: 0.82 + id.charCodeAt(1) % 6 * 0.06, name, job, look, routine, lines: lines2, intro, away, ...more || {} });
+  var P8 = (id, name, job, look2, routine, lines2, intro, away, more) => ({ id, local: "porto", pitch: 0.82 + id.charCodeAt(1) % 6 * 0.06, name, job, look: look2, routine, lines: lines2, intro, away, ...more || {} });
   var at3 = (room4) => PV_ROOM_STAND[room4];
   var PV_PEOPLE = [
     P8(
@@ -10233,7 +10235,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return h3 * 60 + (m || 0);
   };
   var slot5 = (from, to, scene2, where, opts) => Object.assign({ from: hm5(from), to: hm5(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
-  var P9 = (id, name, job, look, routine, lines2, intro, away, more) => ({ id, local: "puffin", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look, routine, lines: lines2, intro, away, ...more || {} });
+  var P9 = (id, name, job, look2, routine, lines2, intro, away, more) => ({ id, local: "puffin", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look: look2, routine, lines: lines2, intro, away, ...more || {} });
   var at4 = (room4) => PI_ROOM_STAND[room4];
   var PI_PEOPLE = [
     P9(
@@ -10324,7 +10326,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return h3 * 60 + (m || 0);
   };
   var slot6 = (from, to, scene2, where, opts) => Object.assign({ from: hm6(from), to: hm6(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
-  var P10 = (id, name, job, look, routine, lines2, intro, away, more) => ({ id, local: "bali", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look, routine, lines: lines2, intro, away, ...more || {} });
+  var P10 = (id, name, job, look2, routine, lines2, intro, away, more) => ({ id, local: "bali", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look: look2, routine, lines: lines2, intro, away, ...more || {} });
   var at5 = (room4) => BA_ROOM_STAND[room4];
   var BA_PEOPLE = [
     P10(
@@ -10423,7 +10425,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return h3 * 60 + (m || 0);
   };
   var slot7 = (from, to, scene2, where, opts) => Object.assign({ from: hm7(from), to: hm7(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
-  var P11 = (id, name, job, look, routine, lines2, intro, away, more) => ({ id, local: "hokkaido", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look, routine, lines: lines2, intro, away, ...more || {} });
+  var P11 = (id, name, job, look2, routine, lines2, intro, away, more) => ({ id, local: "hokkaido", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look: look2, routine, lines: lines2, intro, away, ...more || {} });
   var at6 = (room4) => HK_ROOM_STAND[room4];
   var HK_PEOPLE = [
     P11(
@@ -10515,7 +10517,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return h3 * 60 + (m || 0);
   };
   var slot8 = (from, to, scene2, where, opts) => Object.assign({ from: hm8(from), to: hm8(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
-  var P12 = (id, name, job, look, routine, lines2, intro, away, more) => ({ id, local: "formentera", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look, routine, lines: lines2, intro, away, ...more || {} });
+  var P12 = (id, name, job, look2, routine, lines2, intro, away, more) => ({ id, local: "formentera", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look: look2, routine, lines: lines2, intro, away, ...more || {} });
   var at7 = (room4) => FM_ROOM_STAND[room4];
   var MARKET = [0, 3];
   var FM_PEOPLE = [
@@ -10614,7 +10616,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return h3 * 60 + (m || 0);
   };
   var slot9 = (from, to, scene2, where, opts) => Object.assign({ from: hm9(from), to: hm9(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
-  var P13 = (id, name, job, look, routine, lines2, intro, away, more) => ({ id, local: "bellbird", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look, routine, lines: lines2, intro, away, ...more || {} });
+  var P13 = (id, name, job, look2, routine, lines2, intro, away, more) => ({ id, local: "bellbird", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look: look2, routine, lines: lines2, intro, away, ...more || {} });
   var DESK2 = [404, 292];
   var IN = [[200, 500], [320, 520], [260, 460]];
   var TL_PEOPLE = [
@@ -10985,7 +10987,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
     return h3 * 60 + (m || 0);
   };
   var slot10 = (from, to, scene2, where, opts) => Object.assign({ from: hm10(from), to: hm10(to), scene: scene2 }, Array.isArray(where[0]) ? { wander: where } : { at: where }, opts || {});
-  var P14 = (id, name, job, look, routine, lines2, intro, away, more) => ({ id, local: "bellbird", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look, routine, lines: lines2, intro, away, ...more || {} });
+  var P14 = (id, name, job, look2, routine, lines2, intro, away, more) => ({ id, local: "bellbird", pitch: 0.82 + id.charCodeAt(2) % 6 * 0.06, name, job, look: look2, routine, lines: lines2, intro, away, ...more || {} });
   var DESK3 = [404, 292];
   var IN2 = [[200, 500], [320, 520], [260, 460]];
   var LV_PEOPLE = [
@@ -11840,13 +11842,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["bastien", "Bastien", { skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#6E9FD6", bottom: "#8A6A52", extra: "glasses" }, "Retired, touring the countryside"],
       ["grace", "Grace", { skin: "#C99A78", hair: "#2A211D", hairStyle: "long", top: "#F4C7CF", bottom: "#5E6E8C", hat: "sunhat" }, "Makes soap, like her gran Hazel (and sells it at the Sunday market)"],
       ["hiro", "Hiro", { skin: "#EAC4A4", hair: "#231C19", hairStyle: "spiky", top: "#3E6B8C", bottom: "#2F2B28", extra: "satchel" }, "Here for the farm tours"]
-    ].map(([id, name, look, job]) => ({
+    ].map(([id, name, look2, job]) => ({
       id,
       pitch: 0.9 + id.charCodeAt(0) % 5 * 0.08,
       name,
       job,
       tourist: true,
-      look,
+      look: look2,
       routine: [],
       intro: `Hi! I'm ${name}. ${job}. What a lovely place this is!`,
       lines: ["First time here. It's gorgeous!", "We came for the wine and stayed for the view.", "Is it always this peaceful?", "I'm taking some of this home, for sure.", "Do you live here? Lucky you.", "My friends are going to be so jealous."],
@@ -11864,13 +11866,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["lior", "Lior", { skin: "#D9A882", hair: "#5A3A2A", hairStyle: "short", top: "#F3C969", bottom: "#3E4A43" }, "Makes paper lanterns"],
       ["wen", "Wen", { skin: "#F0D2B6", hair: "#1F1A17", hairStyle: "long", top: "#C9A3E0", bottom: "#2F3B73" }, "Tanghulu and egg waffles"],
       ["kai", "Kai", { skin: "#A8754F", hair: "#1F1A17", hairStyle: "spiky", top: "#9CC27E", bottom: "#4A5568" }, "Presses sugarcane to order"]
-    ].map(([id, name, look, job]) => ({
+    ].map(([id, name, look2, job]) => ({
       id,
       pitch: 0.9 + id.charCodeAt(0) % 5 * 0.08,
       name,
       job,
       tourist: true,
-      look,
+      look: look2,
       routine: [],
       intro: `Hi! I'm ${name}. ${job}. We're here Tuesdays and Thursdays, half five till ten.`,
       lines: ["Busy night! Everyone's out.", "Have you heard the band? They're so good.", "Love this little town. Best market on our route.", "Come back Thursday, I'll have a new batch."],
@@ -11990,13 +11992,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["tae", "Tae", { skin: "#F0D2B6", hair: "#1F1A17", hairStyle: "spiky", top: "#E8566C", bottom: "#2F2B28", hat: "cap" }],
       ["ivy", "Ivy", { skin: "#D9A882", hair: "#3A2A22", hairStyle: "long", top: "#9CC27E", bottom: "#3E4A43" }],
       ["rafe", "Rafe", { skin: "#EBC9A8", hair: "#7C7570", hairStyle: "short", top: "#7FB8E8", bottom: "#8A6A52" }]
-    ].map(([id, name, look]) => ({
+    ].map(([id, name, look2]) => ({
       id,
       pitch: 0.9 + id.charCodeAt(0) % 5 * 0.08,
       name,
       job: "Here for the night market",
       tourist: true,
-      look,
+      look: look2,
       routine: [],
       intro: `Hi! I'm ${name}. We drove up for the night market. Have you tried the fried chicken?`,
       lines: ["This band is amazing.", "I've eaten three things already. No regrets.", "The fairy lights! So pretty.", "We're coming back Thursday.", "Is it always this lively here?"],
@@ -12009,13 +12011,13 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["priya", "Priya", { skin: "#B07A55", hair: "#1F1A17", hairStyle: "long", top: "#E8566C", bottom: "#3F4A6B" }],
       ["jonah", "Jonah", { skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "short", top: "#9CC27E", bottom: "#5E5A55", extra: "glasses" }],
       ["mia", "Mia", { skin: "#D9A882", hair: "#2B2320", hairStyle: "bob", top: "#F3C969", bottom: "#5E6E8C", hat: "sunhat" }]
-    ].map(([id, name, look]) => ({
+    ].map(([id, name, look2]) => ({
       id,
       pitch: 0.95,
       name,
       job: "Visiting with the kids",
       tourist: true,
-      look,
+      look: look2,
       routine: [],
       intro: `Hi, I'm ${name}! We drove up for the day. The kids haven't stopped running since we got here.`,
       lines: ["They'll sleep well tonight!", "A glass of wine while they play? Perfect day.", "We'll definitely be back.", "Is the roundabout always this popular?"],
@@ -12028,14 +12030,14 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
       ["zara", "Zara", { skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "bob", top: "#C9A3E0", bottom: "#E8566C" }],
       ["ollie", "Ollie", { skin: "#F2D3BC", hair: "#D9B46A", hairStyle: "short", top: "#F28C6A", bottom: "#3F4A6B" }],
       ["ava", "Ava", { skin: "#D9A882", hair: "#2B2320", hairStyle: "bun", top: "#8FB3E8", bottom: "#F3C969" }]
-    ].map(([id, name, look]) => ({
+    ].map(([id, name, look2]) => ({
       id,
       pitch: 1.45,
       name,
       job: "Here for the playground",
       tourist: true,
       kid: true,
-      look,
+      look: look2,
       routine: [],
       intro: `I'm ${name}! Wanna race?`,
       lines: ["Push me on the swing!", "Again! Again!", "The roundabout is the BEST.", "I'm not dizzy. Okay, a bit dizzy.", "Can Evan play too?"],
@@ -12229,7 +12231,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         [slot11("10:00", "12:00", "rd_cafe", [170, 480], { act: "sit" }), slot11("12:00", "13:30", "rd_mercado", [[200, 400], [330, 450], [260, 380]]), slot11("14:00", "16:00", "rd_jardin", [406, 604], { act: "notes", dir: -1 }), slot11("16:30", "18:00", "rd_banos", [[200, 320], [330, 340], [260, 420]]), slot11("18:00", "19:30", "rd_cuero", [[200, 420], [330, 440], [260, 500]]), slot11("20:00", "22:00", "rd_tapas", [328, 434], { act: "sit", dir: -1 })],
         ["I'm writing a postcard to every friend I have. I have too many friends.", "The tapas! Free with a drink! France must learn.", "Have you been to the baths? So peaceful."]
       ]
-    ].map(([id, name, look, job, intro, routine, lines2]) => ({ id, local: "ronda", tourist: true, pitch: 0.95 + id.charCodeAt(0) % 4 * 0.07, name, job, intro, look, routine, lines: lines2, away: `${name}'s off seeing another bit of Ronda.` })),
+    ].map(([id, name, look2, job, intro, routine, lines2]) => ({ id, local: "ronda", tourist: true, pitch: 0.95 + id.charCodeAt(0) % 4 * 0.07, name, job, intro, look: look2, routine, lines: lines2, away: `${name}'s off seeing another bit of Ronda.` })),
     // Round 122: Kyoto's people (local: "kyoto"). Sachiko keeps the tea house (Okada's grandmother taught her the tea
     // ceremony); Jōshin is the temple's cheerful monk; Mr Tanaka makes the sweets; Fumiko runs a pickle stall at the
     // market; Ishida throws pots; Mr Mori plays Go under the maples. And two tourists, so the rooms never feel empty.
@@ -12405,7 +12407,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         [slot11("9:30", "11:30", "kt_tea", [260, 300], { act: "sit" }), slot11("11:30", "13:30", "kt_market", [[220, 470], [320, 520]]), slot11("13:30", "15:30", "kt_lane", [[260, 540], [320, 300]]), slot11("15:30", "17:30", "kt_temple", [[240, 400], [300, 560]]), slot11("17:30", "19:30", "kt_river", [[180, 500], [320, 270]])],
         ["Mum's in the pottery buying a seventh teapot. Send help.", "The koi in the temple pond are bigger than my cat.", "I didn't think anywhere could be this quiet and this busy at once."]
       ]
-    ].map(([id, name, look, job, intro, routine, lines2]) => ({ id, local: "kyoto", tourist: true, pitch: 0.95 + id.charCodeAt(0) % 4 * 0.07, name, job, intro, look, routine, lines: lines2, away: `${name}'s off seeing another bit of Kyoto.` })),
+    ].map(([id, name, look2, job, intro, routine, lines2]) => ({ id, local: "kyoto", tourist: true, pitch: 0.95 + id.charCodeAt(0) % 4 * 0.07, name, job, intro, look: look2, routine, lines: lines2, away: `${name}'s off seeing another bit of Kyoto.` })),
     // Round 129: Jeju's people (local: "jeju"). Halmang Kim is a diver (haenyeo), seventy-four, and Seo-yeon is learning
     // from her; Mr Ko grows tangerines; Ha-eun keeps the café in her grandmother's house; Mi-ok and Mrs Boo have stalls at
     // the market; Mr Moon dyes cloth with green persimmons; Captain Oh runs the ferry; Mr Kang mends nets by the harbour;
@@ -12585,7 +12587,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         [slot11("9:30", "11:30", "jj_village", [[220, 400], [300, 480]]), slot11("11:30", "13:30", "jj_dye", [[240, 460], [320, 520]]), slot11("13:30", "15:30", "jj_market", [[220, 480], [300, 540]]), slot11("15:30", "17:30", "jj_haenyeo", [[150, 540], [300, 560]]), slot11("17:30", "19:30", "jj_farms", [[262, 420], [300, 540]])],
         ["My brother rode a pony and now he wants one. We live in a flat.", "I dyed a scarf! It's green. Mr Moon says it'll be brown. I'm confused.", "The porridge at the divers' house is green too. Everything's green and orange here."]
       ]
-    ].map(([id, name, look, job, intro, routine, lines2]) => ({ id, local: "jeju", tourist: true, pitch: 0.95 + id.charCodeAt(0) % 4 * 0.07, name, job, intro, look, routine, lines: lines2, away: `${name}'s off seeing another bit of Jeju.` })),
+    ].map(([id, name, look2, job, intro, routine, lines2]) => ({ id, local: "jeju", tourist: true, pitch: 0.95 + id.charCodeAt(0) % 4 * 0.07, name, job, intro, look: look2, routine, lines: lines2, away: `${name}'s off seeing another bit of Jeju.` })),
     // Round 133: Cinque Terre's people (local: "cinque"). Nonna Pina makes pesto; Beppe bakes the focaccia; Signor Bruno
     // grows the vines and drives the monorail; Gianni makes gelato; Signora Franca has the lemon shop; Aldo and Piero fish
     // and repaint their boats; Signor Rossi keeps the station; Nino plays bocce in the piazza. And tourists, walking the
@@ -12911,7 +12913,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
         [slot11("9:00", "11:00", "ct_corniglia", [[300, 400], [240, 430]]), slot11("11:00", "13:00", "ct_vernazza", [[300, 320], [360, 420]]), slot11("13:00", "15:00", "ct_focacceria", [[200, 540], [320, 560]]), slot11("15:00", "17:00", "ct_monterosso", [[200, 460], [260, 480]]), slot11("17:00", "19:00", "ct_gelato", [[200, 480], [300, 500]])],
         ["I'm sleeping in a room above a boat shed. It smells of paint and fish. I love it.", "The anchovies here are a whole different animal. A fish. A whole different fish.", "Three gelatos a day is a reasonable amount. I've checked."]
       ]
-    ].map(([id, name, look, job, intro, routine, lines2]) => ({ id, local: "cinque", tourist: true, pitch: 0.95 + id.charCodeAt(0) % 4 * 0.07, name, job, intro, look, routine, lines: lines2, away: `${name}'s off seeing another of the five villages.` })),
+    ].map(([id, name, look2, job, intro, routine, lines2]) => ({ id, local: "cinque", tourist: true, pitch: 0.95 + id.charCodeAt(0) % 4 * 0.07, name, job, intro, look: look2, routine, lines: lines2, away: `${name}'s off seeing another of the five villages.` })),
     // cabin, and fishes the pool on Saturday evenings
     {
       id: "wren",
@@ -18777,7 +18779,7 @@ ${r.n}`;
   ${bulbs([...sag(10, 260, 64, 22, 9), ...sag(260, 510, 64, 22, 9)], 0)}</g>`;
   var OTIS = { skin: "#A8754F", hair: "#1F1A17", hairStyle: "short", top: "#2F2B28", bottom: "#3F4A6B", hat: "cap" };
   var ELLA = { skin: "#F2D3BC", hair: "#B5562E", hairStyle: "bob", top: "#8E2C48", bottom: "#2F2B28" };
-  var sway = (x, y, look, dur4) => `<g transform="translate(${x} ${y})"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.4;0 0" dur="${dur4}s" repeatCount="indefinite"/>${personArt(look)}</g></g>`;
+  var sway = (x, y, look2, dur4) => `<g transform="translate(${x} ${y})"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.4;0 0" dur="${dur4}s" repeatCount="indefinite"/>${personArt(look2)}</g></g>`;
   var hat = (x, y) => `<g data-place="jazzhat" aria-label="The band's hat: drop in a tip"><ellipse class="hov" cx="${x}" cy="${y + 2}" rx="20" ry="7" style="fill:var(--butter)"/>
     ${sk(`<ellipse cx="${x}" cy="${y}" rx="12" ry="3.5" style="fill:#2F2B28"/><path d="M${x - 7} ${y} q0 -9 7 -9 q7 0 7 9z" style="fill:#2F2B28"/><circle cx="${x - 3}" cy="${y - 2}" r="1.4" style="fill:#F3C969"/><circle cx="${x + 2}" cy="${y - 1}" r="1.4" style="fill:#F3C969"/>`, `<ellipse cx="${x}" cy="${y}" rx="12" ry="3.5"/><path d="M${x - 7} ${y} q0 -9 7 -9 q7 0 7 9"/>`)}
     ${tapeLabel(x, y + 22, "Tip the band", "var(--butter)", 9)}</g>`;
@@ -20188,8 +20190,13 @@ ${r.n}`;
     const p = places[Math.floor(rnd17() * places.length)], from = rnd17() < 0.5 ? 11 * 60 : 14 * 60;
     COACH[p].shops.filter((s) => own[s]).forEach((s) => h3.boosts.push({ shop: s, from: day, to: day, hm: [from, from + 120], x: 3, why: "coach" }));
     h3.lastCoach = day;
-    note(h3, day, "A coach party today", `A coach is booked in at ${COACH[p].n} at ${from === 11 * 60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours. ${COACH[p].shops.filter((s) => own[s]).map((s) => SHOP_N[s]).join(" and ").replace(/^./, (x) => x.toUpperCase())} will be rushed off ${COACH[p].shops.filter((s) => own[s]).length > 1 ? "their" : "its"} feet: stock up beforehand.`);
+    note(h3, day, "A coach party today", `A coach is booked in at ${COACH[p].n} at ${from === 11 * 60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours. ${COACH[p].shops.filter((s) => own[s]).map((s) => SHOP_N[s]).join(" and ").replace(/^./, (x) => x.toUpperCase())} will be rushed off ${COACH[p].shops.filter((s) => own[s]).length > 1 ? "their" : "its"} feet: stock up beforehand.${p === "vineyard" ? " When the wine shop's full, the rest will take their glasses out onto the terrace." : " Expect a queue out of the door and every seat on the deck taken."}`);
     return p;
+  }
+  function coachToday(F2, day) {
+    const b = hapState(F2).boosts.find((x) => x.why === "coach" && x.from === day && x.hm);
+    if (!b) return null;
+    return { place: b.shop === "wine" ? "vineyard" : "bay", hm: b.hm };
   }
   var ORDER = {
     scoop: { unit: "scoops", price: 4, n: [20, 30], who: [["the cricket club", "the tea after Saturday's match"], ["the primary school", "sports day"], ["the church", "the summer fete"], ["the Wilsons", "their grandson's birthday"]] },
@@ -25331,10 +25338,10 @@ ${r.n}`;
   var board = (k) => `<ellipse cx="0" cy="${-1 * k}" rx="${22 * k}" ry="${3.6 * k}" style="fill:#F3C969"/><path d="M${-18 * k} ${-1 * k} h${36 * k}" fill="none" stroke-width=".8" style="stroke:#E8566C"/>`;
   var paddle = (k) => `<path d="M${12 * k} ${-30 * k} l${5 * k} ${32 * k}" fill="none" stroke-width="1.6" style="stroke:#8A5A3A"/><path d="M${16 * k} ${-2 * k} l${2 * k} ${8 * k} l${3 * k} ${-1 * k} l${-2 * k} ${-8 * k}z" ${S("#7FB8E8")}/>`;
   var cap = (c, y, r) => `<path d="M${-r - 0.2} ${y + 1} c-1 -9 4 -14 ${r} -14 c6 0 ${r + 1} 4 ${r} 14 c-3 -4 -8 -5 -12 -4 c-3 0 -6 2 -8 4z" ${S(c)}/>`;
-  var shut8 = (look, k) => [-1, 1].map((d) => `<ellipse cx="${d * 3.7 * k}" cy="${-44 * k}" rx="${1.7 * k}" ry="${2.1 * k}" ${S(look.skin)} stroke="none"/><path d="M${(d * 3.7 - 1.6) * k} ${-44.2 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="${0.9 * k}"/>`).join("");
+  var shut8 = (look2, k) => [-1, 1].map((d) => `<ellipse cx="${d * 3.7 * k}" cy="${-44 * k}" rx="${1.7 * k}" ry="${2.1 * k}" ${S(look2.skin)} stroke="none"/><path d="M${(d * 3.7 - 1.6) * k} ${-44.2 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="${0.9 * k}"/>`).join("");
   var limb = (d, col, w) => `<path d="${d}" fill="none" stroke-width="${w + 1.6}" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--line)"/><path d="${d}" fill="none" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" style="stroke:${col}"/>`;
   var basket = (cx, ty, k, col, inside2) => `<path d="M${(cx - 5) * k} ${ty * k} Q${cx * k} ${(ty - 12) * k} ${(cx + 5) * k} ${ty * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:#8A6A42"/>${inside2}<path d="M${(cx - 6.4) * k} ${ty * k} H${(cx + 6.4) * k} L${(cx + 5) * k} ${(ty + 8.4) * k} H${(cx - 5) * k}z" style="fill:${col}" stroke-width="${0.8 * k}"/><path d="M${(cx - 6) * k} ${(ty + 2.8) * k} H${(cx + 6) * k} M${(cx - 5.6) * k} ${(ty + 5.6) * k} H${(cx + 5.6) * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#8A6A42"/>${[-3, 0, 3].map((x) => `<path d="M${(cx + x) * k} ${ty * k} v${8.4 * k}" fill="none" stroke-width="${0.4 * k}" style="stroke:#8A6A42"/>`).join("")}`;
-  function extra(kind, look, k) {
+  function extra(kind, look2, k) {
     const y = -46 * k, r = 10.6 * k;
     switch (kind) {
       case "apron":
@@ -25345,7 +25352,7 @@ ${r.n}`;
       case "glasses":
         return `<circle cx="${-3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><circle cx="${3.8 * k}" cy="${y + 2}" r="${2.6 * k}" fill="none" stroke-width=".9"/><path d="M${-1.2 * k} ${y + 2} h${2.4 * k}" fill="none" stroke-width=".9"/>`;
       case "cap":
-        return `<path d="M${-r} ${y - 3} c0 -8 ${r * 2} -8 ${r * 2} 0z" ${S(look.top)}/><path d="M${r - 2} ${y - 3} h${7 * k}" stroke-width="2.2" style="stroke:${look.top}"/>`;
+        return `<path d="M${-r} ${y - 3} c0 -8 ${r * 2} -8 ${r * 2} 0z" ${S(look2.top)}/><path d="M${r - 2} ${y - 3} h${7 * k}" stroke-width="2.2" style="stroke:${look2.top}"/>`;
       case "sunhat":
         return `<ellipse cx="0" cy="${y - 6 * k}" rx="${16 * k}" ry="${3.6 * k}" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 6 * k} c0 -10 ${16 * k} -10 ${16 * k} 0z" ${S("#F3DFA6")}/><path d="M${-8 * k} ${y - 7.5 * k} h${16 * k}" style="stroke:var(--rose)" stroke-width="1.6"/>`;
       case "helmet":
@@ -25362,7 +25369,7 @@ ${r.n}`;
       case "hammer":
         return `<g class="tool"><path d="M${10 * k} ${-20 * k} l${6 * k} ${-14 * k}" fill="none" stroke-width="2.2" style="stroke:#8A5A3A"/><rect x="${12 * k}" y="${-38 * k}" width="${10 * k}" height="${5 * k}" rx="1" transform="rotate(24 ${17 * k} ${-35.5 * k})" ${S("var(--stone)")}/></g>`;
       case "cone":
-        return `<path d="M${9.5 * k} ${-23 * k} l${3 * k} ${10 * k} l${3 * k} ${-10 * k}z" ${S("#E8C48E")}/><circle cx="${12.5 * k}" cy="${-25 * k}" r="${3.6 * k}" ${S(["#F4C7CF", "#C3E8B8", "#F3E27A", "#FFF6DC"][Math.round(k * 7 + (look.top || "").length) % 4])}/>`;
+        return `<path d="M${9.5 * k} ${-23 * k} l${3 * k} ${10 * k} l${3 * k} ${-10 * k}z" ${S("#E8C48E")}/><circle cx="${12.5 * k}" cy="${-25 * k}" r="${3.6 * k}" ${S(["#F4C7CF", "#C3E8B8", "#F3E27A", "#FFF6DC"][Math.round(k * 7 + (look2.top || "").length) % 4])}/>`;
       case "hoe":
         return `<g class="tool"><path d="M${16 * k} ${-48 * k} l${-4 * k} ${46 * k}" fill="none" stroke-width="2" style="stroke:#8A5A3A"/><path d="M${12 * k} ${-2 * k} h${-8 * k} l${1 * k} ${3 * k} h${7 * k}z" ${S("var(--stone)")}/></g>`;
       case "rod":
@@ -25554,15 +25561,15 @@ ${r.n}`;
       case "sarnie":
         return `<g class="inhand"><rect x="${12.4 * k}" y="${-50.4 * k}" width="${10.4 * k}" height="${3.4 * k}" rx="${1.2 * k}" ${S("#EAD2A0")}/><path d="M${12.8 * k} ${-51.6 * k} h${9.6 * k}" stroke-width="${1.8 * k}" style="stroke:#F2A28A"/><path d="M${13.4 * k} ${-52.8 * k} q${2 * k} ${-1 * k} ${4 * k} 0 q${2 * k} ${1 * k} ${4 * k} 0" fill="none" stroke-width="${0.9 * k}" style="stroke:#6FA44E"/><rect x="${12.4 * k}" y="${-56.6 * k}" width="${10.4 * k}" height="${3.4 * k}" rx="${1.2 * k}" ${S("#EAD2A0")}/></g><g class="swoop"><path d="M${21 * k} ${-70 * k} q${3 * k} ${-5 * k} ${7 * k} ${-1 * k} q${3 * k} ${-5 * k} ${7 * k} ${1 * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:#7E848C"/><ellipse cx="${28 * k}" cy="${-68 * k}" rx="${4.8 * k}" ry="${2.4 * k}" ${S("#FFFFFF")}/><circle cx="${23.4 * k}" cy="${-69.4 * k}" r="${2 * k}" ${S("#FFFFFF")}/><path d="M${21.6 * k} ${-69.2 * k} l${-3 * k} ${0.9 * k} l${3 * k} ${0.7 * k}z" style="fill:#F3C93A" stroke-width=".5"/><circle cx="${22.8 * k}" cy="${-70 * k}" r="${0.5 * k}" style="fill:#2F2B28" stroke="none"/></g>`;
       case "lobsterheld":
-        return `<path d="M${21 * k} ${-48 * k} q${-4 * k} ${-6 * k} ${-6 * k} ${-14 * k} M${23 * k} ${-48 * k} q${4 * k} ${-6 * k} ${6 * k} ${-14 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#7E2E1E"/><path d="M${19.6 * k} ${-44 * k} l${-2.4 * k} ${1 * k} M${19.6 * k} ${-41.6 * k} l${-2.4 * k} ${1.2 * k} M${24.4 * k} ${-44 * k} l${2.4 * k} ${1 * k} M${24.4 * k} ${-41.6 * k} l${2.4 * k} ${1.2 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#7E2E1E"/><path d="M${20 * k} ${-40 * k} h${4 * k} l${-0.6 * k} ${8 * k} h${-2.8 * k}z" ${S("#9A3B26")}/><path d="M${20.4 * k} ${-37.4 * k} h${3.2 * k} M${20.6 * k} ${-34.8 * k} h${2.8 * k}" fill="none" stroke-width=".5"/><path d="M${22 * k} ${-32 * k} l${-3 * k} ${3 * k} h${6 * k}z" ${S("#9A3B26")}/><ellipse cx="${22 * k}" cy="${-44 * k}" rx="${2.8 * k}" ry="${4.6 * k}" ${S("#9A3B26")}/><g class="claw"><path d="M${20.6 * k} ${-47.4 * k} l${-2.6 * k} ${-4 * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:#7E2E1E"/><path d="M${18.6 * k} ${-50.6 * k} c${-4 * k} ${-1 * k} ${-5 * k} ${-6 * k} ${-2 * k} ${-8 * k} l${0.8 * k} ${3 * k} l${1.6 * k} ${-2.4 * k} c${1.6 * k} ${2 * k} ${1.4 * k} ${5 * k} ${-0.4 * k} ${7.4 * k}z" ${S("#7E2E1E")}/></g><g class="claw claw2"><path d="M${23.4 * k} ${-47.4 * k} l${2.6 * k} ${-4 * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:#7E2E1E"/><path d="M${25.4 * k} ${-50.6 * k} c${4 * k} ${-1 * k} ${5 * k} ${-6 * k} ${2 * k} ${-8 * k} l${-0.8 * k} ${3 * k} l${-1.6 * k} ${-2.4 * k} c${-1.6 * k} ${2 * k} ${-1.4 * k} ${5 * k} ${0.4 * k} ${7.4 * k}z" ${S("#7E2E1E")}/></g><circle cx="${21.6 * k}" cy="${-40.6 * k}" r="${2.3 * k}" ${S(look.skin)}/>`;
+        return `<path d="M${21 * k} ${-48 * k} q${-4 * k} ${-6 * k} ${-6 * k} ${-14 * k} M${23 * k} ${-48 * k} q${4 * k} ${-6 * k} ${6 * k} ${-14 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#7E2E1E"/><path d="M${19.6 * k} ${-44 * k} l${-2.4 * k} ${1 * k} M${19.6 * k} ${-41.6 * k} l${-2.4 * k} ${1.2 * k} M${24.4 * k} ${-44 * k} l${2.4 * k} ${1 * k} M${24.4 * k} ${-41.6 * k} l${2.4 * k} ${1.2 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#7E2E1E"/><path d="M${20 * k} ${-40 * k} h${4 * k} l${-0.6 * k} ${8 * k} h${-2.8 * k}z" ${S("#9A3B26")}/><path d="M${20.4 * k} ${-37.4 * k} h${3.2 * k} M${20.6 * k} ${-34.8 * k} h${2.8 * k}" fill="none" stroke-width=".5"/><path d="M${22 * k} ${-32 * k} l${-3 * k} ${3 * k} h${6 * k}z" ${S("#9A3B26")}/><ellipse cx="${22 * k}" cy="${-44 * k}" rx="${2.8 * k}" ry="${4.6 * k}" ${S("#9A3B26")}/><g class="claw"><path d="M${20.6 * k} ${-47.4 * k} l${-2.6 * k} ${-4 * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:#7E2E1E"/><path d="M${18.6 * k} ${-50.6 * k} c${-4 * k} ${-1 * k} ${-5 * k} ${-6 * k} ${-2 * k} ${-8 * k} l${0.8 * k} ${3 * k} l${1.6 * k} ${-2.4 * k} c${1.6 * k} ${2 * k} ${1.4 * k} ${5 * k} ${-0.4 * k} ${7.4 * k}z" ${S("#7E2E1E")}/></g><g class="claw claw2"><path d="M${23.4 * k} ${-47.4 * k} l${2.6 * k} ${-4 * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:#7E2E1E"/><path d="M${25.4 * k} ${-50.6 * k} c${4 * k} ${-1 * k} ${5 * k} ${-6 * k} ${2 * k} ${-8 * k} l${-0.8 * k} ${3 * k} l${-1.6 * k} ${-2.4 * k} c${-1.6 * k} ${2 * k} ${-1.4 * k} ${5 * k} ${0.4 * k} ${7.4 * k}z" ${S("#7E2E1E")}/></g><circle cx="${21.6 * k}" cy="${-40.6 * k}" r="${2.3 * k}" ${S(look2.skin)}/>`;
       case "tidebook":
-        return `<path d="M${-29 * k} ${-35 * k} h${14 * k} v${10 * k} h${-14 * k}z" ${S("#2E4A7A")}/><path d="M${-28 * k} ${-35.6 * k} q${3 * k} ${-1.4 * k} ${6 * k} 0 v${9 * k} q${-3 * k} ${-1.4 * k} ${-6 * k} 0z M${-22 * k} ${-35.6 * k} q${3 * k} ${-1.4 * k} ${6 * k} 0 v${9 * k} q${-3 * k} ${-1.4 * k} ${-6 * k} 0z" ${S("#FFFDF6")}/><path d="M${-27 * k} ${-32 * k} q${1 * k} ${-1.4 * k} ${2 * k} 0 q${1 * k} ${1.4 * k} ${2 * k} 0 M${-27 * k} ${-29.4 * k} h${4 * k} M${-21 * k} ${-33 * k} h${4 * k} M${-21 * k} ${-30.6 * k} h${4 * k} M${-21 * k} ${-28.2 * k} h${3 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#3E6BAE"/><circle cx="${-21 * k}" cy="${-26.6 * k}" r="${2 * k}" ${S(look.skin)}/>`;
+        return `<path d="M${-29 * k} ${-35 * k} h${14 * k} v${10 * k} h${-14 * k}z" ${S("#2E4A7A")}/><path d="M${-28 * k} ${-35.6 * k} q${3 * k} ${-1.4 * k} ${6 * k} 0 v${9 * k} q${-3 * k} ${-1.4 * k} ${-6 * k} 0z M${-22 * k} ${-35.6 * k} q${3 * k} ${-1.4 * k} ${6 * k} 0 v${9 * k} q${-3 * k} ${-1.4 * k} ${-6 * k} 0z" ${S("#FFFDF6")}/><path d="M${-27 * k} ${-32 * k} q${1 * k} ${-1.4 * k} ${2 * k} 0 q${1 * k} ${1.4 * k} ${2 * k} 0 M${-27 * k} ${-29.4 * k} h${4 * k} M${-21 * k} ${-33 * k} h${4 * k} M${-21 * k} ${-30.6 * k} h${4 * k} M${-21 * k} ${-28.2 * k} h${3 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#3E6BAE"/><circle cx="${-21 * k}" cy="${-26.6 * k}" r="${2 * k}" ${S(look2.skin)}/>`;
       case "capheld":
-        return `<path d="M${-11.4 * k} ${-45 * k} c${-1 * k} ${-8 * k} ${6 * k} ${-13 * k} ${14 * k} ${-11 * k} c${4 * k} ${1 * k} ${8 * k} ${4 * k} ${11 * k} ${8 * k} c${-6 * k} ${1 * k} ${-14 * k} ${2 * k} ${-25 * k} ${3 * k}z" ${S("#7A6E5A")}/><path d="M${-10.6 * k} ${-47.6 * k} c${7 * k} ${-1.4 * k} ${14 * k} ${-2 * k} ${20 * k} ${-2.6 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#4E4638"/><path d="M${12.6 * k} ${-47 * k} L${8 * k} ${-55.4 * k}" fill="none" stroke-width="${4.2 * k + 2.2}" style="stroke:var(--line)" stroke-linecap="round"/><path d="M${12.6 * k} ${-47 * k} L${8 * k} ${-55.4 * k}" fill="none" stroke-width="${4.2 * k}" style="stroke:${look.skin}" stroke-linecap="round"/><circle cx="${7.4 * k}" cy="${-56.4 * k}" r="${2.6 * k}" ${S(look.skin)}/><g class="flap"><path d="M${-9 * k} ${-32 * k} q${-5 * k} ${1 * k} ${-9 * k} ${4 * k} q${4 * k} ${1 * k} ${8 * k} ${6 * k}z" ${S(look.top)}/></g><path class="gust" d="M${24 * k} ${-58 * k} h${8 * k} M${26 * k} ${-40 * k} h${7 * k} M${22 * k} ${-24 * k} h${6 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#7E9CB4" stroke-linecap="round"/>`;
+        return `<path d="M${-11.4 * k} ${-45 * k} c${-1 * k} ${-8 * k} ${6 * k} ${-13 * k} ${14 * k} ${-11 * k} c${4 * k} ${1 * k} ${8 * k} ${4 * k} ${11 * k} ${8 * k} c${-6 * k} ${1 * k} ${-14 * k} ${2 * k} ${-25 * k} ${3 * k}z" ${S("#7A6E5A")}/><path d="M${-10.6 * k} ${-47.6 * k} c${7 * k} ${-1.4 * k} ${14 * k} ${-2 * k} ${20 * k} ${-2.6 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#4E4638"/><path d="M${12.6 * k} ${-47 * k} L${8 * k} ${-55.4 * k}" fill="none" stroke-width="${4.2 * k + 2.2}" style="stroke:var(--line)" stroke-linecap="round"/><path d="M${12.6 * k} ${-47 * k} L${8 * k} ${-55.4 * k}" fill="none" stroke-width="${4.2 * k}" style="stroke:${look2.skin}" stroke-linecap="round"/><circle cx="${7.4 * k}" cy="${-56.4 * k}" r="${2.6 * k}" ${S(look2.skin)}/><g class="flap"><path d="M${-9 * k} ${-32 * k} q${-5 * k} ${1 * k} ${-9 * k} ${4 * k} q${4 * k} ${1 * k} ${8 * k} ${6 * k}z" ${S(look2.top)}/></g><path class="gust" d="M${24 * k} ${-58 * k} h${8 * k} M${26 * k} ${-40 * k} h${7 * k} M${22 * k} ${-24 * k} h${6 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#7E9CB4" stroke-linecap="round"/>`;
       case "pennant":
         return `<g class="inhand"><path d="M${14.4 * k} ${-46 * k} L${16 * k} ${-72 * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:#8A5A3A"/><g class="tool"><path d="M${16 * k} ${-72 * k} L${31 * k} ${-67.5 * k} L${16 * k} ${-63 * k}z" ${S("#C8432F")}/><path d="M${16 * k} ${-69 * k} L${25.8 * k} ${-69 * k} L${31 * k} ${-67.5 * k} L${25.8 * k} ${-66 * k} L${16 * k} ${-66 * k}z" style="fill:#FFFDF6" stroke="none"/><path d="M${16 * k} ${-72 * k} L${31 * k} ${-67.5 * k} L${16 * k} ${-63 * k}" fill="none"/></g></g>`;
       case "ghostbook":
-        return `<rect x="${-6 * k}" y="${-34 * k}" width="${12 * k}" height="${14 * k}" rx="${1 * k}" ${S("#2A2630")}/><path d="M${-4.4 * k} ${-34 * k} v${14 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#C9A24A"/><path d="M${-1.6 * k} ${-23 * k} v${-5 * k} a${2.2 * k} ${2.2 * k} 0 0 1 ${4.4 * k} 0 v${5 * k} l${-1.1 * k} ${-1 * k} l${-1.1 * k} ${1 * k} l${-1.1 * k} ${-1 * k}z" style="fill:#EDE8F2" stroke="none"/><circle cx="${-0.2 * k}" cy="${-28 * k}" r="${0.45 * k}" style="fill:#2A2630" stroke="none"/><circle cx="${1.4 * k}" cy="${-28 * k}" r="${0.45 * k}" style="fill:#2A2630" stroke="none"/><circle cx="${-6.4 * k}" cy="${-25 * k}" r="${2.1 * k}" ${S(look.skin)}/><circle cx="${6.4 * k}" cy="${-29 * k}" r="${2.1 * k}" ${S(look.skin)}/><g class="shivers" fill="none" stroke-width="${0.8 * k}">${[-1, 1].map((d) => `<path d="M${d * 14 * k} ${-54 * k} l${d * 2 * k} ${2 * k} l${-d * 2 * k} ${2 * k} l${d * 2 * k} ${2 * k} l${-d * 2 * k} ${2 * k}"/>`).join("")}</g>`;
+        return `<rect x="${-6 * k}" y="${-34 * k}" width="${12 * k}" height="${14 * k}" rx="${1 * k}" ${S("#2A2630")}/><path d="M${-4.4 * k} ${-34 * k} v${14 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#C9A24A"/><path d="M${-1.6 * k} ${-23 * k} v${-5 * k} a${2.2 * k} ${2.2 * k} 0 0 1 ${4.4 * k} 0 v${5 * k} l${-1.1 * k} ${-1 * k} l${-1.1 * k} ${1 * k} l${-1.1 * k} ${-1 * k}z" style="fill:#EDE8F2" stroke="none"/><circle cx="${-0.2 * k}" cy="${-28 * k}" r="${0.45 * k}" style="fill:#2A2630" stroke="none"/><circle cx="${1.4 * k}" cy="${-28 * k}" r="${0.45 * k}" style="fill:#2A2630" stroke="none"/><circle cx="${-6.4 * k}" cy="${-25 * k}" r="${2.1 * k}" ${S(look2.skin)}/><circle cx="${6.4 * k}" cy="${-29 * k}" r="${2.1 * k}" ${S(look2.skin)}/><g class="shivers" fill="none" stroke-width="${0.8 * k}">${[-1, 1].map((d) => `<path d="M${d * 14 * k} ${-54 * k} l${d * 2 * k} ${2 * k} l${-d * 2 * k} ${2 * k} l${d * 2 * k} ${2 * k} l${-d * 2 * k} ${2 * k}"/>`).join("")}</g>`;
       case "crabbucket":
         return `<path d="M${-25 * k} ${-8 * k} h${10 * k} l${-1.2 * k} ${8 * k} h${-7.6 * k}z" ${S("#3E9CC8")}/><path d="M${-25 * k} ${-8 * k} q${5 * k} ${-8 * k} ${10 * k} 0" fill="none" stroke-width="${0.8 * k}"/><path d="M${-23 * k} ${-5 * k} h${6 * k}" fill="none" stroke-width="${1.2 * k}" style="stroke:#F3C969"/><path d="M${-21.4 * k} ${-8.6 * k} q${1.4 * k} ${-2.6 * k} ${2.8 * k} 0z" ${S("#D8602E")}/><path class="cline" d="M${21.6 * k} ${-27.4 * k} V${-6.6 * k}" fill="none" stroke-width="${0.6 * k}"/><g class="crabbob" style="--bob:${-3.4 * k}px"><path d="M${19.4 * k} ${-5 * k} l${-2 * k} ${1.6 * k} M${19.6 * k} ${-4 * k} l${-2 * k} ${2 * k} M${23.8 * k} ${-5 * k} l${2 * k} ${1.6 * k} M${23.6 * k} ${-4 * k} l${2 * k} ${2 * k}" fill="none" stroke-width="${0.6 * k}"/><circle cx="${18.2 * k}" cy="${-7.6 * k}" r="${1.3 * k}" ${S("#D8602E")}/><circle cx="${25 * k}" cy="${-7.6 * k}" r="${1.3 * k}" ${S("#D8602E")}/><ellipse cx="${21.6 * k}" cy="${-5.4 * k}" rx="${3 * k}" ry="${2 * k}" ${S("#D8602E")}/><circle cx="${20.6 * k}" cy="${-7.6 * k}" r="${0.5 * k}" style="fill:#2F2B28" stroke="none"/><circle cx="${22.6 * k}" cy="${-7.6 * k}" r="${0.5 * k}" style="fill:#2F2B28" stroke="none"/></g>`;
       // a day out in Portovenere (never done anywhere before): Mum's swimming cap and goggles (and the sea round her waist),
@@ -25574,7 +25581,7 @@ ${r.n}`;
         return `<path d="M${-17 * k} ${-15 * k} a${17 * k} ${4.6 * k} 0 0 0 ${34 * k} 0 a${17 * k} ${4.6 * k} 0 0 0 ${-34 * k} 0z" style="fill:#7FB8E8;stroke:#3E7FAE" opacity=".92" stroke-width="${0.9 * k}"/><path d="M${-12 * k} ${-15.6 * k} q${3 * k} ${-1.6 * k} ${6 * k} 0 q${3 * k} ${1.6 * k} ${6 * k} 0 M${2 * k} ${-14.4 * k} q${3 * k} ${-1.6 * k} ${6 * k} 0 q${2 * k} ${1 * k} ${4 * k} 0" fill="none" stroke-width="${0.7 * k}" style="stroke:#FFFDF6"/>` + [0, 1].map((i) => `<ellipse class="ripple${i ? " ripple2" : ""}" cx="0" cy="${-15 * k}" rx="${20 * k}" ry="${5.4 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#3E7FAE"/>`).join("") + `<path d="M${-R10} ${y + 2 * k} A${R10} ${R10} 0 0 1 ${R10} ${y + 2 * k} Q0 ${y - 7 * k} ${-R10} ${y + 2 * k}z" ${S("#E8566C")}/><path d="M${-R10 * 0.5} ${y - R10 * 0.72} q${R10 * 0.5} ${-2 * k} ${R10} 0" fill="none" stroke-width="${0.9 * k}" style="stroke:#FFFFFF" opacity=".75"/><path d="M${-R10} ${y - 3.6 * k} Q0 ${y - 6.6 * k} ${R10} ${y - 3.6 * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:#2F2B28"/>${[-1, 1].map((d) => `<ellipse cx="${d * 3.9 * k}" cy="${y - 5.2 * k}" rx="${3 * k}" ry="${2.3 * k}" style="fill:#7FD3E8;stroke:#2F2B28" stroke-width="${1 * k}"/><path d="M${(d * 3.9 - 1.2) * k} ${y - 6 * k} l${1 * k} ${-0.8 * k}" stroke-width="${0.6 * k}" style="stroke:#FFFFFF"/>`).join("")}`;
       }
       case "guidebook":
-        return `<path d="M${-31 * k} ${-38 * k} h${20 * k} v${12 * k} h${-20 * k}z" ${S("#C8432F")}/><path d="M${-30 * k} ${-38.6 * k} q${4.5 * k} ${-1.6 * k} ${9 * k} 0 v${11 * k} q${-4.5 * k} ${-1.6 * k} ${-9 * k} 0z M${-21 * k} ${-38.6 * k} q${4.5 * k} ${-1.6 * k} ${9 * k} 0 v${11 * k} q${-4.5 * k} ${-1.6 * k} ${-9 * k} 0z" ${S("#FFFDF6")}/><path d="M${-28.6 * k} ${-30.6 * k} v${-3 * k} h${1.4 * k} v${1 * k} h${1.2 * k} v${-1 * k} h${1.4 * k} v${1 * k} h${1.2 * k} v${-1 * k} h${1.4 * k} v${3 * k}z" style="fill:#B7A27E" stroke-width="${0.5 * k}"/><path d="M${-19.6 * k} ${-35.4 * k} h${6 * k} M${-19.6 * k} ${-33 * k} h${6 * k} M${-19.6 * k} ${-30.6 * k} h${4 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#3E6BAE"/><circle cx="${-21 * k}" cy="${-27 * k}" r="${2.1 * k}" ${S(look.skin)}/><g class="inhand"><rect x="${9.1 * k}" y="${-22 * k}" width="${1.6 * k}" height="${5 * k}" rx="${0.8 * k}" ${S(look.skin)} stroke-width="${0.8 * k}"/></g>`;
+        return `<path d="M${-31 * k} ${-38 * k} h${20 * k} v${12 * k} h${-20 * k}z" ${S("#C8432F")}/><path d="M${-30 * k} ${-38.6 * k} q${4.5 * k} ${-1.6 * k} ${9 * k} 0 v${11 * k} q${-4.5 * k} ${-1.6 * k} ${-9 * k} 0z M${-21 * k} ${-38.6 * k} q${4.5 * k} ${-1.6 * k} ${9 * k} 0 v${11 * k} q${-4.5 * k} ${-1.6 * k} ${-9 * k} 0z" ${S("#FFFDF6")}/><path d="M${-28.6 * k} ${-30.6 * k} v${-3 * k} h${1.4 * k} v${1 * k} h${1.2 * k} v${-1 * k} h${1.4 * k} v${1 * k} h${1.2 * k} v${-1 * k} h${1.4 * k} v${3 * k}z" style="fill:#B7A27E" stroke-width="${0.5 * k}"/><path d="M${-19.6 * k} ${-35.4 * k} h${6 * k} M${-19.6 * k} ${-33 * k} h${6 * k} M${-19.6 * k} ${-30.6 * k} h${4 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#3E6BAE"/><circle cx="${-21 * k}" cy="${-27 * k}" r="${2.1 * k}" ${S(look2.skin)}/><g class="inhand"><rect x="${9.1 * k}" y="${-22 * k}" width="${1.6 * k}" height="${5 * k}" rx="${0.8 * k}" ${S(look2.skin)} stroke-width="${0.8 * k}"/></g>`;
       case "headscarf": {
         const R10 = r + 2.8 * k, ri = r * 0.86, c = "#B8435A";
         return `${[-1, 1].map((d) => `<path d="M${d * R10} ${y + 3 * k} Q${d * (R10 - 0.6 * k)} ${y + 11 * k} ${1.6 * k} ${y + 12.6 * k} L${1.6 * k} ${y + 10 * k} Q${d * (ri - 0.4 * k)} ${y + 8 * k} ${d * ri} ${y + 2 * k}z" ${S(c)}/>`).join("")}<path d="M${-R10} ${y + 4 * k} A${R10} ${R10 * 1.04} 0 0 1 ${R10} ${y + 4 * k} L${ri} ${y + 2.6 * k} A${ri} ${ri * 0.98} 0 0 0 ${-ri} ${y + 2.6 * k}z" ${S(c)}/><path d="M${-R10 + 1.4 * k} ${y + 3 * k} A${R10 - 1.4 * k} ${R10 - 1.4 * k} 0 0 1 ${R10 - 1.4 * k} ${y + 3 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#F3C969"/>` + [-150, -120, -90, -60, -30, -165, -15].map((a) => {
@@ -25589,7 +25596,7 @@ ${r.n}`;
       case "snorkelmask":
         return `${[-1, 1].map((d) => `<path d="M${(d * 3.7 - 3.4) * k} ${-2.4 * k} L${(d * 3.7 - 5.6) * k} ${3.6 * k} Q${d * 3.7 * k} ${5.6 * k} ${(d * 3.7 + 5.6) * k} ${3.6 * k} L${(d * 3.7 + 3.4) * k} ${-2.4 * k}z" ${S("#F3C93A")} stroke-width="${0.9 * k}"/><path d="M${d * 3.7 * k} ${-1 * k} v${4.6 * k}" fill="none" stroke-width="${0.6 * k}" opacity=".6"/>`).join("")}<path d="M${-r} ${y - 0.6 * k} h${2 * r}" fill="none" stroke-width="${1.6 * k}" style="stroke:#2F2B28"/><rect x="${-8.6 * k}" y="${y - 4.4 * k}" width="${17.2 * k}" height="${8.4 * k}" rx="${3 * k}" style="fill:#2E8FB0"/><rect x="${-7 * k}" y="${y - 3 * k}" width="${14 * k}" height="${5.6 * k}" rx="${2.2 * k}" style="fill:#CDEEF7" opacity=".85" stroke="none"/><ellipse cx="${-3.7 * k}" cy="${y + 0 * k}" rx="${1.1 * k}" ry="${1.5 * k}" style="fill:var(--sock)" stroke="none"/><ellipse cx="${3.7 * k}" cy="${y + 0 * k}" rx="${1.1 * k}" ry="${1.5 * k}" style="fill:var(--sock)" stroke="none"/><path d="M${-5.6 * k} ${y - 1.8 * k} l${1.6 * k} ${-0.8 * k}" stroke-width="${0.7 * k}" style="stroke:#FFFFFF"/><path d="M${-0.4 * k} ${y + 6 * k} Q${11.6 * k} ${y + 8 * k} ${11.6 * k} ${y - 2 * k} V${y - 18 * k}" fill="none" stroke-width="${3.4 * k}" stroke-linecap="round" style="stroke:var(--line)"/><path d="M${-0.4 * k} ${y + 6 * k} Q${11.6 * k} ${y + 8 * k} ${11.6 * k} ${y - 2 * k} V${y - 18 * k}" fill="none" stroke-width="${1.8 * k}" stroke-linecap="round" style="stroke:#F3A64A"/><rect x="${-2.6 * k}" y="${y + 4.6 * k}" width="${4 * k}" height="${2.8 * k}" rx="${1 * k}" ${S("#2F2B28")} stroke="none"/><path d="M${10.4 * k} ${y - 9 * k} h${2.4 * k} M${10.4 * k} ${y - 13 * k} h${2.4 * k}" fill="none" stroke-width="${0.8 * k}"/><g class="spout" fill="none" stroke-width="${0.8 * k}" stroke-linecap="round" style="stroke:#5FA8DA"><path d="M${11.6 * k} ${y - 20.4 * k} v${-3 * k} M${9.6 * k} ${y - 20 * k} l${-1.6 * k} ${-2.4 * k} M${13.6 * k} ${y - 20 * k} l${1.6 * k} ${-2.4 * k}"/></g>`;
       case "quillpad":
-        return `<path d="M${-9 * k} ${-30 * k} h${16 * k} v${11 * k} h${-16 * k}z" ${S("#2E5E4E")}/><path d="M${-8.2 * k} ${-30.6 * k} q${3.6 * k} ${-1.2 * k} ${7.2 * k} 0 v${10.2 * k} q${-3.6 * k} ${-1.2 * k} ${-7.2 * k} 0z M${-1 * k} ${-30.6 * k} q${3.6 * k} ${-1.2 * k} ${7.2 * k} 0 v${10.2 * k} q${-3.6 * k} ${-1.2 * k} ${-7.2 * k} 0z" ${S("#FFFDF6")}/><path d="M${-7 * k} ${-28 * k} q${1.2 * k} ${-0.8 * k} ${2.4 * k} 0 t${2.4 * k} 0 M${-7 * k} ${-25.8 * k} q${1.2 * k} ${-0.8 * k} ${2.4 * k} 0 t${2.4 * k} 0 M${-7 * k} ${-23.6 * k} h${3.6 * k} M${0.2 * k} ${-28 * k} q${1.2 * k} ${-0.8 * k} ${2.4 * k} 0" fill="none" stroke-width="${0.55 * k}" style="stroke:#2E3A6E"/><circle cx="${-9.2 * k}" cy="${-23.6 * k}" r="${2.1 * k}" ${S(look.skin)}/><g class="quill"><path d="M${2.2 * k} ${-24.2 * k} L${9.6 * k} ${-33 * k}" fill="none" stroke-width="${2.2 * k + 1.6}" stroke-linecap="round" style="stroke:var(--line)"/><path d="M${2.2 * k} ${-24.2 * k} L${9.6 * k} ${-33 * k}" fill="none" stroke-width="${2.2 * k}" stroke-linecap="round" style="stroke:#2E3A6E"/><path d="M${2.6 * k} ${-24.6 * k} L${1.2 * k} ${-22.2 * k} L${3.6 * k} ${-23.4 * k}z" style="fill:#C9A24A" stroke-width="${0.5 * k}"/><path d="M${8.2 * k} ${-31.4 * k} l${1.2 * k} ${1 * k}" stroke-width="${0.8 * k}" style="stroke:#C9A24A"/><circle cx="${5.6 * k}" cy="${-27.4 * k}" r="${2.2 * k}" ${S(look.skin)}/></g><g class="dream" stroke-width="${0.7 * k}"><path d="M${15 * k} ${-64 * k} l${1 * k} ${-2.6 * k} l${1 * k} ${2.6 * k} l${2.6 * k} ${1 * k} l${-2.6 * k} ${1 * k} l${-1 * k} ${2.6 * k} l${-1 * k} ${-2.6 * k} l${-2.6 * k} ${-1 * k}z" ${S("#F3C969")}/><path d="M${22 * k} ${-58 * k} c${-1.4 * k} ${-1.6 * k} ${-3.4 * k} 0 ${-1.6 * k} ${1.8 * k} l${1.6 * k} ${1.6 * k} l${1.6 * k} ${-1.6 * k} c${1.8 * k} ${-1.8 * k} ${-0.2 * k} ${-3.4 * k} ${-1.6 * k} ${-1.8 * k}z" ${S("#EFA3A6")}/></g>`;
+        return `<path d="M${-9 * k} ${-30 * k} h${16 * k} v${11 * k} h${-16 * k}z" ${S("#2E5E4E")}/><path d="M${-8.2 * k} ${-30.6 * k} q${3.6 * k} ${-1.2 * k} ${7.2 * k} 0 v${10.2 * k} q${-3.6 * k} ${-1.2 * k} ${-7.2 * k} 0z M${-1 * k} ${-30.6 * k} q${3.6 * k} ${-1.2 * k} ${7.2 * k} 0 v${10.2 * k} q${-3.6 * k} ${-1.2 * k} ${-7.2 * k} 0z" ${S("#FFFDF6")}/><path d="M${-7 * k} ${-28 * k} q${1.2 * k} ${-0.8 * k} ${2.4 * k} 0 t${2.4 * k} 0 M${-7 * k} ${-25.8 * k} q${1.2 * k} ${-0.8 * k} ${2.4 * k} 0 t${2.4 * k} 0 M${-7 * k} ${-23.6 * k} h${3.6 * k} M${0.2 * k} ${-28 * k} q${1.2 * k} ${-0.8 * k} ${2.4 * k} 0" fill="none" stroke-width="${0.55 * k}" style="stroke:#2E3A6E"/><circle cx="${-9.2 * k}" cy="${-23.6 * k}" r="${2.1 * k}" ${S(look2.skin)}/><g class="quill"><path d="M${2.2 * k} ${-24.2 * k} L${9.6 * k} ${-33 * k}" fill="none" stroke-width="${2.2 * k + 1.6}" stroke-linecap="round" style="stroke:var(--line)"/><path d="M${2.2 * k} ${-24.2 * k} L${9.6 * k} ${-33 * k}" fill="none" stroke-width="${2.2 * k}" stroke-linecap="round" style="stroke:#2E3A6E"/><path d="M${2.6 * k} ${-24.6 * k} L${1.2 * k} ${-22.2 * k} L${3.6 * k} ${-23.4 * k}z" style="fill:#C9A24A" stroke-width="${0.5 * k}"/><path d="M${8.2 * k} ${-31.4 * k} l${1.2 * k} ${1 * k}" stroke-width="${0.8 * k}" style="stroke:#C9A24A"/><circle cx="${5.6 * k}" cy="${-27.4 * k}" r="${2.2 * k}" ${S(look2.skin)}/></g><g class="dream" stroke-width="${0.7 * k}"><path d="M${15 * k} ${-64 * k} l${1 * k} ${-2.6 * k} l${1 * k} ${2.6 * k} l${2.6 * k} ${1 * k} l${-2.6 * k} ${1 * k} l${-1 * k} ${2.6 * k} l${-1 * k} ${-2.6 * k} l${-2.6 * k} ${-1 * k}z" ${S("#F3C969")}/><path d="M${22 * k} ${-58 * k} c${-1.4 * k} ${-1.6 * k} ${-3.4 * k} 0 ${-1.6 * k} ${1.8 * k} l${1.6 * k} ${1.6 * k} l${1.6 * k} ${-1.6 * k} c${1.8 * k} ${-1.8 * k} ${-0.2 * k} ${-3.4 * k} ${-1.6 * k} ${-1.8 * k}z" ${S("#EFA3A6")}/></g>`;
       // a day out on Puffin Island (never done anywhere before): Mum's sea-pink chain (and the thrift she's lying in), Dad's
       // paper puffin beak (the wings and the waddle are arms and a pose), Ma Ma's basket of samphire (the patch she picks
       // from is on the ground, see personArt), Gong Gong's polishing cloth on the brass plaque, Darren's coil of rope, Marcus
@@ -25601,24 +25608,24 @@ ${r.n}`;
         return tuft8(-15, 1) + tuft8(16, 0.9) + tuft8(26, 0.8) + `<path d="M${2.6 * k} ${-31 * k} Q${12 * k} ${-24 * k} ${20.4 * k} ${-39.6 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#5E8A3E"/>` + [0.1, 0.26, 0.42, 0.58, 0.74, 0.9].map((t2, i) => {
           const [x, yy] = q(t2);
           return `<circle cx="${x * k}" cy="${yy * k}" r="${1.7 * k}" style="fill:${i % 2 ? "#E8739A" : "#F6A8C4"}" stroke-width="${0.55 * k}"/><circle cx="${x * k}" cy="${yy * k}" r="${0.5 * k}" style="fill:#FFF3C8" stroke="none"/>`;
-        }).join("") + `<circle cx="${2.6 * k}" cy="${-31 * k}" r="${2.1 * k}" ${S(look.skin)}/><circle cx="${20.4 * k}" cy="${-39.6 * k}" r="${2.1 * k}" ${S(look.skin)}/><g class="threadf"><path d="M${23.4 * k} ${-38 * k} l${1.4 * k} ${4 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#5E8A3E"/><circle cx="${23.4 * k}" cy="${-38.4 * k}" r="${1.8 * k}" style="fill:#F6A8C4" stroke-width="${0.55 * k}"/></g>`;
+        }).join("") + `<circle cx="${2.6 * k}" cy="${-31 * k}" r="${2.1 * k}" ${S(look2.skin)}/><circle cx="${20.4 * k}" cy="${-39.6 * k}" r="${2.1 * k}" ${S(look2.skin)}/><g class="threadf"><path d="M${23.4 * k} ${-38 * k} l${1.4 * k} ${4 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#5E8A3E"/><circle cx="${23.4 * k}" cy="${-38.4 * k}" r="${1.8 * k}" style="fill:#F6A8C4" stroke-width="${0.55 * k}"/></g>`;
       }
       // (on the head) a little folded-paper puffin beak on an elastic, pointing the way he's facing
       case "puffinwalk":
         return `<path d="M${-r} ${-41.6 * k} L${r} ${-41.6 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#2F2B28" opacity=".7"/><path d="M${-1 * k} ${-44.6 * k} L${5.8 * k} ${-41 * k} L${-1 * k} ${-38.6 * k}z" style="fill:#F08A2E" stroke-width="${0.8 * k}"/><path d="M${3 * k} ${-42.5 * k} L${3 * k} ${-39.6 * k}" fill="none" stroke-width="${1.2 * k}" style="stroke:#D8432F"/><path d="M${-0.2 * k} ${-43.8 * k} v${4.6 * k}" fill="none" stroke-width="${0.9 * k}" style="stroke:#F3C93A"/>`;
       case "samphirebag":
-        return `<path d="M${-19.6 * k} ${-17 * k} q${5 * k} ${-9 * k} ${10 * k} 0" fill="none" stroke-width="${1 * k}" style="stroke:#8A6A42"/>${[-17.4, -15.6, -14, -12.2, -10.6].map((x, i) => `<path d="M${x * k} ${-16 * k} l${(i - 2) * 0.5 * k} ${(-5 - i % 2 * 2) * k}" fill="none" stroke-width="${1.3 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")}<path d="M${-20.4 * k} ${-16.6 * k} h${11.6 * k} l${-1.4 * k} ${8.6 * k} h${-8.8 * k}z" ${S("#C9A27E")}/><path d="M${-20 * k} ${-13.4 * k} h${10.8 * k} M${-19.4 * k} ${-10.6 * k} h${9.6 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#8A6A42"/><circle cx="${-14.5 * k}" cy="${-20.4 * k}" r="${2.1 * k}" ${S(look.skin)}/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><g class="sprig"><path d="M${18.6 * k} ${-23 * k} l${1.4 * k} ${-5 * k} M${19.4 * k} ${-25.6 * k} l${1.6 * k} ${-1.4 * k} M${18.8 * k} ${-24.4 * k} l${-1.4 * k} ${-1.6 * k}" fill="none" stroke-width="${1.1 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/></g></g>`;
+        return `<path d="M${-19.6 * k} ${-17 * k} q${5 * k} ${-9 * k} ${10 * k} 0" fill="none" stroke-width="${1 * k}" style="stroke:#8A6A42"/>${[-17.4, -15.6, -14, -12.2, -10.6].map((x, i) => `<path d="M${x * k} ${-16 * k} l${(i - 2) * 0.5 * k} ${(-5 - i % 2 * 2) * k}" fill="none" stroke-width="${1.3 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")}<path d="M${-20.4 * k} ${-16.6 * k} h${11.6 * k} l${-1.4 * k} ${8.6 * k} h${-8.8 * k}z" ${S("#C9A27E")}/><path d="M${-20 * k} ${-13.4 * k} h${10.8 * k} M${-19.4 * k} ${-10.6 * k} h${9.6 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#8A6A42"/><circle cx="${-14.5 * k}" cy="${-20.4 * k}" r="${2.1 * k}" ${S(look2.skin)}/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><g class="sprig"><path d="M${18.6 * k} ${-23 * k} l${1.4 * k} ${-5 * k} M${19.4 * k} ${-25.6 * k} l${1.6 * k} ${-1.4 * k} M${18.8 * k} ${-24.4 * k} l${-1.4 * k} ${-1.6 * k}" fill="none" stroke-width="${1.1 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/></g></g>`;
       // a round brass plaque on the wall at his shoulder, a polishing rag going round on it, and the shine it gets
       case "brasscloth":
-        return `<circle cx="${25 * k}" cy="${-36 * k}" r="${5.4 * k}" style="fill:#D9B24A" stroke-width="${0.9 * k}"/><circle cx="${25 * k}" cy="${-36 * k}" r="${3.8 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#9A7A2A"/>${[-1, 1].map((d) => `<circle cx="${25 * k}" cy="${(-36 + d * 4.6) * k}" r="${0.5 * k}" style="fill:#7A5A2A" stroke="none"/>`).join("")}<path d="M${23 * k} ${-38.4 * k} q${1.6 * k} ${-1.2 * k} ${3.4 * k} ${-0.6 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#FFF3C8"/><g class="shine"><path d="M${29.6 * k} ${-43 * k} l${0.7 * k} ${-2.2 * k} l${0.7 * k} ${2.2 * k} l${2.2 * k} ${0.7 * k} l${-2.2 * k} ${0.7 * k} l${-0.7 * k} ${2.2 * k} l${-0.7 * k} ${-2.2 * k} l${-2.2 * k} ${-0.7 * k}z" style="fill:#FFF6C8" stroke-width="${0.5 * k}"/></g><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><g class="rag"><path d="M${20 * k} ${-34.4 * k} q${2.6 * k} ${-2.6 * k} ${5.6 * k} ${-1 * k} q${1.4 * k} ${2.6 * k} ${-0.6 * k} ${5.6 * k} q${-3 * k} ${0.6 * k} ${-5.4 * k} ${-1.2 * k} q${-0.6 * k} ${-1.8 * k} ${0.4 * k} ${-3.4 * k}z" style="fill:#D85A4A" stroke-width="${0.8 * k}"/><circle cx="${22.6 * k}" cy="${-31.6 * k}" r="${2 * k}" ${S(look.skin)}/></g></g>`;
+        return `<circle cx="${25 * k}" cy="${-36 * k}" r="${5.4 * k}" style="fill:#D9B24A" stroke-width="${0.9 * k}"/><circle cx="${25 * k}" cy="${-36 * k}" r="${3.8 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#9A7A2A"/>${[-1, 1].map((d) => `<circle cx="${25 * k}" cy="${(-36 + d * 4.6) * k}" r="${0.5 * k}" style="fill:#7A5A2A" stroke="none"/>`).join("")}<path d="M${23 * k} ${-38.4 * k} q${1.6 * k} ${-1.2 * k} ${3.4 * k} ${-0.6 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#FFF3C8"/><g class="shine"><path d="M${29.6 * k} ${-43 * k} l${0.7 * k} ${-2.2 * k} l${0.7 * k} ${2.2 * k} l${2.2 * k} ${0.7 * k} l${-2.2 * k} ${0.7 * k} l${-0.7 * k} ${2.2 * k} l${-0.7 * k} ${-2.2 * k} l${-2.2 * k} ${-0.7 * k}z" style="fill:#FFF6C8" stroke-width="${0.5 * k}"/></g><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><g class="rag"><path d="M${20 * k} ${-34.4 * k} q${2.6 * k} ${-2.6 * k} ${5.6 * k} ${-1 * k} q${1.4 * k} ${2.6 * k} ${-0.6 * k} ${5.6 * k} q${-3 * k} ${0.6 * k} ${-5.4 * k} ${-1.2 * k} q${-0.6 * k} ${-1.8 * k} ${0.4 * k} ${-3.4 * k}z" style="fill:#D85A4A" stroke-width="${0.8 * k}"/><circle cx="${22.6 * k}" cy="${-31.6 * k}" r="${2 * k}" ${S(look2.skin)}/></g></g>`;
       // a coil of rope hung over the bent left forearm; the right hand brings the next loop round
       case "ropecoil": {
         const rope = (d) => `<path d="${d}" fill="none" stroke-width="${2.4 * k + 1.4}" stroke-linecap="round" style="stroke:var(--line)"/><path d="${d}" fill="none" stroke-width="${2.4 * k}" stroke-linecap="round" style="stroke:#D9BC84"/>`;
-        return [-3.6, -1.6, 0.4].map((x, i) => rope(`M${(x - 4.2) * k} ${-27 * k} C${(x - 6) * k} ${(-14 + i) * k} ${(x + 6) * k} ${(-14 + i) * k} ${(x + 4.2) * k} ${-27 * k}`)).join("") + `<path d="M${-6.6 * k} ${-28.2 * k} L${-1.4 * k} ${-26.4 * k}" fill="none" stroke-width="${4.2 * k}" stroke-linecap="round" style="stroke:${look.skin}"/><circle cx="${0.8 * k}" cy="${-26 * k}" r="${2.2 * k}" ${S(look.skin)}/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${rope(`M${3.4 * k} ${-20 * k} Q${12 * k} ${-10 * k} ${20.4 * k} ${-27.4 * k}`)}<circle cx="${20.6 * k}" cy="${-27.6 * k}" r="${2.2 * k}" ${S(look.skin)}/></g>`;
+        return [-3.6, -1.6, 0.4].map((x, i) => rope(`M${(x - 4.2) * k} ${-27 * k} C${(x - 6) * k} ${(-14 + i) * k} ${(x + 6) * k} ${(-14 + i) * k} ${(x + 4.2) * k} ${-27 * k}`)).join("") + `<path d="M${-6.6 * k} ${-28.2 * k} L${-1.4 * k} ${-26.4 * k}" fill="none" stroke-width="${4.2 * k}" stroke-linecap="round" style="stroke:${look2.skin}"/><circle cx="${0.8 * k}" cy="${-26 * k}" r="${2.2 * k}" ${S(look2.skin)}/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${rope(`M${3.4 * k} ${-20 * k} Q${12 * k} ${-10 * k} ${20.4 * k} ${-27.4 * k}`)}<circle cx="${20.6 * k}" cy="${-27.6 * k}" r="${2.2 * k}" ${S(look2.skin)}/></g>`;
       }
       // a chip of green sea glass held up high to the sun, turning, with a glint and a few rays
       case "glasslight":
-        return `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><path d="M${12.6 * k} ${-49 * k} l${2.4 * k} ${-2.6 * k} l${3.4 * k} ${0.4 * k} l${0.8 * k} ${3 * k} l${-2.6 * k} ${2.4 * k} l${-3.2 * k} ${-0.6 * k}z" style="fill:#5FC9B0" fill-opacity=".9" stroke-width="${0.8 * k}"/><path d="M${14.2 * k} ${-49.8 * k} l${1.4 * k} ${-1.2 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#E6FFF6"/><circle cx="${14 * k}" cy="${-45.4 * k}" r="${2.1 * k}" ${S(look.skin)}/><g class="glint"><path d="M${19.4 * k} ${-55.4 * k} l${0.8 * k} ${-2.6 * k} l${0.8 * k} ${2.6 * k} l${2.6 * k} ${0.8 * k} l${-2.6 * k} ${0.8 * k} l${-0.8 * k} ${2.6 * k} l${-0.8 * k} ${-2.6 * k} l${-2.6 * k} ${-0.8 * k}z" style="fill:#FFF6C8" stroke-width="${0.5 * k}"/><path d="M${11 * k} ${-54 * k} l${-1.6 * k} ${-1.6 * k} M${15.6 * k} ${-56.4 * k} v${-2.4 * k} M${21.4 * k} ${-49 * k} h${2.4 * k}" fill="none" stroke-width="${0.8 * k}" stroke-linecap="round" style="stroke:#F3C969"/></g></g>`;
+        return `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><path d="M${12.6 * k} ${-49 * k} l${2.4 * k} ${-2.6 * k} l${3.4 * k} ${0.4 * k} l${0.8 * k} ${3 * k} l${-2.6 * k} ${2.4 * k} l${-3.2 * k} ${-0.6 * k}z" style="fill:#5FC9B0" fill-opacity=".9" stroke-width="${0.8 * k}"/><path d="M${14.2 * k} ${-49.8 * k} l${1.4 * k} ${-1.2 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#E6FFF6"/><circle cx="${14 * k}" cy="${-45.4 * k}" r="${2.1 * k}" ${S(look2.skin)}/><g class="glint"><path d="M${19.4 * k} ${-55.4 * k} l${0.8 * k} ${-2.6 * k} l${0.8 * k} ${2.6 * k} l${2.6 * k} ${0.8 * k} l${-2.6 * k} ${0.8 * k} l${-0.8 * k} ${2.6 * k} l${-0.8 * k} ${-2.6 * k} l${-2.6 * k} ${-0.8 * k}z" style="fill:#FFF6C8" stroke-width="${0.5 * k}"/><path d="M${11 * k} ${-54 * k} l${-1.6 * k} ${-1.6 * k} M${15.6 * k} ${-56.4 * k} v${-2.4 * k} M${21.4 * k} ${-49 * k} h${2.4 * k}" fill="none" stroke-width="${0.8 * k}" stroke-linecap="round" style="stroke:#F3C969"/></g></g>`;
       // a day out in Bali (never done anywhere before): Mum's frangipani behind her ear (and her soft gamelan hands), Dad's
       // green coconut with a straw, Ma Ma's basket of fruit on her head, Gong Gong's caping (rice-farmer's hat) as he dozes
       // cross-legged in the bale, Darren knee-deep in a paddy with a bundle of rice seedlings, the macaque on Marcus's head,
@@ -25634,30 +25641,30 @@ ${r.n}`;
         return `<path d="M${8 * k} ${-50.6 * k} q${4 * k} ${-4.4 * k} ${8.4 * k} ${-2.4 * k} q${-3.6 * k} ${3.4 * k} ${-8.4 * k} ${2.4 * k}z" style="fill:#5E8A3E" stroke-width="${0.6 * k}"/>` + petal(10.2 * k, -49 * k, k);
       }
       case "softhands": {
-        const soft = (d) => `<circle cx="${d * 9.9 * k}" cy="${-20.4 * k}" r="${2.1 * k}" ${S(look.skin)}/>${limb(`M${d * 10.4 * k} ${-18.6 * k} q${d * 2.2 * k} ${1.4 * k} ${d * 3.4 * k} ${-1.6 * k}`, look.skin, 1.2 * k)}${limb(`M${d * 9 * k} ${-18.6 * k} q${d * 1.2 * k} ${1.8 * k} ${d * 2.8 * k} ${0.6 * k}`, look.skin, 1.1 * k)}`;
+        const soft = (d) => `<circle cx="${d * 9.9 * k}" cy="${-20.4 * k}" r="${2.1 * k}" ${S(look2.skin)}/>${limb(`M${d * 10.4 * k} ${-18.6 * k} q${d * 2.2 * k} ${1.4 * k} ${d * 3.4 * k} ${-1.6 * k}`, look2.skin, 1.2 * k)}${limb(`M${d * 9 * k} ${-18.6 * k} q${d * 1.2 * k} ${1.8 * k} ${d * 2.8 * k} ${0.6 * k}`, look2.skin, 1.1 * k)}`;
         return `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${soft(1)}</g><g class="inhandl" style="transform-origin:${-9.9 * k}px ${-34 * k}px">${soft(-1)}</g>`;
       }
       // (on the head) a green coconut held up to his mouth on a bendy straw, eyes shut in bliss; the arm is posed at -135deg
       case "coconutdrink":
-        return shut8(look, k) + `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${limb(`M${17 * k} ${-49 * k} L${9 * k} ${-46 * k} L${3 * k} ${-41 * k}`, "#F6A8C4", 1.3 * k)}<ellipse cx="${19.6 * k}" cy="${-47 * k}" rx="${5.4 * k}" ry="${5.8 * k}" style="fill:#6FA84A" stroke-width="${0.9 * k}"/><path d="M${15.8 * k} ${-50.4 * k} q${3.6 * k} ${-3 * k} ${7.6 * k} 0 q${-3.8 * k} ${2 * k} ${-7.6 * k} 0z" style="fill:#F3EFD8" stroke-width="${0.6 * k}"/><path d="M${22.6 * k} ${-46 * k} q${0.8 * k} ${2.6 * k} ${-0.4 * k} ${4.4 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#A8D07A"/><circle cx="${19 * k}" cy="${-42.6 * k}" r="${2.2 * k}" ${S(look.skin)}/></g><g class="bliss"><path d="M${-13 * k} ${-60 * k} c${-1.4 * k} ${-1.6 * k} ${-3.4 * k} 0 ${-1.6 * k} ${1.8 * k} l${1.6 * k} ${1.6 * k} l${1.6 * k} ${-1.6 * k} c${1.8 * k} ${-1.8 * k} ${-0.2 * k} ${-3.4 * k} ${-1.6 * k} ${-1.8 * k}z" style="fill:#E8739A" stroke-width="${0.6 * k}"/></g>`;
+        return shut8(look2, k) + `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${limb(`M${17 * k} ${-49 * k} L${9 * k} ${-46 * k} L${3 * k} ${-41 * k}`, "#F6A8C4", 1.3 * k)}<ellipse cx="${19.6 * k}" cy="${-47 * k}" rx="${5.4 * k}" ry="${5.8 * k}" style="fill:#6FA84A" stroke-width="${0.9 * k}"/><path d="M${15.8 * k} ${-50.4 * k} q${3.6 * k} ${-3 * k} ${7.6 * k} 0 q${-3.8 * k} ${2 * k} ${-7.6 * k} 0z" style="fill:#F3EFD8" stroke-width="${0.6 * k}"/><path d="M${22.6 * k} ${-46 * k} q${0.8 * k} ${2.6 * k} ${-0.4 * k} ${4.4 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#A8D07A"/><circle cx="${19 * k}" cy="${-42.6 * k}" r="${2.2 * k}" ${S(look2.skin)}/></g><g class="bliss"><path d="M${-13 * k} ${-60 * k} c${-1.4 * k} ${-1.6 * k} ${-3.4 * k} 0 ${-1.6 * k} ${1.8 * k} l${1.6 * k} ${1.6 * k} l${1.6 * k} ${-1.6 * k} c${1.8 * k} ${-1.8 * k} ${-0.2 * k} ${-3.4 * k} ${-1.6 * k} ${-1.8 * k}z" style="fill:#E8739A" stroke-width="${0.6 * k}"/></g>`;
       // (on the head, instead of a hat) a woven basket of fruit on a little cloth ring; the right hand (arm at -170deg) steadies it
       case "basketonhead":
         return `<ellipse cx="0" cy="${-57 * k}" rx="${6.4 * k}" ry="${1.7 * k}" style="fill:#E8566C" stroke-width="${0.7 * k}"/><path d="M${-5 * k} ${-66 * k} q${-3 * k} ${-5 * k} ${-1 * k} ${-8 * k} M${-2 * k} ${-66 * k} q${1 * k} ${-5 * k} ${4 * k} ${-6.4 * k}" fill="none" stroke-width="${1.4 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/><ellipse cx="${-5 * k}" cy="${-66.4 * k}" rx="${4.6 * k}" ry="${3.2 * k}" style="fill:#F2A23A" stroke-width="${0.7 * k}"/><path d="M${-7.4 * k} ${-67.6 * k} q${1.6 * k} ${-1 * k} ${3 * k} ${-0.6 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#FFD98A"/><path d="M${2 * k} ${-66.6 * k} q${4 * k} ${-5 * k} ${9 * k} ${-2.6 * k} q${-4 * k} ${-0.6 * k} ${-7.6 * k} ${3.4 * k}z" style="fill:#F3D34A" stroke-width="${0.7 * k}"/><circle cx="${1.2 * k}" cy="${-67.4 * k}" r="${2.9 * k}" style="fill:#D8432F" stroke-width="${0.7 * k}"/>${[0, 60, 120, 180, 240, 300].map((a) => {
           const rad = a * Math.PI / 180;
           return `<path d="M${1.2 * k + Math.cos(rad) * 2.9 * k} ${-67.4 * k + Math.sin(rad) * 2.9 * k} l${Math.cos(rad) * 1.2 * k} ${Math.sin(rad) * 1.2 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#5E9A3A"/>`;
-        }).join("")}<circle cx="${7.4 * k}" cy="${-66 * k}" r="${2.6 * k}" style="fill:#8A5A3A" stroke-width="${0.7 * k}"/><path d="M${-11.4 * k} ${-65.4 * k} h${22.8 * k} l${-2.8 * k} ${8 * k} h${-17.2 * k}z" style="fill:#C9A06A" stroke-width="${0.9 * k}"/><path d="M${-10.6 * k} ${-62.6 * k} h${21.2 * k} M${-9.8 * k} ${-60 * k} h${19.6 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#8A6A42"/>${[-7, -3.5, 0, 3.5, 7].map((x) => `<path d="M${x * k} ${-65 * k} l${-0.4 * k} ${7.6 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#8A6A42"/>`).join("")}<rect x="${-12 * k}" y="${-66.6 * k}" width="${24 * k}" height="${2 * k}" rx="${1 * k}" style="fill:#B8894E" stroke-width="${0.8 * k}"/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${limb(`M${12.2 * k} ${-47 * k} L${11.4 * k} ${-57.4 * k}`, look.skin, 4.2 * k)}<circle cx="${11.2 * k}" cy="${-58.4 * k}" r="${2.2 * k}" ${S(look.skin)}/></g>`;
+        }).join("")}<circle cx="${7.4 * k}" cy="${-66 * k}" r="${2.6 * k}" style="fill:#8A5A3A" stroke-width="${0.7 * k}"/><path d="M${-11.4 * k} ${-65.4 * k} h${22.8 * k} l${-2.8 * k} ${8 * k} h${-17.2 * k}z" style="fill:#C9A06A" stroke-width="${0.9 * k}"/><path d="M${-10.6 * k} ${-62.6 * k} h${21.2 * k} M${-9.8 * k} ${-60 * k} h${19.6 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#8A6A42"/>${[-7, -3.5, 0, 3.5, 7].map((x) => `<path d="M${x * k} ${-65 * k} l${-0.4 * k} ${7.6 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#8A6A42"/>`).join("")}<rect x="${-12 * k}" y="${-66.6 * k}" width="${24 * k}" height="${2 * k}" rx="${1 * k}" style="fill:#B8894E" stroke-width="${0.8 * k}"/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${limb(`M${12.2 * k} ${-47 * k} L${11.4 * k} ${-57.4 * k}`, look2.skin, 4.2 * k)}<circle cx="${11.2 * k}" cy="${-58.4 * k}" r="${2.2 * k}" ${S(look2.skin)}/></g>`;
       // (on the head, instead of a hat) a conical caping, eyes shut, and a "z" now and then
       case "ricehat":
-        return shut8(look, k) + `<path d="M${-19 * k} ${-51 * k} L0 ${-66 * k} L${19 * k} ${-51 * k} Q0 ${-47.4 * k} ${-19 * k} ${-51 * k}z" style="fill:#E6CB8A" stroke-width="${1 * k}"/>` + [-10, -4, 3, 10].map((x) => `<path d="M0 ${-65 * k} L${x * k} ${-49.6 * k}" fill="none" stroke-width="${0.55 * k}" style="stroke:#B8955A"/>`).join("") + `<path d="M${-13.6 * k} ${-55 * k} Q0 ${-52.4 * k} ${13.6 * k} ${-55 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#B8955A"/><circle cx="0" cy="${-66 * k}" r="${0.9 * k}" style="fill:#8A6A42" stroke="none"/><g class="zzz"><text x="${15 * k}" y="${-60 * k}" font-size="${7 * k}" font-weight="700" stroke="none" style="fill:var(--line)">z</text><text x="${20 * k}" y="${-67 * k}" font-size="${5 * k}" font-weight="700" stroke="none" style="fill:var(--line);animation-delay:-1.5s">z</text></g>`;
+        return shut8(look2, k) + `<path d="M${-19 * k} ${-51 * k} L0 ${-66 * k} L${19 * k} ${-51 * k} Q0 ${-47.4 * k} ${-19 * k} ${-51 * k}z" style="fill:#E6CB8A" stroke-width="${1 * k}"/>` + [-10, -4, 3, 10].map((x) => `<path d="M0 ${-65 * k} L${x * k} ${-49.6 * k}" fill="none" stroke-width="${0.55 * k}" style="stroke:#B8955A"/>`).join("") + `<path d="M${-13.6 * k} ${-55 * k} Q0 ${-52.4 * k} ${13.6 * k} ${-55 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#B8955A"/><circle cx="0" cy="${-66 * k}" r="${0.9 * k}" style="fill:#8A6A42" stroke="none"/><g class="zzz"><text x="${15 * k}" y="${-60 * k}" font-size="${7 * k}" font-weight="700" stroke="none" style="fill:var(--line)">z</text><text x="${20 * k}" y="${-67 * k}" font-size="${5 * k}" font-weight="700" stroke="none" style="fill:var(--line);animation-delay:-1.5s">z</text></g>`;
       // sitting cross-legged (the real legs are hidden, npcs.css; drawn for the body sunk by 11px), hands on his knees
       case "crosslegs": {
-        const G3 = -11, shin = look.shorts ? look.skin : look.bottom;
-        return `<g class="xlegs"><rect x="${-11 * k}" y="${-17 * k}" width="${22 * k}" height="${17 * k + G3}" rx="${2.6 * k}" ${S(look.bottom)}/>${limb(`M${-14 * k} ${G3 - 2.4 * k} L${8 * k} ${G3 - 5.6 * k}`, shin, 4.8 * k)}${limb(`M${14 * k} ${G3 - 2.4 * k} L${-8 * k} ${G3 - 5.6 * k}`, shin, 4.8 * k)}<ellipse cx="${-15.4 * k}" cy="${G3 - 2.2 * k}" rx="${2.8 * k}" ry="${1.9 * k}" style="fill:var(--sock)"/><ellipse cx="${15.4 * k}" cy="${G3 - 2.2 * k}" rx="${2.8 * k}" ry="${1.9 * k}" style="fill:var(--sock)"/></g>`;
+        const G3 = -11, shin = look2.shorts ? look2.skin : look2.bottom;
+        return `<g class="xlegs"><rect x="${-11 * k}" y="${-17 * k}" width="${22 * k}" height="${17 * k + G3}" rx="${2.6 * k}" ${S(look2.bottom)}/>${limb(`M${-14 * k} ${G3 - 2.4 * k} L${8 * k} ${G3 - 5.6 * k}`, shin, 4.8 * k)}${limb(`M${14 * k} ${G3 - 2.4 * k} L${-8 * k} ${G3 - 5.6 * k}`, shin, 4.8 * k)}<ellipse cx="${-15.4 * k}" cy="${G3 - 2.2 * k}" rx="${2.8 * k}" ry="${1.9 * k}" style="fill:var(--sock)"/><ellipse cx="${15.4 * k}" cy="${G3 - 2.2 * k}" rx="${2.8 * k}" ry="${1.9 * k}" style="fill:var(--sock)"/></g>`;
       }
       // a bundle of rice seedlings in the left hand, one in the right being pushed into the mud (the paddy is in personArt)
       case "seedlings": {
         const sprout = (x, y2, n, s) => Array.from({ length: n }, (_, i) => `<path d="M${x * k} ${y2 * k} q${(i - (n - 1) / 2) * 0.8 * s * k} ${-4 * s * k} ${(i - (n - 1) / 2) * 2 * s * k} ${-8 * s * k}" fill="none" stroke-width="${1.1 * k}" stroke-linecap="round" style="stroke:${i % 2 ? "#7CB84A" : "#5E9A3A"}"/>`).join("");
-        return `<g class="inhandl" style="transform-origin:${-9.9 * k}px ${-34 * k}px">${sprout(-9.9, -21, 5, 1.1)}<path d="M${-11.6 * k} ${-19.6 * k} l${0.6 * k} ${3.4 * k} M${-9.9 * k} ${-19.6 * k} v${3.8 * k} M${-8.2 * k} ${-19.6 * k} l${-0.6 * k} ${3.4 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#8A6A42"/><circle cx="${-9.9 * k}" cy="${-20.4 * k}" r="${2.3 * k}" ${S(look.skin)}/><path d="M${-12 * k} ${-22.6 * k} h${4.2 * k}" fill="none" stroke-width="${1 * k}" style="stroke:#C9A06A"/></g><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${sprout(9.9, -20, 3, 0.8)}<path d="M${9.9 * k} ${-19 * k} v${4.6 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#8A6A42"/><circle cx="${9.9 * k}" cy="${-20.4 * k}" r="${2.2 * k}" ${S(look.skin)}/></g>`;
+        return `<g class="inhandl" style="transform-origin:${-9.9 * k}px ${-34 * k}px">${sprout(-9.9, -21, 5, 1.1)}<path d="M${-11.6 * k} ${-19.6 * k} l${0.6 * k} ${3.4 * k} M${-9.9 * k} ${-19.6 * k} v${3.8 * k} M${-8.2 * k} ${-19.6 * k} l${-0.6 * k} ${3.4 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#8A6A42"/><circle cx="${-9.9 * k}" cy="${-20.4 * k}" r="${2.3 * k}" ${S(look2.skin)}/><path d="M${-12 * k} ${-22.6 * k} h${4.2 * k}" fill="none" stroke-width="${1 * k}" style="stroke:#C9A06A"/></g><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${sprout(9.9, -20, 3, 0.8)}<path d="M${9.9 * k} ${-19 * k} v${4.6 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#8A6A42"/><circle cx="${9.9 * k}" cy="${-20.4 * k}" r="${2.2 * k}" ${S(look2.skin)}/></g>`;
       }
       // (on the head, instead of a hat) a little grey-brown macaque, tail hanging down; now and then it scratches or looks about
       case "macaque": {
@@ -25671,7 +25678,7 @@ ${r.n}`;
       case "legonghands": {
         const hand = (d) => {
           const ex = d * 22.6 * k, ey = -38.6 * k, hx2 = d * 21.4 * k, hy = -48 * k;
-          return limb(`M${ex} ${ey} L${hx2} ${hy}`, look.skin, 4 * k) + [[0.25, -1], [0.7, -0.75], [1, -0.3], [1, 0.15]].map(([fx, fy], i) => `<g class="fing" style="transform-origin:${hx2}px ${hy}px;animation-delay:${-i * 0.09}s">${limb(`M${hx2} ${hy} l${d * fx * 4.2 * k} ${fy * 4.2 * k}`, look.skin, 1.1 * k)}</g>`).join("") + limb(`M${hx2} ${hy} l${-d * 1.6 * k} ${-2 * k}`, look.skin, 1.1 * k) + `<circle cx="${hx2}" cy="${hy}" r="${2 * k}" ${S(look.skin)}/>`;
+          return limb(`M${ex} ${ey} L${hx2} ${hy}`, look2.skin, 4 * k) + [[0.25, -1], [0.7, -0.75], [1, -0.3], [1, 0.15]].map(([fx, fy], i) => `<g class="fing" style="transform-origin:${hx2}px ${hy}px;animation-delay:${-i * 0.09}s">${limb(`M${hx2} ${hy} l${d * fx * 4.2 * k} ${fy * 4.2 * k}`, look2.skin, 1.1 * k)}</g>`).join("") + limb(`M${hx2} ${hy} l${-d * 1.6 * k} ${-2 * k}`, look2.skin, 1.1 * k) + `<circle cx="${hx2}" cy="${hy}" r="${2 * k}" ${S(look2.skin)}/>`;
         };
         return `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px">${hand(1)}</g><g class="inhandl" style="transform-origin:${-9.9 * k}px ${-34 * k}px">${hand(-1)}</g>`;
       }
@@ -25681,39 +25688,39 @@ ${r.n}`;
       // eat it, Angellina listening to a little music box. (Helpers: shut eyes; a skin forearm with an outline.)
       // (on the head) eyes shut in bliss and a little heart now and then; the bench and the water are in personArt
       case "footsoak":
-        return shut8(look, k) + `<g class="bliss"><path d="M${-13 * k} ${-60 * k} c${-1.4 * k} ${-1.6 * k} ${-3.4 * k} 0 ${-1.6 * k} ${1.8 * k} l${1.6 * k} ${1.6 * k} l${1.6 * k} ${-1.6 * k} c${1.8 * k} ${-1.8 * k} ${-0.2 * k} ${-3.4 * k} ${-1.6 * k} ${-1.8 * k}z" style="fill:#E8739A" stroke-width="${0.6 * k}"/></g>`;
+        return shut8(look2, k) + `<g class="bliss"><path d="M${-13 * k} ${-60 * k} c${-1.4 * k} ${-1.6 * k} ${-3.4 * k} 0 ${-1.6 * k} ${1.8 * k} l${1.6 * k} ${1.6 * k} l${1.6 * k} ${-1.6 * k} c${1.8 * k} ${-1.8 * k} ${-0.2 * k} ${-3.4 * k} ${-1.6 * k} ${-1.8 * k}z" style="fill:#E8739A" stroke-width="${0.6 * k}"/></g>`;
       // a giant king crab leg held across the body in both hands (arms posed at -62deg and 48deg), knobbly and spiky
       case "crablegheld": {
         const seg = (x1, y1, x2, y2, w) => limb(`M${x1 * k} ${y1 * k} L${x2 * k} ${y2 * k}`, "#D8573A", w * k) + `<path d="M${x1 * k} ${(y1 + w * 0.28) * k} L${x2 * k} ${(y2 + w * 0.28) * k}" fill="none" stroke-width="${w * 0.34 * k}" stroke-linecap="round" style="stroke:#F6C9A0"/>`;
         const spikes = [[-30, -23.6], [-24, -24.6], [-18, -25.6], [-12, -26.6], [-1, -28.2], [6, -28.8], [13, -29.4], [27, -32.6], [33, -34.6]].map(([x, y2]) => `<path d="M${(x - 1.1) * k} ${y2 * k} l${1.1 * k} ${-2 * k} l${1.1 * k} ${2 * k}z" style="fill:#B8402A" stroke-width="${0.45 * k}"/>`).join("");
-        return `<g class="crableg" style="transform-origin:0px ${-27 * k}px">${spikes}${seg(-35, -21, -5, -27, 6)}${seg(-5, -27, 23, -29.6, 5.2)}${seg(23, -29.6, 39, -36, 3.6)}<circle cx="${-5 * k}" cy="${-27 * k}" r="${3.4 * k}" style="fill:#C8432F" stroke-width="${0.8 * k}"/><circle cx="${23 * k}" cy="${-29.6 * k}" r="${2.9 * k}" style="fill:#C8432F" stroke-width="${0.8 * k}"/><path d="M${-35.6 * k} ${-24 * k} q${-2 * k} ${3 * k} ${0.4 * k} ${6 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#F6C9A0"/><path d="M${39 * k} ${-36 * k} l${3.4 * k} ${-1.8 * k} l${-2 * k} ${3.4 * k}z" style="fill:#E8C8A8" stroke-width="${0.6 * k}"/><circle cx="${-20 * k}" cy="${-24.6 * k}" r="${2.3 * k}" ${S(look.skin)}/><circle cx="${21.6 * k}" cy="${-28.4 * k}" r="${2.3 * k}" ${S(look.skin)}/></g><g class="sweat"><path d="M${-11.4 * k} ${-52 * k} q${-1.4 * k} ${2.2 * k} 0 ${2.8 * k} q${1.4 * k} ${-0.6 * k} 0 ${-2.8 * k}z" style="fill:#9ED0F0" stroke-width="${0.5 * k}"/></g>`;
+        return `<g class="crableg" style="transform-origin:0px ${-27 * k}px">${spikes}${seg(-35, -21, -5, -27, 6)}${seg(-5, -27, 23, -29.6, 5.2)}${seg(23, -29.6, 39, -36, 3.6)}<circle cx="${-5 * k}" cy="${-27 * k}" r="${3.4 * k}" style="fill:#C8432F" stroke-width="${0.8 * k}"/><circle cx="${23 * k}" cy="${-29.6 * k}" r="${2.9 * k}" style="fill:#C8432F" stroke-width="${0.8 * k}"/><path d="M${-35.6 * k} ${-24 * k} q${-2 * k} ${3 * k} ${0.4 * k} ${6 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#F6C9A0"/><path d="M${39 * k} ${-36 * k} l${3.4 * k} ${-1.8 * k} l${-2 * k} ${3.4 * k}z" style="fill:#E8C8A8" stroke-width="${0.6 * k}"/><circle cx="${-20 * k}" cy="${-24.6 * k}" r="${2.3 * k}" ${S(look2.skin)}/><circle cx="${21.6 * k}" cy="${-28.4 * k}" r="${2.3 * k}" ${S(look2.skin)}/></g><g class="sweat"><path d="M${-11.4 * k} ${-52 * k} q${-1.4 * k} ${2.2 * k} 0 ${2.8 * k} q${1.4 * k} ${-0.6 * k} 0 ${-2.8 * k}z" style="fill:#9ED0F0" stroke-width="${0.5 * k}"/></g>`;
       }
       // a wooden tray of sea urchin held up close in both hands (bent forearms from the resting hands), a glint on the best one
       case "unibox": {
-        const fore = (d) => limb(`M${d * 9.9 * k} ${-21 * k} L${d * 8.2 * k} ${-28.6 * k}`, look.skin, 3.6 * k);
+        const fore = (d) => limb(`M${d * 9.9 * k} ${-21 * k} L${d * 8.2 * k} ${-28.6 * k}`, look2.skin, 3.6 * k);
         const lobes = [-6, -3, 0, 3, 6].map((x, i) => `<ellipse cx="${x * k}" cy="${-33.4 * k}" rx="${1.7 * k}" ry="${1.2 * k}" style="fill:${i % 2 ? "#F2A23A" : "#E8913A"}" stroke-width="${0.4 * k}"/><ellipse cx="${x * 0.85 * k}" cy="${-31.6 * k}" rx="${1.8 * k}" ry="${1.2 * k}" style="fill:${i % 2 ? "#E8913A" : "#F2B04A"}" stroke-width="${0.4 * k}"/>`).join("");
-        return `${fore(1)}${fore(-1)}<path d="M${-9.4 * k} ${-30 * k} L${-7.6 * k} ${-35.4 * k} H${7.6 * k} L${9.4 * k} ${-30 * k}z" style="fill:#C99A5A" stroke-width="${0.8 * k}"/>${lobes}<rect x="${-9.6 * k}" y="${-30.2 * k}" width="${19.2 * k}" height="${4.4 * k}" rx="${0.6 * k}" style="fill:#EBD2A8" stroke-width="${0.8 * k}"/><path d="M${-7 * k} ${-28 * k} h${4 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#B8894E"/><circle cx="${-8.6 * k}" cy="${-29.2 * k}" r="${2.1 * k}" ${S(look.skin)}/><circle cx="${8.6 * k}" cy="${-29.2 * k}" r="${2.1 * k}" ${S(look.skin)}/><g class="glint"><path d="M${2.6 * k} ${-39.6 * k} l${0.6 * k} ${-2 * k} l${0.6 * k} ${2 * k} l${2 * k} ${0.6 * k} l${-2 * k} ${0.6 * k} l${-0.6 * k} ${2 * k} l${-0.6 * k} ${-2 * k} l${-2 * k} ${-0.6 * k}z" style="fill:#FFF6C8" stroke-width="${0.45 * k}"/></g>`;
+        return `${fore(1)}${fore(-1)}<path d="M${-9.4 * k} ${-30 * k} L${-7.6 * k} ${-35.4 * k} H${7.6 * k} L${9.4 * k} ${-30 * k}z" style="fill:#C99A5A" stroke-width="${0.8 * k}"/>${lobes}<rect x="${-9.6 * k}" y="${-30.2 * k}" width="${19.2 * k}" height="${4.4 * k}" rx="${0.6 * k}" style="fill:#EBD2A8" stroke-width="${0.8 * k}"/><path d="M${-7 * k} ${-28 * k} h${4 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#B8894E"/><circle cx="${-8.6 * k}" cy="${-29.2 * k}" r="${2.1 * k}" ${S(look2.skin)}/><circle cx="${8.6 * k}" cy="${-29.2 * k}" r="${2.1 * k}" ${S(look2.skin)}/><g class="glint"><path d="M${2.6 * k} ${-39.6 * k} l${0.6 * k} ${-2 * k} l${0.6 * k} ${2 * k} l${2 * k} ${0.6 * k} l${-2 * k} ${0.6 * k} l${-0.6 * k} ${2 * k} l${-0.6 * k} ${-2 * k} l${-2 * k} ${-0.6 * k}z" style="fill:#FFF6C8" stroke-width="${0.45 * k}"/></g>`;
       }
       // a rope from the right hand (arm posed at -40deg) down to a little basket of eggs, its bottom in the spring (in personArt)
       case "eggbasket":
-        return `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><path d="M${18.6 * k} ${-23.4 * k} V${-15.4 * k}" fill="none" stroke-width="${0.9 * k}" style="stroke:#8A6A42"/><path d="M${14.6 * k} ${-11 * k} Q${18.6 * k} ${-17.4 * k} ${22.6 * k} ${-11 * k}" fill="none" stroke-width="${0.9 * k}" style="stroke:#8A6A42"/>${[15.8, 18.6, 21.4].map((x) => `<ellipse cx="${x * k}" cy="${-11.6 * k}" rx="${1.6 * k}" ry="${2 * k}" style="fill:#F6EEDC" stroke-width="${0.5 * k}"/>`).join("")}<path d="M${13.4 * k} ${-11 * k} H${23.8 * k} L${22.4 * k} ${-3.4 * k} H${14.8 * k}z" style="fill:#C9A06A" stroke-width="${0.8 * k}"/><path d="M${13.8 * k} ${-8.4 * k} H${23.4 * k} M${14.3 * k} ${-5.8 * k} H${22.9 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#8A6A42"/><circle cx="${18.6 * k}" cy="${-23.6 * k}" r="${2.2 * k}" ${S(look.skin)}/></g>`;
+        return `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><path d="M${18.6 * k} ${-23.4 * k} V${-15.4 * k}" fill="none" stroke-width="${0.9 * k}" style="stroke:#8A6A42"/><path d="M${14.6 * k} ${-11 * k} Q${18.6 * k} ${-17.4 * k} ${22.6 * k} ${-11 * k}" fill="none" stroke-width="${0.9 * k}" style="stroke:#8A6A42"/>${[15.8, 18.6, 21.4].map((x) => `<ellipse cx="${x * k}" cy="${-11.6 * k}" rx="${1.6 * k}" ry="${2 * k}" style="fill:#F6EEDC" stroke-width="${0.5 * k}"/>`).join("")}<path d="M${13.4 * k} ${-11 * k} H${23.8 * k} L${22.4 * k} ${-3.4 * k} H${14.8 * k}z" style="fill:#C9A06A" stroke-width="${0.8 * k}"/><path d="M${13.8 * k} ${-8.4 * k} H${23.4 * k} M${14.3 * k} ${-5.8 * k} H${22.9 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#8A6A42"/><circle cx="${18.6 * k}" cy="${-23.6 * k}" r="${2.2 * k}" ${S(look2.skin)}/></g>`;
       // skis on the right shoulder (arm posed at -165deg, the hand holding them by the head), two poles in the left hand
       case "skipoles": {
         const ski2 = (dx, col) => limb(`M${(1 + dx) * k} ${-9 * k} L${(19.6 + dx) * k} ${-68 * k} q${0.6 * k} ${-2.4 * k} ${-1.6 * k} ${-3 * k}`, col, 2.6 * k);
-        return `${ski2(0, "#E8463A")}${ski2(3.2, "#E8463A")}<path d="M${2.4 * k} ${-12 * k} L${20 * k} ${-68 * k} M${5.6 * k} ${-12 * k} L${23.2 * k} ${-68 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#FFFDF6"/><rect x="${7.4 * k}" y="${-34 * k}" width="${6.6 * k}" height="${3 * k}" rx="${0.6 * k}" transform="rotate(-72 ${10.7 * k} ${-32.5 * k})" style="fill:#2F2B28" stroke-width="${0.5 * k}"/><circle cx="${13.4 * k}" cy="${-47 * k}" r="${2.3 * k}" ${S(look.skin)}/><path d="M${-12.6 * k} ${-26 * k} L${-15.4 * k} ${0}" fill="none" stroke-width="${1.1 * k}" style="stroke:#5A5A62"/><path d="M${-11 * k} ${-26 * k} L${-11.8 * k} ${0}" fill="none" stroke-width="${1.1 * k}" style="stroke:#5A5A62"/><ellipse cx="${-15.1 * k}" cy="${-3 * k}" rx="${2 * k}" ry="${0.7 * k}" fill="none" stroke-width="${0.7 * k}"/><ellipse cx="${-11.8 * k}" cy="${-3 * k}" rx="${2 * k}" ry="${0.7 * k}" fill="none" stroke-width="${0.7 * k}"/><circle cx="${-11.8 * k}" cy="${-21.4 * k}" r="${2.2 * k}" ${S(look.skin)}/>`;
+        return `${ski2(0, "#E8463A")}${ski2(3.2, "#E8463A")}<path d="M${2.4 * k} ${-12 * k} L${20 * k} ${-68 * k} M${5.6 * k} ${-12 * k} L${23.2 * k} ${-68 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#FFFDF6"/><rect x="${7.4 * k}" y="${-34 * k}" width="${6.6 * k}" height="${3 * k}" rx="${0.6 * k}" transform="rotate(-72 ${10.7 * k} ${-32.5 * k})" style="fill:#2F2B28" stroke-width="${0.5 * k}"/><circle cx="${13.4 * k}" cy="${-47 * k}" r="${2.3 * k}" ${S(look2.skin)}/><path d="M${-12.6 * k} ${-26 * k} L${-15.4 * k} ${0}" fill="none" stroke-width="${1.1 * k}" style="stroke:#5A5A62"/><path d="M${-11 * k} ${-26 * k} L${-11.8 * k} ${0}" fill="none" stroke-width="${1.1 * k}" style="stroke:#5A5A62"/><ellipse cx="${-15.1 * k}" cy="${-3 * k}" rx="${2 * k}" ry="${0.7 * k}" fill="none" stroke-width="${0.7 * k}"/><ellipse cx="${-11.8 * k}" cy="${-3 * k}" rx="${2 * k}" ry="${0.7 * k}" fill="none" stroke-width="${0.7 * k}"/><circle cx="${-11.8 * k}" cy="${-21.4 * k}" r="${2.2 * k}" ${S(look2.skin)}/>`;
       }
       // (on the head) a tall Hokkaido-milk soft-serve held up by the face (arm posed at -128deg), dripping onto his hand
       case "softcone":
-        return `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><path d="M${17 * k} ${-46 * k} H${24.2 * k} L${20.6 * k} ${-34.6 * k}z" style="fill:#E8B86A" stroke-width="${0.8 * k}"/><path d="M${18 * k} ${-43 * k} l${4.6 * k} ${3 * k} M${23.2 * k} ${-43 * k} l${-4.6 * k} ${3 * k}" fill="none" stroke-width="${0.45 * k}" style="stroke:#B8894E"/>` + [[-48, 4.6, 2.6], [-52.2, 4, 2.4], [-56, 3.3, 2.2], [-59.4, 2.5, 2]].map(([y2, rx, ry]) => `<ellipse cx="${20.6 * k}" cy="${y2 * k}" rx="${rx * k}" ry="${ry * k}" style="fill:#FFFDF6" stroke-width="${0.8 * k}"/>`).join("") + `<path d="M${19.6 * k} ${-61 * k} q${0.6 * k} ${-3.4 * k} ${2.6 * k} ${-3.4 * k}" fill="none" stroke-width="${1.6 * k}" stroke-linecap="round" style="stroke:var(--line)"/><path d="M${19.6 * k} ${-61 * k} q${0.6 * k} ${-3.4 * k} ${2.6 * k} ${-3.4 * k}" fill="none" stroke-width="${0.8 * k}" stroke-linecap="round" style="stroke:#FFFDF6"/><path d="M${16.2 * k} ${-48 * k} q${-0.6 * k} ${2.4 * k} ${0.2 * k} ${4 * k} q${0.8 * k} ${-1.4 * k} ${0.4 * k} ${-4 * k}z" style="fill:#FFFDF6" stroke-width="${0.5 * k}"/><circle cx="${20.6 * k}" cy="${-40.8 * k}" r="${2.3 * k}" ${S(look.skin)}/><g class="sdrip"><ellipse cx="${16.4 * k}" cy="${-42.4 * k}" rx="${0.8 * k}" ry="${1.1 * k}" style="fill:#FFFDF6" stroke-width="${0.4 * k}"/></g></g><g class="lick"><ellipse cx="${1.6 * k}" cy="${-39.2 * k}" rx="${1.4 * k}" ry="${1 * k}" style="fill:#E8739A" stroke-width="${0.5 * k}"/></g>`;
+        return `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><path d="M${17 * k} ${-46 * k} H${24.2 * k} L${20.6 * k} ${-34.6 * k}z" style="fill:#E8B86A" stroke-width="${0.8 * k}"/><path d="M${18 * k} ${-43 * k} l${4.6 * k} ${3 * k} M${23.2 * k} ${-43 * k} l${-4.6 * k} ${3 * k}" fill="none" stroke-width="${0.45 * k}" style="stroke:#B8894E"/>` + [[-48, 4.6, 2.6], [-52.2, 4, 2.4], [-56, 3.3, 2.2], [-59.4, 2.5, 2]].map(([y2, rx, ry]) => `<ellipse cx="${20.6 * k}" cy="${y2 * k}" rx="${rx * k}" ry="${ry * k}" style="fill:#FFFDF6" stroke-width="${0.8 * k}"/>`).join("") + `<path d="M${19.6 * k} ${-61 * k} q${0.6 * k} ${-3.4 * k} ${2.6 * k} ${-3.4 * k}" fill="none" stroke-width="${1.6 * k}" stroke-linecap="round" style="stroke:var(--line)"/><path d="M${19.6 * k} ${-61 * k} q${0.6 * k} ${-3.4 * k} ${2.6 * k} ${-3.4 * k}" fill="none" stroke-width="${0.8 * k}" stroke-linecap="round" style="stroke:#FFFDF6"/><path d="M${16.2 * k} ${-48 * k} q${-0.6 * k} ${2.4 * k} ${0.2 * k} ${4 * k} q${0.8 * k} ${-1.4 * k} ${0.4 * k} ${-4 * k}z" style="fill:#FFFDF6" stroke-width="${0.5 * k}"/><circle cx="${20.6 * k}" cy="${-40.8 * k}" r="${2.3 * k}" ${S(look2.skin)}/><g class="sdrip"><ellipse cx="${16.4 * k}" cy="${-42.4 * k}" rx="${0.8 * k}" ry="${1.1 * k}" style="fill:#FFFDF6" stroke-width="${0.4 * k}"/></g></g><g class="lick"><ellipse cx="${1.6 * k}" cy="${-39.2 * k}" rx="${1.4 * k}" ry="${1 * k}" style="fill:#E8739A" stroke-width="${0.5 * k}"/></g>`;
       // a little open music box held at the chest in both hands, notes floating up; the eyes shut to listen (listen, below)
       case "musicboxheld": {
-        const fore = (d) => limb(`M${d * 9.9 * k} ${-21 * k} L${d * 8 * k} ${-25.4 * k}`, look.skin, 3.6 * k);
+        const fore = (d) => limb(`M${d * 9.9 * k} ${-21 * k} L${d * 8 * k} ${-25.4 * k}`, look2.skin, 3.6 * k);
         const note3 = (x, y2, c) => `<g style="stroke:${c}"><circle cx="${x * k}" cy="${y2 * k}" r="${1 * k}" style="fill:${c}" stroke="none"/><path d="M${(x + 0.9) * k} ${y2 * k} v${-4 * k} q${1.6 * k} ${0.6 * k} ${1.8 * k} ${2.2 * k}" fill="none" stroke-width="${0.6 * k}"/></g>`;
-        return `${fore(1)}${fore(-1)}<path d="M${-7.6 * k} ${-27 * k} L${-8.6 * k} ${-33.6 * k} H${8.6 * k} L${7.6 * k} ${-27 * k}z" style="fill:#A8794E" stroke-width="${0.8 * k}"/><path d="M${-6.4 * k} ${-28 * k} L${-7 * k} ${-32.4 * k} H${7 * k} L${6.4 * k} ${-28 * k}z" style="fill:#CFE0EE" stroke-width="${0.5 * k}"/><rect x="${-8.4 * k}" y="${-27.4 * k}" width="${16.8 * k}" height="${6.6 * k}" rx="${0.8 * k}" style="fill:#7A4A30" stroke-width="${0.8 * k}"/><path d="M${-7.4 * k} ${-25.6 * k} H${7.4 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#E3C26A"/><circle cx="0" cy="${-23.4 * k}" r="${0.8 * k}" style="fill:#E3C26A" stroke="none"/><circle cx="${-8.2 * k}" cy="${-25 * k}" r="${2.1 * k}" ${S(look.skin)}/><circle cx="${8.2 * k}" cy="${-25 * k}" r="${2.1 * k}" ${S(look.skin)}/><g class="mnotes">${note3(4, -38, "#7A6AB8")}${note3(-6, -44, "#E8739A")}${note3(8, -50, "#5FA8C9")}</g>`;
+        return `${fore(1)}${fore(-1)}<path d="M${-7.6 * k} ${-27 * k} L${-8.6 * k} ${-33.6 * k} H${8.6 * k} L${7.6 * k} ${-27 * k}z" style="fill:#A8794E" stroke-width="${0.8 * k}"/><path d="M${-6.4 * k} ${-28 * k} L${-7 * k} ${-32.4 * k} H${7 * k} L${6.4 * k} ${-28 * k}z" style="fill:#CFE0EE" stroke-width="${0.5 * k}"/><rect x="${-8.4 * k}" y="${-27.4 * k}" width="${16.8 * k}" height="${6.6 * k}" rx="${0.8 * k}" style="fill:#7A4A30" stroke-width="${0.8 * k}"/><path d="M${-7.4 * k} ${-25.6 * k} H${7.4 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#E3C26A"/><circle cx="0" cy="${-23.4 * k}" r="${0.8 * k}" style="fill:#E3C26A" stroke="none"/><circle cx="${-8.2 * k}" cy="${-25 * k}" r="${2.1 * k}" ${S(look2.skin)}/><circle cx="${8.2 * k}" cy="${-25 * k}" r="${2.1 * k}" ${S(look2.skin)}/><g class="mnotes">${note3(4, -38, "#7A6AB8")}${note3(-6, -44, "#E8739A")}${note3(8, -50, "#5FA8C9")}</g>`;
       }
       // (on the head) eyes shut, listening
       case "listen":
-        return shut8(look, k);
+        return shut8(look2, k);
       // a day out in Formentera (round 233, never done anywhere before): Mum in a straw sun hat with a palm basket on her arm,
       // holding up a leather sandal from the market; Dad on a turquoise hire bike ringing its bell; Ma Ma reaching up for a
       // fig, her basket half full; Gong Gong watching the flamingos through field glasses; Darren balancing one more flat
@@ -25722,21 +25729,21 @@ ${r.n}`;
       // (on the head) a wide straw hat with a blue band; a palm basket on the left arm; a sandal held up in the right hand
       // (arm posed at -120deg), turned this way and that
       case "sunbasket":
-        return `<ellipse cx="0" cy="${y - 5 * k}" rx="${17 * k}" ry="${4 * k}" style="fill:#E6CB8A" stroke-width="${0.9 * k}"/><path d="M${-8.4 * k} ${y - 5.6 * k} c0 ${-10 * k} ${16.8 * k} ${-10 * k} ${16.8 * k} 0z" style="fill:#E6CB8A" stroke-width="${0.9 * k}"/><path d="M${-8.2 * k} ${y - 7.4 * k} h${16.4 * k}" fill="none" stroke-width="${2 * k}" style="stroke:#3E9BC7"/><path d="M${-13 * k} ${y - 4.6 * k} q${13 * k} ${3 * k} ${26 * k} 0" fill="none" stroke-width="${0.5 * k}" style="stroke:#B8955A"/>` + basket(-15.6, -13, k, "#D9B87A", "") + `<circle cx="${-15.6 * k}" cy="${-21.4 * k}" r="${2.1 * k}" ${S(look.skin)}/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><ellipse cx="${22.8 * k}" cy="${-47.4 * k}" rx="${2.6 * k}" ry="${6.4 * k}" transform="rotate(14 ${22.8 * k} ${-47.4 * k})" style="fill:#A8794E" stroke-width="${0.8 * k}"/><path d="M${20.6 * k} ${-50.6 * k} l${4.8 * k} ${1.2 * k} M${20 * k} ${-47.2 * k} l${4.8 * k} ${1.4 * k} M${21.2 * k} ${-51.8 * k} l${2.6 * k} ${5.6 * k}" fill="none" stroke-width="${0.9 * k}" style="stroke:#6A4428"/><circle cx="${21.6 * k}" cy="${-40.8 * k}" r="${2.3 * k}" ${S(look.skin)}/></g>`;
+        return `<ellipse cx="0" cy="${y - 5 * k}" rx="${17 * k}" ry="${4 * k}" style="fill:#E6CB8A" stroke-width="${0.9 * k}"/><path d="M${-8.4 * k} ${y - 5.6 * k} c0 ${-10 * k} ${16.8 * k} ${-10 * k} ${16.8 * k} 0z" style="fill:#E6CB8A" stroke-width="${0.9 * k}"/><path d="M${-8.2 * k} ${y - 7.4 * k} h${16.4 * k}" fill="none" stroke-width="${2 * k}" style="stroke:#3E9BC7"/><path d="M${-13 * k} ${y - 4.6 * k} q${13 * k} ${3 * k} ${26 * k} 0" fill="none" stroke-width="${0.5 * k}" style="stroke:#B8955A"/>` + basket(-15.6, -13, k, "#D9B87A", "") + `<circle cx="${-15.6 * k}" cy="${-21.4 * k}" r="${2.1 * k}" ${S(look2.skin)}/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><ellipse cx="${22.8 * k}" cy="${-47.4 * k}" rx="${2.6 * k}" ry="${6.4 * k}" transform="rotate(14 ${22.8 * k} ${-47.4 * k})" style="fill:#A8794E" stroke-width="${0.8 * k}"/><path d="M${20.6 * k} ${-50.6 * k} l${4.8 * k} ${1.2 * k} M${20 * k} ${-47.2 * k} l${4.8 * k} ${1.4 * k} M${21.2 * k} ${-51.8 * k} l${2.6 * k} ${5.6 * k}" fill="none" stroke-width="${0.9 * k}" style="stroke:#6A4428"/><circle cx="${21.6 * k}" cy="${-40.8 * k}" r="${2.3 * k}" ${S(look2.skin)}/></g>`;
       // a bell on the hire bike's handlebar, the right hand on it (arm posed at -20deg) and a ring-ring now and then; a
       // basket on the front (the bike itself is under him, in personArt)
       case "bellbike":
-        return `<path d="M${12.2 * k} ${-14.4 * k} h${8.4 * k} l${-1.2 * k} ${6 * k} h${-6 * k}z" style="fill:#D9B87A" stroke-width="${0.8 * k}"/><path d="M${12.8 * k} ${-12 * k} h${7.2 * k} M${13.4 * k} ${-9.8 * k} h${6 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#A8794E"/><path d="M${13 * k} ${-15.2 * k} a${1.9 * k} ${1.9 * k} 0 0 1 ${3.8 * k} 0z" style="fill:#E3C26A" stroke-width="${0.7 * k}"/><circle cx="${14.9 * k}" cy="${-17.4 * k}" r="${0.6 * k}" style="fill:#E3C26A" stroke-width="${0.4 * k}"/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><circle cx="${14.5 * k}" cy="${-20.4 * k}" r="${2.2 * k}" ${S(look.skin)}/></g><g class="bring" fill="none" stroke-width="${0.7 * k}" style="stroke:var(--line)"><path d="M${19 * k} ${-19.6 * k} q${1.4 * k} ${1.6 * k} 0 ${3.4 * k}"/><path d="M${21.4 * k} ${-21 * k} q${2.4 * k} ${3 * k} 0 ${6.2 * k}"/></g>`;
+        return `<path d="M${12.2 * k} ${-14.4 * k} h${8.4 * k} l${-1.2 * k} ${6 * k} h${-6 * k}z" style="fill:#D9B87A" stroke-width="${0.8 * k}"/><path d="M${12.8 * k} ${-12 * k} h${7.2 * k} M${13.4 * k} ${-9.8 * k} h${6 * k}" fill="none" stroke-width="${0.5 * k}" style="stroke:#A8794E"/><path d="M${13 * k} ${-15.2 * k} a${1.9 * k} ${1.9 * k} 0 0 1 ${3.8 * k} 0z" style="fill:#E3C26A" stroke-width="${0.7 * k}"/><circle cx="${14.9 * k}" cy="${-17.4 * k}" r="${0.6 * k}" style="fill:#E3C26A" stroke-width="${0.4 * k}"/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><circle cx="${14.5 * k}" cy="${-20.4 * k}" r="${2.2 * k}" ${S(look2.skin)}/></g><g class="bring" fill="none" stroke-width="${0.7 * k}" style="stroke:var(--line)"><path d="M${19 * k} ${-19.6 * k} q${1.4 * k} ${1.6 * k} 0 ${3.4 * k}"/><path d="M${21.4 * k} ${-21 * k} q${2.4 * k} ${3 * k} 0 ${6.2 * k}"/></g>`;
       // a palm basket of figs on the left arm, and the right hand up in the fig tree (arm posed at -150deg) holding a fig
       case "figbasket":
-        return basket(-15.6, -13, k, "#C9A06A", [-19, -15.6, -12.2].map((x, i) => `<path d="M${x * k} ${(-17.4 - (i === 1 ? 1 : 0)) * k} c${-0.5 * k} ${0.8 * k} ${-2.2 * k} ${1.6 * k} ${-2.2 * k} ${3.4 * k} a${2.2 * k} ${2.2 * k} 0 0 0 ${4.4 * k} 0 c0 ${-1.8 * k} ${-1.7 * k} ${-2.6 * k} ${-2.2 * k} ${-3.4 * k}z" style="fill:${i === 1 ? "#6A3A5A" : "#8A5A7A"}" stroke-width="${0.5 * k}"/>`).join("") + `<path d="M${-11 * k} ${-16.6 * k} q${2.4 * k} ${-2.6 * k} ${4.6 * k} ${-1 * k} q${-2 * k} ${1.6 * k} ${-4.6 * k} ${1 * k}z" style="fill:#7FA65A" stroke-width="${0.5 * k}"/>`) + `<circle cx="${-15.6 * k}" cy="${-21.4 * k}" r="${2.1 * k}" ${S(look.skin)}/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><path d="M${17.4 * k} ${-52.4 * k} c${-0.6 * k} ${1 * k} ${-2.8 * k} ${2 * k} ${-2.8 * k} ${4.2 * k} a${2.8 * k} ${2.8 * k} 0 0 0 ${5.6 * k} 0 c0 ${-2.2 * k} ${-2.2 * k} ${-3.2 * k} ${-2.8 * k} ${-4.2 * k}z" style="fill:#7A4A6A" stroke-width="${0.6 * k}"/><path d="M${17.4 * k} ${-52.4 * k} l${0.4 * k} ${-1.6 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#5E8A3A"/><circle cx="${16.6 * k}" cy="${-45.6 * k}" r="${2.3 * k}" ${S(look.skin)}/></g>`;
+        return basket(-15.6, -13, k, "#C9A06A", [-19, -15.6, -12.2].map((x, i) => `<path d="M${x * k} ${(-17.4 - (i === 1 ? 1 : 0)) * k} c${-0.5 * k} ${0.8 * k} ${-2.2 * k} ${1.6 * k} ${-2.2 * k} ${3.4 * k} a${2.2 * k} ${2.2 * k} 0 0 0 ${4.4 * k} 0 c0 ${-1.8 * k} ${-1.7 * k} ${-2.6 * k} ${-2.2 * k} ${-3.4 * k}z" style="fill:${i === 1 ? "#6A3A5A" : "#8A5A7A"}" stroke-width="${0.5 * k}"/>`).join("") + `<path d="M${-11 * k} ${-16.6 * k} q${2.4 * k} ${-2.6 * k} ${4.6 * k} ${-1 * k} q${-2 * k} ${1.6 * k} ${-4.6 * k} ${1 * k}z" style="fill:#7FA65A" stroke-width="${0.5 * k}"/>`) + `<circle cx="${-15.6 * k}" cy="${-21.4 * k}" r="${2.1 * k}" ${S(look2.skin)}/><g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><path d="M${17.4 * k} ${-52.4 * k} c${-0.6 * k} ${1 * k} ${-2.8 * k} ${2 * k} ${-2.8 * k} ${4.2 * k} a${2.8 * k} ${2.8 * k} 0 0 0 ${5.6 * k} 0 c0 ${-2.2 * k} ${-2.2 * k} ${-3.2 * k} ${-2.8 * k} ${-4.2 * k}z" style="fill:#7A4A6A" stroke-width="${0.6 * k}"/><path d="M${17.4 * k} ${-52.4 * k} l${0.4 * k} ${-1.6 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#5E8A3A"/><circle cx="${16.6 * k}" cy="${-45.6 * k}" r="${2.3 * k}" ${S(look2.skin)}/></g>`;
       // (on the head) field glasses up to the eyes in both hands (arms posed at -165deg and 165deg), a glint on the lenses
       case "fieldglasses":
-        return `<g class="fglass"><rect x="${-11 * k}" y="${-48.6 * k}" width="${9 * k}" height="${7.6 * k}" rx="${2 * k}" style="fill:#3A4A3A" stroke-width="${0.9 * k}"/><rect x="${2 * k}" y="${-48.6 * k}" width="${9 * k}" height="${7.6 * k}" rx="${2 * k}" style="fill:#3A4A3A" stroke-width="${0.9 * k}"/><rect x="${-2.4 * k}" y="${-47 * k}" width="${4.8 * k}" height="${3 * k}" rx="${0.8 * k}" style="fill:#2A3A2A" stroke-width="${0.7 * k}"/>${[-6.5, 6.5].map((x) => `<circle cx="${x * k}" cy="${-44.8 * k}" r="${2.6 * k}" style="fill:#9FC3D9" stroke-width="${0.7 * k}"/>`).join("")}<g class="glint">${[-6.5, 6.5].map((x) => `<path d="M${(x - 1.2) * k} ${-45.8 * k} l${1.2 * k} ${-1 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#FFFDF6"/>`).join("")}</g></g><circle cx="${-13 * k}" cy="${-46 * k}" r="${2.3 * k}" ${S(look.skin)}/><circle cx="${13 * k}" cy="${-46 * k}" r="${2.3 * k}" ${S(look.skin)}/>`;
+        return `<g class="fglass"><rect x="${-11 * k}" y="${-48.6 * k}" width="${9 * k}" height="${7.6 * k}" rx="${2 * k}" style="fill:#3A4A3A" stroke-width="${0.9 * k}"/><rect x="${2 * k}" y="${-48.6 * k}" width="${9 * k}" height="${7.6 * k}" rx="${2 * k}" style="fill:#3A4A3A" stroke-width="${0.9 * k}"/><rect x="${-2.4 * k}" y="${-47 * k}" width="${4.8 * k}" height="${3 * k}" rx="${0.8 * k}" style="fill:#2A3A2A" stroke-width="${0.7 * k}"/>${[-6.5, 6.5].map((x) => `<circle cx="${x * k}" cy="${-44.8 * k}" r="${2.6 * k}" style="fill:#9FC3D9" stroke-width="${0.7 * k}"/>`).join("")}<g class="glint">${[-6.5, 6.5].map((x) => `<path d="M${(x - 1.2) * k} ${-45.8 * k} l${1.2 * k} ${-1 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#FFFDF6"/>`).join("")}</g></g><circle cx="${-13 * k}" cy="${-46 * k}" r="${2.3 * k}" ${S(look2.skin)}/><circle cx="${13 * k}" cy="${-46 * k}" r="${2.3 * k}" ${S(look2.skin)}/>`;
       // one more flat stone in the right hand (arm posed at -55deg), about to go on top of the stack (the stack is on the
       // sand beside him, in personArt)
       case "stonepile":
-        return `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><ellipse cx="${21.6 * k}" cy="${-23.6 * k}" rx="${3.2 * k}" ry="${1.3 * k}" style="fill:#B8B2AA" stroke-width="${0.7 * k}"/><circle cx="${21 * k}" cy="${-26.2 * k}" r="${2.2 * k}" ${S(look.skin)}/></g>`;
+        return `<g class="inhand" style="transform-origin:${9.9 * k}px ${-34 * k}px"><ellipse cx="${21.6 * k}" cy="${-23.6 * k}" rx="${3.2 * k}" ry="${1.3 * k}" style="fill:#B8B2AA" stroke-width="${0.7 * k}"/><circle cx="${21 * k}" cy="${-26.2 * k}" r="${2.2 * k}" ${S(look2.skin)}/></g>`;
       // (on the head, instead of a hat) a snorkel mask pushed up on the forehead with its strap round the head, the snorkel
       // up the side, and drips falling from his hair
       case "maskforehead":
@@ -25744,7 +25751,7 @@ ${r.n}`;
       // (on the head, instead of a hat) a big floppy hat with a pink ribbon, held on in the breeze by the right hand (arm
       // posed at -165deg); the other hand is on her hip
       case "shorehat":
-        return `<g class="fbrim" style="transform-origin:0px ${y - 5 * k}px"><path d="M${-21 * k} ${y - 4 * k} q${4 * k} ${-5.4 * k} ${21 * k} ${-5.4 * k} q${17 * k} 0 ${21 * k} ${5.4 * k} q${-3 * k} ${3 * k} ${-7 * k} ${1.6 * k} q${-14 * k} ${-2 * k} ${-28 * k} 0 q${-4 * k} ${1.4 * k} ${-7 * k} ${-1.6 * k}z" style="fill:#F6E7C8" stroke-width="${0.9 * k}"/><path d="M${-8.6 * k} ${y - 8 * k} c0 ${-10 * k} ${17.2 * k} ${-10 * k} ${17.2 * k} 0z" style="fill:#F6E7C8" stroke-width="${0.9 * k}"/><path d="M${-8.4 * k} ${y - 9.6 * k} h${16.8 * k}" fill="none" stroke-width="${2.2 * k}" style="stroke:#E8739A"/></g><g class="hribbon"><path d="M${-8 * k} ${y - 9.6 * k} q${-5 * k} ${1 * k} ${-9 * k} ${5 * k} M${-8 * k} ${y - 9.6 * k} q${-4 * k} ${3 * k} ${-6 * k} ${8 * k}" fill="none" stroke-width="${1.4 * k}" stroke-linecap="round" style="stroke:#E8739A"/></g><circle cx="${13.6 * k}" cy="${-48.4 * k}" r="${2.3 * k}" ${S(look.skin)}/>`;
+        return `<g class="fbrim" style="transform-origin:0px ${y - 5 * k}px"><path d="M${-21 * k} ${y - 4 * k} q${4 * k} ${-5.4 * k} ${21 * k} ${-5.4 * k} q${17 * k} 0 ${21 * k} ${5.4 * k} q${-3 * k} ${3 * k} ${-7 * k} ${1.6 * k} q${-14 * k} ${-2 * k} ${-28 * k} 0 q${-4 * k} ${1.4 * k} ${-7 * k} ${-1.6 * k}z" style="fill:#F6E7C8" stroke-width="${0.9 * k}"/><path d="M${-8.6 * k} ${y - 8 * k} c0 ${-10 * k} ${17.2 * k} ${-10 * k} ${17.2 * k} 0z" style="fill:#F6E7C8" stroke-width="${0.9 * k}"/><path d="M${-8.4 * k} ${y - 9.6 * k} h${16.8 * k}" fill="none" stroke-width="${2.2 * k}" style="stroke:#E8739A"/></g><g class="hribbon"><path d="M${-8 * k} ${y - 9.6 * k} q${-5 * k} ${1 * k} ${-9 * k} ${5 * k} M${-8 * k} ${y - 9.6 * k} q${-4 * k} ${3 * k} ${-6 * k} ${8 * k}" fill="none" stroke-width="${1.4 * k}" stroke-linecap="round" style="stroke:#E8739A"/></g><circle cx="${13.6 * k}" cy="${-48.4 * k}" r="${2.3 * k}" ${S(look2.skin)}/>`;
       case "lantern":
         return `<path d="M${12 * k} ${-24 * k} v${-4 * k}" fill="none"/><rect x="${9 * k}" y="${-24 * k}" width="${7 * k}" height="${9 * k}" rx="2" ${S("#FFE7A0")}/><circle cx="${12.5 * k}" cy="${-19.5 * k}" r="${1.8 * k}" fill="#F3A64A" stroke="none" class="twinkle"/>`;
     }
@@ -25796,55 +25803,55 @@ ${r.n}`;
     return `<path d="M${-R10} ${y + 5 * k} A${R10} ${R10 * 1.05} 0 0 1 ${R10} ${y + 5 * k} L${ri} ${y + 3 * k} A${ri} ${ri * 0.95} 0 0 0 ${-ri} ${y + 3 * k}z" style="fill:${g18.a}"/><path d="M${-ri * 0.7} ${y - ri * 0.55} q${ri * 0.7} ${-ri * 0.4} ${ri * 1.4} 0" fill="none" stroke-width=".7" opacity=".5"/>`;
   }
   var coatArt = (g18, k) => `<path class="rcoat" d="M${-9 * k} ${-37.4 * k} q${9 * k} ${-2.4 * k} ${18 * k} 0 l${2.6 * k} ${29 * k} h${-23.2 * k}z" style="fill:${g18.a}"/><path d="M0 ${-35 * k} V${-8.6 * k}" fill="none" stroke-width=".7"/>${[-30, -23, -16].map((y) => `<rect x="${-1.6 * k}" y="${y * k}" width="${3.2 * k}" height="${1.6 * k}" rx=".6" style="fill:${g18.b}" stroke-width=".5"/>`).join("")}`;
-  function personArt(look, kid2) {
-    const k = kid2 ? 0.62 : look.tall ? 1.1 : 1;
+  function personArt(look2, kid2) {
+    const k = kid2 ? 0.62 : look2.tall ? 1.1 : 1;
     const legH = 13 * k, legY = -15 * k, lw = 5 * k;
-    const rain = look.rain, coat = rain && rain.kind === "coat";
-    const capped = ["swimcap", "headscarf", "snorkelmask", "basketonhead", "ricehat", "macaque", "sunbasket", "maskforehead", "shorehat"].includes(look.extra), masked = look.extra === "snorkelmask" || look.extra === "swimcap";
-    const belly = look.extra === "bellyflat" || ["ricehat", "legonghands", "footsoak", "unibox", "musicboxheld"].includes(look.extra);
-    const bodyx = { frangipani: "softhands", ricehat: "crosslegs" }[look.extra], headx = { legonghands: "legongeyes", musicboxheld: "listen" }[look.extra];
-    const paddy = look.extra === "seedlings" ? `<g class="paddy" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><path d="M${-23 * k} ${-5 * k} Q${-23 * k} ${-9 * k} ${-17 * k} ${-9 * k} H${17 * k} Q${23 * k} ${-9 * k} ${23 * k} ${-5 * k} V${2.4 * k} Q0 ${5 * k} ${-23 * k} ${2.4 * k}z" style="fill:#8DB8A2" fill-opacity=".96"/><path d="M${-16 * k} ${-7 * k} h${9 * k} M${6 * k} ${-6.4 * k} h${8 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#D6ECE2"/>${[-18, -12, 16].map((x) => [-1, 0, 1].map((i) => `<path d="M${x * k} ${-8.4 * k} q${i * 0.6 * k} ${-2.6 * k} ${i * 1.8 * k} ${-5 * k}" fill="none" stroke-width="${1 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")).join("")}<g class="prip"><ellipse cx="${19.6 * k}" cy="${-8.6 * k}" rx="${3 * k}" ry="${0.9 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#E6F4EE"/><ellipse cx="${19.6 * k}" cy="${-8.6 * k}" rx="${5.4 * k}" ry="${1.5 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#E6F4EE"/></g></g>` : "";
-    const patch = look.extra === "samphirebag" ? `<g style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><path d="M${15 * k} ${0.6 * k} q${1 * k} ${-4.6 * k} ${6 * k} ${-5 * k} q${6 * k} ${-0.4 * k} ${8 * k} ${5 * k}z" style="fill:#9A948A"/>${[17.6, 20, 22.4, 24.8, 27].map((x, i) => `<path d="M${x * k} ${-3 * k} l${(i - 2) * 0.6 * k} ${(-6 - i % 2 * 2.4) * k} M${(x + (i - 2) * 0.3) * k} ${(-6 - i % 2) * k} l${(i < 2 ? -1.4 : 1.4) * k} ${-1.4 * k}" fill="none" stroke-width="${1.3 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")}</g>` : "";
-    const soakseat = look.extra === "footsoak" ? `<g class="soakseat" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><rect x="${-21 * k}" y="${-7 * k}" width="${3 * k}" height="${7 * k}" style="fill:#7A5236"/><rect x="${18 * k}" y="${-7 * k}" width="${3 * k}" height="${7 * k}" style="fill:#7A5236"/><rect x="${-25 * k}" y="${-9.6 * k}" width="${50 * k}" height="${3.6 * k}" rx="${1 * k}" style="fill:#A8794E"/></g>` : "";
+    const rain = look2.rain, coat = rain && rain.kind === "coat";
+    const capped = ["swimcap", "headscarf", "snorkelmask", "basketonhead", "ricehat", "macaque", "sunbasket", "maskforehead", "shorehat"].includes(look2.extra), masked = look2.extra === "snorkelmask" || look2.extra === "swimcap";
+    const belly = look2.extra === "bellyflat" || ["ricehat", "legonghands", "footsoak", "unibox", "musicboxheld"].includes(look2.extra);
+    const bodyx = { frangipani: "softhands", ricehat: "crosslegs" }[look2.extra], headx = { legonghands: "legongeyes", musicboxheld: "listen" }[look2.extra];
+    const paddy = look2.extra === "seedlings" ? `<g class="paddy" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><path d="M${-23 * k} ${-5 * k} Q${-23 * k} ${-9 * k} ${-17 * k} ${-9 * k} H${17 * k} Q${23 * k} ${-9 * k} ${23 * k} ${-5 * k} V${2.4 * k} Q0 ${5 * k} ${-23 * k} ${2.4 * k}z" style="fill:#8DB8A2" fill-opacity=".96"/><path d="M${-16 * k} ${-7 * k} h${9 * k} M${6 * k} ${-6.4 * k} h${8 * k}" fill="none" stroke-width="${0.8 * k}" style="stroke:#D6ECE2"/>${[-18, -12, 16].map((x) => [-1, 0, 1].map((i) => `<path d="M${x * k} ${-8.4 * k} q${i * 0.6 * k} ${-2.6 * k} ${i * 1.8 * k} ${-5 * k}" fill="none" stroke-width="${1 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")).join("")}<g class="prip"><ellipse cx="${19.6 * k}" cy="${-8.6 * k}" rx="${3 * k}" ry="${0.9 * k}" fill="none" stroke-width="${0.7 * k}" style="stroke:#E6F4EE"/><ellipse cx="${19.6 * k}" cy="${-8.6 * k}" rx="${5.4 * k}" ry="${1.5 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#E6F4EE"/></g></g>` : "";
+    const patch = look2.extra === "samphirebag" ? `<g style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><path d="M${15 * k} ${0.6 * k} q${1 * k} ${-4.6 * k} ${6 * k} ${-5 * k} q${6 * k} ${-0.4 * k} ${8 * k} ${5 * k}z" style="fill:#9A948A"/>${[17.6, 20, 22.4, 24.8, 27].map((x, i) => `<path d="M${x * k} ${-3 * k} l${(i - 2) * 0.6 * k} ${(-6 - i % 2 * 2.4) * k} M${(x + (i - 2) * 0.3) * k} ${(-6 - i % 2) * k} l${(i < 2 ? -1.4 : 1.4) * k} ${-1.4 * k}" fill="none" stroke-width="${1.3 * k}" stroke-linecap="round" style="stroke:#5E9A3A"/>`).join("")}</g>` : "";
+    const soakseat = look2.extra === "footsoak" ? `<g class="soakseat" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><rect x="${-21 * k}" y="${-7 * k}" width="${3 * k}" height="${7 * k}" style="fill:#7A5236"/><rect x="${18 * k}" y="${-7 * k}" width="${3 * k}" height="${7 * k}" style="fill:#7A5236"/><rect x="${-25 * k}" y="${-9.6 * k}" width="${50 * k}" height="${3.6 * k}" rx="${1 * k}" style="fill:#A8794E"/></g>` : "";
     const steam3 = (x, y) => [0, 1, 2].map((i) => `<path class="hksteam" style="animation-delay:${-i * 1.1}s" d="M${(x + (i - 1) * 4) * k} ${y * k} q${-2 * k} ${-3 * k} 0 ${-6 * k} q${2 * k} ${-3 * k} 0 ${-6 * k}" fill="none" stroke-width="${1.2 * k}" stroke-linecap="round" stroke="#FFFDF6" opacity=".8"/>`).join("");
-    const soakwater = look.extra === "footsoak" ? `<g class="soak" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><ellipse cx="0" cy="${4.6 * k}" rx="${24 * k}" ry="${5.6 * k}" style="fill:#9A948A"/><ellipse cx="0" cy="${4 * k}" rx="${21.4 * k}" ry="${4.2 * k}" style="fill:#9ED8D0" fill-opacity=".88"/>${[-3.7, 3.7].map((x) => `<ellipse class="prip" cx="${x * k}" cy="${2.4 * k}" rx="${4 * k}" ry="${1 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#E6F8F4"/>`).join("")}${steam3(-13, 1)}${steam3(13, 1)}</g>` : "";
-    const eggpool = look.extra === "eggbasket" ? `<g class="eggpool" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><ellipse cx="${19 * k}" cy="${-1.4 * k}" rx="${13 * k}" ry="${5 * k}" style="fill:#9A948A"/><ellipse cx="${19 * k}" cy="${-1.6 * k}" rx="${11 * k}" ry="${3.8 * k}" style="fill:#A8DCD0" fill-opacity=".92"/>${steam3(19, -4)}</g>` : "";
-    const stonestack = look.extra === "stonepile" ? `<g class="stonestack" style="stroke:var(--line)" stroke-width="${0.8 * k}" stroke-linejoin="round">${[[22, -1.6, 6.2, 2.2, "#A8A296"], [22.6, -5.6, 5.2, 2, "#C9C2B6"], [21.8, -9.2, 4.4, 1.8, "#9A948A"], [22.4, -12.6, 3.8, 1.7, "#D6CFC2"], [22, -15.8, 3.2, 1.5, "#B8B2AA"], [22.3, -18.8, 2.6, 1.4, "#E3DDD2"]].map(([x, y, rx, ry, c]) => `<ellipse cx="${x * k}" cy="${y * k}" rx="${rx * k}" ry="${ry * k}" style="fill:${c}"/>`).join("")}</g>` : "";
+    const soakwater = look2.extra === "footsoak" ? `<g class="soak" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><ellipse cx="0" cy="${4.6 * k}" rx="${24 * k}" ry="${5.6 * k}" style="fill:#9A948A"/><ellipse cx="0" cy="${4 * k}" rx="${21.4 * k}" ry="${4.2 * k}" style="fill:#9ED8D0" fill-opacity=".88"/>${[-3.7, 3.7].map((x) => `<ellipse class="prip" cx="${x * k}" cy="${2.4 * k}" rx="${4 * k}" ry="${1 * k}" fill="none" stroke-width="${0.6 * k}" style="stroke:#E6F8F4"/>`).join("")}${steam3(-13, 1)}${steam3(13, 1)}</g>` : "";
+    const eggpool = look2.extra === "eggbasket" ? `<g class="eggpool" style="stroke:var(--line)" stroke-width="1" stroke-linejoin="round"><ellipse cx="${19 * k}" cy="${-1.4 * k}" rx="${13 * k}" ry="${5 * k}" style="fill:#9A948A"/><ellipse cx="${19 * k}" cy="${-1.6 * k}" rx="${11 * k}" ry="${3.8 * k}" style="fill:#A8DCD0" fill-opacity=".92"/>${steam3(19, -4)}</g>` : "";
+    const stonestack = look2.extra === "stonepile" ? `<g class="stonestack" style="stroke:var(--line)" stroke-width="${0.8 * k}" stroke-linejoin="round">${[[22, -1.6, 6.2, 2.2, "#A8A296"], [22.6, -5.6, 5.2, 2, "#C9C2B6"], [21.8, -9.2, 4.4, 1.8, "#9A948A"], [22.4, -12.6, 3.8, 1.7, "#D6CFC2"], [22, -15.8, 3.2, 1.5, "#B8B2AA"], [22.3, -18.8, 2.6, 1.4, "#E3DDD2"]].map(([x, y, rx, ry, c]) => `<ellipse cx="${x * k}" cy="${y * k}" rx="${rx * k}" ry="${ry * k}" style="fill:${c}"/>`).join("")}</g>` : "";
     const shoe = coat ? rain.b : "var(--sock)", sleeve = (x) => coat ? `<rect x="${x}" y="${-34 * k}" width="${4.2 * k}" height="${11 * k}" rx="2" ${S(rain.a)}/>` : "";
     return `<g class="flip"><g filter="url(#wob)">
     <ellipse cx="0" cy="0" rx="${11 * k}" ry="${3.5 * k}" fill="rgba(60,40,30,.18)"/>${patch}${soakseat}
     <g class="bob" style="stroke:var(--line)" stroke-width="1.1" stroke-linejoin="round">
-      ${look.board ? board(k) : ""}
-      ${look.towel ? towel(k) : ""}
-      ${look.bike || look.extra === "bellbike" ? `<g transform="translate(0 ${7 * k})">${bikeArt(look.extra === "bellbike" ? "#3EB8C0" : look.bike === true ? "#3E6B8C" : look.bike, k)}</g>` : ""}
-      <g class="legL"><rect x="${-6.2 * k}" y="${look.shorts ? legY : legY - 3 * k}" width="${lw}" height="${look.shorts ? legH : legH + 3 * k}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${-6.6 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${-3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
-      <g class="legR"><rect x="${1.2 * k}" y="${look.shorts ? legY : legY - 3 * k}" width="${lw}" height="${look.shorts ? legH : legH + 3 * k}" rx="2" ${S(look.shorts ? look.skin : look.bottom)}/>${look.shorts ? `<rect x="${0.8 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look.bottom)}/>` : ""}<ellipse cx="${3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
-      <g class="armL"><rect x="${-12 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/>${sleeve(-12 * k)}${look.sleeves && !coat ? `<rect x="${-12 * k - 0.4 * k}" y="${-34.5 * k}" width="${5 * k}" height="${7 * k}" rx="1.5" ${S(look.sleeves)}/>` : ""}</g>
-      <g class="armR"><rect x="${7.8 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look.skin)}/>${sleeve(7.8 * k)}${look.sleeves && !coat ? `<rect x="${7.8 * k - 0.4 * k}" y="${-34.5 * k}" width="${5 * k}" height="${7 * k}" rx="1.5" ${S(look.sleeves)}/>` : ""}</g>
-      ${look.dress ? `<path d="M${-9 * k} ${-17 * k} L${-12.5 * k} ${-5 * k} h${25 * k} L${9 * k} ${-17 * k}z" ${S(look.dress)}/>` : ""}
-      <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look.dress || look.top)}/>
-      ${look.batik && !coat ? batik(look.batik, k) : ""}${look.palms && !coat ? palms(k) : ""}
+      ${look2.board ? board(k) : ""}
+      ${look2.towel ? towel(k) : ""}
+      ${look2.bike || look2.extra === "bellbike" ? `<g transform="translate(0 ${7 * k})">${bikeArt(look2.extra === "bellbike" ? "#3EB8C0" : look2.bike === true ? "#3E6B8C" : look2.bike, k)}</g>` : ""}
+      <g class="legL"><rect x="${-6.2 * k}" y="${look2.shorts ? legY : legY - 3 * k}" width="${lw}" height="${look2.shorts ? legH : legH + 3 * k}" rx="2" ${S(look2.shorts ? look2.skin : look2.bottom)}/>${look2.shorts ? `<rect x="${-6.6 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look2.bottom)}/>` : ""}<ellipse cx="${-3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
+      <g class="legR"><rect x="${1.2 * k}" y="${look2.shorts ? legY : legY - 3 * k}" width="${lw}" height="${look2.shorts ? legH : legH + 3 * k}" rx="2" ${S(look2.shorts ? look2.skin : look2.bottom)}/>${look2.shorts ? `<rect x="${0.8 * k}" y="${legY}" width="${lw + 0.8 * k}" height="${legH * 0.5}" rx="1.5" ${S(look2.bottom)}/>` : ""}<ellipse cx="${3.7 * k}" cy="${-1.6 * k}" rx="${3.6 * k}" ry="${2.1 * k}" ${S(shoe)}/></g>
+      <g class="armL"><rect x="${-12 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look2.skin)}/>${sleeve(-12 * k)}${look2.sleeves && !coat ? `<rect x="${-12 * k - 0.4 * k}" y="${-34.5 * k}" width="${5 * k}" height="${7 * k}" rx="1.5" ${S(look2.sleeves)}/>` : ""}</g>
+      <g class="armR"><rect x="${7.8 * k}" y="${-34 * k}" width="${4.2 * k}" height="${13.5 * k}" rx="2" ${S(look2.skin)}/>${sleeve(7.8 * k)}${look2.sleeves && !coat ? `<rect x="${7.8 * k - 0.4 * k}" y="${-34.5 * k}" width="${5 * k}" height="${7 * k}" rx="1.5" ${S(look2.sleeves)}/>` : ""}</g>
+      ${look2.dress ? `<path d="M${-9 * k} ${-17 * k} L${-12.5 * k} ${-5 * k} h${25 * k} L${9 * k} ${-17 * k}z" ${S(look2.dress)}/>` : ""}
+      <path d="M${-8.6 * k} ${-37 * k} q${8.6 * k} ${-2.4 * k} ${17.2 * k} 0 l${1.4 * k} ${23 * k} h${-20 * k}z" ${S(look2.dress || look2.top)}/>
+      ${look2.batik && !coat ? batik(look2.batik, k) : ""}${look2.palms && !coat ? palms(k) : ""}
       ${coat ? coatArt(rain, k) : ""}
-      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book", "hanger", "remote", "cuppa", "footy", "wineglass", "juggle", "fan", "flats", "roobag", "shopbag", "tongs", "skim", "cards", "mallow", "bodyboard", "yogamat", "telescope", "easel", "macrocam", "clicker", "chipbox", "prawnbag", "shellpail", "driftwood", "parrot", "quoit", "postcard", "thermos", "wadewater", "ducks", "frisbee", "lollybag", "milkpail", "fencerail", "branch", "nutstone", "goldpan", "guardflag", "sarsbottle", "armful", "beebuzz", "baguette", "accordion", "sniffstrip", "atomiser", "beeveil", "bigflower", "ring", "rug", "candlelit", "kid", "sarnie", "lobsterheld", "tidebook", "pennant", "ghostbook", "crabbucket", "guidebook", "handsback", "splash", "quillpad", "thriftchain", "samphirebag", "brasscloth", "ropecoil", "glasslight", "seedlings", "legonghands", "crablegheld", "unibox", "eggbasket", "skipoles", "musicboxheld", "bellbike", "figbasket", "stonepile"].includes(look.extra) ? extra(look.extra, look, k) : ""}${bodyx ? extra(bodyx, look, k) : ""}
+      ${["apron", "tie", "satchel", "bell", "lantern", "can", "hammer", "hoe", "cone", "rod", "guitar", "sketchbook", "camera", "notebook", "newspaper", "parasol", "claycup", "crane", "goboard", "skewer", "brush", "fortune", "kite", "tbasket", "net", "stone", "knit", "bocce", "poles", "oar", "book", "hanger", "remote", "cuppa", "footy", "wineglass", "juggle", "fan", "flats", "roobag", "shopbag", "tongs", "skim", "cards", "mallow", "bodyboard", "yogamat", "telescope", "easel", "macrocam", "clicker", "chipbox", "prawnbag", "shellpail", "driftwood", "parrot", "quoit", "postcard", "thermos", "wadewater", "ducks", "frisbee", "lollybag", "milkpail", "fencerail", "branch", "nutstone", "goldpan", "guardflag", "sarsbottle", "armful", "beebuzz", "baguette", "accordion", "sniffstrip", "atomiser", "beeveil", "bigflower", "ring", "rug", "candlelit", "kid", "sarnie", "lobsterheld", "tidebook", "pennant", "ghostbook", "crabbucket", "guidebook", "handsback", "splash", "quillpad", "thriftchain", "samphirebag", "brasscloth", "ropecoil", "glasslight", "seedlings", "legonghands", "crablegheld", "unibox", "eggbasket", "skipoles", "musicboxheld", "bellbike", "figbasket", "stonepile"].includes(look2.extra) ? extra(look2.extra, look2, k) : ""}${bodyx ? extra(bodyx, look2, k) : ""}
       ${belly ? `<g class="bhead">` : ""}
-      ${(look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe") && look.extra !== "swimcap" ? hair(look.hairStyle, look.hair, k) : ""}
-      <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look.skin)}/>
-      ${look.hairStyle === "long" || look.hairStyle === "bob" || look.hairStyle === "bobfringe" ? cap(look.hair, -46 * k, 10.6 * k) : hair(look.hairStyle, look.hair, k)}
+      ${(look2.hairStyle === "long" || look2.hairStyle === "bob" || look2.hairStyle === "bobfringe") && look2.extra !== "swimcap" ? hair(look2.hairStyle, look2.hair, k) : ""}
+      <circle cx="0" cy="${-46 * k}" r="${10.6 * k}" ${S(look2.skin)}/>
+      ${look2.hairStyle === "long" || look2.hairStyle === "bob" || look2.hairStyle === "bobfringe" ? cap(look2.hair, -46 * k, 10.6 * k) : hair(look2.hairStyle, look2.hair, k)}
       <ellipse cx="${-3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
       <ellipse cx="${3.7 * k}" cy="${-44 * k}" rx="${1.2 * k}" ry="${1.6 * k}" ${S("var(--sock)")} stroke="none"/>
       <ellipse cx="${-6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
       <ellipse cx="${6.4 * k}" cy="${-40.6 * k}" rx="${2 * k}" ry="${1.2 * k}" ${S("var(--rose)")} opacity=".7" stroke="none"/>
       <path d="M${-1.6 * k} ${-40.4 * k} q${1.6 * k} ${1.4 * k} ${3.2 * k} 0" fill="none" stroke-width="1"/>
-      ${look.hairStyle === "bobfringe" ? fringe(look.hair, -46 * k, 10.6 * k, k) : ""}
-      ${["glasses", "cap", "sunhat", "helmet", "binocs", "crownw", "handmirror", "capheld", "swimcap", "headscarf", "snorkelmask", "puffinwalk", "frangipani", "coconutdrink", "basketonhead", "ricehat", "macaque", "footsoak", "softcone", "sunbasket", "fieldglasses", "maskforehead", "shorehat"].includes(look.extra) ? extra(look.extra, look, k) : ""}${headx ? extra(headx, look, k) : ""}
-      ${look.specs && !masked ? extra("specs", look, k) : ""}
-      ${look.hat && !coat && !capped ? extra(look.hat, look, k) : ""}
+      ${look2.hairStyle === "bobfringe" ? fringe(look2.hair, -46 * k, 10.6 * k, k) : ""}
+      ${["glasses", "cap", "sunhat", "helmet", "binocs", "crownw", "handmirror", "capheld", "swimcap", "headscarf", "snorkelmask", "puffinwalk", "frangipani", "coconutdrink", "basketonhead", "ricehat", "macaque", "footsoak", "softcone", "sunbasket", "fieldglasses", "maskforehead", "shorehat"].includes(look2.extra) ? extra(look2.extra, look2, k) : ""}${headx ? extra(headx, look2, k) : ""}
+      ${look2.specs && !masked ? extra("specs", look2, k) : ""}
+      ${look2.hat && !coat && !capped ? extra(look2.hat, look2, k) : ""}
       ${coat ? hoodArt(rain, k) : ""}
-      ${look.specs && !masked ? `<g fill="none" stroke-width="1" style="stroke:${look.specs}"><circle cx="${-3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><circle cx="${3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><path d="M${-1 * k} ${-44 * k} h${2 * k}"/></g>` : ""}
+      ${look2.specs && !masked ? `<g fill="none" stroke-width="1" style="stroke:${look2.specs}"><circle cx="${-3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><circle cx="${3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><path d="M${-1 * k} ${-44 * k} h${2 * k}"/></g>` : ""}
       ${belly ? `</g>` : ""}
-      ${look.board ? paddle(k) : ""}
+      ${look2.board ? paddle(k) : ""}
       ${rain && rain.kind === "brolly" ? brollyArt(rain, k) : ""}
-      ${look.headphones ? `<path d="M${-11 * k} ${-46 * k} a${11 * k} ${12 * k} 0 0 1 ${22 * k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/><rect x="${9 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/>` : ""}
+      ${look2.headphones ? `<path d="M${-11 * k} ${-46 * k} a${11 * k} ${12 * k} 0 0 1 ${22 * k} 0" fill="none" stroke-width="1.8" style="stroke:var(--peri2)"/><rect x="${-13.5 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/><rect x="${9 * k}" y="${-49 * k}" width="${4.5 * k}" height="${7 * k}" rx="2" style="fill:var(--peri)"/>` : ""}
     </g>${paddy}${stonestack}
   </g>${soakwater}${eggpool}</g>`;
   }
@@ -32744,9 +32751,9 @@ ${e.text}`;
         if (k === "start") {
           Object.assign(vz, { step: "intro", answers: [], reflect: "", look: null, lookA: "", draft: "", sum: null, pick: [], error: "", busy: true });
           api4.rerender();
-          const [plan, look] = await Promise.all([readPlan("month").catch(() => null), lastVision()]);
+          const [plan, look2] = await Promise.all([readPlan("month").catch(() => null), lastVision()]);
           vz.month = plan && plan.theme ? plan.theme : "";
-          vz.look = look;
+          vz.look = look2;
           vz.busy = false;
           api4.rerender();
           return;
@@ -35532,19 +35539,19 @@ ${m.from}` : ""}`;
     const d = NPCS.find((n) => n.id === id), s = d && slotNow(d);
     return !!(s && s.scene === api3.scene());
   };
-  function makeNode(id, look, kid2, letter, act2) {
+  function makeNode(id, look2, kid2, letter, act2) {
     const g18 = document.createElementNS(NS, "g");
     g18.setAttribute("class", "ch npc" + (act2 ? " act-" + act2 : ""));
     g18.dataset.npc = id;
     g18.setAttribute("role", "button");
-    if (act2 && PROPS[act2]) look = Object.assign({}, look, { extra: PROPS[act2] });
-    if (act2 === "sup") look = Object.assign({}, look, { board: true, hat: null });
-    if (act2 === "sunbathe") look = Object.assign({}, look, { towel: true, hat: null });
-    if (act2 === "tandem") look = Object.assign({}, look, { bike: "#C8432F" });
+    if (act2 && PROPS[act2]) look2 = Object.assign({}, look2, { extra: PROPS[act2] });
+    if (act2 === "sup") look2 = Object.assign({}, look2, { board: true, hat: null });
+    if (act2 === "sunbathe") look2 = Object.assign({}, look2, { towel: true, hat: null });
+    if (act2 === "tandem") look2 = Object.assign({}, look2, { bike: "#C8432F" });
     const owned2 = api3.F().fam && api3.F().fam.owned || {};
-    if (id === "darren" && act2 === "type" && owned2.headphones) look = Object.assign({}, look, { headphones: true });
-    if (OUTDOOR.includes(api3.scene()) && !townOf(api3.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, { rain: rainGearFor(id, { coat: !!look.bike || !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look.extra) }) });
-    g18.innerHTML = personArt(look, kid2) + (letter ? `<g class="letter">${letterArt}</g>` : "") + `<g class="storycue" transform="translate(0 ${kid2 ? -48 : -72})" pointer-events="none"><g filter="url(#wob)"><rect x="-13" y="-9" width="26" height="16" rx="8" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1.2"/><circle cx="-6" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="0" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="6" cy="-1" r="1.8" style="fill:var(--line)"/></g></g>`;
+    if (id === "darren" && act2 === "type" && owned2.headphones) look2 = Object.assign({}, look2, { headphones: true });
+    if (OUTDOOR.includes(api3.scene()) && !townOf(api3.scene()) && rainyOn(dayKey()) && !look2.board) look2 = Object.assign({}, look2, { rain: rainGearFor(id, { coat: !!look2.bike || !!look2.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look2.extra) }) });
+    g18.innerHTML = personArt(look2, kid2) + (letter ? `<g class="letter">${letterArt}</g>` : "") + `<g class="storycue" transform="translate(0 ${kid2 ? -48 : -72})" pointer-events="none"><g filter="url(#wob)"><rect x="-13" y="-9" width="26" height="16" rx="8" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1.2"/><circle cx="-6" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="0" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="6" cy="-1" r="1.8" style="fill:var(--line)"/></g></g>`;
     $("actors").appendChild(g18);
     return g18;
   }
@@ -35832,13 +35839,13 @@ ${m.from}` : ""}`;
     }
     return schedCache[ck] = out.filter((x) => x.scene);
   }
-  function shopperVisit(look, at9, onArrive, side = Math.random() < 0.5 ? 1 : -1) {
+  function shopperVisit(look2, at9, onArrive, side = Math.random() < 0.5 ? 1 : -1) {
     const host2 = $("actors");
     if (!host2 || host2.querySelector(".shopper")) return null;
     const g18 = document.createElementNS(NS, "g");
     g18.setAttribute("class", "ch npc walk shopper");
     g18.setAttribute("pointer-events", "none");
-    g18.innerHTML = personArt(look, false);
+    g18.innerHTML = personArt(look2, false);
     host2.appendChild(g18);
     const xo = side > 0 ? 560 : -40, walk2 = Math.min(4200, Math.abs(at9[0] - xo) * 14), stay = 2600, t0 = performance.now();
     let arrived2 = false;
@@ -35874,13 +35881,13 @@ ${m.from}` : ""}`;
     requestAnimationFrame(step6);
     return g18;
   }
-  function rideBy(look, y, dir = Math.random() < 0.5 ? 1 : -1, ms = 6500, xr = [-50, 570]) {
+  function rideBy(look2, y, dir = Math.random() < 0.5 ? 1 : -1, ms = 6500, xr = [-50, 570]) {
     const host2 = $("actors");
     if (!host2 || host2.querySelector(".rideby")) return null;
     const g18 = document.createElementNS(NS, "g");
     g18.setAttribute("class", "ch npc walk rideby");
     g18.setAttribute("pointer-events", "none");
-    g18.innerHTML = personArt(Object.assign({}, look, { bike: "#7FC8B4", extra: "helmet", hat: null }), false);
+    g18.innerHTML = personArt(Object.assign({}, look2, { bike: "#7FC8B4", extra: "helmet", hat: null }), false);
     const box = document.createElementNS(NS, "g");
     box.innerHTML = `<g style="stroke:var(--line)" stroke-width="1"><rect x="-24" y="-20" width="13" height="11" rx="2" style="fill:#7FC8B4"/><rect x="-24" y="-20" width="13" height="3" rx="1.5" style="fill:#FFFDF6"/><path d="M-20 -14 l1.5 4 l1.5 -4z" style="fill:#E8C48E"/><circle cx="-18.5" cy="-15" r="1.6" style="fill:#F4C7CF"/></g>`;
     g18.firstElementChild.appendChild(box.firstElementChild);
@@ -39491,7 +39498,7 @@ ${m.from}` : ""}`;
     <path d="M0 0 H520 V40 Q260 70 0 40z" style="fill:#B9734E"/>${[110, 260, 410].map(arch).join("")}<rect x="0" y="196" width="520" height="6" style="fill:#A8754F"/></g>`;
     const stars2 = [70, 170, 260, 350, 450].map((x, i) => `<path d="${star2(x, 22 + i % 2 * 8, 9)}" style="fill:#FFF6D8;stroke:var(--line)" stroke-width="1"/>`).join("");
     const shafts = `<g pointer-events="none">${[[70, 150], [170, 250], [260, 330], [350, 410], [450, 470]].map(([x, fx], i) => `<path d="M${x - 6} ${26 + i % 2 * 8} L${x + 6} ${26 + i % 2 * 8} L${fx + 22} ${300 + i % 3 * 60} L${fx - 22} ${300 + i % 3 * 60}z" fill="#FFF6D8" opacity=".16"><animate attributeName="opacity" values=".1;.22;.1" dur="${7 + i}s" repeatCount="indefinite"/></path><ellipse cx="${fx}" cy="${300 + i % 3 * 60}" rx="24" ry="7" fill="#FFF6D8" opacity=".3"/>`).join("")}</g>`;
-    const look = spot3("banos", 260, 360, "The star skylights", hovE(260, 340, 60, 14), lab5(260, 360, "Look up: the stars", "#F6E3B4", 10));
+    const look2 = spot3("banos", 260, 360, "The star skylights", hovE(260, 340, 60, 14), lab5(260, 360, "Look up: the stars", "#F6E3B4", 10));
     const basin2 = `<g pointer-events="none">${sk(`<path d="M220 470 l12 -26 h56 l12 26 l-12 26 h-56z" style="fill:#B9B0A4"/><path d="M234 470 l8 -16 h36 l8 16 l-8 16 h-36z" style="fill:#9FC0C8"/>`, `<path d="M220 470 l12 -26 h56 l12 26 l-12 26 h-56z M234 470 l8 -16 h36 l8 16 l-8 16 h-36z"/>`)}<path class="ripple" d="M252 470 q8 -4 16 0" fill="none" style="stroke:#FFFDF6" stroke-width="1.2"/></g>`;
     const pillars = [[46, 600], [474, 600]].map(([x, y]) => sk(`<rect x="${x - 10}" y="${y - 380}" width="20" height="380" style="fill:#E8D3A8"/><rect x="${x - 14}" y="${y - 386}" width="28" height="10" style="fill:#C9A27E"/>`, `<rect x="${x - 10}" y="${y - 380}" width="20" height="380"/><rect x="${x - 14}" y="${y - 386}" width="28" height="10"/>`)).join("");
     const niches2 = niche(185, 176) + niche(335, 176) + niche(30, 176) + niche(490, 176);
@@ -39509,7 +39516,7 @@ ${m.from}` : ""}`;
         `<ellipse cx="420" cy="566" rx="30" ry="9"/><path d="M414 558 q-2 -10 6 -10 q8 0 6 10z"/>`
       ) + lab5(420, 600, "Mint tea", "#DCEBF2", 9)
     );
-    return floor2 + wall3 + stars2 + niches2 + pillars + benches + basin2 + tinaja(90, 600) + tinaja(116, 604, 0.8) + tinaja(150, 602, 0.7) + plaque + tea + shafts + look + exit("#A8754F");
+    return floor2 + wall3 + stars2 + niches2 + pillars + benches + basin2 + tinaja(90, 600) + tinaja(116, 604, 0.8) + tinaja(150, 602, 0.7) + plaque + tea + shafts + look2 + exit("#A8754F");
   }
   function jardinRoom() {
     const ground9 = `<rect width="520" height="640" style="fill:${C5.gravel}"/>`;
@@ -47510,6 +47517,67 @@ ${m.from}` : ""}`;
     return view3 + wall3 + floor2 + shop + side + chairs + table5 + mum + tableSpot + book + view22 + steps + pergola + sails + drapes + terraceLights(hm12) + occasionDecor(occ, day, hm12, F2) + labels;
   }
 
+  // src/art/coachcrowd.js
+  var SKIN3 = ["#F2D3B8", "#E8C4A0", "#D9A877", "#B9835A", "#8A5A3C", "#F6DCC6"];
+  var HAIR3 = ["#2F2B28", "#5A3A26", "#B5562E", "#D9B36A", "#8A8279", "#E8E1D6", "#3B2A20"];
+  var TOP = ["#6E9FD6", "#E8899A", "#F3C969", "#7FB86A", "#C9A6E0", "#F08A5C", "#5E8C8A", "#FFFDF6", "#D9534F"];
+  var BOTTOM = ["#5E5A55", "#3E4E6B", "#C9B48E", "#6B5444", "#2F2B28"];
+  var STYLES4 = ["short", "long", "bun", "bob", "curly", "short", "long"];
+  function look(seed2, extra3) {
+    const r = (i) => {
+      const x = Math.sin(seed2 * 97.13 + i * 13.7) * 43758.5453;
+      return x - Math.floor(x);
+    };
+    const p = (a) => a[Math.floor(r(a.length) * a.length) % a.length];
+    const l = { skin: p(SKIN3), hair: p(HAIR3), hairStyle: p(STYLES4), top: p(TOP), bottom: p(BOTTOM) };
+    if (extra3) l.extra = extra3;
+    else if (r(9) < 0.25) l.extra = "camera";
+    if (r(11) < 0.2) l.hat = "sunhat";
+    return l;
+  }
+  var CROWD_AT = {
+    wineshop: [[70, 432], [120, 448], [178, 430], [228, 456], [302, 448], [352, 432], [406, 452], [456, 434], [92, 548], [190, 540], [338, 540], [450, 548]].map(([x, y], i) => [x, y, false, i % 2 ? -1 : 1]),
+    terrace: [...[329, 373, 417, 461, 505, 549].map((y) => [214, y + 12, true, 1]), ...[329, 373, 417, 461, 505, 549].map((y) => [306, y + 12, true, -1])],
+    vineyard: [[350, 262, false, 1], [392, 270, false, -1], [434, 258, false, -1], [312, 280, false, 1], [462, 284, false, -1], [372, 296, false, 1]],
+    // waiting by the wine shop's door (no terrace yet)
+    scoopshop: [[232, 404, false, 1], [272, 408, false, -1], [312, 404, false, 1], [352, 408, false, -1], [204, 454, false, 1], [254, 458, false, 1], [306, 454, false, -1], [362, 458, false, -1], [412, 454, false, -1], [92, 506, true, 1], [150, 506, true, -1], [386, 506, true, 1], [444, 506, true, -1]],
+    cocoa: [[238, 404, false, 1], [278, 408, false, -1], [318, 404, false, 1], [358, 408, false, -1], [214, 454, false, 1], [266, 458, false, 1], [318, 454, false, -1], [372, 458, false, -1], [92, 506, true, 1], [150, 506, true, -1], [386, 506, true, 1], [444, 506, true, -1]],
+    bay: [[382, 290, false, -1], [362, 302, false, -1], [342, 314, false, -1], [322, 326, false, -1], [302, 338, false, -1], [284, 352, false, -1], [138, 338, true, 1], [226, 360, true, -1], [186, 414, true, 1], [148, 400, true, 1]]
+  };
+  var CROWD_ORDER = { vineyard: ["wineshop", "terrace"], bay: ["scoopshop", "cocoa", "bay"] };
+  function crowdLevel(win3, hm12) {
+    if (!win3) return 0;
+    const [a, b] = win3;
+    if (hm12 < a || hm12 >= b) return 0;
+    if (hm12 < a + 12) return (hm12 - a + 1) / 12;
+    if (hm12 >= b - 15) return (b - hm12) / 15;
+    return 1;
+  }
+  function crowdSplit(place11, level2, o = {}) {
+    const rooms = CROWD_ORDER[place11] || [], out = {};
+    const use4 = rooms.map((r) => r === "terrace" && !o.terrace ? "vineyard" : r).filter((r) => r !== "cocoa" || o.cocoa);
+    const total = use4.reduce((a, r) => a + CROWD_AT[r].length, 0);
+    let left7 = Math.round(total * level2);
+    use4.forEach((r) => {
+      const n = Math.min(left7, CROWD_AT[r].length);
+      out[r] = n;
+      left7 -= n;
+    });
+    return out;
+  }
+  function crowdArt(room4, n, seed2 = 1) {
+    const at9 = (CROWD_AT[room4] || []).slice(0, n), extra3 = room4 === "wineshop" || room4 === "terrace" || room4 === "vineyard" ? "wineglass" : room4 === "scoopshop" || room4 === "bay" ? "cone" : null;
+    return at9.map((p, i) => ({ p, i })).sort((a, b) => a.p[1] - b.p[1]).map(({ p: [x, y, sit, dir], i }) => `<g class="ch npc crowd${sit ? " act-sit" : ""}" transform="translate(${x} ${y})" pointer-events="none"><g transform="scale(${dir} 1)">${personArt(look(seed2 * 31 + i * 7 + room4.length, i % 3 === 2 ? null : extra3), false)}</g></g>`).join("");
+  }
+  function coachArt(x = 60, y = 456) {
+    const L3 = `stroke="#3b3530" stroke-width="1.4" stroke-linejoin="round"`;
+    return `<g class="coach" pointer-events="none" transform="translate(${x} ${y})"><ellipse cx="62" cy="50" rx="64" ry="6" fill="#00000018"/>
+    <rect x="0" y="0" width="124" height="44" rx="9" fill="#FFFDF6" ${L3}/><rect x="0" y="26" width="124" height="9" fill="#5E8C8A"/><path d="M0 26 H124 M0 35 H124" ${L3} fill="none"/>
+    ${[10, 32, 54, 76].map((wx) => `<rect x="${wx}" y="6" width="18" height="15" rx="3" fill="#BFD8E2" ${L3}/>`).join("")}<rect x="100" y="6" width="18" height="30" rx="3" fill="#BFD8E2" ${L3}/>
+    <text x="50" y="33" text-anchor="middle" font-family="Klee One,serif" font-size="7" font-weight="700" fill="#FFFDF6">HOLIDAY TOURS</text>
+    ${[24, 98].map((cx) => `<circle cx="${cx}" cy="44" r="8" fill="#3b3530"/><circle cx="${cx}" cy="44" r="3.4" fill="#C9C2B6"/>`).join("")}</g>`;
+  }
+
   // src/art/coast.js
   var C15 = {
     sea: "#4F93B4",
@@ -47745,9 +47813,9 @@ ${m.from}` : ""}`;
       const x = i * 97 % 520, y = 20 + i * 53 % 230;
       return `<circle cx="${x}" cy="${y}" r="${1 + i % 3 * 0.5}" fill="#9FF0D8" class="twinkle" style="animation-delay:${i % 7 * 0.4}s"/>`;
     }).join("")}`);
-    const look = spot11("bv_grotto", 260, 380, "Look up", hovE9(260, 372, 90, 14), lab20(260, 386, "Look up (torches off)", "#C3E8DA"));
+    const look2 = spot11("bv_grotto", 260, 380, "Look up", hovE9(260, 372, 90, 14), lab20(260, 386, "Look up (torches off)", "#C3E8DA"));
     const edges = g9(`<ellipse cx="80" cy="520" rx="60" ry="20" fill="#3A403C"/><ellipse cx="450" cy="500" rx="50" ry="18" fill="#3A403C"/><ellipse cx="260" cy="560" rx="80" ry="14" fill="#2A4A50" opacity=".8"/>`);
-    return back + edges + look + exit9("#3A3430");
+    return back + edges + look2 + exit9("#3A3430");
   }
   function coopRoom() {
     const back = wall2("#C9CED2", { trim: "#3E6B8C" }) + g9(Array.from({ length: 26 }, (_, i) => `<path d="M${i * 20} 12 V200" stroke="#B5BBC0" stroke-width="2"/>`).join("")) + g9(sk(`<rect x="360" y="40" width="130" height="90" style="fill:#FFFDF6"/>`, `<rect x="360" y="40" width="130" height="90"/>`)) + signText(425, 60, "TODAY", "#FFFDF6", "#3E6B8C", 9) + g9(`<text x="372" y="84" font-size="8" font-family="Klee One,serif" fill="#3B3530">crays · 28</text><text x="372" y="100" font-size="8" font-family="Klee One,serif" fill="#3B3530">prawns · 6</text><text x="372" y="116" font-size="8" font-family="Klee One,serif" fill="#3B3530">scallops · 7</text>`) + fishShapes(40, 80, 6, "#9FC3D9") + g9(`<path d="M30 70 H180" stroke="#8A7A66"/>`);
@@ -47784,9 +47852,9 @@ ${m.from}` : ""}`;
   }
   function hideRoom() {
     const back = g9(`<rect width="520" height="640" fill="#5A4A3A"/><rect width="520" height="200" fill="#6B5A44"/>${Array.from({ length: 10 }, (_, i) => `<path d="M0 ${20 + i * 18} H520" stroke="#5A4A3A" stroke-width="2"/>`).join("")}`) + g9(sk(`<rect x="30" y="60" width="460" height="100" style="fill:#3E5A6E"/><path d="M30 130 Q260 116 490 130 V160 H30z" style="fill:#EAD7A8"/><path d="M30 120 Q260 108 490 120" style="stroke:#FFFDF6;fill:none" stroke-width="3"/>`, `<rect x="30" y="60" width="460" height="100"/>`));
-    const look = spot11("bv_hide", 260, 330, "The long window", hovE9(260, 320, 140, 16), lab20(260, 330, "Watch the beach (whisper)", "#DCEBC8"));
+    const look2 = spot11("bv_hide", 260, 330, "The long window", hovE9(260, 320, 140, 16), lab20(260, 330, "Watch the beach (whisper)", "#DCEBC8"));
     const edges = bench7(60, 420, 160, "#3E2A20") + bench7(300, 420, 160, "#3E2A20") + g9(`<rect x="30" y="520" width="60" height="50" rx="3" fill="#3E2A20"/><text x="60" y="550" text-anchor="middle" font-size="7" fill="#F3E7C8">NO FLASH</text>`);
-    return back + edges + look + exit9("#3E2A20");
+    return back + edges + look2 + exit9("#3E2A20");
   }
   function parkstoreRoom() {
     const back = wall2("#F3EAD6", { boards: true, trim: "#3E6B8C" }) + shelfUnit(20, 30, 200, 160, 3, jars2(9, ["#E8913A", "#9FC3D9", "#F3D34A", "#E8566C"])) + g9(sk(`<rect x="300" y="40" width="190" height="130" rx="4" style="fill:#BFE3EE"/><rect x="310" y="50" width="170" height="110" style="fill:#E6F4F8"/>`, `<rect x="300" y="40" width="190" height="130" rx="4"/>`) + [0, 1, 2].map((i) => `<rect x="320" y="${62 + i * 34}" width="150" height="4" fill="#B7C9CF"/>${[0, 1, 2, 3].map((k) => `<rect x="${326 + k * 36}" y="${48 + i * 34}" width="14" height="14" rx="3" fill="${["#E8566C", "#F3C969", "#9CC27E", "#C9A2C8"][(i + k) % 4]}"/>`).join("")}`).join(""));
@@ -58939,6 +59007,11 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
     $("sceneArt").innerHTML = scene === "vshed" ? shedArt2(shedNow()) : scene === "vloft" ? loftArt(loftNow()) : scene === "winecave" ? caveArt({ laid: laidCount(F), old: Object.values(secretState(F).old).filter(Boolean).length, supper: supperNow(dayKey(), sgHM()), guests: 4 }) : coOf(scene) ? cottageArt(scene, coArt()) : scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : scene === "lowervine" ? lowerVineArt(vineState(F), ruinState(F).step) : scene === "green" ? greenArt() : scene === "allotment" ? allotmentArt() : scene === "bramcot" ? bramCottageArt(isHere("bram")) : /^lhtower[123]$/.test(scene) ? towerArt(scene, { night: sgHM() >= 19 * 60 || sgHM() < 6 * 60, curios: Object.keys(towerState(F).curios).length, bottles: bottlesFound(F), logDays: towerState(F).log.length, bram: isHere("bram") }) : scene === "stables" ? stablesArt(!!(F.south && F.south.mine)) : scene === "lighthouse" ? lighthouseArt(sgHM() >= 19 * 60 || sgHM() < 6 * 60, chipsOpen(sgHM())) : townRoom(scene) ? townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "porto" ? portoRoomArt(scene) : townOf(scene) === "puffin" ? puffinRoomArt(scene) : townOf(scene) === "bali" ? baliRoomArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoRoomArt(scene) : townOf(scene) === "formentera" ? formenteraRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene) : TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene) : TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "porto" ? portoArt(scene) : townOf(scene) === "puffin" ? puffinArt(scene) : townOf(scene) === "bali" ? baliArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoArt(scene) : townOf(scene) === "formentera" ? formenteraArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), { shop: owns3(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F)) }) : roomArt(scene);
+    {
+      const cw = coachCrowdNow();
+      if (cw && cw.rooms[scene]) $("sceneArt").insertAdjacentHTML("beforeend", crowdArt(scene, cw.rooms[scene], cw.seed));
+      if (cw && scene === "vineyard" && cw.place === "vineyard") $("sceneArt").insertAdjacentHTML("beforeend", coachArt());
+    }
     if (scene === "cellar" && secretState(F).step) $("sceneArt").insertAdjacentHTML("beforeend", cellarSecretArt(secretState(F).step));
     if (scene === "scoopkitchen" && secretState(F).through) $("sceneArt").insertAdjacentHTML("beforeend", kitchenSecretArt(true));
     $("sceneArt").insertAdjacentHTML("beforeend", keepsakesIn(F, scene) + petsIn(F, scene) + fishSpotArt(scene, scene !== "bay" || spotOpen("bay")) + transportArt(scene) + coastGulls(scene, sgHM() >= 19 * 60 || sgHM() < 6 * 60) + (scene === "green" && bootNow(dayKey(), sgHM()) ? carBootArt() : "") + beachArt(beachFinds(F, scene, dayKey())) + bottleHere() + fridayLayer(scene) + (scene === "base" ? koiArt(F.fish && F.fish.koi || 0) + (F.ronda && F.ronda.bench ? tileBench(236, 548) : "") + (F.kyoto && F.kyoto.lantern ? homeLantern(492, 588) : "") + (F.jeju && F.jeju.dye ? dyeCloth(dyeDays(F)) : "") : "") + (scene === "shore" && F.towns && F.towns.cinque ? homeBoat(204, 380, ...boatCols(F)) : "") + (scene === "cellar" && owns3(F, "cellar") && discoNow(dayKey(), sgHM()) ? discoArt() : "") + vanSleeper() + vanCrateArt() + (scene === "hwoods" ? wishTower(112, 462, (F.wish || {}).n || 3) : ""));
@@ -60622,6 +60695,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       ppView = null;
       coView = null;
       caveView = null;
+      document.querySelectorAll("#actors .rideby").forEach((n) => n.remove());
       scene = id;
       cam.snap = true;
       atSpot = null;
@@ -62438,6 +62512,14 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     drawScene();
     if (coView) ctx();
   }
+  function coachCrowdNow() {
+    const c = coachToday(F, dayKey());
+    if (!c) return null;
+    const hm12 = sgHM(), lv2 = crowdLevel(c.hm, hm12);
+    if (!lv2) return null;
+    return { place: c.place, rooms: crowdSplit(c.place, lv2, { terrace: !!vineState(F).terrace, cocoa: owns3(F, "cocoa") }), seed: +dayKey().replace(/-/g, "") % 997 };
+  }
+  var crowdKey = "";
   var lastHap = 0;
   var hapStock = (shop) => shop === "scoop" ? Object.values(scoopState(F).tubs || {}).reduce((a, n) => a + n, 0) : shop === "cocoa" ? (() => {
     const c = cocoaState(F);
@@ -62446,6 +62528,13 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
   function hapNow() {
     lastHap = Date.now();
     const day = dayKey(), hm12 = sgHM(), prev = prevDay(day);
+    {
+      const cw = coachCrowdNow(), k = cw ? JSON.stringify(cw.rooms) : "";
+      if (k !== crowdKey) {
+        crowdKey = k;
+        if (cw ? cw.rooms[scene] != null || scene === "vineyard" && cw.place === "vineyard" : true) drawScene();
+      }
+    }
     const own = { scoop: !!F.scoop, cocoa: owns3(F, "cocoa"), wine: !!F.vine, boat: owns3(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning) };
     const got3 = hapDaily(F, day, own, { stormy: rainDay(prev) === 2, away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: (rnd17) => birdsTake(F, rnd17) });
     const j = judge(F, day, hm12, hapStock), lp = lapse(F, day, hm12);

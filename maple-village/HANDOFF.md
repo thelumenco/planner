@@ -2989,3 +2989,5 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - Tomo: `.rideby` arms still on the handlebars (npcs.css); setScene removes the ride so it never shows indoors.
 - Cruise ship: planned, not built (Mel asked to wait).
 - Follow-up (Mel: "Some people are under the counter in the shop"): the Scoop Shack and Cocoa Room queues now start a step back (y 404 and 454), clear of the counter.
+
+## Build v248 (round 317) published at Mel's say-so without a full run (slow container); the round 317 browser block and unit checks passed.
