@@ -218,6 +218,15 @@ HANDOFF.md round 316. Port it with the vinegar dishes (section 16's note) and se
 - `art/wine.js` `dishArt`: an `insalata` drawing (tomato slices, basil, a splash of vinegar and a small cruet); without it the small plate showed an empty plate. `TAPAS_COL` gets colours for `encurtidos` and `salmonetes`.
 - Test: "every small plate is drawn, not an empty plate" (a unit check).
 
+### 23. The coach party you can see, and Tomo's bike (round 317)
+HANDOFF.md round 317. Port the coach crowd with section 16 (happenings); Tomo's two fixes wherever the delivery bike rides by.
+- New `src/art/coachcrowd.js`: `CROWD_AT` (where visitors stand or sit in each room, scene units), `CROWD_ORDER` (vineyard: the wine shop, then the terrace; bay: the Scoop Shack, the Cocoa Room, then the bay outside), `crowdLevel(win, hm)` (in over 12 minutes, out over the last 15), `crowdSplit(place, level, {terrace, cocoa})` (rooms fill in order; with no terrace the winery's overflow waits by its door in the vineyard), `crowdArt(room, n, seed)` (static figures with glasses or cones, seated ones use `.act-sit`) and `coachArt()` (the coach, parked by the vineyard stall).
+- `game/happen.js`: `coachToday(F, day)` -> `{place, hm}`; the coach note says where the overflow goes.
+- `core.js`: `coachCrowdNow()`; `drawScene` adds the crowd to the scene art (and the coach in the vineyard); `hapNow` redraws when the numbers change. Check the positions against this edition's rooms.
+- Tomo's bike: `npcs.css` keeps a `.rideby` rider's arms still and forward on the handlebars (no walk swing); `setScene` removes any `.rideby` so his ride never carries on indoors.
+- Not built yet: a cruise ship (Mel: "don't build the cruise part yet").
+- Tests: "The coach party you can see, and Tomo's bike (round 317)" and the round 317 unit checks.
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.
@@ -234,6 +243,7 @@ Port these smoke-test blocks:
 - "Seashells, one at a time, and the chocolate steps (round 299)", plus the changed checks HANDOFF.md round 299 lists, for the parts you ported
 - the changed check in "The paperie in Montrose (round 183)" (section 14)
 - the round 314 checks in "Scoop Shack upgrades" and the bigger churner unit checks (section 20)
+- "The coach party you can see, and Tomo's bike (round 317)" (section 23)
 - "Lise makes paper too: every stage, her own colours and add-ins (round 311)" (section 19)
 - "Happenings: storms, the wine, the critic and coach parties (round 303)" and "Happenings: big orders and upkeep (round 304)" (section 16)
 - "Festival chocolates you can see and give (round 305)" and the changed "rainy days" check (section 17)

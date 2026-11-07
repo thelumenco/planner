@@ -79,8 +79,14 @@ function coach(F, day, own, rnd){
   const p = places[Math.floor(rnd()*places.length)], from = rnd() < .5 ? 11*60 : 14*60;
   COACH[p].shops.filter(s => own[s]).forEach(s => h.boosts.push({shop: s, from: day, to: day, hm: [from, from + 120], x: 3, why: "coach"}));
   h.lastCoach = day;
-  note(h, day, "A coach party today", `A coach is booked in at ${COACH[p].n} at ${from === 11*60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours. ${COACH[p].shops.filter(s => own[s]).map(s => SHOP_N[s]).join(" and ").replace(/^./, x => x.toUpperCase())} will be rushed off ${COACH[p].shops.filter(s => own[s]).length > 1 ? "their" : "its"} feet: stock up beforehand.`);
+  note(h, day, "A coach party today", `A coach is booked in at ${COACH[p].n} at ${from === 11*60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours. ${COACH[p].shops.filter(s => own[s]).map(s => SHOP_N[s]).join(" and ").replace(/^./, x => x.toUpperCase())} will be rushed off ${COACH[p].shops.filter(s => own[s]).length > 1 ? "their" : "its"} feet: stock up beforehand.${p === "vineyard" ? " When the wine shop's full, the rest will take their glasses out onto the terrace." : " Expect a queue out of the door and every seat on the deck taken."}`);
   return p;
+}
+
+// round 317: today's coach, if there is one: where it is ("bay" or "vineyard") and its two hours
+export function coachToday(F, day){
+  const b = hapState(F).boosts.find(x => x.why === "coach" && x.from === day && x.hm); if (!b) return null;
+  return {place: b.shop === "wine" ? "vineyard" : "bay", hm: b.hm};
 }
 
 /* ---------- big orders with a deadline (round 304) ---------- */

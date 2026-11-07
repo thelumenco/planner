@@ -85,6 +85,8 @@
 .bikeWheel{transform-box:fill-box;transform-origin:50% 50%}#mel.biking .bikeWheel,.npc.walk .bikeWheel{animation:bspin .5s linear infinite}@keyframes bspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){#mel.biking .bikeWheel,.npc.walk .bikeWheel{animation:none}}
 #mel.scoot .rideScoot,#mel.drive .rideCar{display:inline}
+/* round 317 (Mel: "Tomo cycles with his hands swinging"): on the delivery bike his hands stay on the handlebars; his legs pedal */
+.ch.rideby .armL,.ch.rideby .armR{animation:none !important;transform:rotate(-58deg)}
 #mel.scoot .legL,#mel.scoot .legR,#mel.scoot .armL,#mel.scoot .armR{animation:none !important}
 #mel.drive .legL,#mel.drive .legR{visibility:hidden}
 .ridePony{display:none}#mel.riding .ridePony{display:inline}#mel .ponyEvan{display:none}#mel.riding.withEvan .ponyEvan{display:inline}/* round 283 */

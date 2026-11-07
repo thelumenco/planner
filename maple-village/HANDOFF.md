@@ -2983,3 +2983,8 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - wine.js `dishArt` had no `insalata` drawing, so it fell back to the bare plate. Drawn now; encurtidos and salmonetes get cazuela colours. A unit check makes sure every DISHES entry has its own drawing. Many trip specials still use the default cazuela colours (drawn, not empty). Port doc section 22. Picture: screens-bottom-row/round316-dishes.png.
 
 ## Build v247 (round 316) published at Mel's say-so without a full run (slow container); the round 316 unit check passed.
+
+## Round 317: the coach party you can see, and Tomo's bike (Mel: "When the coach ... comes in, do I get a lot more people? On the terrace as well because not enough room in the winery itself"; "Tomo cycles with his hands swinging. Also he cycles across the room when I'm in a building"; "don't build the cruise part yet. Just coach")
+- art/coachcrowd.js draws the coach's visitors: the wine shop fills first (12), then the terrace (12 seated), or 6 waiting by the door with no terrace; at the bay, the Scoop Shack (13), the Cocoa Room (12, if owned) and a queue and deck outside (10). In over 12 minutes, out over the last 15. The coach parks by the vineyard stall. happen.js `coachToday`; core.js `coachCrowdNow`, drawScene and hapNow redraws. Pictures: screens-bottom-row/round317-coach-*.png.
+- Tomo: `.rideby` arms still on the handlebars (npcs.css); setScene removes the ride so it never shows indoors.
+- Cruise ship: planned, not built (Mel asked to wait).
