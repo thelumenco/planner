@@ -555,3 +555,16 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
 - art/wine.js: `dishArt` draws `insalata` (tomato slices, basil, a splash of vinegar, a little cruet); it was an
   empty plate. `TAPAS_COL` has colours for `encurtidos` and `salmonetes`.
 - Test (in "Scoop Shack upgrades"): every entry in `DISHES` has its own drawing, and the two newest tapas their colours.
+
+## Round 317 (ported): the coach party you can see, and Tomo's bike
+
+- New art/coachcrowd.js: `CROWD_AT` (spots per room), `CROWD_ORDER` (vineyard: wine shop, then terrace; bay: Scoop
+  Shack, Cocoa Room if owned, then a queue out onto the deck), `crowdLevel` (arrive over 12 minutes, leave over the
+  last 15), `crowdSplit` (with no terrace the winery's overflow waits by the wine shop's door), `crowdArt` (static,
+  untappable strangers with a stable look per seat) and `coachArt` (parked by the vineyard stall).
+- game/happen.js: `coachToday(F, day)`. game/core.js: `coachCrowdNow`, the crowd drawn in `drawScene`, and `hapNow`
+  redraws when the numbers change.
+- Tomo's delivery ride: npcs.css keeps a `.rideby` rider's arms on the handlebars; `setScene` removes any `.rideby`, so
+  the ride never shows indoors.
+- Checked the spots against this edition's rooms (screenshots); they match the source's rooms.
+- Test: unit checks in "Scoop Shack upgrades", and "The coach party you can see, and Tomo's bike (round 317)".

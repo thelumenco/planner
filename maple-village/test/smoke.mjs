@@ -1823,6 +1823,15 @@ if (want("\nScoop Shack upgrades")) try {
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
+  { // round 317: the coach party you can see
+    const cc = await import(new URL("../src/art/coachcrowd.js", import.meta.url)), hp = await import(new URL("../src/game/happen.js", import.meta.url));
+    check(cc.crowdLevel([660, 780], 659) === 0 && cc.crowdLevel([660, 780], 660) > 0 && cc.crowdLevel([660, 780], 660) < .2 && cc.crowdLevel([660, 780], 720) === 1 && cc.crowdLevel([660, 780], 775) < .5 && cc.crowdLevel([660, 780], 780) === 0, "the coach party arrives over twelve minutes and drifts off over the last quarter hour (round 317)");
+    const full = cc.crowdSplit("vineyard", 1, {terrace: true}), half = cc.crowdSplit("vineyard", .4, {terrace: true}), none = cc.crowdSplit("vineyard", 1, {terrace: false});
+    check(full.wineshop === 12 && full.terrace === 12 && half.wineshop === 10 && !half.terrace && none.wineshop === 12 && none.vineyard === 6 && !none.terrace, "the wine shop fills first, then the rest sit out on the terrace (or wait by the door with no terrace)");
+    const bay = cc.crowdSplit("bay", 1, {cocoa: false});
+    check(bay.scoopshop === 13 && bay.bay === 10 && !bay.cocoa && cc.crowdSplit("bay", 1, {cocoa: true}).cocoa === 12, "at the bay: a full Scoop Shack, a queue out of the door and onto the deck, and the Cocoa Room too once it's yours");
+    const F = {hap: {boosts: [{shop: "wine", from: "2026-10-14", to: "2026-10-14", hm: [660, 780], x: 3, why: "coach"}], repairs: [], log: []}};
+    check(hp.coachToday(F, "2026-10-14").place === "vineyard" && !hp.coachToday(F, "2026-10-15") && (cc.crowdArt("terrace", 3).match(/class="ch npc crowd act-sit"/g) || []).length === 3 && /HOLIDAY TOURS/.test(cc.coachArt()), "today's coach, seated figures on the terrace, and the coach itself"); }
   { // round 316: every small plate has its own drawing (the tomato salad was an empty plate)
     const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), wa = await import(new URL("../src/art/wine.js", import.meta.url)), bare = wa.dishArt("no_such_dish");
     const none = Object.keys(kit.DISHES).filter(id => wa.dishArt(id) === bare);
@@ -5516,6 +5525,36 @@ if (want("\nLise makes paper too: every stage, her own colours and add-ins (roun
   check(blush === 5 && pp.LINE === 8 && pp.LINE*pp.BATCH === 48, "blush for Valentine's; the drying line holds eight batches, 48 sheets (round 312)");
   const J = {coins: 500, goals: {paperie: 1, paperkeeper: 1}, inv: {}}, j = pp.paperState(J); j.scraps = 20; j.line = Array.from({length: 6}, () => ({col: "natural", add: "none", n: 6, done: wed + 864e5})); j.at = wed; pp.paperTick(J, false, wed + 7*3600e3);
   check(j.line.length === pp.LINE && j.press && j.scraps < 20, "a full day: she fills the line (eight batches), the next waits pressed until the line has room");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe coach party you can see, and Tomo's bike (round 317)")) try {
+  console.log("\nThe coach party you can see, and Tomo's bike (round 317)");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`coach crowd pageerror: ${e.message}`));
+  await page.addInitScript(() => { const q = location.search; if (!/coachpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
+    f.vine = f.vine || {}; if (!/noterrace/.test(q)) f.vine.terrace = Date.now(); else delete f.vine.terrace;
+    f.hap = Object.assign(f.hap || {}, {day: "2026-10-14", repairs: [], log: [], boosts: [{shop: "wine", from: "2026-10-14", to: "2026-10-14", hm: [11*60, 13*60], x: 3, why: "coach"}]});
+    const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
+  await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-14"); await page.waitForTimeout(1200);
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-14&coachpatch=1"); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1200);
+  const inShop = await page.locator("#sceneArt .crowd").count();
+  await page.evaluate(() => window.__hbScene("terrace")); await page.waitForTimeout(1200);
+  const onTerrace = await page.locator("#sceneArt .crowd.act-sit").count();
+  await page.evaluate(() => window.__hbScene("vineyard")); await page.waitForTimeout(1200);
+  check(inShop === 12 && onTerrace === 12 && await page.locator("#sceneArt .coach").count() === 1 && await page.locator("#sceneArt .crowd").count() === 0, `a coach at the vineyard: the wine shop full (${inShop}), the overflow seated on the terrace (${onTerrace}), and the coach parked by the stall`);
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-14&coachpatch=1&noterrace=1"); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("vineyard")); await page.waitForTimeout(1200);
+  check(await page.locator("#sceneArt .crowd").count() === 6, "with no terrace yet, the overflow waits outside the wine shop's door");
+  await page.goto(url + "?seed=1&time=14:00&date=2026-10-14&coachpatch=1"); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1200);
+  check(await page.locator("#sceneArt .crowd").count() === 0, "and once the two hours are up, they've all gone");
+  // Tomo: hands on the handlebars, and his ride stays outdoors
+  await page.evaluate(() => window.__hbScene("village")); await page.waitForTimeout(1200);
+  await page.evaluate(() => window.__hbOrder && window.__hbOrder()); await page.waitForTimeout(1500);
+  const ride = await page.locator("#actors .rideby").count(), arm = ride ? await page.locator("#actors .rideby .armL").first().evaluate(n => getComputedStyle(n).animationName) : "";
+  await page.evaluate(() => window.__hbScene("wineshop")); await page.waitForTimeout(1500);
+  check(ride === 1 && arm === "none" && await page.locator("#actors .rideby").count() === 0, `Tomo rides by with his hands on the handlebars (arms: ${arm || "no ride"}), and his ride doesn't follow you indoors`);
+  await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe wiki covers every destination (round 227)")) try {
   console.log("\nThe wiki covers every destination (round 227)");

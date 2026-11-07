@@ -85,6 +85,8 @@
 .bikeWheel{transform-box:fill-box;transform-origin:50% 50%}#hero.biking .bikeWheel,.npc.walk .bikeWheel{animation:bspin .5s linear infinite}@keyframes bspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){#hero.biking .bikeWheel,.npc.walk .bikeWheel{animation:none}}
 #hero.scoot .rideScoot,#hero.drive .rideCar{display:inline}
+/* round 317: on the delivery bike Tomo's hands stay on the handlebars; his legs pedal */
+.ch.rideby .armL,.ch.rideby .armR{animation:none !important;transform:rotate(-58deg)}
 #hero.scoot .legL,#hero.scoot .legR,#hero.scoot .armL,#hero.scoot .armR{animation:none !important}
 #hero.drive .legL,#hero.drive .legR{visibility:hidden}
 

@@ -155,3 +155,9 @@ export function boost(F, shop, day, hm){
   return f;
 }
 export const hapMail = F => ((F.hap && F.hap.log) || []).map(n => ({id: n.id, from: "postie", at: n.at, title: n.title, body: n.body}));
+
+// round 317: today's coach, if there is one: where it is ("bay" or "vineyard") and its two hours
+export function coachToday(F, day){
+  const b = hapState(F).boosts.find(x => x.why === "coach" && x.from === day && x.hm); if (!b) return null;
+  return {place: b.shop === "wine" ? "vineyard" : "bay", hm: b.hm};
+}
