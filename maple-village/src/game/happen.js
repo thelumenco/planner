@@ -74,19 +74,25 @@ export function judge(F, day, hm, stockOf){
   h.critic = null; return {good, shop: c.shop};
 }
 const COACH = {bay: {shops: ["scoop", "cocoa"], n: "the bay"}, vineyard: {shops: ["wine"], n: "the vineyard"}};
+// round 318 (Mel: "I thought it would be for all at once"): one coach, every shop you own, the same two hours. The forty
+// are split between the bay and the vineyard, so each shop is two and a half times as busy rather than three
+export const COACH_X = 2.5;
 function coach(F, day, own, rnd){
   const h = hapState(F), places = Object.keys(COACH).filter(p => COACH[p].shops.some(s => own[s])); if (!places.length) return null;
-  const p = places[Math.floor(rnd()*places.length)], from = rnd() < .5 ? 11*60 : 14*60;
-  COACH[p].shops.filter(s => own[s]).forEach(s => h.boosts.push({shop: s, from: day, to: day, hm: [from, from + 120], x: 3, why: "coach"}));
+  rnd();   // (was: which place; the coach now stops at every one)
+  const from = rnd() < .5 ? 11*60 : 14*60, shops = places.flatMap(p => COACH[p].shops.filter(s => own[s]));
+  shops.forEach(s => h.boosts.push({shop: s, from: day, to: day, hm: [from, from + 120], x: COACH_X, why: "coach"}));
   h.lastCoach = day;
-  note(h, day, "A coach party today", `A coach is booked in at ${COACH[p].n} at ${from === 11*60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours. ${COACH[p].shops.filter(s => own[s]).map(s => SHOP_N[s]).join(" and ").replace(/^./, x => x.toUpperCase())} will be rushed off ${COACH[p].shops.filter(s => own[s]).length > 1 ? "their" : "its"} feet: stock up beforehand.${p === "vineyard" ? " When the wine shop's full, the rest will take their glasses out onto the terrace." : " Expect a queue out of the door and every seat on the deck taken."}`);
-  return p;
+  const names = shops.map(s => SHOP_N[s]), list = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0];
+  note(h, day, "A coach party today", `A coach is booked in at ${from === 11*60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours, and they'll be everywhere at once.${places.length > 1 ? " It drops half at the bay and takes the rest up to the vineyard." : ""} ${list.replace(/^./, x => x.toUpperCase())} will be rushed off ${shops.length > 1 ? "their" : "its"} feet: stock up beforehand.${places.includes("vineyard") ? " When the wine shop's full, the rest will take their glasses out onto the terrace." : ""}${places.includes("bay") ? " Expect a queue out of the Scoop Shack's door and every seat on the deck taken." : ""}`);
+  return places.join("+");
 }
 
 // round 317: today's coach, if there is one: where it is ("bay" or "vineyard") and its two hours
 export function coachToday(F, day){
-  const b = hapState(F).boosts.find(x => x.why === "coach" && x.from === day && x.hm); if (!b) return null;
-  return {place: b.shop === "wine" ? "vineyard" : "bay", hm: b.hm};
+  const bs = hapState(F).boosts.filter(x => x.why === "coach" && x.from === day && x.hm); if (!bs.length) return null;
+  const places = [...new Set(bs.map(b => b.shop === "wine" ? "vineyard" : "bay"))];
+  return {places, place: places[0], hm: bs[0].hm};   // round 318: every place it stops at
 }
 
 /* ---------- big orders with a deadline (round 304) ---------- */

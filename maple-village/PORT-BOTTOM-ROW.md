@@ -224,6 +224,7 @@ HANDOFF.md round 317. Port the coach crowd with section 16 (happenings); Tomo's 
 - `game/happen.js`: `coachToday(F, day)` -> `{place, hm}`; the coach note says where the overflow goes.
 - `core.js`: `coachCrowdNow()`; `drawScene` adds the crowd to the scene art (and the coach in the vineyard); `hapNow` redraws when the numbers change. Check the positions against this edition's rooms.
 - Tomo's bike: `npcs.css` keeps a `.rideby` rider's arms still and forward on the handlebars (no walk swing); `setScene` removes any `.rideby` so his ride never carries on indoors.
+- Round 318 (Mel: "I thought it would be for all at once"): `coach()` in `happen.js` now boosts every shop the player owns, at the bay and the vineyard together, for the same two hours, at `COACH_X` = 2.5 each (was 3 for one place, so the money stays in check). `coachToday` returns `places`; `coachCrowdNow` merges `crowdSplit` for each. The note says it splits between the bay and the vineyard.
 - Not built yet: a cruise ship (Mel: "don't build the cruise part yet").
 - Tests: "The coach party you can see, and Tomo's bike (round 317)" and the round 317 unit checks.
 

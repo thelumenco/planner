@@ -2283,7 +2283,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     const bay = cc.crowdSplit("bay", 1, {cocoa: false});
     check(bay.scoopshop === 13 && bay.bay === 10 && !bay.cocoa && cc.crowdSplit("bay", 1, {cocoa: true}).cocoa === 12, "at the bay: a full Scoop Shack, a queue out of the door and onto the deck, and the Cocoa Room too once it's yours");
     const F = {hap: {boosts: [{shop: "wine", from: "2026-10-14", to: "2026-10-14", hm: [660, 780], x: 3, why: "coach"}], repairs: [], log: []}};
-    check(hp.coachToday(F, "2026-10-14").place === "vineyard" && !hp.coachToday(F, "2026-10-15") && (cc.crowdArt("terrace", 3).match(/class="ch npc crowd act-sit"/g) || []).length === 3 && /HOLIDAY TOURS/.test(cc.coachArt()), "today's coach, seated figures on the terrace, and the coach itself"); }
+    F.hap.boosts.push({shop: "scoop", from: "2026-10-14", to: "2026-10-14", hm: [660, 780], x: 2.5, why: "coach"});
+    check(hp.coachToday(F, "2026-10-14").places.join() === "vineyard,bay" && !hp.coachToday(F, "2026-10-15") && (cc.crowdArt("terrace", 3).match(/class="ch npc crowd act-sit"/g) || []).length === 3 && /HOLIDAY TOURS/.test(cc.coachArt()), "today's coach, seated figures on the terrace, and the coach itself"); }
   { // round 316: every small plate has its own drawing (the tomato salad was an empty plate)
     const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), wa = await import(new URL("../src/art/wine.js", import.meta.url)), bare = wa.dishArt("no_such_dish");
     const none = Object.keys(kit.DISHES).filter(id => wa.dishArt(id) === bare);
@@ -5292,7 +5293,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   page.on("pageerror", e => errors.push(`coach crowd pageerror: ${e.message}`));
   await page.addInitScript(() => { const q = location.search; if (!/coachpatch/.test(q)) return; const f = JSON.parse(localStorage.getItem("fox.fox") || "null"); if (!f) return;
     f.vine = f.vine || {}; if (!/noterrace/.test(q)) f.vine.terrace = Date.now(); else delete f.vine.terrace;
-    f.hap = Object.assign(f.hap || {}, {day: "2026-10-14", repairs: [], log: [], boosts: [{shop: "wine", from: "2026-10-14", to: "2026-10-14", hm: [11*60, 13*60], x: 3, why: "coach"}]});
+    f.hap = Object.assign(f.hap || {}, {day: "2026-10-14", repairs: [], log: [], boosts: (/allshops/.test(q) ? ["wine", "scoop"] : ["wine"]).map(shop => ({shop, from: "2026-10-14", to: "2026-10-14", hm: [11*60, 13*60], x: 2.5, why: "coach"}))});
     const j = JSON.stringify(f); localStorage.setItem("fox.fox", j); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, j)); });
   await page.goto(url + "?reset=1&seed=1&time=12:00&date=2026-10-14"); await page.waitForTimeout(1200);
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-14&coachpatch=1"); await page.waitForTimeout(1500);
@@ -5305,6 +5306,11 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.goto(url + "?seed=1&time=12:00&date=2026-10-14&coachpatch=1&noterrace=1"); await page.waitForTimeout(1500);
   await page.evaluate(() => window.__mapleScene("vineyard")); await page.waitForTimeout(1200);
   check(await page.locator("#sceneArt .crowd").count() === 6, "with no terrace yet, the overflow waits outside the wine shop's door");
+  await page.goto(url + "?seed=1&time=12:00&date=2026-10-14&coachpatch=1&allshops=1"); await page.waitForTimeout(1500);
+  await page.evaluate(() => window.__mapleScene("scoopshop")); await page.waitForTimeout(1200);
+  const inScoop = await page.locator("#sceneArt .crowd").count();
+  await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
+  check(inScoop === 13 && await page.locator("#sceneArt .crowd").count() === 12, `one coach, every shop at once: the Scoop Shack (${inScoop}) and the wine shop full at the same time (round 318)`);
   await page.goto(url + "?seed=1&time=14:00&date=2026-10-14&coachpatch=1"); await page.waitForTimeout(1500);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
   check(await page.locator("#sceneArt .crowd").count() === 0, "and once the two hours are up, they've all gone");
@@ -5407,7 +5413,7 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     const G = {coins: 0}; hp.hapDaily(G, "2026-06-01", {}); hp.hapDaily(G, "2026-06-02", {wine: 1}, {rnd: seq([.01, 0, 0, 0])});
     check(!hp.judge(G, "2026-06-03", 0, () => 0).good && !G.hap.boosts.length && /lukewarm/.test(G.hap.log[0].body), "bare shelves: a lukewarm write-up, no harm done"); }
   { const F = {coins: 0}; hp.hapDaily(F, "2026-06-01", {});
-    check(hp.hapDaily(F, "2026-06-02", {scoop: 1, cocoa: 1, wine: 1}, {rnd: seq([.9, .05, .2, .2])}).includes("coach") && hp.boost(F, "scoop", "2026-06-02", 11*60 + 30) === 3 && hp.boost(F, "cocoa", "2026-06-02", 12*60) === 3 && hp.boost(F, "scoop", "2026-06-02", 13*60) === 1 && hp.boost(F, "wine", "2026-06-02", 12*60) === 1, "a coach party at the bay at 11: the Scoop Shack and Cocoa Room three times as busy for two hours");
+    check(hp.hapDaily(F, "2026-06-02", {scoop: 1, cocoa: 1, wine: 1}, {rnd: seq([.9, .05, .2, .2])}).includes("coach") && hp.boost(F, "scoop", "2026-06-02", 11*60 + 30) === hp.COACH_X && hp.boost(F, "cocoa", "2026-06-02", 12*60) === hp.COACH_X && hp.boost(F, "scoop", "2026-06-02", 13*60) === 1 && hp.boost(F, "wine", "2026-06-02", 12*60) === hp.COACH_X && hp.COACH_X === 2.5, "a coach party at 11: every shop at once (round 318), each two and a half times as busy for two hours");
     check(!hp.hapDaily(F, "2026-06-03", {scoop: 1}, {rnd: seq([.9, 0])}).includes("coach"), "and not another coach for a few days"); }
   { const F = {coins: 0, scoop: {}, hap: {repairs: [{id: "awning-x", kind: "awning"}], boosts: [], log: []}};
     check(hp.boost(F, "scoop", "2026-06-02", 600) === .85, "a torn awning: the deck's a bit quieter until it's mended"); }

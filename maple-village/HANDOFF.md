@@ -2991,3 +2991,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - Follow-up (Mel: "Some people are under the counter in the shop"): the Scoop Shack and Cocoa Room queues now start a step back (y 404 and 454), clear of the counter.
 
 ## Build v248 (round 317) published at Mel's say-so without a full run (slow container); the round 317 browser block and unit checks passed.
+
+## Round 318: one coach party, every shop at once (Mel: "I thought it would be for all at once")
+- happen.js `coach()`: boosts every owned shop (bay and vineyard) for the same two hours at `COACH_X` 2.5 (was 3, one place at random). `coachToday` -> `{places, place, hm}`; core.js `coachCrowdNow` merges the rooms of every place. The round 303 check now expects 2.5 everywhere; the round 317 block checks the Scoop Shack and the wine shop full together. Port doc section 23.
