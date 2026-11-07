@@ -54,9 +54,9 @@ export function crowdArt(room, n, seed = 1){
   const at = (CROWD_AT[room] || []).slice(0, n), extra = room === "wineshop" || room === "terrace" || room === "vineyard" ? "wineglass" : room === "scoopshop" || room === "bay" ? "cone" : null;
   return at.map((p, i) => ({p, i})).sort((a, b) => a.p[1] - b.p[1]).map(({p: [x, y, sit, dir], i}) => {
     const lk = look(seed*31 + i*7 + room.length, i % 3 === 2 ? null : extra), d = `--d:-${((i*0.73 + seed*0.11) % 3).toFixed(2)}s`;
-    const stroll = !sit && i % 4 === 1, hop = !sit && !stroll && i % 5 === 3;
-    if (stroll) return `<g class="ch npc crowd stroll walk" transform="translate(${x} ${y})" style="${d}" pointer-events="none"><g class="strollw">${personArt(lk, false)}</g></g>`;
-    return `<g class="ch npc crowd${sit ? " act-sit" : ""}${hop ? " hop" : ""}" transform="translate(${x} ${y})" style="${d}" pointer-events="none"><g class="cb"><g transform="scale(${dir} 1)">${personArt(lk, false)}</g></g></g>`;
+    const stroll = !sit && i % 6 === 1, hop = !sit && !stroll && i % 5 === 3, holds = lk.extra === "wineglass" || lk.extra === "cone" ? " holds" : "";   // round 319: fewer strollers; a hand holding a glass or a cone stays still
+    if (stroll) return `<g class="ch npc crowd stroll${holds}" transform="translate(${x} ${y})" style="${d}" pointer-events="none"><g class="strollw">${personArt(lk, false)}</g></g>`;
+    return `<g class="ch npc crowd${sit ? " act-sit" : ""}${hop ? " hop" : ""}${holds}" transform="translate(${x} ${y})" style="${d}" pointer-events="none"><g class="cb"><g transform="scale(${dir} 1)">${personArt(lk, false)}</g></g></g>`;
   }).join("");
 }
 // what they say (British spelling, no dashes), room by room

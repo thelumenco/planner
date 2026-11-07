@@ -5316,7 +5316,10 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   const inWine = await page.locator("#sceneArt .crowd").count(); await page.evaluate(() => window.__mapleScene("giftshop")); await page.waitForTimeout(1200); const inGift = await page.locator("#sceneArt .crowd").count(); await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
   check(inScoop === 13 && inWine === 12 && inGift === 10, `one coach, every shop at once: the Scoop Shack (${inScoop}), the wine shop (${inWine}) and the gift shop (${inGift}) full at the same time (round 318)`);
   await page.waitForFunction(() => document.querySelector("#sceneArt .crowdsay"), null, { timeout: 20000 }).catch(() => {});
-  check(await page.locator("#sceneArt .crowdsay").count() === 1 && await page.locator("#sceneArt .crowd.stroll").count() >= 2 && await page.locator("#sceneArt .crowd:not(.walk) .armR").first().evaluate(n => getComputedStyle(n).animationName) !== "none", "and they're lively: chatting in little bubbles, waving and sipping, a few strolling about");
+  check(await page.locator("#sceneArt .crowdsay").count() === 1 && await page.locator("#sceneArt .crowd.stroll").count() >= 1 && await page.locator("#sceneArt .crowd.walk").count() === 0
+    && await page.locator("#sceneArt .crowd.holds:not(.stroll)").first().evaluate(n => getComputedStyle(n.querySelector(".armR")).animationName === "none" && getComputedStyle(n.querySelector(".armL")).animationName !== "none")
+    && await page.locator("#sceneArt .crowd.stroll").first().evaluate(n => getComputedStyle(n.querySelector(".armR")).animationName === "none"),
+    "and they're lively: chatting in little bubbles, talking with the free hand while the glass hand stays still, and now and then one takes a few steps (round 319)");
   await page.goto(url + "?seed=1&time=14:00&date=2026-10-14&coachpatch=1"); await page.waitForTimeout(1500);
   await page.evaluate(() => window.__mapleScene("wineshop")); await page.waitForTimeout(1200);
   check(await page.locator("#sceneArt .crowd").count() === 0, "and once the two hours are up, they've all gone");

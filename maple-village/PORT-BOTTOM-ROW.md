@@ -229,6 +229,7 @@ HANDOFF.md round 317. Port the coach crowd with section 16 (happenings); Tomo's 
   - `crowdArt` wraps each visitor: standing ones in `.cb` (a gentle bob; `.hop` now and then), a few `.stroll` (walking back and forth), seated ones sip. Each has its own `--d` timing. The CSS is at the end of `styles/npcs.css` (`crowdBob`, `crowdHop`, `crowdTalk`, `crowdSip`, `crowdWave`, `crowdStroll`, `crowdSay`), off under reduced motion.
   - `CHAT` (lines per room) and `chatBubble()`; `core.js` `crowdChatter()` puts one bubble over a random visitor every 3 seconds.
   - The gift shop joins the vineyard's coach: `COACH.vineyard.shops` gets "gift" (`own.gift`), `CROWD_AT.giftshop` (10 browsing), `CROWD_ORDER.vineyard` wine shop, gift shop, then terrace; `giftSellMinute` multiplies its chance by `o.boost` (core passes `HP.boost(F, "gift", ...)`).
+- Round 319 (Mel: "some are walking too much ... the walking ones are swinging their arms while there's a glass of wine floating next to them"): the held glass or cone (`.tool`) isn't part of the arm, so a visitor holding one gets `.holds` and that arm stays still (they talk with the other hand). Fewer strollers (`i % 6 === 1`), no `.walk` class: they stand most of a 16-second cycle and take a few steps each way, legs only (`crowdStroll`, `crowdStepA/B`).
 - Not built yet: a cruise ship (Mel: "don't build the cruise part yet").
 - Tests: "The coach party you can see, and Tomo's bike (round 317)" and the round 317 unit checks.
 

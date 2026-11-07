@@ -2997,3 +2997,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - Follow-up (Mel: "how come they don't talk or do stuff... They should be moving around talking"; "Gift shop also gets more tourists"): the crowd bobs, talks with its hands, sips, hops, a few stroll; a chatter bubble every 3 seconds (coachcrowd.js CHAT, core.js crowdChatter); CSS at the end of npcs.css. The gift shop joins the coach (10 browsing; sales boosted via giftSellMinute's o.boost). Pictures: screens-bottom-row/round318-lively-*.png.
 
 ## Build v249 (round 318) published at Mel's say-so without a full run (slow container); the round 303 and 317/318 blocks and unit checks passed.
+
+## Round 319: calmer strollers, glasses stay in hand (Mel: "some are walking too much ... swinging their arms while there's a glass of wine floating next to them. I don't mind if they just occasionally move a few steps")
+- coachcrowd.js: `.holds` on visitors with a wineglass or cone (the prop isn't inside the arm, so moving that arm left it floating); fewer strollers, no `.walk`. npcs.css: holders talk with the left hand; strollers take a few steps twice in a 16-second cycle, legs only. Test: the "lively" check in the round 317 block. Picture: screens-bottom-row/round319-glasses.png.
