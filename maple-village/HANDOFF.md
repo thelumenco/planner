@@ -2988,3 +2988,4 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - art/coachcrowd.js draws the coach's visitors: the wine shop fills first (12), then the terrace (12 seated), or 6 waiting by the door with no terrace; at the bay, the Scoop Shack (13), the Cocoa Room (12, if owned) and a queue and deck outside (10). In over 12 minutes, out over the last 15. The coach parks by the vineyard stall. happen.js `coachToday`; core.js `coachCrowdNow`, drawScene and hapNow redraws. Pictures: screens-bottom-row/round317-coach-*.png.
 - Tomo: `.rideby` arms still on the handlebars (npcs.css); setScene removes the ride so it never shows indoors.
 - Cruise ship: planned, not built (Mel asked to wait).
+- Follow-up (Mel: "Some people are under the counter in the shop"): the Scoop Shack and Cocoa Room queues now start a step back (y 404 and 454), clear of the counter.
