@@ -748,7 +748,11 @@ if (want("\ntasting room")) try {
   check(await page.evaluate(() => { const k = JSON.parse(localStorage.getItem("fox.fox")).kitchen; return !!k.oven && !k.larder.flour; }), "flour goes in the oven to bake");
   await page.click('#ctx [data-close]');
   await page.locator('#world [data-spot="stove"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-k="tapas"]', { timeout: 15000 });
-  check(await page.locator('#ctx [data-k="tapas"]').count() === 33 && await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().getAttribute("aria-selected") === "true", "the stove's Local tab offers this season's local tapas (33 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams, your own vinegar)");
+  check(await page.locator('#ctx [data-k="tapas"]').count() === 34 && await page.locator('#ctx [data-k="ktab"][data-id="local"]').first().getAttribute("aria-selected") === "true", "the stove's Local tab offers this season's local tapas (34 in autumn: garden, seafood, farm, woods, greenhouse, Sal's clams, your own vinegar, red mullet)");
+  { // round 315: red mullet has a dish at the kitchen
+    const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)); await import(new URL("../src/game/fishing.js", import.meta.url));
+    const t = kit.TAPAS.salmonetes;
+    check(t && t.need.mullet === 1 && t.need.lemon === 1 && !t.seasons && !t.special && kit.GOODS.mullet && kit.SOURCE.mullet && /kitchen/.test(it.ITEMS.mullet.what) && t.price >= it.ITEMS.mullet.sell + 4, "red mullet goes to the kitchen: fried with lemon, all year, and the backpack says so (round 315)"); }
   check(/from the market deli|from the farm gate|from the garden/.test(await page.locator("#ctx").innerText()), "each missing ingredient says where to get it");
   await page.locator('#ctx [data-k="ktab"][data-id="specials"]').first().click(); await page.waitForTimeout(200);
   check(await page.locator('#ctx [data-k="tapas"]').count() === 0 && /travel to Ronda, Kyoto, Jeju, Cinque Terre, Saltwick Harbour, Puffin Isle, Hokkaido or Bali/.test(await page.locator("#ctx").innerText()), "the Specials tab is empty until you've travelled: specials come from the trips");
@@ -1819,6 +1823,17 @@ if (want("\nScoop Shack upgrades")) try {
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
+  { // round 316: every small plate has its own drawing (the tomato salad was an empty plate)
+    const kit = await import(new URL("../src/game/kitchen.js", import.meta.url)), wa = await import(new URL("../src/art/wine.js", import.meta.url)), bare = wa.dishArt("no_such_dish");
+    const none = Object.keys(kit.DISHES).filter(id => wa.dishArt(id) === bare);
+    check(!none.length && ["encurtidos", "salmonetes"].every(id => wa.dishArt("tapas:" + id) !== wa.dishArt("tapas:no_such_dish")), `every small plate is drawn, not an empty plate${none.length ? ` (missing: ${none.join(", ")})` : ""}; the newest local tapas have their own colours (round 316)`); }
+  { // round 314: a bigger churner, four tubs at once
+    const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), F = {coins: 1000}, s = sc.scoopState(F), t = Date.now() + 3600e3;
+    s.churn = [{id: "a", done: t}, {id: "b", done: t}];
+    check(sc.churnFull(s) && sc.churnCap(s) === 2 && /2 of 2/.test(sc.churnLine(s)), "the churner holds two tubs at once");
+    const said = sc.buyUpgrade(F, "bigchurn");
+    check(said && F.coins === 1000 - sc.UPGRADES.bigchurn.price && sc.UPGRADES.bigchurn.price >= 900 && !sc.churnFull(s) && sc.churnCap(s) === 4 && /2 of 4/.test(sc.churnLine(s)) && !sc.buyUpgrade(F, "bigchurn"), "the bigger churner (an upgrade, 900 coins) holds four");
+    s.churn.push({id: "c", done: t}, {id: "d", done: t}); check(sc.churnFull(s), "and is full at four"); }
   { const sc = await import(new URL("../src/game/scoop.js", import.meta.url)), s = sc.scoopState({}), d = "2026-10-10";
     s.recipes = [{id: "m", ings: ["mango"], name: "Mango Sorbet", col: "#F8D59A"}]; s.tubs = {m: 4};
     const low = sc.scoopNews(s, d, 12*60), again = sc.scoopNews(s, d, 12*60 + 5); s.tubs = {}; const out = sc.scoopNews(s, d, 13*60);
@@ -1840,7 +1855,7 @@ if (want("\nScoop Shack upgrades")) try {
   check(await page.locator('#world [data-place="hfreezer"]').count() === 0 && await page.locator('#world [data-place="dbike"]').count() === 0, "before any upgrades, no honesty freezer or bike on the bay");
   await page.evaluate(() => window.__hbScene("scoopshop")); await page.waitForTimeout(700);
   await page.locator('#world [data-spot="gupgrades"]').dispatchEvent("click"); await page.waitForSelector("#ctx [data-gbuy]", { timeout: 15000 });
-  check(await page.locator("#ctx [data-gbuy]").count() === 5, "the catalogue in the shop lists five upgrades");
+  check(await page.locator("#ctx [data-gbuy]").count() === 6, "the catalogue in the shop lists six upgrades (the bigger churner since round 314)");
   for (const k of ["honesty", "awning", "neon", "bike", "dip"]) { await page.evaluate(() => { document.querySelector("#ctx [data-close]")?.click(); });
     await page.locator('#world [data-spot="gupgrades"]').dispatchEvent("click"); await page.waitForSelector(`#ctx [data-gbuy="${k}"]`, { timeout: 15000 }); await page.click(`#ctx [data-gbuy="${k}"]`); await page.waitForTimeout(300); }
   const f1 = await fox();

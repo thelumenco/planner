@@ -533,3 +533,25 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   the loft redraws straight away after a start or collect (`render(true)`, `drawScene()` after `[data-lf]`).
 - test/smoke.mjs: tests that fill or bottle tap barrel 1 (`b0`) instead of the crates; the loft test climbs the ladder
   in the room; new checks for the two panels, racks drying while casks age, and the tray redrawing at once.
+
+## Round 314 (ported): a bigger churner for the Scoop Shack
+
+- game/scoop.js: a sixth upgrade, `bigchurn` ("A bigger churner", 900 coins), with its line in `buyUpgrade`.
+  `churnCap(s)` is `BIG_CHURNS` (4) with it, otherwise `CHURNS` (2); `churnFull`, the "churner's full" message and
+  `churnLine` all use the cap. Each tub still takes an hour.
+- Wiki: the Scoop Shack page lists it with the other upgrades (from `UPGRADES`) and mentions four at once.
+- Test: unit checks for the cap in "Scoop Shack upgrades"; the catalogue now lists six upgrades.
+
+## Round 315 (ported): a dish for red mullet
+
+- game/kitchen.js: `mullet` in `GOODS` and `SOURCE` ("the bay, Friday evenings 5 to 8"), and an all-year tapa
+  `salmonetes` ("Fried red mullet with lemon": 1 mullet, 1 lemon, 12 coins). 34 autumn tapas on the Local tab.
+- game/fishing.js: the mullet's backpack line names the kitchen (this edition has no Friday bonfire, so that part of
+  the source line is left out).
+- Test: the Local tab count is 34, plus a unit check for the dish.
+
+## Round 316 (ported): the tomato salad's picture
+
+- art/wine.js: `dishArt` draws `insalata` (tomato slices, basil, a splash of vinegar, a little cruet); it was an
+  empty plate. `TAPAS_COL` has colours for `encurtidos` and `salmonetes`.
+- Test (in "Scoop Shack upgrades"): every entry in `DISHES` has its own drawing, and the two newest tapas their colours.
