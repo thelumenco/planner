@@ -1018,6 +1018,22 @@ button.subname[aria-expanded="true"]::after{content:"▴"}
 .lhspin{transform-box:view-box;transform-origin:260px 330px;animation:lhspin 10s linear infinite}@keyframes lhspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.lhspin{animation:none}}
 
+/* round 318: the coach party's visitors are lively (art/coachcrowd.js) */
+.ch.crowd:not(.act-sit):not(.stroll) > .cb{animation:crowdBob 2.2s ease-in-out infinite;animation-delay:var(--d,0s)}
+.ch.crowd.hop > .cb{animation:crowdHop 3.4s ease-out infinite;animation-delay:var(--d,0s)}
+.ch.crowd:not(.walk) .armR{animation:crowdTalk 1.5s ease-in-out infinite alternate;animation-delay:var(--d,0s)}
+.ch.crowd.act-sit .armR{animation:crowdSip 2.6s ease-in-out infinite alternate;animation-delay:var(--d,0s)}
+.ch.crowd:not(.walk):nth-child(3n) .armL{animation:crowdWave 1.2s ease-in-out infinite alternate;animation-delay:var(--d,0s)}
+.ch.crowd.stroll > .strollw{animation:crowdStroll 9s linear infinite;animation-delay:var(--d,0s)}
+@keyframes crowdBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6px)}}
+@keyframes crowdHop{0%,72%,100%{transform:translateY(0)}80%{transform:translateY(-7px)}88%{transform:translateY(0)}93%{transform:translateY(-3px)}}
+@keyframes crowdTalk{from{transform:rotate(-12deg)}to{transform:rotate(-62deg)}}
+@keyframes crowdSip{0%,55%{transform:rotate(-15deg)}100%{transform:rotate(-80deg)}}
+@keyframes crowdWave{from{transform:rotate(10deg)}to{transform:rotate(55deg)}}
+@keyframes crowdStroll{0%{transform:translateX(0) scaleX(1)}44%{transform:translateX(26px) scaleX(1)}50%{transform:translateX(26px) scaleX(-1)}94%{transform:translateX(0) scaleX(-1)}100%{transform:translateX(0) scaleX(1)}}
+.crowdsay{animation:crowdSay 2.8s ease-out forwards}@keyframes crowdSay{0%{opacity:0}10%,82%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.ch.crowd > .cb,.ch.crowd .armR,.ch.crowd .armL,.ch.crowd.stroll > .strollw,.ch.crowd.stroll .legL,.ch.crowd.stroll .legR{animation:none !important}}
+
 /* ---------- in-game layout: the map is the screen; everything opens on top of it ---------- */
 :root{--mapw:max(300px,min(980px,calc((100dvh - 196px)*520/640 + 26px)))}
 .wrap{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:none;padding:12px 16px 20px}
@@ -20183,20 +20199,25 @@ ${r.n}`;
     h3.critic = null;
     return { good, shop: c.shop };
   }
-  var COACH = { bay: { shops: ["scoop", "cocoa"], n: "the bay" }, vineyard: { shops: ["wine"], n: "the vineyard" } };
+  var COACH = { bay: { shops: ["scoop", "cocoa"], n: "the bay" }, vineyard: { shops: ["wine", "gift"], n: "the vineyard" } };
+  var COACH_N = Object.assign({ gift: "the gift shop" }, SHOP_N);
+  var COACH_X = 2.5;
   function coach(F2, day, own, rnd17) {
-    const h3 = hapState(F2), places = Object.keys(COACH).filter((p2) => COACH[p2].shops.some((s) => own[s]));
+    const h3 = hapState(F2), places = Object.keys(COACH).filter((p) => COACH[p].shops.some((s) => own[s]));
     if (!places.length) return null;
-    const p = places[Math.floor(rnd17() * places.length)], from = rnd17() < 0.5 ? 11 * 60 : 14 * 60;
-    COACH[p].shops.filter((s) => own[s]).forEach((s) => h3.boosts.push({ shop: s, from: day, to: day, hm: [from, from + 120], x: 3, why: "coach" }));
+    rnd17();
+    const from = rnd17() < 0.5 ? 11 * 60 : 14 * 60, shops = places.flatMap((p) => COACH[p].shops.filter((s) => own[s]));
+    shops.forEach((s) => h3.boosts.push({ shop: s, from: day, to: day, hm: [from, from + 120], x: COACH_X, why: "coach" }));
     h3.lastCoach = day;
-    note(h3, day, "A coach party today", `A coach is booked in at ${COACH[p].n} at ${from === 11 * 60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours. ${COACH[p].shops.filter((s) => own[s]).map((s) => SHOP_N[s]).join(" and ").replace(/^./, (x) => x.toUpperCase())} will be rushed off ${COACH[p].shops.filter((s) => own[s]).length > 1 ? "their" : "its"} feet: stock up beforehand.${p === "vineyard" ? " When the wine shop's full, the rest will take their glasses out onto the terrace." : " Expect a queue out of the door and every seat on the deck taken."}`);
-    return p;
+    const names = shops.map((s) => COACH_N[s]), list11 = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0];
+    note(h3, day, "A coach party today", `A coach is booked in at ${from === 11 * 60 ? "11am" : "2pm"}: forty people, all hungry and in holiday mood, for two hours, and they'll be everywhere at once.${places.length > 1 ? " It drops half at the bay and takes the rest up to the vineyard." : ""} ${list11.replace(/^./, (x) => x.toUpperCase())} will be rushed off ${shops.length > 1 ? "their" : "its"} feet: stock up beforehand.${places.includes("vineyard") ? " When the wine shop's full, the rest will take their glasses out onto the terrace." : ""}${places.includes("bay") ? " Expect a queue out of the Scoop Shack's door and every seat on the deck taken." : ""}`);
+    return places.join("+");
   }
   function coachToday(F2, day) {
-    const b = hapState(F2).boosts.find((x) => x.why === "coach" && x.from === day && x.hm);
-    if (!b) return null;
-    return { place: b.shop === "wine" ? "vineyard" : "bay", hm: b.hm };
+    const bs = hapState(F2).boosts.filter((x) => x.why === "coach" && x.from === day && x.hm);
+    if (!bs.length) return null;
+    const places = [...new Set(bs.map((b) => b.shop === "wine" || b.shop === "gift" ? "vineyard" : "bay"))];
+    return { places, place: places[0], hm: bs[0].hm };
   }
   var ORDER = {
     scoop: { unit: "scoops", price: 4, n: [20, 30], who: [["the cricket club", "the tea after Saturday's match"], ["the primary school", "sports day"], ["the church", "the summer fete"], ["the Wilsons", "their grandson's birthday"]] },
@@ -33913,7 +33934,7 @@ ${chosen.map((a) => "- " + a.title).join("\n")}` : ""}`;
   }
   function giftSellMinute(F2, day, hm12, mode, o) {
     if (!mode) return 0;
-    const p = mode === "mel" ? 0.08 : 0.05;
+    const p = (mode === "mel" ? 0.08 : 0.05) * (o && o.boost || 1);
     if (Math.random() >= p) return 0;
     const g18 = giftState(F2);
     if (g18.wrapped.length && Math.random() < (pairSeason(day) ? 0.3 : 0.12)) {
@@ -47542,9 +47563,11 @@ ${m.from}` : ""}`;
     // waiting by the wine shop's door (no terrace yet)
     scoopshop: [[232, 404, false, 1], [272, 408, false, -1], [312, 404, false, 1], [352, 408, false, -1], [204, 454, false, 1], [254, 458, false, 1], [306, 454, false, -1], [362, 458, false, -1], [412, 454, false, -1], [92, 506, true, 1], [150, 506, true, -1], [386, 506, true, 1], [444, 506, true, -1]],
     cocoa: [[238, 404, false, 1], [278, 408, false, -1], [318, 404, false, 1], [358, 408, false, -1], [214, 454, false, 1], [266, 458, false, 1], [318, 454, false, -1], [372, 458, false, -1], [92, 506, true, 1], [150, 506, true, -1], [386, 506, true, 1], [444, 506, true, -1]],
+    giftshop: [[96, 322, false, 1], [150, 336, false, -1], [214, 320, false, 1], [268, 334, false, -1], [330, 322, false, 1], [408, 336, false, -1], [196, 404, false, 1], [228, 520, false, 1], [300, 532, false, -1], [440, 488, false, -1]],
+    // round 318: browsing the cases and the shelves
     bay: [[382, 290, false, -1], [362, 302, false, -1], [342, 314, false, -1], [322, 326, false, -1], [302, 338, false, -1], [284, 352, false, -1], [138, 338, true, 1], [226, 360, true, -1], [186, 414, true, 1], [148, 400, true, 1]]
   };
-  var CROWD_ORDER = { vineyard: ["wineshop", "terrace"], bay: ["scoopshop", "cocoa", "bay"] };
+  var CROWD_ORDER = { vineyard: ["wineshop", "giftshop", "terrace"], bay: ["scoopshop", "cocoa", "bay"] };
   function crowdLevel(win3, hm12) {
     if (!win3) return 0;
     const [a, b] = win3;
@@ -47555,7 +47578,7 @@ ${m.from}` : ""}`;
   }
   function crowdSplit(place11, level2, o = {}) {
     const rooms = CROWD_ORDER[place11] || [], out = {};
-    const use4 = rooms.map((r) => r === "terrace" && !o.terrace ? "vineyard" : r).filter((r) => r !== "cocoa" || o.cocoa);
+    const use4 = rooms.map((r) => r === "terrace" && !o.terrace ? "vineyard" : r).filter((r) => (r !== "cocoa" || o.cocoa) && (r !== "giftshop" || o.gift));
     const total = use4.reduce((a, r) => a + CROWD_AT[r].length, 0);
     let left7 = Math.round(total * level2);
     use4.forEach((r) => {
@@ -47567,7 +47590,25 @@ ${m.from}` : ""}`;
   }
   function crowdArt(room4, n, seed2 = 1) {
     const at9 = (CROWD_AT[room4] || []).slice(0, n), extra3 = room4 === "wineshop" || room4 === "terrace" || room4 === "vineyard" ? "wineglass" : room4 === "scoopshop" || room4 === "bay" ? "cone" : null;
-    return at9.map((p, i) => ({ p, i })).sort((a, b) => a.p[1] - b.p[1]).map(({ p: [x, y, sit, dir], i }) => `<g class="ch npc crowd${sit ? " act-sit" : ""}" transform="translate(${x} ${y})" pointer-events="none"><g transform="scale(${dir} 1)">${personArt(look(seed2 * 31 + i * 7 + room4.length, i % 3 === 2 ? null : extra3), false)}</g></g>`).join("");
+    return at9.map((p, i) => ({ p, i })).sort((a, b) => a.p[1] - b.p[1]).map(({ p: [x, y, sit, dir], i }) => {
+      const lk = look(seed2 * 31 + i * 7 + room4.length, i % 3 === 2 ? null : extra3), d = `--d:-${((i * 0.73 + seed2 * 0.11) % 3).toFixed(2)}s`;
+      const stroll = !sit && i % 4 === 1, hop = !sit && !stroll && i % 5 === 3;
+      if (stroll) return `<g class="ch npc crowd stroll walk" transform="translate(${x} ${y})" style="${d}" pointer-events="none"><g class="strollw">${personArt(lk, false)}</g></g>`;
+      return `<g class="ch npc crowd${sit ? " act-sit" : ""}${hop ? " hop" : ""}" transform="translate(${x} ${y})" style="${d}" pointer-events="none"><g class="cb"><g transform="scale(${dir} 1)">${personArt(lk, false)}</g></g></g>`;
+    }).join("");
+  }
+  var CHAT = {
+    wineshop: ["Ooh, try the rosé!", "Cheers!", "Can we take a bottle home?", "This is gorgeous!", "Another glass?", "Smell that!", "Who's driving? Not me!"],
+    terrace: ["Look at that view!", "Cheers, everyone!", "Photo! Squeeze in!", "Lavender for miles!", "I could stay all day.", "Pass the olives!", "To us!"],
+    vineyard: ["Is it our turn yet?", "Look, real vines!", "Photo by the barrels!", "I can smell the grapes!"],
+    giftshop: ["Perfect for Mum!", "Ooh, look at this!", "Can you wrap it?", "Handmade? Lovely!", "One for me, one for my sister."],
+    scoopshop: ["Two scoops, please!", "What's the pink one?", "Ooh, a waffle cone!", "Best gelato ever!", "Can I try the mango?"],
+    cocoa: ["Smell the chocolate!", "A box for Gran!", "Is that made here?", "Ooh, salted caramel!", "Just one more..."],
+    bay: ["Ice cream by the sea!", "Look, a dolphin!", "Mind the drips!", "Is the queue moving?", "Photo on the deck!"]
+  };
+  function chatBubble(x, y, text) {
+    const w = Math.round(text.length * 5.3 + 16), cx = Math.max(w / 2 + 4, Math.min(516 - w / 2, x)), top = y - 92;
+    return `<g class="crowdsay" pointer-events="none"><rect x="${(cx - w / 2).toFixed(1)}" y="${top}" width="${w}" height="19" rx="9" fill="#FFFDF6" stroke="#3b3530" stroke-width="1"/><path d="M${x - 4} ${top + 19} l4 6 l4 -6" fill="#FFFDF6" stroke="#3b3530" stroke-width="1"/><rect x="${x - 4.5}" y="${top + 17.5}" width="9" height="2.5" fill="#FFFDF6"/><text x="${cx.toFixed(1)}" y="${top + 13}" text-anchor="middle" font-family="Klee One,serif" font-size="10" fill="#3b3530">${text}</text></g>`;
   }
   function coachArt(x = 60, y = 456) {
     const L3 = `stroke="#3b3530" stroke-width="1.4" stroke-linejoin="round"`;
@@ -53750,6 +53791,7 @@ ${m.from}` : ""}`;
     townTick();
     letsTick();
     if (Date.now() - lastHap > 15e3) hapNow();
+    if (Date.now() - crowdSaidAt > 3e3 && crowdKey) crowdChatter();
     {
       const k = scene === "base" ? `${bonfireNow(dayKey(), sgHM())}` : scene === "bay" ? `${vanNow(dayKey(), sgHM())}${spotOpen("bay")}` : scene === "field" ? `${!!(S3.kite && S3.kite.until > Date.now())}${movieNow(dayKey(), sgHM())}${bayMarketNow(dayKey(), sgHM())}` : "";
       if (k !== lastFri) {
@@ -59010,7 +59052,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     {
       const cw = coachCrowdNow();
       if (cw && cw.rooms[scene]) $("sceneArt").insertAdjacentHTML("beforeend", crowdArt(scene, cw.rooms[scene], cw.seed));
-      if (cw && scene === "vineyard" && cw.place === "vineyard") $("sceneArt").insertAdjacentHTML("beforeend", coachArt());
+      if (cw && scene === "vineyard" && cw.places.includes("vineyard")) $("sceneArt").insertAdjacentHTML("beforeend", coachArt());
     }
     if (scene === "cellar" && secretState(F).step) $("sceneArt").insertAdjacentHTML("beforeend", cellarSecretArt(secretState(F).step));
     if (scene === "scoopkitchen" && secretState(F).through) $("sceneArt").insertAdjacentHTML("beforeend", kitchenSecretArt(true));
@@ -62517,9 +62559,25 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     if (!c) return null;
     const hm12 = sgHM(), lv2 = crowdLevel(c.hm, hm12);
     if (!lv2) return null;
-    return { place: c.place, rooms: crowdSplit(c.place, lv2, { terrace: !!vineState(F).terrace, cocoa: owns3(F, "cocoa") }), seed: +dayKey().replace(/-/g, "") % 997 };
+    const o = { terrace: !!vineState(F).terrace, cocoa: owns3(F, "cocoa"), gift: owns3(F, "giftshop") };
+    return { place: c.place, places: c.places, rooms: Object.assign({}, ...c.places.map((p) => crowdSplit(p, lv2, o))), seed: +dayKey().replace(/-/g, "") % 997 };
   }
   var crowdKey = "";
+  var crowdSaidAt = 0;
+  function crowdChatter() {
+    crowdSaidAt = Date.now();
+    const lines2 = CHAT[scene];
+    if (!lines2) return;
+    const ppl = [...document.querySelectorAll("#sceneArt .crowd:not(.stroll)")];
+    if (!ppl.length) return;
+    document.querySelectorAll("#sceneArt .crowdsay").forEach((n) => n.remove());
+    const p = ppl[Math.floor(Math.random() * ppl.length)], m = /translate\(([-\d.]+) ([-\d.]+)\)/.exec(p.getAttribute("transform") || "");
+    if (!m) return;
+    $("sceneArt").insertAdjacentHTML("beforeend", chatBubble(+m[1], +m[2] + (p.classList.contains("act-sit") ? 7 : 0), lines2[Math.floor(Math.random() * lines2.length)]));
+    setTimeout(() => document.querySelectorAll("#sceneArt .crowdsay").forEach((n) => {
+      if (Date.now() - crowdSaidAt >= 2700) n.remove();
+    }), 2800);
+  }
   var lastHap = 0;
   var hapStock = (shop) => shop === "scoop" ? Object.values(scoopState(F).tubs || {}).reduce((a, n) => a + n, 0) : shop === "cocoa" ? (() => {
     const c = cocoaState(F);
@@ -62532,10 +62590,10 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       const cw = coachCrowdNow(), k = cw ? JSON.stringify(cw.rooms) : "";
       if (k !== crowdKey) {
         crowdKey = k;
-        if (cw ? cw.rooms[scene] != null || scene === "vineyard" && cw.place === "vineyard" : true) drawScene();
+        if (cw ? cw.rooms[scene] != null || scene === "vineyard" && cw.places.includes("vineyard") : true) drawScene();
       }
     }
-    const own = { scoop: !!F.scoop, cocoa: owns3(F, "cocoa"), wine: !!F.vine, boat: owns3(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning) };
+    const own = { scoop: !!F.scoop, cocoa: owns3(F, "cocoa"), wine: !!F.vine, gift: owns3(F, "giftshop"), boat: owns3(F, "boat"), awning: !!(F.scoop && F.scoop.up && F.scoop.up.awning) };
     const got3 = hapDaily(F, day, own, { stormy: rainDay(prev) === 2, away: !!tripOn(F), harvest: (festivalOn(day) || {}).id === "harvest" && !!F.vine, birds: (rnd17) => birdsTake(F, rnd17) });
     const j = judge(F, day, hm12, hapStock), lp = lapse(F, day, hm12);
     if (lp && !got3.length && !j) {
@@ -62646,7 +62704,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         r.skip.forEach((g18) => setTimeout(() => flash(`${g18.who}'s box waits a week: it's ${g18.cost} coins`), 1200));
       }
       if (owns3(F, "giftshop")) {
-        const fr0 = JSON.stringify(galleryState(F).frames.concat([makersState(F).stock])), g18 = giftSellMinute(F, day, hm12, at9 + 6e4 > now5 && scene === "giftshop" && atSpot === "gtill" ? "mel" : keeperOn(day, hm12) ? "keeper" : null, giftOpts());
+        const fr0 = JSON.stringify(galleryState(F).frames.concat([makersState(F).stock])), g18 = giftSellMinute(F, day, hm12, at9 + 6e4 > now5 && scene === "giftshop" && atSpot === "gtill" ? "mel" : keeperOn(day, hm12) ? "keeper" : null, Object.assign(giftOpts(), { boost: boost(F, "gift", day, hm12) }));
         if (g18) {
           gcoins += g18;
           gn++;

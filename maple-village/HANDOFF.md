@@ -2995,3 +2995,5 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Round 318: one coach party, every shop at once (Mel: "I thought it would be for all at once")
 - happen.js `coach()`: boosts every owned shop (bay and vineyard) for the same two hours at `COACH_X` 2.5 (was 3, one place at random). `coachToday` -> `{places, place, hm}`; core.js `coachCrowdNow` merges the rooms of every place. The round 303 check now expects 2.5 everywhere; the round 317 block checks the Scoop Shack and the wine shop full together. Port doc section 23.
 - Follow-up (Mel: "how come they don't talk or do stuff... They should be moving around talking"; "Gift shop also gets more tourists"): the crowd bobs, talks with its hands, sips, hops, a few stroll; a chatter bubble every 3 seconds (coachcrowd.js CHAT, core.js crowdChatter); CSS at the end of npcs.css. The gift shop joins the coach (10 browsing; sales boosted via giftSellMinute's o.boost). Pictures: screens-bottom-row/round318-lively-*.png.
+
+## Build v249 (round 318) published at Mel's say-so without a full run (slow container); the round 303 and 317/318 blocks and unit checks passed.
