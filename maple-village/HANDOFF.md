@@ -3003,3 +3003,5 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 320: no coach on Sundays or wedding days, and no tourist on a villager (Mel: "Tours must never clash with a wedding or a Sunday lunch"; "Pilar is sitting on someone")
 - happen.js `noCoachOn(day)` (Sunday or a wedding day; imports `weddingOn` from occasions.js); core passes `noCoach` to `hapDaily`. coachcrowd.js: the wine shop's second row moves from the tasting tables to the bottom of the room; the deck seat and the spot by the wine shop door move off the regulars and Marco. A unit check compares every crowd spot with the villagers' spots in data/npcs.js. Picture: screens-bottom-row/round320-tables-clear.png.
+
+## Build v250 (rounds 319 and 320) published at Mel's say-so without a full run (slow container); the round 303 and 317 blocks and unit checks passed.
