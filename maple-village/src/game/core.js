@@ -3683,7 +3683,7 @@ function crateTick(){
 /* ---------- round 236: the holiday cottages (game/lets.js, game/letpanels.js, art/cottages.js) ---------- */
 function coArt(){
   const {c, f} = coOf(scene), L = LT.letState(F), m = sgHM();
-  return {c, floor: f, style: L.style[c] || "cottagecore", tiers: L.tiers[c], acc: L.acc[c], turn: LT.turn(F, c), basket: !!L.basket[c], fridge: !!L.fridge[c],
+  return {c, floor: f, style: L.style[c] || "cottagecore", tiers: L.tiers[c], acc: L.acc[c], turn: LT.turn(F, c), basket: LT.holds(F, c, "basket").length, fridge: LT.holds(F, c, "fridge").length,
     occupied: LT.occupied(F, c), night: m >= 18*60 || m < 6*60, crates: []};
 }
 const guestNames = s => s.who.map(id => (NPCS.find(n => n.id === id) || {name: id}).name).join(" and ");
@@ -3717,8 +3717,9 @@ function coSpot(id, x, y){
   if (id === "guestbook") return open("book");
   if (id === "catalogue") return open("cat");
   const t = LT.turn(F, c), k = CO_TASK_OF[id];
-  if (k && (k === "basket" || k === "fridge" || (t && !t[k]))) { go(scene, x, y, () => coTask(c, k)); return; }
-  if (id === "tidy") return open("todo");
+  if (id === "basket" || id === "fridge") return open(id);   // round 321: the bowl and the fridge open to show what's in them
+  if (id === "tidy") return open("todo");   // round 321: the broom cupboard is the checklist
+  if (k && t && !t[k]) { go(scene, x, y, () => coTask(c, k)); return; }
   if (CO_PIECES[id]) {
     go(scene, x, y, () => { coView = {c, v: "piece", id}; atSpot = id; sfx("paper", true); ctx();
       if (id === "bed" && LT.tierOf(F, c, "bed") && evanHere()) { evan.tx = mel.x + 10; evan.ty = mel.y - 30; evan.run = true; evan.wait = 5; setTimeout(() => evanSays(pick(["boing! boing!", "bouncy bed!", "Mama, watch me jump!"])), 900); }

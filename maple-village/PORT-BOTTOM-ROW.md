@@ -234,6 +234,15 @@ HANDOFF.md round 317. Port the coach crowd with section 16 (happenings); Tomo's 
 - Not built yet: a cruise ship (Mel: "don't build the cruise part yet").
 - Tests: "The coach party you can see, and Tomo's bike (round 317)" and the round 317 unit checks.
 
+### 24. The cottages: the fruit bowl and fridge panels, the broom cupboard checklist, letting Hattie go (round 321)
+HANDOFF.md round 321. Port it if this edition has the holiday cottages (round 236).
+- `game/lets.js`: the bowl and the fridge hold a list (`L.basket[c]`, `L.fridge[c]`, as before, but now filled one at a time): `SPACE` (6 each), `holds`, `wants` (3 fruit, 2 treats), `filled`, `fits`, `putIn(F, c, k, id)`, `takeOut(F, c, k, id)`. Guests count it as a welcome once `filled`; `doTask` tops it up to `wants`. Everything that read `!!L.basket[c]` now uses `filled` (the review prep, the checklist) or the count (the art).
+- `game/letpanels.js`: `boxPanel(F, c, k)` ("The fruit bowl" / "The fridge": what's inside with "Take one out", what's in the backpack with "Put one in"), opened by `coView.v` "basket" or "fridge"; `wireLets` handles `put:<id>` and `take:<id>`. `todoPanel` is now "The changeover checklist": each job ticks off as it's done, says where to do it ("Tap the bath in the bathroom"), "Grab the broom" for the tidying, "Open" for the bowl and fridge, and a Hattie row with "Hire her" / "Let her go". The calendar's Hattie row has "Let her go" too.
+- `core.js` `coSpot`: the bowl and the fridge open their panels; the broom cupboard (`tidy`) always opens the checklist; the bed, bath and hot tub still do their job when tapped.
+- `art/cottages.js` `fruitBowl()`: a bigger bowl and a 68 by 52 tap area, with as many pieces of fruit as are in it; the fridge's label says how many treats.
+- `data/cottages.js`: the task is "Fill the fruit bowl".
+- Tests: the round 321 checks in "The holiday cottages ... (round 236)".
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.
@@ -250,6 +259,7 @@ Port these smoke-test blocks:
 - "Seashells, one at a time, and the chocolate steps (round 299)", plus the changed checks HANDOFF.md round 299 lists, for the parts you ported
 - the changed check in "The paperie in Montrose (round 183)" (section 14)
 - the round 314 checks in "Scoop Shack upgrades" and the bigger churner unit checks (section 20)
+- the round 321 checks in "The holiday cottages ... (round 236)" (section 24)
 - "The coach party you can see, and Tomo's bike (round 317)" (section 23)
 - "Lise makes paper too: every stage, her own colours and add-ins (round 311)" (section 19)
 - "Happenings: storms, the wine, the critic and coach parties (round 303)" and "Happenings: big orders and upkeep (round 304)" (section 16)

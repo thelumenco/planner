@@ -4941,6 +4941,9 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(F.coins === c0 + s0.n*s0.rate && L.letState(F).reviews.length === 1 && L.toDo(F, "figtree").length === 3, `the first guests check out: ${s0.n} nights paid, a review, and the changeover waiting (beds, bathroom, tidy)`);
     F.inv = {apple: 2, fig: 1, milk: 1, honey: 1};
     check(["beds", "bath", "tidy"].every(k => L.doTask(F, "figtree", k).ok) && L.ready(F, "figtree") && L.doTask(F, "figtree", "basket").ok && L.doTask(F, "figtree", "fridge").ok && !Object.keys(F.inv).length, "turned round, with a fruit basket and welcome treats from the backpack");
+    { const G = {coins: 0, inv: {pear: 2, egg: 1}, lets: JSON.parse(JSON.stringify(F.lets))}; G.lets.basket.figtree = false; G.lets.fridge.figtree = false;
+      check(L.putIn(G, "figtree", "basket", "pear").ok && !L.putIn(G, "figtree", "basket", "egg").ok && L.putIn(G, "figtree", "fridge", "egg").ok && L.holds(G, "figtree", "basket").length === 1 && !L.filled(G, "figtree", "basket")
+        && L.putIn(G, "figtree", "basket", "pear").ok && L.takeOut(G, "figtree", "basket", "pear").ok && G.inv.pear === 1 && L.holds(G, "figtree", "basket").length === 1, "the bowl and the fridge take one thing at a time, only what belongs, and give it back (round 321)"); }
     check(L.forSale(F, "bluebell"), "and Bluebell's for sale once Fig Tree has had guests");
     const s1 = L.staysFor(F, "figtree").find(s => !s.checkedIn), tr = await import(new URL("../src/game/tours.js", import.meta.url));
     tr.setLetsGuests((day, hm) => L.porchGuests(F, day, hm)); const g0 = s1.who[0];
@@ -5011,8 +5014,27 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   await page.locator('#world [data-cospot="bed"]').dispatchEvent("click"); await page.waitForTimeout(5000);
   f = await cf(); check(f.lets.turn.figtree && f.lets.turn.figtree.beds, "strip and make the bed upstairs");
   await page.evaluate(() => window.__mapleScene("figtree_down")); await page.waitForTimeout(1500);
-  await page.locator('#world [data-cospot="basket"]').dispatchEvent("click"); await page.waitForTimeout(5000);
-  f = await cf(); check(Array.isArray(f.lets.basket.figtree) && f.lets.basket.figtree.length === 3, "fill the fruit basket on the table");
+  // round 321: the bowl and the fridge open to show what's in them; the broom cupboard is the checklist; Hattie can be let go
+  await page.locator('#world [data-cospot="basket"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-co="put:apple"]', { timeout: 20000 });
+  check(/fruit bowl/i.test(await page.locator("#ctx h2").textContent()) && /An empty bowl/.test(await page.locator("#ctx").innerText()), "tap the fruit bowl: it opens to show what's in it (empty) and the fruit in your backpack (round 321)");
+  for (let i = 0; i < 3; i++) { await page.click('#ctx [data-co="put:apple"]'); await page.waitForTimeout(250); }
+  f = await cf(); check(Array.isArray(f.lets.basket.figtree) && f.lets.basket.figtree.length === 3 && !f.inv.apple && await page.locator('#world [data-cospot="basket"] circle').count() === 3, "put three apples in, one at a time: three in the bowl on the table");
+  await page.click('#ctx [data-co="take:apple"]'); await page.waitForTimeout(250);
+  f = await cf(); check(f.lets.basket.figtree.length === 2 && f.inv.apple === 1, "and take one back out into the backpack");
+  await page.click('#ctx [data-co="put:apple"]'); await page.waitForTimeout(250); await page.click("#ctx [data-close]").catch(() => {});
+  await page.locator('#world [data-cospot="fridge"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-co="put:milk"]', { timeout: 20000 });
+  await page.click('#ctx [data-co="put:milk"]'); await page.waitForTimeout(250);
+  f = await cf(); check(/The fridge/.test(await page.locator("#ctx h2").textContent()) && f.lets.fridge.figtree.length === 1 && /1 of 6/.test(await page.locator("#ctx .sub").textContent()), "the fridge opens the same way: a pint of milk in");
+  await page.click("#ctx [data-close]").catch(() => {});
+  await page.locator('#world [data-cospot="tidy"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-co="task:tidy"]', { timeout: 20000 });
+  check(/changeover checklist/i.test(await page.locator("#ctx h2").textContent()) && /✓ Strip and make the bed/.test(await page.locator("#ctx").innerText()) && /Tap the bath in the bathroom/.test(await page.locator("#ctx").innerText()), "the broom cupboard opens the changeover checklist: the bed ticked off, the rest saying where to go");
+  await page.click('#ctx [data-co="task:tidy"]'); await page.waitForTimeout(600);
+  f = await cf(); check(f.lets.turn.figtree && f.lets.turn.figtree.tidy && /✓ Tidy, sweep and wash up/.test(await page.locator("#ctx").innerText()), "grab the broom: the tidying ticks off on the list");
+  await page.click('#ctx [data-co="keeper"]'); await page.waitForTimeout(400);
+  f = await cf(); const hired = !!f.lets.keeper.figtree, letGo = await page.locator('#ctx [data-co="keeper"]').textContent();
+  await page.click('#ctx [data-co="keeper"]'); await page.waitForTimeout(400);
+  f = await cf(); check(hired && /Let her go/.test(letGo) && !f.lets.keeper.figtree && /Hire her/.test(await page.locator('#ctx [data-co="keeper"]').textContent()), "hire Hattie from the checklist, and let her go again whenever you like");
+  await page.click("#ctx [data-close]").catch(() => {});
   await page.locator('#world [data-cospot="guestbook"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 20000 });
   check(/guest book/i.test(await page.locator("#ctx").innerText()) && /★/.test(await page.locator("#ctx").innerText()), "the guest book has its first review");
   await page.close();

@@ -221,7 +221,7 @@ function kitchen(t, x, y){
 function fridge(){
   const [sx] = SPOTS.down.fridge, x0 = sx - 16, y = 240, col = mix(S.accent, "#FFFFFF", .72);
   const note = ST.fridge ? `<g transform="rotate(-6 ${sx} 212)"><rect x="${sx - 13}" y="205" width="26" height="14" rx="1" fill="#F4C7CF" stroke="${INK}" stroke-width=".5"/>${txt(sx, 214, "Welcome!", 5.4, INK, 700)}<circle cx="${sx}" cy="205" r="1.8" fill="${S.accent}"/></g>` : "";
-  return otherSpot("fridge", ST.fridge ? "The fridge: welcome treats inside" : "The fridge", hovE(sx, 246, 22, 9),
+  return otherSpot("fridge", ST.fridge ? `The fridge: ${ST.fridge} welcome treat${ST.fridge === 1 ? "" : "s"} inside` : "The fridge", hovE(sx, 246, 22, 9),
     D(`<path d="M${x0} ${y} V185 q0 -9 9 -9 h14 q9 0 9 9 V${y}z" style="fill:${col}"/>`, `<path d="M${x0} 198 h32" stroke="${dk(col, .3)}" stroke-width="1"/><path d="M${x0 + 4} 186 v8 M${x0 + 4} 203 v16" stroke="#9AA0A6" stroke-width="2.4" stroke-linecap="round"/><circle cx="${x0 + 24}" cy="226" r="1.8" fill="#C8553D"/><circle cx="${x0 + 14}" cy="232" r="1.8" fill="#7FA06B"/>`) + note
     + lab(sx, 254, "Fridge", "#E6EEF2", 7));
 }
@@ -238,12 +238,14 @@ function dining(t, x, y){
   const runner = t === 3 ? `<rect x="${x - W + 8}" y="${ty + 5}" width="${W*2 - 16}" height="5" fill="${S.fabric2}" opacity=".9"/>${[x - W + 6, x + W - 6].map(cx => `<rect x="${cx - 1.4}" y="${ty - 4}" width="2.8" height="9" fill="${CREAM}" stroke="${INK}" stroke-width=".4"/>`).join("")}` : "";
   return back + D(top + (t === 1 ? "" : legs), (t === 1 ? legs : "") + ends + runner);
 }
-function fruitBowl(){   // the fruit basket on the dining table (filled when st.basket)
-  const [dx, dy] = at("dining"), t = tier("dining"), x = dx - 14, y = t ? dy - 28 : dy - 4;
-  const fruit = ST.basket ? `<circle cx="${x - 4}" cy="${y - 5}" r="3.2" fill="#D9433A"/><circle cx="${x + 2}" cy="${y - 6}" r="3.2" fill="#F2A03A"/><path d="M${x + 6} ${y - 3} q-3 -6 1 -8 q3 2 2 8z" fill="#A8C25A"/><circle cx="${x - 1}" cy="${y - 3}" r="2.8" fill="#7A4A66"/>` : "";
-  return otherSpot("basket", ST.basket ? "The fruit basket, full" : "The fruit basket, empty", hovE(x, y + 2, 13, 7)
-    + `<rect x="${x - 22}" y="${y - 22}" width="44" height="32" rx="8" fill="transparent" pointer-events="all"/>`,   // round 254 (Mel: tapping the basket opened the dining table): a finger-sized tap area over the bowl, above the table's
-    `<g pointer-events="none">${fruit}${D(`<path d="M${x - 9} ${y - 3} h18 q-2 6 -9 6 q-7 0 -9 -6z" style="fill:#C9A26A"/>`)}</g>`);
+function fruitBowl(){   // the fruit bowl on the dining table, with as many pieces as are in it (st.basket: how many)
+  const [dx, dy] = at("dining"), t = tier("dining"), x = dx - 14, y = t ? dy - 28 : dy - 4, n = Math.min(6, +ST.basket || 0);
+  const P = [[-5, -5, "#D9433A"], [2, -6, "#F2A03A"], [8, -4, "#A8C25A"], [-1, -2, "#7A4A66"], [-8, -2, "#F3C969"], [5, -9, "#E8574C"]];
+  const fruit = P.slice(0, n).map(([fx, fy, c]) => `<circle cx="${x + fx}" cy="${y + fy}" r="3.4" fill="${c}" stroke="${INK}" stroke-width=".5"/>`).join("");
+  // round 321 (Mel: "the tap area for the bowl must be bigger"): a generous finger-sized area over the bowl, on top of the table's
+  return otherSpot("basket", n ? `The fruit bowl: ${n} piece${n === 1 ? "" : "s"} of fruit` : "The fruit bowl, empty", hovE(x, y + 2, 16, 8)
+    + `<rect x="${x - 34}" y="${y - 34}" width="68" height="52" rx="10" fill="transparent" pointer-events="all"/>`,
+    `<g pointer-events="none">${fruit}${D(`<path d="M${x - 11} ${y - 3} h22 q-2 7 -11 7 q-9 0 -11 -7z" style="fill:#C9A26A"/>`)}</g>`);
 }
 function rug(t, x, y){
   if (t === 1) return D(`<ellipse cx="${x}" cy="${y - 30}" rx="62" ry="30" style="fill:${S.fabric2}"/>`, [S.fabric, S.accent, S.wall2, S.fabric, lt(S.accent, .3)].map((c, k) => `<ellipse cx="${x}" cy="${y - 30}" rx="${56 - k*10}" ry="${26 - k*4.6}" fill="none" stroke="${c}" stroke-width="3.6" stroke-dasharray="${7 + k} 2.4"/>`).join(""));

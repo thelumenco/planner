@@ -5,6 +5,8 @@ import { esc } from "../util.js";
 import { icon } from "../art/icons.js";
 import { COTTAGES, STYLES, STYLE_IDS, PIECES, PIECE_IDS, ACCESSORIES, ACC_IDS, TASKS, HOUSEKEEPER, REPAINT, BASICS } from "../data/cottages.js";
 import * as LT from "./lets.js";
+import { ITEMS } from "../data/items.js";
+const ITEM_N = id => ITEMS[id] && ITEMS[id].n;
 
 const coin = () => icon("coin", 13);
 const tape = `<span class="tape gingham" aria-hidden="true"></span>`;
@@ -69,7 +71,7 @@ export function calendarPanel(F, c, today, nameOf){
   h += `</div><p class="muted" style="font-size:.75rem">Green: guests in. Gold: check-out morning. Peach: out and in the same day. Stripes: your buffer. Grey: weeks you've blocked off (any bookings in them are cancelled kindly).</p>`;
   const up = L.stays[c].filter(s => !s.done).slice(0, 4);
   h += `<p class="eyebrow">Coming up</p>` + (up.length ? `<ul class="hlist">${up.map(s => `<li><span><b>${esc(s.who.map(nameOf).join(" and "))}</b><small>${esc(fmtDay(s.in))} to ${esc(fmtDay(s.out))}, ${s.n} nights${s.checkedIn ? " · staying now" : ""}</small></span></li>`).join("")}</ul>` : `<p class="muted">No bookings yet. They'll come.</p>`);
-  h += `<p class="eyebrow">Changeovers</p><ul class="hlist wlist"><li><span class="wtxt"><b>${esc(HOUSEKEEPER.n)} the housekeeper</b><small>Strips the beds, cleans and tidies, and sees to the hot tub at eleven on check-out days, for ${HOUSEKEEPER.fee} coins a time. The fruit basket and the fridge stay yours.</small></span><button class="btn small ${L.keeper[c] ? "primary" : "alt"}" data-co="keeper">${L.keeper[c] ? "Hired" : "Hire her"}</button></li></ul>`;
+  h += `<p class="eyebrow">Changeovers</p><ul class="hlist wlist"><li><span class="wtxt"><b>${esc(HOUSEKEEPER.n)} the housekeeper</b><small>Strips the beds, cleans and tidies, and sees to the hot tub at eleven on check-out days, for ${HOUSEKEEPER.fee} coins a time. The fruit basket and the fridge stay yours.</small></span><span class="orbtns">${L.keeper[c] ? `<span class="hbadge">hired</span> <button class="btn small alt" data-co="keeper">Let her go</button>` : `<button class="btn small primary" data-co="keeper">Hire her</button>`}</span></li></ul>`;
   return h + shut;
 }
 export function guestBookPanel(F, c, nameOf){
@@ -78,17 +80,35 @@ export function guestBookPanel(F, c, nameOf){
   h += r.length ? `<ul class="hlist">${r.slice(0, 12).map(v => `<li><span><b>${"★".repeat(v.score)}${"☆".repeat(5 - v.score)} ${esc(v.who.map(nameOf).join(" and "))}</b><small>${esc(fmtDay(v.in))}: "${esc(v.text)}"</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty pages, waiting for the first guests to write something nice.</p>`;
   return h + shut;
 }
+// round 321 (Mel: "if tidying the cottages I don't know what needs to be done so it'll be nice if the broom cupboard
+// is tappable and opens a checklist that is then checked off if I clean the relevant item"): the broom cupboard
+// opens this; each job ticks off as it's done (the bed, the bath, the hot tub where they are; the sweeping here)
+const WHERE = {beds: "Tap the bed upstairs", bath: "Tap the bath in the bathroom", hottub: "Tap the hot tub in the garden", tidy: "Here, with the broom"};
+const keeperRow = (F, c) => { const on = !!LT.letState(F).keeper[c];
+  return `<li><span class="wtxt"><b>${esc(HOUSEKEEPER.n)} the housekeeper${on ? ": hired" : ""}</b><small>${on ? `She strips the bed, cleans, tidies and sees to the hot tub at eleven on check-out days, for ${HOUSEKEEPER.fee} coins a time. You can let her go whenever you like.` : `She'd do the bed, the bathroom, the tidying and the hot tub at eleven on check-out days, for ${HOUSEKEEPER.fee} coins a time.`}</small></span><span class="orbtns">${on ? `<button class="btn small alt" data-co="keeper">Let her go</button>` : `<button class="btn small primary" data-co="keeper">Hire her</button>`}</span></li>`; };
 export function todoPanel(F, c){
   const L = LT.letState(F), t = LT.turn(F, c), cur = LT.current(F, c), nx = LT.nextStay(F, c);
-  let h = `${tape}<h2>Getting ${esc(COTTAGES[c].n)} ready</h2>`;
-  if (cur) return h + `<p class="sub">Guests are staying until ${esc(fmtDay(cur.out))}. Leave them in peace.</p>${shut}`;
-  h += `<p class="sub">${nx ? `Next guests: ${esc(fmtDay(nx.in))} at 3pm.` : "No one booked in yet."} ${t ? "Tap each thing in the cottage to do it." : "It's clean and fresh."}</p><ul class="hlist wlist">`;
+  let h = `${tape}<h2>The changeover checklist</h2>`;
+  if (cur) return h + `<p class="sub">Guests are staying at ${esc(COTTAGES[c].n)} until ${esc(fmtDay(cur.out))}. Leave them in peace.</p><ul class="hlist wlist">${keeperRow(F, c)}</ul>${shut}`;
+  const left = LT.toDo(F, c).length;
+  h += `<p class="sub">${esc(COTTAGES[c].n)}. ${nx ? `Next guests: ${esc(fmtDay(nx.in))} at 3pm.` : "No one booked in yet."} ${left ? `${left} job${left === 1 ? "" : "s"} to do before they come; each ticks off as you do it.` : "All clean and fresh."}</p><ul class="hlist wlist">`;
   for (const [k, T] of Object.entries(TASKS)) {
     if (T.only && !LT.tierOf(F, c, T.only)) continue;
-    const done = k === "basket" ? !!L.basket[c] : k === "fridge" ? !!L.fridge[c] : !t || t[k];
-    h += `<li><span class="wtxt"><b>${done ? "✓ " : ""}${esc(T.n)}</b><small>${T.need ? (T.floor === "up" ? "Upstairs" : T.floor === "bath" ? "In the bathroom" : T.floor === "garden" ? "In the garden" : "Downstairs") : k === "basket" ? `A nice extra: ${T.fruit} pieces of fruit from your backpack` : `A nice extra: ${T.treats} treats from your backpack (milk, eggs, honey, cheese)`}</small></span>${done ? `<span class="hbadge">done</span>` : !T.need ? `<button class="btn small primary" data-co="task:${k}">Do it</button>` : ""}</li>`;
+    const extra = k === "basket" || k === "fridge", done = extra ? LT.filled(F, c, k) : !t || t[k], n = extra ? LT.holds(F, c, k).length : 0;
+    const sub = !extra ? (done ? "Done" : WHERE[k]) : k === "basket" ? `A nice extra: ${T.fruit} pieces of fruit (${n} in the bowl now)` : `A nice extra: ${T.treats} treats (${n} in the fridge now)`;
+    const btn = done && !extra ? `<span class="hbadge">done</span>` : extra ? `<button class="btn small ${done ? "alt" : "primary"}" data-co="view:${k}">${done ? "Look inside" : "Open"}</button>` : k === "tidy" ? `<button class="btn small primary" data-co="task:tidy">Grab the broom</button>` : "";
+    h += `<li><span class="wtxt"><b>${done ? "✓ " : ""}${esc(T.n)}</b><small>${esc(sub)}</small></span><span class="orbtns">${btn}</span></li>`;
   }
-  return h + `</ul>${shut}`;
+  return h + keeperRow(F, c) + `</ul>${shut}`;
+}
+// the fruit bowl and the fridge: what's in, what you could put in from your backpack
+export function boxPanel(F, c, k){
+  const L = LT.letState(F), inside = LT.holds(F, c, k), need = LT.wants(k), occ = LT.occupied(F, c), bag = Object.keys(F.inv || {}).filter(id => F.inv[id] > 0 && LT.fits(k, id));
+  const name = id => (ITEM_N(id) || id), count = {}; inside.forEach(id => { count[id] = (count[id] || 0) + 1; });
+  let h = `${tape}<h2>${k === "basket" ? "The fruit bowl" : "The fridge"}</h2><p class="sub">${esc(COTTAGES[c].n)}. ${occ ? "Guests are staying: it's theirs for now." : `${inside.length} of ${LT.SPACE[k]}. ${inside.length >= need ? "Enough for a lovely welcome." : `Guests notice once there are ${need}.`} They'll enjoy it all when they arrive.`}</p>`;
+  h += inside.length ? `<p class="eyebrow">Inside</p><ul class="hlist wlist">${Object.entries(count).map(([id, n]) => `<li><span class="wpic">${icon(id, 26)}</span><span class="wtxt"><b>${esc(name(id))}</b><small>${n} in ${k === "basket" ? "the bowl" : "the fridge"}</small></span><span class="orbtns">${occ ? "" : `<button class="btn small alt" data-co="take:${id}">Take one out</button>`}</span></li>`).join("")}</ul>` : `<p class="muted">${k === "basket" ? "An empty bowl." : "Empty shelves and a little light."}</p>`;
+  if (!occ) h += `<p class="eyebrow">From your backpack</p>` + (bag.length ? `<ul class="hlist wlist">${bag.map(id => `<li><span class="wpic">${icon(id, 26)}</span><span class="wtxt"><b>${esc(name(id))}</b><small>${F.inv[id]} with you</small></span><span class="orbtns"><button class="btn small primary" data-co="put:${id}" ${inside.length >= LT.SPACE[k] ? "disabled" : ""}>Put one in</button></span></li>`).join("")}</ul>` : `<p class="muted">${k === "basket" ? "No fresh fruit with you: try the orchard, the berry bushes or a trip." : "No milk, eggs, honey or cheese with you: try the farm gate."}</p>`);
+  return h + shut;
 }
 export function coPanel(F, v, today, nameOf){
   const c = v.c;
@@ -98,6 +118,7 @@ export function coPanel(F, v, today, nameOf){
   if (v.v === "piece") return piecePanel(F, c, v.id);
   if (v.v === "cal") return calendarPanel(F, c, today, nameOf);
   if (v.v === "book") return guestBookPanel(F, c, nameOf);
+  if (v.v === "basket" || v.v === "fridge") return boxPanel(F, c, v.v);   // round 321
   return todoPanel(F, c);
 }
 // api: {save, rerender, say, flash, sfx, today, enter(c)}
@@ -111,7 +132,8 @@ export function wireLets(root, F, v, api){
     if (a === "view") { v.v = k; api.sfx("paper"); api.rerender(); return; }
     if (a === "buffer") { LT.setBuffer(F, c, +k, today); api.sfx("tap"); api.save(); api.rerender(); return; }
     if (a === "block") { const on = !LT.letState(F).blocked[c].includes(k), r = LT.setBlocked(F, c, k, on, today); api.sfx("paper"); if (r.cancelled) api.say(`Blocked off. ${r.cancelled} booking${r.cancelled > 1 ? "s" : ""} moved on, with a kind note.`); api.save(); api.rerender(); return; }
-    if (a === "keeper") { const L = LT.letState(F); LT.setKeeper(F, c, !L.keeper[c]); api.sfx("chime"); api.say(L.keeper[c] ? `${HOUSEKEEPER.n}'s hired: she'll turn ${COTTAGES[c].n} round after every stay. The basket and the fridge are still yours.` : `You'll do the changeovers yourself.`); api.save(); api.rerender(); return; }
+    if (a === "keeper") { const L = LT.letState(F); LT.setKeeper(F, c, !L.keeper[c]); api.sfx("chime"); api.say(L.keeper[c] ? `${HOUSEKEEPER.n}'s hired: she'll turn ${COTTAGES[c].n} round after every stay. The basket and the fridge are still yours.` : `You've let ${HOUSEKEEPER.n} go, with a thank-you and a jar of honey. You'll do the changeovers at ${COTTAGES[c].n} yourself.`); api.save(); api.rerender(); return; }
     if (a === "task") { api.task(c, k); return; }
+    if (a === "put" || a === "take") { const r = a === "put" ? LT.putIn(F, c, v.v, k) : LT.takeOut(F, c, v.v, k); if (!r.ok) return r.msg && api.say(r.msg); api.sfx(a === "put" ? "paper" : "tap"); api.save(); api.rerender(); api.redraw(); return; }   // round 321
   });
 }

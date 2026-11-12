@@ -137,6 +137,25 @@ const need = (F, c) => Object.keys(TASKS).filter(k => TASKS[k].need && (!TASKS[k
 export const turn = (F, c) => letState(F).turn[c] || null;
 export const ready = (F, c) => !turn(F, c) || need(F, c).every(k => turn(F, c)[k]);
 export const occupied = (F, c) => !!current(F, c);
+// round 321 (Mel: "can the bowl or fridge open up into a modal so I can see what's there, add stuff or take away
+// stuff"): the bowl and the fridge hold a list of what's in them (up to SPACE), one item in or out at a time. Guests
+// count it as a welcome touch once there's enough (TASKS[k].fruit / .treats); they eat it all when they arrive.
+export const SPACE = {basket: 6, fridge: 6};
+export const holds = (F, c, k) => { const v = letState(F)[k][c]; return Array.isArray(v) ? v : []; };
+export const wants = k => k === "basket" ? TASKS.basket.fruit : TASKS.fridge.treats;
+export const filled = (F, c, k) => holds(F, c, k).length >= wants(k);
+export const fits = (k, id) => (k === "basket" ? FRUIT : TREATS).includes(id);
+export function putIn(F, c, k, id){
+  const L = letState(F); if (!owns(F, c) || !SPACE[k]) return {ok: false};
+  if (occupied(F, c)) return {ok: false, msg: "Guests are staying. Leave them in peace."};
+  if (!fits(k, id) || !((F.inv || {})[id] > 0)) return {ok: false, msg: k === "basket" ? "Only fresh fruit goes in the bowl." : "Milk, eggs, honey or cheese for the fridge."};
+  const list = holds(F, c, k); if (list.length >= SPACE[k]) return {ok: false, msg: k === "basket" ? "The bowl's piled as high as it'll go." : "The fridge is full."};
+  F.inv[id]--; if (!F.inv[id]) delete F.inv[id]; L[k][c] = [...list, id]; return {ok: true};
+}
+export function takeOut(F, c, k, id){
+  const L = letState(F), list = holds(F, c, k), i = list.lastIndexOf(id); if (i < 0 || occupied(F, c)) return {ok: false};
+  const left = list.slice(); left.splice(i, 1); L[k][c] = left.length ? left : false; F.inv = F.inv || {}; F.inv[id] = (F.inv[id] || 0) + 1; return {ok: true};
+}
 // a mix where she can: one of each kind in turn
 const takeFrom = (F, list, n) => { const inv = F.inv || (F.inv = {}), used = [];
   while (used.length < n) { const ks = list.filter(k => inv[k] > 0); if (!ks.length) break;
@@ -148,10 +167,10 @@ export function doTask(F, c, k){
   const L = letState(F), T = TASKS[k]; if (!T || !owns(F, c)) return {ok: false};
   if (occupied(F, c)) return {ok: false, msg: "Guests are staying. Leave them in peace."};
   if (k === "basket" || k === "fridge") {
-    const flag = k === "basket" ? L.basket : L.fridge; if (flag[c]) return {ok: false, msg: k === "basket" ? "The fruit basket's already full." : "The fridge is already stocked."};
-    const list = k === "basket" ? FRUIT : TREATS, n = k === "basket" ? T.fruit : T.treats;
+    const flag = k === "basket" ? L.basket : L.fridge; if (filled(F, c, k)) return {ok: false, msg: k === "basket" ? "The fruit basket's already full." : "The fridge is already stocked."};
+    const list = k === "basket" ? FRUIT : TREATS, n = wants(k) - holds(F, c, k).length;
     if (countOf(F, list) < n) return {ok: false, msg: k === "basket" ? `The basket needs ${n} pieces of fruit from your backpack: from the orchard, the berry bushes, or a trip.` : `The fridge needs ${n} treats from your backpack: milk, eggs, honey or cheese from the farm.`};
-    const used = takeFrom(F, list, n); flag[c] = used; return {ok: true, used};
+    const used = takeFrom(F, list, n); flag[c] = [...holds(F, c, k), ...used]; return {ok: true, used};
   }
   const t = L.turn[c]; if (!t) return {ok: false, msg: "All fresh already. Nothing to do here."};
   if (t[k]) return {ok: false, msg: "Done already."};
@@ -201,7 +220,7 @@ export function step(F, day, hm){
       if (s.done) continue;
       if (!s.checkedIn && due(day, hm, s.in, CHECKIN)) {
         s.checkedIn = true; s.rate = rate(F, c);
-        s.prep = {ready: ready(F, c), basket: !!L.basket[c], fridge: !!L.fridge[c], stars: stars(F, c), hottub: tierOf(F, c, "hottub") > 0};
+        s.prep = {ready: ready(F, c), basket: filled(F, c, "basket"), fridge: filled(F, c, "fridge"), stars: stars(F, c), hottub: tierOf(F, c, "hottub") > 0};
         L.turn[c] = null; ev.push({k: "in", c, s});
       }
       if (s.checkedIn && !s.done && due(day, hm, s.out, CHECKOUT)) {

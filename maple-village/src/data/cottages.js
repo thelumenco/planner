@@ -107,7 +107,7 @@ export const TASKS = {
   bath:   {n: "Clean the bathroom, fresh towels", floor: "bath", spot: "bath", need: true},
   tidy:   {n: "Tidy, sweep and wash up", floor: "down", spot: "tidy", need: true},
   hottub: {n: "Skim and test the hot tub", floor: "garden", spot: "hottub", need: true, only: "hottub"},
-  basket: {n: "Fill the fruit basket", floor: "down", spot: "basket", fruit: 3},
+  basket: {n: "Fill the fruit bowl", floor: "down", spot: "basket", fruit: 3},
   fridge: {n: "Welcome treats in the fridge", floor: "down", spot: "fridge", treats: 2}
 };
 export const FRUIT = ["apple", "pear", "fig", "orange", "peach", "cherry", "lemon", "mango", "persimmon", "tangerine", "strawberry", "blueberry",
