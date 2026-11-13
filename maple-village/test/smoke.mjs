@@ -4315,7 +4315,7 @@ if (want("\nElena's cottages: buy them, furnish them, let them (round 219)")) tr
   await page.click(`#ctx [data-let="${free}"]`); await page.waitForTimeout(200);
   check(await fox().then(f => f.lets.cottages.figtree.closed[free.slice(4)] === 1) && await page.locator(`#ctx [data-let="${free}"].closed`).count() === 1, "the calendar: tap a free day and it's closed");
   await page.click('#ctx [data-let="tab:welcome"]'); await page.waitForTimeout(200);
-  check(await page.locator('#ctx [data-let="keeper:1"]').count() === 1 && /fruit basket/.test(await page.locator("#ctx").textContent()), "the welcome tab: the fruit basket, the fridge, and Hettie to hire");
+  check(await page.locator('#ctx [data-let="keeper:1"]').count() === 1 && /fruit bowl/.test(await page.locator("#ctx").textContent()), "the changeover tab: the fruit bowl, the fridge, and Hettie to hire");
   await page.click('#ctx [data-let="tab:garden"]'); await page.waitForTimeout(200);
   check(await page.locator('#ctx [data-let="extra:hottub"]').count() === 1, "the garden tab: a hot tub, among other things");
   await page.click("#ctx [data-close]"); await page.waitForTimeout(200);
@@ -4776,6 +4776,34 @@ if (want("\nThe cottage fruit basket takes any fruit (round 231)")) try {
   check(!["sevilla", "yuzu", "fingerlime", "carrot"].some(lt.isFruit), "but not sour or cooking fruit, or vegetables");
   const mc = await import(new URL("../src/game/millcraft.js", import.meta.url)), r = mc.HERB.raspberry;
   check(r.soap && r.lotion && r.balm && r.lipoil, "and at the mill, raspberries go in soaps, hand lotions, lip balms and lip oils (the creator: \"need to be able to use raspberries for the mill stuff\")");
+} catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
+if (want("\nThe cottage fruit bowl and fridge, and the changeover checklist (round 321)")) try {
+  // the creator's friend: "Where's the fruit bowl though": the bowl is always on the table, and it and the fridge open
+  // their own panels; the hall table's Changeover tab is a checklist
+  console.log("\nThe cottage fruit bowl and fridge, and the changeover checklist (round 321)");
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.on("pageerror", e => errors.push(`cottage bowl pageerror: ${e.message}`));
+  await page.goto(url + "?reset=1&seed=1&time=11:00&date=2026-10-14"); await page.waitForTimeout(1500);
+  await page.evaluate(() => { const F = window.__hbGame.F(); F.inv = {...F.inv, apple: 2, banana: 1, cheese: 1};
+    F.lets = {cottages: {bluebell: {owned: "2026-10-01", slots: {table: {cat: "table", tier: 1, col: "sage"}}, ready: {tidy: false, fruit: {}, fridge: {}}}}, spare: [], orders: []}; window.__hbGame.save(); });
+  await page.evaluate(() => window.__hbScene("bluebell", [260, 560])); await page.waitForTimeout(1500);
+  check(await page.locator('#world [data-letbox="bowl"]').count() === 1 && await page.locator('#world [data-letbox="fridge"]').count() === 1, "an empty fruit bowl stands on the table, and the bowl and the fridge can be tapped");
+  await page.locator('#world [data-letbox="bowl"]').dispatchEvent("click"); await page.waitForSelector("#ctx h2", { timeout: 20000 });
+  check(/fruit bowl/i.test(await page.locator("#ctx h2").textContent()) && await page.locator('#ctx [data-let="put:fruit:apple"]').count() === 1, "tap the bowl: The fruit bowl, with your fruit to put in");
+  await page.click('#ctx [data-let="put:fruit:apple"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => { const F = window.__hbGame.F(); return F.lets.cottages.bluebell.ready.fruit.apple === 1 && F.inv.apple === 1; }) && await page.locator('#ctx [data-let="un:fruit:apple"]').count() === 1,
+    "Put one in moves one apple from the backpack into the bowl, and it can be taken out again");
+  check(await page.locator("#sceneArt circle[style*='#D9534F']").count() >= 1, "and the apple shows in the bowl on the table");
+  await page.click("#ctx [data-close]").catch(() => {}); await page.waitForTimeout(300);
+  await page.locator('#world [data-letbox="fridge"]').dispatchEvent("click"); await page.waitForSelector('#ctx [data-let="put:fridge:cheese"]', { timeout: 20000 });
+  await page.click('#ctx [data-let="put:fridge:cheese"]'); await page.waitForTimeout(400);
+  check(/The fridge/.test(await page.locator("#ctx h2").textContent()) && await page.evaluate(() => window.__hbGame.F().lets.cottages.bluebell.ready.fridge.cheese === 1), "tap the fridge: The fridge, and the cheese goes in");
+  await page.click('#ctx [data-let="tab:welcome"]'); await page.waitForTimeout(400);
+  const txt = await page.locator("#ctx").textContent();
+  check(/changeover checklist/i.test(txt) && /Fill the fruit bowl \(1 of 3\)/.test(txt) && /On the dining table/.test(txt) && /In the kitchen/.test(txt) && await page.locator('#ctx [data-let="keeper:1"]').count() === 1, "the changeover checklist: each job, where it's done, and Hire her");
+  await page.click('#ctx [data-let="keeper:1"]'); await page.waitForTimeout(400);
+  check(await page.locator('#ctx [data-let="keeper:0"]').textContent().then(t => /Let her go/.test(t)), "and once Hettie's hired, Let her go");
+  await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
 if (want("\nThe bin, and digging up (round 231)")) try {
   // the creator: "there's no trash button... a trash button with an undo, and a trash tab to retrieve it; otherwise it

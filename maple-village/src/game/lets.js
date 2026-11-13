@@ -216,7 +216,7 @@ export function hallPanel(F, id, st = {}, day = dayKey()){
     : !rate ? "Not ready to let yet: it needs a bed, made up, and a bath."
     : `${!c.ready.tidy ? "The guests have gone: it needs a tidy. " : ""}Lets at ${rate} ${coin()} a night (up to ${capOf(F, id)}).${next ? ` Next guests: ${next.from === day ? "today" : next.from === addDays(day, 1) ? "tomorrow" : `in ${daysBetween(day, next.from)} days`}.` : c.paused ? " Bookings are paused." : ""}`;
   let h = head(C.n, sub);
-  h += `<div class="gchips">${[["home", "The cottage"], ["welcome", "Welcome"], ["cal", "Calendar"], ["shop", "Catalogue"], ["garden", "Garden"], ["book", "Guest book"]].map(([k, n]) => `<button class="gchip${tab === k ? " on" : ""}" data-let="tab:${k}"><span>${n}</span></button>`).join("")}</div>`;
+  h += `<div class="gchips">${[["home", "The cottage"], ["welcome", "Changeover"], ["cal", "Calendar"], ["shop", "Catalogue"], ["garden", "Garden"], ["book", "Guest book"]].map(([k, n]) => `<button class="gchip${tab === k ? " on" : ""}" data-let="tab:${k}"><span>${n}</span></button>`).join("")}</div>`;
   if (tab === "shop") {
     const cat = st.cat || "bed", col = st.col || "sage";
     h += `<div class="gchips">${Object.entries(CATS).map(([k, x]) => `<button class="gchip${cat === k ? " on" : ""}" data-let="cat:${k}"><span>${esc(x.n)}</span></button>`).join("")}</div>`;
@@ -248,18 +248,31 @@ export function hallPanel(F, id, st = {}, day = dayKey()){
     h += up.length ? `<ul class="hlist wlist">${up.map(b => `<li><span class="wtxt"><b>${b.from === day ? "Today" : b.from}</b><small>${plural(b.nights, "night")} · ${b.guests.length} guest${b.guests.length > 1 ? "s" : ""}</small></span></li>`).join("")}</ul>` : `<p class="muted">No bookings yet.</p>`;
     return h + shut;
   }
+  // round 321 (ported, in this edition's own cottages): the fruit bowl and the fridge each open their own panel, one
+  // thing in or out at a time; the Changeover tab is a checklist that says where each job is done
+  const r = c.ready, bag = Object.keys(F.inv || {}).filter(k => F.inv[k] > 0), fruit = bag.filter(isFruit), treats = bag.filter(isTreat);
+  if (tab === "bowl" || tab === "fridge") {
+    const where = tab === "bowl" ? "fruit" : "fridge", inside = r[where], cap = WELCOME[where], n = count(inside), mine = where === "fruit" ? fruit : treats;
+    h = head(tab === "bowl" ? "The fruit bowl" : "The fridge", `${tab === "bowl" ? "On the dining table" : "In the kitchen"}, for the next guests: ${n} of ${cap}.${n >= WELCOME.need ? " That's a good welcome." : ` ${WELCOME.need} or more makes a good welcome.`}`);
+    if (stay) h += `<p class="muted">Guests are staying, so it's theirs for now. Fill it for the next ones once they've gone.</p>`;
+    h += `<p class="eyebrow">Inside</p>` + (n ? `<ul class="hlist wlist">${Object.entries(inside).map(([k, m]) => `<li><span class="wpic">${icon(ITEMS[k] && ITEMS[k].ico || k, 28)}</span><span class="wtxt"><b>${esc(nm(k))}</b><small>× ${m}</small></span>${stay ? "" : `<button class="btn small alt" data-let="un:${where}:${k}">Take one out</button>`}</li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`);
+    if (!stay) h += `<p class="eyebrow">In your backpack</p>` + (!mine.length ? `<p class="muted">${where === "fruit" ? "No fruit in your backpack: pick some in the orchard, the garden or on a trip." : "Nothing for the fridge in your backpack: wine, cheese, chocolate, bread or jam."}</p>`
+      : `<ul class="hlist wlist">${mine.map(k => `<li><span class="wpic">${icon(ITEMS[k] && ITEMS[k].ico || k, 28)}</span><span class="wtxt"><b>${esc(nm(k))}</b><small>${F.inv[k]} in your backpack</small></span><button class="btn small primary" data-let="put:${where}:${k}" ${n >= cap ? "disabled" : ""}>Put one in</button></li>`).join("")}</ul>`);
+    return h + `<div class="actions"><button class="btn alt small" data-let="tab:welcome">The changeover checklist</button><button class="btn alt small" data-close="1">Close</button></div>`;
+  }
   if (tab === "welcome") {
-    const r = c.ready, bag = Object.keys(F.inv || {}).filter(k => F.inv[k] > 0), fruit = bag.filter(isFruit), treats = bag.filter(isTreat);
-    const box = (o, where) => Object.keys(o).length ? `<ul class="hlist wlist">${Object.entries(o).map(([k, n]) => `<li><span class="wtxt"><b>${esc(nm(k))}</b><small>× ${n}</small></span><button class="btn small alt" data-let="un:${where}:${k}">Take back</button></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
-    const add = (list, where, full) => full ? "" : list.length ? `<div class="gchips">${list.map(k => `<button class="gchip" data-let="put:${where}:${k}"><span>+ ${esc(nm(k))}</span></button>`).join("")}</div>` : `<p class="muted">Nothing for it in your backpack.</p>`;
-    h += stay ? `<p class="muted">Guests are staying. Get things ready for the next ones once they've gone.</p>`
-      : r.tidy ? `<p class="muted">Clean and tidy, beds made.</p>` : `<div class="actions"><button class="btn primary" data-let="tidy">Tidy up and make the beds</button></div>`;
-    h += `<h3 class="ph3">The fruit basket (${count(r.fruit)}/${WELCOME.fruit})</h3>${box(r.fruit, "fruit")}${stay ? "" : add(fruit, "fruit", count(r.fruit) >= WELCOME.fruit)}`;
-    h += `<h3 class="ph3">The fridge (${count(r.fridge)}/${WELCOME.fridge})</h3>${box(r.fridge, "fridge")}${stay ? "" : add(treats, "fridge", count(r.fridge) >= WELCOME.fridge)}`;
-    h += `<p class="muted">Tidy, with ${WELCOME.need} or more in the basket and the fridge: guests add a star, and leave a tip.</p>`;
-    h += `<h3 class="ph3">${KEEPER.name}, the housekeeper</h3><p class="muted">${c.keeper ? `${KEEPER.name} does the changeover the day guests leave: ${KEEPER.fee[id]} ${coin()} each time. She fills the basket and fridge from the pantry cupboard.` : `${KEEPER.name} lives on the lane and does changeovers: ${KEEPER.fee[id]} ${coin()} each time, paid on the day. She'll stock the welcome from a pantry cupboard you keep filled.`}</p>`;
-    h += `<div class="actions"><button class="btn small ${c.keeper ? "alt" : "primary"}" data-let="keeper:${c.keeper ? 0 : 1}">${c.keeper ? `Let ${KEEPER.name} go` : `Hire ${KEEPER.name}`}</button></div>`;
-    if (c.keeper || count(c.pantry)) h += `<h3 class="ph3">The pantry (${count(c.pantry)})</h3>${box(c.pantry, "pantry")}${add([...fruit, ...treats], "pantry", count(c.pantry) >= 30)}`;
+    const tick = (done, what, where, btn) => `<li><span class="wpic">${done ? "✓" : "○"}</span><span class="wtxt"><b>${what}</b><small>${where}</small></span>${btn || ""}</li>`;
+    h += stay ? `<p class="muted">Guests are staying. Get things ready for the next ones once they've gone.</p>` : "";
+    h += `<p class="eyebrow">The changeover checklist</p><ul class="hlist wlist">`
+      + tick(r.tidy, "Tidy up and make the beds", r.tidy ? "Clean and tidy, beds made." : "All through the cottage.", r.tidy || stay ? "" : `<button class="btn small primary" data-let="tidy">Tidy up</button>`)
+      + tick(count(r.fruit) >= WELCOME.need, `Fill the fruit bowl (${count(r.fruit)} of ${WELCOME.fruit})`, "On the dining table.", `<button class="btn small alt" data-let="tab:bowl">Open</button>`)
+      + tick(count(r.fridge) >= WELCOME.need, `Stock the fridge (${count(r.fridge)} of ${WELCOME.fridge})`, "In the kitchen.", `<button class="btn small alt" data-let="tab:fridge">Open</button>`)
+      + tick(!!c.keeper, `${KEEPER.name}, the housekeeper`, c.keeper ? `Does the changeover the day guests leave: ${KEEPER.fee[id]} ${coin()} each time, and fills the bowl and the fridge from the pantry.` : `She'd do all of this the day guests leave, for ${KEEPER.fee[id]} ${coin()} each time, filling the bowl and the fridge from the pantry.`,
+        `<button class="btn small ${c.keeper ? "alt" : "primary"}" data-let="keeper:${c.keeper ? 0 : 1}">${c.keeper ? "Let her go" : "Hire her"}</button>`)
+      + `</ul><p class="muted">Tidy, with ${WELCOME.need} or more in the bowl and the fridge: guests add a star, and leave a tip.</p>`;
+    const box = (o, where) => Object.keys(o).length ? `<ul class="hlist wlist">${Object.entries(o).map(([k, n]) => `<li><span class="wtxt"><b>${esc(nm(k))}</b><small>× ${n}</small></span><button class="btn small alt" data-let="un:${where}:${k}">Take one out</button></li>`).join("")}</ul>` : `<p class="muted">Empty.</p>`;
+    const add = (list, where, full) => full ? "" : list.length ? `<div class="gchips">${list.map(k => `<button class="gchip" data-let="put:${where}:${k}"><span>+ ${esc(nm(k))}</span></button>`).join("")}</div>` : "";
+    if (c.keeper || count(c.pantry)) h += `<h3 class="ph3">The pantry, for ${KEEPER.name} (${count(c.pantry)})</h3>${box(c.pantry, "pantry")}${add([...fruit, ...treats], "pantry", count(c.pantry) >= 30)}`;
     return h + shut;
   }
   // the cottage: the parcels to unpack, the spares, what's in each place

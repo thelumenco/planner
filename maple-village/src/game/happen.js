@@ -94,7 +94,7 @@ function coach(F, day, own, rnd){
 // who orders what, from which shop: n is how many (scoops, bars, bottles); paid at the shop's own price, plus a thank-you
 export const ORDER = {
   scoop: {unit: "scoops", price: 4, n: [20, 30], who: [["the cricket club", "the tea after Saturday's match"], ["the primary school", "sports day"], ["the church", "the summer fete"], ["the Wilsons", "their grandson's birthday"]]},
-  cocoa: {unit: "bars", price: 6, n: [12, 18], who: [["the village hall", "the raffle prizes"], ["Nell at the holiday cottages", "a chocolate on every pillow"], ["the book club", "their Christmas swap"], ["the primary school", "the end-of-term prizes"]]},
+  cocoa: {unit: "bars", price: 6, n: [12, 18], who: [["the village hall", "the raffle prizes"], ["Hettie at the holiday cottages", "a chocolate on every pillow"], ["the book club", "their Christmas swap"], ["the primary school", "the end-of-term prizes"]]},
   wine: {unit: "bottles", price: 15, n: [10, 16], who: [["the golf club", "its annual dinner"], ["the Hendersons", "their ruby wedding party"], ["the village hall", "the quiz night"], ["the cricket club", "the end-of-season supper"]]}
 };
 export const ORDER_AT = {scoop: ["bay", [388, 210]], cocoa: ["bay", [396, 566]], wine: ["vineyard", [390, 266]]};

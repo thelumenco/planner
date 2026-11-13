@@ -783,6 +783,11 @@ export const hallTable = (x, y) => shp([[R(x-27, y-46, 54, 14, 2), "#9A6E48"], [
 
 // round 221: the welcome you've left out, on the table top at (x, y): a fruit bowl (fruit 0-3) and treats from the
 // fridge (0-4: a bottle of wine, a wedge of cheese, a bar of chocolate, a jar of jam). Drawn big, set down small.
+// the fruit bowl, empty or with up to three pieces of fruit in it
+function bowlBig(bx, y, fr){
+  return [`${fr.map(([fx, fy, col]) => `<circle cx="${fx}" cy="${fy}" r="6.5" style="fill:${col}"/>`).join("")}<path d="M${bx-18} ${y-10} Q${bx} ${y+2} ${bx+18} ${y-10}z" style="fill:#E3EEF2"/><path d="M${bx-14} ${y-7} Q${bx} ${y} ${bx+14} ${y-7}" style="stroke:#7FA0D0;fill:none" stroke-width="2"/><rect x="${bx-6}" y="${y-2}" width="12" height="3" style="fill:#E3EEF2"/>`,
+    `<path d="M${bx-18} ${y-10} Q${bx} ${y+2} ${bx+18} ${y-10}z"/>${fr.map(([fx, fy]) => `<circle cx="${fx}" cy="${fy}" r="6.5"/>`).join("")}${fr.length > 1 ? `<path d="M${bx+7} ${y-19} l2 -4" />` : ""}`];
+}
 function welcomeBig(x, y, fruit, treats){
   const bx = x - 28, fr = [[bx - 8, y - 12, "#D9534F"], [bx + 7, y - 13, "#9BC26A"], [bx, y - 19, "#F2A65A"]].slice(0, fruit);
   const T = [
@@ -790,11 +795,18 @@ function welcomeBig(x, y, fruit, treats){
     [`<path d="M${x+9} ${y} L${x+27} ${y} L${x+27} ${y-11}z" style="fill:#F3D36A"/><circle cx="${x+22}" cy="${y-4}" r="1.6" style="fill:#D9B44A"/>`, `<path d="M${x+9} ${y} L${x+27} ${y} L${x+27} ${y-11}z"/>`],
     [`<rect x="${x+29}" y="${y-8}" width="17" height="8" rx="1" style="fill:#5A3A2A"/><rect x="${x+35}" y="${y-8}" width="6" height="8" style="fill:#C2505F"/>`, `<rect x="${x+29}" y="${y-8}" width="17" height="8" rx="1"/>`],
     [`<rect x="${x+48}" y="${y-14}" width="11" height="14" rx="2" style="fill:#B03A48"/><path d="M${x+46} ${y-14} q7 -6 15 0z" style="fill:#F3E7C8"/><path d="M${x+47} ${y-13} h13" style="stroke:#C2505F" stroke-width="1.4"/>`, `<rect x="${x+48}" y="${y-14}" width="11" height="14" rx="2"/><path d="M${x+46} ${y-14} q7 -6 15 0"/>`]].slice(0, treats);
-  const bowl = fruit ? [`${fr.map(([fx, fy, col]) => `<circle cx="${fx}" cy="${fy}" r="6.5" style="fill:${col}"/>`).join("")}<path d="M${bx-18} ${y-10} Q${bx} ${y+2} ${bx+18} ${y-10}z" style="fill:#E3EEF2"/><path d="M${bx-14} ${y-7} Q${bx} ${y} ${bx+14} ${y-7}" style="stroke:#7FA0D0;fill:none" stroke-width="2"/><rect x="${bx-6}" y="${y-2}" width="12" height="3" style="fill:#E3EEF2"/>`,
-    `<path d="M${bx-18} ${y-10} Q${bx} ${y+2} ${bx+18} ${y-10}z"/>${fr.map(([fx, fy]) => `<circle cx="${fx}" cy="${fy}" r="6.5"/>`).join("")}<path d="M${bx+7} ${y-19} l2 -4" />`] : ["", ""];
+  const bowl = fruit >= 0 ? bowlBig(bx, y, fr) : ["", ""];   // round 321: welcomeArt draws the bowl itself, bigger (fruit -1 here)
   return sk(bowl[0] + T.map(p => p[0]).join(""), bowl[1] + T.map(p => p[1]).join(""));
 }
+// round 321: the bowl is always there (empty until you fill it), drawn bigger, with a finger-sized tap area over it
+// (data-letbox="bowl"); the treats sit beside it as before
 export const welcomeArt = (x, y, fruit, treats) => {
   fruit = Math.max(0, Math.min(3, fruit || 0)); treats = Math.max(0, Math.min(4, treats || 0));
-  return `<g pointer-events="none">${sc(x + 15, y, .42, () => welcomeBig(x + 15, y, fruit, treats), x, y)}</g>`;
+  const bx = x - 26, fr = [[bx - 8, y - 12, "#D9534F"], [bx + 7, y - 13, "#9BC26A"], [bx, y - 19, "#F2A65A"]].slice(0, fruit);
+  return `<g pointer-events="none">${sc(bx, y, .85, () => sk(...bowlBig(bx, y, fr)))}${treats ? sc(x + 15, y, .42, () => welcomeBig(x + 15, y, -1, treats), x, y) : ""}</g>`
+    + `<rect data-letbox="bowl" x="${bx - 34}" y="${y - 40}" width="68" height="52" fill="transparent" style="cursor:pointer"><title>The fruit bowl</title></rect>`;
 };
+// the fridge's tap area (the fridges are drawn in the room shells: Bluebell's on the right, Fig Tree's on the left)
+export const LET_FRIDGE_X = {bluebell: 458, figtree: 37};
+export const LET_KFRONT = KFRONT;
+export const fridgeTap = id => LET_FRIDGE_X[id] == null ? "" : `<rect data-letbox="fridge" x="${LET_FRIDGE_X[id] - 24}" y="${KFRONT - 80}" width="48" height="84" fill="transparent" style="cursor:pointer"><title>The fridge</title></rect>`;

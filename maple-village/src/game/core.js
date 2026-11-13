@@ -1761,7 +1761,7 @@ function ctxBody(){
     else if (a === "extra") { const x = LT.orderExtra(F, letView, v); if (!x) return; sfx("chaching"); flash(x.n); speak("Ordered. The builders will bring it tomorrow and put it in the garden.", 4000); save(); }
     else if (a === "put") { if (!LT.stock(F, letView, v, w)) return; sfx("tap"); save(); drawScene(); }
     else if (a === "un") { if (!LT.unstock(F, letView, v, w)) return; sfx("tap"); save(); drawScene(); }
-    else if (a === "keeper") { LT.hireKeeper(F, letView, v === "1"); sfx("paper", true); if (v === "1") speak("Hettie beams. \"Leave it with me. I'll do the changeovers, and fill the basket and the fridge from the pantry. Just keep it stocked.\"", 6000); save(); }
+    else if (a === "keeper") { LT.hireKeeper(F, letView, v === "1"); sfx("paper", true); if (v !== "1") speak("Hettie hangs up her apron. \"Call me any time you want a hand again.\" The changeovers are yours now.", 5000); if (v === "1") speak("Hettie beams. \"Leave it with me. I'll do the changeovers, and fill the fruit bowl and the fridge from the pantry. Just keep it stocked.\"", 6000); save(); }
     else if (a === "day") { if (!LT.toggleDay(F, letView, v)) { sfx("tap"); return; } sfx("tap"); save(); }
     else if (a === "buffer") { LT.setBuffer(F, letView, +v); sfx("tap"); save(); }
     else if (a === "pause") { LT.setPaused(F, letView, v === "1"); sfx("paper", true); save(); }
@@ -3796,6 +3796,9 @@ svg.addEventListener("click", ev => {
   if (ord) { const at = (HP.orderAt(F) || {}).at || [hero.x, hero.y]; go(scene, at[0], Math.min(600, at[1] + 40), () => { const r = HP.deliver(F, dayKey(), localHM(), orderStock, orderTake); if (!r) return; speak(r.line, 6000); if (r.ok) { sfx("coin"); S.earned += r.paid; gainXp(3); act("cheer"); } save(true); drawScene(); }); return; }
   const mnd = ev.target.closest("[data-mend]");   // round 303: mend storm damage, pay upkeep
   if (mnd) { const id = mnd.dataset.mend, at = (HP.repairAt(F, id) || {}).at || [hero.x, hero.y]; go(scene, at[0], Math.min(600, at[1] + 40), () => { const r = HP.mend(F, id); if (!r) return; speak(r.line, 6000); if (r.ok) { sfx("chime"); gainXp(2); act("cheer"); } save(true); drawScene(); }); return; }
+  const lbx = LET_COTTAGES[scene] && ev.target.closest("[data-letbox]");   // round 321 (ported): the cottage's fruit bowl and fridge
+  if (lbx) { const k = lbx.dataset.letbox, cx = +lbx.getAttribute("x") + +lbx.getAttribute("width")/2, cy = +lbx.getAttribute("y") + +lbx.getAttribute("height"), id = scene;
+    letView = id; letSt = {tab: k}; sfx("paper", true); render(); go(scene, cx, Math.min(600, Math.max(260, cy + 30))); return; }
   const vsp = (scene === "vshed" || scene === "vloft") && ev.target.closest("[data-vsspot]");   // round 308: the barrel shed and the drying loft
   if (vsp) { vsSpot(vsp.dataset.vsspot); return; }
   const lsp = /^lhtower[123]$/.test(scene) && ev.target.closest("[data-lhspot]");

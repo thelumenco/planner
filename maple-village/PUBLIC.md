@@ -583,3 +583,19 @@ Shack's gelato kitchen. Game rules and state in `src/game/passage.js` (`F.passag
   reduced motion.
 - Tests: the round 317 unit block and page section cover all of it, including a check that no visitor is within 30
   of a villager's spot in data/npcs.js.
+
+## Round 321 (adapted to this edition's cottages): the fruit bowl and the fridge open up, and a changeover checklist
+
+This edition still has the round 219 cottages (the hall table runs everything, Hettie keeps house), not the personal
+edition's round 236 rewrite, so section 24 of PORT-BOTTOM-ROW.md was rebuilt on what's here rather than ported line
+for line. (A friend's question, "Where's the fruit bowl though": the bowl was only drawn once it had fruit in it.)
+- art/lets-art.js: the bowl is always on the dining table (or the hall table if there's no table yet), drawn bigger,
+  empty until filled; `welcomeArt` adds a 68 by 52 tap area (`data-letbox="bowl"`), and `fridgeTap(id)` one over each
+  cottage's fridge (`LET_FRIDGE_X`). art/scenes.js tapes "Fruit bowl" and "Fridge" labels beside them.
+- game/lets.js `hallPanel`: new tabs "bowl" and "fridge" (what's inside with "Take one out", what's in the backpack
+  with "Put one in", one at a time); the Welcome chip is now "Changeover", a checklist (tidy up, fill the fruit bowl
+  "On the dining table", stock the fridge "In the kitchen", each with Open; Hettie with "Hire her" / "Let her go");
+  the pantry for Hettie stays below it.
+- game/core.js: tapping `[data-letbox]` in a cottage opens that panel; letting Hettie go has its own line.
+- Wiki: the cottages page describes the checklist, the bowl and the fridge.
+- Test: "The cottage fruit bowl and fridge, and the changeover checklist (round 321)".
