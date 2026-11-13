@@ -18534,14 +18534,14 @@ ${p.sign}` };
     if (!pk) return h3 + `<p class="sub">${sea2 === "valentine" ? `Penny's table is out again for Valentine's: wicker baskets, pink tissue, paper hearts. "For your sweetheart? Or yourself. I won't tell."` : sea2 === "mothers" ? `Penny's table is out for Mother's Day: wicker baskets, lilac ribbon, sprigs of dried lavender. "Something for your mum, love? Or your ma ma?"` : `Penny's set up a table by the window: wicker baskets, straw, red ribbon and gift tags. "Pick a basket, fill it with things you've made, and I'll tie the bow."`}</p>
     <div class="actions">${Object.entries(BASKETS).map(([k, b]) => `<button class="btn ${F2.coins >= b.price ? "primary" : "alt"}" data-xh="start:${k}" ${F2.coins >= b.price ? "" : "disabled"}>${esc(b.n)}: ${b.holds} things · ${b.price} ${icon("coin", 13)}</button>`).join("")}</div>
     <p class="muted">A packed hamper makes a lovely gift${sea2 === "xmas" ? ", sells from your stall at the Christmas market," : ""} and Penny will post one for you.</p>` + postHTML(F2, o) + shut2;
-    const holds = BASKETS[pk.size].holds, val = hamperValue(pk.items, pk.size);
-    h3 += `<p class="sub">${esc(BASKETS[pk.size].n)}: ${pk.items.length} of ${holds} in.${pk.items.length ? ` So far it's shaping up as ${esc(seasonName(pk.items, pk.size, pk.season || "xmas"))}, worth ${val.sell} coins.` : ""}</p>`;
+    const holds2 = BASKETS[pk.size].holds, val = hamperValue(pk.items, pk.size);
+    h3 += `<p class="sub">${esc(BASKETS[pk.size].n)}: ${pk.items.length} of ${holds2} in.${pk.items.length ? ` So far it's shaping up as ${esc(seasonName(pk.items, pk.size, pk.season || "xmas"))}, worth ${val.sell} coins.` : ""}</p>`;
     if (pk.items.length) h3 += `<ul class="hlist wlist">${pk.items.map((it, i) => `<li><span class="wpic">${icon(typeof it === "object" ? "wine_" + (["red", "rose", "white", "sparkling"].includes(it.type) ? it.type : "red") : (ITEMS[it] || {}).ico || it, 28)}</span><span class="wtxt"><b>${esc(typeof it === "object" ? it.wine : ITEMS[it].n)}</b></span><button class="btn small alt" data-xh="out:${i}">Take out</button></li>`).join("")}</ul>`;
-    if (pk.items.length < holds) {
+    if (pk.items.length < holds2) {
       const bag2 = Object.keys(F2.inv || {}).filter((id) => F2.inv[id] > 0 && hamperGood(id)), bottles2 = (v.shelf || []).filter((b) => b.n > 0);
       h3 += bag2.length || bottles2.length ? `<p class="eyebrow" style="margin:10px 0 6px">Add from your backpack</p><div class="actions">${bag2.map((id) => `<button class="btn small alt" data-xh="add:${id}">${icon(ITEMS[id].ico || id, 16)} ${esc(ITEMS[id].n)} (${F2.inv[id]})</button>`).join("")}${bottles2.map((b) => `<button class="btn small alt" data-xh="wine:${b.id}">A bottle of ${esc(b.name)} (${b.n})</button>`).join("")}</div>` : `<p class="muted">Nothing in your backpack for a hamper: soaps, oils and lotions from the mill, honey, your cheeses, Cocoa Room bars and boxes. Or a bottle off the wine shelves.</p>`;
     }
-    return h3 + `<div class="actions">${pk.items.length === holds ? `<button class="btn primary" data-xh="tie">Tie the bow</button>` : ""}</div>` + shut2;
+    return h3 + `<div class="actions">${pk.items.length === holds2 ? `<button class="btn primary" data-xh="tie">Tie the bow</button>` : ""}</div>` + shut2;
   }
   var CAROL_SONGS = [
     { n: "Silent Night", a: "Silent night, holy night...", b: "All is calm, all is bright..." },
@@ -18690,8 +18690,8 @@ ${r.n}`;
   }
   function ordersOn(F2, day) {
     if (!xmasOn(day) || day.slice(5) < "12-01") return [];
-    const x = xmasState(F2), filled = x.filled || {};
-    return [0, 1].map((k) => mkOrder(`${day}:${k}`, ORDER_FOLK[hash(day + ":o" + k) % ORDER_FOLK.length], hash(day + ":" + k))).concat(x.orders || []).filter((o) => !filled[o.id]);
+    const x = xmasState(F2), filled2 = x.filled || {};
+    return [0, 1].map((k) => mkOrder(`${day}:${k}`, ORDER_FOLK[hash(day + ":o" + k) % ORDER_FOLK.length], hash(day + ":" + k))).concat(x.orders || []).filter((o) => !filled2[o.id]);
   }
   var orderText = (o) => `${o.who}: a ${o.size} hamper with ${o.wants.map((w) => WANT[w]).join(" and ")}`;
   var fits = (hp, o) => hp && hp.size === o.size && o.wants.every((w) => hp.items.some((i) => catOf(i) === w));
@@ -36860,7 +36860,7 @@ ${m.from}` : ""}`;
     bath: { n: "Clean the bathroom, fresh towels", floor: "bath", spot: "bath", need: true },
     tidy: { n: "Tidy, sweep and wash up", floor: "down", spot: "tidy", need: true },
     hottub: { n: "Skim and test the hot tub", floor: "garden", spot: "hottub", need: true, only: "hottub" },
-    basket: { n: "Fill the fruit basket", floor: "down", spot: "basket", fruit: 3 },
+    basket: { n: "Fill the fruit bowl", floor: "down", spot: "basket", fruit: 3 },
     fridge: { n: "Welcome treats in the fridge", floor: "down", spot: "fridge", treats: 2 }
   };
   var FRUIT = [
@@ -37050,6 +37050,36 @@ ${m.from}` : ""}`;
   var turn = (F2, c) => letState(F2).turn[c] || null;
   var ready = (F2, c) => !turn(F2, c) || need(F2, c).every((k) => turn(F2, c)[k]);
   var occupied = (F2, c) => !!current(F2, c);
+  var SPACE = { basket: 6, fridge: 6 };
+  var holds = (F2, c, k) => {
+    const v = letState(F2)[k][c];
+    return Array.isArray(v) ? v : [];
+  };
+  var wants = (k) => k === "basket" ? TASKS.basket.fruit : TASKS.fridge.treats;
+  var filled = (F2, c, k) => holds(F2, c, k).length >= wants(k);
+  var fits2 = (k, id) => (k === "basket" ? FRUIT : TREATS3).includes(id);
+  function putIn(F2, c, k, id) {
+    const L3 = letState(F2);
+    if (!owns(F2, c) || !SPACE[k]) return { ok: false };
+    if (occupied(F2, c)) return { ok: false, msg: "Guests are staying. Leave them in peace." };
+    if (!fits2(k, id) || !((F2.inv || {})[id] > 0)) return { ok: false, msg: k === "basket" ? "Only fresh fruit goes in the bowl." : "Milk, eggs, honey or cheese for the fridge." };
+    const list11 = holds(F2, c, k);
+    if (list11.length >= SPACE[k]) return { ok: false, msg: k === "basket" ? "The bowl's piled as high as it'll go." : "The fridge is full." };
+    F2.inv[id]--;
+    if (!F2.inv[id]) delete F2.inv[id];
+    L3[k][c] = [...list11, id];
+    return { ok: true };
+  }
+  function takeOut(F2, c, k, id) {
+    const L3 = letState(F2), list11 = holds(F2, c, k), i = list11.lastIndexOf(id);
+    if (i < 0 || occupied(F2, c)) return { ok: false };
+    const left7 = list11.slice();
+    left7.splice(i, 1);
+    L3[k][c] = left7.length ? left7 : false;
+    F2.inv = F2.inv || {};
+    F2.inv[id] = (F2.inv[id] || 0) + 1;
+    return { ok: true };
+  }
   var takeFrom = (F2, list11, n) => {
     const inv = F2.inv || (F2.inv = {}), used = [];
     while (used.length < n) {
@@ -37071,11 +37101,11 @@ ${m.from}` : ""}`;
     if (occupied(F2, c)) return { ok: false, msg: "Guests are staying. Leave them in peace." };
     if (k === "basket" || k === "fridge") {
       const flag = k === "basket" ? L3.basket : L3.fridge;
-      if (flag[c]) return { ok: false, msg: k === "basket" ? "The fruit basket's already full." : "The fridge is already stocked." };
-      const list11 = k === "basket" ? FRUIT : TREATS3, n = k === "basket" ? T2.fruit : T2.treats;
+      if (filled(F2, c, k)) return { ok: false, msg: k === "basket" ? "The fruit basket's already full." : "The fridge is already stocked." };
+      const list11 = k === "basket" ? FRUIT : TREATS3, n = wants(k) - holds(F2, c, k).length;
       if (countOf(F2, list11) < n) return { ok: false, msg: k === "basket" ? `The basket needs ${n} pieces of fruit from your backpack: from the orchard, the berry bushes, or a trip.` : `The fridge needs ${n} treats from your backpack: milk, eggs, honey or cheese from the farm.` };
       const used = takeFrom(F2, list11, n);
-      flag[c] = used;
+      flag[c] = [...holds(F2, c, k), ...used];
       return { ok: true, used };
     }
     const t2 = L3.turn[c];
@@ -37144,7 +37174,7 @@ ${m.from}` : ""}`;
         if (!s.checkedIn && due(day, hm12, s.in, CHECKIN)) {
           s.checkedIn = true;
           s.rate = rate(F2, c);
-          s.prep = { ready: ready(F2, c), basket: !!L3.basket[c], fridge: !!L3.fridge[c], stars: stars(F2, c), hottub: tierOf(F2, c, "hottub") > 0 };
+          s.prep = { ready: ready(F2, c), basket: filled(F2, c, "basket"), fridge: filled(F2, c, "fridge"), stars: stars(F2, c), hottub: tierOf(F2, c, "hottub") > 0 };
           L3.turn[c] = null;
           ev.push({ k: "in", c, s });
         }
@@ -47602,9 +47632,9 @@ ${m.from}` : ""}`;
     const at9 = (CROWD_AT[room4] || []).slice(0, n), extra3 = room4 === "wineshop" || room4 === "terrace" || room4 === "vineyard" ? "wineglass" : room4 === "scoopshop" || room4 === "bay" ? "cone" : null;
     return at9.map((p, i) => ({ p, i })).sort((a, b) => a.p[1] - b.p[1]).map(({ p: [x, y, sit, dir], i }) => {
       const lk = look(seed2 * 31 + i * 7 + room4.length, i % 3 === 2 ? null : extra3), d = `--d:-${((i * 0.73 + seed2 * 0.11) % 3).toFixed(2)}s`;
-      const stroll = !sit && i % 6 === 1, hop = !sit && !stroll && i % 5 === 3, holds = lk.extra === "wineglass" || lk.extra === "cone" ? " holds" : "";
-      if (stroll) return `<g class="ch npc crowd stroll${holds}" transform="translate(${x} ${y})" style="${d}" pointer-events="none"><g class="strollw">${personArt(lk, false)}</g></g>`;
-      return `<g class="ch npc crowd${sit ? " act-sit" : ""}${hop ? " hop" : ""}${holds}" transform="translate(${x} ${y})" style="${d}" pointer-events="none"><g class="cb"><g transform="scale(${dir} 1)">${personArt(lk, false)}</g></g></g>`;
+      const stroll = !sit && i % 6 === 1, hop = !sit && !stroll && i % 5 === 3, holds2 = lk.extra === "wineglass" || lk.extra === "cone" ? " holds" : "";
+      if (stroll) return `<g class="ch npc crowd stroll${holds2}" transform="translate(${x} ${y})" style="${d}" pointer-events="none"><g class="strollw">${personArt(lk, false)}</g></g>`;
+      return `<g class="ch npc crowd${sit ? " act-sit" : ""}${hop ? " hop" : ""}${holds2}" transform="translate(${x} ${y})" style="${d}" pointer-events="none"><g class="cb"><g transform="scale(${dir} 1)">${personArt(lk, false)}</g></g></g>`;
     }).join("");
   }
   var CHAT = {
@@ -49256,7 +49286,7 @@ ${m.from}` : ""}`;
     s[id] = (s[id] || 0) + k;
     return k;
   }
-  function takeOut(F2, where, id, n = 99) {
+  function takeOut2(F2, where, id, n = 99) {
     const s = storeState(F2)[where], k = Math.min(n, s[id] || 0);
     if (!k) return 0;
     s[id] -= k;
@@ -49370,6 +49400,7 @@ ${m.from}` : ""}`;
   }
 
   // src/game/letpanels.js
+  var ITEM_N = (id) => ITEMS[id] && ITEMS[id].n;
   var coin22 = () => icon("coin", 13);
   var tape6 = `<span class="tape gingham" aria-hidden="true"></span>`;
   var shut32 = `<div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
@@ -49438,7 +49469,7 @@ ${m.from}` : ""}`;
     h3 += `</div><p class="muted" style="font-size:.75rem">Green: guests in. Gold: check-out morning. Peach: out and in the same day. Stripes: your buffer. Grey: weeks you've blocked off (any bookings in them are cancelled kindly).</p>`;
     const up = L3.stays[c].filter((s) => !s.done).slice(0, 4);
     h3 += `<p class="eyebrow">Coming up</p>` + (up.length ? `<ul class="hlist">${up.map((s) => `<li><span><b>${esc(s.who.map(nameOf3).join(" and "))}</b><small>${esc(fmtDay2(s.in))} to ${esc(fmtDay2(s.out))}, ${s.n} nights${s.checkedIn ? " · staying now" : ""}</small></span></li>`).join("")}</ul>` : `<p class="muted">No bookings yet. They'll come.</p>`);
-    h3 += `<p class="eyebrow">Changeovers</p><ul class="hlist wlist"><li><span class="wtxt"><b>${esc(HOUSEKEEPER.n)} the housekeeper</b><small>Strips the beds, cleans and tidies, and sees to the hot tub at eleven on check-out days, for ${HOUSEKEEPER.fee} coins a time. The fruit basket and the fridge stay yours.</small></span><button class="btn small ${L3.keeper[c] ? "primary" : "alt"}" data-co="keeper">${L3.keeper[c] ? "Hired" : "Hire her"}</button></li></ul>`;
+    h3 += `<p class="eyebrow">Changeovers</p><ul class="hlist wlist"><li><span class="wtxt"><b>${esc(HOUSEKEEPER.n)} the housekeeper</b><small>Strips the beds, cleans and tidies, and sees to the hot tub at eleven on check-out days, for ${HOUSEKEEPER.fee} coins a time. The fruit basket and the fridge stay yours.</small></span><span class="orbtns">${L3.keeper[c] ? `<span class="hbadge">hired</span> <button class="btn small alt" data-co="keeper">Let her go</button>` : `<button class="btn small primary" data-co="keeper">Hire her</button>`}</span></li></ul>`;
     return h3 + shut32;
   }
   function guestBookPanel(F2, c, nameOf3) {
@@ -49447,17 +49478,36 @@ ${m.from}` : ""}`;
     h3 += r.length ? `<ul class="hlist">${r.slice(0, 12).map((v) => `<li><span><b>${"★".repeat(v.score)}${"☆".repeat(5 - v.score)} ${esc(v.who.map(nameOf3).join(" and "))}</b><small>${esc(fmtDay2(v.in))}: "${esc(v.text)}"</small></span></li>`).join("")}</ul>` : `<p class="muted">Empty pages, waiting for the first guests to write something nice.</p>`;
     return h3 + shut32;
   }
+  var WHERE = { beds: "Tap the bed upstairs", bath: "Tap the bath in the bathroom", hottub: "Tap the hot tub in the garden", tidy: "Here, with the broom" };
+  var keeperRow = (F2, c) => {
+    const on = !!letState(F2).keeper[c];
+    return `<li><span class="wtxt"><b>${esc(HOUSEKEEPER.n)} the housekeeper${on ? ": hired" : ""}</b><small>${on ? `She strips the bed, cleans, tidies and sees to the hot tub at eleven on check-out days, for ${HOUSEKEEPER.fee} coins a time. You can let her go whenever you like.` : `She'd do the bed, the bathroom, the tidying and the hot tub at eleven on check-out days, for ${HOUSEKEEPER.fee} coins a time.`}</small></span><span class="orbtns">${on ? `<button class="btn small alt" data-co="keeper">Let her go</button>` : `<button class="btn small primary" data-co="keeper">Hire her</button>`}</span></li>`;
+  };
   function todoPanel(F2, c) {
     const L3 = letState(F2), t2 = turn(F2, c), cur2 = current(F2, c), nx = nextStay(F2, c);
-    let h3 = `${tape6}<h2>Getting ${esc(COTTAGES[c].n)} ready</h2>`;
-    if (cur2) return h3 + `<p class="sub">Guests are staying until ${esc(fmtDay2(cur2.out))}. Leave them in peace.</p>${shut32}`;
-    h3 += `<p class="sub">${nx ? `Next guests: ${esc(fmtDay2(nx.in))} at 3pm.` : "No one booked in yet."} ${t2 ? "Tap each thing in the cottage to do it." : "It's clean and fresh."}</p><ul class="hlist wlist">`;
+    let h3 = `${tape6}<h2>The changeover checklist</h2>`;
+    if (cur2) return h3 + `<p class="sub">Guests are staying at ${esc(COTTAGES[c].n)} until ${esc(fmtDay2(cur2.out))}. Leave them in peace.</p><ul class="hlist wlist">${keeperRow(F2, c)}</ul>${shut32}`;
+    const left7 = toDo(F2, c).length;
+    h3 += `<p class="sub">${esc(COTTAGES[c].n)}. ${nx ? `Next guests: ${esc(fmtDay2(nx.in))} at 3pm.` : "No one booked in yet."} ${left7 ? `${left7} job${left7 === 1 ? "" : "s"} to do before they come; each ticks off as you do it.` : "All clean and fresh."}</p><ul class="hlist wlist">`;
     for (const [k, T2] of Object.entries(TASKS)) {
       if (T2.only && !tierOf(F2, c, T2.only)) continue;
-      const done = k === "basket" ? !!L3.basket[c] : k === "fridge" ? !!L3.fridge[c] : !t2 || t2[k];
-      h3 += `<li><span class="wtxt"><b>${done ? "✓ " : ""}${esc(T2.n)}</b><small>${T2.need ? T2.floor === "up" ? "Upstairs" : T2.floor === "bath" ? "In the bathroom" : T2.floor === "garden" ? "In the garden" : "Downstairs" : k === "basket" ? `A nice extra: ${T2.fruit} pieces of fruit from your backpack` : `A nice extra: ${T2.treats} treats from your backpack (milk, eggs, honey, cheese)`}</small></span>${done ? `<span class="hbadge">done</span>` : !T2.need ? `<button class="btn small primary" data-co="task:${k}">Do it</button>` : ""}</li>`;
+      const extra3 = k === "basket" || k === "fridge", done = extra3 ? filled(F2, c, k) : !t2 || t2[k], n = extra3 ? holds(F2, c, k).length : 0;
+      const sub = !extra3 ? done ? "Done" : WHERE[k] : k === "basket" ? `A nice extra: ${T2.fruit} pieces of fruit (${n} in the bowl now)` : `A nice extra: ${T2.treats} treats (${n} in the fridge now)`;
+      const btn4 = done && !extra3 ? `<span class="hbadge">done</span>` : extra3 ? `<button class="btn small ${done ? "alt" : "primary"}" data-co="view:${k}">${done ? "Look inside" : "Open"}</button>` : k === "tidy" ? `<button class="btn small primary" data-co="task:tidy">Grab the broom</button>` : "";
+      h3 += `<li><span class="wtxt"><b>${done ? "✓ " : ""}${esc(T2.n)}</b><small>${esc(sub)}</small></span><span class="orbtns">${btn4}</span></li>`;
     }
-    return h3 + `</ul>${shut32}`;
+    return h3 + keeperRow(F2, c) + `</ul>${shut32}`;
+  }
+  function boxPanel2(F2, c, k) {
+    const L3 = letState(F2), inside2 = holds(F2, c, k), need3 = wants(k), occ = occupied(F2, c), bag2 = Object.keys(F2.inv || {}).filter((id) => F2.inv[id] > 0 && fits2(k, id));
+    const name = (id) => ITEM_N(id) || id, count = {};
+    inside2.forEach((id) => {
+      count[id] = (count[id] || 0) + 1;
+    });
+    let h3 = `${tape6}<h2>${k === "basket" ? "The fruit bowl" : "The fridge"}</h2><p class="sub">${esc(COTTAGES[c].n)}. ${occ ? "Guests are staying: it's theirs for now." : `${inside2.length} of ${SPACE[k]}. ${inside2.length >= need3 ? "Enough for a lovely welcome." : `Guests notice once there are ${need3}.`} They'll enjoy it all when they arrive.`}</p>`;
+    h3 += inside2.length ? `<p class="eyebrow">Inside</p><ul class="hlist wlist">${Object.entries(count).map(([id, n]) => `<li><span class="wpic">${icon(id, 26)}</span><span class="wtxt"><b>${esc(name(id))}</b><small>${n} in ${k === "basket" ? "the bowl" : "the fridge"}</small></span><span class="orbtns">${occ ? "" : `<button class="btn small alt" data-co="take:${id}">Take one out</button>`}</span></li>`).join("")}</ul>` : `<p class="muted">${k === "basket" ? "An empty bowl." : "Empty shelves and a little light."}</p>`;
+    if (!occ) h3 += `<p class="eyebrow">From your backpack</p>` + (bag2.length ? `<ul class="hlist wlist">${bag2.map((id) => `<li><span class="wpic">${icon(id, 26)}</span><span class="wtxt"><b>${esc(name(id))}</b><small>${F2.inv[id]} with you</small></span><span class="orbtns"><button class="btn small primary" data-co="put:${id}" ${inside2.length >= SPACE[k] ? "disabled" : ""}>Put one in</button></span></li>`).join("")}</ul>` : `<p class="muted">${k === "basket" ? "No fresh fruit with you: try the orchard, the berry bushes or a trip." : "No milk, eggs, honey or cheese with you: try the farm gate."}</p>`);
+    return h3 + shut32;
   }
   function coPanel(F2, v, today2, nameOf3) {
     const c = v.c;
@@ -49467,6 +49517,7 @@ ${m.from}` : ""}`;
     if (v.v === "piece") return piecePanel(F2, c, v.id);
     if (v.v === "cal") return calendarPanel(F2, c, today2, nameOf3);
     if (v.v === "book") return guestBookPanel(F2, c, nameOf3);
+    if (v.v === "basket" || v.v === "fridge") return boxPanel2(F2, c, v.v);
     return todoPanel(F2, c);
   }
   function wireLets(root, F2, v, api4) {
@@ -49534,13 +49585,22 @@ ${m.from}` : ""}`;
         const L3 = letState(F2);
         setKeeper(F2, c, !L3.keeper[c]);
         api4.sfx("chime");
-        api4.say(L3.keeper[c] ? `${HOUSEKEEPER.n}'s hired: she'll turn ${COTTAGES[c].n} round after every stay. The basket and the fridge are still yours.` : `You'll do the changeovers yourself.`);
+        api4.say(L3.keeper[c] ? `${HOUSEKEEPER.n}'s hired: she'll turn ${COTTAGES[c].n} round after every stay. The basket and the fridge are still yours.` : `You've let ${HOUSEKEEPER.n} go, with a thank-you and a jar of honey. You'll do the changeovers at ${COTTAGES[c].n} yourself.`);
         api4.save();
         api4.rerender();
         return;
       }
       if (a === "task") {
         api4.task(c, k);
+        return;
+      }
+      if (a === "put" || a === "take") {
+        const r = a === "put" ? putIn(F2, c, v.v, k) : takeOut(F2, c, v.v, k);
+        if (!r.ok) return r.msg && api4.say(r.msg);
+        api4.sfx(a === "put" ? "paper" : "tap");
+        api4.save();
+        api4.rerender();
+        api4.redraw();
         return;
       }
     });
@@ -49820,7 +49880,7 @@ ${m.from}` : ""}`;
     const note3 = ST.fridge ? `<g transform="rotate(-6 ${sx} 212)"><rect x="${sx - 13}" y="205" width="26" height="14" rx="1" fill="#F4C7CF" stroke="${INK6}" stroke-width=".5"/>${txt7(sx, 214, "Welcome!", 5.4, INK6, 700)}<circle cx="${sx}" cy="205" r="1.8" fill="${S2.accent}"/></g>` : "";
     return otherSpot(
       "fridge",
-      ST.fridge ? "The fridge: welcome treats inside" : "The fridge",
+      ST.fridge ? `The fridge: ${ST.fridge} welcome treat${ST.fridge === 1 ? "" : "s"} inside` : "The fridge",
       hovE10(sx, 246, 22, 9),
       D5(`<path d="M${x0} ${y} V185 q0 -9 9 -9 h14 q9 0 9 9 V${y}z" style="fill:${col}"/>`, `<path d="M${x0} 198 h32" stroke="${dk(col, 0.3)}" stroke-width="1"/><path d="M${x0 + 4} 186 v8 M${x0 + 4} 203 v16" stroke="#9AA0A6" stroke-width="2.4" stroke-linecap="round"/><circle cx="${x0 + 24}" cy="226" r="1.8" fill="#C8553D"/><circle cx="${x0 + 14}" cy="232" r="1.8" fill="#7FA06B"/>`) + note3 + lab21(sx, 254, "Fridge", "#E6EEF2", 7)
     );
@@ -49838,14 +49898,14 @@ ${m.from}` : ""}`;
     return back + D5(top + (t2 === 1 ? "" : legs2), (t2 === 1 ? legs2 : "") + ends + runner);
   }
   function fruitBowl() {
-    const [dx, dy] = at8("dining"), t2 = tier("dining"), x = dx - 14, y = t2 ? dy - 28 : dy - 4;
-    const fruit = ST.basket ? `<circle cx="${x - 4}" cy="${y - 5}" r="3.2" fill="#D9433A"/><circle cx="${x + 2}" cy="${y - 6}" r="3.2" fill="#F2A03A"/><path d="M${x + 6} ${y - 3} q-3 -6 1 -8 q3 2 2 8z" fill="#A8C25A"/><circle cx="${x - 1}" cy="${y - 3}" r="2.8" fill="#7A4A66"/>` : "";
+    const [dx, dy] = at8("dining"), t2 = tier("dining"), x = dx - 14, y = t2 ? dy - 28 : dy - 4, n = Math.min(6, +ST.basket || 0);
+    const P21 = [[-5, -5, "#D9433A"], [2, -6, "#F2A03A"], [8, -4, "#A8C25A"], [-1, -2, "#7A4A66"], [-8, -2, "#F3C969"], [5, -9, "#E8574C"]];
+    const fruit = P21.slice(0, n).map(([fx, fy, c]) => `<circle cx="${x + fx}" cy="${y + fy}" r="3.4" fill="${c}" stroke="${INK6}" stroke-width=".5"/>`).join("");
     return otherSpot(
       "basket",
-      ST.basket ? "The fruit basket, full" : "The fruit basket, empty",
-      hovE10(x, y + 2, 13, 7) + `<rect x="${x - 22}" y="${y - 22}" width="44" height="32" rx="8" fill="transparent" pointer-events="all"/>`,
-      // round 254 (Mel: tapping the basket opened the dining table): a finger-sized tap area over the bowl, above the table's
-      `<g pointer-events="none">${fruit}${D5(`<path d="M${x - 9} ${y - 3} h18 q-2 6 -9 6 q-7 0 -9 -6z" style="fill:#C9A26A"/>`)}</g>`
+      n ? `The fruit bowl: ${n} piece${n === 1 ? "" : "s"} of fruit` : "The fruit bowl, empty",
+      hovE10(x, y + 2, 16, 8) + `<rect x="${x - 34}" y="${y - 34}" width="68" height="52" rx="10" fill="transparent" pointer-events="all"/>`,
+      `<g pointer-events="none">${fruit}${D5(`<path d="M${x - 11} ${y - 3} h22 q-2 7 -11 7 q-9 0 -11 -7z" style="fill:#C9A26A"/>`)}</g>`
     );
   }
   function rug(t2, x, y) {
@@ -52401,13 +52461,13 @@ ${m.from}` : ""}`;
     // round 233: and Formentera's
   };
   var canKeep = (it) => !!it && (it.kind === "keepsake" || !!it.keep);
-  var fits2 = (it, sp) => canKeep(it) && (sp.only ? !!it[sp.only] : !it.magnet);
+  var fits3 = (it, sp) => canKeep(it) && (sp.only ? !!it[sp.only] : !it.magnet);
   var BUILDING = { scoopshop: "The Scoop Shack", wineshop: "The wine shop", home: "Home", room: "Your room", office: "The home office", cocoa: "The Cocoa Room", greenhouse: "The greenhouse", mill: "The old mill", chord: "Chord workshop", chico: "Chico cottage", luna: "Luna house", ohayo: "Ohayo house" };
   var onWhat = (sp) => sp.only ? `on the fridge at ${sp.n.replace(/, .*/, "")}` : `on the shelf in ${sp.n}`;
   var keeps = (F2) => F2.keeps = F2.keeps || {};
   function placeKeep(F2, item, spot15) {
     const it = ITEMS[item], sp = KEEP_SPOTS[spot15];
-    if (!it || !sp || !fits2(it, sp) || !(F2.inv[item] > 0)) return null;
+    if (!it || !sp || !fits3(it, sp) || !(F2.inv[item] > 0)) return null;
     const K4 = keeps(F2), old = K4[spot15];
     F2.inv[item]--;
     if (!F2.inv[item]) delete F2.inv[item];
@@ -52424,7 +52484,7 @@ ${m.from}` : ""}`;
   }
   function keepPanel(F2, item) {
     const it = ITEMS[item], K4 = keeps(F2);
-    const by = Object.keys(BUILDING).map((sc) => [sc, Object.keys(KEEP_SPOTS).filter((k) => KEEP_SPOTS[k].scene === sc && fits2(it, KEEP_SPOTS[k]))]).filter(([, ks]) => ks.length);
+    const by = Object.keys(BUILDING).map((sc) => [sc, Object.keys(KEEP_SPOTS).filter((k) => KEEP_SPOTS[k].scene === sc && fits3(it, KEEP_SPOTS[k]))]).filter(([, ks]) => ks.length);
     return `<span class="tape stripe" aria-hidden="true"></span><h2>${esc(it ? it.n : "A keepsake")}</h2><p class="sub">${esc(it ? it.line || "" : "")} ${it && it.magnet ? "Where shall it go?" : "Which shelf?"}</p>
     ${by.map(([sc, ks]) => `<p class="eyebrow" style="margin:10px 0 4px">${esc(BUILDING[sc])}</p><div class="vhelp">${ks.map((k) => `<button class="vhelpi" data-keepat="${k}"><span><b>${esc(KEEP_SPOTS[k].n.replace(/^[^,]+, /, "").replace(/^./, (c) => c.toUpperCase()))}</b><small>${K4[k] ? `${esc(ITEMS[K4[k]].n)} there now (it comes back to you)` : KEEP_SPOTS[k].only ? "nothing on it yet" : "empty shelf"}</small></span></button>`).join("")}</div>`).join("")}
     <div class="actions"><button class="btn alt small" data-close="1">Close</button></div>`;
@@ -56077,7 +56137,7 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
         const ids = Object.keys(F.inv || {}).filter((x) => placeFor(x) === where), k = ids.reduce((t2, x) => t2 + putAway(F, where, x), 0);
         if (k) line = `${k} thing${k > 1 ? "s" : ""}, put away in ${where === "shelf" ? "the garage" : "the fridge"}.`;
       } else if (a === "take") {
-        const k = takeOut(F, where, id, n);
+        const k = takeOut2(F, where, id, n);
         if (k) line = `${k} ${ITEMS[id].n.toLowerCase()}, into your backpack.`;
       } else if (a === "send") {
         const sh = SHOPS.find((x) => x.k === b.dataset.to), k = sendOff(F, where, id, b.dataset.to);
@@ -60626,10 +60686,10 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     $("crown").style.display = S3.crown ? "" : "none";
     pose();
     if (!speechLock) $("speech").textContent = plain(say2 ? say2.line : defaultLine());
-    const span = next ? next.xp - LEVELS[L3].xp : 1, into = next ? F.xp - LEVELS[L3].xp : 1, filled = Math.round(Math.min(1, into / span) * 5);
+    const span = next ? next.xp - LEVELS[L3].xp : 1, into = next ? F.xp - LEVELS[L3].xp : 1, filled2 = Math.round(Math.min(1, into / span) * 5);
     const ftabs = [["where", "Who's where"], ["maple", esc(F.name)], ["stories", "Stories"], ["family", "Family"]], noHead = (h3) => h3.replace(/^\s*<h3 class="ph3">[^<]*<\/h3>/, "");
     $("friendTitle").textContent = { where: "Who's where today", maple: `Friendship with ${F.name}`, stories: "Stories so far", family: "Family" }[friendTab];
-    const fbody = friendTab === "where" ? noHead(whosWhereHTML()) : friendTab === "stories" ? noHead(storiesHTML(F, Object.fromEntries(NPCS.map((n) => [n.id, n.name])))) : friendTab === "family" ? `<p class="muted">${icon("heart", 14)} Gifts for Evan: ${F.fam.gifts.evan} · for Darren: ${F.fam.gifts.darren}. Every third gift, they give you something back. Treats and keepsakes are in the market's Family tab.</p>` : `<p class="hearts" aria-label="${filled} of 5 hearts to next level">${Array.from({ length: 5 }, (_, i) => icon("heart", 22, i < filled ? "" : "faint")).join("")}</p>
+    const fbody = friendTab === "where" ? noHead(whosWhereHTML()) : friendTab === "stories" ? noHead(storiesHTML(F, Object.fromEntries(NPCS.map((n) => [n.id, n.name])))) : friendTab === "family" ? `<p class="muted">${icon("heart", 14)} Gifts for Evan: ${F.fam.gifts.evan} · for Darren: ${F.fam.gifts.darren}. Every third gift, they give you something back. Treats and keepsakes are in the market's Family tab.</p>` : `<p class="hearts" aria-label="${filled2} of 5 hearts to next level">${Array.from({ length: 5 }, (_, i) => icon("heart", 22, i < filled2 ? "" : "faint")).join("")}</p>
     <p class="muted">${esc(F.name)} is your ${LEVELS[L3].name}. ${next ? `Next up: ${next.name}${next.gift ? `, which brings ${next.gift}` : ""}.` : "Friendship maxed!"} ${F.days || 0} day${F.days === 1 ? "" : "s"} together. It grows when you show up, feed, play and garden, and never goes down.</p>
     <h3 class="ph3">Village upgrades</h3>
     <p class="muted">${F.totalQuests || 0} quests finished so far. ${(() => {
@@ -62446,8 +62506,8 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       tiers: L3.tiers[c],
       acc: L3.acc[c],
       turn: turn(F, c),
-      basket: !!L3.basket[c],
-      fridge: !!L3.fridge[c],
+      basket: holds(F, c, "basket").length,
+      fridge: holds(F, c, "fridge").length,
       occupied: occupied(F, c),
       night: m >= 18 * 60 || m < 6 * 60,
       crates: []
@@ -62520,11 +62580,12 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
     if (id === "guestbook") return open2("book");
     if (id === "catalogue") return open2("cat");
     const t2 = turn(F, c), k = CO_TASK_OF[id];
-    if (k && (k === "basket" || k === "fridge" || t2 && !t2[k])) {
+    if (id === "basket" || id === "fridge") return open2(id);
+    if (id === "tidy") return open2("todo");
+    if (k && t2 && !t2[k]) {
       go(scene, x, y, () => coTask(c, k));
       return;
     }
-    if (id === "tidy") return open2("todo");
     if (PIECES[id]) {
       go(scene, x, y, () => {
         coView = { c, v: "piece", id };

@@ -3008,3 +3008,5 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Round 321: the cottages' fruit bowl and fridge open up, the broom cupboard is a checklist, Hattie can be let go (Mel: "can the bowl or fridge open up into a modal so I can see what's there, add stuff or take away stuff. Also the tap area for the bowl must be bigger. Also ... the broom cupboard is tappable and opens a checklist that is then checked off if I clean the relevant item. Also I must be able to stop hiring Hattie")
 - lets.js putIn/takeOut/holds/filled (SPACE 6); letpanels.js boxPanel and the new todoPanel checklist with a Hattie row (Hire her / Let her go); core.js coSpot opens them; cottages.js fruitBowl bigger with a count. Port doc section 24. Pictures: screens-bottom-row/round321-*.png.
+
+## Build v251 (round 321) published at Mel's say-so without a full run (slow container); the cottages block (33 checks) passed.
