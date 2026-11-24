@@ -2286,6 +2286,15 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
     check(wr(vx.xmasDress("bay", has(["scoop", "cocoa"]), false)) === 2 && wr(vx.xmasDress("bay", has(["scoop"]), false)) === 1 && vx.xmasDress("bay", has([]), false) === "" && wr(vx.xmasDress("vineyard", has(["vine"]), false)) === 1
       && wr(vx.xmasDress("hlane", has([]), false)) === 4 && wr(vx.xmasDress("lane", has([]), false)) === 4 && wr(vx.xmasDress("base", has([]), false)) === 1,
       "the Scoop Shack, the Cocoa Room and the wine shop get wreaths and lights once they're yours; every house and cottage gets them too"); }
+  { // round 323: December snow, the snowbanks after, and winter clothes
+    const vx = await import(new URL("../src/art/village-extras.js", import.meta.url)), pp = await import(new URL("../src/art/people.js", import.meta.url));
+    const w = vx.showerAt("2026-12-01"), mid = Math.floor((w.from + w.to)/2);
+    check(vx.rainDay("2026-12-01") && vx.snowingOn("2026-12-01", mid) && !vx.snowingOn("2026-12-01", w.from - 5) && !vx.snowingOn("2026-11-12", vx.showerAt("2026-11-12").from + 5)
+      && vx.snowLying("2026-12-01", w.to + 30) && vx.snowLying("2026-12-02", w.to - 10) && !vx.snowLying("2026-12-02", w.to + 10) && !vx.snowLying("2026-12-01", w.from - 5),
+      "in December a shower falls as snow, and the snow lies till the same time the next day (round 323)");
+    const sg = ["marco", "ines", "hana", "theo", "celeste", "sofia", "penny", "bram"].map(id => pp.snowGearFor(id)), lk = {skin: "#E8C4A0", hair: "#2F2B28", top: "#6E9FD6", bottom: "#5E5A55", hat: "sunhat"};
+    check(sg.every(g => g.kind === "jacket") && new Set(sg.map(g => g.acc)).size >= 3 && /wintergear/.test(pp.personArt({...lk, rain: sg[0]})) && /class="rcoat"/.test(pp.personArt({...lk, rain: sg[0]})) && /DRIFTS|snowbank/.test(vx.snowDrifts("village")),
+      "while it snows, everyone wears a winter jacket, with scarves, bobble hats or earmuffs; snowbanks in the village"); }
   { // round 317: the coach party you can see
     const cc = await import(new URL("../src/art/coachcrowd.js", import.meta.url)), hp = await import(new URL("../src/game/happen.js", import.meta.url));
     check(cc.crowdLevel([660, 780], 659) === 0 && cc.crowdLevel([660, 780], 660) > 0 && cc.crowdLevel([660, 780], 660) < .2 && cc.crowdLevel([660, 780], 720) === 1 && cc.crowdLevel([660, 780], 775) < .5 && cc.crowdLevel([660, 780], 780) === 0, "the coach party arrives over twelve minutes and drifts off over the last quarter hour (round 317)");

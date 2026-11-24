@@ -250,6 +250,13 @@ HANDOFF.md round 322.
 - Follow-ups (Mel: "maybe the town square tree can move to just behind the Good News board"; "make sure that the restaurant, Scoop Shack and Chocolate Room, if they've all been bought, all show Christmas decorations as well? Same for houses"): No tree in the town square after all (Mel: the tree behind the Good News board "looks odd, remove that"): the big tree is in the field; `xmasTree` stays in village-extras.js unused. `XMAS_DRESS` (per scene: eaves lights and a door wreath for each building, with `need` "scoop", "cocoa" or "vine" for the shops) and `xmasDress(scene, has, dark)`; `core.js` drawScene adds it to the bay, the vineyard, home, the lane of holiday cottages and the lane of app houses. Check the positions against this edition's buildings.
 - Test: the round 322 unit checks.
 
+### 26. Snow in December (round 323)
+HANDOFF.md round 323. Mel: "add snow to the village in December"; "if it has snowed, then The Village would have some snowbanks ... for about 24 hours after the snow"; "If it's snowing, everyone should be wearing jackets, some scarves, some hats, and some earmuffs."
+- `art/village-extras.js`: `snowMonth(day)`, `snowingOn(day, hm)` (a December shower, the same days and times rain would fall), `snowLying(day, hm)` (from the start of a snowfall until the same time the next day), `DRIFTS` (snowbank spots per outdoor scene) and `snowDrifts(scene)`.
+- `index.html` a `#snow` layer beside `#rain`; `styles/game-ui.css` `.map .snow` (soft flakes drifting down over a light frosty wash, still under reduced motion). `core.js` drawScene shows it while it snows (and hides the rain), adds the drifts while snow lies, and says one line on each snowy day.
+- `art/people.js`: `snowGearFor(seed)` (a jacket and boots, and a scarf, bobble hat, earmuffs or scarf and hat, each villager their own) and `winterArt(g, k, y, r)`; in `personArt` a `jacket` is drawn like the raincoat without the hood, and a hat or earmuffs take the place of the villager's own hat. `game/npcs.js` gives villagers snow gear instead of rain gear in December. `core.js` `dressRain`: Mel in a red bobble hat and scarf, Evan in a navy jacket and a yellow bobble hat.
+- Tests: the round 323 unit checks. Check the drift spots against this edition's scenes.
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.

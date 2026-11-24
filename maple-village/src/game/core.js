@@ -3,7 +3,7 @@ import { H, M, W, HH, now, dayKey, sgHM, prevDay, $, esc, pick, rnd, clamp, dur,
 import { icon, progressBar, progressBarV } from "../art/icons.js";
 import { VILLAGE, WORK, ROOMS, MAPLE_BED, OUTDOOR, BRIDGES, ARRIVE, INNER, nextHop, outdoorOf, isWeekend, stationsOf, spotObj, placeOf, spotOf, isTreadTask, SOUTH } from "../data/world.js";
 import { CROPS, ITEMS, DECOR, PLOTS, QUEST_BOOST, LEVELS, PEP, YAY, itemIco, seasonOf, SEASONS } from "../data/items.js";
-import { brollyArt, hoodArt } from "../art/people.js";
+import { brollyArt, hoodArt, winterArt } from "../art/people.js";
 import { UPGRADES, unlocked, nextUpgrade, festivalOn, rainyOn, stormyOn, rainLevel, rainDay, roughSea, FESTIVALS } from "../art/village-extras.js";
 import { foreArt, villageArt, baseArt, laneArt, roomArt, farmArt, vineyardArt, orchardArt, flowerFarmArt, setArtContext } from "../art/scenes.js";
 import { vineSpot, vineScene } from "../art/vineyard.js";
@@ -2580,16 +2580,18 @@ function questMark(){
 }
 function drawScene(){
   const ssn = seasonOf(dayKey()); ["spring", "summer", "autumn", "winter"].forEach(k => document.body.classList.toggle("season-" + k, k === ssn));
-  const day = dayKey(), wet = outside() && !townOf(scene) && rainyOn(day), fest = festivalOn(day);
-  $("rain").hidden = !wet; $("rain").classList.toggle("light", rainLevel(day) === 1);
+  const day = dayKey(), snowy = outside() && !townOf(scene) && XV.snowingOn(day), wet = outside() && !townOf(scene) && rainyOn(day) && !snowy, fest = festivalOn(day);   // round 323: December snow instead of rain
+  $("rain").hidden = !wet; $("snow").hidden = !snowy; $("rain").classList.toggle("light", rainLevel(day) === 1);
   if (scene === "vineyard" && fest && fest.id === "harvest" && S.harvestSaid !== day) { S.harvestSaid = day; setTimeout(() => speak("It's the grape harvest! Bunting's up, and every vine gives an extra bunch this week.", 6000), 1500); }
   else if (scene === "village" && fest && !fest.vineyard && S.festSaid !== day) { S.festSaid = day; setTimeout(() => speak(`${fest.name} decorations are up in the town square!`, 5000), 1500); }
   else if (scene === "base" && S.hestiaSaid !== day && hestiaCounts().chores) { S.hestiaSaid = day; const n = hestiaCounts().chores; setTimeout(() => speak(`${n} home chore${n > 1 ? "s" : ""} waiting in the cleaning cupboard. No rush.`, 5000), 2600); }
   else if (scene === "base" && isWeekend() && S.weekendSaid !== day) { S.weekendSaid = day; setTimeout(() => speak("Weekend! Home things happen here at home. Any work quests still wait in town.", 5500), 2200); }
   else if (wet && S.rainSaid !== day) { S.rainSaid = day; const light = rainLevel(day) === 1; setTimeout(() => speak(light ? "A light shower blowing through. Brollies up! It won't last long." : "A downpour! It'll pass within the hour. Perfect for a cosy indoor quest meanwhile.", 4500), 1500); }
+  else if (snowy && F.snowSaid !== day) { F.snowSaid = day; setTimeout(() => speak("Snow! Soft flakes drifting down over the rooftops. Scarves and hats on, everyone.", 5000), 1500); }   // round 323: once each snowy day
   $("fore").innerHTML = outside() ? "" : foreArt(scene);
   tableKey = "";
   $("sceneArt").innerHTML = scene === "vshed" ? shedArt(shedNow()) : scene === "vloft" ? loftArt(loftNow()) : scene === "winecave" ? caveArt({laid: SC.laidCount(F), old: Object.values(SC.secretState(F).old).filter(Boolean).length, supper: SC.supperNow(dayKey(), sgHM()), guests: 4}) : coOf(scene) ? cottageArt(scene, coArt()) : scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : scene === "lowervine" ? lowerVineArt(vineState(F), SO.ruinState(F).step) : scene === "green" ? greenArt() : scene === "allotment" ? allotmentArt() : scene === "bramcot" ? bramCottageArt(isHere("bram")) : /^lhtower[123]$/.test(scene) ? towerArt(scene, {night: sgHM() >= 19*60 || sgHM() < 6*60, curios: Object.keys(TW.towerState(F).curios).length, bottles: TW.bottlesFound(F), logDays: TW.towerState(F).log.length, bram: isHere("bram")}) : scene === "stables" ? stablesArt(!!(F.south && F.south.mine)) : scene === "lighthouse" ? lighthouseArt(sgHM() >= 19*60 || sgHM() < 6*60, SO.chipsOpen(sgHM())) : townRoom(scene) ? (townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "porto" ? portoRoomArt(scene) : townOf(scene) === "puffin" ? puffinRoomArt(scene) : townOf(scene) === "bali" ? baliRoomArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoRoomArt(scene) : townOf(scene) === "formentera" ? formenteraRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene): TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene): TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene)) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene): townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "porto" ? portoArt(scene) : townOf(scene) === "puffin" ? puffinArt(scene) : townOf(scene) === "bali" ? baliArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoArt(scene) : townOf(scene) === "formentera" ? formenteraArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), {shop: owns(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F))}) : roomArt(scene);
+  if (outside() && !townOf(scene) && XV.snowLying(dayKey())) $("sceneArt").insertAdjacentHTML("beforeend", XV.snowDrifts(scene));   // round 323: snowbanks for a day after it snows
   if (XV.xmasDecorOn(dayKey()) && XV.XMAS_DRESS[scene]) $("sceneArt").insertAdjacentHTML("beforeend", XV.xmasDress(scene, n => n === "scoop" ? !!F.scoop : n === "cocoa" ? owns(F, "cocoa") : n === "vine" ? !!F.vine : true, sgHM() >= 16*60 + 30 || sgHM() < 7*60));   // round 322: wreaths and lights on the shops and houses
   { const cw = coachCrowdNow(); if (cw && cw.rooms[scene]) $("sceneArt").insertAdjacentHTML("beforeend", crowdArt(scene, cw.rooms[scene], cw.seed)); if (cw && scene === "vineyard" && cw.places.includes("vineyard")) $("sceneArt").insertAdjacentHTML("beforeend", coachArt()); }   // round 317: the coach party, drawn
   if (scene === "cellar" && SC.secretState(F).step) $("sceneArt").insertAdjacentHTML("beforeend", cellarSecretArt(SC.secretState(F).step));
@@ -3131,14 +3133,16 @@ function fishBite(){ const c = fishSt.cast; if (!c || !fishSpot) return; c.t0 = 
   fishT = setTimeout(() => { if (fishSt.cast === c) { fishSt = {msg: "It nibbled the worm and slipped away while you weren't looking."}; dressMel(); ctx(); } }, FISH_ESCAPE); }
 // Rainy days outdoors: Mel under her periwinkle brolly with white dots; Evan in a yellow raincoat, hood up, red wellies.
 const MEL_BROLLY = {kind: "brolly", a: "#9AA9DD", b: "#FFFDF6", pat: "dots"}, EVAN_COAT = {kind: "coat", a: "#F3C969", b: "#E8566C"};
+const MEL_SNOW = {kind: "jacket", a: "#C8323A", acc: "scarfhat", w: "#C8323A"}, EVAN_SNOW = {kind: "jacket", a: "#2E3A70", acc: "scarfhat", w: "#F3C969"};
 let rainDressed = null;
 function dressRain(){
-  const wet = outside() && !townOf(scene) && rainyOn(dayKey()) && !($("mel") && $("mel").classList.contains("sup")), k = wet ? "y" : "";
+  const out = outside() && !townOf(scene) && !($("mel") && $("mel").classList.contains("sup")), snow = out && XV.snowingOn(dayKey()), wet = out && rainyOn(dayKey()) && !snow, k = snow ? "s" : wet ? "y" : "";
   if (k === rainDressed) return; rainDressed = k;
   const mr = $("melRain"), er = $("evanRain"), ev = $("evan");
-  if (mr) mr.innerHTML = wet ? brollyArt(MEL_BROLLY, 1) : "";
-  if (er) er.innerHTML = wet ? hoodArt(EVAN_COAT, .61, -28, 8.6) : "";
-  if (ev) { ev.classList.toggle("raincoat", wet); if (wet) ev.style.setProperty("--tee", EVAN_COAT.a); else ev.style.removeProperty("--tee"); }
+  // round 323: in the snow, Mel in a red bobble hat and scarf; Evan in his navy jacket and a yellow bobble hat
+  if (mr) mr.innerHTML = wet ? brollyArt(MEL_BROLLY, 1) : snow ? winterArt(MEL_SNOW, 1) : "";
+  if (er) er.innerHTML = wet ? hoodArt(EVAN_COAT, .61, -28, 8.6) : snow ? winterArt(EVAN_SNOW, .61, -28, 8.6) : "";
+  if (ev) { const coat = wet ? EVAN_COAT.a : snow ? EVAN_SNOW.a : ""; ev.classList.toggle("raincoat", wet || snow); if (coat) ev.style.setProperty("--tee", coat); else ev.style.removeProperty("--tee"); }
 }
 function dressMel(){
   const d = F.decor || {}, show = (id, on) => { const e = $(id); if (e) e.style.display = on ? "" : "none"; };

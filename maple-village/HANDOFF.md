@@ -3019,3 +3019,7 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - Then (Mel: the tree behind the Good News board "looks odd, remove that"): no tree in the town square; scenes.js no longer draws xmasTree. The rest of the decorations stay.
 
 ## Build v253 published: the town square tree removed (Mel asked). Section 25 sent to the public session.
+
+## Round 323: snow in December, snowbanks for a day, winter clothes (Mel: "add snow to the village in December"; "snowbanks ... for about 24 hours after the snow"; "If it's snowing, everyone should be wearing jackets, some scarves, some hats, and some earmuffs")
+- village-extras.js snowingOn / snowLying / DRIFTS / snowDrifts; #snow layer and .map .snow CSS; core.js drawScene and dressRain (Mel and Evan's hats and scarves); people.js snowGearFor / winterArt and the jacket in personArt; npcs.js snow gear in December. Port doc section 26. Pictures: screens-bottom-row/round323-*.png.
+- Mel asked why the seasons hadn't changed since September: they do (trees and grass via body.season-* CSS, crops by season lists), but September to November is all autumn; winter starts on 1 December.

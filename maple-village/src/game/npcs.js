@@ -1,8 +1,8 @@
 // NPC engine: places villagers by their Singapore-time routine, walks them about, handles taps and daily reactions,
 // and runs agent messengers who carry unread mail to Mel. Core owns the frame loop and calls tickNpcs / tapNpc.
 import { NPCS, AGENTS } from "../data/npcs.js";
-import { personArt, letterArt, rainGearFor } from "../art/people.js";
-import { rainyOn } from "../art/village-extras.js";
+import { personArt, letterArt, rainGearFor, snowGearFor } from "../art/people.js";
+import { rainyOn, snowMonth } from "../art/village-extras.js";
 import { OUTDOOR } from "../data/world.js";
 import { sgHM, now, H, pick, rnd, clamp, $, plain, esc, dayKey } from "../util.js";
 import { lunchSlot } from "./lunch.js";
@@ -106,7 +106,8 @@ function makeNode(id, look, kid, letter, act){
   const owned = (api.F().fam && api.F().fam.owned) || {};
   if (id === "darren" && act === "type" && owned.headphones) look = Object.assign({}, look, {headphones: true});
   // a rainy day outdoors: everyone has their own brolly or raincoat (a coat if their right hand's busy or they're on a board)
-  if (OUTDOOR.includes(api.scene()) && !townOf(api.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, {rain: rainGearFor(id, {coat: !!look.bike || !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look.extra)})});
+  // round 323: in December's snow, a winter jacket and boots, and a scarf, bobble hat or earmuffs instead
+  if (OUTDOOR.includes(api.scene()) && !townOf(api.scene()) && rainyOn(dayKey()) && !look.board) look = Object.assign({}, look, {rain: snowMonth(dayKey()) ? snowGearFor(id) : rainGearFor(id, {coat: !!look.bike || !!look.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look.extra)})});
   g.innerHTML = personArt(look, kid) + (letter ? `<g class="letter">${letterArt}</g>` : "") + `<g class="storycue" transform="translate(0 ${kid ? -48 : -72})" pointer-events="none"><g filter="url(#wob)"><rect x="-13" y="-9" width="26" height="16" rx="8" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1.2"/><circle cx="-6" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="0" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="6" cy="-1" r="1.8" style="fill:var(--line)"/></g></g>`;
   $("actors").appendChild(g);
   return g;
