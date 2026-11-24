@@ -93,6 +93,29 @@ export function rainSpell(day){ if (!dayRain(day)) return null; const from = 7*6
 export function rainLevel(day, hm){ const l = dayRain(day); if (!l || hm == null) return l; const s = rainSpell(day); return hm >= s.from && hm < s.to ? l : 0; }
 export const rainyOn = (day, hm) => rainLevel(day, hm) > 0;
 export const stormyOn = (day, hm) => rainLevel(day, hm) === 2;
+// round 323: in December a
+// shower falls as snow (the same days and times as rain would). The snow lies until the same time the next day.
+export const snowMonth = day => String(day).slice(5, 7) === "12";
+export const snowingOn = (day, hm) => snowMonth(day) && rainyOn(day, hm);
+const dayBefore = day => new Date(Date.parse(day + "T00:00:00Z") - 864e5).toISOString().slice(0, 10);
+export function snowLying(day, hm){
+  if (snowMonth(day) && rainDay(day) && hm >= rainSpell(day).from) return true;   // falling now, or fallen earlier today
+  const y = dayBefore(day); return snowMonth(y) && !!rainDay(y) && hm < rainSpell(y).to;   // yesterday's, till the same time today
+}
+// the drifts, scene by scene: open ground beside paths and under hedges
+export const DRIFTS = {
+  village: [[30, 506, 1], [492, 506, 1.1], [442, 592, .9], [330, 404, .8], [24, 410, .8], [470, 238, .8]],
+  base: [[26, 402, 1], [470, 330, .9], [200, 540, .8], [380, 470, .9], [30, 560, 1]],
+  bay: [[300, 600, 1], [480, 330, .9], [430, 560, .7], [470, 600, .9]],   // (this edition: clear of the boardwalk)
+  vineyard: [[30, 560, 1], [40, 262, .8], [260, 470, .7], [470, 520, .9]],
+  lane: [[30, 600, 1], [470, 500, .9], [250, 300, .7], [480, 200, .8]],
+  hlane: [[30, 480, 1], [470, 540, .9], [200, 360, .7], [460, 440, .8]],
+  green: [[40, 560, 1], [470, 560, .9], [260, 300, .8]], orchard: [[30, 560, 1], [480, 560, .9], [260, 330, .7]]
+};
+export function snowDrifts(scene){
+  const list = DRIFTS[scene] || [[36, 600, 1], [484, 600, 1]];
+  return `<g class="snowbank" pointer-events="none">${list.map(([x, y, s]) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="2" cy="3" rx="30" ry="7" fill="#B9C8D6" opacity=".35"/><path d="M-30 2 Q-24 -10 -12 -8 Q-4 -16 6 -9 Q16 -14 24 -5 Q31 -2 30 3 Z" fill="#FFFFFF" style="stroke:var(--line)" stroke-width=".8"/><path d="M-18 -5 q5 -3 9 -1 M8 -6 q5 -2 8 1" fill="none" stroke="#D6E2EC" stroke-width="1.2"/></g>`).join("")}</g>`;
+}
 // round 306: with downpours so much commoner, the sea's only too rough to sail from half an hour before one until two
 // hours after it
 export const roughSea = (day, hm) => { if (dayRain(day) !== 2) return false; const w = rainSpell(day); return hm >= w.from - 30 && hm < w.to + 120; };

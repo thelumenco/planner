@@ -257,6 +257,13 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .map .rain[hidden]{display:none}
 .map .rain.light{opacity:.2;background-size:260px 260px;animation-duration:.8s}
 @keyframes rainfall{from{background-position:0 0}to{background-position:-40px 200px}}
+/* round 323: soft flakes drifting down over a frosty wash, outdoors at home all December */
+.map .snow{position:absolute;inset:0;z-index:2;pointer-events:none;background-color:rgba(255,255,255,.16);
+  background-image:radial-gradient(circle,#fff 0 1.8px,transparent 2.4px),radial-gradient(circle,#fff 0 1.2px,transparent 1.8px),radial-gradient(circle,rgba(255,255,255,.9) 0 2.4px,transparent 3px);
+  background-size:90px 110px,60px 70px,150px 170px;background-position:0 0,30px 20px,70px 40px;animation:snowfall 14s linear infinite;opacity:.9}
+.map .snow[hidden]{display:none}
+@keyframes snowfall{from{background-position:0 0,30px 20px,70px 40px}to{background-position:30px 440px,10px 420px,90px 380px}}
+@media (prefers-reduced-motion:reduce){.map .snow{animation:none}}
 .floaty{animation:floaty 3s ease-in-out infinite;transform-box:fill-box}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .uplist{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:4px;font-size:.88rem}

@@ -613,3 +613,18 @@ for line. (A friend's question, "Where's the fruit bowl though": the bowl was on
   `xmasTree` stays in the file, unused. The positions match this edition's buildings (checked with screenshots).
 - scenes.js `villageArt` adds the village decor; core.js `drawScene` adds the shop and house dressing.
 - Test: the round 322 checks in "Scoop Shack upgrades".
+
+## Round 323 (ported): snow in December
+
+- art/village-extras.js: `snowMonth`, `snowingOn(day, hm)` (a December shower falls as snow, on the same days and at
+  the same times rain would, from `rainSpell`), `snowLying(day, hm)` (the snow lies till the same time the next day),
+  `DRIFTS` and `snowDrifts(scene)`. This edition takes the time as an argument (no default clock), and the bay's middle
+  drift is moved clear of the boardwalk.
+- index.html `#snow` layer and `.map .snow` in game-ui.css: soft flakes over a light frost wash (still under reduced
+  motion). core.js `drawScene` shows the snow instead of the rain, adds the drifts while snow lies, and says one line
+  on each snowy day (`S.snowSaid`); `rainWas` counts snow too, so the 20 second weather check doesn't redraw in a loop.
+- art/people.js: `snowGearFor` (a winter jacket and boots, and a scarf, bobble hat, earmuffs, or scarf and hat) and
+  `winterArt`; in `personArt` a `jacket` is the raincoat without the hood, and a hat or earmuffs replace the
+  villager's own hat. npcs.js uses snow gear instead of rain gear in December. core.js `dressRain` puts the player in a
+  red bobble hat and scarf (this edition has no child to dress).
+- Test: the round 323 checks in "Scoop Shack upgrades" (the November shower day is 3 November in this edition).

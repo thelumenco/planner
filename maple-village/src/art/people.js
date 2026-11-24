@@ -281,6 +281,22 @@ export function brollyArt(g, k){
     <defs><clipPath id="${id}"><path d="${clip}"/></clipPath></defs><path d="${dome} ${hem}z" style="fill:${g.a}"${alpha}/><g clip-path="url(#${id})">${deco}</g>${ribs}<path d="${dome} ${hem}z" fill="none"/><circle cx="${cx}" cy="${top - 1.4*k}" r="${1.4*k}" style="fill:${g.b}"/></g>`;
 }
 // a raincoat's hood, pulled up round the face (head centre at (0, -46k), radius 10.6k)
+// round 323: winter clothes for the December snow.
+// snow gear = {kind: "jacket", a (jacket), b (boots and trim), acc: "scarf"|"hat"|"earmuffs"|"scarfhat", w (knit colour)}
+const KNIT = ["#C8323A", "#F3C969", "#FFFDF6", "#3E6B8C", "#7FB8A8", "#E8899A", "#5E8A5A", "#9AA9DD"];
+const JACKET = [["#2E3A70", "#5A3A26"], ["#C2505F", "#3B3530"], ["#5E8A5A", "#5A3A26"], ["#E8913A", "#3B3530"], ["#7FB8A8", "#5A3A26"], ["#3B3530", "#8A5A3A"], ["#9AA9DD", "#3B3530"], ["#F3E7C9", "#5A3A26"]];
+const ACC = ["scarf", "hat", "earmuffs", "scarfhat", "scarf", "scarfhat"];
+export function snowGearFor(seed){
+  let h = 7; for (const c of String(seed) + "snow") h = (h*31 + c.charCodeAt(0)) | 0; h = Math.abs(h);
+  const [a, b] = JACKET[h % JACKET.length]; return {kind: "jacket", a, b, acc: ACC[(h >> 4) % ACC.length], w: KNIT[(h >> 7) % KNIT.length]};
+}
+// the knitwear: a scarf round the neck (with a tail), a bobble hat, or earmuffs (head centre at (0, y), radius r)
+export function winterArt(g, k, y = -46*k, r = 10.6*k){
+  const scarf = /scarf/.test(g.acc) ? `<path d="M${-8.4*k} ${y + 8.6*k} q${8.4*k} ${3*k} ${16.8*k} 0 v${3.6*k} q${-8.4*k} ${3*k} ${-16.8*k} 0z" style="fill:${g.w}"/><path d="M${3*k} ${y + 12*k} l${1.4*k} ${9*k} h${3.6*k} l${-1*k} ${-9.6*k}z" style="fill:${g.w}"/><path d="M${4.6*k} ${y + 19*k} h${3.4*k}" fill="none" stroke-width=".6"/>` : "";
+  const hat = /hat/.test(g.acc) ? `<path d="M${-r - .6*k} ${y - 2*k} Q${-r} ${y - r - 6*k} 0 ${y - r - 6.4*k} Q${r} ${y - r - 6*k} ${r + .6*k} ${y - 2*k}z" style="fill:${g.w}"/><rect x="${-r - 1*k}" y="${y - 4.4*k}" width="${2*r + 2*k}" height="${3.6*k}" rx="${1.6*k}" style="fill:${g.a === g.w ? "#FFFDF6" : g.a}"/><circle cx="0" cy="${y - r - 7.6*k}" r="${2.8*k}" style="fill:#FFFDF6"/>` : "";
+  const muffs = g.acc === "earmuffs" ? `<path d="M${-r} ${y} Q0 ${y - r - 8*k} ${r} ${y}" fill="none" stroke-width="${1.8*k}" style="stroke:#6B5444"/>${[-r, r].map(x => `<circle cx="${x}" cy="${y + .5*k}" r="${3.6*k}" style="fill:${g.w}"/>`).join("")}` : "";
+  return `<g class="wintergear" pointer-events="none">${scarf}${hat}${muffs}</g>`;
+}
 export function hoodArt(g, k, y = -46*k, r = 10.6*k){
   const R = r + 2.2*k, ri = r*.82;
   return `<path d="M${-R} ${y + 5*k} A${R} ${R*1.05} 0 0 1 ${R} ${y + 5*k} L${ri} ${y + 3*k} A${ri} ${ri*.95} 0 0 0 ${-ri} ${y + 3*k}z" style="fill:${g.a}"/><path d="M${-ri*.7} ${y - ri*.55} q${ri*.7} ${-ri*.4} ${ri*1.4} 0" fill="none" stroke-width=".7" opacity=".5"/>`;
@@ -291,7 +307,7 @@ const coatArt = (g, k) => `<path class="rcoat" d="M${-9*k} ${-37.4*k} q${9*k} ${
 export function personArt(look, kid){
   const k = kid ? 0.62 : look.tall ? 1.1 : 1;
   const legH = 13*k, legY = -15*k, lw = 5*k;
-  const rain = look.rain, coat = rain && rain.kind === "coat";
+  const rain = look.rain, coat = rain && (rain.kind === "coat" || rain.kind === "jacket"), hooded = rain && rain.kind === "coat", topped = rain && rain.kind === "jacket" && /hat|muffs/.test(rain.acc);   // round 323: a winter jacket is a coat without the hood
   // (Portovenere: a swimming cap, headscarf or snorkel mask takes the place of a hat; a mask or cap of specs)
   const capped = ["swimcap", "headscarf", "snorkelmask", "sunbasket", "maskforehead", "shorehat"].includes(look.extra), masked = look.extra === "snorkelmask" || look.extra === "swimcap";
   const stonestack = look.extra === "stonepile" ? `<g class="stonestack" style="stroke:var(--line)" stroke-width="${.8*k}" stroke-linejoin="round">${[[22, -1.6, 6.2, 2.2, "#A8A296"], [22.6, -5.6, 5.2, 2, "#C9C2B6"], [21.8, -9.2, 4.4, 1.8, "#9A948A"], [22.4, -12.6, 3.8, 1.7, "#D6CFC2"], [22, -15.8, 3.2, 1.5, "#B8B2AA"], [22.3, -18.8, 2.6, 1.4, "#E3DDD2"]].map(([x, y, rx, ry, c]) => `<ellipse cx="${x*k}" cy="${y*k}" rx="${rx*k}" ry="${ry*k}" style="fill:${c}"/>`).join("")}</g>` : "";
@@ -322,8 +338,8 @@ export function personArt(look, kid){
       ${look.hairStyle === "bobfringe" ? fringe(look.hair, -46*k, 10.6*k, k) : ""}
       ${["glasses", "cap", "sunhat", "helmet", "binocs", "crownw", "swimcap", "headscarf", "snorkelmask", "sunbasket", "fieldglasses", "maskforehead", "shorehat"].includes(look.extra) ? extra(look.extra, look, k) : ""}
       ${look.specs && !masked ? extra("specs", look, k) : ""}
-      ${look.hat && !coat && !capped ? extra(look.hat, look, k) : ""}
-      ${coat ? hoodArt(rain, k) : ""}
+      ${look.hat && !hooded && !topped && !capped ? extra(look.hat, look, k) : ""}
+      ${hooded ? hoodArt(rain, k) : rain && rain.kind === "jacket" ? winterArt(rain, k) : ""}
       ${look.specs && !masked ? `<g fill="none" stroke-width="1" style="stroke:${look.specs}"><circle cx="${-3.8*k}" cy="${-44*k}" r="${2.8*k}"/><circle cx="${3.8*k}" cy="${-44*k}" r="${2.8*k}"/><path d="M${-1*k} ${-44*k} h${2*k}"/></g>` : ""}
       ${look.board ? paddle(k) : ""}
       ${rain && rain.kind === "brolly" ? brollyArt(rain, k) : ""}
