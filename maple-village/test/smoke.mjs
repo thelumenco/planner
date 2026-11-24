@@ -2284,8 +2284,8 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
       "the village's Christmas decorations go up with the tree lighting on 20 November and come down after Boxing Day, twinkling after dark");
     const has = got => n => got.includes(n), wr = h => (h.match(/r="7.5" fill="none" style/g) || []).length;
     check(wr(vx.xmasDress("bay", has(["scoop", "cocoa"]), false)) === 2 && wr(vx.xmasDress("bay", has(["scoop"]), false)) === 1 && vx.xmasDress("bay", has([]), false) === "" && wr(vx.xmasDress("vineyard", has(["vine"]), false)) === 1
-      && wr(vx.xmasDress("hlane", has([]), false)) === 4 && wr(vx.xmasDress("lane", has([]), false)) === 4 && wr(vx.xmasDress("base", has([]), false)) === 1 && /xmastree/.test(vx.xmasTree(vx.VILLAGE_TREE[0], vx.VILLAGE_TREE[1], false)),
-      "the Scoop Shack, the Cocoa Room and the wine shop get wreaths and lights once they're yours; every house and cottage gets them too; the tree stands behind the Good News board"); }
+      && wr(vx.xmasDress("hlane", has([]), false)) === 4 && wr(vx.xmasDress("lane", has([]), false)) === 4 && wr(vx.xmasDress("base", has([]), false)) === 1,
+      "the Scoop Shack, the Cocoa Room and the wine shop get wreaths and lights once they're yours; every house and cottage gets them too"); }
   { // round 317: the coach party you can see
     const cc = await import(new URL("../src/art/coachcrowd.js", import.meta.url)), hp = await import(new URL("../src/game/happen.js", import.meta.url));
     check(cc.crowdLevel([660, 780], 659) === 0 && cc.crowdLevel([660, 780], 660) > 0 && cc.crowdLevel([660, 780], 660) < .2 && cc.crowdLevel([660, 780], 720) === 1 && cc.crowdLevel([660, 780], 775) < .5 && cc.crowdLevel([660, 780], 780) === 0, "the coach party arrives over twelve minutes and drifts off over the last quarter hour (round 317)");

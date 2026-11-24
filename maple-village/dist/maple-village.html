@@ -16979,7 +16979,6 @@ ${p.sign}` };
     return md3 >= "11-20" && md3 <= "12-26";
   };
   var RED = "#C8323A";
-  var GOLD = "#F3C969";
   var GREEN = "#3F7A4A";
   var G2 = "#5E9A5A";
   var LN = `style="stroke:var(--line)"`;
@@ -16996,16 +16995,6 @@ ${p.sign}` };
   var eavesLights = (x1, x2, y, dark) => wire(x1, x2, y, 3) + `<g>${bulbs(sag(x1, x2, y, 3, Math.max(4, Math.round((x2 - x1) / 11))), dark)}</g>`;
   var wreath = (x, y) => `<g ${LN} stroke-width=".8"><circle cx="${x}" cy="${y}" r="7.5" fill="none" style="stroke:${GREEN}" stroke-width="4.2"/><circle cx="${x}" cy="${y}" r="7.5" fill="none" stroke-width=".6"/>${[0, 72, 144, 216, 288].map((a) => `<circle cx="${(x + 7.5 * Math.cos(a * Math.PI / 180)).toFixed(1)}" cy="${(y + 7.5 * Math.sin(a * Math.PI / 180)).toFixed(1)}" r="1.3" fill="${RED}" stroke="none"/>`).join("")}<path d="M${x - 3} ${y + 7} l3 -2.5 l3 2.5 l-1.5 4 M${x} ${y + 4.5} l-1.5 6.5" fill="${RED}"/></g>`;
   var bow = (x, y) => `<g ${LN} stroke-width=".6"><path d="M${x} ${y} l-6 -3.5 v7z M${x} ${y} l6 -3.5 v7z" fill="${RED}"/><circle cx="${x}" cy="${y}" r="1.6" fill="${RED}"/><path d="M${x - 1} ${y + 1} l-2.5 7 M${x + 1} ${y + 1} l2.5 7" stroke="${RED}" stroke-width="1.4"/><path d="M${x - 9} ${y + 3} q3 -4 6 -1 q-3 3 -6 1z M${x + 9} ${y + 3} q-3 -4 -6 -1 q3 3 6 1z" fill="${G2}"/></g>`;
-  function xmasTree(tx, ty, dark) {
-    const tiers = [[0, 46, 28], [-22, 38, 24], [-42, 28, 20], [-58, 18, 16]];
-    return `<g class="xmastree" pointer-events="none"><g ${LN} stroke-width="1.1"><rect x="${tx - 5}" y="${ty - 4}" width="10" height="12" fill="#8A5A3A"/>${tiers.map(([dy, w, h3]) => `<path d="M${tx - w / 2} ${ty + dy - 2} L${tx} ${ty + dy - 2 - h3 - 14} L${tx + w / 2} ${ty + dy - 2}z" fill="${GREEN}"/>`).join("")}
-    <path d="M${tx} ${ty - 98} l2.6 5.4 l6 .8 l-4.4 4.2 l1 6 l-5.2 -2.8 l-5.2 2.8 l1 -6 l-4.4 -4.2 l6 -.8z" fill="${GOLD}"/></g>
-    <g>${[[-14, -10, RED], [10, -14, GOLD], [-4, -26, "#7FB8E8"], [14, -32, RED], [-12, -40, GOLD], [4, -48, RED], [-6, -60, "#7FB8E8"], [6, -68, GOLD], [-16, -20, "#7FB8E8"], [16, -6, "#7FB8E8"]].map(([dx, dy, c]) => `<circle cx="${tx + dx}" cy="${ty + dy}" r="2.6" fill="${c}" ${LN} stroke-width=".6"/>`).join("")}</g>
-    <g>${bulbs([...sag(tx - 20, tx + 20, ty - 18, 4, 6), ...sag(tx - 14, tx + 14, ty - 40, 3, 5), ...sag(tx - 8, tx + 8, ty - 60, 2, 3)], dark)}</g>
-    <g ${LN} stroke-width=".9"><rect x="${tx - 30}" y="${ty - 2}" width="13" height="10" fill="${RED}"/><path d="M${tx - 23.5} ${ty - 2} v10 M${tx - 30} ${ty + 3} h13" stroke="${GOLD}" stroke-width="1.4"/>
-    <rect x="${tx + 16}" y="${ty}" width="12" height="8" fill="#7FB8E8"/><path d="M${tx + 22} ${ty} v8" stroke="#FFFDF6" stroke-width="1.4"/><rect x="${tx + 8}" y="${ty + 3}" width="9" height="7" fill="${GOLD}"/><path d="M${tx + 12.5} ${ty + 3} v7" stroke="${RED}" stroke-width="1.2"/></g></g>`;
-  }
-  var VILLAGE_TREE = [92, 452];
   function xmasDecor(dark) {
     const eaves = eavesLights(100, 247, 106, dark) + eavesLights(327, 433, 104, dark);
     const doors = [[171, 134], [380, 128], [96, 326], [430, 460]].map(([x, y]) => wreath(x, y)).join("");
@@ -18887,7 +18876,7 @@ ${r.n}`;
     ${bulbs2(sag2(x - 66, x + 66, y - 68, 6, 7), 2)}<path d="M${x - 66} ${y - 68} Q${x} ${y - 56} ${x + 66} ${y - 68} M${x - 66} ${y - 68} v48 M${x + 66} ${y - 68} v48" fill="none" style="stroke:var(--line)" stroke-width=".9" opacity=".7"/></g>
     ${hat(x - 30, y + 20)}`;
   }
-  function xmasTree2(lit2) {
+  function xmasTree(lit2) {
     const [x, y] = XMAS_TREE, tiers = [[0, 46, 34], [-26, 38, 30], [-50, 28, 26], [-70, 18, 22]];
     const pts = [[-30, -12], [-14, -6], [4, -10], [22, -8], [34, -14], [-20, -36], [-4, -32], [14, -38], [26, -34], [-12, -58], [6, -60], [18, -56], [-4, -80], [8, -78]];
     return `<g data-place="xtree" aria-label="The Christmas tree"><ellipse class="hov" cx="${x}" cy="${y + 4}" rx="56" ry="12" style="fill:var(--butter)"/>
@@ -18969,7 +18958,7 @@ ${r.n}`;
     ${tapeLabel(332, 614, "Orchard", "var(--sage)", 11)}</g>`;
     const ev = eventNow(artCtx().day(), sgHM());
     const xm = ev && ev.kind === "xmas", season2 = xmasOn(artCtx().day()), lit2 = season2 && treeLit(artCtx().day(), sgHM(), artCtx().F && artCtx().F());
-    const xtree = season2 ? xmasTree2(lit2) + grotto(grottoNow(artCtx().day(), sgHM())) : "";
+    const xtree = season2 ? xmasTree(lit2) + grotto(grottoNow(artCtx().day(), sgHM())) : "";
     const event = ev ? (ev.kind === "night" || xm ? fairyLights() : bunting2) + (xm ? lanterns(true) : "") + ev.stalls.map((s) => stall(s.at, STALL_SPOTS[s.at][0], STALL_SPOTS[s.at][1], s)).join("") + (ev.kind === "night" ? stage() : xm ? "" : blanket2() + (ev.kind === "fair" ? kites : "")) + tapeLabel(260, 30, ev.name, "var(--butter)", 12) : "";
     const dark = skyWash(sgHM());
     return lampDefs + ground9 + swans + dark + [[110, 196], [396, 196]].map(([x, y]) => streetLamp(x, y)).join("") + lake + picnic2 + pitch + lawn + xtree + toTown + toFarm + toOrchard + event + archGate("toShoreF", 20, 292, "Foreshore", 52, 332, "var(--sky)", "Gate to the foreshore");
@@ -24130,7 +24119,7 @@ ${r.n}`;
     const lamps = [[384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => streetLamp(x, y)).join("");
     const station = archGate("toStationV", 281, 70, "Station road", 281, 118, "var(--peri)", "Up the station road to Honeybrook station") + sk(`<rect x="228" y="232" width="66" height="22" rx="3" style="fill:#FFF6E8"/><path d="M236 254 v14 M286 254 v14" stroke-width="3"/>`, `<rect x="228" y="232" width="66" height="22" rx="3"/>`) + `<g pointer-events="none" font-family="Klee One,serif" text-anchor="middle"><text x="261" y="241" font-size="5.8" fill="#8A6A52">Welcome to</text><text x="261" y="250.5" font-size="8.6" font-weight="700" fill="#5E8A5A">Honeybrook</text></g>`;
     const xdark = sgHM() >= 16 * 60 + 30 || sgHM() < 7 * 60, xon = xmasDecorOn(G3.day());
-    return lampDefs + ground9 + lamps + (xon ? xmasTree(VILLAGE_TREE[0], VILLAGE_TREE[1], xdark) : "") + places + station + upgradesArt(G3.F().totalQuests || 0, "village") + festivalArt(festivalOn(G3.day())) + (xon ? xmasDecor(xdark) : "");
+    return lampDefs + ground9 + lamps + places + station + upgradesArt(G3.F().totalQuests || 0, "village") + festivalArt(festivalOn(G3.day())) + (xon ? xmasDecor(xdark) : "");
   }
   var waterBand = (y1, y2) => `<path d="M0 ${y1 + 4} Q65 ${y1 - 4} 130 ${y1 + 3} T260 ${y1 + 2} T390 ${y1 + 4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2 + 5} 390 ${y2 - 2} T260 ${y2} T130 ${y2 - 3} T0 ${y2 + 2}`}z" style="fill:var(--water)"/>`;
   function bridge(id, x, y1, y2, label2, tapeX, tapeY, size) {
