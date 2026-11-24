@@ -1279,6 +1279,13 @@ svg.ico{--bg:#F2EEE7;--card:#F9F7F2;--ink:#2F2B28;--soft:#8A8279;--oat:#EAE3D8;-
 .map .rain.light{opacity:.2;background-size:260px 260px;animation-duration:.8s}
 #evan .welly,#evan .esleeve{display:none}#evan.raincoat .welly,#evan.raincoat .esleeve{display:inline}
 @keyframes rainfall{from{background-position:0 0}to{background-position:-40px 200px}}
+/* round 323 (Mel: "add snow to the village in December"): soft flakes drifting down over a frosty wash, outdoors at home all December */
+.map .snow{position:absolute;inset:0;z-index:2;pointer-events:none;background-color:rgba(255,255,255,.16);
+  background-image:radial-gradient(circle,#fff 0 1.8px,transparent 2.4px),radial-gradient(circle,#fff 0 1.2px,transparent 1.8px),radial-gradient(circle,rgba(255,255,255,.9) 0 2.4px,transparent 3px);
+  background-size:90px 110px,60px 70px,150px 170px;background-position:0 0,30px 20px,70px 40px;animation:snowfall 14s linear infinite;opacity:.9}
+.map .snow[hidden]{display:none}
+@keyframes snowfall{from{background-position:0 0,30px 20px,70px 40px}to{background-position:30px 440px,10px 420px,90px 380px}}
+@media (prefers-reduced-motion:reduce){.map .snow{animation:none}}
 .floaty{animation:floaty 3s ease-in-out infinite;transform-box:fill-box}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .uplist{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:4px;font-size:.88rem}
@@ -2183,6 +2190,7 @@ details.whowhere summary b{font-size:1rem;margin-right:6px}
           <g id="fore" pointer-events="none"></g>
         </svg>
       <div class="rain" id="rain" hidden aria-hidden="true"></div>
+      <div class="snow" id="snow" hidden aria-hidden="true"></div>
       <div class="mprops" id="mprops"></div>
       <p class="speech" id="speech" aria-live="polite"></p>
       <p class="speech small" id="evanSay" hidden></p>
@@ -16930,6 +16938,28 @@ ${p.sign}` };
   }
   var rainyOn = (day, hm12) => rainLevel(day, hm12) > 0;
   var stormyOn = (day, hm12) => rainLevel(day, hm12) === 2;
+  var snowMonth = (day) => String(day).slice(5, 7) === "12";
+  var snowingOn = (day, hm12 = sgHM()) => snowMonth(day) && rainyOn(day, hm12);
+  var dayBefore = (day) => new Date(Date.parse(day + "T00:00:00Z") - 864e5).toISOString().slice(0, 10);
+  function snowLying(day, hm12 = sgHM()) {
+    if (snowMonth(day) && rainDay(day) && hm12 >= showerAt(day).from) return true;
+    const y = dayBefore(day);
+    return snowMonth(y) && !!rainDay(y) && hm12 < showerAt(y).to;
+  }
+  var DRIFTS = {
+    village: [[30, 506, 1], [492, 506, 1.1], [442, 592, 0.9], [330, 404, 0.8], [24, 410, 0.8], [470, 238, 0.8]],
+    base: [[26, 402, 1], [470, 330, 0.9], [200, 540, 0.8], [380, 470, 0.9], [30, 560, 1]],
+    bay: [[300, 600, 1], [480, 330, 0.9], [250, 400, 0.7], [470, 600, 0.9]],
+    vineyard: [[30, 560, 1], [40, 262, 0.8], [260, 470, 0.7], [470, 520, 0.9]],
+    lane: [[30, 600, 1], [470, 500, 0.9], [250, 300, 0.7], [480, 200, 0.8]],
+    hlane: [[30, 480, 1], [470, 540, 0.9], [200, 360, 0.7], [460, 440, 0.8]],
+    green: [[40, 560, 1], [470, 560, 0.9], [260, 300, 0.8]],
+    orchard: [[30, 560, 1], [480, 560, 0.9], [260, 330, 0.7]]
+  };
+  function snowDrifts(scene2) {
+    const list11 = DRIFTS[scene2] || [[36, 600, 1], [484, 600, 1]];
+    return `<g class="snowbank" pointer-events="none">${list11.map(([x, y, s]) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="2" cy="3" rx="30" ry="7" fill="#B9C8D6" opacity=".35"/><path d="M-30 2 Q-24 -10 -12 -8 Q-4 -16 6 -9 Q16 -14 24 -5 Q31 -2 30 3 Z" fill="#FFFFFF" style="stroke:var(--line)" stroke-width=".8"/><path d="M-18 -5 q5 -3 9 -1 M8 -6 q5 -2 8 1" fill="none" stroke="#D6E2EC" stroke-width="1.2"/></g>`).join("")}</g>`;
+  }
   var roughSea = (day, hm12 = sgHM()) => {
     if (rainDay(day) !== 2) return false;
     const w = showerAt(day);
@@ -21569,7 +21599,7 @@ ${r.n}`;
   var RENO_LINE = `Boarded up for now, with scaffolding out front. The sign says: "Coming soon: a craft brewery? A chocolatier?" Someone's pencilled "both!!" underneath.`;
   var LOW_SCOOPS = 5;
   var hmTxt = (m) => `${(Math.floor(m / 60) + 11) % 12 + 1}${m % 60 ? ":" + String(m % 60).padStart(2, "0") : ""}${m < 12 * 60 ? "am" : "pm"}`;
-  var dayBefore = (day) => new Date(Date.parse(day + "T00:00:00Z") - 864e5).toISOString().slice(0, 10);
+  var dayBefore2 = (day) => new Date(Date.parse(day + "T00:00:00Z") - 864e5).toISOString().slice(0, 10);
   function scoopNews(s, day, hm12) {
     const out = [], left7 = onDisplay(s).reduce((a, r) => a + (s.tubs[r.id] || 0), 0);
     if (openNow(hm12) && s.recipes.length) {
@@ -21592,10 +21622,10 @@ ${r.n}`;
     if (hm12 >= CLOSE && s.reported !== day) {
       const r = report2(day);
       if (r) out.push(r);
-    } else if (hm12 < CLOSE && s.reported && s.reported < dayBefore(day)) {
-      const r = report2(dayBefore(day));
+    } else if (hm12 < CLOSE && s.reported && s.reported < dayBefore2(day)) {
+      const r = report2(dayBefore2(day));
       if (r) out.push(r);
-    } else if (!s.reported) s.reported = dayBefore(day);
+    } else if (!s.reported) s.reported = dayBefore2(day);
     return out;
   }
   var TROLLEY = { flavours: 3, scoops: 10, ms: 2 * 36e5 };
@@ -25879,6 +25909,22 @@ ${r.n}`;
     return `<g class="brolly" pointer-events="none"><path d="M${10 * k} ${-20 * k} L${cx} ${top}" fill="none" stroke-width="${1.4 * k}"/><path d="M${10 * k} ${-20 * k} q0 ${3 * k} ${-2.6 * k} ${3 * k}" fill="none" stroke-width="${1.4 * k}" style="stroke:${g18.pat === "paper" ? "#8A5A3A" : "var(--line)"}"/>
     <defs><clipPath id="${id}"><path d="${clip5}"/></clipPath></defs><path d="${dome} ${hem}z" style="fill:${g18.a}"${alpha}/><g clip-path="url(#${id})">${deco}</g>${ribs}<path d="${dome} ${hem}z" fill="none"/><circle cx="${cx}" cy="${top - 1.4 * k}" r="${1.4 * k}" style="fill:${g18.b}"/></g>`;
   }
+  var KNIT = ["#C8323A", "#F3C969", "#FFFDF6", "#3E6B8C", "#7FB8A8", "#E8899A", "#5E8A5A", "#9AA9DD"];
+  var JACKET = [["#2E3A70", "#5A3A26"], ["#C2505F", "#3B3530"], ["#5E8A5A", "#5A3A26"], ["#E8913A", "#3B3530"], ["#7FB8A8", "#5A3A26"], ["#3B3530", "#8A5A3A"], ["#9AA9DD", "#3B3530"], ["#F3E7C9", "#5A3A26"]];
+  var ACC = ["scarf", "hat", "earmuffs", "scarfhat", "scarf", "scarfhat"];
+  function snowGearFor(seed2) {
+    let h3 = 7;
+    for (const c of String(seed2) + "snow") h3 = h3 * 31 + c.charCodeAt(0) | 0;
+    h3 = Math.abs(h3);
+    const [a, b] = JACKET[h3 % JACKET.length];
+    return { kind: "jacket", a, b, acc: ACC[(h3 >> 4) % ACC.length], w: KNIT[(h3 >> 7) % KNIT.length] };
+  }
+  function winterArt(g18, k, y = -46 * k, r = 10.6 * k) {
+    const scarf = /scarf/.test(g18.acc) ? `<path d="M${-8.4 * k} ${y + 8.6 * k} q${8.4 * k} ${3 * k} ${16.8 * k} 0 v${3.6 * k} q${-8.4 * k} ${3 * k} ${-16.8 * k} 0z" style="fill:${g18.w}"/><path d="M${3 * k} ${y + 12 * k} l${1.4 * k} ${9 * k} h${3.6 * k} l${-1 * k} ${-9.6 * k}z" style="fill:${g18.w}"/><path d="M${4.6 * k} ${y + 19 * k} h${3.4 * k}" fill="none" stroke-width=".6"/>` : "";
+    const hat2 = /hat/.test(g18.acc) ? `<path d="M${-r - 0.6 * k} ${y - 2 * k} Q${-r} ${y - r - 6 * k} 0 ${y - r - 6.4 * k} Q${r} ${y - r - 6 * k} ${r + 0.6 * k} ${y - 2 * k}z" style="fill:${g18.w}"/><rect x="${-r - 1 * k}" y="${y - 4.4 * k}" width="${2 * r + 2 * k}" height="${3.6 * k}" rx="${1.6 * k}" style="fill:${g18.a === g18.w ? "#FFFDF6" : g18.a}"/><circle cx="0" cy="${y - r - 7.6 * k}" r="${2.8 * k}" style="fill:#FFFDF6"/>` : "";
+    const muffs = g18.acc === "earmuffs" ? `<path d="M${-r} ${y} Q0 ${y - r - 8 * k} ${r} ${y}" fill="none" stroke-width="${1.8 * k}" style="stroke:#6B5444"/>${[-r, r].map((x) => `<circle cx="${x}" cy="${y + 0.5 * k}" r="${3.6 * k}" style="fill:${g18.w}"/>`).join("")}` : "";
+    return `<g class="wintergear" pointer-events="none">${scarf}${hat2}${muffs}</g>`;
+  }
   function hoodArt(g18, k, y = -46 * k, r = 10.6 * k) {
     const R10 = r + 2.2 * k, ri = r * 0.82;
     return `<path d="M${-R10} ${y + 5 * k} A${R10} ${R10 * 1.05} 0 0 1 ${R10} ${y + 5 * k} L${ri} ${y + 3 * k} A${ri} ${ri * 0.95} 0 0 0 ${-ri} ${y + 3 * k}z" style="fill:${g18.a}"/><path d="M${-ri * 0.7} ${y - ri * 0.55} q${ri * 0.7} ${-ri * 0.4} ${ri * 1.4} 0" fill="none" stroke-width=".7" opacity=".5"/>`;
@@ -25887,7 +25933,7 @@ ${r.n}`;
   function personArt(look2, kid2) {
     const k = kid2 ? 0.62 : look2.tall ? 1.1 : 1;
     const legH = 13 * k, legY = -15 * k, lw = 5 * k;
-    const rain = look2.rain, coat = rain && rain.kind === "coat";
+    const rain = look2.rain, coat = rain && (rain.kind === "coat" || rain.kind === "jacket"), hooded = rain && rain.kind === "coat", topped = rain && rain.kind === "jacket" && /hat|muffs/.test(rain.acc);
     const capped = ["swimcap", "headscarf", "snorkelmask", "basketonhead", "ricehat", "macaque", "sunbasket", "maskforehead", "shorehat"].includes(look2.extra), masked = look2.extra === "snorkelmask" || look2.extra === "swimcap";
     const belly = look2.extra === "bellyflat" || ["ricehat", "legonghands", "footsoak", "unibox", "musicboxheld"].includes(look2.extra);
     const bodyx = { frangipani: "softhands", ricehat: "crosslegs" }[look2.extra], headx = { legonghands: "legongeyes", musicboxheld: "listen" }[look2.extra];
@@ -25926,8 +25972,8 @@ ${r.n}`;
       ${look2.hairStyle === "bobfringe" ? fringe(look2.hair, -46 * k, 10.6 * k, k) : ""}
       ${["glasses", "cap", "sunhat", "helmet", "binocs", "crownw", "handmirror", "capheld", "swimcap", "headscarf", "snorkelmask", "puffinwalk", "frangipani", "coconutdrink", "basketonhead", "ricehat", "macaque", "footsoak", "softcone", "sunbasket", "fieldglasses", "maskforehead", "shorehat"].includes(look2.extra) ? extra(look2.extra, look2, k) : ""}${headx ? extra(headx, look2, k) : ""}
       ${look2.specs && !masked ? extra("specs", look2, k) : ""}
-      ${look2.hat && !coat && !capped ? extra(look2.hat, look2, k) : ""}
-      ${coat ? hoodArt(rain, k) : ""}
+      ${look2.hat && !hooded && !topped && !capped ? extra(look2.hat, look2, k) : ""}
+      ${hooded ? hoodArt(rain, k) : rain && rain.kind === "jacket" ? winterArt(rain, k) : ""}
       ${look2.specs && !masked ? `<g fill="none" stroke-width="1" style="stroke:${look2.specs}"><circle cx="${-3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><circle cx="${3.8 * k}" cy="${-44 * k}" r="${2.8 * k}"/><path d="M${-1 * k} ${-44 * k} h${2 * k}"/></g>` : ""}
       ${belly ? `</g>` : ""}
       ${look2.board ? paddle(k) : ""}
@@ -35631,7 +35677,7 @@ ${m.from}` : ""}`;
     if (act2 === "tandem") look2 = Object.assign({}, look2, { bike: "#C8432F" });
     const owned2 = api3.F().fam && api3.F().fam.owned || {};
     if (id === "darren" && act2 === "type" && owned2.headphones) look2 = Object.assign({}, look2, { headphones: true });
-    if (OUTDOOR.includes(api3.scene()) && !townOf(api3.scene()) && rainyOn(dayKey()) && !look2.board) look2 = Object.assign({}, look2, { rain: rainGearFor(id, { coat: !!look2.bike || !!look2.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look2.extra) }) });
+    if (OUTDOOR.includes(api3.scene()) && !townOf(api3.scene()) && rainyOn(dayKey()) && !look2.board) look2 = Object.assign({}, look2, { rain: snowMonth(dayKey()) ? snowGearFor(id) : rainGearFor(id, { coat: !!look2.bike || !!look2.extra && ["can", "hammer", "hoe", "lantern", "cone", "bell", "rod"].includes(look2.extra) }) });
     g18.innerHTML = personArt(look2, kid2) + (letter ? `<g class="letter">${letterArt}</g>` : "") + `<g class="storycue" transform="translate(0 ${kid2 ? -48 : -72})" pointer-events="none"><g filter="url(#wob)"><rect x="-13" y="-9" width="26" height="16" rx="8" style="fill:#FFFDF6;stroke:var(--line)" stroke-width="1.2"/><circle cx="-6" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="0" cy="-1" r="1.8" style="fill:var(--line)"/><circle cx="6" cy="-1" r="1.8" style="fill:var(--line)"/></g></g>`;
     $("actors").appendChild(g18);
     return g18;
@@ -59145,8 +59191,9 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
   function drawScene() {
     const ssn8 = seasonOf(dayKey());
     ["spring", "summer", "autumn", "winter"].forEach((k) => document.body.classList.toggle("season-" + k, k === ssn8));
-    const day = dayKey(), wet2 = outside() && !townOf(scene) && rainyOn(day), fest = festivalOn(day);
+    const day = dayKey(), snowy = outside() && !townOf(scene) && snowingOn(day), wet2 = outside() && !townOf(scene) && rainyOn(day) && !snowy, fest = festivalOn(day);
     $("rain").hidden = !wet2;
+    $("snow").hidden = !snowy;
     $("rain").classList.toggle("light", rainLevel(day) === 1);
     if (scene === "vineyard" && fest && fest.id === "harvest" && S3.harvestSaid !== day) {
       S3.harvestSaid = day;
@@ -59165,10 +59212,14 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
       S3.rainSaid = day;
       const light4 = rainLevel(day) === 1;
       setTimeout(() => speak(light4 ? "A light shower blowing through. Brollies up! It won't last long." : "A downpour! It'll pass within the hour. Perfect for a cosy indoor quest meanwhile.", 4500), 1500);
+    } else if (snowy && F.snowSaid !== day) {
+      F.snowSaid = day;
+      setTimeout(() => speak("Snow! Soft flakes drifting down over the rooftops. Scarves and hats on, everyone.", 5e3), 1500);
     }
     $("fore").innerHTML = outside() ? "" : foreArt(scene);
     tableKey = "";
     $("sceneArt").innerHTML = scene === "vshed" ? shedArt2(shedNow()) : scene === "vloft" ? loftArt(loftNow()) : scene === "winecave" ? caveArt({ laid: laidCount(F), old: Object.values(secretState(F).old).filter(Boolean).length, supper: supperNow(dayKey(), sgHM()), guests: 4 }) : coOf(scene) ? cottageArt(scene, coArt()) : scene === "terrace" ? terraceArt(F) : scene === "village" ? villageArt() : scene === "base" ? baseArt() : scene === "lane" ? laneArt() : scene === "vineyard" ? vineyardArt() : scene === "orchard" ? orchardArt() : scene === "flowers" ? flowerFarmArt() : scene === "field" ? fieldArt() : scene === "shore" ? shoreArt() : scene === "bay" ? bayArt() : scene === "hfarm" ? hfarmArt() : scene === "hlane" ? hlaneArt() : scene === "hwoods" ? hwoodsArt() : scene === "lowervine" ? lowerVineArt(vineState(F), ruinState(F).step) : scene === "green" ? greenArt() : scene === "allotment" ? allotmentArt() : scene === "bramcot" ? bramCottageArt(isHere("bram")) : /^lhtower[123]$/.test(scene) ? towerArt(scene, { night: sgHM() >= 19 * 60 || sgHM() < 6 * 60, curios: Object.keys(towerState(F).curios).length, bottles: bottlesFound(F), logDays: towerState(F).log.length, bram: isHere("bram") }) : scene === "stables" ? stablesArt(!!(F.south && F.south.mine)) : scene === "lighthouse" ? lighthouseArt(sgHM() >= 19 * 60 || sgHM() < 6 * 60, chipsOpen(sgHM())) : townRoom(scene) ? townOf(scene) === "saltwick" ? saltwickRoomArt(scene) : townOf(scene) === "porto" ? portoRoomArt(scene) : townOf(scene) === "puffin" ? puffinRoomArt(scene) : townOf(scene) === "bali" ? baliRoomArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoRoomArt(scene) : townOf(scene) === "formentera" ? formenteraRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoRoomArt(scene) : townOf(scene) === "jeju" ? jejuRoomArt(scene) : townOf(scene) === "cinque" ? cinqueRoomArt(scene) : TOWNS[townOf(scene)].region === "lavender" ? lavenderRoomArt(scene) : TOWNS[townOf(scene)].region === "tablelands" ? tablelandsRoomArt(scene) : TOWNS[townOf(scene)].region === "coast" ? coastRoomArt(scene) : TOWNS[townOf(scene)].by === "van" ? bellbirdRoomArt(scene) : rondaRoomArt(scene) : townOf(scene) === "kyoto" ? kyotoArt(scene) : townOf(scene) === "jeju" ? jejuArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "lavender" ? lavenderArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "tablelands" ? tablelandsArt(scene) : townOf(scene) && TOWNS[townOf(scene)].region === "coast" ? coastArt(scene) : townOf(scene) && TOWNS[townOf(scene)].by === "van" ? bellbirdArt(scene) : townOf(scene) === "cinque" ? cinqueArt(scene) : townOf(scene) === "saltwick" ? saltwickArt(scene) : townOf(scene) === "porto" ? portoArt(scene) : townOf(scene) === "puffin" ? puffinArt(scene) : townOf(scene) === "bali" ? baliArt(scene) : townOf(scene) === "hokkaido" ? hokkaidoArt(scene) : townOf(scene) === "formentera" ? formenteraArt(scene) : townOf(scene) ? rondaArt(scene) : scene === "farm" ? farmArt() : scene === "greenhouse" ? greenhouseArt(ghState(F).beds, ghGrowth, ghState(F).pots) : scene === "millup" ? millUpArt(millUpInfo()) : scene === "mill" ? millArt(!!millState(F).press && pressLeft(millState(F)) > 0, !!millState(F).press && !pressLeft(millState(F)), { shop: owns3(F, "millshop"), cure: craftState(F).cure.length, steep: craftState(F).steep.length, store: storeCount(craftState(F)) }) : roomArt(scene);
+    if (outside() && !townOf(scene) && snowLying(dayKey())) $("sceneArt").insertAdjacentHTML("beforeend", snowDrifts(scene));
     if (xmasDecorOn(dayKey()) && XMAS_DRESS[scene]) $("sceneArt").insertAdjacentHTML("beforeend", xmasDress(scene, (n) => n === "scoop" ? !!F.scoop : n === "cocoa" ? owns3(F, "cocoa") : n === "vine" ? !!F.vine : true, sgHM() >= 16 * 60 + 30 || sgHM() < 7 * 60));
     {
       const cw = coachCrowdNow();
@@ -60652,17 +60703,20 @@ Return JSON only: {"text": "..."}`, { modelTier: "quick", cache: false }).catch(
   }
   var MEL_BROLLY = { kind: "brolly", a: "#9AA9DD", b: "#FFFDF6", pat: "dots" };
   var EVAN_COAT = { kind: "coat", a: "#F3C969", b: "#E8566C" };
+  var MEL_SNOW = { kind: "jacket", a: "#C8323A", acc: "scarfhat", w: "#C8323A" };
+  var EVAN_SNOW = { kind: "jacket", a: "#2E3A70", acc: "scarfhat", w: "#F3C969" };
   var rainDressed = null;
   function dressRain() {
-    const wet2 = outside() && !townOf(scene) && rainyOn(dayKey()) && !($("mel") && $("mel").classList.contains("sup")), k = wet2 ? "y" : "";
+    const out = outside() && !townOf(scene) && !($("mel") && $("mel").classList.contains("sup")), snow = out && snowingOn(dayKey()), wet2 = out && rainyOn(dayKey()) && !snow, k = snow ? "s" : wet2 ? "y" : "";
     if (k === rainDressed) return;
     rainDressed = k;
     const mr = $("melRain"), er = $("evanRain"), ev = $("evan");
-    if (mr) mr.innerHTML = wet2 ? brollyArt(MEL_BROLLY, 1) : "";
-    if (er) er.innerHTML = wet2 ? hoodArt(EVAN_COAT, 0.61, -28, 8.6) : "";
+    if (mr) mr.innerHTML = wet2 ? brollyArt(MEL_BROLLY, 1) : snow ? winterArt(MEL_SNOW, 1) : "";
+    if (er) er.innerHTML = wet2 ? hoodArt(EVAN_COAT, 0.61, -28, 8.6) : snow ? winterArt(EVAN_SNOW, 0.61, -28, 8.6) : "";
     if (ev) {
-      ev.classList.toggle("raincoat", wet2);
-      if (wet2) ev.style.setProperty("--tee", EVAN_COAT.a);
+      const coat = wet2 ? EVAN_COAT.a : snow ? EVAN_SNOW.a : "";
+      ev.classList.toggle("raincoat", wet2 || snow);
+      if (coat) ev.style.setProperty("--tee", coat);
       else ev.style.removeProperty("--tee");
     }
   }

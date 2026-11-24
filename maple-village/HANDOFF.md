@@ -3023,3 +3023,5 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 ## Round 323: snow in December, snowbanks for a day, winter clothes (Mel: "add snow to the village in December"; "snowbanks ... for about 24 hours after the snow"; "If it's snowing, everyone should be wearing jackets, some scarves, some hats, and some earmuffs")
 - village-extras.js snowingOn / snowLying / DRIFTS / snowDrifts; #snow layer and .map .snow CSS; core.js drawScene and dressRain (Mel and Evan's hats and scarves); people.js snowGearFor / winterArt and the jacket in personArt; npcs.js snow gear in December. Port doc section 26. Pictures: screens-bottom-row/round323-*.png.
 - Mel asked why the seasons hadn't changed since September: they do (trees and grass via body.season-* CSS, crops by season lists), but September to November is all autumn; winter starts on 1 December.
+
+## Build v254 (round 323) published at Mel's say-so without a full run; the round 322 and 323 unit checks passed and every snowy scene was checked in pictures. Section 26 sent to the public session.
