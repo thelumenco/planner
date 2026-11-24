@@ -123,30 +123,47 @@ export function festivalArt(f){
    lights along the town hall's and the bank's eaves; red bows and holly on the lamp posts; a garland over the
    market stall; and a snowman on the green by the Good news board. The lights twinkle after dark. ---------- */
 export const xmasDecorOn = day => { const md = (day || "").slice(5); return md >= "11-20" && md <= "12-26"; };
-export function xmasDecor(dark){
-  const L = `style="stroke:var(--line)"`, RED = "#C8323A", GOLD = "#F3C969", GREEN = "#3F7A4A", G2 = "#5E9A5A";
-  const glow = dark ? ` class="twinkle"` : "";
-  const bulbs = (pts) => pts.map(([x, y], i) => `<circle${glow} cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.1" fill="${["#F3C969", "#E8574C", "#7FB8E8", "#9CC27E"][i % 4]}" ${L} stroke-width=".5"/>`).join("");
-  const sag = (x1, x2, y, dip, n) => { const p = []; for (let i = 0; i <= n; i++) { const t = i/n; p.push([x1 + (x2 - x1)*t, y + Math.sin(Math.PI*t)*dip]); } return p; };
-  const wire = (x1, x2, y, dip) => `<path d="M${x1} ${y} Q${(x1 + x2)/2} ${y + dip*2} ${x2} ${y}" fill="none" ${L} stroke-width=".7"/>`;
-  const wreath = (x, y) => `<g ${L} stroke-width=".8"><circle cx="${x}" cy="${y}" r="7.5" fill="none" style="stroke:${GREEN}" stroke-width="4.2"/><circle cx="${x}" cy="${y}" r="7.5" fill="none" stroke-width=".6"/>${[0, 72, 144, 216, 288].map(a => `<circle cx="${(x + 7.5*Math.cos(a*Math.PI/180)).toFixed(1)}" cy="${(y + 7.5*Math.sin(a*Math.PI/180)).toFixed(1)}" r="1.3" fill="${RED}" stroke="none"/>`).join("")}<path d="M${x - 3} ${y + 7} l3 -2.5 l3 2.5 l-1.5 4 M${x} ${y + 4.5} l-1.5 6.5" fill="${RED}"/></g>`;
-  const bow = (x, y) => `<g ${L} stroke-width=".6"><path d="M${x} ${y} l-6 -3.5 v7z M${x} ${y} l6 -3.5 v7z" fill="${RED}"/><circle cx="${x}" cy="${y}" r="1.6" fill="${RED}"/><path d="M${x - 1} ${y + 1} l-2.5 7 M${x + 1} ${y + 1} l2.5 7" stroke="${RED}" stroke-width="1.4"/><path d="M${x - 9} ${y + 3} q3 -4 6 -1 q-3 3 -6 1z M${x + 9} ${y + 3} q-3 -4 -6 -1 q3 3 6 1z" fill="${G2}"/></g>`;
-  // the tree in the square
-  const tx = 318, ty = 438;
+const RED = "#C8323A", GOLD = "#F3C969", GREEN = "#3F7A4A", G2 = "#5E9A5A", LN = `style="stroke:var(--line)"`;
+const bulbs = (pts, dark) => pts.map(([x, y], i) => `<circle${dark ? ` class="twinkle"` : ""} cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.1" fill="${["#F3C969", "#E8574C", "#7FB8E8", "#9CC27E"][i % 4]}" ${LN} stroke-width=".5"/>`).join("");
+const sag = (x1, x2, y, dip, n) => { const p = []; for (let i = 0; i <= n; i++) { const t = i/n; p.push([x1 + (x2 - x1)*t, y + Math.sin(Math.PI*t)*dip]); } return p; };
+const wire = (x1, x2, y, dip) => `<path d="M${x1} ${y} Q${(x1 + x2)/2} ${y + dip*2} ${x2} ${y}" fill="none" ${LN} stroke-width=".7"/>`;
+export const eavesLights = (x1, x2, y, dark) => wire(x1, x2, y, 3) + `<g>${bulbs(sag(x1, x2, y, 3, Math.max(4, Math.round((x2 - x1)/11))), dark)}</g>`;
+export const wreath = (x, y) => `<g ${LN} stroke-width=".8"><circle cx="${x}" cy="${y}" r="7.5" fill="none" style="stroke:${GREEN}" stroke-width="4.2"/><circle cx="${x}" cy="${y}" r="7.5" fill="none" stroke-width=".6"/>${[0, 72, 144, 216, 288].map(a => `<circle cx="${(x + 7.5*Math.cos(a*Math.PI/180)).toFixed(1)}" cy="${(y + 7.5*Math.sin(a*Math.PI/180)).toFixed(1)}" r="1.3" fill="${RED}" stroke="none"/>`).join("")}<path d="M${x - 3} ${y + 7} l3 -2.5 l3 2.5 l-1.5 4 M${x} ${y + 4.5} l-1.5 6.5" fill="${RED}"/></g>`;
+const bow = (x, y) => `<g ${LN} stroke-width=".6"><path d="M${x} ${y} l-6 -3.5 v7z M${x} ${y} l6 -3.5 v7z" fill="${RED}"/><circle cx="${x}" cy="${y}" r="1.6" fill="${RED}"/><path d="M${x - 1} ${y + 1} l-2.5 7 M${x + 1} ${y + 1} l2.5 7" stroke="${RED}" stroke-width="1.4"/><path d="M${x - 9} ${y + 3} q3 -4 6 -1 q-3 3 -6 1z M${x + 9} ${y + 3} q-3 -4 -6 -1 q3 3 6 1z" fill="${G2}"/></g>`;
+// the decorated tree: lights, baubles, a star and presents
+export function xmasTree(tx, ty, dark){
   const tiers = [[0, 46, 28], [-22, 38, 24], [-42, 28, 20], [-58, 18, 16]];
-  const tree = `<g ${L} stroke-width="1.1"><rect x="${tx - 5}" y="${ty - 4}" width="10" height="12" fill="#8A5A3A"/>${tiers.map(([dy, w, h]) => `<path d="M${tx - w/2} ${ty + dy - 2} L${tx} ${ty + dy - 2 - h - 14} L${tx + w/2} ${ty + dy - 2}z" fill="${GREEN}"/>`).join("")}
+  return `<g class="xmastree" pointer-events="none"><g ${LN} stroke-width="1.1"><rect x="${tx - 5}" y="${ty - 4}" width="10" height="12" fill="#8A5A3A"/>${tiers.map(([dy, w, h]) => `<path d="M${tx - w/2} ${ty + dy - 2} L${tx} ${ty + dy - 2 - h - 14} L${tx + w/2} ${ty + dy - 2}z" fill="${GREEN}"/>`).join("")}
     <path d="M${tx} ${ty - 98} l2.6 5.4 l6 .8 l-4.4 4.2 l1 6 l-5.2 -2.8 l-5.2 2.8 l1 -6 l-4.4 -4.2 l6 -.8z" fill="${GOLD}"/></g>
-    <g>${[[-14, -10, RED], [10, -14, GOLD], [-4, -26, "#7FB8E8"], [14, -32, RED], [-12, -40, GOLD], [4, -48, RED], [-6, -60, "#7FB8E8"], [6, -68, GOLD], [-16, -20, "#7FB8E8"], [16, -6, "#7FB8E8"]].map(([dx, dy, c]) => `<circle cx="${tx + dx}" cy="${ty + dy}" r="2.6" fill="${c}" ${L} stroke-width=".6"/>`).join("")}</g>
-    <g>${bulbs([...sag(tx - 20, tx + 20, ty - 18, 4, 6), ...sag(tx - 14, tx + 14, ty - 40, 3, 5), ...sag(tx - 8, tx + 8, ty - 60, 2, 3)])}</g>
-    <g ${L} stroke-width=".9"><rect x="${tx - 30}" y="${ty - 2}" width="13" height="10" fill="${RED}"/><path d="M${tx - 23.5} ${ty - 2} v10 M${tx - 30} ${ty + 3} h13" stroke="${GOLD}" stroke-width="1.4"/>
-    <rect x="${tx + 16}" y="${ty}" width="12" height="8" fill="#7FB8E8"/><path d="M${tx + 22} ${ty} v8" stroke="#FFFDF6" stroke-width="1.4"/><rect x="${tx + 8}" y="${ty + 3}" width="9" height="7" fill="${GOLD}"/><path d="M${tx + 12.5} ${ty + 3} v7" stroke="${RED}" stroke-width="1.2"/></g>`;
-  // fairy lights along the eaves, wreaths on the doors, bows on the lamps, the market's garland, the snowman
-  const eaves = wire(100, 247, 106, 3) + `<g>${bulbs(sag(100, 247, 106, 3, 14))}</g>` + wire(327, 433, 104, 3) + `<g>${bulbs(sag(327, 433, 104, 3, 10))}</g>`;
+    <g>${[[-14, -10, RED], [10, -14, GOLD], [-4, -26, "#7FB8E8"], [14, -32, RED], [-12, -40, GOLD], [4, -48, RED], [-6, -60, "#7FB8E8"], [6, -68, GOLD], [-16, -20, "#7FB8E8"], [16, -6, "#7FB8E8"]].map(([dx, dy, c]) => `<circle cx="${tx + dx}" cy="${ty + dy}" r="2.6" fill="${c}" ${LN} stroke-width=".6"/>`).join("")}</g>
+    <g>${bulbs([...sag(tx - 20, tx + 20, ty - 18, 4, 6), ...sag(tx - 14, tx + 14, ty - 40, 3, 5), ...sag(tx - 8, tx + 8, ty - 60, 2, 3)], dark)}</g>
+    <g ${LN} stroke-width=".9"><rect x="${tx - 30}" y="${ty - 2}" width="13" height="10" fill="${RED}"/><path d="M${tx - 23.5} ${ty - 2} v10 M${tx - 30} ${ty + 3} h13" stroke="${GOLD}" stroke-width="1.4"/>
+    <rect x="${tx + 16}" y="${ty}" width="12" height="8" fill="#7FB8E8"/><path d="M${tx + 22} ${ty} v8" stroke="#FFFDF6" stroke-width="1.4"/><rect x="${tx + 8}" y="${ty + 3}" width="9" height="7" fill="${GOLD}"/><path d="M${tx + 12.5} ${ty + 3} v7" stroke="${RED}" stroke-width="1.2"/></g></g>`;
+}
+// round 322 follow-up (Mel: "maybe the town square tree can move it to just behind the Good News board"): the tree
+// stands behind the board (scenes.js draws it before the board, so the board hides its foot)
+export const VILLAGE_TREE = [92, 452];
+export function xmasDecor(dark){
+  const eaves = eavesLights(100, 247, 106, dark) + eavesLights(327, 433, 104, dark);
   const doors = [[171, 134], [380, 128], [96, 326], [430, 460]].map(([x, y]) => wreath(x, y)).join("");
   const lamps = [[384, 432], [400, 252], [236, 524], [284, 524], [120, 560], [440, 572]].map(([x, y]) => bow(x, y - 44)).join("");
-  const garland = `<path d="M330 318 q15 9 30 0 q15 9 30 0" fill="none" style="stroke:${G2}" stroke-width="4"/><g>${bulbs(sag(330, 390, 319, 4, 6))}</g>`;
-  const snowman = `<g transform="translate(-182 -52)"><g ${L} stroke-width="1"><circle cx="230" cy="584" r="10" fill="#FFFDF6"/><circle cx="230" cy="566" r="7" fill="#FFFDF6"/><path d="M226 559 h8 v-7 h-8z M223 559 h14" fill="#3B3530"/><path d="M230 567 l5 1.2 l-5 1z" fill="#F08A3C"/><circle cx="227.6" cy="564.6" r=".9" fill="#3B3530"/><circle cx="232.4" cy="564.6" r=".9" fill="#3B3530"/><path d="M223 572 q7 4 14 0 l1 5 l-3 -1" fill="none" stroke="${RED}" stroke-width="2.4"/><path d="M220 578 l-8 -6 M240 578 l8 -6" stroke="#8A5A3A"/></g></g>`;
-  return `<g class="xmasdecor" pointer-events="none">${eaves}${doors}${lamps}${garland}${snowman}${tree}</g>`;
+  const garland = `<path d="M330 318 q15 9 30 0 q15 9 30 0" fill="none" style="stroke:${G2}" stroke-width="4"/><g>${bulbs(sag(330, 390, 319, 4, 6), dark)}</g>`;
+  const snowman = `<g transform="translate(-182 -52)"><g ${LN} stroke-width="1"><circle cx="230" cy="584" r="10" fill="#FFFDF6"/><circle cx="230" cy="566" r="7" fill="#FFFDF6"/><path d="M226 559 h8 v-7 h-8z M223 559 h14" fill="#3B3530"/><path d="M230 567 l5 1.2 l-5 1z" fill="#F08A3C"/><circle cx="227.6" cy="564.6" r=".9" fill="#3B3530"/><circle cx="232.4" cy="564.6" r=".9" fill="#3B3530"/><path d="M223 572 q7 4 14 0 l1 5 l-3 -1" fill="none" stroke="${RED}" stroke-width="2.4"/><path d="M220 578 l-8 -6 M240 578 l8 -6" stroke="#8A5A3A"/></g></g>`;
+  return `<g class="xmasdecor" pointer-events="none">${eaves}${doors}${lamps}${garland}${snowman}</g>`;
+}
+// round 322 follow-up (Mel: "make sure that the restaurant, Scoop Shack and Chocolate Room, if they've all been bought,
+// all show Christmas decorations as well? Same for houses"): lights along the eaves and a wreath on the door. need:
+// what has to be Mel's first ("scoop", "cocoa", "vine"); houses always
+export const XMAS_DRESS = {
+  bay: [{need: "scoop", lights: [328, 458, 178], wreath: [386, 230]}, {need: "cocoa", lights: [322, 470, 430], wreath: [416, 488]}],
+  vineyard: [{need: "vine", lights: [308, 470, 124], wreath: [390, 178]}],
+  base: [{lights: [198, 322, 223], wreath: [260, 266]}],
+  hlane: [{lights: [54, 166, 220], wreath: [110, 240]}, {lights: [288, 390, 220], wreath: [338, 240]}, {lights: [54, 166, 391], wreath: [110, 410]}, {lights: [288, 392, 391], wreath: [338, 412]}],
+  lane: [{lights: [86, 202, 207], wreath: [145, 246]}, {lights: [334, 438, 233], wreath: [380, 256]}, {lights: [102, 244, 458], wreath: [160, 494]}, {lights: [302, 426, 458], wreath: [370, 492]}]
+};
+export function xmasDress(scene, has, dark){
+  const list = (XMAS_DRESS[scene] || []).filter(d => !d.need || has(d.need)); if (!list.length) return "";
+  return `<g class="xmasdress" pointer-events="none">${list.map(d => eavesLights(d.lights[0], d.lights[1], d.lights[2], dark) + wreath(d.wreath[0], d.wreath[1])).join("")}</g>`;
 }
 
 /* ---------- evening: the day's wins float on the pond as lanterns ---------- */

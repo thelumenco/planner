@@ -10,7 +10,7 @@ import { roomShell } from "./interiors.js";
 import { iconAt } from "./icons.js";
 import { runArt } from "../game/pets.js";
 import { jarArt } from "../game/jars.js";
-import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDefs, xmasDecor, xmasDecorOn } from "./village-extras.js";
+import { upgradesArt, festivalArt, festivalOn, pondLanterns, streetLamp, lampDefs, xmasDecor, xmasDecorOn, xmasTree, VILLAGE_TREE } from "./village-extras.js";
 import { trophySVG } from "../game/trophies.js";
 import { bankBuilding } from "./buildings.js";
 import { archGate } from "./orchard.js";
@@ -106,7 +106,8 @@ export function villageArt(){
   const station = archGate("toStationV", 281, 70, "Station road", 281, 118, "var(--peri)", "Up the station road to Honeybrook station")
     + sk(`<rect x="228" y="232" width="66" height="22" rx="3" style="fill:#FFF6E8"/><path d="M236 254 v14 M286 254 v14" stroke-width="3"/>`, `<rect x="228" y="232" width="66" height="22" rx="3"/>`)
     + `<g pointer-events="none" font-family="Klee One,serif" text-anchor="middle"><text x="261" y="241" font-size="5.8" fill="#8A6A52">Welcome to</text><text x="261" y="250.5" font-size="8.6" font-weight="700" fill="#5E8A5A">Honeybrook</text></g>`;
-  return lampDefs + ground + lamps + places + station + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day())) + (xmasDecorOn(G.day()) ? xmasDecor(sgHM() >= 16*60 + 30 || sgHM() < 7*60) : "");   // round 322
+  const xdark = sgHM() >= 16*60 + 30 || sgHM() < 7*60, xon = xmasDecorOn(G.day());
+  return lampDefs + ground + lamps + (xon ? xmasTree(VILLAGE_TREE[0], VILLAGE_TREE[1], xdark) : "") + places + station + upgradesArt(G.F().totalQuests || 0, "village") + festivalArt(festivalOn(G.day())) + (xon ? xmasDecor(xdark) : "");   // round 322: the tree behind the Good News board
 }
 /* ---------- the river between the two screens ---------- */
 const waterBand = (y1, y2) => `<path d="M0 ${y1+4} Q65 ${y1-4} 130 ${y1+3} T260 ${y1+2} T390 ${y1+4} T520 ${y1} V${y2} ${y2 >= 640 ? "H0" : `Q455 ${y2+5} 390 ${y2-2} T260 ${y2} T130 ${y2-3} T0 ${y2+2}`}z" style="fill:var(--water)"/>`;
