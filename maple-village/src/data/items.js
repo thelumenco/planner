@@ -167,7 +167,7 @@ export const ITEMS = {
   shipbottle:{n:"Ship in a bottle", kind:"keep", price:80, tab:"family", say:"A ship in a bottle for the windowsill at home. Tiny sails, tiny rigging, and no idea how it got in there."},
   truck:{n:"Vintage tin truck", kind:"keep", price:80, say:"A little red tin truck for the windowsill at home. Wind it up and it trundles."},
   headphones:{n:"Headphones", kind:"keep", to:"bo", price:120, tab:"family", say:"Noise-cancelling headphones for Bo! Now he can hum over the saw in peace."},
-  treehouse:{n:"Your treehouse", kind:"keep", price:800, tab:"family", say:"A treehouse in the swing tree! A reading nook with a view, and a ladder up."},
+  treehouse:{n:"Your treehouse", ico:"treehouse", kind:"keep", price:800, tab:"family", say:"A treehouse in the swing tree! A reading nook with a view, and a ladder up."},
   hammock:{n:"Hammock", kind:"keep", price:250, tab:"family", say:"A hammock by the pond. Your evenings are sorted."},
   // Animals tab: chicks and bunnies live in the run at home base; their food goes in the backpack.
   chick:{n:"Chick", kind:"pet", pet:"chick", price:25, tab:"animals", say:"A fluffy little chick! Cheep cheep."},

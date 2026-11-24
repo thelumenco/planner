@@ -793,7 +793,7 @@ if (want("\ntasting room")) try {
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.plates > 0), "villagers order small plates with their wine");
   await page.close();
 } catch (e) { errors.push("FAIL (threw): " + String(e && e.message || e).split("\n")[0]); console.log("  ✗ threw: " + String(e && e.message || e).split("\n")[0]); }
-if (want("\nthe vineyard")) try {
+if (want("\nthe vineyard")) try {   // (a fixed October day: from 20 November Celeste is at the Christmas market's mulled wine stall at teatime)
   // The vineyard: grow grapes, ferment and bottle wine, sell it in the wine shop; workers water, an assistant serves
   console.log("\nthe vineyard");
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -803,7 +803,7 @@ if (want("\nthe vineyard")) try {
     if (q.includes("ripen")) { f.vine.rows[0].vines.forEach(v => { if (v) v.wateredAt = Date.now() - 9*3600e3; }); (f.vine.barrels || []).forEach(b => { if (b) b.start = Date.now() - 14*3600e3; }); }
     if (q.includes("sold")) { f.vine.lastTick = Date.now() - 600*60e3; if (f.vine.shelf[0]) f.vine.shelf[0].n = 60; }
     localStorage.setItem("fox.fox", JSON.stringify(f)); Object.keys(localStorage).filter(k => /^stub:.*\/fox$/.test(k)).forEach(k => localStorage.setItem(k, JSON.stringify(f))); });
-  await page.goto(url + "?reset=1&seed=1&time=17:00");
+  await page.goto(url + "?reset=1&seed=1&time=17:00&date=2026-10-14");
   await page.waitForTimeout(800);
   check(await page.locator('#world [data-place="toVine"]').count() === 1, "home base has a gate to the vineyard");
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
@@ -818,7 +818,7 @@ if (want("\nthe vineyard")) try {
   check(await page.evaluate(() => { const e = document.querySelector("#ctx .sub"); return !!e && getComputedStyle(e).display === "block" && e.getBoundingClientRect().height < 80; }), "panel text flows normally (the notebook's checklist styles stay in the notebook)");
   await page.waitForSelector('#ctx [data-vy="water"]', { timeout: 5000 }); await page.click('#ctx [data-vy="water"]');
   check(await page.evaluate(() => { const v = JSON.parse(localStorage.getItem("fox.fox")).vine; return v.rows[0].vines[0] && v.rows[0].vines[0].v === "red" && !!v.rows[0].vines[0].wateredAt; }), "a red vine is planted on the trellis and watered");
-  await page.goto(url + "?seed=1&time=17:10&ripen=1"); await page.waitForTimeout(800);
+  await page.goto(url + "?seed=1&time=17:10&ripen=1&date=2026-10-14"); await page.waitForTimeout(800);
   await page.locator('#world [data-place="toVine"]').dispatchEvent("click");
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-vine="0-0"]').dispatchEvent("click");
@@ -828,7 +828,7 @@ if (want("\nthe vineyard")) try {
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="b0"]').dispatchEvent("click");   // round 308: into the barrel shed; round 313: barrel 1 opens the wines
   await page.waitForSelector('#ctx [data-vy="fill"][data-k="rose"]:not([disabled])', { timeout: 20000 }); await page.click('#ctx [data-vy="fill"][data-k="rose"]');
   check(await page.evaluate(() => JSON.parse(localStorage.getItem("fox.fox")).vine.barrels[0].style === "rose"), "and go into a barrel to ferment as a rosé");
-  await page.waitForTimeout(1200); await page.goto(url + "?seed=1&time=17:20&ripen=1"); await page.waitForTimeout(800);
+  await page.waitForTimeout(1200); await page.goto(url + "?seed=1&time=17:20&ripen=1&date=2026-10-14"); await page.waitForTimeout(800);
   if (!/vineyard/i.test(await page.locator("#sceneName").textContent())) await page.locator('#world [data-place="toVine"]').dispatchEvent("click");   // round 312: the reload may already be in the vineyard
   await page.waitForFunction(() => /vineyard/i.test(document.querySelector("#sceneName").textContent), null, { timeout: 20000 });
   await page.locator('#world [data-place="barrels"]').dispatchEvent("click"); await page.waitForSelector('#world [data-vsspot="crates"]', { timeout: 20000 }); await page.waitForTimeout(400); await page.locator('#world [data-vsspot="b0"]').dispatchEvent("click");
@@ -1823,6 +1823,18 @@ if (want("\nScoop Shack upgrades")) try {
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
+  { // round 322: every item has a picture, and the village dresses up for Christmas
+    const ic = await import(new URL("../src/art/icons.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)); await import(new URL("../src/game/bikesend.js", import.meta.url));
+    const vx = await import(new URL("../src/art/village-extras.js", import.meta.url)), spark = ic.icon("sparkle");
+    const blank = Object.entries(it.ITEMS).filter(([id, t]) => !id.startsWith("__") && ic.icon(t.ico || id) === spark)   // (ids starting "__" are the tests' own stand-ins)
+   .map(([id]) => id);
+    check(!blank.length && ["treehouse", "dlv_bonbons", "dlv_tapas"].every(id => ic.icon(it.ITEMS[id].ico) !== spark), `every item in the game has its own picture, not a sparkle${blank.length ? ` (missing: ${blank.slice(0, 8).join(", ")})` : ""} (round 322)`);
+    check(vx.xmasDecorOn("2026-11-20") && vx.xmasDecorOn("2026-12-26") && !vx.xmasDecorOn("2026-11-19") && !vx.xmasDecorOn("2026-12-27") && /xmasdecor/.test(vx.xmasDecor(false)) && /twinkle/.test(vx.xmasDecor(true)) && !/twinkle/.test(vx.xmasDecor(false)),
+      "the village's Christmas decorations go up with the tree lighting on 20 November and come down after Boxing Day, twinkling after dark");
+    const has = got => n => got.includes(n), wr = h => (h.match(/r="7.5" fill="none" style/g) || []).length;
+    check(wr(vx.xmasDress("bay", has(["scoop", "cocoa"]), false)) === 2 && wr(vx.xmasDress("bay", has(["scoop"]), false)) === 1 && vx.xmasDress("bay", has([]), false) === "" && wr(vx.xmasDress("vineyard", has(["vine"]), false)) === 1
+      && wr(vx.xmasDress("hlane", has([]), false)) === 4 && wr(vx.xmasDress("lane", has([]), false)) === 4 && wr(vx.xmasDress("base", has([]), false)) === 1,
+      "the Scoop Shack, the Cocoa Room and the wine shop get wreaths and lights once they're yours; every house and cottage gets them too"); }
   { // round 317: the coach party you can see
     const cc = await import(new URL("../src/art/coachcrowd.js", import.meta.url)), hp = await import(new URL("../src/game/happen.js", import.meta.url));
     check(cc.crowdLevel([660, 780], 659) === 0 && cc.crowdLevel([660, 780], 660) > 0 && cc.crowdLevel([660, 780], 660) < .2 && cc.crowdLevel([660, 780], 720) === 1 && cc.crowdLevel([660, 780], 775) < .5 && cc.crowdLevel([660, 780], 780) === 0, "the coach party arrives over twelve minutes and drifts off over the last quarter hour (round 317)");

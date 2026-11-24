@@ -599,3 +599,17 @@ for line. (A friend's question, "Where's the fruit bowl though": the bowl was on
 - game/core.js: tapping `[data-letbox]` in a cottage opens that panel; letting Hettie go has its own line.
 - Wiki: the cottages page describes the checklist, the bowl and the fridge.
 - Test: "The cottage fruit bowl and fridge, and the changeover checklist (round 321)".
+
+## Round 322 (ported): every item has a picture, and Christmas in the village
+
+- art/icons.js: `I.tapas_dish` (this edition already had `I.treehouse`); `ico` set on the treehouse and on Tomo's
+  delivered bonbons (`box9`) and tapas. game/core.js `renderBody` gives any item without an `ico` its own id once, so
+  nothing falls back to a sparkle.
+- art/village-extras.js: `xmasDecorOn(day)` (20 November to Boxing Day), `xmasDecor(dark)` (wreaths on the town hall,
+  bank, library and post office doors; lights along the eaves; bows on the lamp posts; a garland on the market stall;
+  a snowman by the Good news board), and `XMAS_DRESS` / `xmasDress` (lights and a door wreath on the Scoop Shack, the
+  Cocoa Room and the wine shop once yours, home, the station lane cottages and Makers' Lane houses), twinkling after
+  dark. No tree in the town square, and the old little festival tree there is gone (the big tree is in the field).
+  `xmasTree` stays in the file, unused. The positions match this edition's buildings (checked with screenshots).
+- scenes.js `villageArt` adds the village decor; core.js `drawScene` adds the shop and house dressing.
+- Test: the round 322 checks in "Scoop Shack upgrades".
