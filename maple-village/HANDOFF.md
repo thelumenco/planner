@@ -3017,3 +3017,5 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 
 ## Build v252 (round 322) published at Mel's say-so without a full run (slow container); the round 322 unit checks passed and every decorated scene was checked in pictures.
 - Then (Mel: the tree behind the Good News board "looks odd, remove that"): no tree in the town square; scenes.js no longer draws xmasTree. The rest of the decorations stay.
+
+## Build v253 published: the town square tree removed (Mel asked). Section 25 sent to the public session.
