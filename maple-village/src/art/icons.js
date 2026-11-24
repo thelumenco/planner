@@ -127,6 +127,11 @@ const art = name => {
 };
 const body = name => { const [a, l] = art(name); return `<g filter="url(#markerS)">${a}</g><g filter="url(#wobS)" fill="none" stroke="var(--line)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">${l}</g>`; };
 
+// round 322 (Mel: "Fix the items that don't have any icons"): Evan's treehouse, and the plate of tapas Tomo delivers
+I.treehouse = [`<rect x="10.5" y="13" width="3" height="9" ${f(C.wood)}/><circle cx="7" cy="9" r="4.5" ${f(C.moss)}/><circle cx="17" cy="9" r="4.5" ${f(C.moss)}/><circle cx="12" cy="6" r="4.5" ${f(C.sage)}/><rect x="8" y="9" width="8" height="5.5" ${f("#C98A5A")}/><path d="M7 9.5l5 -4l5 4z" ${f("#D9534F")}/><rect x="11" y="11" width="2" height="3.5" ${f("#6B4A32")}/>`,
+  `<path d="M10.5 22v-7.5M13.5 22v-7.5"/><rect x="8" y="9" width="8" height="5.5"/><path d="M7 9.5l5 -4l5 4"/><path d="M15.5 14.5l2 7.5M17.6 14.5l2 7.5M16 17h2.4M16.7 19.6h2.4"/><path d="M3.5 10c-1-4 3-6 5-5M20.5 10c1-4-3-6-5-5"/>`];
+I.tapas_dish = [`<ellipse cx="12" cy="15" rx="9.5" ry="5" ${f("#C46A4A")}/><ellipse cx="12" cy="13.5" rx="7.5" ry="3.4" ${f("#F3C969")}/><circle cx="9" cy="13" r="1.6" ${f("#E8704C")}/><circle cx="12.5" cy="12.4" r="1.6" ${f("#7FA35A")}/><circle cx="15" cy="13.8" r="1.6" ${f("#E8704C")}/>`,
+  `<ellipse cx="12" cy="15" rx="9.5" ry="5"/><ellipse cx="12" cy="13.5" rx="7.5" ry="3.4"/><path d="M2.5 14.5q-1.5 -2 .8 -2.6M21.5 14.5q1.5 -2 -.8 -2.6M15 9l4 -5"/>`];
 // shed tools
 I.wateringCan = [`<rect x="4" y="9" width="11" height="10" rx="2" ${f(C.water)}/>`, `<rect x="4" y="9" width="11" height="10" rx="2"/><path d="M15 12l5-4M19 6.5l2 2.5M6 9c0-3 7-3 7 0"/><circle cx="21" cy="11" r=".6"/><circle cx="20" cy="13.5" r=".6"/>`];
 I.compost = [`<path d="M5 9h14l-1.5 11h-11z" ${f(C.wood)}/><path d="M8 8c1-2 2-3 4-3s3 1 4 3" ${f(C.moss)}/>`, `<path d="M5 9h14l-1.5 11h-11zM4 9h16M8 13h8M8.5 16.5h7"/><path d="M8 8c1-2 2-3 4-3s3 1 4 3"/>`];

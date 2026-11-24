@@ -158,7 +158,7 @@ export const ITEMS = {
   sandpit:{n:"Sandpit", kind:"keep", to:"evan", price:150, tab:"family", say:"A sandpit at home! Evan's already digging."},
   truck:{n:"Toy truck", kind:"keep", to:"evan", price:80, tab:"family", say:"Vroom vroom! Evan won't put it down."},
   headphones:{n:"Headphones", kind:"keep", to:"darren", price:120, tab:"family", say:"Noise-cancelling! Darren's calls just got calmer."},
-  treehouse:{n:"Evan's treehouse", kind:"keep", to:"evan", price:800, tab:"family", say:"A treehouse in the swing tree! Evan's already up the ladder."},
+  treehouse:{n:"Evan's treehouse", ico:"treehouse", kind:"keep", to:"evan", price:800, tab:"family", say:"A treehouse in the swing tree! Evan's already up the ladder."},
   hammock:{n:"Hammock", kind:"keep", to:"darren", price:250, tab:"family", say:"A hammock by the pond. Darren's evenings are sorted."},
   // Animals tab: chicks and bunnies live in the run at home base; their food goes in the backpack.
   chick:{n:"Chick", kind:"pet", pet:"chick", price:25, tab:"animals", say:"A fluffy little chick! Cheep cheep."},

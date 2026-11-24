@@ -8,8 +8,8 @@ import { vineState, tapasOn } from "./vineyard.js";
 import { TAPAS, DISHES } from "./kitchen.js";
 
 Object.assign(ITEMS, {
-  dlv_bonbons: {n: "Box of bonbons", kind: "gift", price: 0, say: "Bonbons, delivered! I've hidden them from everyone else. Well. Mostly."},
-  dlv_tapas: {n: "Plate of tapas", kind: "gift", price: 0, say: "Tapas on a bike, still warm! Tomo even brought a napkin."}
+  dlv_bonbons: {n: "Box of bonbons", ico: "box9", kind: "gift", price: 0, say: "Bonbons, delivered! I've hidden them from everyone else. Well. Mostly."},
+  dlv_tapas: {n: "Plate of tapas", ico: "tapas_dish", kind: "gift", price: 0, say: "Tapas on a bike, still warm! Tomo even brought a napkin."}
 });
 const BONBONS = 4;
 // what can go out right now -> [{k, n, sub}]

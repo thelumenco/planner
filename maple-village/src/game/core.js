@@ -3153,6 +3153,7 @@ function dressMel(){
 // rescue card (index.html) and the game carries on.
 let reported = false;
 function report(e){ if (reported) return; reported = true; try { window.dispatchEvent(new ErrorEvent("error", {message: e && e.message || String(e), error: e})); } catch {} }
+let icoCount = 0;
 function render(redraw){ try { renderNow(redraw); } catch (e) { report(e); } }
 function renderNow(redraw){
   if (S.day !== dayKey()) S = freshToday();
@@ -3162,6 +3163,7 @@ function renderNow(redraw){
   registerHampers(F);   // round 173: and each hamper she's packed
   registerBottles(F);   // round 188: bottles taken from the gift shop's wine corner
   WR.registerWraps(F);   // round 185: and every gift she's wrapped
+  { const n = Object.keys(ITEMS).length; if (n !== icoCount) { icoCount = n; for (const id in ITEMS) if (!ITEMS[id].ico) ITEMS[id].ico = id; } }   // round 322: an item drawn under its own name, wherever its picture is looked up
   setLive(liveNow());   // the jazz duo at the night market, the guitar in Ronda: live, over the record player
   $("evan").style.display = evanHere() ? "" : "none";
   creditEarly(); dressMel();

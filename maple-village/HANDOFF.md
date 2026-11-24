@@ -3010,3 +3010,6 @@ Mel: villagers' story chapters read as broken-up speech without context; thank-y
 - lets.js putIn/takeOut/holds/filled (SPACE 6); letpanels.js boxPanel and the new todoPanel checklist with a Hattie row (Hire her / Let her go); core.js coSpot opens them; cottages.js fruitBowl bigger with a count. Port doc section 24. Pictures: screens-bottom-row/round321-*.png.
 
 ## Build v251 (round 321) published at Mel's say-so without a full run (slow container); the cottages block (33 checks) passed.
+
+## Round 322: every item has a picture, and Christmas in the village (Mel: "Fix the items that don't have any icons"; "Add more Christmas decor in the village town")
+- icons.js I.treehouse, I.tapas_dish; ico on treehouse, dlv_bonbons (box9), dlv_tapas; core.js render fills ico = id where missing (42 items showed sparkles in the shops, storage and gift basket). village-extras.js xmasDecorOn / xmasDecor (20 Nov to 26 Dec): big tree, wreaths, eaves lights, lamp bows, market garland, snowman; scenes.js village. Port doc section 25. Picture: screens-bottom-row/round322-village-christmas.png.

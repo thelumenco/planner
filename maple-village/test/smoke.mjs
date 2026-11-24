@@ -2275,6 +2275,13 @@ for (const vp of [{ name: "phone", width: 390, height: 844 }, { name: "desktop",
   // Scoop Shack upgrades: buy them from the catalogue; the dip station's room (dips and toppings to buy, make a dipped
   // one to give), the honesty freezer's coin box filling while the shop's shut, and the delivery bike
   console.log("\nScoop Shack upgrades");
+  { // round 322: every item has a picture, and the village dresses up for Christmas
+    const ic = await import(new URL("../src/art/icons.js", import.meta.url)), it = await import(new URL("../src/data/items.js", import.meta.url)); await import(new URL("../src/game/bikesend.js", import.meta.url));
+    const vx = await import(new URL("../src/art/village-extras.js", import.meta.url)), spark = ic.icon("sparkle");
+    const blank = Object.entries(it.ITEMS).filter(([id, t]) => ic.icon(t.ico || id) === spark).map(([id]) => id);
+    check(!blank.length && ["treehouse", "dlv_bonbons", "dlv_tapas"].every(id => ic.icon(it.ITEMS[id].ico) !== spark), `every item in the game has its own picture, not a sparkle${blank.length ? ` (missing: ${blank.slice(0, 8).join(", ")})` : ""} (round 322)`);
+    check(vx.xmasDecorOn("2026-11-20") && vx.xmasDecorOn("2026-12-26") && !vx.xmasDecorOn("2026-11-19") && !vx.xmasDecorOn("2026-12-27") && /xmasdecor/.test(vx.xmasDecor(false)) && /twinkle/.test(vx.xmasDecor(true)) && !/twinkle/.test(vx.xmasDecor(false)),
+      "the village's Christmas decorations go up with the tree lighting on 20 November and come down after Boxing Day, twinkling after dark"); }
   { // round 317: the coach party you can see
     const cc = await import(new URL("../src/art/coachcrowd.js", import.meta.url)), hp = await import(new URL("../src/game/happen.js", import.meta.url));
     check(cc.crowdLevel([660, 780], 659) === 0 && cc.crowdLevel([660, 780], 660) > 0 && cc.crowdLevel([660, 780], 660) < .2 && cc.crowdLevel([660, 780], 720) === 1 && cc.crowdLevel([660, 780], 775) < .5 && cc.crowdLevel([660, 780], 780) === 0, "the coach party arrives over twelve minutes and drifts off over the last quarter hour (round 317)");

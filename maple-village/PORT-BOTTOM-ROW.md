@@ -243,6 +243,12 @@ HANDOFF.md round 321. Port it if this edition has the holiday cottages (round 23
 - `data/cottages.js`: the task is "Fill the fruit bowl".
 - Tests: the round 321 checks in "The holiday cottages ... (round 236)".
 
+### 25. Every item has a picture, and Christmas in the village (round 322)
+HANDOFF.md round 322.
+- Icons (Mel: "Fix the items that don't have any icons"): three items drew a sparkle everywhere (Evan's treehouse, Tomo's delivered bonbons and tapas): new icons `I.treehouse` and `I.tapas_dish` in `art/icons.js`, and `ico` on those items (`box9` for the bonbons). 42 more had no `ico` field and showed a sparkle wherever the game looks up `ITEMS[id].ico` without falling back to the id (the shops' item buttons, the storage shed, the gift shop's basket): `core.js` render fills `ico = id` for any item without one (after all the register* calls, whenever the item count changes). Port the icons for the items this edition has; run the new check to list any it's missing.
+- Christmas (Mel: "Add more Christmas decor in the village town"): `art/village-extras.js` `xmasDecorOn(day)` (20 November, the tree lighting, to Boxing Day) and `xmasDecor(dark)`: a big decorated tree in the square with a star and presents, wreaths on the town hall, bank, Fresh Pages and post office doors, fairy lights along the town hall's and bank's eaves, red bows and holly on the six lamp posts, a garland over the market stall and a snowman on the green; the lights twinkle after dark. `art/scenes.js` adds it to the village. The old little tree in the Christmas festival art is gone (the big one stands there). Check the positions against this edition's village.
+- Test: the round 322 unit checks.
+
 ## Make it fit this edition
 This edition has no personal family content, so adapt these:
 - **Evan:** the pony ride and the little reactions use Evan (`evanHere`, `evanSays`). Use this edition's child or companion character if it has one. Otherwise drop the ride's child condition and the reactions.
